@@ -1,0 +1,65 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d0d1a; color: #e0e0e0; display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar { width: 260px; background: #141422; border-right: 1px solid #333; padding: 16px; flex-shrink: 0; overflow-y: auto; max-height: 100vh; position: sticky; top: 0; }
+.sidebar input[type="text"] { width: 100%; padding: 8px 12px; background: #1a1a2e; border: 1px solid #333; border-radius: 6px; color: #e0e0e0; font-size: 13px; outline: none; }
+.sidebar input[type="text"]:focus { border-color: #7ecfff; }
+.sidebar-section { margin-top: 16px; }
+.sidebar-label { color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 8px; }
+.view-toggle { display: flex; gap: 4px; }
+.view-btn { padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; border: 1px solid #333; background: #1a1a2e; color: #888; }
+.view-btn.active { color: #7ecfff; border-color: #7ecfff; background: #2a2a4a; }
+.status-filter label { display: flex; align-items: center; gap: 6px; color: #ccc; font-size: 12px; cursor: pointer; padding: 2px 0; }
+.tag-tree { font-size: 12px; }
+.tag-item { color: #7ecfff; cursor: pointer; padding: 2px 0; }
+.tag-scenario { color: #ccc; padding-left: 12px; font-size: 11px; cursor: pointer; padding-top: 1px; padding-bottom: 1px; }
+
+/* Main */
+.main { flex: 1; padding: 20px; overflow-y: auto; }
+.header { margin-bottom: 20px; }
+.header h1 { font-size: 20px; font-weight: 600; }
+.header .meta { color: #888; font-size: 12px; margin-top: 4px; }
+
+/* Scenario cards */
+.scenario { background: #1a1a2e; border-radius: 8px; padding: 16px; margin-bottom: 16px; border-left: 3px solid #4caf50; }
+.scenario.failed { border-left-color: #f44336; }
+.scenario.skipped { border-left-color: #ff9800; }
+.scenario-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.scenario-name { font-size: 15px; font-weight: 600; }
+.scenario-tag { background: #2a2a4a; color: #7ecfff; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
+.scenario-status { font-size: 12px; }
+.scenario-status.passed { color: #4caf50; }
+.scenario-status.failed { color: #f44336; }
+.scenario-status.skipped { color: #ff9800; }
+
+/* Steps */
+.steps { font-size: 13px; line-height: 1.8; }
+.phase-label { font-weight: 600; margin-bottom: 2px; }
+.phase-given { color: #c792ea; }
+.phase-when { color: #ffcb6b; }
+.phase-then { color: #82aaff; }
+.step-text { color: #ccc; padding-left: 16px; margin-bottom: 2px; }
+.step-children { padding-left: 16px; border-left: 1px solid #333; margin-left: 8px; }
+.step-toggle { cursor: pointer; user-select: none; }
+
+/* Param table */
+.param-table { width: 100%; border-collapse: collapse; font-size: 13px; background: #0d0d1a; border-radius: 6px; overflow: hidden; margin-top: 8px; }
+.param-table th { text-align: left; padding: 8px 12px; color: #888; font-weight: 500; background: #1e1e3a; }
+.param-table td { padding: 8px 12px; color: #ccc; border-top: 1px solid #1a1a2e; }
+.param-table tr.failed-row { background: #2a1015; }
+
+/* Error */
+.error-block { margin-top: 8px; background: #2a1015; border-radius: 6px; padding: 12px; font-size: 12px; border: 1px solid rgba(244, 67, 54, 0.2); }
+.error-message { color: #f44336; font-weight: 600; margin-bottom: 4px; }
+.error-diff { color: #ccc; font-size: 11px; line-height: 1.5; white-space: pre-wrap; font-family: monospace; }
+
+/* Attachments */
+.attachment-badge { color: #888; font-size: 11px; cursor: pointer; background: #0d0d1a; display: inline-block; padding: 2px 8px; border-radius: 4px; margin-top: 4px; }
+.attachment-content { background: #0d0d1a; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-family: monospace; white-space: pre-wrap; color: #ccc; margin-top: 4px; }
+
+/* Counts */
+.count-badge { font-size: 11px; color: #888; margin-left: 4px; }
+.dot-passed { color: #4caf50; }
+.dot-failed { color: #f44336; }
+.dot-skipped { color: #ff9800; }

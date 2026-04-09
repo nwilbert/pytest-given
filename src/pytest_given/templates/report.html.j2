@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ metadata.project }} — pytest-given Report</title>
+<style>
+{{ css }}
+</style>
+</head>
+<body x-data="reportApp()">
+
+<div class="sidebar">
+  <input type="text" placeholder="Filter scenarios..." x-model="search">
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">View by</div>
+    <div class="view-toggle">
+      <div class="view-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
+      <div class="view-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Status</div>
+    <div class="status-filter">
+      <label><input type="checkbox" x-model="showPassed"> <span class="dot-passed">●</span> Passed (<span x-text="counts.passed"></span>)</label>
+      <label><input type="checkbox" x-model="showFailed"> <span class="dot-failed">●</span> Failed (<span x-text="counts.failed"></span>)</label>
+      <label><input type="checkbox" x-model="showSkipped"> <span class="dot-skipped">●</span> Skipped (<span x-text="counts.skipped"></span>)</label>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label" x-text="view === 'tags' ? 'Tags' : 'Modules'"></div>
+    <div class="tag-tree">
+      <template x-for="group in groups" :key="group.name">
+        <div>
+          <div class="tag-item" @click="toggleGroup(group.name)">
+            <span x-text="expandedGroups.has(group.name) ? '▾' : '▸'"></span>
+            <span x-text="group.name"></span>
+            <span class="count-badge" x-text="'(' + group.scenarios.length + ')'"></span>
+          </div>
+          <template x-if="expandedGroups.has(group.name)">
+            <div>
+              <template x-for="s in group.scenarios" :key="s.id">
+                <div class="tag-scenario" @click="scrollTo(s.id)" x-text="s.name"></div>
+              </template>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="header">
+    <h1>{{ metadata.project }}</h1>
+    <div class="meta">Generated {{ metadata.timestamp }} · pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }}</div>
+  </div>
+
+  {% for scenario in scenarios %}
+  <div class="scenario {{ scenario.status }}"
+       x-show="isVisible({{ scenario | tojson }})"
+       :id="'scenario-' + {{ loop.index0 }}">
+    <div class="scenario-header">
+      <div>
+        <span class="scenario-name">{{ scenario.name }}</span>
+        {% for tag in scenario.tags %}
+        <span class="scenario-tag">{{ tag }}</span>
+        {% endfor %}
+      </div>
+      <span class="scenario-status {{ scenario.status }}">
+        {% if scenario.status == 'passed' %}✓ passed{% elif scenario.status == 'failed' %}✗ failed{% else %}○ skipped{% endif %}
+      </span>
+    </div>
+
+    <div class="steps">
+      {{ render_steps(scenario.steps) }}
+    </div>
+
+    {% if scenario.parameters %}
+    <table class="param-table">
+      <thead>
+        <tr>
+          {% for name in scenario.parameters.names %}
+          <th>{{ name }}</th>
+          {% endfor %}
+          <th style="text-align:right">status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for case in scenario.parameters.cases %}
+        <tr class="{{ 'failed-row' if case.status == 'failed' else '' }}">
+          {% for val in case.values %}
+          <td>{{ val }}</td>
+          {% endfor %}
+          <td style="text-align:right">
+            {% if case.status == 'passed' %}<span class="dot-passed">✓</span>{% else %}<span class="dot-failed">✗</span>{% endif %}
+          </td>
+        </tr>
+        {% if case.error %}
+        <tr>
+          <td colspan="{{ scenario.parameters.names | length + 1 }}">
+            <div class="error-block">
+              <div class="error-message">{{ case.error.message }}</div>
+              {% if case.error.diff %}<pre class="error-diff">{{ case.error.diff }}</pre>{% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+
+    {% if scenario.error %}
+    <div class="error-block">
+      <div class="error-message">{{ scenario.error.message }}</div>
+      {% if scenario.error.diff %}<pre class="error-diff">{{ scenario.error.diff }}</pre>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+window.__REPORT_DATA__ = {{ report_json }};
+</script>
+<script>
+/* Alpine.js v3 will be inlined here — for now use a minimal reactive implementation */
+document.addEventListener('alpine:init', () => {});
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script>
+function reportApp() {
+  const data = window.__REPORT_DATA__;
+  return {
+    search: '',
+    view: 'tags',
+    showPassed: true,
+    showFailed: true,
+    showSkipped: true,
+    expandedGroups: new Set(),
+    expandedSteps: new Set(),
+    expandedAttachments: new Set(),
+    get counts() {
+      return {
+        passed: data.scenarios.filter(s => s.status === 'passed').length,
+        failed: data.scenarios.filter(s => s.status === 'failed').length,
+        skipped: data.scenarios.filter(s => s.status === 'skipped').length,
+      };
+    },
+    get groups() {
+      const grouped = {};
+      for (const s of data.scenarios) {
+        const keys = this.view === 'tags'
+          ? (s.tags.length ? s.tags : ['untagged'])
+          : [s.module];
+        for (const k of keys) {
+          if (!grouped[k]) grouped[k] = { name: k, scenarios: [] };
+          grouped[k].scenarios.push(s);
+        }
+      }
+      return Object.values(grouped).sort((a, b) => a.name.localeCompare(b.name));
+    },
+    toggleGroup(name) {
+      if (this.expandedGroups.has(name)) this.expandedGroups.delete(name);
+      else this.expandedGroups.add(name);
+    },
+    isVisible(scenario) {
+      if (scenario.status === 'passed' && !this.showPassed) return false;
+      if (scenario.status === 'failed' && !this.showFailed) return false;
+      if (scenario.status === 'skipped' && !this.showSkipped) return false;
+      if (this.search) {
+        const q = this.search.toLowerCase();
+        const text = (scenario.name + ' ' + scenario.tags.join(' ')).toLowerCase();
+        if (!text.includes(q)) return false;
+      }
+      return true;
+    },
+    scrollTo(id) {
+      const el = document.getElementById('scenario-' + data.scenarios.findIndex(s => s.id === id));
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+  };
+}
+</script>
+</body>
+</html>
