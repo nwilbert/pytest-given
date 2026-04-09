@@ -63,20 +63,15 @@
   {%- if step.children and step.children | length > 0 -%}
     <div class="step-text step-toggle" @click="toggleStep('{{ step_id }}')">
       <span x-text="expandedSteps['{{ step_id }}'] ? '▾' : '▸'"></span>
-      {{ step.text }}
+      {{ step.text | highlight_params }}
     </div>
     <div class="step-children" x-show="expandedSteps['{{ step_id }}']">
-      {%- set child_ns = namespace(child_phase=None) -%}
       {%- for child in step.children -%}
-        {%- if child.phase != child_ns.child_phase -%}
-          {%- set child_ns.child_phase = child.phase -%}
-          <div class="phase-label phase-{{ child.phase }}">{{ child.phase | capitalize }}</div>
-        {%- endif -%}
         {{ render_step(child, step_id ~ '_' ~ loop.index0) }}
       {%- endfor -%}
     </div>
   {%- else -%}
-    <div class="step-text">{{ step.text }}</div>
+    <div class="step-text">{{ step.text | highlight_params }}</div>
   {%- endif -%}
   {%- if step.attachments -%}
     {%- for att in step.attachments -%}
@@ -127,7 +122,7 @@
       <thead>
         <tr>
           {% for name in scenario.parameters.names %}
-          <th>{{ name }}</th>
+          <th class="param-color-{{ param_color_map.get(name, 0) % num_param_colors }}">{{ name }}</th>
           {% endfor %}
           <th style="text-align:right">status</th>
         </tr>
@@ -135,7 +130,7 @@
       <tbody>
         {% for case in scenario.parameters.cases %}
         <tr class="{{ 'failed-row' if case.status == 'failed' else '' }}">
-          {% for val in case.values %}
+          {% for val in case["values"] %}
           <td>{{ val }}</td>
           {% endfor %}
           <td style="text-align:right">

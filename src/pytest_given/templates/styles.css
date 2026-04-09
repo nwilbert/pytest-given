@@ -36,16 +36,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 /* Steps */
 .steps { font-size: 13px; line-height: 1.8; }
 .phase-label { font-weight: 600; margin-bottom: 2px; }
-.phase-given { color: #c792ea; }
-.phase-when { color: #ffcb6b; }
-.phase-then { color: #82aaff; }
+.phase-given, .phase-when, .phase-then { color: #ccc; }
 .step-text { color: #ccc; padding-left: 16px; margin-bottom: 2px; }
 .step-children { padding-left: 16px; border-left: 1px solid #333; margin-left: 8px; }
 .step-toggle { cursor: pointer; user-select: none; }
 
 /* Param table */
-.param-table { width: 100%; border-collapse: collapse; font-size: 13px; background: #0d0d1a; border-radius: 6px; overflow: hidden; margin-top: 8px; }
-.param-table th { text-align: left; padding: 8px 12px; color: #888; font-weight: 500; background: #1e1e3a; }
+.param-table { width: auto; border-collapse: collapse; font-size: 13px; background: #0d0d1a; border-radius: 6px; overflow: hidden; margin-top: 8px; margin-left: 16px; }
+.param-table th { text-align: left; padding: 8px 12px; color: #888; font-weight: 600; background: #1e1e3a; }
 .param-table td { padding: 8px 12px; color: #ccc; border-top: 1px solid #1a1a2e; }
 .param-table tr.failed-row { background: #2a1015; }
 
@@ -63,3 +61,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .dot-passed { color: #4caf50; }
 .dot-failed { color: #f44336; }
 .dot-skipped { color: #ff9800; }
+
+/* Parameter colors — used for both placeholders in step text and column headers */
+.param-color-0, th.param-color-0 { color: #f9a8d4; font-weight: 600; }
+.param-color-1, th.param-color-1 { color: #a5f3c4; font-weight: 600; }
+.param-color-2, th.param-color-2 { color: #93c5fd; font-weight: 600; }
+.param-color-3, th.param-color-3 { color: #fcd34d; font-weight: 600; }
+.param-color-4, th.param-color-4 { color: #c4b5fd; font-weight: 600; }
+.param-color-5, th.param-color-5 { color: #fdba74; font-weight: 600; }

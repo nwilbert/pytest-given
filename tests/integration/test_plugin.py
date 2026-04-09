@@ -161,10 +161,16 @@ def test_parameterized_test_as_table(pytester, tmp_path):
     result = pytester.runpytest(f'--given-json={json_path}')
     result.assert_outcomes(passed=2)
     data = json.loads(json_path.read_text())
-    # Parameterized tests should be grouped under one scenario name
-    # Each run is a separate scenario entry (pytest creates separate items)
-    assert len(data['scenarios']) == 2
-    assert all(s['name'] == 'Param test' for s in data['scenarios'])
+    # Parameterized tests are grouped into one scenario with a parameter table
+    assert len(data['scenarios']) == 1
+    s = data['scenarios'][0]
+    assert s['name'] == 'Param test'
+    assert s['parameters'] is not None
+    assert s['parameters']['names'] == ['a', 'b', 'expected']
+    assert len(s['parameters']['cases']) == 2
+    assert s['parameters']['cases'][0]['values'] == [1, 2, 3]
+    assert s['parameters']['cases'][0]['status'] == 'passed'
+    assert s['parameters']['cases'][1]['values'] == [2, 3, 5]
 
 
 def test_full_html_report_generation(pytester, tmp_path):
