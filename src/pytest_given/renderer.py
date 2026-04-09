@@ -78,6 +78,7 @@ def render_html(json_path: Path, html_path: Path) -> None:
 
     templates_dir = Path(__file__).parent / 'templates'
     css = (templates_dir / 'styles.css').read_text()
+    alpine_js = (templates_dir / 'alpine.min.js').read_text()
 
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(str(templates_dir)),
@@ -89,6 +90,7 @@ def render_html(json_path: Path, html_path: Path) -> None:
         scenarios=data['scenarios'],
         report_json=json.dumps(data),
         css=css,
+        alpine_js=alpine_js,
         render_steps=lambda steps: _build_step_html(steps),
     )
     html_path.parent.mkdir(parents=True, exist_ok=True)

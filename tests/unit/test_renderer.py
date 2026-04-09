@@ -73,7 +73,7 @@ def test_render_includes_scenario_data(tmp_path: Path) -> None:
 
 
 def test_render_self_contained(tmp_path: Path) -> None:
-    """The output HTML has no external dependencies (except Alpine.js CDN for now)."""
+    """The output HTML has no external dependencies."""
     json_path = tmp_path / 'data.json'
     json_path.write_text(
         json.dumps(
@@ -93,3 +93,5 @@ def test_render_self_contained(tmp_path: Path) -> None:
     content = html_path.read_text()
     assert '<style>' in content
     assert '<script>' in content
+    assert 'src="http' not in content
+    assert 'href="http' not in content

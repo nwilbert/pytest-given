@@ -127,11 +127,7 @@
 <script>
 window.__REPORT_DATA__ = {{ report_json }};
 </script>
-<script>
-/* Alpine.js v3 will be inlined here — for now use a minimal reactive implementation */
-document.addEventListener('alpine:init', () => {});
-</script>
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script>{{ alpine_js }}</script>
 <script>
 function reportApp() {
   const data = window.__REPORT_DATA__;
