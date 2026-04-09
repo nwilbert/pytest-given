@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.nox/
+.venv/
+.coverage
+/htmlcov
+.mypy_cache/
+/dist/
+*.egg-info/
+.DS_Store
+.idea/
+.superpowers/
