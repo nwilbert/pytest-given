@@ -4,14 +4,23 @@ import functools
 import threading
 from typing import Any
 
-# Thread-local stack tracking active phases for cross-phase nesting detection
-_phase_stack: threading.local = threading.local()
+_local: threading.local = threading.local()
 
 
 def _get_phase_stack() -> list[str]:
-    if not hasattr(_phase_stack, 'stack'):
-        _phase_stack.stack = []
-    return _phase_stack.stack
+    if not hasattr(_local, 'phase_stack'):
+        _local.phase_stack = []
+    return _local.phase_stack
+
+
+def set_active_collector(collector: Any) -> None:
+    """Set the active collector for the current thread."""
+    _local.collector = collector
+
+
+def get_active_collector() -> Any:
+    """Get the active collector for the current thread, or None."""
+    return getattr(_local, 'collector', None)
 
 
 class StepDescriptor:
@@ -39,6 +48,9 @@ class StepDescriptor:
                 ' — restructure your test or use a phase-neutral helper'
             )
         stack.append(self.phase)
+        collector = get_active_collector()
+        if collector is not None:
+            collector.push_step(self.phase, self.text)
         return self
 
     def __exit__(
@@ -48,6 +60,9 @@ class StepDescriptor:
         exc_tb: Any,
     ) -> None:
         _get_phase_stack().pop()
+        collector = get_active_collector()
+        if collector is not None:
+            collector.pop_step()
 
     def __call__(self, func: Any) -> Any:
         @functools.wraps(func)

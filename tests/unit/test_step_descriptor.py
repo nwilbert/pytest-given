@@ -1,4 +1,5 @@
-from pytest_given.step_descriptor import StepDescriptor
+from pytest_given.collector import Collector
+from pytest_given.step_descriptor import StepDescriptor, set_active_collector
 
 
 def test_context_manager_basic() -> None:
@@ -67,3 +68,26 @@ def test_sequential_different_phases_allowed() -> None:
         pass
     with StepDescriptor('then', 'check'):
         pass
+
+
+def test_context_manager_records_step_in_collector() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        desc = StepDescriptor('given', 'a coffee machine')
+        with desc:
+            pass
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        assert len(scenario.steps) == 1
+        assert scenario.steps[0].text == 'a coffee machine'
+    finally:
+        set_active_collector(None)
+
+
+def test_context_manager_without_collector_is_noop() -> None:
+    """When no collector is active, context manager still works (no recording)."""
+    set_active_collector(None)
+    desc = StepDescriptor('given', 'a thing')
+    with desc:
+        pass  # no error
