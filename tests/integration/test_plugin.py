@@ -166,3 +166,54 @@ def test_parameterized_test_as_table(pytester, tmp_path):
     # Each run is a separate scenario entry (pytest creates separate items)
     assert len(data['scenarios']) == 2
     assert all(s['name'] == 'Param test' for s in data['scenarios'])
+
+
+def test_full_html_report_generation(pytester, tmp_path):
+    """Full pipeline: tests -> JSON -> HTML."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, when, then, attach
+
+        @pytest.fixture
+        @given("a calculator")
+        def calc():
+            return {"value": 0}
+
+        @scenario("Basic addition", tags=["math"])
+        def test_add(calc):
+            with when("I add 2 and 3"):
+                calc["value"] = 2 + 3
+            with then("the result is 5"):
+                assert calc["value"] == 5
+                attach("debug", f"result was {calc['value']}")
+
+        @scenario("Failing test", tags=["math"])
+        def test_fail(calc):
+            with then("this will fail"):
+                assert 1 == 2
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    html_path = tmp_path / 'report.html'
+    result = pytester.runpytest(
+        f'--given-json={json_path}',
+        '--given-html',
+        f'--given-html-output={html_path}',
+    )
+    result.assert_outcomes(passed=1, failed=1)
+    assert json_path.exists()
+    assert html_path.exists()
+
+    # Verify JSON structure
+    data = json.loads(json_path.read_text())
+    assert len(data['scenarios']) == 2
+    names = {s['name'] for s in data['scenarios']}
+    assert names == {'Basic addition', 'Failing test'}
+
+    # Verify HTML content
+    html = html_path.read_text()
+    assert 'Basic addition' in html
+    assert 'Failing test' in html
+    assert 'a calculator' in html
+    assert 'x-data' in html  # Alpine.js reactive
