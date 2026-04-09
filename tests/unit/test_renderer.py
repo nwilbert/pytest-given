@@ -72,6 +72,74 @@ def test_render_includes_scenario_data(tmp_path: Path) -> None:
     assert 'a thing' in content
 
 
+def test_render_attachments_and_errors(tmp_path: Path) -> None:
+    """Renderer handles steps with attachments and errors."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_x',
+                        'name': 'Err Scenario',
+                        'module': 'test_mod',
+                        'tags': [],
+                        'status': 'failed',
+                        'duration_ms': 5,
+                        'steps': [
+                            {
+                                'phase': 'then',
+                                'text': 'check value',
+                                'status': 'failed',
+                                'source': None,
+                                'children': [
+                                    {
+                                        'phase': 'then',
+                                        'text': 'nested check',
+                                        'status': 'passed',
+                                        'source': None,
+                                        'children': [],
+                                        'attachments': [],
+                                        'error': None,
+                                    }
+                                ],
+                                'attachments': [
+                                    {
+                                        'label': 'debug log',
+                                        'content': 'some log output',
+                                    }
+                                ],
+                                'error': {
+                                    'message': 'assert 1 == 2',
+                                    'diff': '- 1\n+ 2',
+                                },
+                            }
+                        ],
+                        'parameters': None,
+                        'error': {
+                            'message': 'assert 1 == 2',
+                            'diff': '- 1\n+ 2',
+                        },
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text()
+    assert 'debug log' in content
+    assert 'some log output' in content
+    assert 'assert 1 == 2' in content
+    assert '- 1' in content
+
+
 def test_render_self_contained(tmp_path: Path) -> None:
     """The output HTML has no external dependencies."""
     json_path = tmp_path / 'data.json'

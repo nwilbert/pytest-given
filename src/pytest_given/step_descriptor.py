@@ -10,7 +10,8 @@ _local: threading.local = threading.local()
 def _get_phase_stack() -> list[str]:
     if not hasattr(_local, 'phase_stack'):
         _local.phase_stack = []
-    return _local.phase_stack
+    result: list[str] = _local.phase_stack
+    return result
 
 
 def set_active_collector(collector: Any) -> None:

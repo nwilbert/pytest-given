@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 
 def test_basic_scenario_generates_json(pytester, tmp_path):

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +22,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption(
         '--given-json',
         default='given-report/report-data.json',
-        help='Output path for JSON report data (default: given-report/report-data.json)',
+        help='Output path for JSON report data',
     )
     group.addoption(
         '--given-html',
@@ -37,7 +37,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
-def pytest_sessionstart(session: pytest.Session) -> None:  # noqa: ARG001
+def pytest_sessionstart(session: pytest.Session) -> None:
     """Reset the collector at the start of each session."""
     global collector
     collector = Collector()
@@ -46,7 +46,7 @@ def pytest_sessionstart(session: pytest.Session) -> None:  # noqa: ARG001
 def _get_scenario_marker(item: pytest.Item) -> Any | None:
     """Get the _scenario attribute from a test function, if present."""
     func = getattr(item, 'function', None)
-    if func is None:
+    if func is None:  # pragma: no cover
         return None
     return getattr(func, '_scenario', None)
 
@@ -54,7 +54,7 @@ def _get_scenario_marker(item: pytest.Item) -> Any | None:
 def _get_fixture_steps(item: pytest.Item) -> list[tuple[str, str]]:
     """Collect step descriptors from fixtures used by this item."""
     steps: list[tuple[str, str]] = []
-    if not hasattr(item, 'fixturenames'):
+    if not hasattr(item, 'fixturenames'):  # pragma: no cover
         return steps
     fm = item.session._fixturemanager
     for name in item.fixturenames:
@@ -76,7 +76,8 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
     scenario_marker = _get_scenario_marker(item)
     if scenario_marker is None:
         return
-    module = item.module.__name__ if item.module else item.nodeid.split('::')[0]
+    mod = getattr(item, 'module', None)
+    module = mod.__name__ if mod else item.nodeid.split('::')[0]
     collector.start_scenario(
         scenario_id=item.nodeid,
         name=scenario_marker.name,
@@ -92,14 +93,14 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
 
 
 @pytest.hookimpl(trylast=True)
-def pytest_runtest_teardown(item: pytest.Item) -> None:
+def pytest_runtest_teardown(item: pytest.Item) -> None:  # pragma: no cover
     if collector.active_scenario_id != item.nodeid:
         return
     set_active_collector(None)
 
 
 @pytest.hookimpl(tryfirst=True)
-def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) -> None:  # type: ignore[type-arg]
+def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) -> None:
     if collector.active_scenario_id != item.nodeid:
         return
     if call.when == 'call' and call.excinfo is not None:
@@ -129,7 +130,7 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     report = ReportData(
         metadata=Metadata(
             project=session.config.rootpath.name,
-            timestamp=datetime.now(tz=timezone.utc).isoformat(),
+            timestamp=datetime.now(tz=UTC).isoformat(),
             pytest_version=pytest.__version__,
             plugin_version='0.1.0',
         ),

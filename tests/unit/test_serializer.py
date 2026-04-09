@@ -74,7 +74,9 @@ def test_serialize_scenario_with_steps() -> None:
 
 def test_serialize_with_parameters() -> None:
     report = ReportData(
-        metadata=Metadata(project='p', timestamp='t', pytest_version='9', plugin_version='0.1'),
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+        ),
         scenarios=[
             Scenario(
                 id='test.py::test_param',
@@ -104,7 +106,9 @@ def test_serialize_with_parameters() -> None:
 
 def test_serialize_with_attachments() -> None:
     report = ReportData(
-        metadata=Metadata(project='p', timestamp='t', pytest_version='9', plugin_version='0.1'),
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+        ),
         scenarios=[
             Scenario(
                 id='id',

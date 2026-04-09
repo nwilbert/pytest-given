@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import jinja2
 
 
-def _build_step_html(steps: list[dict], depth: int = 0) -> str:  # type: ignore[type-arg]
+def _build_step_html(steps: list[dict[str, Any]], depth: int = 0) -> str:
     """Recursively build HTML for steps."""
     html_parts: list[str] = []
     current_phase: str | None = None
@@ -16,8 +17,7 @@ def _build_step_html(steps: list[dict], depth: int = 0) -> str:  # type: ignore[
         if phase != current_phase:
             current_phase = phase
             html_parts.append(
-                f'<div class="phase-label phase-{phase}">'
-                f'{phase.capitalize()}</div>'
+                f'<div class="phase-label phase-{phase}">{phase.capitalize()}</div>'
             )
 
         html_parts.append(f'<div class="step-text">{_escape(step["text"])}</div>')

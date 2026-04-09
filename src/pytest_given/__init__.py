@@ -1,4 +1,4 @@
-"""pytest-given: Generate interactive HTML reports from Given/When/Then annotated tests."""
+"""pytest-given: Generate interactive HTML reports from GWT tests."""
 
 from __future__ import annotations
 
@@ -32,9 +32,7 @@ def attach(label: str, content: str) -> None:
         collector.attach(label, content)
 
 
-def scenario(
-    name: str, tags: list[str] | None = None
-) -> _ScenarioDecorator:
+def scenario(name: str, tags: list[str] | None = None) -> _ScenarioDecorator:
     """Mark a test for inclusion in the report."""
     return _ScenarioDecorator(name, tags or [])
 

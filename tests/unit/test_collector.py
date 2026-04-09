@@ -1,6 +1,4 @@
 from pytest_given.collector import Collector
-from pytest_given.model import Scenario, Step
-from pytest_given.step_descriptor import StepDescriptor
 
 
 def test_start_and_finish_scenario() -> None:
@@ -71,6 +69,11 @@ def test_step_failure() -> None:
 def test_no_active_scenario_returns_none() -> None:
     collector = Collector()
     assert collector.active_scenario_id is None
+
+
+def test_pop_step_empty_stack() -> None:
+    collector = Collector()
+    assert collector.pop_step() is None
 
 
 def test_active_scenario_id_set() -> None:

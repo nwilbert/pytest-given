@@ -42,22 +42,23 @@ def test_cross_phase_nesting_raises() -> None:
 
     outer = StepDescriptor('then', 'result is correct')
     inner = StepDescriptor('given', 'some precondition')
-    with pytest.raises(
-        RuntimeError,
-        match="Cannot nest 'given' inside 'then'",
+    with (
+        pytest.raises(
+            RuntimeError,
+            match="Cannot nest 'given' inside 'then'",
+        ),
+        outer,
+        inner,
     ):
-        with outer:
-            with inner:
-                pass
+        pass
 
 
 def test_same_phase_nesting_allowed() -> None:
     """Nesting the same phase inside itself is allowed."""
     outer = StepDescriptor('when', 'outer step')
     inner = StepDescriptor('when', 'inner step')
-    with outer:
-        with inner:
-            pass  # no error
+    with outer, inner:
+        pass  # no error
 
 
 def test_sequential_different_phases_allowed() -> None:

@@ -70,9 +70,7 @@ class Collector:
                 Attachment(label=label, content=content)
             )
 
-    def fail_current_step(
-        self, message: str, diff: str | None = None
-    ) -> None:
+    def fail_current_step(self, message: str, diff: str | None = None) -> None:
         if self._step_stack:
             step = self._step_stack[-1]
             step.status = 'failed'

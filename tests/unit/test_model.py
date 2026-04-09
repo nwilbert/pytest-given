@@ -61,7 +61,9 @@ def test_scenario_defaults() -> None:
 
 def test_parameter_table() -> None:
     case1 = ParameterCase(values=[1, 0], status='passed')
-    case2 = ParameterCase(values=[2, 1], status='failed', error=ErrorInfo(message='fail'))
+    case2 = ParameterCase(
+        values=[2, 1], status='failed', error=ErrorInfo(message='fail')
+    )
     table = ParameterTable(names=['euros', 'coffees'], cases=[case1, case2])
     assert table.names == ['euros', 'coffees']
     assert len(table.cases) == 2

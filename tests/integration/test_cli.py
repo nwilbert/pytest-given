@@ -1,7 +1,7 @@
 import json
-import subprocess
-import sys
 from pathlib import Path
+
+from pytest_given.cli import main
 
 
 def test_cli_generates_html(tmp_path: Path) -> None:
@@ -20,20 +20,17 @@ def test_cli_generates_html(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'out.html'
-    result = subprocess.run(
-        [sys.executable, '-m', 'pytest_given.cli', 'report', str(json_path), '-o', str(html_path)],
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0, result.stderr
+    rc = main(['report', str(json_path), '-o', str(html_path)])
+    assert rc == 0
     assert html_path.exists()
     assert 'cli-test' in html_path.read_text()
 
 
 def test_cli_missing_input_file(tmp_path: Path) -> None:
-    result = subprocess.run(
-        [sys.executable, '-m', 'pytest_given.cli', 'report', str(tmp_path / 'nonexistent.json')],
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode != 0
+    rc = main(['report', str(tmp_path / 'nonexistent.json')])
+    assert rc == 1
+
+
+def test_cli_no_command() -> None:
+    rc = main([])
+    assert rc == 1
