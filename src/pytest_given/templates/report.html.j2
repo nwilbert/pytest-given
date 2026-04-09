@@ -36,11 +36,11 @@
       <template x-for="group in groups" :key="group.name">
         <div>
           <div class="tag-item" @click="toggleGroup(group.name)">
-            <span x-text="expandedGroups.has(group.name) ? '▾' : '▸'"></span>
+            <span x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
             <span x-text="group.name"></span>
             <span class="count-badge" x-text="'(' + group.scenarios.length + ')'"></span>
           </div>
-          <template x-if="expandedGroups.has(group.name)">
+          <template x-if="expandedGroups[group.name]">
             <div>
               <template x-for="s in group.scenarios" :key="s.id">
                 <div class="tag-scenario" @click="scrollTo(s.id)" x-text="s.name"></div>
@@ -59,10 +59,45 @@
     <div class="meta">Generated {{ metadata.timestamp }} · pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }}</div>
   </div>
 
+  {%- macro render_step(step, step_id) -%}
+  {%- if step.children and step.children | length > 0 -%}
+    <div class="step-text step-toggle" @click="toggleStep('{{ step_id }}')">
+      <span x-text="expandedSteps['{{ step_id }}'] ? '▾' : '▸'"></span>
+      {{ step.text }}
+    </div>
+    <div class="step-children" x-show="expandedSteps['{{ step_id }}']">
+      {%- set child_ns = namespace(child_phase=None) -%}
+      {%- for child in step.children -%}
+        {%- if child.phase != child_ns.child_phase -%}
+          {%- set child_ns.child_phase = child.phase -%}
+          <div class="phase-label phase-{{ child.phase }}">{{ child.phase | capitalize }}</div>
+        {%- endif -%}
+        {{ render_step(child, step_id ~ '_' ~ loop.index0) }}
+      {%- endfor -%}
+    </div>
+  {%- else -%}
+    <div class="step-text">{{ step.text }}</div>
+  {%- endif -%}
+  {%- if step.attachments -%}
+    {%- for att in step.attachments -%}
+    <div class="step-text">
+      <span class="attachment-badge" @click="toggleAttachment('{{ step_id }}_att_{{ loop.index0 }}')">📎 {{ att.label }}</span>
+      <div class="attachment-content" x-show="expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}']">{{ att.content }}</div>
+    </div>
+    {%- endfor -%}
+  {%- endif -%}
+  {%- if step.error -%}
+    <div class="error-block">
+      <div class="error-message">{{ step.error.message }}</div>
+      {%- if step.error.diff -%}<pre class="error-diff">{{ step.error.diff }}</pre>{%- endif -%}
+    </div>
+  {%- endif -%}
+  {%- endmacro -%}
+
   {% for scenario in scenarios %}
   <div class="scenario {{ scenario.status }}"
-       x-show="isVisible({{ scenario | tojson }})"
-       :id="'scenario-' + {{ loop.index0 }}">
+       x-show="isVisible({{ loop.index0 }})"
+       id="scenario-{{ loop.index0 }}">
     <div class="scenario-header">
       <div>
         <span class="scenario-name">{{ scenario.name }}</span>
@@ -76,7 +111,15 @@
     </div>
 
     <div class="steps">
-      {{ render_steps(scenario.steps) }}
+      {%- set scenario_idx = loop.index0 -%}
+      {%- set ns = namespace(current_phase=None) -%}
+      {%- for step in scenario.steps -%}
+        {%- if step.phase != ns.current_phase -%}
+          {%- set ns.current_phase = step.phase -%}
+          <div class="phase-label phase-{{ step.phase }}">{{ step.phase | capitalize }}</div>
+        {%- endif -%}
+        {{ render_step(step, 's' ~ scenario_idx ~ '_' ~ loop.index0) }}
+      {%- endfor -%}
     </div>
 
     {% if scenario.parameters %}
@@ -126,9 +169,7 @@
 
 <script>
 window.__REPORT_DATA__ = {{ report_json }};
-</script>
-<script>{{ alpine_js }}</script>
-<script>
+
 function reportApp() {
   const data = window.__REPORT_DATA__;
   return {
@@ -137,9 +178,9 @@ function reportApp() {
     showPassed: true,
     showFailed: true,
     showSkipped: true,
-    expandedGroups: new Set(),
-    expandedSteps: new Set(),
-    expandedAttachments: new Set(),
+    expandedGroups: {},
+    expandedSteps: {},
+    expandedAttachments: {},
     get counts() {
       return {
         passed: data.scenarios.filter(s => s.status === 'passed').length,
@@ -161,10 +202,16 @@ function reportApp() {
       return Object.values(grouped).sort((a, b) => a.name.localeCompare(b.name));
     },
     toggleGroup(name) {
-      if (this.expandedGroups.has(name)) this.expandedGroups.delete(name);
-      else this.expandedGroups.add(name);
+      if (this.expandedGroups[name]) delete this.expandedGroups[name];
+      else this.expandedGroups[name] = true;
     },
-    isVisible(scenario) {
+    toggleStep(stepId) {
+      if (this.expandedSteps[stepId]) delete this.expandedSteps[stepId];
+      else this.expandedSteps[stepId] = true;
+    },
+    isVisible(index) {
+      const scenario = data.scenarios[index];
+      if (!scenario) return false;
       if (scenario.status === 'passed' && !this.showPassed) return false;
       if (scenario.status === 'failed' && !this.showFailed) return false;
       if (scenario.status === 'skipped' && !this.showSkipped) return false;
@@ -179,8 +226,13 @@ function reportApp() {
       const el = document.getElementById('scenario-' + data.scenarios.findIndex(s => s.id === id));
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     },
+    toggleAttachment(key) {
+      if (this.expandedAttachments[key]) delete this.expandedAttachments[key];
+      else this.expandedAttachments[key] = true;
+    },
   };
 }
 </script>
+<script>{{ alpine_js }}</script>
 </body>
 </html>
