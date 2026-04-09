@@ -11,7 +11,7 @@ Automated tests are valuable documentation, but their value is locked inside cod
 ### Core imports
 
 ```python
-from pytest_given import scenario, given, when, then, attach, scenario_fixture
+from pytest_given import scenario, given, when, then, attach
 ```
 
 ### `@scenario` decorator
@@ -46,6 +46,8 @@ def test_buy_coffee(coffee_machine):
 
 **Nesting**: Steps can nest to arbitrary depth. If a helper function is called during a phase, it can use context managers to add sub-steps. These render as collapsible trees in the report.
 
+**Cross-phase nesting is an error**: A `given` inside a `then` (or any other cross-phase nesting) raises a runtime error. This prevents semantically confused reports. Top-level ordering is not enforced — multiple given/when/then cycles in one test are allowed.
+
 ```python
 def insert_money(machine, amount):
     with when(f"validating coin... {'accepted' if amount > 0 else 'rejected'}"):
@@ -71,18 +73,24 @@ with then("I get a coffee"):
 
 Only text attachments are supported (no binary/images).
 
-### `@scenario_fixture`
+### `given`, `when`, `then` as decorators
 
-Annotates a pytest fixture with a description for the report.
+The same `given`, `when`, `then` names work as both context managers and function decorators. When used as a decorator on a pytest fixture, the description appears as a step in the report.
 
 ```python
+# As decorator on a fixture
 @pytest.fixture
-@scenario_fixture("a standard coffee machine")
+@given("a standard coffee machine")
 def coffee_machine():
     return CoffeeMachine()
+
+# As decorator on a helper function
+@when("inserting money")
+def insert_money(machine, amount):
+    machine.insert(amount)
 ```
 
-When this fixture is used in a `@scenario` test, the description appears as a Given step in the report.
+Internally, `given("text")` returns a `StepDescriptor` that implements both `__enter__`/`__exit__` (context manager) and `__call__` (decorator). If `__call__` receives a function, it wraps it as a decorated step. If `__enter__` is called, it opens a context-managed step block.
 
 ### Parameterized tests
 
@@ -303,7 +311,7 @@ pytest-given/
 
 - **`collector.py`**: Maintains a thread-local stack of active steps. The `given`/`when`/`then` context managers push/pop steps on this stack. Nested context managers naturally create child steps. Captures fixture descriptions from `@scenario_fixture`. Captures subtest boundaries.
 
-- **`model.py`**: Dataclasses for the in-memory model. `Scenario`, `Step` (recursive via `children`), `ParameterTable`, `ParameterCase`, `Attachment`, `ErrorInfo`. Serializable to/from JSON.
+- **`model.py`**: Dataclasses for the in-memory model. `Scenario`, `Step` (recursive via `children`), `StepDescriptor` (dual context-manager/decorator), `ParameterTable`, `ParameterCase`, `Attachment`, `ErrorInfo`. Serializable to/from JSON.
 
 - **`serializer.py`**: Converts the model to the JSON format described above. Handles dataclass serialization, duration formatting.
 
