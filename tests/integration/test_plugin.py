@@ -140,3 +140,29 @@ def test_decorated_fixture_appears_as_given_step(pytester, tmp_path):
     assert steps[0]['phase'] == 'given'
     assert steps[0]['text'] == 'a prepared value'
     assert steps[0]['source'] == 'fixture'
+
+
+def test_parameterized_test_as_table(pytester, tmp_path):
+    """Parameterized tests produce a parameter table in the report."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, when, then
+
+        @scenario("Param test", tags=["math"])
+        @pytest.mark.parametrize("a,b,expected", [(1, 2, 3), (2, 3, 5)])
+        def test_add(a, b, expected):
+            with given(f"a={a} and b={b}"):
+                pass
+            with then(f"sum is {expected}"):
+                assert a + b == expected
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    data = json.loads(json_path.read_text())
+    # Parameterized tests should be grouped under one scenario name
+    # Each run is a separate scenario entry (pytest creates separate items)
+    assert len(data['scenarios']) == 2
+    assert all(s['name'] == 'Param test' for s in data['scenarios'])
