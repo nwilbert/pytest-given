@@ -173,6 +173,32 @@ def test_parameterized_test_as_table(pytester, tmp_path):
     assert s['parameters']['cases'][1]['values'] == [2, 3, 5]
 
 
+def test_parameterized_with_failure(pytester, tmp_path):
+    """A parameterized test with a failing case marks the scenario as failed."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then
+
+        @scenario("Fail param")
+        @pytest.mark.parametrize("n", [1, 2])
+        def test_check(n):
+            with then(f"n={n} is 1"):
+                assert n == 1
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1, failed=1)
+    data = json.loads(json_path.read_text())
+    assert len(data['scenarios']) == 1
+    s = data['scenarios'][0]
+    assert s['status'] == 'failed'
+    assert s['parameters']['cases'][0]['status'] == 'passed'
+    assert s['parameters']['cases'][1]['status'] == 'failed'
+    assert s['parameters']['cases'][1]['values'] == [2]
+
+
 def test_full_html_report_generation(pytester, tmp_path):
     """Full pipeline: tests -> JSON -> HTML."""
     pytester.makepyfile(

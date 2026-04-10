@@ -11,12 +11,12 @@ import pytest
 
 from pytest_given.collector import Collector
 from pytest_given.model import (
-    ErrorInfo,
     Metadata,
     ParameterCase,
     ParameterTable,
     ReportData,
     Scenario,
+    Step,
 )
 from pytest_given.serializer import write_json
 from pytest_given.step_descriptor import set_active_collector
@@ -75,11 +75,6 @@ def _get_fixture_steps(item: pytest.Item) -> list[tuple[str, str]]:
     return steps
 
 
-_start_times: dict[str, float] = {}
-# Store param info per scenario id: {nodeid: (param_names, param_values)}
-_param_info: dict[str, tuple[list[str], list[Any]]] = {}
-
-
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_setup(item: pytest.Item) -> None:
     scenario_marker = _get_scenario_marker(item)
@@ -99,12 +94,12 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
     if callspec is not None:
         names = list(callspec.params.keys())
         values = [callspec.params[n] for n in names]
-        _param_info[item.nodeid] = (names, values)
+        collector.param_info[item.nodeid] = (names, values)
     # Add fixture steps
     for phase, text in _get_fixture_steps(item):
         collector.push_step(phase, text, source='fixture')
         collector.pop_step()
-    _start_times[item.nodeid] = time.monotonic()
+    collector.start_times[item.nodeid] = time.monotonic()
 
 
 @pytest.hookimpl(trylast=True)
@@ -122,10 +117,7 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
         error_repr = call.excinfo.getrepr(style='short')
         message = str(call.excinfo.value)
         diff = str(error_repr)
-
-        assert collector._current_scenario is not None
-        collector._current_scenario.error = ErrorInfo(message=message, diff=diff)
-        collector._current_scenario.status = 'failed'
+        collector.fail_scenario(message=message, diff=diff)
 
 
 @pytest.hookimpl(trylast=True)
@@ -134,7 +126,9 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
         return
     if collector.active_scenario_id != report.nodeid:
         return
-    elapsed = time.monotonic() - _start_times.pop(report.nodeid, time.monotonic())
+    elapsed = time.monotonic() - collector.start_times.pop(
+        report.nodeid, time.monotonic()
+    )
     duration_ms = int(elapsed * 1000)
     status = 'passed' if report.passed else 'failed' if report.failed else 'skipped'
     collector.finish_scenario(status=status, duration_ms=duration_ms)
@@ -149,7 +143,9 @@ def _templatize_step_text(text: str, param_names: list[str], values: list[Any]) 
     # Sort by length of string representation (longest first) to avoid
     # partial replacements (e.g., replacing "1" inside "10").
     pairs = sorted(
-        zip(param_names, values), key=lambda p: len(str(p[1])), reverse=True
+        zip(param_names, values, strict=True),
+        key=lambda p: len(str(p[1])),
+        reverse=True,
     )
     for name, value in pairs:
         result = result.replace(str(value), '{' + name + '}')
@@ -162,14 +158,12 @@ def _templatize_steps(
     values: list[Any],
 ) -> list[Step]:
     """Create template steps by replacing param values with {name} placeholders."""
-    from pytest_given.model import Step as StepModel
-
-    result: list[StepModel] = []
+    result: list[Step] = []
     for step in steps:
         new_text = _templatize_step_text(step.text, param_names, values)
         new_children = _templatize_steps(step.children, param_names, values)
         result.append(
-            StepModel(
+            Step(
                 phase=step.phase,
                 text=new_text,
                 status=step.status,
@@ -188,20 +182,20 @@ def _group_parameterized(scenarios: list[Scenario]) -> list[Scenario]:
     groups: dict[tuple[str, str], list[Scenario]] = {}
     group_order: list[tuple[str, str]] = []
 
-    for s in scenarios:
-        if s.id in _param_info:
-            key = (s.name, s.module)
+    for scenario in scenarios:
+        if scenario.id in collector.param_info:
+            key = (scenario.name, scenario.module)
             if key not in groups:
                 groups[key] = []
                 group_order.append(key)
-            groups[key].append(s)
+            groups[key].append(scenario)
         else:
-            result.append(s)
+            result.append(scenario)
 
     for key in group_order:
         group = groups[key]
         first = group[0]
-        param_names, first_values = _param_info[first.id]
+        param_names, first_values = collector.param_info[first.id]
 
         # Build template steps from the first run's steps,
         # replacing concrete values with {param_name} placeholders
@@ -210,18 +204,18 @@ def _group_parameterized(scenarios: list[Scenario]) -> list[Scenario]:
         cases: list[ParameterCase] = []
         any_failed = False
         total_duration = 0
-        for s in group:
-            _, values = _param_info[s.id]
+        for scenario in group:
+            _, values = collector.param_info[scenario.id]
             cases.append(
                 ParameterCase(
                     values=values,
-                    status=s.status,
-                    error=s.error,
+                    status=scenario.status,
+                    error=scenario.error,
                 )
             )
-            if s.status == 'failed':
+            if scenario.status == 'failed':
                 any_failed = True
-            total_duration += s.duration_ms
+            total_duration += scenario.duration_ms
 
         merged = Scenario(
             id=first.id,
@@ -235,7 +229,7 @@ def _group_parameterized(scenarios: list[Scenario]) -> list[Scenario]:
         )
         result.append(merged)
 
-    _param_info.clear()
+    collector.param_info.clear()
     return result
 
 

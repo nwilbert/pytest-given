@@ -7,7 +7,6 @@ from pathlib import Path
 import jinja2
 from markupsafe import Markup, escape
 
-
 _NUM_PARAM_COLORS = 6
 # Set by render_html for the current rendering context
 _param_color_map: dict[str, int] = {}
@@ -19,10 +18,7 @@ def _highlight_params(text: str) -> Markup:
     def _replace(m: re.Match[str]) -> str:
         name = m.group(1)
         color_idx = _param_color_map.get(name, 0) % _NUM_PARAM_COLORS
-        return (
-            f'<span class="param-color-{color_idx}">'
-            f'{escape(m.group(0))}</span>'
-        )
+        return f'<span class="param-color-{color_idx}">{escape(m.group(0))}</span>'
 
     result = re.sub(r'\{([a-zA-Z_]\w*)\}', _replace, str(escape(text)))
     return Markup(result)

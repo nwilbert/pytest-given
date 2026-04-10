@@ -140,6 +140,68 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
     assert '- 1' in content
 
 
+def test_render_parameterized_with_color_coded_placeholders(tmp_path: Path) -> None:
+    """Parameterized scenarios get color-coded placeholders in step text and headers."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_p',
+                        'name': 'Param scenario',
+                        'module': 'mod',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [
+                            {
+                                'phase': 'when',
+                                'text': 'I insert {euros}',
+                                'status': 'passed',
+                                'source': None,
+                                'children': [],
+                                'attachments': [],
+                                'error': None,
+                            }
+                        ],
+                        'parameters': {
+                            'names': ['euros', 'expect'],
+                            'cases': [
+                                {
+                                    'values': [1, False],
+                                    'status': 'passed',
+                                    'error': None,
+                                },
+                                {
+                                    'values': [2, True],
+                                    'status': 'passed',
+                                    'error': None,
+                                },
+                            ],
+                        },
+                        'error': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text()
+    # Placeholder in step text should be wrapped in a color span
+    assert 'param-color-0' in content
+    # Column header should use the same color class
+    assert '<th class="param-color-0">euros</th>' in content
+    assert '<th class="param-color-1">expect</th>' in content
+
+
 def test_render_self_contained(tmp_path: Path) -> None:
     """The output HTML has no external dependencies."""
     json_path = tmp_path / 'data.json'
