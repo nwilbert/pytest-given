@@ -44,7 +44,7 @@ quote-style = "single"
 [tool.ruff.lint]
 select = ["B", "C4", "E", "F", "I", "PT", "RUF", "SIM", "UP", "W"]
 
-[tool.pytest.ini_options]
+[tool.pytest]
 testpaths = ["tests"]
 
 [tool.mypy]
