@@ -14,6 +14,14 @@
   <div class="sidebar-title">{{ metadata.project }}</div>
   <input type="text" placeholder="🔍 Search scenarios..." x-model="search">
 
+  <div class="active-filter" x-show="activeTag" x-cloak>
+    <span class="active-filter-label">Filter:</span>
+    <span class="active-filter-chip" @click="filterByTag(activeTag)">
+      <span x-text="activeTag"></span>
+      <span class="active-filter-dismiss">×</span>
+    </span>
+  </div>
+
   <div class="sidebar-section">
     <div class="sidebar-label">Status</div>
     <div class="status-pills">
