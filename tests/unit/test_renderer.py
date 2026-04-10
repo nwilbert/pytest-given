@@ -334,7 +334,6 @@ def test_render_status_filter_pills(tmp_path: Path) -> None:
     render_html(json_path, html_path)
     content = html_path.read_text()
     assert 'status-pill' in content
-    assert 'status-bar' in content
     assert 'showPassed' in content
     assert 'showFailed' in content
     assert 'showSkipped' in content

@@ -54,31 +54,6 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     collector = Collector()
 
 
-def _get_scenario_marker(item: pytest.Item) -> Any | None:
-    """Get the _scenario attribute from a test function, if present."""
-    func = getattr(item, 'function', None)
-    if func is None:  # pragma: no cover
-        return None
-    return getattr(func, '_scenario', None)
-
-
-def _get_fixture_steps(item: pytest.Item) -> list[tuple[str, str]]:
-    """Collect step descriptors from fixtures used by this item."""
-    steps: list[tuple[str, str]] = []
-    if not hasattr(item, 'fixturenames'):  # pragma: no cover
-        return steps
-    fm = item.session._fixturemanager
-    for name in item.fixturenames:
-        defs = fm.getfixturedefs(name, item)
-        if not defs:
-            continue
-        func = defs[-1].func
-        desc = getattr(func, '_step_descriptor', None)
-        if desc is not None:
-            steps.append((desc.phase, desc.text))
-    return steps
-
-
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_setup(item: pytest.Item) -> None:
     scenario_marker = _get_scenario_marker(item)
@@ -105,6 +80,31 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
         collector.push_step(phase, text, source='fixture')
         collector.pop_step()
     collector.start_times[node_id] = time.monotonic()
+
+
+def _get_scenario_marker(item: pytest.Item) -> Any | None:
+    """Get the _scenario attribute from a test function, if present."""
+    func = getattr(item, 'function', None)
+    if func is None:  # pragma: no cover
+        return None
+    return getattr(func, '_scenario', None)
+
+
+def _get_fixture_steps(item: pytest.Item) -> list[tuple[str, str]]:
+    """Collect step descriptors from fixtures used by this item."""
+    steps: list[tuple[str, str]] = []
+    if not hasattr(item, 'fixturenames'):  # pragma: no cover
+        return steps
+    fm = item.session._fixturemanager
+    for name in item.fixturenames:
+        defs = fm.getfixturedefs(name, item)
+        if not defs:
+            continue
+        func = defs[-1].func
+        desc = getattr(func, '_step_descriptor', None)
+        if desc is not None:
+            steps.append((desc.phase, desc.text))
+    return steps
 
 
 @pytest.hookimpl(trylast=True)
@@ -138,27 +138,25 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
     collector.finish_scenario(status=status, duration_ms=duration_ms)
 
 
-def _templatize_step_text(text: str, replacements: list[tuple[str, str]]) -> str:
-    """Replace parameter values in step text with {param_name} placeholders."""
-    result = text
-    for name, str_value in replacements:
-        # Simple text replacement — may match unrelated occurrences of the same
-        # value in the step text. Longest-first ordering mitigates partial matches.
-        result = result.replace(str_value, '{' + name + '}')
-    return result
+def pytest_sessionfinish(session: pytest.Session) -> None:
+    json_path = Path(session.config.getoption('given_json'))
+    scenarios = _group_parameterized(collector.scenarios, collector.param_info)
+    collector.param_info.clear()
+    report = ReportData(
+        metadata=Metadata(
+            project=session.config.rootpath.name,
+            timestamp=datetime.now(tz=UTC).isoformat(),
+            pytest_version=pytest.__version__,
+            plugin_version='0.1.0',
+        ),
+        scenarios=scenarios,
+    )
+    write_json(report, json_path)
+    if session.config.getoption('given_html'):
+        from pytest_given.renderer import render_html
 
-
-def _templatize_steps(
-    steps: list[Step],
-    replacements: list[tuple[str, str]],
-) -> list[Step]:
-    """Create template steps by replacing param values with {name} placeholders."""
-    result: list[Step] = []
-    for step in steps:
-        new_text = _templatize_step_text(step.text, replacements)
-        new_children = _templatize_steps(step.children, replacements)
-        result.append(dataclasses.replace(step, text=new_text, children=new_children))
-    return result
+        html_path = Path(session.config.getoption('given_html_output'))
+        render_html(json_path, html_path)
 
 
 def _group_parameterized(
@@ -225,22 +223,24 @@ def _group_parameterized(
     return result
 
 
-def pytest_sessionfinish(session: pytest.Session) -> None:
-    json_path = Path(session.config.getoption('given_json'))
-    scenarios = _group_parameterized(collector.scenarios, collector.param_info)
-    collector.param_info.clear()
-    report = ReportData(
-        metadata=Metadata(
-            project=session.config.rootpath.name,
-            timestamp=datetime.now(tz=UTC).isoformat(),
-            pytest_version=pytest.__version__,
-            plugin_version='0.1.0',
-        ),
-        scenarios=scenarios,
-    )
-    write_json(report, json_path)
-    if session.config.getoption('given_html'):
-        from pytest_given.renderer import render_html
+def _templatize_steps(
+    steps: list[Step],
+    replacements: list[tuple[str, str]],
+) -> list[Step]:
+    """Create template steps by replacing param values with {name} placeholders."""
+    result: list[Step] = []
+    for step in steps:
+        new_text = _templatize_step_text(step.text, replacements)
+        new_children = _templatize_steps(step.children, replacements)
+        result.append(dataclasses.replace(step, text=new_text, children=new_children))
+    return result
 
-        html_path = Path(session.config.getoption('given_html_output'))
-        render_html(json_path, html_path)
+
+def _templatize_step_text(text: str, replacements: list[tuple[str, str]]) -> str:
+    """Replace parameter values in step text with {param_name} placeholders."""
+    result = text
+    for name, str_value in replacements:
+        # Simple text replacement — may match unrelated occurrences of the same
+        # value in the step text. Longest-first ordering mitigates partial matches.
+        result = result.replace(str_value, '{' + name + '}')
+    return result

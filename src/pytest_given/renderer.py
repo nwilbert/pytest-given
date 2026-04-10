@@ -15,25 +15,6 @@ _PARAM_RE = re.compile(r'\{([a-zA-Z_]\w*)\}')
 type ParamColorMap = dict[str, int]
 
 
-def _make_highlight_filter(
-    color_map: ParamColorMap,
-) -> Callable[[str], Markup]:
-    """Create a Jinja2 filter that highlights {param_name} with color-coded spans."""
-
-    def _highlight_params(text: str) -> Markup:
-        def _replace(m: re.Match[str]) -> str:
-            name = m.group(1)
-            if name not in color_map:
-                return m.group(0)
-            color_idx = color_map[name] % _NUM_PARAM_COLORS
-            return f'<span class="param-color-{color_idx}">{escape(m.group(0))}</span>'
-
-        result = _PARAM_RE.sub(_replace, str(escape(text)))
-        return Markup(result)
-
-    return _highlight_params
-
-
 def render_html(json_path: Path, html_path: Path) -> None:
     """Render a JSON report to a self-contained HTML file."""
     raw_json = json_path.read_text()
@@ -72,3 +53,22 @@ def render_html(json_path: Path, html_path: Path) -> None:
     )
     html_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.write_text(html)
+
+
+def _make_highlight_filter(
+    color_map: ParamColorMap,
+) -> Callable[[str], Markup]:
+    """Create a Jinja2 filter that highlights {param_name} with color-coded spans."""
+
+    def _highlight_params(text: str) -> Markup:
+        def _replace(m: re.Match[str]) -> str:
+            name = m.group(1)
+            if name not in color_map:
+                return m.group(0)
+            color_idx = color_map[name] % _NUM_PARAM_COLORS
+            return f'<span class="param-color-{color_idx}">{escape(m.group(0))}</span>'
+
+        result = _PARAM_RE.sub(_replace, str(escape(text)))
+        return Markup(result)
+
+    return _highlight_params

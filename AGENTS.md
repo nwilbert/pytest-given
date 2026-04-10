@@ -40,6 +40,7 @@ Individual sessions:
 - Single quotes (ruff format)
 - Strict mypy (`disallow_untyped_defs`)
 - Use `NewType` for domain-specific IDs (e.g., `NodeId`) and PEP 695 `type` statements for aliases. Avoid raw complex types like `dict[str, tuple[list[str], list[Any]]]` — introduce named types instead.
+- Step-down rule: callers before callees, public before private. Read each file top-down from high-level API to implementation details.
 - TDD: write tests first
 - Commit messages: single line, no co-author trailers
 - Always run `nox` (or at minimum `nox -s format lint mypy test`) before committing

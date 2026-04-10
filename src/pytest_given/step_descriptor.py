@@ -8,23 +8,6 @@ from typing import Any, Self
 _local: threading.local = threading.local()
 
 
-def _get_phase_stack() -> list[str]:
-    if not hasattr(_local, 'phase_stack'):
-        _local.phase_stack = []
-    result: list[str] = _local.phase_stack
-    return result
-
-
-def set_active_collector(collector: Any) -> None:
-    """Set the active collector for the current thread."""
-    _local.collector = collector
-
-
-def get_active_collector() -> Any:
-    """Get the active collector for the current thread, or None."""
-    return getattr(_local, 'collector', None)
-
-
 class StepDescriptor:
     """Dual context-manager / decorator for Given/When/Then steps.
 
@@ -73,3 +56,20 @@ class StepDescriptor:
 
         wrapper._step_descriptor = self  # type: ignore[attr-defined]
         return wrapper
+
+
+def set_active_collector(collector: Any) -> None:
+    """Set the active collector for the current thread."""
+    _local.collector = collector
+
+
+def get_active_collector() -> Any:
+    """Get the active collector for the current thread, or None."""
+    return getattr(_local, 'collector', None)
+
+
+def _get_phase_stack() -> list[str]:
+    if not hasattr(_local, 'phase_stack'):
+        _local.phase_stack = []
+    result: list[str] = _local.phase_stack
+    return result
