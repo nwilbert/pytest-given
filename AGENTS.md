@@ -37,7 +37,7 @@ Individual sessions:
 - Python >= 3.12, pytest >= 9.0
 - src layout with hatchling build
 - Single quotes (ruff format)
-- Strict mypy (`disallow_untyped_defs`)
+- Strict mypy (`disallow_untyped_defs`). Avoid `Any` — use precise types, generics, `TYPE_CHECKING` imports, or `ContextVar[T]` over untyped `threading.local`.
 - Use `NewType` for domain-specific IDs (e.g., `NodeId`) and PEP 695 `type` statements for aliases. Avoid raw complex types like `dict[str, tuple[list[str], list[Any]]]` — introduce named types instead.
 - Step-down rule: callers before callees, public before private. Read each file top-down from high-level API to implementation details.
 - TDD: write tests first
