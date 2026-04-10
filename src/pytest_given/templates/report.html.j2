@@ -114,8 +114,11 @@
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
         {% endfor %}
       </div>
-      <span class="scenario-status {{ scenario.status }}">
-        {% if scenario.status == 'passed' %}✓ passed{% elif scenario.status == 'failed' %}✗ failed{% else %}○ skipped{% endif %}
+      <span class="scenario-meta">
+        <span class="scenario-status {{ scenario.status }}">
+          {% if scenario.status == 'passed' %}✓ passed{% elif scenario.status == 'failed' %}✗ failed{% else %}○ skipped{% endif %}
+        </span>
+        <span class="scenario-duration">{{ scenario.duration_ms }}ms</span>
       </span>
     </div>
 
