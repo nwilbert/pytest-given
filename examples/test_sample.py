@@ -57,6 +57,33 @@ def test_buy_with_validation(machine):
             attach('Final state', str(machine))
 
 
+@scenario('Complex ordering workflow', tags=['billing', 'detailed'])
+def test_complex_order(machine):
+    with given('a loyalty card with 5 points'):
+        loyalty = {'points': 5}
+    with when('I place a large order'):
+        with when('I select 3 coffees'):
+            order_count = 3
+        with when('I apply loyalty discount'):
+            with when('validating loyalty card'):
+                assert loyalty['points'] >= 3
+            with when('calculating discount'):
+                discount = min(loyalty['points'], order_count)
+                loyalty['points'] -= discount
+    with then('the order is processed correctly'):
+        with then('the coffee count is updated'):
+            machine['coffees'] -= order_count
+            assert machine['coffees'] == 7
+        with then('the loyalty points are deducted'):
+            assert loyalty['points'] == 2
+            with then('the remaining points are valid'):
+                assert loyalty['points'] >= 0
+                attach('Loyalty state', str(loyalty))
+    with then('the machine state is consistent'):
+        assert machine['price'] == 2
+        attach('Final machine state', str(machine))
+
+
 @scenario('Failing assertion', tags=['debug'])
 def test_failing(machine):
     with then('the machine has 20 coffees'):
