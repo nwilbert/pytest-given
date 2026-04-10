@@ -65,7 +65,7 @@
   <div class="header">
     <div style="display:flex; justify-content:space-between; align-items:baseline;">
       <div>
-        <div class="header-context" x-text="activeTag ? 'Tag: ' + activeTag : (view === 'tags' ? 'All Scenarios' : 'All Scenarios')"></div>
+        <div class="header-context" x-text="activeTag ? 'Tag: ' + activeTag : 'All Scenarios'"></div>
         <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
       </div>
       <div class="header-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · {{ metadata.timestamp }}</div>
