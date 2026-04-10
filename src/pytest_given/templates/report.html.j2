@@ -60,9 +60,10 @@
 <div class="main">
   <div class="header">
     <div style="display:flex; justify-content:space-between; align-items:baseline;">
-      <div>
-        <div class="header-context" x-text="activeTag ? 'Tag: ' + activeTag : 'All Scenarios'"></div>
+      <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
         <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
+        <div class="header-context" x-text="activeTag ? 'Tag: ' + activeTag : 'All Scenarios'"></div>
+        <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
       </div>
       <div class="header-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · {{ metadata.timestamp }}</div>
     </div>
@@ -246,6 +247,18 @@ function reportApp() {
     toggleScenario(index) {
       if (this.expandedScenarios[index]) delete this.expandedScenarios[index];
       else this.expandedScenarios[index] = true;
+    },
+    get anyScenariosExpanded() {
+      return data.scenarios.some((_, i) => this.isVisible(i) && this.expandedScenarios[i]);
+    },
+    toggleAllScenarios() {
+      const expand = !this.anyScenariosExpanded;
+      data.scenarios.forEach((_, i) => {
+        if (this.isVisible(i)) {
+          if (expand) this.expandedScenarios[i] = true;
+          else delete this.expandedScenarios[i];
+        }
+      });
     },
     isVisible(index) {
       const scenario = data.scenarios[index];
