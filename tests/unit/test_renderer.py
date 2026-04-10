@@ -227,3 +227,115 @@ def test_render_self_contained(tmp_path: Path) -> None:
     assert '<script>' in content
     assert 'src="http' not in content
     assert 'href="http' not in content
+
+
+def test_render_clickable_tag_badges(tmp_path: Path) -> None:
+    """Tag badges on scenario cards include click handler for filtering."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_x',
+                        'name': 'Tagged Scenario',
+                        'module': 'test_mod',
+                        'tags': ['billing', 'happy-path'],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text()
+    assert "filterByTag('billing')" in content
+    assert "filterByTag('happy-path')" in content
+    assert 'scenario-tag' in content
+
+
+def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -> None:
+    """Scenarios are collapsed by default; failed ones auto-expand."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_pass',
+                        'name': 'Passing',
+                        'module': 'mod',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                    },
+                    {
+                        'id': 'test.py::test_fail',
+                        'name': 'Failing',
+                        'module': 'mod',
+                        'tags': [],
+                        'status': 'failed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': {
+                            'message': 'boom',
+                            'diff': None,
+                        },
+                    },
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text()
+    assert 'expandedScenarios' in content
+    assert 'toggleScenario' in content
+    assert 'failedIndices' in content
+
+
+def test_render_status_filter_pills(tmp_path: Path) -> None:
+    """Report includes clickable status filter pills in sidebar."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text()
+    assert 'status-pill' in content
+    assert 'status-bar' in content
+    assert 'showPassed' in content
+    assert 'showFailed' in content
+    assert 'showSkipped' in content
