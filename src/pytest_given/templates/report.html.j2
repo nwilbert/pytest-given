@@ -21,11 +21,6 @@
       <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
       <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped">○ Skipped <span x-text="counts.skipped"></span></span>
     </div>
-    <div class="status-bar">
-      <div class="status-bar-segment" :style="'flex:' + (showPassed ? counts.passed : 0) + ';background:var(--color-passed)'"></div>
-      <div class="status-bar-segment" :style="'flex:' + (showFailed ? counts.failed : 0) + ';background:var(--color-failed)'"></div>
-      <div class="status-bar-segment" :style="'flex:' + (showSkipped ? counts.skipped : 0) + ';background:var(--color-skipped)'"></div>
-    </div>
   </div>
 
   <div class="sidebar-section">

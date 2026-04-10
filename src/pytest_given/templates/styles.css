@@ -107,9 +107,6 @@ body {
 .status-pill.active-skipped { background: #fff3cd; color: #856404; border-color: var(--color-skipped); }
 .status-pill:not([class*="active-"]) { opacity: 0.5; text-decoration: line-through; }
 
-/* Status summary bar */
-.status-bar { display: flex; gap: 1px; height: 3px; border-radius: 2px; overflow: hidden; margin-top: var(--space-sm); }
-.status-bar-segment { transition: flex 0.2s; }
 
 /* Browse-by toggle */
 .view-toggle {
