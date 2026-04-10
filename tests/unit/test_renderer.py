@@ -312,7 +312,6 @@ def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -
     content = html_path.read_text()
     assert 'expandedScenarios' in content
     assert 'toggleScenario' in content
-    assert 'failedIndices' in content
 
 
 def test_render_status_filter_pills(tmp_path: Path) -> None:

@@ -194,9 +194,6 @@ window.__REPORT_DATA__ = {{ report_json }};
 
 function reportApp() {
   const data = window.__REPORT_DATA__;
-  const failedIndices = new Set();
-  data.scenarios.forEach((s, i) => { if (s.status === 'failed') failedIndices.add(i); });
-
   return {
     search: '',
     view: 'tags',
@@ -206,7 +203,7 @@ function reportApp() {
     expandedGroups: {},
     expandedSteps: {},
     expandedAttachments: {},
-    expandedScenarios: Object.fromEntries([...failedIndices].map(i => [i, true])),
+    expandedScenarios: {},
     activeTag: null,
     get counts() {
       return {
