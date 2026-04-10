@@ -194,6 +194,9 @@ window.__REPORT_DATA__ = {{ report_json }};
 
 function reportApp() {
   const data = window.__REPORT_DATA__;
+  const failedIndices = new Set();
+  data.scenarios.forEach((s, i) => { if (s.status === 'failed') failedIndices.add(i); });
+
   return {
     search: '',
     view: 'tags',
@@ -203,6 +206,8 @@ function reportApp() {
     expandedGroups: {},
     expandedSteps: {},
     expandedAttachments: {},
+    expandedScenarios: Object.fromEntries([...failedIndices].map(i => [i, true])),
+    activeTag: null,
     get counts() {
       return {
         passed: data.scenarios.filter(s => s.status === 'passed').length,
@@ -210,9 +215,13 @@ function reportApp() {
         skipped: data.scenarios.filter(s => s.status === 'skipped').length,
       };
     },
+    get filteredCount() {
+      return data.scenarios.filter((_, i) => this.isVisible(i)).length;
+    },
     get groups() {
       const grouped = {};
       for (const s of data.scenarios) {
+        if (!this._matchesFilters(s)) continue;
         const keys = this.view === 'tags'
           ? (s.tags.length ? s.tags : ['untagged'])
           : [s.module];
@@ -223,6 +232,18 @@ function reportApp() {
       }
       return Object.values(grouped).sort((a, b) => a.name.localeCompare(b.name));
     },
+    _matchesFilters(s) {
+      if (s.status === 'passed' && !this.showPassed) return false;
+      if (s.status === 'failed' && !this.showFailed) return false;
+      if (s.status === 'skipped' && !this.showSkipped) return false;
+      if (this.activeTag && !s.tags.includes(this.activeTag)) return false;
+      if (this.search) {
+        const q = this.search.toLowerCase();
+        const text = (s.name + ' ' + s.tags.join(' ')).toLowerCase();
+        if (!text.includes(q)) return false;
+      }
+      return true;
+    },
     toggleGroup(name) {
       if (this.expandedGroups[name]) delete this.expandedGroups[name];
       else this.expandedGroups[name] = true;
@@ -231,22 +252,31 @@ function reportApp() {
       if (this.expandedSteps[stepId]) delete this.expandedSteps[stepId];
       else this.expandedSteps[stepId] = true;
     },
+    toggleScenario(index) {
+      if (this.expandedScenarios[index]) delete this.expandedScenarios[index];
+      else this.expandedScenarios[index] = true;
+    },
     isVisible(index) {
       const scenario = data.scenarios[index];
       if (!scenario) return false;
-      if (scenario.status === 'passed' && !this.showPassed) return false;
-      if (scenario.status === 'failed' && !this.showFailed) return false;
-      if (scenario.status === 'skipped' && !this.showSkipped) return false;
-      if (this.search) {
-        const q = this.search.toLowerCase();
-        const text = (scenario.name + ' ' + scenario.tags.join(' ')).toLowerCase();
-        if (!text.includes(q)) return false;
-      }
-      return true;
+      return this._matchesFilters(scenario);
     },
-    scrollTo(id) {
-      const el = document.getElementById('scenario-' + data.scenarios.findIndex(s => s.id === id));
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollToAndExpand(id) {
+      const index = data.scenarios.findIndex(s => s.id === id);
+      if (index === -1) return;
+      this.expandedScenarios[index] = true;
+      this.$nextTick(() => {
+        const el = document.getElementById('scenario-' + index);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    },
+    filterByTag(tag) {
+      if (this.activeTag === tag) {
+        this.activeTag = null;
+      } else {
+        this.activeTag = tag;
+        this.view = 'tags';
+      }
     },
     toggleAttachment(key) {
       if (this.expandedAttachments[key]) delete this.expandedAttachments[key];
