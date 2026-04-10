@@ -11,10 +11,25 @@
 <body x-data="reportApp()">
 
 <div class="sidebar">
-  <input type="text" placeholder="Filter scenarios..." x-model="search">
+  <div class="sidebar-title">{{ metadata.project }}</div>
+  <input type="text" placeholder="🔍 Search scenarios..." x-model="search">
 
   <div class="sidebar-section">
-    <div class="sidebar-label">View by</div>
+    <div class="sidebar-label">Status</div>
+    <div class="status-pills">
+      <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
+      <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
+      <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped">○ Skipped <span x-text="counts.skipped"></span></span>
+    </div>
+    <div class="status-bar">
+      <div class="status-bar-segment" :style="'flex:' + (showPassed ? counts.passed : 0) + ';background:var(--color-passed)'"></div>
+      <div class="status-bar-segment" :style="'flex:' + (showFailed ? counts.failed : 0) + ';background:var(--color-failed)'"></div>
+      <div class="status-bar-segment" :style="'flex:' + (showSkipped ? counts.skipped : 0) + ';background:var(--color-skipped)'"></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Browse by</div>
     <div class="view-toggle">
       <div class="view-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
       <div class="view-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
@@ -22,28 +37,21 @@
   </div>
 
   <div class="sidebar-section">
-    <div class="sidebar-label">Status</div>
-    <div class="status-filter">
-      <label><input type="checkbox" x-model="showPassed"> <span class="dot-passed">●</span> Passed (<span x-text="counts.passed"></span>)</label>
-      <label><input type="checkbox" x-model="showFailed"> <span class="dot-failed">●</span> Failed (<span x-text="counts.failed"></span>)</label>
-      <label><input type="checkbox" x-model="showSkipped"> <span class="dot-skipped">●</span> Skipped (<span x-text="counts.skipped"></span>)</label>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label" x-text="view === 'tags' ? 'Tags' : 'Modules'"></div>
-    <div class="tag-tree">
+    <div class="nav-tree">
       <template x-for="group in groups" :key="group.name">
         <div>
-          <div class="tag-item" @click="toggleGroup(group.name)">
-            <span x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
-            <span x-text="group.name"></span>
-            <span class="count-badge" x-text="'(' + group.scenarios.length + ')'"></span>
+          <div class="nav-group" @click="toggleGroup(group.name)">
+            <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
+            <span class="nav-group-name" x-text="group.name"></span>
+            <span class="nav-group-count" x-text="group.scenarios.length"></span>
           </div>
           <template x-if="expandedGroups[group.name]">
             <div>
               <template x-for="s in group.scenarios" :key="s.id">
-                <div class="tag-scenario" @click="scrollTo(s.id)" x-text="s.name"></div>
+                <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
+                  <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
+                  <span x-text="s.name"></span>
+                </div>
               </template>
             </div>
           </template>
