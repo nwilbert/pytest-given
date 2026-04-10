@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import functools
-import threading
 import types
-from typing import Any, Self
+from contextvars import ContextVar
+from typing import TYPE_CHECKING, Any, Self
 
-_local: threading.local = threading.local()
+if TYPE_CHECKING:
+    from pytest_given.collector import Collector
+
+_phase_stack_var: ContextVar[list[str]] = ContextVar('phase_stack')
+_collector_var: ContextVar[Collector | None] = ContextVar('collector', default=None)
 
 
 class StepDescriptor:
@@ -58,18 +62,20 @@ class StepDescriptor:
         return wrapper
 
 
-def set_active_collector(collector: Any) -> None:
+def set_active_collector(collector: Collector | None) -> None:
     """Set the active collector for the current thread."""
-    _local.collector = collector
+    _collector_var.set(collector)
 
 
-def get_active_collector() -> Any:
+def get_active_collector() -> Collector | None:
     """Get the active collector for the current thread, or None."""
-    return getattr(_local, 'collector', None)
+    return _collector_var.get()
 
 
 def _get_phase_stack() -> list[str]:
-    if not hasattr(_local, 'phase_stack'):
-        _local.phase_stack = []
-    result: list[str] = _local.phase_stack
-    return result
+    try:
+        return _phase_stack_var.get()
+    except LookupError:
+        stack: list[str] = []
+        _phase_stack_var.set(stack)
+        return stack
