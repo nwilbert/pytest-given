@@ -12,6 +12,7 @@ from typing import Any
 import pytest
 
 from pytest_given.collector import Collector
+from pytest_given.decorators import set_active_collector
 from pytest_given.model import (
     Metadata,
     NodeId,
@@ -23,7 +24,6 @@ from pytest_given.model import (
     Scenario,
     Step,
 )
-from pytest_given.step_descriptor import set_active_collector
 
 collector = Collector()
 

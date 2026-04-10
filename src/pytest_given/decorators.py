@@ -62,6 +62,22 @@ class StepDescriptor:
         return wrapper
 
 
+class ScenarioDecorator:
+    """Decorator that marks a test for inclusion in the report."""
+
+    def __init__(self, name: str, tags: list[str]) -> None:
+        self.name = name
+        self.tags = tags
+
+    def __call__(self, func: Any) -> Any:
+        @functools.wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            return func(*args, **kwargs)
+
+        wrapper._scenario = self  # type: ignore[attr-defined]
+        return wrapper
+
+
 def set_active_collector(collector: Collector | None) -> None:
     """Set the active collector for the current thread."""
     _collector_var.set(collector)

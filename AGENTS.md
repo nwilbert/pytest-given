@@ -25,7 +25,7 @@ Individual sessions:
 ## Architecture
 
 - `src/pytest_given/__init__.py` — Public API: `scenario`, `given`, `when`, `then`, `attach`
-- `src/pytest_given/step_descriptor.py` — `StepDescriptor`: dual context-manager/decorator, cross-phase nesting detection
+- `src/pytest_given/decorators.py` — `StepDescriptor` + `ScenarioDecorator`: dual context-manager/decorator, cross-phase nesting detection, thread-local state
 - `src/pytest_given/collector.py` — Step stack, collects scenario data during test execution
 - `src/pytest_given/plugin.py` — pytest hooks, parametrized test grouping
 - `src/pytest_given/renderer.py` — JSON to self-contained HTML (Jinja2 + Alpine.js)

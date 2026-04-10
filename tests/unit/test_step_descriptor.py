@@ -1,5 +1,5 @@
 from pytest_given.collector import Collector
-from pytest_given.step_descriptor import StepDescriptor, set_active_collector
+from pytest_given.decorators import StepDescriptor, set_active_collector
 
 
 def test_context_manager_basic() -> None:
