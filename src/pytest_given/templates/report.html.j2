@@ -73,44 +73,34 @@
     </div>
   </div>
 
-  {%- macro render_step(step, step_id, show_phase) -%}
-  <div class="step-line">
-    {%- if show_phase -%}
-      <span class="phase-label">{{ step.phase | capitalize }}</span>
-    {%- else -%}
-      <span class="phase-spacer"></span>
-    {%- endif -%}
+  {%- macro render_step(step, step_id) -%}
+  <div class="step-text">
     {%- if step.children and step.children | length > 0 -%}
-      <span class="step-text step-toggle" @click="toggleStep('{{ step_id }}')">
-        <span x-text="expandedSteps['{{ step_id }}'] ? '▾' : '▸'"></span>
+      <span class="step-toggle" @click="toggleStep('{{ step_id }}')">
+        <span class="step-toggle-icon" x-text="expandedSteps['{{ step_id }}'] ? '▾' : '▸'"></span>
         {{ step.text | highlight_params }}
       </span>
     {%- else -%}
-      <span class="step-text">{{ step.text | highlight_params }}</span>
+      {{ step.text | highlight_params }}
     {%- endif -%}
   </div>
   {%- if step.children and step.children | length > 0 -%}
     <div class="step-children" x-show="expandedSteps['{{ step_id }}']">
-      {%- set child_ns = namespace(prev_phase=None) -%}
       {%- for child in step.children -%}
-        {{ render_step(child, step_id ~ '_' ~ loop.index0, child.phase != child_ns.prev_phase) }}
-        {%- set child_ns.prev_phase = child.phase -%}
+        {{ render_step(child, step_id ~ '_' ~ loop.index0) }}
       {%- endfor -%}
     </div>
   {%- endif -%}
   {%- if step.attachments -%}
     {%- for att in step.attachments -%}
-    <div class="step-line">
-      <span class="phase-spacer"></span>
-      <span>
-        <span class="attachment-badge" @click="toggleAttachment('{{ step_id }}_att_{{ loop.index0 }}')">📎 {{ att.label }}</span>
-        <div class="attachment-content" x-show="expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}']">{{ att.content }}</div>
-      </span>
+    <div>
+      <span class="attachment-badge" @click="toggleAttachment('{{ step_id }}_att_{{ loop.index0 }}')">📎 {{ att.label }}</span>
+      <div class="attachment-content" x-show="expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}']">{{ att.content }}</div>
     </div>
     {%- endfor -%}
   {%- endif -%}
   {%- if step.error -%}
-    <div class="error-block" style="margin-left: 48px;">
+    <div class="error-block">
       <div class="error-message">{{ step.error.message }}</div>
       {%- if step.error.diff -%}<pre class="error-diff">{{ step.error.diff }}</pre>{%- endif -%}
     </div>
@@ -139,8 +129,13 @@
         {%- set scenario_idx = loop.index0 -%}
         {%- set ns = namespace(prev_phase=None) -%}
         {%- for step in scenario.steps -%}
-          {{ render_step(step, 's' ~ scenario_idx ~ '_' ~ loop.index0, step.phase != ns.prev_phase) }}
-          {%- set ns.prev_phase = step.phase -%}
+          {%- if step.phase != ns.prev_phase -%}
+            <div class="phase-label">{{ step.phase | capitalize }}</div>
+            {%- set ns.prev_phase = step.phase -%}
+          {%- endif -%}
+          <div class="phase-steps">
+            {{ render_step(step, 's' ~ scenario_idx ~ '_' ~ loop.index0) }}
+          </div>
         {%- endfor -%}
       </div>
 

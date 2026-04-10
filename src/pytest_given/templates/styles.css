@@ -88,10 +88,13 @@ body {
 }
 
 /* Status filter pills */
-.status-pills { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
+.status-pills { display: flex; gap: var(--space-xs); }
 .status-pill {
+  flex: 1;
+  text-align: center;
   font-size: var(--font-size-sm);
-  padding: 2px 8px;
+  padding: 2px 4px;
+  white-space: nowrap;
   border-radius: var(--radius-pill);
   cursor: pointer;
   border: 1px solid var(--border);
@@ -214,18 +217,12 @@ body {
 
 /* Steps */
 .steps { padding-top: var(--space-md); padding-left: var(--space-xl); font-size: var(--font-size-base); line-height: 1.8; }
-.step-line { display: flex; align-items: baseline; }
-.phase-label {
-  display: inline-block;
-  width: 48px;
-  flex-shrink: 0;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-.phase-spacer { display: inline-block; width: 48px; flex-shrink: 0; }
+.phase-label { font-weight: 600; color: var(--text-muted); margin-top: var(--space-xs); }
+.phase-steps { padding-left: var(--space-lg); }
 .step-text { color: var(--text-secondary); }
-.step-children { padding-left: var(--space-lg); border-left: 1px solid var(--border); margin-left: var(--space-sm); }
+.step-children { padding-left: var(--space-lg); border-left: 1px solid var(--border); margin-left: var(--space-xs); }
 .step-toggle { cursor: pointer; user-select: none; }
+.step-toggle-icon { display: inline-block; width: 1em; margin-left: -1em; }
 
 /* Param table */
 .param-table {
