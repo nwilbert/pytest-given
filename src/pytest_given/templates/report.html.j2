@@ -280,6 +280,33 @@ function reportApp() {
       if (this.expandedAttachments[key]) delete this.expandedAttachments[key];
       else this.expandedAttachments[key] = true;
     },
+    init() {
+      this._readHash();
+      ['search', 'activeTag', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+        this.$watch(key, () => this._writeHash());
+      });
+      window.addEventListener('hashchange', () => this._readHash());
+    },
+    _readHash() {
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      if (params.has('tag')) this.activeTag = params.get('tag');
+      else this.activeTag = null;
+      if (params.has('passed')) this.showPassed = params.get('passed') !== '0';
+      if (params.has('failed')) this.showFailed = params.get('failed') !== '0';
+      if (params.has('skipped')) this.showSkipped = params.get('skipped') !== '0';
+      if (params.has('q')) this.search = params.get('q');
+      else this.search = '';
+    },
+    _writeHash() {
+      const params = new URLSearchParams();
+      if (this.activeTag) params.set('tag', this.activeTag);
+      if (!this.showPassed) params.set('passed', '0');
+      if (!this.showFailed) params.set('failed', '0');
+      if (!this.showSkipped) params.set('skipped', '0');
+      if (this.search) params.set('q', this.search);
+      const hash = params.toString();
+      history.replaceState(null, '', hash ? '#' + hash : window.location.pathname);
+    },
   };
 }
 </script>
