@@ -32,6 +32,14 @@ Individual sessions:
 - `src/pytest_given/cli.py` — Standalone `pytest-given report` command
 - `src/pytest_given/templates/` — Jinja2 template, CSS, bundled Alpine.js
 
+## Report testing
+
+A Playwright MCP server is available for visually inspecting the HTML report. Open it with `file:///` URLs pointing to `given-report/report.html`. Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
+
+- The report targets desktop only — assume a minimum viewport width of ~900px. No mobile/responsive layout needed.
+- Traceback display and header metadata formatting are known limitations, not current priorities.
+- Never save Playwright screenshots into the project directory. Use `/tmp/` or omit the `filename` parameter.
+
 ## Conventions
 
 - Python >= 3.12, pytest >= 9.0
@@ -39,6 +47,7 @@ Individual sessions:
 - Single quotes (ruff format)
 - Strict mypy (`disallow_untyped_defs`). Avoid `Any` — use precise types, generics, `TYPE_CHECKING` imports, or `ContextVar[T]` over untyped `threading.local`.
 - Use `NewType` for domain-specific IDs (e.g., `NodeId`) and PEP 695 `type` statements for aliases. Avoid raw complex types like `dict[str, tuple[list[str], list[Any]]]` — introduce named types instead.
+- Only module-level imports — no inline/function-level imports.
 - Step-down rule: callers before callees, public before private. Read each file top-down from high-level API to implementation details.
 - TDD: write tests first
 - Commit messages: single line, no co-author trailers

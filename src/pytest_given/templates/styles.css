@@ -194,6 +194,7 @@ body {
 }
 .scenario.failed { border-left-color: var(--color-failed); }
 .scenario.skipped { border-left-color: var(--color-skipped); }
+.scenario-expanded { border-left-width: 5px; }
 .scenario-header {
   display: flex;
   justify-content: space-between;
@@ -228,9 +229,24 @@ body {
 .phase-label { font-weight: 600; color: var(--text-muted); margin-top: var(--space-xs); }
 .phase-steps { padding-left: var(--space-lg); }
 .step-text { color: var(--text-secondary); }
-.step-children { padding-left: var(--space-lg); border-left: 1px solid var(--border); margin-left: var(--space-xs); }
-.step-toggle { cursor: pointer; user-select: none; }
-.step-toggle-icon { display: inline-block; width: 1em; margin-left: -1em; }
+.step-children {
+  margin-left: 6px;
+  padding-left: var(--space-lg);
+  border-left: 1.5px dashed var(--border);
+}
+.step-toggle { cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 2px; }
+.step-chevron {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: rotate(-45deg) translateY(-1px);
+  transition: transform 0.15s ease;
+  margin-right: 4px;
+}
+.step-chevron-open { transform: rotate(45deg) translateY(-2px); }
 
 /* Param table */
 .param-table {

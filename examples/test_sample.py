@@ -15,7 +15,7 @@ def test_buy_coffee(machine):
         machine['coffees'] -= 1
     with then('I get a coffee'):
         assert machine['coffees'] == 9
-        attach('Machine state', str(machine))
+        attach('Machine state', machine)
 
 
 @scenario('Not enough money', tags=['billing', 'edge-case'])
@@ -54,7 +54,7 @@ def test_buy_with_validation(machine):
         assert machine['coffees'] == 9
         with then('the machine state is consistent'):
             assert machine['price'] == 2
-            attach('Final state', str(machine))
+            attach('Final state', machine)
 
 
 @scenario('Complex ordering workflow', tags=['billing', 'detailed'])
@@ -78,10 +78,10 @@ def test_complex_order(machine):
             assert loyalty['points'] == 2
             with then('the remaining points are valid'):
                 assert loyalty['points'] >= 0
-                attach('Loyalty state', str(loyalty))
+                attach('Loyalty state', loyalty)
     with then('the machine state is consistent'):
         assert machine['price'] == 2
-        attach('Final machine state', str(machine))
+        attach('Final machine state', machine)
 
 
 @scenario('Failing assertion', tags=['debug'])

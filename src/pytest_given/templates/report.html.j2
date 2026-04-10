@@ -19,7 +19,7 @@
     <div class="status-pills">
       <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
       <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
-      <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped">○ Skipped <span x-text="counts.skipped"></span></span>
+      <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
     </div>
   </div>
 
@@ -73,7 +73,7 @@
   <div class="step-text">
     {%- if step.children and step.children | length > 0 -%}
       <span class="step-toggle" @click="toggleStep('{{ step_id }}')">
-        <span class="step-toggle-icon" x-text="expandedSteps['{{ step_id }}'] ? '▾' : '▸'"></span>
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['{{ step_id }}'] }"></span>
         {{ step.text | highlight_params }}
       </span>
     {%- else -%}
@@ -91,7 +91,7 @@
     {%- for att in step.attachments -%}
     <div>
       <span class="attachment-badge" @click="toggleAttachment('{{ step_id }}_att_{{ loop.index0 }}')">📎 {{ att.label }}</span>
-      <div class="attachment-content" x-show="expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}']">{{ att.content }}</div>
+      <div class="attachment-content" x-show="expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}']"><pre>{{ att.content }}</pre></div>
     </div>
     {%- endfor -%}
   {%- endif -%}
@@ -106,7 +106,8 @@
   {% for scenario in scenarios %}
   <div class="scenario {{ scenario.status }}"
        x-show="isVisible({{ loop.index0 }})"
-       :id="'scenario-' + {{ loop.index0 }}">
+       :id="'scenario-' + {{ loop.index0 }}"
+       :class="{ 'scenario-expanded': expandedScenarios[{{ loop.index0 }}] }">
     <div class="scenario-header" @click="toggleScenario({{ loop.index0 }})">
       <div style="display:flex; align-items:center;">
         <span class="scenario-toggle" x-text="expandedScenarios[{{ loop.index0 }}] ? '▾' : '▸'"></span>

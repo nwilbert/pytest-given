@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import json
 import types
 from typing import Any, Self
 
@@ -81,11 +82,22 @@ def then(text: str) -> StepDescriptor:
     return StepDescriptor('then', text)
 
 
-def attach(label: str, content: str) -> None:
-    """Attach text to the current step."""
+def attach(label: str, content: object) -> None:
+    """Attach data to the current step.
+
+    If *content* is a ``str`` it is stored verbatim.  Any other type is
+    serialised as indented JSON.
+    """
     collector = get_active_collector()
     if collector is not None:
-        collector.attach(label, content)
+        if isinstance(content, str):
+            collector.attach(label, content, content_type='text')
+        else:
+            collector.attach(
+                label,
+                json.dumps(content, indent=2, default=str),
+                content_type='json',
+            )
 
 
 def scenario(name: str, tags: list[str] | None = None) -> ScenarioDecorator:

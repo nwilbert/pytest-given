@@ -1,7 +1,7 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-04-10T09:13:09.700374+00:00",
+    "timestamp": "2026-04-10T15:53:40.290479+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0"
   },
@@ -20,7 +20,6 @@
           "phase": "given",
           "text": "a calculator",
           "status": "passed",
-          "source": "fixture",
           "children": [],
           "attachments": [],
           "error": null
@@ -29,7 +28,6 @@
           "phase": "when",
           "text": "I add 2 and 3",
           "status": "passed",
-          "source": null,
           "children": [],
           "attachments": [],
           "error": null
@@ -38,12 +36,12 @@
           "phase": "then",
           "text": "the result is 5",
           "status": "passed",
-          "source": null,
           "children": [],
           "attachments": [
             {
               "label": "debug",
-              "content": "result was 5"
+              "content": "result was 5",
+              "content_type": "text"
             }
           ],
           "error": null
@@ -60,13 +58,12 @@
         "math"
       ],
       "status": "failed",
-      "duration_ms": 55,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
           "text": "a calculator",
           "status": "passed",
-          "source": "fixture",
           "children": [],
           "attachments": [],
           "error": null
@@ -75,7 +72,6 @@
           "phase": "then",
           "text": "this will fail",
           "status": "passed",
-          "source": null,
           "children": [],
           "attachments": [],
           "error": null
@@ -84,7 +80,7 @@
       "parameters": null,
       "error": {
         "message": "assert 1 == 2",
-        "diff": "/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/_pytest/runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/pluggy/_manager.py:475: in traced_hookexec\n    return outcome.get_result()\n           ^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/pluggy/_manager.py:472: in <lambda>\n    lambda: oldcall(hook_name, hook_impls, caller_kwargs, firstresult)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call\n    yield\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/_pytest/runner.py:179: in pytest_runtest_call\n    item.runtest()\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/_pytest/python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/pluggy/_manager.py:475: in traced_hookexec\n    return outcome.get_result()\n           ^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/pluggy/_manager.py:472: in <lambda>\n    lambda: oldcall(hook_name, hook_impls, caller_kwargs, firstresult)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/coverage/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/src/pytest_given/__init__.py:48: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\ntest_full_html_report_generation.py:20: in test_fail\n    assert 1 == 2\nE   assert 1 == 2"
+        "diff": "/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/_pytest/runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/pluggy/_manager.py:475: in traced_hookexec\n    return outcome.get_result()\n           ^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/pluggy/_manager.py:472: in <lambda>\n    lambda: oldcall(hook_name, hook_impls, caller_kwargs, firstresult)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call\n    yield\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/_pytest/runner.py:179: in pytest_runtest_call\n    item.runtest()\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/_pytest/python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/pluggy/_manager.py:475: in traced_hookexec\n    return outcome.get_result()\n           ^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/pluggy/_manager.py:472: in <lambda>\n    lambda: oldcall(hook_name, hook_impls, caller_kwargs, firstresult)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/.nox/test/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/niko/projects/repos/pytest-given/src/pytest_given/decorators.py:64: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\ntest_full_html_report_generation.py:20: in test_fail\n    assert 1 == 2\nE   assert 1 == 2"
       }
     }
   ]

@@ -5,87 +5,354 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>pytest-given — pytest-given Report</title>
 <style>
+/* === Design Tokens === */
+:root {
+  --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-size-sm: 0.75rem;
+  --font-size-base: 0.8125rem;
+  --font-size-md: 0.875rem;
+  --font-size-lg: 1.25rem;
+
+  --bg-page: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --border: #dee2e6;
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --text-muted: #6c757d;
+
+  --color-passed: #28a745;
+  --color-failed: #dc3545;
+  --color-skipped: #ffc107;
+
+  --color-accent: #0d6efd;
+  --color-accent-bg: #e7f1ff;
+
+  --color-error-bg: #fff5f5;
+  --color-error-border: #f5c6cb;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-pill: 9999px;
+}
+
+/* === Reset & Base === */
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d0d1a; color: #e0e0e0; display: flex; min-height: 100vh; }
+body {
+  font-family: var(--font-family);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  display: flex;
+  min-height: 100vh;
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
 
-/* Sidebar */
-.sidebar { width: 260px; background: #141422; border-right: 1px solid #333; padding: 16px; flex-shrink: 0; overflow-y: auto; max-height: 100vh; position: sticky; top: 0; }
-.sidebar input[type="text"] { width: 100%; padding: 8px 12px; background: #1a1a2e; border: 1px solid #333; border-radius: 6px; color: #e0e0e0; font-size: 13px; outline: none; }
-.sidebar input[type="text"]:focus { border-color: #7ecfff; }
-.sidebar-section { margin-top: 16px; }
-.sidebar-label { color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 8px; }
-.view-toggle { display: flex; gap: 4px; }
-.view-btn { padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; border: 1px solid #333; background: #1a1a2e; color: #888; }
-.view-btn.active { color: #7ecfff; border-color: #7ecfff; background: #2a2a4a; }
-.status-filter label { display: flex; align-items: center; gap: 6px; color: #ccc; font-size: 12px; cursor: pointer; padding: 2px 0; }
-.tag-tree { font-size: 12px; }
-.tag-item { color: #7ecfff; cursor: pointer; padding: 2px 0; }
-.tag-scenario { color: #ccc; padding-left: 12px; font-size: 11px; cursor: pointer; padding-top: 1px; padding-bottom: 1px; }
+/* === Sidebar === */
+.sidebar {
+  width: 260px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  padding: var(--space-lg);
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: 100vh;
+  position: sticky;
+  top: 0;
+}
+.sidebar-title {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+}
+.sidebar input[type="text"] {
+  width: 100%;
+  padding: 6px 10px;
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  outline: none;
+}
+.sidebar input[type="text"]:focus { border-color: var(--color-accent); }
 
-/* Main */
-.main { flex: 1; padding: 20px; overflow-y: auto; }
-.header { margin-bottom: 20px; }
-.header h1 { font-size: 20px; font-weight: 600; }
-.header .meta { color: #888; font-size: 12px; margin-top: 4px; }
+.sidebar-section { margin-top: var(--space-lg); }
+.sidebar-label {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-sm);
+}
 
-/* Scenario cards */
-.scenario { background: #1a1a2e; border-radius: 8px; padding: 16px; margin-bottom: 16px; border-left: 3px solid #4caf50; }
-.scenario.failed { border-left-color: #f44336; }
-.scenario.skipped { border-left-color: #ff9800; }
-.scenario-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.scenario-name { font-size: 15px; font-weight: 600; }
-.scenario-tag { background: #2a2a4a; color: #7ecfff; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
-.scenario-status { font-size: 12px; }
-.scenario-status.passed { color: #4caf50; }
-.scenario-status.failed { color: #f44336; }
-.scenario-status.skipped { color: #ff9800; }
+/* Status filter pills */
+.status-pills { display: flex; gap: var(--space-xs); }
+.status-pill {
+  flex: 1;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  padding: 2px 4px;
+  white-space: nowrap;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  user-select: none;
+}
+.status-pill.active-passed { background: #d4edda; color: #155724; border-color: var(--color-passed); }
+.status-pill.active-failed { background: #f8d7da; color: #721c24; border-color: var(--color-failed); }
+.status-pill.active-skipped { background: #fff3cd; color: #856404; border-color: var(--color-skipped); }
+.status-pill:not([class*="active-"]) { opacity: 0.5; text-decoration: line-through; }
+
+
+/* Browse-by toggle */
+.view-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.view-btn {
+  flex: 1;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  padding: var(--space-xs) 0;
+  cursor: pointer;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: none;
+  user-select: none;
+}
+.view-btn.active {
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 500;
+}
+
+/* Navigation tree */
+.nav-tree { font-size: var(--font-size-base); }
+.nav-group {
+  padding: 3px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--text-primary);
+}
+.nav-group-toggle { color: var(--text-muted); width: 14px; display: inline-block; flex-shrink: 0; }
+.nav-group-name { font-weight: 500; }
+.nav-group-active { background: var(--color-accent); color: #fff; border-radius: var(--radius-sm); padding-left: var(--space-xs); padding-right: var(--space-xs); }
+.nav-group-active .nav-group-toggle,
+.nav-group-active .nav-group-count { color: rgba(255, 255, 255, 0.7); }
+.nav-group-active .nav-group-name { font-weight: 600; }
+.nav-group-dimmed { opacity: 0.4; }
+.nav-group-dismiss { font-size: 0.875rem; margin-left: var(--space-xs); opacity: 0.8; }
+.nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; }
+.nav-scenario {
+  padding: 2px 0 2px 14px;
+  font-size: var(--font-size-sm);
+  color: var(--color-accent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.nav-scenario:hover { text-decoration: underline; }
+.nav-status-icon { font-size: 0.625rem; }
+
+/* === Main === */
+.main { flex: 1; padding: var(--space-xl); overflow-y: auto; }
+.header { margin-bottom: var(--space-xl); }
+.header-context {
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
+}
+.header-title { font-size: var(--font-size-lg); font-weight: 600; }
+.header-meta { color: var(--text-muted); font-size: var(--font-size-sm); }
+.collapse-all-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+.collapse-all-btn:hover { color: var(--color-accent); }
+
+/* === Scenario Cards === */
+.scenario {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-sm);
+  border-left: 3px solid var(--color-passed);
+}
+.scenario.failed { border-left-color: var(--color-failed); }
+.scenario.skipped { border-left-color: var(--color-skipped); }
+.scenario-expanded { border-left-width: 5px; }
+.scenario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+.scenario-toggle { color: var(--text-muted); font-size: var(--font-size-sm); margin-right: var(--space-sm); }
+.scenario-name { font-size: var(--font-size-md); font-weight: 500; }
+.scenario-tag {
+  display: inline-block;
+  background: var(--color-accent-bg);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  margin-left: var(--space-xs);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.scenario-tag:hover { border-color: var(--color-accent); }
+.scenario-tag.active-tag { background: var(--color-accent); color: #fff; border-color: var(--color-accent); font-weight: 600; }
+.scenario-meta { display: flex; align-items: center; gap: var(--space-sm); }
+.scenario-status { font-size: var(--font-size-sm); font-weight: 500; }
+.scenario-duration { font-size: var(--font-size-sm); color: var(--text-muted); }
+.scenario-status.passed { color: var(--color-passed); }
+.scenario-status.failed { color: var(--color-failed); }
+.scenario-status.skipped { color: var(--color-skipped); }
 
 /* Steps */
-.steps { font-size: 13px; line-height: 1.8; }
-.phase-label { font-weight: 600; margin-bottom: 2px; }
-.phase-given, .phase-when, .phase-then { color: #ccc; }
-.step-text { color: #ccc; padding-left: 16px; margin-bottom: 2px; }
-.step-children { padding-left: 16px; border-left: 1px solid #333; margin-left: 8px; }
-.step-toggle { cursor: pointer; user-select: none; }
+.steps { padding-top: var(--space-md); padding-left: var(--space-xl); font-size: var(--font-size-base); line-height: 1.8; }
+.phase-label { font-weight: 600; color: var(--text-muted); margin-top: var(--space-xs); }
+.phase-steps { padding-left: var(--space-lg); }
+.step-text { color: var(--text-secondary); }
+.step-children {
+  margin-left: 6px;
+  padding-left: var(--space-lg);
+  border-left: 1.5px dashed var(--border);
+}
+.step-toggle { cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 2px; }
+.step-chevron {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: rotate(-45deg) translateY(-1px);
+  transition: transform 0.15s ease;
+  margin-right: 4px;
+}
+.step-chevron-open { transform: rotate(45deg) translateY(-2px); }
 
 /* Param table */
-.param-table { width: auto; border-collapse: collapse; font-size: 13px; background: #0d0d1a; border-radius: 6px; overflow: hidden; margin-top: 8px; margin-left: 16px; }
-.param-table th { text-align: left; padding: 8px 12px; color: #888; font-weight: 600; background: #1e1e3a; }
-.param-table td { padding: 8px 12px; color: #ccc; border-top: 1px solid #1a1a2e; }
-.param-table tr.failed-row { background: #2a1015; }
+.param-table {
+  width: auto;
+  border-collapse: collapse;
+  font-size: var(--font-size-base);
+  background: var(--bg-page);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-top: var(--space-sm);
+  margin-left: var(--space-xl);
+}
+.param-table th {
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-muted);
+  font-weight: 600;
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--border);
+}
+.param-table td {
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+}
+.param-table tr.failed-row { background: var(--color-error-bg); }
 
 /* Error */
-.error-block { margin-top: 8px; background: #2a1015; border-radius: 6px; padding: 12px; font-size: 12px; border: 1px solid rgba(244, 67, 54, 0.2); }
-.error-message { color: #f44336; font-weight: 600; margin-bottom: 4px; }
-.error-diff { color: #ccc; font-size: 11px; line-height: 1.5; white-space: pre-wrap; font-family: monospace; }
+.error-block {
+  margin-top: var(--space-sm);
+  background: var(--color-error-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  border: 1px solid var(--color-error-border);
+}
+.error-message { color: var(--color-failed); font-weight: 600; font-size: var(--font-size-sm); margin-bottom: var(--space-xs); }
+.error-diff {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+}
 
 /* Attachments */
-.attachment-badge { color: #888; font-size: 11px; cursor: pointer; background: #0d0d1a; display: inline-block; padding: 2px 8px; border-radius: 4px; margin-top: 4px; }
-.attachment-content { background: #0d0d1a; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-family: monospace; white-space: pre-wrap; color: #ccc; margin-top: 4px; }
+.attachment-badge {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  background: var(--bg-page);
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-xs);
+}
+.attachment-badge:hover { background: var(--border); }
+.attachment-content {
+  background: var(--bg-page);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  white-space: pre-wrap;
+  color: var(--text-secondary);
+  margin-top: var(--space-xs);
+}
 
-/* Counts */
-.count-badge { font-size: 11px; color: #888; margin-left: 4px; }
-.dot-passed { color: #4caf50; }
-.dot-failed { color: #f44336; }
-.dot-skipped { color: #ff9800; }
+/* Counts & dots */
+.dot-passed { color: var(--color-passed); }
+.dot-failed { color: var(--color-failed); }
+.dot-skipped { color: var(--color-skipped); }
 
-/* Parameter colors — used for both placeholders in step text and column headers */
-.param-color-0, th.param-color-0 { color: #f9a8d4; font-weight: 600; }
-.param-color-1, th.param-color-1 { color: #a5f3c4; font-weight: 600; }
-.param-color-2, th.param-color-2 { color: #93c5fd; font-weight: 600; }
-.param-color-3, th.param-color-3 { color: #fcd34d; font-weight: 600; }
-.param-color-4, th.param-color-4 { color: #c4b5fd; font-weight: 600; }
-.param-color-5, th.param-color-5 { color: #fdba74; font-weight: 600; }
+/* Parameter colors — light-background variants */
+.param-color-0, th.param-color-0 { color: #d63384; font-weight: 600; }
+.param-color-1, th.param-color-1 { color: #198754; font-weight: 600; }
+.param-color-2, th.param-color-2 { color: #0d6efd; font-weight: 600; }
+.param-color-3, th.param-color-3 { color: #ca8a04; font-weight: 600; }
+.param-color-4, th.param-color-4 { color: #7c3aed; font-weight: 600; }
+.param-color-5, th.param-color-5 { color: #e85d04; font-weight: 600; }
 
 </style>
 </head>
 <body x-data="reportApp()">
 
 <div class="sidebar">
-  <input type="text" placeholder="Filter scenarios..." x-model="search">
+  <div class="sidebar-title">pytest-given</div>
+  <input type="text" placeholder="🔍 Search scenarios..." x-model="search">
 
   <div class="sidebar-section">
-    <div class="sidebar-label">View by</div>
+    <div class="sidebar-label">Status</div>
+    <div class="status-pills">
+      <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
+      <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
+      <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Browse by</div>
     <div class="view-toggle">
       <div class="view-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
       <div class="view-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
@@ -93,28 +360,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   </div>
 
   <div class="sidebar-section">
-    <div class="sidebar-label">Status</div>
-    <div class="status-filter">
-      <label><input type="checkbox" x-model="showPassed"> <span class="dot-passed">●</span> Passed (<span x-text="counts.passed"></span>)</label>
-      <label><input type="checkbox" x-model="showFailed"> <span class="dot-failed">●</span> Failed (<span x-text="counts.failed"></span>)</label>
-      <label><input type="checkbox" x-model="showSkipped"> <span class="dot-skipped">●</span> Skipped (<span x-text="counts.skipped"></span>)</label>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label" x-text="view === 'tags' ? 'Tags' : 'Modules'"></div>
-    <div class="tag-tree">
+    <div class="nav-tree">
       <template x-for="group in groups" :key="group.name">
         <div>
-          <div class="tag-item" @click="toggleGroup(group.name)">
-            <span x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
-            <span x-text="group.name"></span>
-            <span class="count-badge" x-text="'(' + group.scenarios.length + ')'"></span>
+          <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
+            <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
+            <span class="nav-group-name" x-text="group.name"></span>
+            <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
+            <span class="nav-group-count" x-text="group.scenarios.length"></span>
           </div>
           <template x-if="expandedGroups[group.name]">
             <div>
               <template x-for="s in group.scenarios" :key="s.id">
-                <div class="tag-scenario" @click="scrollTo(s.id)" x-text="s.name"></div>
+                <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
+                  <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
+                  <span x-text="s.name"></span>
+                </div>
               </template>
             </div>
           </template>
@@ -126,118 +387,243 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 
 <div class="main">
   <div class="header">
-    <h1>pytest-given</h1>
-    <div class="meta">Generated 2026-04-09T17:07:33.609775+00:00 · pytest 9.0.3 · pytest-given 0.1.0</div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline;">
+      <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+        <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
+        <div class="header-context" x-text="activeTag ? 'Tag: ' + activeTag : 'All Scenarios'"></div>
+        <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
+      </div>
+      <div class="header-meta">pytest 9.0.3 · pytest-given 0.1.0 · 2026-04-10T15:52:55.005799+00:00</div>
+    </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(0)"
-       id="scenario-0">
-    <div class="scenario-header">
-      <div>
+       :id="'scenario-' + 0"
+       :class="{ 'scenario-expanded': expandedScenarios[0] }">
+    <div class="scenario-header" @click="toggleScenario(0)">
+      <div style="display:flex; align-items:center;">
+        <span class="scenario-toggle" x-text="expandedScenarios[0] ? '▾' : '▸'"></span>
         <span class="scenario-name">Buy coffee</span>
         
-        <span class="scenario-tag">billing</span>
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
-        <span class="scenario-tag">happy-path</span>
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'happy-path' }" @click.stop="filterByTag('happy-path')">happy-path</span>
         
       </div>
-      <span class="scenario-status passed">
-        ✓ passed
+      <span class="scenario-meta">
+        <span class="scenario-status passed">
+          ✓ passed
+        </span>
+        <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div class="steps"><div class="phase-label phase-given">Given</div><div class="step-text">a coffee machine</div><div class="phase-label phase-when">When</div><div class="step-text">I insert $2</div><div class="phase-label phase-then">Then</div><div class="step-text">I get a coffee</div><div class="step-text">
+    <div x-show="expandedScenarios[0]">
+      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
+            <div class="step-text">a coffee machine</div>
+          </div><div class="phase-label">When</div><div class="phase-steps">
+            <div class="step-text">I insert $2</div>
+          </div><div class="phase-label">Then</div><div class="phase-steps">
+            <div class="step-text">I get a coffee</div><div>
       <span class="attachment-badge" @click="toggleAttachment('s0_2_att_0')">📎 Machine state</span>
-      <div class="attachment-content" x-show="expandedAttachments['s0_2_att_0']">{&#39;coffees&#39;: 9, &#39;price&#39;: 2}</div>
-    </div></div>
+      <div class="attachment-content" x-show="expandedAttachments['s0_2_att_0']"><pre>{
+  &#34;coffees&#34;: 9,
+  &#34;price&#34;: 2
+}</pre></div>
+    </div>
+          </div></div>
 
-    
+      
 
-    
+      
+    </div>
   </div>
   
   <div class="scenario passed"
        x-show="isVisible(1)"
-       id="scenario-1">
-    <div class="scenario-header">
-      <div>
+       :id="'scenario-' + 1"
+       :class="{ 'scenario-expanded': expandedScenarios[1] }">
+    <div class="scenario-header" @click="toggleScenario(1)">
+      <div style="display:flex; align-items:center;">
+        <span class="scenario-toggle" x-text="expandedScenarios[1] ? '▾' : '▸'"></span>
         <span class="scenario-name">Not enough money</span>
         
-        <span class="scenario-tag">billing</span>
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
-        <span class="scenario-tag">edge-case</span>
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'edge-case' }" @click.stop="filterByTag('edge-case')">edge-case</span>
         
       </div>
-      <span class="scenario-status passed">
-        ✓ passed
+      <span class="scenario-meta">
+        <span class="scenario-status passed">
+          ✓ passed
+        </span>
+        <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div class="steps"><div class="phase-label phase-given">Given</div><div class="step-text">a coffee machine</div><div class="phase-label phase-when">When</div><div class="step-text">I insert $1</div><div class="phase-label phase-then">Then</div><div class="step-text">I don&#39;t get a coffee</div></div>
+    <div x-show="expandedScenarios[1]">
+      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
+            <div class="step-text">a coffee machine</div>
+          </div><div class="phase-label">When</div><div class="phase-steps">
+            <div class="step-text">I insert $1</div>
+          </div><div class="phase-label">Then</div><div class="phase-steps">
+            <div class="step-text">I don&#39;t get a coffee</div>
+          </div></div>
 
-    
+      
 
-    
+      
+    </div>
   </div>
   
   <div class="scenario passed"
        x-show="isVisible(2)"
-       id="scenario-2">
-    <div class="scenario-header">
-      <div>
+       :id="'scenario-' + 2"
+       :class="{ 'scenario-expanded': expandedScenarios[2] }">
+    <div class="scenario-header" @click="toggleScenario(2)">
+      <div style="display:flex; align-items:center;">
+        <span class="scenario-toggle" x-text="expandedScenarios[2] ? '▾' : '▸'"></span>
         <span class="scenario-name">Buy coffee with validation</span>
         
-        <span class="scenario-tag">billing</span>
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
-        <span class="scenario-tag">detailed</span>
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'detailed' }" @click.stop="filterByTag('detailed')">detailed</span>
         
       </div>
-      <span class="scenario-status passed">
-        ✓ passed
+      <span class="scenario-meta">
+        <span class="scenario-status passed">
+          ✓ passed
+        </span>
+        <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div class="steps"><div class="phase-label phase-given">Given</div><div class="step-text">a coffee machine</div><div class="phase-label phase-when">When</div><div class="step-text step-toggle" @click="toggleStep('s2_1')">
-      <span x-text="expandedSteps['s2_1'] ? '▾' : '▸'"></span>
-      I insert $2
-    </div>
-    <div class="step-children" x-show="expandedSteps['s2_1']"><div class="step-text">validating coin... accepted</div><div class="step-text">updating balance</div></div><div class="phase-label phase-then">Then</div><div class="step-text">the coin is accepted</div><div class="step-text step-toggle" @click="toggleStep('s2_3')">
-      <span x-text="expandedSteps['s2_3'] ? '▾' : '▸'"></span>
-      a coffee is dispensed
-    </div>
-    <div class="step-children" x-show="expandedSteps['s2_3']"><div class="step-text">the machine state is consistent</div><div class="step-text">
+    <div x-show="expandedScenarios[2]">
+      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
+            <div class="step-text">a coffee machine</div>
+          </div><div class="phase-label">When</div><div class="phase-steps">
+            <div class="step-text"><span class="step-toggle" @click="toggleStep('s2_1')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s2_1'] }"></span>
+        I insert $2
+      </span></div><div class="step-children" x-show="expandedSteps['s2_1']"><div class="step-text">validating coin... accepted</div><div class="step-text">updating balance</div></div>
+          </div><div class="phase-label">Then</div><div class="phase-steps">
+            <div class="step-text">the coin is accepted</div>
+          </div><div class="phase-steps">
+            <div class="step-text"><span class="step-toggle" @click="toggleStep('s2_3')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s2_3'] }"></span>
+        a coffee is dispensed
+      </span></div><div class="step-children" x-show="expandedSteps['s2_3']"><div class="step-text">the machine state is consistent</div><div>
       <span class="attachment-badge" @click="toggleAttachment('s2_3_0_att_0')">📎 Final state</span>
-      <div class="attachment-content" x-show="expandedAttachments['s2_3_0_att_0']">{&#39;coffees&#39;: 9, &#39;price&#39;: 2}</div>
+      <div class="attachment-content" x-show="expandedAttachments['s2_3_0_att_0']"><pre>{
+  &#34;coffees&#34;: 9,
+  &#34;price&#34;: 2
+}</pre></div>
+    </div></div>
+          </div></div>
+
+      
+
+      
+    </div>
+  </div>
+  
+  <div class="scenario passed"
+       x-show="isVisible(3)"
+       :id="'scenario-' + 3"
+       :class="{ 'scenario-expanded': expandedScenarios[3] }">
+    <div class="scenario-header" @click="toggleScenario(3)">
+      <div style="display:flex; align-items:center;">
+        <span class="scenario-toggle" x-text="expandedScenarios[3] ? '▾' : '▸'"></span>
+        <span class="scenario-name">Complex ordering workflow</span>
+        
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'detailed' }" @click.stop="filterByTag('detailed')">detailed</span>
+        
+      </div>
+      <span class="scenario-meta">
+        <span class="scenario-status passed">
+          ✓ passed
+        </span>
+        <span class="scenario-duration">0ms</span>
+      </span>
+    </div>
+
+    <div x-show="expandedScenarios[3]">
+      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
+            <div class="step-text">a coffee machine</div>
+          </div><div class="phase-steps">
+            <div class="step-text">a loyalty card with 5 points</div>
+          </div><div class="phase-label">When</div><div class="phase-steps">
+            <div class="step-text"><span class="step-toggle" @click="toggleStep('s3_2')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s3_2'] }"></span>
+        I place a large order
+      </span></div><div class="step-children" x-show="expandedSteps['s3_2']"><div class="step-text">I select 3 coffees</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s3_2_1')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s3_2_1'] }"></span>
+        I apply loyalty discount
+      </span></div><div class="step-children" x-show="expandedSteps['s3_2_1']"><div class="step-text">validating loyalty card</div><div class="step-text">calculating discount</div></div></div>
+          </div><div class="phase-label">Then</div><div class="phase-steps">
+            <div class="step-text"><span class="step-toggle" @click="toggleStep('s3_3')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s3_3'] }"></span>
+        the order is processed correctly
+      </span></div><div class="step-children" x-show="expandedSteps['s3_3']"><div class="step-text">the coffee count is updated</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s3_3_1')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s3_3_1'] }"></span>
+        the loyalty points are deducted
+      </span></div><div class="step-children" x-show="expandedSteps['s3_3_1']"><div class="step-text">the remaining points are valid</div><div>
+      <span class="attachment-badge" @click="toggleAttachment('s3_3_1_0_att_0')">📎 Loyalty state</span>
+      <div class="attachment-content" x-show="expandedAttachments['s3_3_1_0_att_0']"><pre>{
+  &#34;points&#34;: 2
+}</pre></div>
     </div></div></div>
+          </div><div class="phase-steps">
+            <div class="step-text">the machine state is consistent</div><div>
+      <span class="attachment-badge" @click="toggleAttachment('s3_4_att_0')">📎 Final machine state</span>
+      <div class="attachment-content" x-show="expandedAttachments['s3_4_att_0']"><pre>{
+  &#34;coffees&#34;: 7,
+  &#34;price&#34;: 2
+}</pre></div>
+    </div>
+          </div></div>
 
-    
+      
 
-    
+      
+    </div>
   </div>
   
   <div class="scenario failed"
-       x-show="isVisible(3)"
-       id="scenario-3">
-    <div class="scenario-header">
-      <div>
+       x-show="isVisible(4)"
+       :id="'scenario-' + 4"
+       :class="{ 'scenario-expanded': expandedScenarios[4] }">
+    <div class="scenario-header" @click="toggleScenario(4)">
+      <div style="display:flex; align-items:center;">
+        <span class="scenario-toggle" x-text="expandedScenarios[4] ? '▾' : '▸'"></span>
         <span class="scenario-name">Failing assertion</span>
         
-        <span class="scenario-tag">debug</span>
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'debug' }" @click.stop="filterByTag('debug')">debug</span>
         
       </div>
-      <span class="scenario-status failed">
-        ✗ failed
+      <span class="scenario-meta">
+        <span class="scenario-status failed">
+          ✗ failed
+        </span>
+        <span class="scenario-duration">57ms</span>
       </span>
     </div>
 
-    <div class="steps"><div class="phase-label phase-given">Given</div><div class="step-text">a coffee machine</div><div class="phase-label phase-then">Then</div><div class="step-text">the machine has 20 coffees</div></div>
+    <div x-show="expandedScenarios[4]">
+      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
+            <div class="step-text">a coffee machine</div>
+          </div><div class="phase-label">Then</div><div class="phase-steps">
+            <div class="step-text">the machine has 20 coffees</div>
+          </div></div>
 
-    
+      
 
-    
-    <div class="error-block">
-      <div class="error-message">assert 10 == 20</div>
-      <pre class="error-diff">.venv/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call
+      
+      <div class="error-block">
+        <div class="error-message">assert 10 == 20</div>
+        <pre class="error-diff">.venv/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call
     result: TResult | None = func()
                              ^^^^^^
 .venv/lib/python3.14/site-packages/_pytest/runner.py:245: in &lt;lambda&gt;
@@ -270,94 +656,509 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .venv/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call
     result = testfunction(**testargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^
-src/pytest_given/__init__.py:48: in wrapper
+src/pytest_given/decorators.py:64: in wrapper
     return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^
-examples/test_sample.py:63: in test_failing
+examples/test_sample.py:90: in test_failing
     assert machine[&#39;coffees&#39;] == 20
 E   assert 10 == 20</pre>
+      </div>
+      
     </div>
-    
   </div>
   
   <div class="scenario passed"
-       x-show="isVisible(4)"
-       id="scenario-4">
-    <div class="scenario-header">
-      <div>
+       x-show="isVisible(5)"
+       :id="'scenario-' + 5"
+       :class="{ 'scenario-expanded': expandedScenarios[5] }">
+    <div class="scenario-header" @click="toggleScenario(5)">
+      <div style="display:flex; align-items:center;">
+        <span class="scenario-toggle" x-text="expandedScenarios[5] ? '▾' : '▸'"></span>
         <span class="scenario-name">Pricing</span>
         
-        <span class="scenario-tag">billing</span>
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
       </div>
-      <span class="scenario-status passed">
-        ✓ passed
+      <span class="scenario-meta">
+        <span class="scenario-status passed">
+          ✓ passed
+        </span>
+        <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div class="steps"><div class="phase-label phase-given">Given</div><div class="step-text">a coffee machine</div><div class="phase-label phase-when">When</div><div class="step-text">I insert $<span class="param-color-0">{euros}</span></div><div class="phase-label phase-then">Then</div><div class="step-text">can_buy is <span class="param-color-1">{expect}</span></div></div>
+    <div x-show="expandedScenarios[5]">
+      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
+            <div class="step-text">a coffee machine</div>
+          </div><div class="phase-label">When</div><div class="phase-steps">
+            <div class="step-text">I insert $<span class="param-color-0">{euros}</span></div>
+          </div><div class="phase-label">Then</div><div class="phase-steps">
+            <div class="step-text">can_buy is <span class="param-color-1">{expect}</span></div>
+          </div></div>
 
-    
-    <table class="param-table">
-      <thead>
-        <tr>
+      
+      <table class="param-table">
+        <thead>
+          <tr>
+            
+            <th class="param-color-0">euros</th>
+            
+            <th class="param-color-1">expect</th>
+            
+            <th style="text-align:right">status</th>
+          </tr>
+        </thead>
+        <tbody>
           
-          <th class="param-color-0">euros</th>
+          <tr class="">
+            
+            <td>1</td>
+            
+            <td>False</td>
+            
+            <td style="text-align:right">
+              <span class="dot-passed">✓</span>
+            </td>
+          </tr>
           
-          <th class="param-color-1">expect</th>
           
-          <th style="text-align:right">status</th>
-        </tr>
-      </thead>
-      <tbody>
-        
-        <tr class="">
+          <tr class="">
+            
+            <td>2</td>
+            
+            <td>True</td>
+            
+            <td style="text-align:right">
+              <span class="dot-passed">✓</span>
+            </td>
+          </tr>
           
-          <td>1</td>
           
-          <td>False</td>
+          <tr class="">
+            
+            <td>3</td>
+            
+            <td>True</td>
+            
+            <td style="text-align:right">
+              <span class="dot-passed">✓</span>
+            </td>
+          </tr>
           
-          <td style="text-align:right">
-            <span class="dot-passed">✓</span>
-          </td>
-        </tr>
-        
-        
-        <tr class="">
           
-          <td>2</td>
-          
-          <td>True</td>
-          
-          <td style="text-align:right">
-            <span class="dot-passed">✓</span>
-          </td>
-        </tr>
-        
-        
-        <tr class="">
-          
-          <td>3</td>
-          
-          <td>True</td>
-          
-          <td style="text-align:right">
-            <span class="dot-passed">✓</span>
-          </td>
-        </tr>
-        
-        
-      </tbody>
-    </table>
-    
+        </tbody>
+      </table>
+      
 
-    
+      
+    </div>
   </div>
   
 </div>
 
 <script>
-window.__REPORT_DATA__ = {"metadata": {"project": "pytest-given", "timestamp": "2026-04-09T17:07:33.609775+00:00", "pytest_version": "9.0.3", "plugin_version": "0.1.0"}, "scenarios": [{"id": "examples/test_sample.py::test_buy_coffee", "name": "Buy coffee", "module": "test_sample", "tags": ["billing", "happy-path"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert $2", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "I get a coffee", "status": "passed", "source": null, "children": [], "attachments": [{"label": "Machine state", "content": "{'coffees': 9, 'price': 2}"}], "error": null}], "parameters": null, "error": null}, {"id": "examples/test_sample.py::test_not_enough", "name": "Not enough money", "module": "test_sample", "tags": ["billing", "edge-case"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert $1", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "I don't get a coffee", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "parameters": null, "error": null}, {"id": "examples/test_sample.py::test_buy_with_validation", "name": "Buy coffee with validation", "module": "test_sample", "tags": ["billing", "detailed"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert $2", "status": "passed", "source": null, "children": [{"phase": "when", "text": "validating coin... accepted", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "updating balance", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "attachments": [], "error": null}, {"phase": "then", "text": "the coin is accepted", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "a coffee is dispensed", "status": "passed", "source": null, "children": [{"phase": "then", "text": "the machine state is consistent", "status": "passed", "source": null, "children": [], "attachments": [{"label": "Final state", "content": "{'coffees': 9, 'price': 2}"}], "error": null}], "attachments": [], "error": null}], "parameters": null, "error": null}, {"id": "examples/test_sample.py::test_failing", "name": "Failing assertion", "module": "test_sample", "tags": ["debug"], "status": "failed", "duration_ms": 54, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "the machine has 20 coffees", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "parameters": null, "error": {"message": "assert 10 == 20", "diff": ".venv/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call\n    yield\n.venv/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.venv/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.venv/lib/python3.14/site-packages/_pytest/runner.py:179: in pytest_runtest_call\n    item.runtest()\n.venv/lib/python3.14/site-packages/_pytest/python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.venv/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc/pytest_given/__init__.py:48: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples/test_sample.py:63: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"}}, {"id": "examples/test_sample.py::test_pricing[1-False]", "name": "Pricing", "module": "test_sample", "tags": ["billing"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert ${euros}", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "can_buy is {expect}", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "parameters": {"names": ["euros", "expect"], "cases": [{"values": [1, false], "status": "passed", "error": null}, {"values": [2, true], "status": "passed", "error": null}, {"values": [3, true], "status": "passed", "error": null}]}, "error": null}]};
+window.__REPORT_DATA__ = {
+  "metadata": {
+    "project": "pytest-given",
+    "timestamp": "2026-04-10T15:52:55.005799+00:00",
+    "pytest_version": "9.0.3",
+    "plugin_version": "0.1.0"
+  },
+  "scenarios": [
+    {
+      "id": "examples/test_sample.py::test_buy_coffee",
+      "name": "Buy coffee",
+      "module": "test_sample",
+      "tags": [
+        "billing",
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I insert $2",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "I get a coffee",
+          "status": "passed",
+          "children": [],
+          "attachments": [
+            {
+              "label": "Machine state",
+              "content": "{\n  \"coffees\": 9,\n  \"price\": 2\n}",
+              "content_type": "json"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": null
+    },
+    {
+      "id": "examples/test_sample.py::test_not_enough",
+      "name": "Not enough money",
+      "module": "test_sample",
+      "tags": [
+        "billing",
+        "edge-case"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I insert $1",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "I don't get a coffee",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": null
+    },
+    {
+      "id": "examples/test_sample.py::test_buy_with_validation",
+      "name": "Buy coffee with validation",
+      "module": "test_sample",
+      "tags": [
+        "billing",
+        "detailed"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I insert $2",
+          "status": "passed",
+          "children": [
+            {
+              "phase": "when",
+              "text": "validating coin... accepted",
+              "status": "passed",
+              "children": [],
+              "attachments": [],
+              "error": null
+            },
+            {
+              "phase": "when",
+              "text": "updating balance",
+              "status": "passed",
+              "children": [],
+              "attachments": [],
+              "error": null
+            }
+          ],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "the coin is accepted",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "a coffee is dispensed",
+          "status": "passed",
+          "children": [
+            {
+              "phase": "then",
+              "text": "the machine state is consistent",
+              "status": "passed",
+              "children": [],
+              "attachments": [
+                {
+                  "label": "Final state",
+                  "content": "{\n  \"coffees\": 9,\n  \"price\": 2\n}",
+                  "content_type": "json"
+                }
+              ],
+              "error": null
+            }
+          ],
+          "attachments": [],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": null
+    },
+    {
+      "id": "examples/test_sample.py::test_complex_order",
+      "name": "Complex ordering workflow",
+      "module": "test_sample",
+      "tags": [
+        "billing",
+        "detailed"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "given",
+          "text": "a loyalty card with 5 points",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I place a large order",
+          "status": "passed",
+          "children": [
+            {
+              "phase": "when",
+              "text": "I select 3 coffees",
+              "status": "passed",
+              "children": [],
+              "attachments": [],
+              "error": null
+            },
+            {
+              "phase": "when",
+              "text": "I apply loyalty discount",
+              "status": "passed",
+              "children": [
+                {
+                  "phase": "when",
+                  "text": "validating loyalty card",
+                  "status": "passed",
+                  "children": [],
+                  "attachments": [],
+                  "error": null
+                },
+                {
+                  "phase": "when",
+                  "text": "calculating discount",
+                  "status": "passed",
+                  "children": [],
+                  "attachments": [],
+                  "error": null
+                }
+              ],
+              "attachments": [],
+              "error": null
+            }
+          ],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "the order is processed correctly",
+          "status": "passed",
+          "children": [
+            {
+              "phase": "then",
+              "text": "the coffee count is updated",
+              "status": "passed",
+              "children": [],
+              "attachments": [],
+              "error": null
+            },
+            {
+              "phase": "then",
+              "text": "the loyalty points are deducted",
+              "status": "passed",
+              "children": [
+                {
+                  "phase": "then",
+                  "text": "the remaining points are valid",
+                  "status": "passed",
+                  "children": [],
+                  "attachments": [
+                    {
+                      "label": "Loyalty state",
+                      "content": "{\n  \"points\": 2\n}",
+                      "content_type": "json"
+                    }
+                  ],
+                  "error": null
+                }
+              ],
+              "attachments": [],
+              "error": null
+            }
+          ],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "the machine state is consistent",
+          "status": "passed",
+          "children": [],
+          "attachments": [
+            {
+              "label": "Final machine state",
+              "content": "{\n  \"coffees\": 7,\n  \"price\": 2\n}",
+              "content_type": "json"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": null
+    },
+    {
+      "id": "examples/test_sample.py::test_failing",
+      "name": "Failing assertion",
+      "module": "test_sample",
+      "tags": [
+        "debug"
+      ],
+      "status": "failed",
+      "duration_ms": 57,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "the machine has 20 coffees",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": {
+        "message": "assert 10 == 20",
+        "diff": ".venv/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call\n    yield\n.venv/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.venv/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.venv/lib/python3.14/site-packages/_pytest/runner.py:179: in pytest_runtest_call\n    item.runtest()\n.venv/lib/python3.14/site-packages/_pytest/python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.venv/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc/pytest_given/decorators.py:64: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples/test_sample.py:90: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
+      }
+    },
+    {
+      "id": "examples/test_sample.py::test_pricing[1-False]",
+      "name": "Pricing",
+      "module": "test_sample",
+      "tags": [
+        "billing"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I insert ${euros}",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "can_buy is {expect}",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        }
+      ],
+      "parameters": {
+        "names": [
+          "euros",
+          "expect"
+        ],
+        "cases": [
+          {
+            "values": [
+              1,
+              false
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              2,
+              true
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              3,
+              true
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
+      "error": null
+    }
+  ]
+};
 
 function reportApp() {
   const data = window.__REPORT_DATA__;
@@ -370,6 +1171,8 @@ function reportApp() {
     expandedGroups: {},
     expandedSteps: {},
     expandedAttachments: {},
+    expandedScenarios: {},
+    activeTag: null,
     get counts() {
       return {
         passed: data.scenarios.filter(s => s.status === 'passed').length,
@@ -377,9 +1180,13 @@ function reportApp() {
         skipped: data.scenarios.filter(s => s.status === 'skipped').length,
       };
     },
+    get filteredCount() {
+      return data.scenarios.filter((_, i) => this.isVisible(i)).length;
+    },
     get groups() {
       const grouped = {};
       for (const s of data.scenarios) {
+        if (!this._matchesFilters(s)) continue;
         const keys = this.view === 'tags'
           ? (s.tags.length ? s.tags : ['untagged'])
           : [s.module];
@@ -390,6 +1197,18 @@ function reportApp() {
       }
       return Object.values(grouped).sort((a, b) => a.name.localeCompare(b.name));
     },
+    _matchesFilters(s) {
+      if (s.status === 'passed' && !this.showPassed) return false;
+      if (s.status === 'failed' && !this.showFailed) return false;
+      if (s.status === 'skipped' && !this.showSkipped) return false;
+      if (this.activeTag && !s.tags.includes(this.activeTag)) return false;
+      if (this.search) {
+        const q = this.search.toLowerCase();
+        const text = (s.name + ' ' + s.tags.join(' ')).toLowerCase();
+        if (!text.includes(q)) return false;
+      }
+      return true;
+    },
     toggleGroup(name) {
       if (this.expandedGroups[name]) delete this.expandedGroups[name];
       else this.expandedGroups[name] = true;
@@ -398,31 +1217,80 @@ function reportApp() {
       if (this.expandedSteps[stepId]) delete this.expandedSteps[stepId];
       else this.expandedSteps[stepId] = true;
     },
+    toggleScenario(index) {
+      if (this.expandedScenarios[index]) delete this.expandedScenarios[index];
+      else this.expandedScenarios[index] = true;
+    },
+    get anyScenariosExpanded() {
+      return data.scenarios.some((_, i) => this.isVisible(i) && this.expandedScenarios[i]);
+    },
+    toggleAllScenarios() {
+      const expand = !this.anyScenariosExpanded;
+      data.scenarios.forEach((_, i) => {
+        if (this.isVisible(i)) {
+          if (expand) this.expandedScenarios[i] = true;
+          else delete this.expandedScenarios[i];
+        }
+      });
+    },
     isVisible(index) {
       const scenario = data.scenarios[index];
       if (!scenario) return false;
-      if (scenario.status === 'passed' && !this.showPassed) return false;
-      if (scenario.status === 'failed' && !this.showFailed) return false;
-      if (scenario.status === 'skipped' && !this.showSkipped) return false;
-      if (this.search) {
-        const q = this.search.toLowerCase();
-        const text = (scenario.name + ' ' + scenario.tags.join(' ')).toLowerCase();
-        if (!text.includes(q)) return false;
-      }
-      return true;
+      return this._matchesFilters(scenario);
     },
-    scrollTo(id) {
-      const el = document.getElementById('scenario-' + data.scenarios.findIndex(s => s.id === id));
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollToAndExpand(id) {
+      const index = data.scenarios.findIndex(s => s.id === id);
+      if (index === -1) return;
+      this.expandedScenarios[index] = true;
+      this.$nextTick(() => {
+        const el = document.getElementById('scenario-' + index);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    },
+    filterByTag(tag) {
+      if (this.activeTag === tag) {
+        this.activeTag = null;
+      } else {
+        this.activeTag = tag;
+        this.view = 'tags';
+      }
     },
     toggleAttachment(key) {
       if (this.expandedAttachments[key]) delete this.expandedAttachments[key];
       else this.expandedAttachments[key] = true;
     },
+    init() {
+      this._readHash();
+      ['search', 'activeTag', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+        this.$watch(key, () => this._writeHash());
+      });
+      window.addEventListener('hashchange', () => this._readHash());
+    },
+    _readHash() {
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      if (params.has('tag')) this.activeTag = params.get('tag');
+      else this.activeTag = null;
+      if (params.has('passed')) this.showPassed = params.get('passed') !== '0';
+      if (params.has('failed')) this.showFailed = params.get('failed') !== '0';
+      if (params.has('skipped')) this.showSkipped = params.get('skipped') !== '0';
+      if (params.has('q')) this.search = params.get('q');
+      else this.search = '';
+    },
+    _writeHash() {
+      const params = new URLSearchParams();
+      if (this.activeTag) params.set('tag', this.activeTag);
+      if (!this.showPassed) params.set('passed', '0');
+      if (!this.showFailed) params.set('failed', '0');
+      if (!this.showSkipped) params.set('skipped', '0');
+      if (this.search) params.set('q', this.search);
+      const hash = params.toString();
+      history.replaceState(null, '', hash ? '#' + hash : window.location.pathname);
+    },
   };
 }
 </script>
-<script>(()=>{var ee=!1,re=!1,W=[],ne=-1,ie=!1;function Ve(t){Dn(t)}function Ue(){ie=!0}function qe(){ie=!1,We()}function Dn(t){W.includes(t)||W.push(t),We()}function Ke(t){let e=W.indexOf(t);e!==-1&&e>ne&&W.splice(e,1)}function We(){if(!re&&!ee){if(ie)return;ee=!0,queueMicrotask(In)}}function In(){ee=!1,re=!0;for(let t=0;t<W.length;t++)W[t](),ne=t;W.length=0,ne=-1,re=!1}var C,R,j,se,oe=!0;function Ge(t){oe=!1,t(),oe=!0}function Je(t){C=t.reactive,j=t.release,R=e=>t.effect(e,{scheduler:r=>{oe?Ve(r):r()}}),se=t.raw}function ae(t){R=t}function Ye(t){let e=()=>{};return[n=>{let i=R(n);return t._x_effects||(t._x_effects=new Set,t._x_runEffects=()=>{t._x_effects.forEach(o=>o())}),t._x_effects.add(i),e=()=>{i!==void 0&&(t._x_effects.delete(i),j(i))},i},()=>{e()}]}function St(t,e){let r=!0,n,i,o=R(()=>{let s=t(),a=JSON.stringify(s);if(!r&&(typeof s=="object"||s!==n)){let c=typeof n=="object"?JSON.parse(i):n;queueMicrotask(()=>{e(s,c)})}n=s,i=a,r=!1});return()=>j(o)}async function Xe(t){Ue();try{await t(),await Promise.resolve()}finally{qe()}}var Ze=[],Qe=[],tr=[];function er(t){tr.push(t)}function et(t,e){typeof e=="function"?(t._x_cleanups||(t._x_cleanups=[]),t._x_cleanups.push(e)):(e=t,Qe.push(e))}function At(t){Ze.push(t)}function Ot(t,e,r){t._x_attributeCleanups||(t._x_attributeCleanups={}),t._x_attributeCleanups[e]||(t._x_attributeCleanups[e]=[]),t._x_attributeCleanups[e].push(r)}function ce(t,e){t._x_attributeCleanups&&Object.entries(t._x_attributeCleanups).forEach(([r,n])=>{(e===void 0||e.includes(r))&&(n.forEach(i=>i()),delete t._x_attributeCleanups[r])})}function rr(t){for(t._x_effects?.forEach(Ke);t._x_cleanups?.length;)t._x_cleanups.pop()()}var le=new MutationObserver(pe),ue=!1;function ut(){le.observe(document,{subtree:!0,childList:!0,attributes:!0,attributeOldValue:!0}),ue=!0}function fe(){kn(),le.disconnect(),ue=!1}var lt=[];function kn(){let t=le.takeRecords();lt.push(()=>t.length>0&&pe(t));let e=lt.length;queueMicrotask(()=>{if(lt.length===e)for(;lt.length>0;)lt.shift()()})}function m(t){if(!ue)return t();fe();let e=t();return ut(),e}var de=!1,vt=[];function nr(){de=!0}function ir(){de=!1,pe(vt),vt=[]}function pe(t){if(de){vt=vt.concat(t);return}let e=[],r=new Set,n=new Map,i=new Map;for(let o=0;o<t.length;o++)if(!t[o].target._x_ignoreMutationObserver&&(t[o].type==="childList"&&(t[o].removedNodes.forEach(s=>{s.nodeType===1&&s._x_marker&&r.add(s)}),t[o].addedNodes.forEach(s=>{if(s.nodeType===1){if(r.has(s)){r.delete(s);return}s._x_marker||e.push(s)}})),t[o].type==="attributes")){let s=t[o].target,a=t[o].attributeName,c=t[o].oldValue,l=()=>{n.has(s)||n.set(s,[]),n.get(s).push({name:a,value:s.getAttribute(a)})},u=()=>{i.has(s)||i.set(s,[]),i.get(s).push(a)};s.hasAttribute(a)&&c===null?l():s.hasAttribute(a)?(u(),l()):u()}i.forEach((o,s)=>{ce(s,o)}),n.forEach((o,s)=>{Ze.forEach(a=>a(s,o))});for(let o of r)e.some(s=>s.contains(o))||Qe.forEach(s=>s(o));for(let o of e)o.isConnected&&tr.forEach(s=>s(o));e=null,r=null,n=null,i=null}function Ct(t){return P(F(t))}function N(t,e,r){return t._x_dataStack=[e,...F(r||t)],()=>{t._x_dataStack=t._x_dataStack.filter(n=>n!==e)}}function F(t){return t._x_dataStack?t._x_dataStack:typeof ShadowRoot=="function"&&t instanceof ShadowRoot?F(t.host):t.parentNode?F(t.parentNode):[]}function P(t){return new Proxy({objects:t},$n)}function or(t,e){return t===null||t===Object.prototype?null:Object.prototype.hasOwnProperty.call(t,e)?t:or(Object.getPrototypeOf(t),e)}var $n={ownKeys({objects:t}){return Array.from(new Set(t.flatMap(e=>Object.keys(e))))},has({objects:t},e){return e==Symbol.unscopables?!1:t.some(r=>Object.prototype.hasOwnProperty.call(r,e)||Reflect.has(r,e))},get({objects:t},e,r){return e=="toJSON"?Ln:Reflect.get(t.find(n=>Reflect.has(n,e))||{},e,r)},set({objects:t},e,r,n){let i;for(let s of t)if(i=or(s,e),i)break;i||(i=t[t.length-1]);let o=Object.getOwnPropertyDescriptor(i,e);return o?.set&&o?.get?o.set.call(n,r)||!0:Reflect.set(i,e,r)}};function Ln(){return Reflect.ownKeys(this).reduce((e,r)=>(e[r]=Reflect.get(this,r),e),{})}function rt(t){let e=n=>typeof n=="object"&&!Array.isArray(n)&&n!==null,r=(n,i="")=>{Object.entries(Object.getOwnPropertyDescriptors(n)).forEach(([o,{value:s,enumerable:a}])=>{if(a===!1||s===void 0||typeof s=="object"&&s!==null&&s.__v_skip)return;let c=i===""?o:`${i}.${o}`;typeof s=="object"&&s!==null&&s._x_interceptor?n[o]=s.initialize(t,c,o):e(s)&&s!==n&&!(s instanceof Element)&&r(s,c)})};return r(t)}function Tt(t,e=()=>{}){let r={initialValue:void 0,_x_interceptor:!0,initialize(n,i,o){return t(this.initialValue,()=>jn(n,i),s=>me(n,i,s),i,o)}};return e(r),n=>{if(typeof n=="object"&&n!==null&&n._x_interceptor){let i=r.initialize.bind(r);r.initialize=(o,s,a)=>{let c=n.initialize(o,s,a);return r.initialValue=c,i(o,s,a)}}else r.initialValue=n;return r}}function jn(t,e){return e.split(".").reduce((r,n)=>r[n],t)}function me(t,e,r){if(typeof e=="string"&&(e=e.split(".")),e.length===1)t[e[0]]=r;else{if(e.length===0)throw error;return t[e[0]]||(t[e[0]]={}),me(t[e[0]],e.slice(1),r)}}var sr={};function x(t,e){sr[t]=e}function H(t,e){let r=Fn(e);return Object.entries(sr).forEach(([n,i])=>{Object.defineProperty(t,`$${n}`,{get(){return i(e,r)},enumerable:!1})}),t}function Fn(t){let[e,r]=he(t),n={interceptor:Tt,...e};return et(t,r),n}function ar(t,e,r,...n){try{return r(...n)}catch(i){nt(i,t,e)}}function nt(...t){return cr(...t)}var cr=Bn;function lr(t){cr=t}function Bn(t,e,r=void 0){t=Object.assign(t??{message:"No error message given."},{el:e,expression:r}),console.warn(`Alpine Expression Error: ${t.message}
+<script>// Alpine.js v3.15.11 | MIT License | https://github.com/alpinejs/alpine
+(()=>{var ee=!1,re=!1,W=[],ne=-1,ie=!1;function Ve(t){Dn(t)}function Ue(){ie=!0}function qe(){ie=!1,We()}function Dn(t){W.includes(t)||W.push(t),We()}function Ke(t){let e=W.indexOf(t);e!==-1&&e>ne&&W.splice(e,1)}function We(){if(!re&&!ee){if(ie)return;ee=!0,queueMicrotask(In)}}function In(){ee=!1,re=!0;for(let t=0;t<W.length;t++)W[t](),ne=t;W.length=0,ne=-1,re=!1}var C,R,j,se,oe=!0;function Ge(t){oe=!1,t(),oe=!0}function Je(t){C=t.reactive,j=t.release,R=e=>t.effect(e,{scheduler:r=>{oe?Ve(r):r()}}),se=t.raw}function ae(t){R=t}function Ye(t){let e=()=>{};return[n=>{let i=R(n);return t._x_effects||(t._x_effects=new Set,t._x_runEffects=()=>{t._x_effects.forEach(o=>o())}),t._x_effects.add(i),e=()=>{i!==void 0&&(t._x_effects.delete(i),j(i))},i},()=>{e()}]}function St(t,e){let r=!0,n,i,o=R(()=>{let s=t(),a=JSON.stringify(s);if(!r&&(typeof s=="object"||s!==n)){let c=typeof n=="object"?JSON.parse(i):n;queueMicrotask(()=>{e(s,c)})}n=s,i=a,r=!1});return()=>j(o)}async function Xe(t){Ue();try{await t(),await Promise.resolve()}finally{qe()}}var Ze=[],Qe=[],tr=[];function er(t){tr.push(t)}function et(t,e){typeof e=="function"?(t._x_cleanups||(t._x_cleanups=[]),t._x_cleanups.push(e)):(e=t,Qe.push(e))}function At(t){Ze.push(t)}function Ot(t,e,r){t._x_attributeCleanups||(t._x_attributeCleanups={}),t._x_attributeCleanups[e]||(t._x_attributeCleanups[e]=[]),t._x_attributeCleanups[e].push(r)}function ce(t,e){t._x_attributeCleanups&&Object.entries(t._x_attributeCleanups).forEach(([r,n])=>{(e===void 0||e.includes(r))&&(n.forEach(i=>i()),delete t._x_attributeCleanups[r])})}function rr(t){for(t._x_effects?.forEach(Ke);t._x_cleanups?.length;)t._x_cleanups.pop()()}var le=new MutationObserver(pe),ue=!1;function ut(){le.observe(document,{subtree:!0,childList:!0,attributes:!0,attributeOldValue:!0}),ue=!0}function fe(){kn(),le.disconnect(),ue=!1}var lt=[];function kn(){let t=le.takeRecords();lt.push(()=>t.length>0&&pe(t));let e=lt.length;queueMicrotask(()=>{if(lt.length===e)for(;lt.length>0;)lt.shift()()})}function m(t){if(!ue)return t();fe();let e=t();return ut(),e}var de=!1,vt=[];function nr(){de=!0}function ir(){de=!1,pe(vt),vt=[]}function pe(t){if(de){vt=vt.concat(t);return}let e=[],r=new Set,n=new Map,i=new Map;for(let o=0;o<t.length;o++)if(!t[o].target._x_ignoreMutationObserver&&(t[o].type==="childList"&&(t[o].removedNodes.forEach(s=>{s.nodeType===1&&s._x_marker&&r.add(s)}),t[o].addedNodes.forEach(s=>{if(s.nodeType===1){if(r.has(s)){r.delete(s);return}s._x_marker||e.push(s)}})),t[o].type==="attributes")){let s=t[o].target,a=t[o].attributeName,c=t[o].oldValue,l=()=>{n.has(s)||n.set(s,[]),n.get(s).push({name:a,value:s.getAttribute(a)})},u=()=>{i.has(s)||i.set(s,[]),i.get(s).push(a)};s.hasAttribute(a)&&c===null?l():s.hasAttribute(a)?(u(),l()):u()}i.forEach((o,s)=>{ce(s,o)}),n.forEach((o,s)=>{Ze.forEach(a=>a(s,o))});for(let o of r)e.some(s=>s.contains(o))||Qe.forEach(s=>s(o));for(let o of e)o.isConnected&&tr.forEach(s=>s(o));e=null,r=null,n=null,i=null}function Ct(t){return P(F(t))}function N(t,e,r){return t._x_dataStack=[e,...F(r||t)],()=>{t._x_dataStack=t._x_dataStack.filter(n=>n!==e)}}function F(t){return t._x_dataStack?t._x_dataStack:typeof ShadowRoot=="function"&&t instanceof ShadowRoot?F(t.host):t.parentNode?F(t.parentNode):[]}function P(t){return new Proxy({objects:t},$n)}function or(t,e){return t===null||t===Object.prototype?null:Object.prototype.hasOwnProperty.call(t,e)?t:or(Object.getPrototypeOf(t),e)}var $n={ownKeys({objects:t}){return Array.from(new Set(t.flatMap(e=>Object.keys(e))))},has({objects:t},e){return e==Symbol.unscopables?!1:t.some(r=>Object.prototype.hasOwnProperty.call(r,e)||Reflect.has(r,e))},get({objects:t},e,r){return e=="toJSON"?Ln:Reflect.get(t.find(n=>Reflect.has(n,e))||{},e,r)},set({objects:t},e,r,n){let i;for(let s of t)if(i=or(s,e),i)break;i||(i=t[t.length-1]);let o=Object.getOwnPropertyDescriptor(i,e);return o?.set&&o?.get?o.set.call(n,r)||!0:Reflect.set(i,e,r)}};function Ln(){return Reflect.ownKeys(this).reduce((e,r)=>(e[r]=Reflect.get(this,r),e),{})}function rt(t){let e=n=>typeof n=="object"&&!Array.isArray(n)&&n!==null,r=(n,i="")=>{Object.entries(Object.getOwnPropertyDescriptors(n)).forEach(([o,{value:s,enumerable:a}])=>{if(a===!1||s===void 0||typeof s=="object"&&s!==null&&s.__v_skip)return;let c=i===""?o:`${i}.${o}`;typeof s=="object"&&s!==null&&s._x_interceptor?n[o]=s.initialize(t,c,o):e(s)&&s!==n&&!(s instanceof Element)&&r(s,c)})};return r(t)}function Tt(t,e=()=>{}){let r={initialValue:void 0,_x_interceptor:!0,initialize(n,i,o){return t(this.initialValue,()=>jn(n,i),s=>me(n,i,s),i,o)}};return e(r),n=>{if(typeof n=="object"&&n!==null&&n._x_interceptor){let i=r.initialize.bind(r);r.initialize=(o,s,a)=>{let c=n.initialize(o,s,a);return r.initialValue=c,i(o,s,a)}}else r.initialValue=n;return r}}function jn(t,e){return e.split(".").reduce((r,n)=>r[n],t)}function me(t,e,r){if(typeof e=="string"&&(e=e.split(".")),e.length===1)t[e[0]]=r;else{if(e.length===0)throw error;return t[e[0]]||(t[e[0]]={}),me(t[e[0]],e.slice(1),r)}}var sr={};function x(t,e){sr[t]=e}function H(t,e){let r=Fn(e);return Object.entries(sr).forEach(([n,i])=>{Object.defineProperty(t,`$${n}`,{get(){return i(e,r)},enumerable:!1})}),t}function Fn(t){let[e,r]=he(t),n={interceptor:Tt,...e};return et(t,r),n}function ar(t,e,r,...n){try{return r(...n)}catch(i){nt(i,t,e)}}function nt(...t){return cr(...t)}var cr=Bn;function lr(t){cr=t}function Bn(t,e,r=void 0){t=Object.assign(t??{message:"No error message given."},{el:e,expression:r}),console.warn(`Alpine Expression Error: ${t.message}
 
 ${r?'Expression: "'+r+`"
 

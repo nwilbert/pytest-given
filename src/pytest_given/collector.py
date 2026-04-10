@@ -4,6 +4,7 @@ from contextvars import ContextVar
 
 from pytest_given.model import (
     Attachment,
+    ContentType,
     ErrorInfo,
     NodeId,
     ParamInfo,
@@ -100,10 +101,16 @@ class Collector:
             return None
         return self._step_stack.pop()
 
-    def attach(self, label: str, content: str) -> None:
+    def attach(
+        self,
+        label: str,
+        content: str,
+        *,
+        content_type: ContentType = 'text',
+    ) -> None:
         if self._step_stack:
             self._step_stack[-1].attachments.append(
-                Attachment(label=label, content=content)
+                Attachment(label=label, content=content, content_type=content_type)
             )
 
     def fail_scenario(self, message: str, diff: str | None = None) -> None:

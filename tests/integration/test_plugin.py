@@ -140,7 +140,6 @@ def test_decorated_fixture_appears_as_given_step(pytester, tmp_path):
     assert steps[0]['text'] == 'a prepared value'
 
 
-
 def test_parameterized_test_as_table(pytester, tmp_path):
     """Parameterized tests produce a parameter table in the report."""
     pytester.makepyfile(

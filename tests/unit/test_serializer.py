@@ -124,5 +124,5 @@ def test_serialize_with_attachments() -> None:
     )
     data = asdict(report)
     att = data['scenarios'][0]['steps'][0]['attachments'][0]
-    assert att == {'label': 'Log', 'content': 'data'}
+    assert att == {'label': 'Log', 'content': 'data', 'content_type': 'text'}
     json.dumps(data)

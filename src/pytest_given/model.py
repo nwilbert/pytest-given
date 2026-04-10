@@ -24,10 +24,14 @@ class ParamSpec(NamedTuple):
 type ParamInfo = dict[NodeId, ParamSpec]
 
 
+type ContentType = Literal['text', 'json']
+
+
 @dataclass
 class Attachment:
     label: str
     content: str
+    content_type: ContentType = 'text'
 
 
 @dataclass
