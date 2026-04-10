@@ -2,7 +2,15 @@ from __future__ import annotations
 
 from contextvars import ContextVar
 
-from pytest_given.model import Attachment, ErrorInfo, NodeId, ParamInfo, Scenario, Step
+from pytest_given.model import (
+    Attachment,
+    ErrorInfo,
+    NodeId,
+    ParamInfo,
+    Phase,
+    Scenario,
+    Step,
+)
 
 _collector_var: ContextVar[Collector | None] = ContextVar('collector', default=None)
 
@@ -42,7 +50,7 @@ class Collector:
         return self._scenarios
 
     @property
-    def current_phase(self) -> str | None:
+    def current_phase(self) -> Phase | None:
         """The phase of the innermost active step, or None."""
         if self._step_stack:
             return self._step_stack[-1].phase
@@ -73,7 +81,7 @@ class Collector:
         self._step_stack = []
         return scenario
 
-    def push_step(self, phase: str, text: str, source: str | None = None) -> Step:
+    def push_step(self, phase: Phase, text: str, source: str | None = None) -> Step:
         if self._step_stack and self._step_stack[-1].phase != phase:
             raise RuntimeError(
                 f"Cannot nest '{phase}' inside '{self._step_stack[-1].phase}'"

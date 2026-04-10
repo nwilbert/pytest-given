@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, NamedTuple, NewType
+from typing import Any, Literal, NamedTuple, NewType
 
 # Pytest node ID, e.g. "tests/test_billing.py::test_buy_coffee[1-2-3]"
 NodeId = NewType('NodeId', str)
+
+# Step phase
+type Phase = Literal['given', 'when', 'then']
 
 # Arbitrary Python value from @pytest.mark.parametrize (int, str, bool, etc.)
 type ParamValue = Any
@@ -35,7 +38,7 @@ class ErrorInfo:
 
 @dataclass
 class Step:
-    phase: str  # 'given', 'when', 'then'
+    phase: Phase
     text: str
     status: str = 'passed'
     source: str | None = None  # 'fixture' if from a decorated fixture

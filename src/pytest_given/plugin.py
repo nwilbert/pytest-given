@@ -19,6 +19,7 @@ from pytest_given.model import (
     ParameterTable,
     ParamInfo,
     ParamSpec,
+    Phase,
     ReportData,
     Scenario,
     Step,
@@ -89,9 +90,9 @@ def _get_scenario_marker(item: pytest.Item) -> Any | None:
     return getattr(func, '_scenario', None)
 
 
-def _get_fixture_steps(item: pytest.Item) -> list[tuple[str, str]]:
+def _get_fixture_steps(item: pytest.Item) -> list[tuple[Phase, str]]:
     """Collect step descriptors from fixtures used by this item."""
-    steps: list[tuple[str, str]] = []
+    steps: list[tuple[Phase, str]] = []
     if not hasattr(item, 'fixturenames'):  # pragma: no cover
         return steps
     fm = item.session._fixturemanager
