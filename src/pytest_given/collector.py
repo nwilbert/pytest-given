@@ -1,6 +1,20 @@
 from __future__ import annotations
 
+from contextvars import ContextVar
+
 from pytest_given.model import Attachment, ErrorInfo, NodeId, ParamInfo, Scenario, Step
+
+_collector_var: ContextVar[Collector | None] = ContextVar('collector', default=None)
+
+
+def set_active_collector(collector: Collector | None) -> None:
+    """Set the active collector for the current thread."""
+    _collector_var.set(collector)
+
+
+def get_active_collector() -> Collector | None:
+    """Get the active collector for the current thread, or None."""
+    return _collector_var.get()
 
 
 class Collector:
@@ -26,6 +40,13 @@ class Collector:
     @property
     def scenarios(self) -> list[Scenario]:
         return self._scenarios
+
+    @property
+    def current_phase(self) -> str | None:
+        """The phase of the innermost active step, or None."""
+        if self._step_stack:
+            return self._step_stack[-1].phase
+        return None
 
     def start_scenario(
         self,
@@ -53,6 +74,11 @@ class Collector:
         return scenario
 
     def push_step(self, phase: str, text: str, source: str | None = None) -> Step:
+        if self._step_stack and self._step_stack[-1].phase != phase:
+            raise RuntimeError(
+                f"Cannot nest '{phase}' inside '{self._step_stack[-1].phase}'"
+                ' — restructure your test or use a phase-neutral helper'
+            )
         step = Step(phase=phase, text=text, source=source)
         if self._step_stack:
             self._step_stack[-1].children.append(step)

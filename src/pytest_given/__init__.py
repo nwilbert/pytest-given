@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-from pytest_given.decorators import (
-    ScenarioDecorator,
-    StepDescriptor,
-    get_active_collector,
-)
+from pytest_given.collector import get_active_collector
+from pytest_given.decorators import ScenarioDecorator, StepDescriptor
 
 __all__ = ['attach', 'given', 'scenario', 'then', 'when']
 

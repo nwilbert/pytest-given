@@ -1,3 +1,5 @@
+import pytest
+
 from pytest_given.collector import Collector
 
 
@@ -82,3 +84,54 @@ def test_active_scenario_id_set() -> None:
     assert collector.active_scenario_id == 'test.py::test_x'
     collector.finish_scenario(status='passed', duration_ms=0)
     assert collector.active_scenario_id is None
+
+
+def test_cross_phase_nesting_raises() -> None:
+    """Nesting a different phase inside another raises an error."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    collector.push_step('then', 'result is correct')
+    with pytest.raises(
+        RuntimeError,
+        match="Cannot nest 'given' inside 'then'",
+    ):
+        collector.push_step('given', 'some precondition')
+
+
+def test_same_phase_nesting_allowed() -> None:
+    """Nesting the same phase inside itself is allowed."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    collector.push_step('when', 'outer step')
+    collector.push_step('when', 'inner step')
+    collector.pop_step()
+    collector.pop_step()
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    assert len(scenario.steps) == 1
+    assert len(scenario.steps[0].children) == 1
+
+
+def test_sequential_different_phases_allowed() -> None:
+    """Different phases at the top level (not nested) is fine."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    collector.push_step('given', 'setup')
+    collector.pop_step()
+    collector.push_step('when', 'action')
+    collector.pop_step()
+    collector.push_step('then', 'check')
+    collector.pop_step()
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    assert len(scenario.steps) == 3
+
+
+def test_current_phase() -> None:
+    """current_phase reflects the innermost active step."""
+    collector = Collector()
+    assert collector.current_phase is None
+    collector.start_scenario('id', 'name', 'mod', [])
+    assert collector.current_phase is None
+    collector.push_step('given', 'a thing')
+    assert collector.current_phase == 'given'
+    collector.pop_step()
+    assert collector.current_phase is None

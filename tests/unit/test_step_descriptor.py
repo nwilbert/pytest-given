@@ -1,5 +1,5 @@
-from pytest_given.collector import Collector
-from pytest_given.decorators import StepDescriptor, set_active_collector
+from pytest_given.collector import Collector, set_active_collector
+from pytest_given.decorators import StepDescriptor
 
 
 def test_context_manager_basic() -> None:
@@ -34,41 +34,6 @@ def test_decorator_preserves_function_metadata() -> None:
 
     assert my_func.__name__ == 'my_func'
     assert my_func.__doc__ == 'My docstring.'
-
-
-def test_cross_phase_nesting_raises() -> None:
-    """Nesting a different phase inside another raises an error."""
-    import pytest
-
-    outer = StepDescriptor('then', 'result is correct')
-    inner = StepDescriptor('given', 'some precondition')
-    with (
-        pytest.raises(
-            RuntimeError,
-            match="Cannot nest 'given' inside 'then'",
-        ),
-        outer,
-        inner,
-    ):
-        pass
-
-
-def test_same_phase_nesting_allowed() -> None:
-    """Nesting the same phase inside itself is allowed."""
-    outer = StepDescriptor('when', 'outer step')
-    inner = StepDescriptor('when', 'inner step')
-    with outer, inner:
-        pass  # no error
-
-
-def test_sequential_different_phases_allowed() -> None:
-    """Different phases at the top level (not nested) is fine."""
-    with StepDescriptor('given', 'setup'):
-        pass
-    with StepDescriptor('when', 'action'):
-        pass
-    with StepDescriptor('then', 'check'):
-        pass
 
 
 def test_context_manager_records_step_in_collector() -> None:
