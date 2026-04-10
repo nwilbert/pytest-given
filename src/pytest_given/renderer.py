@@ -22,6 +22,7 @@ def render_html(json_path: Path, html_path: Path) -> None:
 
     templates_dir = Path(__file__).parent / 'templates'
     css = (templates_dir / 'styles.css').read_text()
+    app_js = (templates_dir / 'app.js').read_text()
     alpine_js = (templates_dir / 'alpine.min.js').read_text()
 
     env = jinja2.Environment(
@@ -47,6 +48,7 @@ def render_html(json_path: Path, html_path: Path) -> None:
         scenarios=data['scenarios'],
         report_json=Markup(raw_json),
         css=Markup(css),
+        app_js=Markup(app_js),
         alpine_js=Markup(alpine_js),
         param_color_map=param_color_map,
         num_param_colors=_NUM_PARAM_COLORS,
