@@ -60,10 +60,10 @@ body {
   top: 0;
 }
 .sidebar-title {
-  font-size: var(--font-size-md);
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 .sidebar input[type="text"] {
   width: 100%;
@@ -77,7 +77,11 @@ body {
 }
 .sidebar input[type="text"]:focus { border-color: var(--color-accent); }
 
-.sidebar-section { margin-top: var(--space-lg); }
+.sidebar-section {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border);
+}
 .sidebar-label {
   color: var(--text-muted);
   font-size: 0.6875rem;
@@ -133,9 +137,9 @@ body {
 }
 
 /* Navigation tree */
-.nav-tree { font-size: var(--font-size-base); }
+.nav-tree { font-size: var(--font-size-base); margin-top: var(--space-md); }
 .nav-group {
-  padding: 3px 0;
+  padding: 5px 0;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -164,10 +168,15 @@ body {
 
 /* === Main === */
 .main { flex: 1; padding: var(--space-xl); overflow-y: auto; }
-.header { margin-bottom: var(--space-xl); }
+.header {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
 .header-context {
-  font-size: var(--font-size-base);
-  color: var(--text-muted);
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 .header-title { font-size: var(--font-size-lg); font-weight: 600; }
 .header-meta { color: var(--text-muted); font-size: var(--font-size-sm); }
@@ -202,7 +211,18 @@ body {
   cursor: pointer;
   user-select: none;
 }
-.scenario-toggle { color: var(--text-muted); font-size: var(--font-size-sm); margin-right: var(--space-sm); }
+.scenario-chevron {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  margin-right: var(--space-sm);
+}
+.scenario-chevron-open { transform: rotate(45deg); }
 .scenario-name { font-size: var(--font-size-md); font-weight: 500; }
 .scenario-tag {
   display: inline-block;
@@ -318,6 +338,11 @@ body {
 .dot-passed { color: var(--color-passed); }
 .dot-failed { color: var(--color-failed); }
 .dot-skipped { color: var(--color-skipped); }
+
+/* Transitions */
+.transition-enter { transition: opacity 0.15s ease, transform 0.15s ease; }
+.transition-enter-start { opacity: 0; transform: translateY(-4px); }
+.transition-enter-end { opacity: 1; transform: translateY(0); }
 
 /* Parameter colors — light-background variants */
 .param-color-0, th.param-color-0 { color: #d63384; font-weight: 600; }

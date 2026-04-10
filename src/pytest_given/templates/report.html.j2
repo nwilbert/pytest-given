@@ -29,9 +29,6 @@
       <div class="view-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
       <div class="view-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
     </div>
-  </div>
-
-  <div class="sidebar-section">
     <div class="nav-tree">
       <template x-for="group in groups" :key="group.name">
         <div>
@@ -65,7 +62,7 @@
         <div class="header-context" x-text="activeTag ? 'Tag: ' + activeTag : 'All Scenarios'"></div>
         <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
       </div>
-      <div class="header-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · {{ metadata.timestamp }}</div>
+      <div class="header-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · <span x-text="formattedTimestamp"></span></div>
     </div>
   </div>
 
@@ -81,7 +78,7 @@
     {%- endif -%}
   </div>
   {%- if step.children and step.children | length > 0 -%}
-    <div class="step-children" x-show="expandedSteps['{{ step_id }}']">
+    <div class="step-children" x-show="expandedSteps['{{ step_id }}']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
       {%- for child in step.children -%}
         {{ render_step(child, step_id ~ '_' ~ loop.index0) }}
       {%- endfor -%}
@@ -91,7 +88,7 @@
     {%- for att in step.attachments -%}
     <div>
       <span class="attachment-badge" @click="toggleAttachment('{{ step_id }}_att_{{ loop.index0 }}')">📎 {{ att.label }}</span>
-      <div class="attachment-content" x-show="expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}']"><pre>{{ att.content }}</pre></div>
+      <div class="attachment-content" x-show="expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{{ att.content }}</pre></div>
     </div>
     {%- endfor -%}
   {%- endif -%}
@@ -110,7 +107,7 @@
        :class="{ 'scenario-expanded': expandedScenarios[{{ loop.index0 }}] }">
     <div class="scenario-header" @click="toggleScenario({{ loop.index0 }})">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-toggle" x-text="expandedScenarios[{{ loop.index0 }}] ? '▾' : '▸'"></span>
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span>
         <span class="scenario-name">{{ scenario.name }}</span>
         {% for tag in scenario.tags %}
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
@@ -124,7 +121,7 @@
       </span>
     </div>
 
-    <div x-show="expandedScenarios[{{ loop.index0 }}]">
+    <div x-show="expandedScenarios[{{ loop.index0 }}]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
       <div class="steps">
         {%- set scenario_idx = loop.index0 -%}
         {%- set ns = namespace(prev_phase=None) -%}
@@ -201,6 +198,12 @@ function reportApp() {
     expandedAttachments: {},
     expandedScenarios: {},
     activeTag: null,
+    get formattedTimestamp() {
+      const d = new Date(data.metadata.timestamp);
+      if (isNaN(d)) return data.metadata.timestamp;
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        + ' at ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    },
     get counts() {
       return {
         passed: data.scenarios.filter(s => s.status === 'passed').length,
