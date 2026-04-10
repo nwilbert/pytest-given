@@ -14,14 +14,6 @@
   <div class="sidebar-title">{{ metadata.project }}</div>
   <input type="text" placeholder="🔍 Search scenarios..." x-model="search">
 
-  <div class="active-filter" x-show="activeTag" x-cloak>
-    <span class="active-filter-label">Filter:</span>
-    <span class="active-filter-chip" @click="filterByTag(activeTag)">
-      <span x-text="activeTag"></span>
-      <span class="active-filter-dismiss">×</span>
-    </span>
-  </div>
-
   <div class="sidebar-section">
     <div class="sidebar-label">Status</div>
     <div class="status-pills">
@@ -48,9 +40,10 @@
     <div class="nav-tree">
       <template x-for="group in groups" :key="group.name">
         <div>
-          <div class="nav-group" @click="toggleGroup(group.name)">
+          <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
             <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
             <span class="nav-group-name" x-text="group.name"></span>
+            <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
             <span class="nav-group-count" x-text="group.scenarios.length"></span>
           </div>
           <template x-if="expandedGroups[group.name]">
