@@ -81,13 +81,13 @@ class Collector:
         self._step_stack = []
         return scenario
 
-    def push_step(self, phase: Phase, text: str, source: str | None = None) -> Step:
+    def push_step(self, phase: Phase, text: str) -> Step:
         if self._step_stack and self._step_stack[-1].phase != phase:
             raise RuntimeError(
                 f"Cannot nest '{phase}' inside '{self._step_stack[-1].phase}'"
                 ' — restructure your test or use a phase-neutral helper'
             )
-        step = Step(phase=phase, text=text, source=source)
+        step = Step(phase=phase, text=text)
         if self._step_stack:
             self._step_stack[-1].children.append(step)
         elif self._current_scenario is not None:

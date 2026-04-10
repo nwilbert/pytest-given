@@ -17,7 +17,7 @@ def test_step_defaults() -> None:
     assert step.status == 'passed'
     assert step.children == []
     assert step.attachments == []
-    assert step.source is None
+
     assert step.error is None
 
 

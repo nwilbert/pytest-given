@@ -41,7 +41,6 @@ class Step:
     phase: Phase
     text: str
     status: str = 'passed'
-    source: str | None = None  # 'fixture' if from a decorated fixture
     children: list[Step] = field(default_factory=list)
     attachments: list[Attachment] = field(default_factory=list)
     error: ErrorInfo | None = None

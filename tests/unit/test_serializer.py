@@ -49,7 +49,6 @@ def test_serialize_scenario_with_steps() -> None:
                     Step(
                         phase='given',
                         text='a machine',
-                        source='fixture',
                     ),
                     Step(
                         phase='when',
@@ -67,7 +66,6 @@ def test_serialize_scenario_with_steps() -> None:
     assert scenario['name'] == 'Test X'
     assert scenario['tags'] == ['billing']
     assert len(scenario['steps']) == 2
-    assert scenario['steps'][0]['source'] == 'fixture'
     assert len(scenario['steps'][1]['children']) == 1
     json.dumps(data)
 

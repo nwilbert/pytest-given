@@ -138,7 +138,7 @@ def test_decorated_fixture_appears_as_given_step(pytester, tmp_path):
     steps = data['scenarios'][0]['steps']
     assert steps[0]['phase'] == 'given'
     assert steps[0]['text'] == 'a prepared value'
-    assert steps[0]['source'] == 'fixture'
+
 
 
 def test_parameterized_test_as_table(pytester, tmp_path):

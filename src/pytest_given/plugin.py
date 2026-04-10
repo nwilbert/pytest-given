@@ -77,7 +77,7 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
         collector.param_info[node_id] = ParamSpec(names=names, values=values)
     # Add fixture steps
     for phase, text in _get_fixture_steps(item):
-        collector.push_step(phase, text, source='fixture')
+        collector.push_step(phase, text)
         collector.pop_step()
     collector.start_times[node_id] = time.monotonic()
 
