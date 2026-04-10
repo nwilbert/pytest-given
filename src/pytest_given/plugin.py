@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -12,8 +13,11 @@ import pytest
 from pytest_given.collector import Collector
 from pytest_given.model import (
     Metadata,
+    NodeId,
     ParameterCase,
     ParameterTable,
+    ParamInfo,
+    ParamSpec,
     ReportData,
     Scenario,
     Step,
@@ -82,8 +86,9 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
         return
     mod = getattr(item, 'module', None)
     module = mod.__name__ if mod else item.nodeid.split('::')[0]
+    node_id = NodeId(item.nodeid)
     collector.start_scenario(
-        scenario_id=item.nodeid,
+        scenario_id=node_id,
         name=scenario_marker.name,
         module=module,
         tags=scenario_marker.tags,
@@ -94,24 +99,24 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
     if callspec is not None:
         names = list(callspec.params.keys())
         values = [callspec.params[n] for n in names]
-        collector.param_info[item.nodeid] = (names, values)
+        collector.param_info[node_id] = ParamSpec(names=names, values=values)
     # Add fixture steps
     for phase, text in _get_fixture_steps(item):
         collector.push_step(phase, text, source='fixture')
         collector.pop_step()
-    collector.start_times[item.nodeid] = time.monotonic()
+    collector.start_times[node_id] = time.monotonic()
 
 
 @pytest.hookimpl(trylast=True)
 def pytest_runtest_teardown(item: pytest.Item) -> None:  # pragma: no cover
-    if collector.active_scenario_id != item.nodeid:
+    if collector.active_scenario_id != NodeId(item.nodeid):
         return
     set_active_collector(None)
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) -> None:
-    if collector.active_scenario_id != item.nodeid:
+    if collector.active_scenario_id != NodeId(item.nodeid):
         return
     if call.when == 'call' and call.excinfo is not None:
         error_repr = call.excinfo.getrepr(style='short')
@@ -124,66 +129,49 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
 def pytest_runtest_logreport(report: pytest.TestReport) -> None:
     if report.when != 'call':
         return
-    if collector.active_scenario_id != report.nodeid:
+    node_id = NodeId(report.nodeid)
+    if collector.active_scenario_id != node_id:
         return
-    elapsed = time.monotonic() - collector.start_times.pop(
-        report.nodeid, time.monotonic()
-    )
+    elapsed = time.monotonic() - collector.start_times.pop(node_id, time.monotonic())
     duration_ms = int(elapsed * 1000)
     status = 'passed' if report.passed else 'failed' if report.failed else 'skipped'
     collector.finish_scenario(status=status, duration_ms=duration_ms)
 
 
-def _templatize_step_text(text: str, param_names: list[str], values: list[Any]) -> str:
-    """Replace parameter values in step text with {param_name} placeholders.
-
-    Replaces longer string representations first to avoid partial matches.
-    """
+def _templatize_step_text(text: str, replacements: list[tuple[str, str]]) -> str:
+    """Replace parameter values in step text with {param_name} placeholders."""
     result = text
-    # Sort by length of string representation (longest first) to avoid
-    # partial replacements (e.g., replacing "1" inside "10").
-    pairs = sorted(
-        zip(param_names, values, strict=True),
-        key=lambda p: len(str(p[1])),
-        reverse=True,
-    )
-    for name, value in pairs:
-        result = result.replace(str(value), '{' + name + '}')
+    for name, str_value in replacements:
+        # Simple text replacement — may match unrelated occurrences of the same
+        # value in the step text. Longest-first ordering mitigates partial matches.
+        result = result.replace(str_value, '{' + name + '}')
     return result
 
 
 def _templatize_steps(
     steps: list[Step],
-    param_names: list[str],
-    values: list[Any],
+    replacements: list[tuple[str, str]],
 ) -> list[Step]:
     """Create template steps by replacing param values with {name} placeholders."""
     result: list[Step] = []
     for step in steps:
-        new_text = _templatize_step_text(step.text, param_names, values)
-        new_children = _templatize_steps(step.children, param_names, values)
-        result.append(
-            Step(
-                phase=step.phase,
-                text=new_text,
-                status=step.status,
-                source=step.source,
-                children=new_children,
-                attachments=step.attachments,
-                error=step.error,
-            )
-        )
+        new_text = _templatize_step_text(step.text, replacements)
+        new_children = _templatize_steps(step.children, replacements)
+        result.append(dataclasses.replace(step, text=new_text, children=new_children))
     return result
 
 
-def _group_parameterized(scenarios: list[Scenario]) -> list[Scenario]:
+def _group_parameterized(
+    scenarios: list[Scenario],
+    param_info: ParamInfo,
+) -> list[Scenario]:
     """Group parameterized scenarios into single scenarios with parameter tables."""
     result: list[Scenario] = []
     groups: dict[tuple[str, str], list[Scenario]] = {}
     group_order: list[tuple[str, str]] = []
 
     for scenario in scenarios:
-        if scenario.id in collector.param_info:
+        if scenario.id in param_info:
             key = (scenario.name, scenario.module)
             if key not in groups:
                 groups[key] = []
@@ -195,17 +183,22 @@ def _group_parameterized(scenarios: list[Scenario]) -> list[Scenario]:
     for key in group_order:
         group = groups[key]
         first = group[0]
-        param_names, first_values = collector.param_info[first.id]
+        param_names, first_values = param_info[first.id]
 
-        # Build template steps from the first run's steps,
-        # replacing concrete values with {param_name} placeholders
-        template_steps = _templatize_steps(first.steps, param_names, first_values)
+        # Pre-sort replacements by length (longest first) to avoid
+        # partial matches (e.g., replacing "1" inside "10").
+        replacements = sorted(
+            zip(param_names, [str(v) for v in first_values], strict=True),
+            key=lambda p: len(p[1]),
+            reverse=True,
+        )
+        template_steps = _templatize_steps(first.steps, replacements)
 
         cases: list[ParameterCase] = []
         any_failed = False
         total_duration = 0
         for scenario in group:
-            _, values = collector.param_info[scenario.id]
+            _, values = param_info[scenario.id]
             cases.append(
                 ParameterCase(
                     values=values,
@@ -229,13 +222,13 @@ def _group_parameterized(scenarios: list[Scenario]) -> list[Scenario]:
         )
         result.append(merged)
 
-    collector.param_info.clear()
     return result
 
 
 def pytest_sessionfinish(session: pytest.Session) -> None:
     json_path = Path(session.config.getoption('given_json'))
-    scenarios = _group_parameterized(collector.scenarios)
+    scenarios = _group_parameterized(collector.scenarios, collector.param_info)
+    collector.param_info.clear()
     report = ReportData(
         metadata=Metadata(
             project=session.config.rootpath.name,

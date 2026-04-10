@@ -43,16 +43,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 /* Steps */
 .steps { font-size: 13px; line-height: 1.8; }
 .phase-label { font-weight: 600; margin-bottom: 2px; }
-.phase-given { color: #c792ea; }
-.phase-when { color: #ffcb6b; }
-.phase-then { color: #82aaff; }
+.phase-given, .phase-when, .phase-then { color: #ccc; }
 .step-text { color: #ccc; padding-left: 16px; margin-bottom: 2px; }
 .step-children { padding-left: 16px; border-left: 1px solid #333; margin-left: 8px; }
 .step-toggle { cursor: pointer; user-select: none; }
 
 /* Param table */
-.param-table { width: 100%; border-collapse: collapse; font-size: 13px; background: #0d0d1a; border-radius: 6px; overflow: hidden; margin-top: 8px; }
-.param-table th { text-align: left; padding: 8px 12px; color: #888; font-weight: 500; background: #1e1e3a; }
+.param-table { width: auto; border-collapse: collapse; font-size: 13px; background: #0d0d1a; border-radius: 6px; overflow: hidden; margin-top: 8px; margin-left: 16px; }
+.param-table th { text-align: left; padding: 8px 12px; color: #888; font-weight: 600; background: #1e1e3a; }
 .param-table td { padding: 8px 12px; color: #ccc; border-top: 1px solid #1a1a2e; }
 .param-table tr.failed-row { background: #2a1015; }
 
@@ -70,6 +68,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .dot-passed { color: #4caf50; }
 .dot-failed { color: #f44336; }
 .dot-skipped { color: #ff9800; }
+
+/* Parameter colors — used for both placeholders in step text and column headers */
+.param-color-0, th.param-color-0 { color: #f9a8d4; font-weight: 600; }
+.param-color-1, th.param-color-1 { color: #a5f3c4; font-weight: 600; }
+.param-color-2, th.param-color-2 { color: #93c5fd; font-weight: 600; }
+.param-color-3, th.param-color-3 { color: #fcd34d; font-weight: 600; }
+.param-color-4, th.param-color-4 { color: #c4b5fd; font-weight: 600; }
+.param-color-5, th.param-color-5 { color: #fdba74; font-weight: 600; }
 
 </style>
 </head>
@@ -121,7 +127,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 <div class="main">
   <div class="header">
     <h1>pytest-given</h1>
-    <div class="meta">Generated 2026-04-09T16:46:09.006298+00:00 · pytest 9.0.3 · pytest-given 0.1.0</div>
+    <div class="meta">Generated 2026-04-09T17:07:33.609775+00:00 · pytest 9.0.3 · pytest-given 0.1.0</div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(0)"
@@ -179,9 +185,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
        id="scenario-2">
     <div class="scenario-header">
       <div>
-        <span class="scenario-name">Pricing</span>
+        <span class="scenario-name">Buy coffee with validation</span>
         
         <span class="scenario-tag">billing</span>
+        
+        <span class="scenario-tag">detailed</span>
         
       </div>
       <span class="scenario-status passed">
@@ -189,51 +197,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       </span>
     </div>
 
-    <div class="steps"><div class="phase-label phase-given">Given</div><div class="step-text">a coffee machine</div><div class="phase-label phase-when">When</div><div class="step-text">I insert $1</div><div class="phase-label phase-then">Then</div><div class="step-text">can_buy is False</div></div>
-
-    
-
-    
-  </div>
-  
-  <div class="scenario passed"
-       x-show="isVisible(3)"
-       id="scenario-3">
-    <div class="scenario-header">
-      <div>
-        <span class="scenario-name">Pricing</span>
-        
-        <span class="scenario-tag">billing</span>
-        
-      </div>
-      <span class="scenario-status passed">
-        ✓ passed
-      </span>
+    <div class="steps"><div class="phase-label phase-given">Given</div><div class="step-text">a coffee machine</div><div class="phase-label phase-when">When</div><div class="step-text step-toggle" @click="toggleStep('s2_1')">
+      <span x-text="expandedSteps['s2_1'] ? '▾' : '▸'"></span>
+      I insert $2
     </div>
-
-    <div class="steps"><div class="phase-label phase-given">Given</div><div class="step-text">a coffee machine</div><div class="phase-label phase-when">When</div><div class="step-text">I insert $2</div><div class="phase-label phase-then">Then</div><div class="step-text">can_buy is True</div></div>
-
-    
-
-    
-  </div>
-  
-  <div class="scenario passed"
-       x-show="isVisible(4)"
-       id="scenario-4">
-    <div class="scenario-header">
-      <div>
-        <span class="scenario-name">Pricing</span>
-        
-        <span class="scenario-tag">billing</span>
-        
-      </div>
-      <span class="scenario-status passed">
-        ✓ passed
-      </span>
+    <div class="step-children" x-show="expandedSteps['s2_1']"><div class="step-text">validating coin... accepted</div><div class="step-text">updating balance</div></div><div class="phase-label phase-then">Then</div><div class="step-text">the coin is accepted</div><div class="step-text step-toggle" @click="toggleStep('s2_3')">
+      <span x-text="expandedSteps['s2_3'] ? '▾' : '▸'"></span>
+      a coffee is dispensed
     </div>
-
-    <div class="steps"><div class="phase-label phase-given">Given</div><div class="step-text">a coffee machine</div><div class="phase-label phase-when">When</div><div class="step-text">I insert $3</div><div class="phase-label phase-then">Then</div><div class="step-text">can_buy is True</div></div>
+    <div class="step-children" x-show="expandedSteps['s2_3']"><div class="step-text">the machine state is consistent</div><div class="step-text">
+      <span class="attachment-badge" @click="toggleAttachment('s2_3_0_att_0')">📎 Final state</span>
+      <div class="attachment-content" x-show="expandedAttachments['s2_3_0_att_0']">{&#39;coffees&#39;: 9, &#39;price&#39;: 2}</div>
+    </div></div></div>
 
     
 
@@ -241,8 +216,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   </div>
   
   <div class="scenario failed"
-       x-show="isVisible(5)"
-       id="scenario-5">
+       x-show="isVisible(3)"
+       id="scenario-3">
     <div class="scenario-header">
       <div>
         <span class="scenario-name">Failing assertion</span>
@@ -298,17 +273,91 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 src/pytest_given/__init__.py:48: in wrapper
     return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^
-examples/test_sample.py:41: in test_failing
+examples/test_sample.py:63: in test_failing
     assert machine[&#39;coffees&#39;] == 20
 E   assert 10 == 20</pre>
     </div>
     
   </div>
   
+  <div class="scenario passed"
+       x-show="isVisible(4)"
+       id="scenario-4">
+    <div class="scenario-header">
+      <div>
+        <span class="scenario-name">Pricing</span>
+        
+        <span class="scenario-tag">billing</span>
+        
+      </div>
+      <span class="scenario-status passed">
+        ✓ passed
+      </span>
+    </div>
+
+    <div class="steps"><div class="phase-label phase-given">Given</div><div class="step-text">a coffee machine</div><div class="phase-label phase-when">When</div><div class="step-text">I insert $<span class="param-color-0">{euros}</span></div><div class="phase-label phase-then">Then</div><div class="step-text">can_buy is <span class="param-color-1">{expect}</span></div></div>
+
+    
+    <table class="param-table">
+      <thead>
+        <tr>
+          
+          <th class="param-color-0">euros</th>
+          
+          <th class="param-color-1">expect</th>
+          
+          <th style="text-align:right">status</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr class="">
+          
+          <td>1</td>
+          
+          <td>False</td>
+          
+          <td style="text-align:right">
+            <span class="dot-passed">✓</span>
+          </td>
+        </tr>
+        
+        
+        <tr class="">
+          
+          <td>2</td>
+          
+          <td>True</td>
+          
+          <td style="text-align:right">
+            <span class="dot-passed">✓</span>
+          </td>
+        </tr>
+        
+        
+        <tr class="">
+          
+          <td>3</td>
+          
+          <td>True</td>
+          
+          <td style="text-align:right">
+            <span class="dot-passed">✓</span>
+          </td>
+        </tr>
+        
+        
+      </tbody>
+    </table>
+    
+
+    
+  </div>
+  
 </div>
 
 <script>
-window.__REPORT_DATA__ = {"metadata": {"project": "pytest-given", "timestamp": "2026-04-09T16:46:09.006298+00:00", "pytest_version": "9.0.3", "plugin_version": "0.1.0"}, "scenarios": [{"id": "examples/test_sample.py::test_buy_coffee", "name": "Buy coffee", "module": "test_sample", "tags": ["billing", "happy-path"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert $2", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "I get a coffee", "status": "passed", "source": null, "children": [], "attachments": [{"label": "Machine state", "content": "{'coffees': 9, 'price': 2}"}], "error": null}], "parameters": null, "error": null}, {"id": "examples/test_sample.py::test_not_enough", "name": "Not enough money", "module": "test_sample", "tags": ["billing", "edge-case"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert $1", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "I don't get a coffee", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "parameters": null, "error": null}, {"id": "examples/test_sample.py::test_pricing[1-False]", "name": "Pricing", "module": "test_sample", "tags": ["billing"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert $1", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "can_buy is False", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "parameters": null, "error": null}, {"id": "examples/test_sample.py::test_pricing[2-True]", "name": "Pricing", "module": "test_sample", "tags": ["billing"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert $2", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "can_buy is True", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "parameters": null, "error": null}, {"id": "examples/test_sample.py::test_pricing[3-True]", "name": "Pricing", "module": "test_sample", "tags": ["billing"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert $3", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "can_buy is True", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "parameters": null, "error": null}, {"id": "examples/test_sample.py::test_failing", "name": "Failing assertion", "module": "test_sample", "tags": ["debug"], "status": "failed", "duration_ms": 54, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "the machine has 20 coffees", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "parameters": null, "error": {"message": "assert 10 == 20", "diff": ".venv/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call\n    yield\n.venv/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.venv/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.venv/lib/python3.14/site-packages/_pytest/runner.py:179: in pytest_runtest_call\n    item.runtest()\n.venv/lib/python3.14/site-packages/_pytest/python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.venv/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc/pytest_given/__init__.py:48: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples/test_sample.py:41: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"}}]};
+window.__REPORT_DATA__ = {"metadata": {"project": "pytest-given", "timestamp": "2026-04-09T17:07:33.609775+00:00", "pytest_version": "9.0.3", "plugin_version": "0.1.0"}, "scenarios": [{"id": "examples/test_sample.py::test_buy_coffee", "name": "Buy coffee", "module": "test_sample", "tags": ["billing", "happy-path"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert $2", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "I get a coffee", "status": "passed", "source": null, "children": [], "attachments": [{"label": "Machine state", "content": "{'coffees': 9, 'price': 2}"}], "error": null}], "parameters": null, "error": null}, {"id": "examples/test_sample.py::test_not_enough", "name": "Not enough money", "module": "test_sample", "tags": ["billing", "edge-case"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert $1", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "I don't get a coffee", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "parameters": null, "error": null}, {"id": "examples/test_sample.py::test_buy_with_validation", "name": "Buy coffee with validation", "module": "test_sample", "tags": ["billing", "detailed"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert $2", "status": "passed", "source": null, "children": [{"phase": "when", "text": "validating coin... accepted", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "updating balance", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "attachments": [], "error": null}, {"phase": "then", "text": "the coin is accepted", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "a coffee is dispensed", "status": "passed", "source": null, "children": [{"phase": "then", "text": "the machine state is consistent", "status": "passed", "source": null, "children": [], "attachments": [{"label": "Final state", "content": "{'coffees': 9, 'price': 2}"}], "error": null}], "attachments": [], "error": null}], "parameters": null, "error": null}, {"id": "examples/test_sample.py::test_failing", "name": "Failing assertion", "module": "test_sample", "tags": ["debug"], "status": "failed", "duration_ms": 54, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "the machine has 20 coffees", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "parameters": null, "error": {"message": "assert 10 == 20", "diff": ".venv/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call\n    yield\n.venv/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.venv/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.venv/lib/python3.14/site-packages/_pytest/runner.py:179: in pytest_runtest_call\n    item.runtest()\n.venv/lib/python3.14/site-packages/_pytest/python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.venv/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc/pytest_given/__init__.py:48: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples/test_sample.py:63: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"}}, {"id": "examples/test_sample.py::test_pricing[1-False]", "name": "Pricing", "module": "test_sample", "tags": ["billing"], "status": "passed", "duration_ms": 0, "steps": [{"phase": "given", "text": "a coffee machine", "status": "passed", "source": "fixture", "children": [], "attachments": [], "error": null}, {"phase": "when", "text": "I insert ${euros}", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}, {"phase": "then", "text": "can_buy is {expect}", "status": "passed", "source": null, "children": [], "attachments": [], "error": null}], "parameters": {"names": ["euros", "expect"], "cases": [{"values": [1, false], "status": "passed", "error": null}, {"values": [2, true], "status": "passed", "error": null}, {"values": [3, true], "status": "passed", "error": null}]}, "error": null}]};
 
 function reportApp() {
   const data = window.__REPORT_DATA__;

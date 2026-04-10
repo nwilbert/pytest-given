@@ -1,7 +1,24 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, NamedTuple, NewType
+
+# Pytest node ID, e.g. "tests/test_billing.py::test_buy_coffee[1-2-3]"
+NodeId = NewType('NodeId', str)
+
+# Arbitrary Python value from @pytest.mark.parametrize (int, str, bool, etc.)
+type ParamValue = Any
+
+
+class ParamSpec(NamedTuple):
+    """Parameter names and values for a single parameterized test run."""
+
+    names: list[str]
+    values: list[ParamValue]
+
+
+# Maps node IDs to their parameter specification
+type ParamInfo = dict[NodeId, ParamSpec]
 
 
 @dataclass
@@ -42,7 +59,7 @@ class ParameterTable:
 
 @dataclass
 class Scenario:
-    id: str
+    id: NodeId
     name: str
     module: str
     tags: list[str] = field(default_factory=list)

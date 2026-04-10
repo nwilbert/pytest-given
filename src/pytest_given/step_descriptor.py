@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import functools
 import threading
-from typing import Any
+import types
+from typing import Any, Self
 
 _local: threading.local = threading.local()
 
@@ -41,7 +42,7 @@ class StepDescriptor:
         self.phase = phase
         self.text = text
 
-    def __enter__(self) -> StepDescriptor:
+    def __enter__(self) -> Self:
         stack = _get_phase_stack()
         if stack and stack[-1] != self.phase:
             raise RuntimeError(
@@ -58,7 +59,7 @@ class StepDescriptor:
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
-        exc_tb: Any,
+        exc_tb: types.TracebackType | None,
     ) -> None:
         _get_phase_stack().pop()
         collector = get_active_collector()

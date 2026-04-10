@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
-
-from pytest_given.model import Attachment, ErrorInfo, Scenario, Step
+from pytest_given.model import Attachment, ErrorInfo, NodeId, ParamInfo, Scenario, Step
 
 
 class Collector:
@@ -16,11 +14,11 @@ class Collector:
         self._scenarios: list[Scenario] = []
         self._current_scenario: Scenario | None = None
         self._step_stack: list[Step] = []
-        self.start_times: dict[str, float] = {}
-        self.param_info: dict[str, tuple[list[str], list[Any]]] = {}
+        self.start_times: dict[NodeId, float] = {}
+        self.param_info: ParamInfo = {}
 
     @property
-    def active_scenario_id(self) -> str | None:
+    def active_scenario_id(self) -> NodeId | None:
         if self._current_scenario is None:
             return None
         return self._current_scenario.id
@@ -31,7 +29,7 @@ class Collector:
 
     def start_scenario(
         self,
-        scenario_id: str,
+        scenario_id: NodeId,
         name: str,
         module: str,
         tags: list[str],
@@ -75,7 +73,6 @@ class Collector:
             )
 
     def fail_scenario(self, message: str, diff: str | None = None) -> None:
-        """Mark the current scenario as failed with an error."""
         if self._current_scenario is not None:
             self._current_scenario.status = 'failed'
             self._current_scenario.error = ErrorInfo(message=message, diff=diff)

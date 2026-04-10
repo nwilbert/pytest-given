@@ -163,7 +163,7 @@ def test_render_parameterized_with_color_coded_placeholders(tmp_path: Path) -> N
                         'steps': [
                             {
                                 'phase': 'when',
-                                'text': 'I insert {euros}',
+                                'text': 'I insert {euros} into {unknown}',
                                 'status': 'passed',
                                 'source': None,
                                 'children': [],
@@ -200,6 +200,8 @@ def test_render_parameterized_with_color_coded_placeholders(tmp_path: Path) -> N
     # Column header should use the same color class
     assert '<th class="param-color-0">euros</th>' in content
     assert '<th class="param-color-1">expect</th>' in content
+    # Unknown placeholders are left as plain text (not wrapped in a color span)
+    assert '{unknown}' in content
 
 
 def test_render_self_contained(tmp_path: Path) -> None:
