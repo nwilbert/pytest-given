@@ -59,7 +59,7 @@
     <div style="display:flex; justify-content:space-between; align-items:baseline;">
       <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
         <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
-        <div class="header-context" x-text="activeTag ? 'Tag: ' + activeTag : 'All Scenarios'"></div>
+        <div class="header-context" x-text="filterSummary"></div>
         <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
       </div>
       <div class="header-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · <span x-text="formattedTimestamp"></span></div>
@@ -198,6 +198,23 @@ function reportApp() {
     expandedAttachments: {},
     expandedScenarios: {},
     activeTag: null,
+    get filterSummary() {
+      const parts = [];
+      if (this.activeTag) parts.push('Tag: ' + this.activeTag);
+      const hasStatus = (s) => data.scenarios.some(sc => sc.status === s);
+      const allShown = (this.showPassed || !hasStatus('passed'))
+        && (this.showFailed || !hasStatus('failed'))
+        && (this.showSkipped || !hasStatus('skipped'));
+      if (!allShown) {
+        const shown = [];
+        if (this.showPassed && hasStatus('passed')) shown.push('passed');
+        if (this.showFailed && hasStatus('failed')) shown.push('failed');
+        if (this.showSkipped && hasStatus('skipped')) shown.push('skipped');
+        if (shown.length) parts.push(shown.join(', '));
+      }
+      if (this.search) parts.push('"' + this.search + '"');
+      return parts.length ? parts.join(' · ') : 'All Scenarios';
+    },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
       if (isNaN(d)) return data.metadata.timestamp;
