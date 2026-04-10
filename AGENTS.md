@@ -28,7 +28,6 @@ Individual sessions:
 - `src/pytest_given/step_descriptor.py` — `StepDescriptor`: dual context-manager/decorator, cross-phase nesting detection
 - `src/pytest_given/collector.py` — Step stack, collects scenario data during test execution
 - `src/pytest_given/plugin.py` — pytest hooks, parametrized test grouping
-- `src/pytest_given/serializer.py` — Model to JSON
 - `src/pytest_given/renderer.py` — JSON to self-contained HTML (Jinja2 + Alpine.js)
 - `src/pytest_given/cli.py` — Standalone `pytest-given report` command
 - `src/pytest_given/templates/` — Jinja2 template, CSS, bundled Alpine.js

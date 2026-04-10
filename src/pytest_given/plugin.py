@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import dataclasses
+import json
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -22,7 +23,6 @@ from pytest_given.model import (
     Scenario,
     Step,
 )
-from pytest_given.serializer import write_json
 from pytest_given.step_descriptor import set_active_collector
 
 collector = Collector()
@@ -151,7 +151,8 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         ),
         scenarios=scenarios,
     )
-    write_json(report, json_path)
+    json_path.parent.mkdir(parents=True, exist_ok=True)
+    json_path.write_text(json.dumps(dataclasses.asdict(report), indent=2))
     if session.config.getoption('given_html'):
         from pytest_given.renderer import render_html
 

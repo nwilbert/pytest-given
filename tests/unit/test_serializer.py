@@ -1,4 +1,5 @@
 import json
+from dataclasses import asdict
 
 from pytest_given.model import (
     Attachment,
@@ -10,7 +11,6 @@ from pytest_given.model import (
     Scenario,
     Step,
 )
-from pytest_given.serializer import serialize_report
 
 
 def test_serialize_empty_report() -> None:
@@ -23,7 +23,7 @@ def test_serialize_empty_report() -> None:
         ),
         scenarios=[],
     )
-    data = serialize_report(report)
+    data = asdict(report)
     assert data['metadata']['project'] == 'test'
     assert data['scenarios'] == []
     json.dumps(data)
@@ -62,7 +62,7 @@ def test_serialize_scenario_with_steps() -> None:
             )
         ],
     )
-    data = serialize_report(report)
+    data = asdict(report)
     scenario = data['scenarios'][0]
     assert scenario['name'] == 'Test X'
     assert scenario['tags'] == ['billing']
@@ -97,7 +97,7 @@ def test_serialize_with_parameters() -> None:
             )
         ],
     )
-    data = serialize_report(report)
+    data = asdict(report)
     params = data['scenarios'][0]['parameters']
     assert params['names'] == ['a', 'b']
     assert params['cases'][1]['error']['message'] == 'assert 3 == 4'
@@ -124,7 +124,7 @@ def test_serialize_with_attachments() -> None:
             )
         ],
     )
-    data = serialize_report(report)
+    data = asdict(report)
     att = data['scenarios'][0]['steps'][0]['attachments'][0]
     assert att == {'label': 'Log', 'content': 'data'}
     json.dumps(data)
