@@ -2,7 +2,7 @@
 name = "pytest-given"
 version = "0.1.0"
 description = "A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests."
-license = { text = "Apache-2.0" }
+license = { text = "MIT" }
 authors = [{ name = "Niko Wilbert", email = "mail@nikowilbert.de" }]
 classifiers = ["Framework :: Pytest"]
 requires-python = ">=3.12"
