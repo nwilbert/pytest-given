@@ -14,3 +14,4 @@ __pycache__/
 docs/superpowers/plans/
 /given-report/
 .claude/settings.local.json
+.playwright-mcp/
