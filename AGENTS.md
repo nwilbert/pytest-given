@@ -51,4 +51,5 @@ A Playwright MCP server is available for visually inspecting the HTML report. Op
 - Step-down rule: callers before callees, public before private. Read each file top-down from high-level API to implementation details.
 - TDD: write tests first
 - Commit messages: single line, no co-author trailers
+- Plan files under `docs/superpowers/plans/` are scratch artifacts — never commit them. Spec files under `docs/superpowers/specs/` are committed.
 - Always run `nox` (or at minimum `nox -s format lint mypy test`) before committing

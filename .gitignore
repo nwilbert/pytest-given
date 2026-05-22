@@ -11,5 +11,6 @@ __pycache__/
 .DS_Store
 .idea/
 .superpowers/
+docs/superpowers/plans/
 /given-report/
 .claude/settings.local.json
