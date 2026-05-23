@@ -1,6 +1,8 @@
 import pytest
 
 from pytest_given.collector import Collector
+from pytest_given.errors import PytestGivenError
+from pytest_given.model import FixtureRecording, Step
 
 
 def test_start_and_finish_scenario() -> None:
@@ -135,3 +137,176 @@ def test_current_phase() -> None:
     assert collector.current_phase == 'given'
     collector.pop_step()
     assert collector.current_phase is None
+
+
+def test_collector_starts_idle() -> None:
+    collector = Collector()
+    assert collector.state == 'idle'
+
+
+def test_start_scenario_transitions_to_test() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    assert collector.state == 'test'
+
+
+def test_finish_scenario_returns_to_idle() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    collector.finish_scenario(status='passed', duration_ms=0)
+    assert collector.state == 'idle'
+
+
+def test_enter_fixture_setup_transitions_state() -> None:
+    collector = Collector()
+    recording = FixtureRecording(root=Step(phase='given', text='a shop'))
+    token = collector.enter_fixture_setup(recording)
+    assert collector.state == 'fixture_setup'
+    collector.exit_fixture_setup(token)
+    assert collector.state == 'idle'
+
+
+def test_enter_fixture_setup_nests_inside_test() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    recording = FixtureRecording(root=Step(phase='given', text='a shop'))
+    token = collector.enter_fixture_setup(recording)
+    assert collector.state == 'fixture_setup'
+    collector.exit_fixture_setup(token)
+    assert collector.state == 'test'  # restored
+
+
+def test_enter_fixture_teardown_transitions_state() -> None:
+    collector = Collector()
+    token = collector.enter_fixture_teardown()
+    assert collector.state == 'fixture_teardown'
+    collector.exit_fixture_teardown(token)
+    assert collector.state == 'idle'
+
+
+def test_push_step_during_fixture_setup_records_into_recording() -> None:
+    collector = Collector()
+    root = Step(phase='given', text='a shop')
+    recording = FixtureRecording(root=root)
+    token = collector.enter_fixture_setup(recording)
+    collector.push_step('given', 'with 3 items')
+    collector.pop_step()
+    collector.exit_fixture_setup(token)
+    assert len(root.children) == 1
+    assert root.children[0].text == 'with 3 items'
+
+
+def test_attach_during_fixture_setup_records_into_recording() -> None:
+    collector = Collector()
+    root = Step(phase='given', text='a shop')
+    recording = FixtureRecording(root=root)
+    token = collector.enter_fixture_setup(recording)
+    collector.attach('snapshot', 'data')
+    collector.exit_fixture_setup(token)
+    assert len(root.attachments) == 1
+    assert root.attachments[0].label == 'snapshot'
+
+
+def test_push_step_routing_isolates_recording_from_scenario() -> None:
+    """Steps recorded inside fixture setup must NOT leak into the active scenario."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    root = Step(phase='given', text='a shop')
+    recording = FixtureRecording(root=root)
+    token = collector.enter_fixture_setup(recording)
+    collector.push_step('given', 'fixture-internal')
+    collector.pop_step()
+    collector.exit_fixture_setup(token)
+    # Scenario should still be empty — fixture body's step lives only in recording.
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    assert scenario.steps == []
+    assert root.children[0].text == 'fixture-internal'
+
+
+def test_push_step_during_idle_raises() -> None:
+    collector = Collector()
+    with pytest.raises(PytestGivenError, match='no active scenario or fixture'):
+        collector.push_step('given', 'orphan')
+
+
+def test_push_step_during_teardown_raises() -> None:
+    collector = Collector()
+    token = collector.enter_fixture_teardown()
+    try:
+        with pytest.raises(PytestGivenError, match='fixture teardown'):
+            collector.push_step('given', 'teardown step')
+    finally:
+        collector.exit_fixture_teardown(token)
+
+
+def test_attach_during_teardown_raises() -> None:
+    collector = Collector()
+    token = collector.enter_fixture_teardown()
+    try:
+        with pytest.raises(PytestGivenError, match='fixture teardown'):
+            collector.attach('label', 'content')
+    finally:
+        collector.exit_fixture_teardown(token)
+
+
+def test_attach_during_idle_raises() -> None:
+    collector = Collector()
+    with pytest.raises(PytestGivenError, match='no active scenario or fixture'):
+        collector.attach('label', 'content')
+
+
+def test_store_and_retrieve_recording_by_key() -> None:
+    collector = Collector()
+    recording = FixtureRecording(root=Step(phase='given', text='a shop'))
+    collector.store_recording(('fixdef_a', None), recording)
+    assert collector.get_recording(('fixdef_a', None)) is recording
+    assert collector.get_recording(('fixdef_b', None)) is None
+
+
+def test_graft_recording_deep_copies_into_scenario() -> None:
+    collector = Collector()
+    root = Step(phase='given', text='a shop')
+    root.children.append(Step(phase='given', text='with 3 items'))
+    recording = FixtureRecording(root=root)
+
+    collector.start_scenario('id', 'name', 'mod', [])
+    collector.graft_recording(recording)
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+
+    assert len(scenario.steps) == 1
+    assert scenario.steps[0].text == 'a shop'
+    assert scenario.steps[0].children[0].text == 'with 3 items'
+    # Deep-copy: mutating the recording must not affect the scenario.
+    root.children[0].text = 'mutated'
+    assert scenario.steps[0].children[0].text == 'with 3 items'
+
+
+def test_graft_recording_with_no_scenario_is_noop() -> None:
+    collector = Collector()
+    recording = FixtureRecording(root=Step(phase='given', text='x'))
+    collector.graft_recording(recording)  # should not raise
+
+
+def test_pop_step_protects_recording_root() -> None:
+    """In fixture_setup state, popping the root step is a no-op so it remains
+    as the labeled parent for grafting."""
+    collector = Collector()
+    recording = FixtureRecording(root=Step(phase='given', text='label'))
+    token = collector.enter_fixture_setup(recording)
+    try:
+        # Stack has just the root; pop should refuse to remove it.
+        assert collector.pop_step() is None
+        assert len(recording.stack) == 1
+        # A pushed child can still be popped.
+        collector.push_step('given', 'child')
+        popped = collector.pop_step()
+        assert popped is not None
+        assert popped.text == 'child'
+    finally:
+        collector.exit_fixture_setup(token)
+
+
+def test_pop_step_with_empty_stack_returns_none() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    assert collector.pop_step() is None

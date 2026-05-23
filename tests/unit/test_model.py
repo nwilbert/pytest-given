@@ -1,9 +1,11 @@
 from pytest_given.model import (
     Attachment,
     ErrorInfo,
+    FixtureRecording,
     Metadata,
     ParameterCase,
     ParameterTable,
+    RecordingState,
     ReportData,
     Scenario,
     Step,
@@ -91,3 +93,16 @@ def test_report_data() -> None:
         scenarios=[],
     )
     assert report.scenarios == []
+
+
+def test_recording_state_literals() -> None:
+    # Type-check sanity: these are the four legal states
+    states: list[RecordingState] = ['idle', 'test', 'fixture_setup', 'fixture_teardown']
+    assert len(states) == 4
+
+
+def test_fixture_recording_holds_root_step_and_stack() -> None:
+    root = Step(phase='given', text='a shop')
+    recording = FixtureRecording(root=root)
+    assert recording.root is root
+    assert recording.stack == [root]

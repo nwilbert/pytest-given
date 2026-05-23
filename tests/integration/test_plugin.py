@@ -247,3 +247,330 @@ def test_full_html_report_generation(pytester, tmp_path):
     assert 'Failing test' in html
     assert 'a calculator' in html
     assert 'x-data' in html  # Alpine.js reactive
+
+
+def test_given_inside_unannotated_test_warns(pytester, tmp_path):
+    """A `with given(...)` inside a non-@scenario test warns, doesn't crash."""
+    pytester.makepyfile(
+        """
+        import warnings
+        from pytest_given import given
+
+        def test_plain():
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter('always')
+                with given('a thing'):
+                    pass
+                assert any('without @scenario' in str(w.message) for w in caught)
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+
+
+def test_with_given_inside_fixture_body_is_captured(pytester, tmp_path):
+    """Nested `with given(...)` in a decorated fixture body lands under its step."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture
+        @given("a shop")
+        def shop():
+            with given("with 3 items"):
+                pass
+            return {"items": 3}
+
+        @scenario("Fixture body recording")
+        def test_shop(shop):
+            with then("items == 3"):
+                assert shop["items"] == 3
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    steps = data['scenarios'][0]['steps']
+    assert steps[0]['text'] == 'a shop'
+    assert len(steps[0]['children']) == 1
+    assert steps[0]['children'][0]['text'] == 'with 3 items'
+    assert steps[1]['text'] == 'items == 3'
+
+
+def test_given_in_fixture_teardown_raises(pytester, tmp_path):
+    """Calling `with given(...)` after the fixture's yield is a hard error."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture
+        @given("a thing")
+        def thing():
+            yield 1
+            with given("teardown step"):  # illegal
+                pass
+
+        @scenario("Teardown raises")
+        def test_use(thing):
+            with then("v == 1"):
+                assert thing == 1
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}', '-v')
+    # The test body passes; the teardown failure should surface as an error.
+    # pytester reports teardown errors as ERROR, not as a failed test.
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*PytestGivenError*'])
+
+
+def test_attach_in_fixture_teardown_raises(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then, attach
+
+        @pytest.fixture
+        @given("a thing")
+        def thing():
+            yield 1
+            attach("late", "data")
+
+        @scenario("Attach teardown raises")
+        def test_use(thing):
+            with then("v == 1"):
+                assert thing == 1
+        """
+    )
+    result = pytester.runpytest('-v')
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*PytestGivenError*'])
+
+
+def test_session_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
+    """A session-scoped decorated fixture body runs once but each consumer's
+    scenario shows the recorded subtree."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture(scope='session')
+        @given("a database")
+        def db():
+            with given("seeded with 2 users"):
+                pass
+            return {"users": 2}
+
+        @scenario("First consumer")
+        def test_a(db):
+            with then("ok"):
+                assert db["users"] == 2
+
+        @scenario("Second consumer")
+        def test_b(db):
+            with then("ok"):
+                assert db["users"] == 2
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    data = json.loads(json_path.read_text())
+    scenarios = {s['name']: s for s in data['scenarios']}
+    for name in ('First consumer', 'Second consumer'):
+        steps = scenarios[name]['steps']
+        assert steps[0]['text'] == 'a database'
+        assert steps[0]['children'][0]['text'] == 'seeded with 2 users'
+
+
+def test_module_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture(scope='module')
+        @given("a service")
+        def svc():
+            with given("with credentials"):
+                pass
+            return "svc"
+
+        @scenario("A")
+        def test_a(svc):
+            with then("ok"):
+                assert svc == "svc"
+
+        @scenario("B")
+        def test_b(svc):
+            with then("ok"):
+                assert svc == "svc"
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    data = json.loads(json_path.read_text())
+    for s in data['scenarios']:
+        assert s['steps'][0]['children'][0]['text'] == 'with credentials'
+
+
+def test_class_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture(scope='class')
+        @given("a browser")
+        def browser():
+            with given("navigated to /"):
+                pass
+            return "browser"
+
+        class TestUI:
+            @scenario("Click A")
+            def test_a(self, browser):
+                with then("ok"):
+                    assert browser == "browser"
+
+            @scenario("Click B")
+            def test_b(self, browser):
+                with then("ok"):
+                    assert browser == "browser"
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    data = json.loads(json_path.read_text())
+    for s in data['scenarios']:
+        assert s['steps'][0]['children'][0]['text'] == 'navigated to /'
+
+
+def test_parametrized_fixture_records_per_variant(pytester, tmp_path):
+    """Each parametrize variant of a fixture produces a case in the parameter table.
+
+    In pytest >= 9, direct fixture params (via `params=[...]`) ARE included in
+    callspec.params, so both variants get grouped into one scenario with a
+    parameter table — just like indirect parametrize.  The fixture body's step
+    text is templatized to the `{shop}` placeholder and both values appear in
+    the cases table.
+    """
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture(params=[3, 7])
+        @given("a shop")
+        def shop(request):
+            with given(f"with {request.param} items"):
+                pass
+            return request.param
+
+        @scenario("Shop test")
+        def test_shop(shop):
+            with then(f"count is {shop}"):
+                assert shop in (3, 7)
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    data = json.loads(json_path.read_text())
+    # pytest >= 9 puts direct fixture params in callspec.params, so the two
+    # variants are grouped into one scenario with a parameter table.
+    assert len(data['scenarios']) == 1
+    s = data['scenarios'][0]
+    assert s['parameters'] is not None
+    case_values = [c['values'] for c in s['parameters']['cases']]
+    assert [3] in case_values
+    assert [7] in case_values
+    # The fixture body's nested step text is templatized.
+    nested_text = s['steps'][0]['children'][0]['text']
+    assert nested_text == 'with {shop} items'
+
+
+def test_indirect_parametrize_templatizes_fixture_step_text(pytester, tmp_path):
+    """Indirect parametrize of a fixture lets the templatizer collapse step
+    text in the fixture body into a `{name}` placeholder."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture
+        @given("a shop")
+        def shop(request):
+            with given(f"with {request.param} items"):
+                pass
+            return request.param
+
+        @scenario("Shop test")
+        @pytest.mark.parametrize("shop", [3, 7], indirect=True)
+        def test_shop(shop):
+            with then("ok"):
+                assert shop in (3, 7)
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    data = json.loads(json_path.read_text())
+    # Indirect parametrize is in callspec.params → templatized to one scenario.
+    assert len(data['scenarios']) == 1
+    s = data['scenarios'][0]
+    assert s['parameters'] is not None
+    # Inside the fixture's recorded child step, the variant value is replaced
+    # with the param name placeholder.
+    nested = s['steps'][0]['children'][0]['text']
+    assert nested == 'with {shop} items'
+
+
+def test_nested_decorated_fixtures_appear_as_siblings(pytester, tmp_path):
+    """Fixture B depending on fixture A: both recordings graft as top-level."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture
+        @given("a database")
+        def db():
+            with given("seeded"):
+                pass
+            return "db"
+
+        @pytest.fixture
+        @given("an authenticated user")
+        def user(db):
+            with given("with admin role"):
+                pass
+            return f"user@{db}"
+
+        @scenario("Nested")
+        def test_uses_both(user):
+            with then("ok"):
+                assert "user@db" in user
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    steps = data['scenarios'][0]['steps']
+    top_texts = [s['text'] for s in steps]
+    assert 'a database' in top_texts
+    assert 'an authenticated user' in top_texts
+    # `db` is set up before `user`, so its recording grafts first.
+    assert top_texts.index('a database') < top_texts.index('an authenticated user')
+    db_step = next(s for s in steps if s['text'] == 'a database')
+    user_step = next(s for s in steps if s['text'] == 'an authenticated user')
+    assert db_step['children'][0]['text'] == 'seeded'
+    assert user_step['children'][0]['text'] == 'with admin role'

@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import functools
+import inspect
 import json
 import types
+import warnings
 from typing import Any, Self
 
+import pytest
+
 from pytest_given.collector import get_active_collector
+from pytest_given.errors import PytestGivenError
 from pytest_given.model import Phase
 
 
@@ -28,8 +33,20 @@ class StepDescriptor:
 
     def __enter__(self) -> Self:
         collector = get_active_collector()
-        if collector is not None:
-            collector.push_step(self.phase, self.text)
+        if collector is None or collector.state == 'idle':
+            if collector is not None and collector.inside_unannotated_test:
+                warnings.warn(
+                    f"'{self.phase}: {self.text}' recorded in a test without "
+                    '@scenario — step will not appear in the report.',
+                    pytest.PytestWarning,
+                    stacklevel=2,
+                )
+                return self
+            raise PytestGivenError(
+                f"Cannot enter '{self.phase}: {self.text}' — "
+                'no active scenario or fixture.'
+            )
+        collector.push_step(self.phase, self.text)
         return self
 
     def __exit__(
@@ -39,10 +56,20 @@ class StepDescriptor:
         exc_tb: types.TracebackType | None,
     ) -> None:
         collector = get_active_collector()
-        if collector is not None:
-            collector.pop_step()
+        if collector is None or collector.inside_unannotated_test:
+            return
+        collector.pop_step()
 
     def __call__(self, func: Any) -> Any:
+        if inspect.isgeneratorfunction(func):
+
+            @functools.wraps(func)
+            def gen_wrapper(*args: Any, **kwargs: Any) -> Any:
+                yield from func(*args, **kwargs)
+
+            gen_wrapper._step_descriptor = self  # type: ignore[attr-defined]
+            return gen_wrapper
+
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             return func(*args, **kwargs)
@@ -89,15 +116,26 @@ def attach(label: str, content: object) -> None:
     serialised as indented JSON.
     """
     collector = get_active_collector()
-    if collector is not None:
-        if isinstance(content, str):
-            collector.attach(label, content, content_type='text')
-        else:
-            collector.attach(
-                label,
-                json.dumps(content, indent=2, default=str),
-                content_type='json',
+    if collector is None or collector.state == 'idle':
+        if collector is not None and collector.inside_unannotated_test:
+            warnings.warn(
+                f"attach('{label}') called in a test without @scenario — "
+                'attachment will not appear in the report.',
+                pytest.PytestWarning,
+                stacklevel=2,
             )
+            return
+        raise PytestGivenError(
+            f"Cannot attach '{label}' — no active scenario or fixture."
+        )
+    if isinstance(content, str):
+        collector.attach(label, content, content_type='text')
+    else:
+        collector.attach(
+            label,
+            json.dumps(content, indent=2, default=str),
+            content_type='json',
+        )
 
 
 def scenario(name: str, tags: list[str] | None = None) -> ScenarioDecorator:

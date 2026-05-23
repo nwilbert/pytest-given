@@ -2,24 +2,33 @@
 
 from __future__ import annotations
 
+import contextlib
 import dataclasses
+import functools
+import inspect
 import json
 import time
+from collections.abc import Generator
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
+from _pytest.fixtures import SubRequest
 
-from pytest_given.collector import Collector, set_active_collector
+from pytest_given.collector import (
+    Collector,
+    FixtureInstanceKey,
+    set_active_collector,
+)
 from pytest_given.model import (
+    FixtureRecording,
     Metadata,
     NodeId,
     ParameterCase,
     ParameterTable,
     ParamInfo,
     ParamSpec,
-    Phase,
     ReportData,
     Scenario,
     Step,
@@ -54,11 +63,17 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     collector = Collector()
 
 
-@pytest.hookimpl(tryfirst=True)
-def pytest_runtest_setup(item: pytest.Item) -> None:
+@pytest.hookimpl(hookwrapper=True, tryfirst=True)
+def pytest_runtest_setup(item: pytest.Item) -> Generator[None, None, None]:
     scenario_marker = _get_scenario_marker(item)
     if scenario_marker is None:
+        # Unannotated test: set the flag so `with given(...)` inside it warns
+        # instead of raising. Teardown clears the flag and active collector.
+        collector.inside_unannotated_test = True
+        set_active_collector(collector)
+        yield
         return
+
     mod = getattr(item, 'module', None)
     module = mod.__name__ if mod else item.nodeid.split('::')[0]
     node_id = NodeId(item.nodeid)
@@ -69,46 +84,114 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
         tags=scenario_marker.tags,
     )
     set_active_collector(collector)
-    # Capture parametrize info if present
     callspec = getattr(item, 'callspec', None)
     if callspec is not None:
         names = list(callspec.params.keys())
         values = [callspec.params[n] for n in names]
         collector.param_info[node_id] = ParamSpec(names=names, values=values)
-    # Add fixture steps
-    for phase, text in _get_fixture_steps(item):
-        collector.push_step(phase, text)
-        collector.pop_step()
+    # Pre-fixture-setup work done; let pytest run fixture setup here.
+    yield
+    _graft_fixture_recordings(item)
     collector.start_times[node_id] = time.monotonic()
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_fixture_setup(
+    fixturedef: pytest.FixtureDef[object],
+    request: pytest.FixtureRequest,
+) -> Generator[None, None, None]:
+    desc = getattr(fixturedef.func, '_step_descriptor', None)
+    if desc is None:
+        yield
+        return
+    if collector.state == 'idle':
+        # Fixture is being set up outside any tracked scenario (e.g. unannotated
+        # test pulling in a decorated fixture). Don't record.
+        yield
+        return
+    _ensure_teardown_wrapped(fixturedef)
+    recording = FixtureRecording(root=Step(phase=desc.phase, text=desc.text))
+    token = collector.enter_fixture_setup(recording)
+    try:
+        yield
+    finally:
+        collector.exit_fixture_setup(token)
+        key = _fixture_instance_key(fixturedef, request)
+        collector.store_recording(key, recording)
+
+
+def _ensure_teardown_wrapped(fixturedef: pytest.FixtureDef[object]) -> None:
+    """Wrap a generator fixture's body once so post-yield code runs in
+    fixture_teardown state. Idempotent."""
+    func = fixturedef.func
+    if getattr(func, '_pytest_given_teardown_wrapped', False):
+        return
+    if not inspect.isgeneratorfunction(func):
+        return
+    original = func
+    desc = original._step_descriptor  # type: ignore[attr-defined]
+
+    @functools.wraps(original)
+    def wrapped(*args: object, **kwargs: object) -> Generator[object, None, None]:
+        gen = original(*args, **kwargs)
+        try:
+            value = next(gen)
+        except StopIteration:
+            return
+        yield value
+        # Past the yield → teardown
+        token = collector.enter_fixture_teardown()
+        try:
+            with contextlib.suppress(StopIteration):
+                next(gen)
+        finally:
+            collector.exit_fixture_teardown(token)
+
+    wrapped._pytest_given_teardown_wrapped = True  # type: ignore[attr-defined]
+    wrapped._step_descriptor = desc  # type: ignore[attr-defined]
+    fixturedef.func = wrapped  # type: ignore[misc]
+
+
+def _fixture_instance_key(
+    fixturedef: pytest.FixtureDef[object],
+    request: pytest.FixtureRequest,
+) -> FixtureInstanceKey:
+    return (id(fixturedef), fixturedef.cache_key(cast(SubRequest, request)))
 
 
 def _get_scenario_marker(item: pytest.Item) -> Any | None:
     """Get the _scenario attribute from a test function, if present."""
     func = getattr(item, 'function', None)
-    if func is None:  # pragma: no cover
-        return None
+    assert func is not None, f'expected item.function on {item!r}'
     return getattr(func, '_scenario', None)
 
 
-def _get_fixture_steps(item: pytest.Item) -> list[tuple[Phase, str]]:
-    """Collect step descriptors from fixtures used by this item."""
-    steps: list[tuple[Phase, str]] = []
-    if not hasattr(item, 'fixturenames'):  # pragma: no cover
-        return steps
+def _graft_fixture_recordings(item: pytest.Item) -> None:
+    """Graft this item's decorated-fixture recordings in setup order."""
+    assert hasattr(item, 'fixturenames'), f'expected fixturenames on {item!r}'
     fm = item.session._fixturemanager
+    expected: set[FixtureInstanceKey] = set()
     for name in item.fixturenames:
         defs = fm.getfixturedefs(name, item)
         if not defs:
             continue
-        func = defs[-1].func
-        desc = getattr(func, '_step_descriptor', None)
-        if desc is not None:
-            steps.append((desc.phase, desc.text))
-    return steps
+        fixturedef = defs[-1]
+        if getattr(fixturedef.func, '_step_descriptor', None) is None:
+            continue
+        if fixturedef.cached_result is None:
+            continue
+        expected.add((id(fixturedef), fixturedef.cached_result[1]))
+    for key, recording in collector.recordings():
+        if key in expected:
+            collector.graft_recording(recording)
 
 
 @pytest.hookimpl(trylast=True)
-def pytest_runtest_teardown(item: pytest.Item) -> None:  # pragma: no cover
+def pytest_runtest_teardown(item: pytest.Item) -> None:
+    if collector.inside_unannotated_test:
+        collector.inside_unannotated_test = False
+        set_active_collector(None)
+        return
     if collector.active_scenario_id != NodeId(item.nodeid):
         return
     set_active_collector(None)

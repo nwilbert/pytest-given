@@ -9,6 +9,9 @@ NodeId = NewType('NodeId', str)
 # Step phase
 type Phase = Literal['given', 'when', 'then']
 
+# Lifecycle state of the collector — determines where push_step/attach route.
+type RecordingState = Literal['idle', 'test', 'fixture_setup', 'fixture_teardown']
+
 # Arbitrary Python value from @pytest.mark.parametrize (int, str, bool, etc.)
 type ParamValue = Any
 
@@ -48,6 +51,24 @@ class Step:
     children: list[Step] = field(default_factory=list)
     attachments: list[Attachment] = field(default_factory=list)
     error: ErrorInfo | None = None
+
+
+@dataclass
+class FixtureRecording:
+    """A captured subtree of steps/attachments for one fixture instance.
+
+    `root` is the labeled step from @given/@when/@then on the fixture; its
+    `children` accumulate as the fixture body runs. `stack` mirrors the
+    collector's step stack while the recording is active, so nested
+    `with given(...)` inside the body works.
+    """
+
+    root: Step
+    stack: list[Step] = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        if not self.stack:
+            self.stack.append(self.root)
 
 
 @dataclass

@@ -1,17 +1,34 @@
 from __future__ import annotations
 
+import copy
+from collections.abc import Iterator
 from contextvars import ContextVar
+from dataclasses import dataclass
 
+from pytest_given.errors import PytestGivenError
 from pytest_given.model import (
     Attachment,
     ContentType,
     ErrorInfo,
+    FixtureRecording,
     NodeId,
     ParamInfo,
     Phase,
+    RecordingState,
     Scenario,
     Step,
 )
+
+
+@dataclass(frozen=True)
+class StateToken:
+    """Opaque token returned by enter_* methods; pass to exit_* to restore."""
+
+    previous_state: RecordingState
+    previous_recording: FixtureRecording | None
+
+
+type FixtureInstanceKey = tuple[object, object]
 
 _collector_var: ContextVar[Collector | None] = ContextVar('collector', default=None)
 
@@ -39,6 +56,14 @@ class Collector:
         self._step_stack: list[Step] = []
         self.start_times: dict[NodeId, float] = {}
         self.param_info: ParamInfo = {}
+        self._state: RecordingState = 'idle'
+        self._active_recording: FixtureRecording | None = None
+        self._recordings: dict[FixtureInstanceKey, FixtureRecording] = {}
+        self.inside_unannotated_test: bool = False
+
+    @property
+    def state(self) -> RecordingState:
+        return self._state
 
     @property
     def active_scenario_id(self) -> NodeId | None:
@@ -53,8 +78,9 @@ class Collector:
     @property
     def current_phase(self) -> Phase | None:
         """The phase of the innermost active step, or None."""
-        if self._step_stack:
-            return self._step_stack[-1].phase
+        stack = self._target_stack()
+        if stack:
+            return stack[-1].phase
         return None
 
     def start_scenario(
@@ -71,6 +97,8 @@ class Collector:
             tags=tags,
         )
         self._step_stack = []
+        self._state = 'test'
+        self.inside_unannotated_test = False
 
     def finish_scenario(self, status: str, duration_ms: int) -> Scenario:
         assert self._current_scenario is not None
@@ -80,26 +108,85 @@ class Collector:
         self._scenarios.append(scenario)
         self._current_scenario = None
         self._step_stack = []
+        self._state = 'idle'
         return scenario
 
+    def enter_fixture_setup(self, recording: FixtureRecording) -> StateToken:
+        token = StateToken(
+            previous_state=self._state,
+            previous_recording=self._active_recording,
+        )
+        self._state = 'fixture_setup'
+        self._active_recording = recording
+        return token
+
+    def exit_fixture_setup(self, token: StateToken) -> None:
+        self._state = token.previous_state
+        self._active_recording = token.previous_recording
+
+    def enter_fixture_teardown(self) -> StateToken:
+        token = StateToken(
+            previous_state=self._state,
+            previous_recording=self._active_recording,
+        )
+        self._state = 'fixture_teardown'
+        return token
+
+    def exit_fixture_teardown(self, token: StateToken) -> None:
+        self._state = token.previous_state
+        self._active_recording = token.previous_recording
+
+    def store_recording(
+        self, key: FixtureInstanceKey, recording: FixtureRecording
+    ) -> None:
+        self._recordings[key] = recording
+
+    def get_recording(self, key: FixtureInstanceKey) -> FixtureRecording | None:
+        return self._recordings.get(key)
+
+    def recordings(self) -> Iterator[tuple[FixtureInstanceKey, FixtureRecording]]:
+        """(key, recording) pairs in storage (setup) order."""
+        return iter(self._recordings.items())
+
+    def graft_recording(self, recording: FixtureRecording) -> None:
+        """Deep-copy the recording's root into the active scenario's steps."""
+        if self._current_scenario is None:
+            return
+        self._current_scenario.steps.append(copy.deepcopy(recording.root))
+
     def push_step(self, phase: Phase, text: str) -> Step:
-        if self._step_stack and self._step_stack[-1].phase != phase:
+        if self._state == 'idle':
+            raise PytestGivenError(
+                f"Cannot record '{phase}: {text}' — no active scenario or fixture."
+            )
+        if self._state == 'fixture_teardown':
+            raise PytestGivenError(
+                f"Cannot record '{phase}: {text}' from fixture teardown — "
+                'teardown is technical, not narrative.'
+            )
+        stack = self._target_stack()
+        if stack and stack[-1].phase != phase:
             raise RuntimeError(
-                f"Cannot nest '{phase}' inside '{self._step_stack[-1].phase}'"
+                f"Cannot nest '{phase}' inside '{stack[-1].phase}'"
                 ' — restructure your test or use a phase-neutral helper'
             )
         step = Step(phase=phase, text=text)
-        if self._step_stack:
-            self._step_stack[-1].children.append(step)
-        elif self._current_scenario is not None:
+        if stack:
+            stack[-1].children.append(step)
+        elif self._state == 'test' and self._current_scenario is not None:
             self._current_scenario.steps.append(step)
-        self._step_stack.append(step)
+        stack.append(step)
         return step
 
     def pop_step(self) -> Step | None:
-        if not self._step_stack:
+        stack = self._target_stack()
+        if not stack:
             return None
-        return self._step_stack.pop()
+        # When recording into a fixture, don't pop the root: it's the labeled
+        # parent that the test will graft children under.
+        if self._state == 'fixture_setup' and len(stack) == 1:
+            return None
+        return stack.pop()
 
     def attach(
         self,
@@ -108,10 +195,26 @@ class Collector:
         *,
         content_type: ContentType = 'text',
     ) -> None:
-        if self._step_stack:
-            self._step_stack[-1].attachments.append(
+        if self._state == 'idle':
+            raise PytestGivenError(
+                f"Cannot attach '{label}' — no active scenario or fixture."
+            )
+        if self._state == 'fixture_teardown':
+            raise PytestGivenError(
+                f"Cannot attach '{label}' from fixture teardown — "
+                'teardown is technical, not narrative.'
+            )
+        stack = self._target_stack()
+        if stack:
+            stack[-1].attachments.append(
                 Attachment(label=label, content=content, content_type=content_type)
             )
+
+    def _target_stack(self) -> list[Step]:
+        """Return the step stack that push/pop/attach should mutate, per state."""
+        if self._state == 'fixture_setup' and self._active_recording is not None:
+            return self._active_recording.stack
+        return self._step_stack
 
     def fail_scenario(self, message: str, diff: str | None = None) -> None:
         if self._current_scenario is not None:
