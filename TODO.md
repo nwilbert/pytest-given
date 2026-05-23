@@ -2,7 +2,7 @@
 
 ## Now
 
-- [ ] Work on annotation spec
+- [ ] Work on t-string step-text spec (preferred placeholder mechanism; bumps baseline to 3.14)
 
 ## Next
 
@@ -12,6 +12,7 @@
 
 ## Later
 
+- [ ] Revisit Annotated fixture/parametrize labels spec — deferred pending structured step text (see `docs/superpowers/specs/2026-05-23-structured-step-text-design.md`)
 - [ ] UI improvements in report
   - highlight on hover for parametrization table)
   - search box improvements 

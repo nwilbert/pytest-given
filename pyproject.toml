@@ -5,7 +5,7 @@ description = "A pytest plugin that generates interactive HTML reports from Give
 license = { text = "MIT" }
 authors = [{ name = "Niko Wilbert", email = "mail@nikowilbert.de" }]
 classifiers = ["Framework :: Pytest"]
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 dependencies = [
     "pytest>=9.0",
     "jinja2>=3.1",
@@ -48,7 +48,7 @@ select = ["B", "C4", "E", "F", "I", "PT", "RUF", "SIM", "UP", "W", "PYI"]
 testpaths = ["tests"]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.14"
 ignore_missing_imports = true
 no_implicit_optional = true
 warn_return_any = true
