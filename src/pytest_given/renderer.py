@@ -17,13 +17,13 @@ type ParamColorMap = dict[str, int]
 
 def render_html(json_path: Path, html_path: Path) -> None:
     """Render a JSON report to a self-contained HTML file."""
-    raw_json = json_path.read_text()
+    raw_json = json_path.read_text(encoding='utf-8')
     data = json.loads(raw_json)
 
     templates_dir = Path(__file__).parent / 'templates'
-    css = (templates_dir / 'styles.css').read_text()
-    app_js = (templates_dir / 'app.js').read_text()
-    alpine_js = (templates_dir / 'alpine.min.js').read_text()
+    css = (templates_dir / 'styles.css').read_text(encoding='utf-8')
+    app_js = (templates_dir / 'app.js').read_text(encoding='utf-8')
+    alpine_js = (templates_dir / 'alpine.min.js').read_text(encoding='utf-8')
 
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(str(templates_dir)),
@@ -54,7 +54,7 @@ def render_html(json_path: Path, html_path: Path) -> None:
         num_param_colors=_NUM_PARAM_COLORS,
     )
     html_path.parent.mkdir(parents=True, exist_ok=True)
-    html_path.write_text(html)
+    html_path.write_text(html, encoding='utf-8')
 
 
 def _make_highlight_filter(

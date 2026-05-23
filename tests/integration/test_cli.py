@@ -23,7 +23,7 @@ def test_cli_generates_html(tmp_path: Path) -> None:
     rc = main(['report', str(json_path), '-o', str(html_path)])
     assert rc == 0
     assert html_path.exists()
-    assert 'cli-test' in html_path.read_text()
+    assert 'cli-test' in html_path.read_text(encoding='utf-8')
 
 
 def test_cli_missing_input_file(tmp_path: Path) -> None:

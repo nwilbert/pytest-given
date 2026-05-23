@@ -152,7 +152,9 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         scenarios=scenarios,
     )
     json_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(dataclasses.asdict(report), indent=2))
+    json_path.write_text(
+        json.dumps(dataclasses.asdict(report), indent=2), encoding='utf-8'
+    )
     if session.config.getoption('given_html'):
         from pytest_given.renderer import render_html
 

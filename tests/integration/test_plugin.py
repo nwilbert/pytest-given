@@ -242,7 +242,7 @@ def test_full_html_report_generation(pytester, tmp_path):
     assert names == {'Basic addition', 'Failing test'}
 
     # Verify HTML content
-    html = html_path.read_text()
+    html = html_path.read_text(encoding='utf-8')
     assert 'Basic addition' in html
     assert 'Failing test' in html
     assert 'a calculator' in html

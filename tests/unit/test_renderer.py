@@ -22,7 +22,7 @@ def test_render_produces_html_file(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(json_path, html_path)
     assert html_path.exists()
-    content = html_path.read_text()
+    content = html_path.read_text(encoding='utf-8')
     assert 'test-proj' in content
     assert 'x-data' in content
 
@@ -65,7 +65,7 @@ def test_render_includes_scenario_data(tmp_path: Path) -> None:
     )
     html_path = tmp_path / 'report.html'
     render_html(json_path, html_path)
-    content = html_path.read_text()
+    content = html_path.read_text(encoding='utf-8')
     assert 'My Scenario' in content
     assert 'billing' in content
     assert 'a thing' in content
@@ -130,7 +130,7 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
     )
     html_path = tmp_path / 'report.html'
     render_html(json_path, html_path)
-    content = html_path.read_text()
+    content = html_path.read_text(encoding='utf-8')
     assert 'debug log' in content
     assert 'some log output' in content
     assert 'assert 1 == 2' in content
@@ -190,7 +190,7 @@ def test_render_parameterized_with_color_coded_placeholders(tmp_path: Path) -> N
     )
     html_path = tmp_path / 'report.html'
     render_html(json_path, html_path)
-    content = html_path.read_text()
+    content = html_path.read_text(encoding='utf-8')
     # Placeholder in step text should be wrapped in a color span
     assert 'param-color-0' in content
     # Column header should use the same color class
@@ -218,7 +218,7 @@ def test_render_self_contained(tmp_path: Path) -> None:
     )
     html_path = tmp_path / 'report.html'
     render_html(json_path, html_path)
-    content = html_path.read_text()
+    content = html_path.read_text(encoding='utf-8')
     assert '<style>' in content
     assert '<script>' in content
     assert 'src="http' not in content
@@ -255,7 +255,7 @@ def test_render_clickable_tag_badges(tmp_path: Path) -> None:
     )
     html_path = tmp_path / 'report.html'
     render_html(json_path, html_path)
-    content = html_path.read_text()
+    content = html_path.read_text(encoding='utf-8')
     assert "filterByTag('billing')" in content
     assert "filterByTag('happy-path')" in content
     assert 'scenario-tag' in content
@@ -305,7 +305,7 @@ def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -
     )
     html_path = tmp_path / 'report.html'
     render_html(json_path, html_path)
-    content = html_path.read_text()
+    content = html_path.read_text(encoding='utf-8')
     assert 'expandedScenarios' in content
     assert 'toggleScenario' in content
 
@@ -328,7 +328,7 @@ def test_render_status_filter_pills(tmp_path: Path) -> None:
     )
     html_path = tmp_path / 'report.html'
     render_html(json_path, html_path)
-    content = html_path.read_text()
+    content = html_path.read_text(encoding='utf-8')
     assert 'status-pill' in content
     assert 'showPassed' in content
     assert 'showFailed' in content
