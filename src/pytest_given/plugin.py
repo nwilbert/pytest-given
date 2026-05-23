@@ -21,6 +21,7 @@ from pytest_given.collector import (
     FixtureInstanceKey,
     set_active_collector,
 )
+from pytest_given.errors import PytestGivenError
 from pytest_given.model import (
     FixtureRecording,
     Metadata,
@@ -104,6 +105,12 @@ def pytest_fixture_setup(
     if desc is None:
         yield
         return
+    if desc.phase != 'given':
+        raise PytestGivenError(
+            f"Fixture '{fixturedef.argname}' is decorated with @{desc.phase}, "
+            'but only @given is allowed on fixtures (fixtures are setup). '
+            'Use @given(...) on the fixture, or move the step into the test body.'
+        )
     if collector.state == 'idle':
         # Fixture is being set up outside any tracked scenario (e.g. unannotated
         # test pulling in a decorated fixture). Don't record.

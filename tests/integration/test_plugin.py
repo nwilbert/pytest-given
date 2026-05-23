@@ -351,6 +351,52 @@ def test_attach_in_fixture_teardown_raises(pytester, tmp_path):
     result.stdout.fnmatch_lines(['*PytestGivenError*'])
 
 
+def test_when_on_fixture_raises(pytester):
+    """@when on a fixture is rejected: fixtures are setup, only @given fits."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, when, then
+
+        @pytest.fixture
+        @when("inserting money")
+        def coin():
+            return 2
+
+        @scenario("uses bad fixture")
+        def test_use(coin):
+            with then("coin is 2"):
+                assert coin == 2
+        """
+    )
+    result = pytester.runpytest('-v')
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*PytestGivenError*', '*@given*'])
+
+
+def test_then_on_fixture_raises(pytester):
+    """@then on a fixture is rejected for the same reason as @when."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then
+
+        @pytest.fixture
+        @then("a coffee is dispensed")
+        def coffee():
+            return 'espresso'
+
+        @scenario("uses bad fixture")
+        def test_use(coffee):
+            with then("coffee is espresso"):
+                assert coffee == 'espresso'
+        """
+    )
+    result = pytester.runpytest('-v')
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*PytestGivenError*', '*@given*'])
+
+
 def test_session_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
     """A session-scoped decorated fixture body runs once but each consumer's
     scenario shows the recorded subtree."""
