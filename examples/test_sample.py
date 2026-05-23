@@ -9,13 +9,41 @@ def machine():
     return {'coffees': 10, 'price': 2}
 
 
-@scenario('Buy coffee', tags=['billing', 'happy-path'])
+@pytest.fixture
+@given('a database connection')
+def db():
+    conn = {'open': True, 'queries': []}
+    yield conn
+    conn['open'] = False
+
+
+@scenario(
+    'Basic scenario with when/then and a JSON attachment',
+    tags=['billing', 'happy-path'],
+)
 def test_buy_coffee(machine):
     with when('I insert $2'):
         machine['coffees'] -= 1
     with then('I get a coffee'):
         assert machine['coffees'] == 9
         attach('Machine state', machine)
+
+
+@scenario('Plain text attachment', tags=['billing'])
+def test_text_attachment(machine):
+    with when('I print the receipt'):
+        receipt = 'Coffee x1     $2.00\n----------------\nTotal:        $2.00'
+    with then('the receipt is recorded verbatim'):
+        attach('Receipt', receipt)
+
+
+@scenario('Generator fixture with teardown')
+def test_generator_fixture(db):
+    with when('I run a query'):
+        db['queries'].append('SELECT 1')
+    with then('the connection is open and the query was logged'):
+        assert db['open']
+        assert db['queries'] == ['SELECT 1']
 
 
 @scenario('Not enough money', tags=['billing', 'edge-case'])
@@ -26,7 +54,10 @@ def test_not_enough(machine):
         assert paid < machine['price']
 
 
-@scenario('Pricing', tags=['billing'])
+@scenario(
+    'Parameterized test (renders as a parameter table)',
+    tags=['billing'],
+)
 @pytest.mark.parametrize('euros,expect', [(1, False), (2, True), (3, True)])
 def test_pricing(machine, euros, expect):
     with when(f'I insert ${euros}'):
@@ -44,7 +75,7 @@ def validate_coin(machine, amount):
     return valid
 
 
-@scenario('Buy coffee with validation', tags=['billing', 'detailed'])
+@scenario('Helper functions can record their own steps', tags=['billing'])
 def test_buy_with_validation(machine):
     with when('I insert $2'):
         result = validate_coin(machine, 2)
@@ -57,7 +88,7 @@ def test_buy_with_validation(machine):
             attach('Final state', machine)
 
 
-@scenario('Complex ordering workflow', tags=['billing', 'detailed'])
+@scenario('Top-level `given` block and deeply nested steps', tags=['billing'])
 def test_complex_order(machine):
     with given('a loyalty card with 5 points'):
         loyalty = {'points': 5}
@@ -84,7 +115,7 @@ def test_complex_order(machine):
         attach('Final machine state', machine)
 
 
-@scenario('Failing assertion', tags=['debug'])
+@scenario('Failure rendering (intentionally failing)')
 def test_failing(machine):
     with then('the machine has 20 coffees'):
         assert machine['coffees'] == 20
