@@ -21,6 +21,7 @@ Individual sessions:
 - `nox -s test` — pytest
 - `nox -s coverage` — 100% coverage target
 - `nox -s audit` — pip-audit
+- `nox -s examples` — regenerate `examples/report-data.json` and `examples/report.html`. Run after changes to the renderer, templates, plugin output schema, or `examples/test_examples.py` itself, and commit the updated JSON.
 
 ## Architecture
 
@@ -34,7 +35,7 @@ Individual sessions:
 
 ## Report testing
 
-A Playwright MCP server is available for visually inspecting the HTML report. Open it with `file:///` URLs pointing to `examples/report.html` (regenerate via `pytest examples/test_examples.py --given-json=examples/report-data.json --given-html --given-html-output=examples/report.html`). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
+A Playwright MCP server is available for visually inspecting the HTML report. Open it with `file:///` URLs pointing to `examples/report.html` (regenerate via `nox -s examples`). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
 
 - The report targets desktop only — assume a minimum viewport width of ~900px. No mobile/responsive layout needed.
 - Traceback display and header metadata formatting are known limitations, not current priorities.

@@ -70,3 +70,17 @@ def coverage(session: nox.Session) -> None:
 def audit(session: nox.Session) -> None:
     _sync(session, 'audit')
     session.run('pip-audit', '--local')
+
+
+@nox.session
+def examples(session: nox.Session) -> None:
+    """Regenerate examples/report-data.json and examples/report.html."""
+    _sync(session, 'test')
+    session.run(
+        'pytest',
+        'examples/test_examples.py',
+        '--given-json=examples/report-data.json',
+        '--given-html',
+        '--given-html-output=examples/report.html',
+        success_codes=[0, 1],
+    )
