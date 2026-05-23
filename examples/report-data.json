@@ -1,0 +1,478 @@
+{
+  "metadata": {
+    "project": "pytest-given",
+    "timestamp": "2026-05-23T15:46:20.450382+00:00",
+    "pytest_version": "9.0.3",
+    "plugin_version": "0.1.0"
+  },
+  "scenarios": [
+    {
+      "id": "examples/test_examples.py::test_buy_coffee",
+      "name": "Basic scenario with when/then and a JSON attachment",
+      "module": "test_examples",
+      "tags": [
+        "billing",
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I insert $2",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "I get a coffee",
+          "status": "passed",
+          "children": [],
+          "attachments": [
+            {
+              "label": "Machine state",
+              "content": "{\n  \"coffees\": 9,\n  \"price\": 2\n}",
+              "content_type": "json"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": null
+    },
+    {
+      "id": "examples/test_examples.py::test_text_attachment",
+      "name": "Plain text attachment",
+      "module": "test_examples",
+      "tags": [
+        "billing"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I print the receipt",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "the receipt is recorded verbatim",
+          "status": "passed",
+          "children": [],
+          "attachments": [
+            {
+              "label": "Receipt",
+              "content": "Coffee x1     $2.00\n----------------\nTotal:        $2.00",
+              "content_type": "text"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": null
+    },
+    {
+      "id": "examples/test_examples.py::test_generator_fixture",
+      "name": "Generator fixture with teardown",
+      "module": "test_examples",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a database connection",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I run a query",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "the connection is open and the query was logged",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": null
+    },
+    {
+      "id": "examples/test_examples.py::test_not_enough",
+      "name": "Not enough money",
+      "module": "test_examples",
+      "tags": [
+        "billing",
+        "edge-case"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I insert $1",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "I don't get a coffee",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": null
+    },
+    {
+      "id": "examples/test_examples.py::test_buy_with_validation",
+      "name": "Helper functions can record their own steps",
+      "module": "test_examples",
+      "tags": [
+        "billing"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I insert $2",
+          "status": "passed",
+          "children": [
+            {
+              "phase": "when",
+              "text": "validating coin... accepted",
+              "status": "passed",
+              "children": [],
+              "attachments": [],
+              "error": null
+            },
+            {
+              "phase": "when",
+              "text": "updating balance",
+              "status": "passed",
+              "children": [],
+              "attachments": [],
+              "error": null
+            }
+          ],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "the coin is accepted",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "a coffee is dispensed",
+          "status": "passed",
+          "children": [
+            {
+              "phase": "then",
+              "text": "the machine state is consistent",
+              "status": "passed",
+              "children": [],
+              "attachments": [
+                {
+                  "label": "Final state",
+                  "content": "{\n  \"coffees\": 9,\n  \"price\": 2\n}",
+                  "content_type": "json"
+                }
+              ],
+              "error": null
+            }
+          ],
+          "attachments": [],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": null
+    },
+    {
+      "id": "examples/test_examples.py::test_complex_order",
+      "name": "Top-level `given` block and deeply nested steps",
+      "module": "test_examples",
+      "tags": [
+        "billing"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "given",
+          "text": "a loyalty card with 5 points",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I place a large order",
+          "status": "passed",
+          "children": [
+            {
+              "phase": "when",
+              "text": "I select 3 coffees",
+              "status": "passed",
+              "children": [],
+              "attachments": [],
+              "error": null
+            },
+            {
+              "phase": "when",
+              "text": "I apply loyalty discount",
+              "status": "passed",
+              "children": [
+                {
+                  "phase": "when",
+                  "text": "validating loyalty card",
+                  "status": "passed",
+                  "children": [],
+                  "attachments": [],
+                  "error": null
+                },
+                {
+                  "phase": "when",
+                  "text": "calculating discount",
+                  "status": "passed",
+                  "children": [],
+                  "attachments": [],
+                  "error": null
+                }
+              ],
+              "attachments": [],
+              "error": null
+            }
+          ],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "the order is processed correctly",
+          "status": "passed",
+          "children": [
+            {
+              "phase": "then",
+              "text": "the coffee count is updated",
+              "status": "passed",
+              "children": [],
+              "attachments": [],
+              "error": null
+            },
+            {
+              "phase": "then",
+              "text": "the loyalty points are deducted",
+              "status": "passed",
+              "children": [
+                {
+                  "phase": "then",
+                  "text": "the remaining points are valid",
+                  "status": "passed",
+                  "children": [],
+                  "attachments": [
+                    {
+                      "label": "Loyalty state",
+                      "content": "{\n  \"points\": 2\n}",
+                      "content_type": "json"
+                    }
+                  ],
+                  "error": null
+                }
+              ],
+              "attachments": [],
+              "error": null
+            }
+          ],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "the machine state is consistent",
+          "status": "passed",
+          "children": [],
+          "attachments": [
+            {
+              "label": "Final machine state",
+              "content": "{\n  \"coffees\": 7,\n  \"price\": 2\n}",
+              "content_type": "json"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": null
+    },
+    {
+      "id": "examples/test_examples.py::test_failing",
+      "name": "Failure rendering (intentionally failing)",
+      "module": "test_examples",
+      "tags": [],
+      "status": "failed",
+      "duration_ms": 83,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "the machine has 20 coffees",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": {
+        "message": "assert 10 == 20",
+        "diff": ".venv\\Lib\\site-packages\\_pytest\\runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.venv\\Lib\\site-packages\\_pytest\\runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\_pytest\\logging.py:850: in pytest_runtest_call\n    yield\n.venv\\Lib\\site-packages\\_pytest\\capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.venv\\Lib\\site-packages\\_pytest\\skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.venv\\Lib\\site-packages\\_pytest\\runner.py:179: in pytest_runtest_call\n    item.runtest()\n.venv\\Lib\\site-packages\\_pytest\\python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.venv\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\_pytest\\python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc\\pytest_given\\decorators.py:91: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples\\test_examples.py:121: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
+      }
+    },
+    {
+      "id": "examples/test_examples.py::test_pricing[1-False]",
+      "name": "Parameterized test (renders as a parameter table)",
+      "module": "test_examples",
+      "tags": [
+        "billing"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "text": "a coffee machine",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "text": "I insert ${euros}",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "text": "can_buy is {expect}",
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        }
+      ],
+      "parameters": {
+        "names": [
+          "euros",
+          "expect"
+        ],
+        "cases": [
+          {
+            "values": [
+              1,
+              false
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              2,
+              true
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              3,
+              true
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
+      "error": null
+    }
+  ]
+}

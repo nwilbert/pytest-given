@@ -13,5 +13,6 @@ __pycache__/
 .superpowers/
 docs/superpowers/plans/
 /given-report/
+/examples/report.html
 .claude/settings.local.json
 .playwright-mcp/
