@@ -2,7 +2,7 @@
 
 ## Project overview
 
-pytest-given is a pytest plugin that generates interactive HTML reports from Given/When/Then annotated Python tests. Inspired by JGiven (Java). The code is the single source of truth — no Gherkin DSL.
+See [README.md](README.md) for the user-facing overview, public API, and CLI flags. The rest of this document is contributor-facing.
 
 ## Setup
 
@@ -43,7 +43,6 @@ A Playwright MCP server is available for visually inspecting the HTML report. Op
 
 ## Conventions
 
-- Python >= 3.12, pytest >= 9.0
 - src layout with hatchling build
 - Single quotes (ruff format)
 - Strict mypy (`disallow_untyped_defs`). Avoid `Any` — use precise types, generics, `TYPE_CHECKING` imports, or `ContextVar[T]` over untyped `threading.local`.
