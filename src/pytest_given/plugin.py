@@ -1,7 +1,5 @@
 """pytest-given plugin entry point."""
 
-from __future__ import annotations
-
 import contextlib
 import dataclasses
 import functools
@@ -65,7 +63,7 @@ def pytest_sessionstart(session: pytest.Session) -> None:
 
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
-def pytest_runtest_setup(item: pytest.Item) -> Generator[None, None, None]:
+def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     scenario_marker = _get_scenario_marker(item)
     if scenario_marker is None:
         # Unannotated test: set the flag so `with given(...)` inside it warns
@@ -100,7 +98,7 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None, None, None]:
 def pytest_fixture_setup(
     fixturedef: pytest.FixtureDef[object],
     request: pytest.FixtureRequest,
-) -> Generator[None, None, None]:
+) -> Generator[None]:
     desc = getattr(fixturedef.func, '_step_descriptor', None)
     if desc is None:
         yield
@@ -139,7 +137,7 @@ def _ensure_teardown_wrapped(fixturedef: pytest.FixtureDef[object]) -> None:
     desc = original._step_descriptor  # type: ignore[attr-defined]
 
     @functools.wraps(original)
-    def wrapped(*args: object, **kwargs: object) -> Generator[object, None, None]:
+    def wrapped(*args: object, **kwargs: object) -> Generator[object]:
         gen = original(*args, **kwargs)
         try:
             value = next(gen)

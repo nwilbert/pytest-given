@@ -1,8 +1,6 @@
 """Unit tests for plugin internals reached only via pytester subprocesses
 in integration tests; tested here directly so coverage hits 100%."""
 
-from __future__ import annotations
-
 import inspect
 from types import SimpleNamespace
 from typing import Any, cast
@@ -52,7 +50,7 @@ def _fake_item(fixturedefs: dict[str, Any]) -> pytest.Item:
     )
 
 
-def test_pytest_fixture_setup_skips_undecorated_fixture(
+def test_pytest_fixture_setup_skips_plain_fixture(
     fresh_collector: Collector,
 ) -> None:
     fixturedef = SimpleNamespace(func=lambda: None)
@@ -107,7 +105,7 @@ def test_wrapped_generator_handles_no_yield() -> None:
     assert list(wrapped()) == []
 
 
-def test_graft_fixture_recordings_skips_undecorated_fixtures(
+def test_graft_fixture_recordings_skips_plain_fixtures(
     fresh_collector: Collector,
 ) -> None:
     fixturedef = SimpleNamespace(func=lambda: None, cached_result=('v', None, None))
