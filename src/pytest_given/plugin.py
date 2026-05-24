@@ -111,7 +111,7 @@ def pytest_fixture_setup(
         )
     if collector.state == 'idle':
         # Fixture is being set up outside any tracked scenario (e.g. unannotated
-        # test pulling in a decorated fixture). Don't record.
+        # test pulling in a step fixture). Don't record.
         yield
         return
     _ensure_teardown_wrapped(fixturedef)
@@ -172,7 +172,7 @@ def _get_scenario_marker(item: pytest.Item) -> Any | None:
 
 
 def _graft_fixture_recordings(item: pytest.Item) -> None:
-    """Graft this item's decorated-fixture recordings in setup order."""
+    """Graft this item's step-fixture recordings in setup order."""
     assert hasattr(item, 'fixturenames'), f'expected fixturenames on {item!r}'
     fm = item.session._fixturemanager
     expected: set[FixtureInstanceKey] = set()

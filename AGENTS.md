@@ -43,6 +43,7 @@ A Playwright MCP server is available for visually inspecting the HTML report. Op
 
 ## Conventions
 
+- Use the project's canonical vocabulary — see [GLOSSARY.md](GLOSSARY.md). Renames touch the glossary in the same commit.
 - src layout with hatchling build
 - Single quotes (ruff format)
 - Strict mypy (`disallow_untyped_defs`). Avoid `Any` — use precise types, generics, `TYPE_CHECKING` imports, or `ContextVar[T]` over untyped `threading.local`.

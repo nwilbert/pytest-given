@@ -113,8 +113,8 @@ def test_attachment_in_report(pytester, tmp_path):
     assert att[0]['label'] == 'my log'
 
 
-def test_decorated_fixture_appears_as_given_step(pytester, tmp_path):
-    """A fixture decorated with @given appears as a given step."""
+def test_step_fixture_appears_as_given_step(pytester, tmp_path):
+    """A step fixture appears as a given step."""
     pytester.makepyfile(
         """
         import pytest
@@ -270,7 +270,7 @@ def test_given_inside_unannotated_test_warns(pytester, tmp_path):
 
 
 def test_with_given_inside_fixture_body_is_captured(pytester, tmp_path):
-    """Nested `with given(...)` in a decorated fixture body lands under its step."""
+    """Nested `with given(...)` in a step fixture body lands under its step."""
     pytester.makepyfile(
         """
         import pytest
@@ -398,7 +398,7 @@ def test_then_on_fixture_raises(pytester):
 
 
 def test_session_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
-    """A session-scoped decorated fixture body runs once but each consumer's
+    """A session-scoped step fixture body runs once but each consumer's
     scenario shows the recorded subtree."""
     pytester.makepyfile(
         """
@@ -579,7 +579,7 @@ def test_indirect_parametrize_templatizes_fixture_step_text(pytester, tmp_path):
     assert nested == 'with {shop} items'
 
 
-def test_nested_decorated_fixtures_appear_as_siblings(pytester, tmp_path):
+def test_nested_step_fixtures_appear_as_siblings(pytester, tmp_path):
     """Fixture B depending on fixture A: both recordings graft as top-level."""
     pytester.makepyfile(
         """
