@@ -172,6 +172,13 @@ def test_pytest_runtest_teardown_clears_unannotated_flag(
     assert get_active_collector() is None
 
 
+def test_get_scenario_marker_returns_none_for_item_without_function() -> None:
+    """DoctestItem and other non-Function items lack `.function`; the marker
+    lookup must tolerate that rather than asserting."""
+    item = cast(pytest.Item, SimpleNamespace(nodeid='t::doctest'))
+    assert plugin._get_scenario_marker(item) is None
+
+
 def test_templatize_parts_rejects_unknown_placeholder() -> None:
     """Safety-net guard: a NarrationPlaceholder whose name isn't a parametrize
     column raises. Defense in depth on top of the collection-time hook, which

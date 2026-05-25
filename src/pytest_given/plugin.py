@@ -211,9 +211,14 @@ def _fixture_instance_key(
 
 
 def _get_scenario_marker(item: pytest.Item) -> Any | None:
-    """Get the _scenario attribute from a test function, if present."""
+    """Get the _scenario attribute from a test function, if present.
+
+    Returns None for items without a `.function` (e.g. DoctestItem) — those
+    can't carry @scenario, so they're never load-bearing here.
+    """
     func = getattr(item, 'function', None)
-    assert func is not None, f'expected item.function on {item!r}'
+    if func is None:
+        return None
     return getattr(func, '_scenario', None)
 
 
