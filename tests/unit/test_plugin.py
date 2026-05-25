@@ -10,7 +10,9 @@ import pytest
 from pytest_given import plugin
 from pytest_given.collector import Collector, get_active_collector, set_active_collector
 from pytest_given.decorators import StepDescriptor
+from pytest_given.errors import PytestGivenError
 from pytest_given.model import NodeId
+from pytest_given.template import NarrationPlaceholder
 
 
 @pytest.fixture(autouse=True)
@@ -168,3 +170,14 @@ def test_pytest_runtest_teardown_clears_unannotated_flag(
     plugin.pytest_runtest_teardown(item)
     assert fresh_collector.inside_unannotated_test is False
     assert get_active_collector() is None
+
+
+def test_templatize_parts_rejects_unknown_placeholder() -> None:
+    """Safety-net guard: a NarrationPlaceholder whose name isn't a parametrize
+    column raises. Defense in depth on top of the collection-time hook, which
+    catches Template placeholders in scenario names (and step text from
+    Template can't happen since given/when/then reject Template). The runtime
+    guard covers any future code path that might construct text_parts directly."""
+    parts = [NarrationPlaceholder(name='cup_zize')]
+    with pytest.raises(PytestGivenError, match='cup_zize'):
+        plugin._templatize_parts(parts, ['cup_size'])
