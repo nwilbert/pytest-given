@@ -42,10 +42,10 @@ Three authoring forms, each with a clear lane — and each lane only accepts the
 
 Test bodies use t-strings or plain strings only; deferred decorator contexts use `pytest_given.Template` or plain strings only. The lanes don't overlap.
 
-When a step is recorded, the collector stores both a flat `text: str` and an optional structured `text_parts: list[TextPart] | None`. The same `text_parts` model serves both Template types:
+When a step is recorded, the collector stores both a flat `text: str` and an optional structured `text_parts: list[NarrationPart] | None`. The same `text_parts` model serves both Template types:
 
-- **t-string** → `text_parts` carries `TextLiteral` / `TextValue` (value-with-expression, already known).
-- **`pytest_given.Template`** → `text_parts` carries `TextLiteral` / `TextPlaceholder` (name + format spec, unresolved until merge).
+- **t-string** → `text_parts` carries `NarrationLiteral` / `NarrationValue` (value-with-expression, already known).
+- **`pytest_given.Template`** → `text_parts` carries `NarrationLiteral` / `NarrationPlaceholder` (name + format spec, unresolved until merge).
 
 The renderer and templatizer dispatch on `text_parts`; plain `str` steps render verbatim with no regex pass.
 
@@ -63,10 +63,10 @@ class Template:
     def __init__(self, template: str) -> None:
         self.template = template
         formatter = Formatter()
-        self.parts: list[TextPart] = []
+        self.parts: list[NarrationPart] = []
         for literal, name, spec, conversion in formatter.parse(template):
             if literal:
-                self.parts.append(TextLiteral(value=literal))
+                self.parts.append(NarrationLiteral(value=literal))
             if name is not None:
                 if not name.isidentifier():
                     raise PytestGivenError(
@@ -75,13 +75,13 @@ class Template:
                         f"test body (where the value is in scope)."
                     )
                 self.parts.append(
-                    TextPlaceholder(name=name, format_spec=spec or '', conversion=conversion)
+                    NarrationPlaceholder(name=name, format_spec=spec or '', conversion=conversion)
                 )
 
     def substitute(self, mapping: Mapping[str, Any]) -> str:
         out: list[str] = []
         for part in self.parts:
-            if isinstance(part, TextLiteral):
+            if isinstance(part, NarrationLiteral):
                 out.append(part.value)
                 continue
             if part.name not in mapping:
@@ -93,7 +93,7 @@ class Template:
         return ''.join(out)
 
     def get_identifiers(self) -> list[str]:
-        return [p.name for p in self.parts if isinstance(p, TextPlaceholder)]
+        return [p.name for p in self.parts if isinstance(p, NarrationPlaceholder)]
 ```
 
 Syntax supported: **bare identifiers only** (`{name}`), with optional format specs (`{n:03d}`) and conversions (`{obj!r}`). **Not** supported: attribute access (`{obj.attr}`), indexing (`{d[key]}`), arbitrary expressions, method calls, walrus, ternaries. Rationale: the substitution source is the parametrize mapping (`callspec.params`), keyed by bare column names. Nested access would either need to alias to its root column (silently surprising) or synthesize derived columns (a separate, larger feature applied uniformly to t-strings and Template — out of scope here). T-strings remain the full-expressiveness form for in-scope authoring; if you want compositional narration, either parametrize by the attributes directly, or move the step into the test body with a t-string.
@@ -142,7 +142,7 @@ The merge key for `_group_parameterized` is:
 - `str` → the string itself (existing behavior).
 - `Template` → `template.template` (the raw `{name}`-bearing source). All cases of a parametrized scenario share that exact raw string, so they merge into one group; per-case rendering substitutes from `callspec.params`.
 
-JSON model for scenario names mirrors the step model: `Scenario.name: str` always holds the rendered (or raw, for Template) string; `Scenario.name_parts: list[TextPart] | None` holds the structured form when the name was a Template. Rendering dispatches on `name_parts` exactly like step text.
+JSON model for scenario names mirrors the step model: `Scenario.name: str` always holds the rendered (or raw, for Template) string; `Scenario.name_parts: list[NarrationPart] | None` holds the structured form when the name was a Template. Rendering dispatches on `name_parts` exactly like step text.
 
 ### Fixture-side decorators (`@given(text)` on a fixture)
 
@@ -154,37 +154,37 @@ Rejection happens in `StepDescriptor.__call__(func)`: any `text_parts is not Non
 
 ```python
 @dataclass(frozen=True, kw_only=True)
-class TextLiteral:
+class NarrationLiteral:
     value: str
 
 @dataclass(frozen=True, kw_only=True)
-class TextValue:
+class NarrationValue:
     """A t-string interpolation — value already known."""
     rendered: str            # str(value) post-conversion+format_spec
     expression: str          # source expression text
-    format_spec: str = ''    # preserved so templatize can hand it to TextPlaceholder
+    format_spec: str = ''    # preserved so templatize can hand it to NarrationPlaceholder
     conversion: str | None = None
 
 @dataclass(frozen=True, kw_only=True)
-class TextPlaceholder:
+class NarrationPlaceholder:
     """A deferred placeholder — resolved at render time against per-case mapping.
 
-    Produced by pytest_given.Template, or by templatize when a TextValue's
+    Produced by pytest_given.Template, or by templatize when a NarrationValue's
     expression matches a parametrize name.
     """
     name: str
     format_spec: str = ''
     conversion: str | None = None
 
-type TextPart = TextLiteral | TextValue | TextPlaceholder
+type NarrationPart = NarrationLiteral | NarrationValue | NarrationPlaceholder
 
 @dataclass
 class Step:
     ...
-    text_parts: list[TextPart] | None = None  # None for plain-str authoring
+    text_parts: list[NarrationPart] | None = None  # None for plain-str authoring
 ```
 
-Python-side dispatch uses `match` over `TextPart` (the union narrows exhaustively); the field sets are disjoint — `TextLiteral` has `value`, `TextValue` has `rendered`/`expression`, `TextPlaceholder` has `name` — so no `kind` discriminator is needed.
+Python-side dispatch uses `match` over `NarrationPart` (the union narrows exhaustively); the field sets are disjoint — `NarrationLiteral` has `value`, `NarrationValue` has `rendered`/`expression`, `NarrationPlaceholder` has `name` — so no `kind` discriminator is needed.
 
 ## Resolution Rules
 
@@ -196,16 +196,16 @@ Python-side dispatch uses `match` over `TextPart` (the union narrows exhaustivel
 
 2. **Recording.** `collector.push_step(phase, text)` dispatches on type:
    - `str` → `Step(text=text, text_parts=None)`.
-   - `templatelib.Template` → `_to_text_parts_tstring(t)` iterates the Template (yielding `str | Interpolation`), applies conversion then `format(value, format_spec)` per interpolation, and produces a rendered string plus `[TextLiteral | TextValue, ...]`.
+   - `templatelib.Template` → `_to_text_parts_tstring(t)` iterates the Template (yielding `str | Interpolation`), applies conversion then `format(value, format_spec)` per interpolation, and produces a rendered string plus `[NarrationLiteral | NarrationValue, ...]`.
 
    `pytest_given.Template` does not appear here — it is rejected by `given/when/then` (and `attach`) before reaching the collector. Scenario-name recording (via the `_scenario` marker) handles `pytest_given.Template` separately in `start_scenario`.
 
 3. **Parametric merge.** `_group_parameterized` walks `first.steps` for the merged-template structure (existing first-case-is-template behavior). Per step:
    - `text_parts is None`: pass through unchanged.
    - `text_parts is not None`: walk parts.
-     - `TextLiteral`: unchanged.
-     - `TextValue`: if `expression in param_names`, **replace with** `TextPlaceholder(name=expression, format_spec=tv.format_spec, conversion=tv.conversion)`. The renderer's per-case logic then applies uniformly. Otherwise leave the `TextValue` verbatim (same value across all cases by construction; renders as a neutral value-highlight).
-     - `TextPlaceholder`: if `name in param_names`, keep as-is (renderer substitutes per case from the parameter table). If `name not in param_names`, raise `PytestGivenError` with the file/line of the call site — Template placeholders that don't match a parametrize name are almost always typos.
+     - `NarrationLiteral`: unchanged.
+     - `NarrationValue`: if `expression in param_names`, **replace with** `NarrationPlaceholder(name=expression, format_spec=tv.format_spec, conversion=tv.conversion)`. The renderer's per-case logic then applies uniformly. Otherwise leave the `NarrationValue` verbatim (same value across all cases by construction; renders as a neutral value-highlight).
+     - `NarrationPlaceholder`: if `name in param_names`, keep as-is (renderer substitutes per case from the parameter table). If `name not in param_names`, raise `PytestGivenError` with the file/line of the call site — Template placeholders that don't match a parametrize name are almost always typos.
 
    The same dispatch runs over the scenario's `name_parts` (if present) so a Template-named scenario merges and renders identically.
 
@@ -214,15 +214,15 @@ Python-side dispatch uses `match` over `TextPart` (the union narrows exhaustivel
 4. **Render.** New Jinja filter `step_text(step, case=None)` returns Markup. Single dispatch shape:
    - `step.text_parts is None`: render `step.text` HTML-escaped. No regex pass; braces render as braces.
    - `step.text_parts is not None`: walk parts.
-     - `TextLiteral`: escaped literal.
-     - `TextValue`: rendered string wrapped in `<span class="param-value">` (neutral highlight). Only reachable for non-parametrize t-string expressions — matching expressions have already been converted to `TextPlaceholder` by merge.
-     - `TextPlaceholder`: look up color via `param_color_map[name]`. When `case is not None`, substitute via `mapping = dict(zip(param_names, case.values))`, apply `conversion` then `format(value, format_spec)`, and wrap the result in `<span class="param-color-N">`. When `case is None` (merged-template view), render as `{name}` wrapped in the param-color span.
+     - `NarrationLiteral`: escaped literal.
+     - `NarrationValue`: rendered string wrapped in `<span class="param-value">` (neutral highlight). Only reachable for non-parametrize t-string expressions — matching expressions have already been converted to `NarrationPlaceholder` by merge.
+     - `NarrationPlaceholder`: look up color via `param_color_map[name]`. When `case is not None`, substitute via `mapping = dict(zip(param_names, case.values))`, apply `conversion` then `format(value, format_spec)`, and wrap the result in `<span class="param-color-N">`. When `case is None` (merged-template view), render as `{name}` wrapped in the param-color span.
 
    `scenario.name` rendering: same dispatch on `name_parts`.
 
    The old `highlight_params` filter and `_PARAM_RE` are removed.
 
-5. **JSON model.** `text_parts` and the scenario-name `Template` serialize via `dataclasses.asdict` as plain field-shaped dicts. The renderer loads JSON as raw dict via `json.loads` (renderer.py:21); absent or `null` `text_parts` falls through to the literal-render path. Back-compatible: old reports still render (without the new highlights since they have no `text_parts`). Discrimination is structural — `TextLiteral` is the only part shape with a `value` key, `TextValue` is the only one with `rendered`+`expression`, and `TextPlaceholder` is the only one with `name`; no explicit `kind` field is needed.
+5. **JSON model.** `text_parts` and the scenario-name `Template` serialize via `dataclasses.asdict` as plain field-shaped dicts. The renderer loads JSON as raw dict via `json.loads` (renderer.py:21); absent or `null` `text_parts` falls through to the literal-render path. Back-compatible: old reports still render (without the new highlights since they have no `text_parts`). Discrimination is structural — `NarrationLiteral` is the only part shape with a `value` key, `NarrationValue` is the only one with `rendered`+`expression`, and `NarrationPlaceholder` is the only one with `name`; no explicit `kind` field is needed.
 
    Plain-`str` steps and scenarios serialize `"text_parts": null` / `"name_parts": null` unconditionally — we don't strip `None` values from the dump. **Intentional**: it keeps a single dispatch shape on read (one branch on `is None`, no `dict.get(...)` ladder) and makes the JSON schema predictable for external consumers. The size impact is negligible.
 
@@ -231,13 +231,13 @@ Python-side dispatch uses `match` over `TextPart` (the union narrows exhaustivel
 | File | Change |
 |---|---|
 | `pyproject.toml` | `requires-python = ">=3.14"`; `[tool.mypy] python_version = "3.14"`. Re-run `uv lock`. |
-| `src/pytest_given/template.py` *(new)* | `Template` class + `TextLiteral` / `TextValue` / `TextPlaceholder` / `TextPart`. |
+| `src/pytest_given/template.py` *(new)* | `Template` class + `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationPart`. |
 | `src/pytest_given/__init__.py` | Export `Template`. |
-| `src/pytest_given/model.py` | Add `Step.text_parts: list[TextPart] \| None = None`. Add `Scenario.name_parts: list[TextPart] \| None = None`; `Scenario.name` stays `str` (the raw template when Template-authored). |
+| `src/pytest_given/model.py` | Add `Step.text_parts: list[NarrationPart] \| None = None`. Add `Scenario.name_parts: list[NarrationPart] \| None = None`; `Scenario.name` stays `str` (the raw template when Template-authored). |
 | `src/pytest_given/decorators.py` | `given/when/then` accept `str \| templatelib.Template` (import as `from string import templatelib` to avoid the name collision with `pytest_given.Template`; reference t-strings as `templatelib.Template`). Runtime `isinstance` check rejects `pytest_given.Template` with the documented message. `StepDescriptor` carries `text: str` and `text_parts`. Helper `_to_text_parts(text)`. Decorator-on-fixture path rejects `text_parts is not None`. `scenario(name)` accepts `str \| Template`. |
 | `src/pytest_given/collector.py` | `push_step` accepts `str \| templatelib.Template`; `attach` accepts the same. `start_scenario` accepts `str \| Template` for the scenario name. |
 | `src/pytest_given/plugin.py` | Remove `_templatize_step_text` and `_templatize_steps`. Add structural templatize. `_group_parameterized` merge key uses `template.template` when scenario name is a `Template`. Add `pytest_collection_modifyitems` hook for the Template-on-non-parametrized validation (Resolution Rule 1). |
-| `src/pytest_given/renderer.py` | Replace `highlight_params` with `step_text`. Remove `_PARAM_RE`. Add `.param-value` highlight class. Per-case rendering for `TextPlaceholder` substitutes from the case's values. |
+| `src/pytest_given/renderer.py` | Replace `highlight_params` with `step_text`. Remove `_PARAM_RE`. Add `.param-value` highlight class. Per-case rendering for `NarrationPlaceholder` substitutes from the case's values. |
 | `src/pytest_given/templates/report.html.j2` | Switch step-text and scenario-name call sites to the new filter. Per-case rows pass the case dict into the filter for placeholder substitution. |
 | `src/pytest_given/templates/styles.css` | `.param-value` rule. |
 | `tests/unit/test_template.py` *(new)* | `Template` parsing, substitution, errors, `get_identifiers`. |
@@ -253,7 +253,7 @@ Integration (`tests/integration/test_plugin.py`):
 1. **t-string in non-parametrized scenario** → value span with `param-value` highlight; no `{name}` token.
 2. **t-string in parametrized scenario, expression matches param name** → merged template shows `{name}`; per-case parameter table renders values.
 3. **t-string with arbitrary expression** (`t'cost: {price * 1.2}'`) → neutral highlight; no param-table link.
-4. **t-string conversion + format_spec** (`t'{n:03d}'`, `t'{obj!r}'`) → `TextValue.rendered` matches Python `format(value, spec)` post-conversion.
+4. **t-string conversion + format_spec** (`t'{n:03d}'`, `t'{obj!r}'`) → `NarrationValue.rendered` matches Python `format(value, spec)` post-conversion.
 5. **Template in `@scenario(name)`** in a parametrized scenario → cases group correctly; per-case rendered name substitutes values.
 6. **`given(Template(...))` / `when(Template(...))` / `then(Template(...))`** → `PytestGivenError` with the documented message pointing to t-string.
 7. **Mixed authoring within one scenario** — `@scenario(Template(...))` for the name, t-string and plain `str` steps inside — each rendered by its own path.
@@ -313,7 +313,7 @@ In-repo migration (`tests/examples/test_examples.py` + example report regenerati
 
 - **`Template` only accepts bare identifiers.** No attribute access, indexing, arbitrary expressions, method calls, walrus, ternaries. Workaround: add a derived parametrize column (e.g., parametrize by `total, passed` rather than a packed `results` object), or move the value into a test-body t-string.
 - **First case is the template (parametrized scenarios only).** When a scenario is parametrized, `_group_parameterized` collapses the N case-records into one logical scenario plus a parameter table; the step *structure* shown to the reader comes from case 1's `text_parts`. Cases 2..N's `text_parts` are discarded — only their per-case values are preserved (in the parameter table and, for matching placeholders, in per-case rendering). This is fine for the common pattern where every case runs the same code and the only per-case difference is values plugged into a fixed narration. It is **misleading** when the narration structure itself varies across cases (e.g., conditional `with given(t'...')` branches inside a parametrized test), because case 1's narration is shown for all rows of the parameter table. Workarounds today: split into separate `@scenario` tests, or parametrize by a column whose value *is* the variant (`parametrize('case_label', ['small', 'big'])` and use `t'{case_label} number: {n}'`). Future option (separate spec): a per-scenario opt-out flag — e.g., `@scenario(name, group_parametrized=False)` — that emits each case as its own scenario in the report (named by substituting Template placeholders per case, or by appending the parametrize id to a `str` name), bypassing the merge entirely. Out of scope here; this caveat documents the current behavior.
-- **`TextValue.expression` is stored verbatim in JSON.** A step like `t'cost: {self._secret_attr}'` writes that expression text into the report. Niche concern.
+- **`NarrationValue.expression` is stored verbatim in JSON.** A step like `t'cost: {self._secret_attr}'` writes that expression text into the report. Niche concern.
 
 ## Out of Scope
 

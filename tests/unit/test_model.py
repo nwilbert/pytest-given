@@ -10,7 +10,7 @@ from pytest_given.model import (
     Scenario,
     Step,
 )
-from pytest_given.template import TextLiteral, TextPart, TextPlaceholder
+from pytest_given.template import NarrationLiteral, NarrationPart, NarrationPlaceholder
 
 
 def test_step_defaults() -> None:
@@ -115,10 +115,10 @@ def test_step_text_parts_defaults_to_none() -> None:
 
 
 def test_step_text_parts_accepts_list() -> None:
-    parts: list[TextPart] = [
-        TextLiteral(value='Brew '),
-        TextPlaceholder(name='cup_size'),
-        TextLiteral(value=' ml'),
+    parts: list[NarrationPart] = [
+        NarrationLiteral(value='Brew '),
+        NarrationPlaceholder(name='cup_size'),
+        NarrationLiteral(value=' ml'),
     ]
     step = Step(phase='given', text='Brew 200 ml', text_parts=parts)
     assert step.text_parts == parts

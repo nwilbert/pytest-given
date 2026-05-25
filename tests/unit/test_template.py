@@ -4,10 +4,10 @@ import pytest
 
 from pytest_given.errors import PytestGivenError
 from pytest_given.template import (
+    NarrationLiteral,
+    NarrationPlaceholder,
+    NarrationValue,
     Template,
-    TextLiteral,
-    TextPlaceholder,
-    TextValue,
     parse_tstring,
 )
 
@@ -15,25 +15,25 @@ from pytest_given.template import (
 def test_template_parses_literal_only() -> None:
     t = Template('hello world')
     assert t.template == 'hello world'
-    assert t.parts == [TextLiteral(value='hello world')]
+    assert t.parts == [NarrationLiteral(value='hello world')]
 
 
 def test_template_parses_single_placeholder() -> None:
     t = Template('Brew {cup_size} ml')
     assert t.parts == [
-        TextLiteral(value='Brew '),
-        TextPlaceholder(name='cup_size', format_spec='', conversion=None),
-        TextLiteral(value=' ml'),
+        NarrationLiteral(value='Brew '),
+        NarrationPlaceholder(name='cup_size', format_spec='', conversion=None),
+        NarrationLiteral(value=' ml'),
     ]
 
 
 def test_template_parses_format_spec_and_conversion() -> None:
     t = Template('n={n:03d} r={obj!r}')
     assert t.parts == [
-        TextLiteral(value='n='),
-        TextPlaceholder(name='n', format_spec='03d', conversion=None),
-        TextLiteral(value=' r='),
-        TextPlaceholder(name='obj', format_spec='', conversion='r'),
+        NarrationLiteral(value='n='),
+        NarrationPlaceholder(name='n', format_spec='03d', conversion=None),
+        NarrationLiteral(value=' r='),
+        NarrationPlaceholder(name='obj', format_spec='', conversion='r'),
     ]
 
 
@@ -92,7 +92,7 @@ def test_parse_tstring_literal_only() -> None:
     cup_size = 200  # noqa: F841
     rendered, parts = parse_tstring(t'just a label')
     assert rendered == 'just a label'
-    assert parts == [TextLiteral(value='just a label')]
+    assert parts == [NarrationLiteral(value='just a label')]
 
 
 def test_parse_tstring_single_interpolation() -> None:
@@ -100,14 +100,14 @@ def test_parse_tstring_single_interpolation() -> None:
     rendered, parts = parse_tstring(t'a {cup_size} ml cup')
     assert rendered == 'a 200 ml cup'
     assert parts == [
-        TextLiteral(value='a '),
-        TextValue(
+        NarrationLiteral(value='a '),
+        NarrationValue(
             rendered='200',
             expression='cup_size',
             format_spec='',
             conversion=None,
         ),
-        TextLiteral(value=' ml cup'),
+        NarrationLiteral(value=' ml cup'),
     ]
 
 
@@ -116,8 +116,8 @@ def test_parse_tstring_format_spec() -> None:
     rendered, parts = parse_tstring(t'n={n:03d}')
     assert rendered == 'n=007'
     assert parts == [
-        TextLiteral(value='n='),
-        TextValue(
+        NarrationLiteral(value='n='),
+        NarrationValue(
             rendered='007',
             expression='n',
             format_spec='03d',
@@ -131,8 +131,8 @@ def test_parse_tstring_conversion() -> None:
     rendered, parts = parse_tstring(t'r={obj!r}')
     assert rendered == "r='hi'"
     assert parts == [
-        TextLiteral(value='r='),
-        TextValue(
+        NarrationLiteral(value='r='),
+        NarrationValue(
             rendered="'hi'",
             expression='obj',
             format_spec='',
@@ -147,8 +147,8 @@ def test_parse_tstring_consecutive_interpolations() -> None:
     rendered, parts = parse_tstring(t'{a}{b}')
     assert rendered == '12'
     assert parts == [
-        TextValue(rendered='1', expression='a', format_spec='', conversion=None),
-        TextValue(rendered='2', expression='b', format_spec='', conversion=None),
+        NarrationValue(rendered='1', expression='a', format_spec='', conversion=None),
+        NarrationValue(rendered='2', expression='b', format_spec='', conversion=None),
     ]
 
 
@@ -156,7 +156,7 @@ def test_parse_tstring_expression() -> None:
     price = 10
     rendered, parts = parse_tstring(t'cost: {price * 1.2}')
     assert rendered == 'cost: 12.0'
-    assert parts[1] == TextValue(
+    assert parts[1] == NarrationValue(
         rendered='12.0',
         expression='price * 1.2',
         format_spec='',

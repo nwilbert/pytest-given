@@ -9,12 +9,12 @@ _CONVERSIONS: dict[str, Callable[[Any], str]] = {'s': str, 'r': repr, 'a': ascii
 
 
 @dataclass(frozen=True, kw_only=True)
-class TextLiteral:
+class NarrationLiteral:
     value: str
 
 
 @dataclass(frozen=True, kw_only=True)
-class TextValue:
+class NarrationValue:
     """A t-string interpolation — value already known at construction time."""
 
     rendered: str
@@ -24,7 +24,7 @@ class TextValue:
 
 
 @dataclass(frozen=True, kw_only=True)
-class TextPlaceholder:
+class NarrationPlaceholder:
     """A deferred placeholder — resolved at render time from a per-case mapping."""
 
     name: str
@@ -32,7 +32,7 @@ class TextPlaceholder:
     conversion: str | None = None
 
 
-type TextPart = TextLiteral | TextValue | TextPlaceholder
+type NarrationPart = NarrationLiteral | NarrationValue | NarrationPlaceholder
 
 
 class Template:
@@ -46,10 +46,10 @@ class Template:
     def __init__(self, template: str) -> None:
         self.template = template
         formatter = Formatter()
-        parts: list[TextPart] = []
+        parts: list[NarrationPart] = []
         for literal, name, spec, conversion in formatter.parse(template):
             if literal:
-                parts.append(TextLiteral(value=literal))
+                parts.append(NarrationLiteral(value=literal))
             if name is not None:
                 if not name.isidentifier():
                     raise PytestGivenError(
@@ -59,21 +59,21 @@ class Template:
                         f'(where the value is in scope).'
                     )
                 parts.append(
-                    TextPlaceholder(
+                    NarrationPlaceholder(
                         name=name,
                         format_spec=spec or '',
                         conversion=conversion,
                     )
                 )
-        self.parts: list[TextPart] = parts
+        self.parts: list[NarrationPart] = parts
 
     def substitute(self, mapping: Mapping[str, Any]) -> str:
         out: list[str] = []
         for part in self.parts:
             match part:
-                case TextLiteral(value=value):
+                case NarrationLiteral(value=value):
                     out.append(value)
-                case TextPlaceholder(name=name, format_spec=spec, conversion=conv):
+                case NarrationPlaceholder(name=name, format_spec=spec, conversion=conv):
                     if name not in mapping:
                         raise KeyError(name)
                     resolved = mapping[name]
@@ -83,26 +83,26 @@ class Template:
         return ''.join(out)
 
     def get_identifiers(self) -> list[str]:
-        return [p.name for p in self.parts if isinstance(p, TextPlaceholder)]
+        return [p.name for p in self.parts if isinstance(p, NarrationPlaceholder)]
 
 
 def parse_tstring(
     tstring: templatelib.Template,
-) -> tuple[str, list[TextPart]]:
+) -> tuple[str, list[NarrationPart]]:
     """Convert a t-string Template into (rendered text, structured parts).
 
     Iterates the t-string yielding str | Interpolation. Each interpolation
-    becomes a TextValue carrying the rendered string plus the source
+    becomes a NarrationValue carrying the rendered string plus the source
     expression and any conversion / format_spec — preserved so that the
-    templatize step can convert matching expressions to TextPlaceholder.
+    templatize step can convert matching expressions to NarrationPlaceholder.
     """
-    parts: list[TextPart] = []
+    parts: list[NarrationPart] = []
     rendered_chunks: list[str] = []
     for chunk in tstring:
         match chunk:
             case str() as literal:
                 if literal:
-                    parts.append(TextLiteral(value=literal))
+                    parts.append(NarrationLiteral(value=literal))
                     rendered_chunks.append(literal)
             case templatelib.Interpolation(
                 value=value,
@@ -114,7 +114,7 @@ def parse_tstring(
                     value = _CONVERSIONS[conversion](value)
                 rendered = format(value, format_spec)
                 parts.append(
-                    TextValue(
+                    NarrationValue(
                         rendered=rendered,
                         expression=expression,
                         format_spec=format_spec,
