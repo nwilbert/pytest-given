@@ -10,6 +10,7 @@ from pytest_given.model import (
     Scenario,
     Step,
 )
+from pytest_given.template import TextLiteral, TextPart, TextPlaceholder
 
 
 def test_step_defaults() -> None:
@@ -106,3 +107,23 @@ def test_fixture_recording_holds_root_step_and_stack() -> None:
     recording = FixtureRecording(root=root)
     assert recording.root is root
     assert recording.stack == [root]
+
+
+def test_step_text_parts_defaults_to_none() -> None:
+    step = Step(phase='given', text='hello')
+    assert step.text_parts is None
+
+
+def test_step_text_parts_accepts_list() -> None:
+    parts: list[TextPart] = [
+        TextLiteral(value='Brew '),
+        TextPlaceholder(name='cup_size'),
+        TextLiteral(value=' ml'),
+    ]
+    step = Step(phase='given', text='Brew 200 ml', text_parts=parts)
+    assert step.text_parts == parts
+
+
+def test_scenario_name_parts_defaults_to_none() -> None:
+    s = Scenario(id='id', name='hello', module='m')
+    assert s.name_parts is None
