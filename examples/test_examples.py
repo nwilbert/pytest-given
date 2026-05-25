@@ -1,6 +1,6 @@
 import pytest
 
-from pytest_given import attach, given, scenario, then, when
+from pytest_given import Template, attach, given, scenario, then, when
 
 
 @pytest.fixture
@@ -60,10 +60,22 @@ def test_not_enough(machine):
 )
 @pytest.mark.parametrize('euros,expect', [(1, False), (2, True), (3, True)])
 def test_pricing(machine, euros, expect):
-    with when(f'I insert ${euros}'):
+    with when(t'I insert ${euros}'):
         can_buy = euros >= machine['price']
-    with then(f'can_buy is {expect}'):
+    with then(t'can_buy is {expect}'):
         assert can_buy == expect
+
+
+@scenario(
+    Template('Brew {cup_size} ml (templated scenario name)'),
+    tags=['billing'],
+)
+@pytest.mark.parametrize('cup_size', [200, 300])
+def test_brew(machine, cup_size):
+    with when(t'I brew a {cup_size} ml cup'):
+        machine['coffees'] -= 1
+    with then('the machine has one fewer coffee'):
+        assert machine['coffees'] < 10
 
 
 def validate_coin(machine, amount):
