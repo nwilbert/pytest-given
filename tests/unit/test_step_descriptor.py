@@ -111,7 +111,7 @@ def test_attach_unannotated_test_warns_instead_of_raises() -> None:
 def test_attach_non_string_content_serializes_as_json() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('given', 'a step')
+    collector.push_step('given', 'a step', None)
     set_active_collector(collector)
     try:
         attach('payload', {'a': 1, 'b': [2, 3]})
@@ -166,7 +166,7 @@ def test_scenario_with_tstring_raises() -> None:
 def test_attach_with_tstring_label_renders_eagerly() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('given', 'a step')
+    collector.push_step('given', 'a step', None)
     set_active_collector(collector)
     try:
         size = 200

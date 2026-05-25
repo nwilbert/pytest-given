@@ -1,8 +1,14 @@
 import pytest
 
+from pytest_given import Template
 from pytest_given.collector import Collector
 from pytest_given.errors import PytestGivenError
 from pytest_given.model import FixtureRecording, Step
+from pytest_given.template import (
+    NarrationLiteral,
+    NarrationPart,
+    NarrationValue,
+)
 
 
 def test_start_and_finish_scenario() -> None:
@@ -18,9 +24,9 @@ def test_start_and_finish_scenario() -> None:
 def test_collect_steps() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('given', 'a machine')
+    collector.push_step('given', 'a machine', None)
     collector.pop_step()
-    collector.push_step('when', 'I press start')
+    collector.push_step('when', 'I press start', None)
     collector.pop_step()
     scenario = collector.finish_scenario(status='passed', duration_ms=0)
     assert len(scenario.steps) == 2
@@ -32,8 +38,8 @@ def test_collect_steps() -> None:
 def test_nested_steps() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('when', 'outer')
-    collector.push_step('when', 'inner')
+    collector.push_step('when', 'outer', None)
+    collector.push_step('when', 'inner', None)
     collector.pop_step()
     collector.pop_step()
     scenario = collector.finish_scenario(status='passed', duration_ms=0)
@@ -47,7 +53,7 @@ def test_nested_steps() -> None:
 def test_attach_to_current_step() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('then', 'check result')
+    collector.push_step('then', 'check result', None)
     collector.attach('Log output', 'line1\nline2')
     collector.pop_step()
     scenario = collector.finish_scenario(status='passed', duration_ms=0)
@@ -60,7 +66,7 @@ def test_attach_to_current_step() -> None:
 def test_step_failure() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('then', 'should fail')
+    collector.push_step('then', 'should fail', None)
     collector.fail_current_step('assert 1 == 2', diff='- 1\n+ 2')
     collector.pop_step()
     scenario = collector.finish_scenario(status='failed', duration_ms=0)
@@ -92,20 +98,20 @@ def test_cross_phase_nesting_raises() -> None:
     """Nesting a different phase inside another raises an error."""
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('then', 'result is correct')
+    collector.push_step('then', 'result is correct', None)
     with pytest.raises(
         RuntimeError,
         match="Cannot nest 'given' inside 'then'",
     ):
-        collector.push_step('given', 'some precondition')
+        collector.push_step('given', 'some precondition', None)
 
 
 def test_same_phase_nesting_allowed() -> None:
     """Nesting the same phase inside itself is allowed."""
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('when', 'outer step')
-    collector.push_step('when', 'inner step')
+    collector.push_step('when', 'outer step', None)
+    collector.push_step('when', 'inner step', None)
     collector.pop_step()
     collector.pop_step()
     scenario = collector.finish_scenario(status='passed', duration_ms=0)
@@ -117,11 +123,11 @@ def test_sequential_different_phases_allowed() -> None:
     """Different phases at the top level (not nested) is fine."""
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('given', 'setup')
+    collector.push_step('given', 'setup', None)
     collector.pop_step()
-    collector.push_step('when', 'action')
+    collector.push_step('when', 'action', None)
     collector.pop_step()
-    collector.push_step('then', 'check')
+    collector.push_step('then', 'check', None)
     collector.pop_step()
     scenario = collector.finish_scenario(status='passed', duration_ms=0)
     assert len(scenario.steps) == 3
@@ -133,7 +139,7 @@ def test_current_phase() -> None:
     assert collector.current_phase is None
     collector.start_scenario('id', 'name', 'mod', [])
     assert collector.current_phase is None
-    collector.push_step('given', 'a thing')
+    collector.push_step('given', 'a thing', None)
     assert collector.current_phase == 'given'
     collector.pop_step()
     assert collector.current_phase is None
@@ -189,7 +195,7 @@ def test_push_step_during_fixture_setup_records_into_recording() -> None:
     root = Step(phase='given', text='a shop')
     recording = FixtureRecording(root=root)
     token = collector.enter_fixture_setup(recording)
-    collector.push_step('given', 'with 3 items')
+    collector.push_step('given', 'with 3 items', None)
     collector.pop_step()
     collector.exit_fixture_setup(token)
     assert len(root.children) == 1
@@ -214,7 +220,7 @@ def test_push_step_routing_isolates_recording_from_scenario() -> None:
     root = Step(phase='given', text='a shop')
     recording = FixtureRecording(root=root)
     token = collector.enter_fixture_setup(recording)
-    collector.push_step('given', 'fixture-internal')
+    collector.push_step('given', 'fixture-internal', None)
     collector.pop_step()
     collector.exit_fixture_setup(token)
     # Scenario should still be empty — fixture body's step lives only in recording.
@@ -226,7 +232,7 @@ def test_push_step_routing_isolates_recording_from_scenario() -> None:
 def test_push_step_during_idle_raises() -> None:
     collector = Collector()
     with pytest.raises(PytestGivenError, match='no active scenario or fixture'):
-        collector.push_step('given', 'orphan')
+        collector.push_step('given', 'orphan', None)
 
 
 def test_push_step_during_teardown_raises() -> None:
@@ -234,7 +240,7 @@ def test_push_step_during_teardown_raises() -> None:
     token = collector.enter_fixture_teardown()
     try:
         with pytest.raises(PytestGivenError, match='fixture teardown'):
-            collector.push_step('given', 'teardown step')
+            collector.push_step('given', 'teardown step', None)
     finally:
         collector.exit_fixture_teardown(token)
 
@@ -298,7 +304,7 @@ def test_pop_step_protects_recording_root() -> None:
         assert collector.pop_step() is None
         assert len(recording.stack) == 1
         # A pushed child can still be popped.
-        collector.push_step('given', 'child')
+        collector.push_step('given', 'child', None)
         popped = collector.pop_step()
         assert popped is not None
         assert popped.text == 'child'
@@ -310,3 +316,48 @@ def test_pop_step_with_empty_stack_returns_none() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
     assert collector.pop_step() is None
+
+
+def test_push_step_with_text_parts() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    parts: list[NarrationPart] = [
+        NarrationLiteral(value='a '),
+        NarrationValue(rendered='200', expression='cup_size'),
+        NarrationLiteral(value=' ml cup'),
+    ]
+    collector.push_step('given', 'a 200 ml cup', parts)
+    collector.pop_step()
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    assert scenario.steps[0].text == 'a 200 ml cup'
+    assert scenario.steps[0].text_parts == parts
+
+
+def test_push_step_with_no_text_parts_leaves_field_none() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    collector.push_step('given', 'plain', None)
+    collector.pop_step()
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    assert scenario.steps[0].text_parts is None
+
+
+def test_start_scenario_with_template_stores_name_parts() -> None:
+    collector = Collector()
+    tmpl = Template('Brew {cup_size} ml')
+    collector.start_scenario('id', tmpl, 'mod', [])
+    collector.push_step('given', 'a step', None)
+    collector.pop_step()
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    assert scenario.name == 'Brew {cup_size} ml'  # raw template string
+    assert scenario.name_parts == list(tmpl.parts)
+
+
+def test_start_scenario_with_plain_str_leaves_name_parts_none() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'plain name', 'mod', [])
+    collector.push_step('given', 'a step', None)
+    collector.pop_step()
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    assert scenario.name == 'plain name'
+    assert scenario.name_parts is None

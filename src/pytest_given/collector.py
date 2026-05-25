@@ -16,6 +16,7 @@ from pytest_given.model import (
     Scenario,
     Step,
 )
+from pytest_given.template import NarrationPart, Template
 
 
 @dataclass(frozen=True)
@@ -84,15 +85,22 @@ class Collector:
     def start_scenario(
         self,
         scenario_id: NodeId,
-        name: str,
+        name: str | Template,
         module: str,
         tags: list[str],
     ) -> None:
+        if isinstance(name, Template):
+            name_str = name.template
+            name_parts: list[NarrationPart] | None = list(name.parts)
+        else:
+            name_str = name
+            name_parts = None
         self._current_scenario = Scenario(
             id=scenario_id,
-            name=name,
+            name=name_str,
             module=module,
             tags=tags,
+            name_parts=name_parts,
         )
         self._step_stack = []
         self._state = 'test'
@@ -152,7 +160,12 @@ class Collector:
             return
         self._current_scenario.steps.append(copy.deepcopy(recording.root))
 
-    def push_step(self, phase: Phase, text: str) -> Step:
+    def push_step(
+        self,
+        phase: Phase,
+        text: str,
+        text_parts: list[NarrationPart] | None,
+    ) -> Step:
         if self._state == 'idle':
             raise PytestGivenError(
                 f"Cannot record '{phase}: {text}' — no active scenario or fixture."
@@ -168,7 +181,7 @@ class Collector:
                 f"Cannot nest '{phase}' inside '{stack[-1].phase}'"
                 ' — restructure your test or use a phase-neutral helper'
             )
-        step = Step(phase=phase, text=text)
+        step = Step(phase=phase, text=text, text_parts=text_parts)
         if stack:
             stack[-1].children.append(step)
         elif self._state == 'test' and self._current_scenario is not None:

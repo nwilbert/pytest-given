@@ -56,7 +56,7 @@ class StepDescriptor:
                 f"Cannot enter '{self.phase}: {self.text}' — "
                 'no active scenario or fixture.'
             )
-        collector.push_step(self.phase, self.text)
+        collector.push_step(self.phase, self.text, self.text_parts)
         return self
 
     def __exit__(
