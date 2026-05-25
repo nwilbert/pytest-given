@@ -1,3 +1,5 @@
+from string import templatelib
+
 import pytest
 
 from pytest_given.errors import PytestGivenError
@@ -5,6 +7,8 @@ from pytest_given.template import (
     Template,
     TextLiteral,
     TextPlaceholder,
+    TextValue,
+    parse_tstring,
 )
 
 
@@ -82,3 +86,88 @@ def test_template_indexing_raises_pytest_given_error() -> None:
 def test_template_expression_raises_pytest_given_error() -> None:
     with pytest.raises(PytestGivenError, match='bare identifiers'):
         Template('{x + 1}')
+
+
+def test_parse_tstring_literal_only() -> None:
+    cup_size = 200  # noqa: F841
+    rendered, parts = parse_tstring(t'just a label')
+    assert rendered == 'just a label'
+    assert parts == [TextLiteral(value='just a label')]
+
+
+def test_parse_tstring_single_interpolation() -> None:
+    cup_size = 200
+    rendered, parts = parse_tstring(t'a {cup_size} ml cup')
+    assert rendered == 'a 200 ml cup'
+    assert parts == [
+        TextLiteral(value='a '),
+        TextValue(
+            rendered='200',
+            expression='cup_size',
+            format_spec='',
+            conversion=None,
+        ),
+        TextLiteral(value=' ml cup'),
+    ]
+
+
+def test_parse_tstring_format_spec() -> None:
+    n = 7
+    rendered, parts = parse_tstring(t'n={n:03d}')
+    assert rendered == 'n=007'
+    assert parts == [
+        TextLiteral(value='n='),
+        TextValue(
+            rendered='007',
+            expression='n',
+            format_spec='03d',
+            conversion=None,
+        ),
+    ]
+
+
+def test_parse_tstring_conversion() -> None:
+    obj = 'hi'
+    rendered, parts = parse_tstring(t'r={obj!r}')
+    assert rendered == "r='hi'"
+    assert parts == [
+        TextLiteral(value='r='),
+        TextValue(
+            rendered="'hi'",
+            expression='obj',
+            format_spec='',
+            conversion='r',
+        ),
+    ]
+
+
+def test_parse_tstring_consecutive_interpolations() -> None:
+    a = 1
+    b = 2
+    rendered, parts = parse_tstring(t'{a}{b}')
+    assert rendered == '12'
+    assert parts == [
+        TextValue(rendered='1', expression='a', format_spec='', conversion=None),
+        TextValue(rendered='2', expression='b', format_spec='', conversion=None),
+    ]
+
+
+def test_parse_tstring_expression() -> None:
+    price = 10
+    rendered, parts = parse_tstring(t'cost: {price * 1.2}')
+    assert rendered == 'cost: 12.0'
+    assert parts[1] == TextValue(
+        rendered='12.0',
+        expression='price * 1.2',
+        format_spec='',
+        conversion=None,
+    )
+
+
+def test_parse_tstring_accepts_templatelib_template() -> None:
+    """Sanity check: the input type is string.templatelib.Template."""
+    cup_size = 200
+    tpl = t'{cup_size}'
+    assert isinstance(tpl, templatelib.Template)
+    rendered, _ = parse_tstring(tpl)
+    assert rendered == '200'

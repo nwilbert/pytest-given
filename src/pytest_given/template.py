@@ -1,6 +1,6 @@
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
-from string import Formatter
+from string import Formatter, templatelib
 from typing import Any
 
 from pytest_given.errors import PytestGivenError
@@ -84,3 +84,42 @@ class Template:
 
     def get_identifiers(self) -> list[str]:
         return [p.name for p in self.parts if isinstance(p, TextPlaceholder)]
+
+
+def parse_tstring(
+    tstring: templatelib.Template,
+) -> tuple[str, list[TextPart]]:
+    """Convert a t-string Template into (rendered text, structured parts).
+
+    Iterates the t-string yielding str | Interpolation. Each interpolation
+    becomes a TextValue carrying the rendered string plus the source
+    expression and any conversion / format_spec — preserved so that the
+    templatize step can convert matching expressions to TextPlaceholder.
+    """
+    parts: list[TextPart] = []
+    rendered_chunks: list[str] = []
+    for chunk in tstring:
+        match chunk:
+            case str() as literal:
+                if literal:
+                    parts.append(TextLiteral(value=literal))
+                    rendered_chunks.append(literal)
+            case templatelib.Interpolation(
+                value=value,
+                expression=expression,
+                conversion=conversion,
+                format_spec=format_spec,
+            ):
+                if conversion is not None:
+                    value = _CONVERSIONS[conversion](value)
+                rendered = format(value, format_spec)
+                parts.append(
+                    TextValue(
+                        rendered=rendered,
+                        expression=expression,
+                        format_spec=format_spec,
+                        conversion=conversion,
+                    )
+                )
+                rendered_chunks.append(rendered)
+    return ''.join(rendered_chunks), parts
