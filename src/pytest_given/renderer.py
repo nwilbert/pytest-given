@@ -1,13 +1,12 @@
 import json
-import re
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import jinja2
 from markupsafe import Markup, escape
 
 _NUM_PARAM_COLORS = 6
-_PARAM_RE = re.compile(r'\{([a-zA-Z_]\w*)\}')
 
 # Maps parameter name to its color index (0-based, wraps at _NUM_PARAM_COLORS)
 type ParamColorMap = dict[str, int]
@@ -39,7 +38,8 @@ def render_html(json_path: Path, html_path: Path) -> None:
                     param_color_map[name] = color_idx
                     color_idx += 1
 
-    env.filters['highlight_params'] = _make_highlight_filter(param_color_map)
+    env.filters['step_text'] = _make_step_text_filter(param_color_map)
+    env.filters['scenario_name'] = _make_scenario_name_filter(param_color_map)
     template = env.get_template('report.html.j2')
     html = template.render(
         metadata=data['metadata'],
@@ -55,20 +55,73 @@ def render_html(json_path: Path, html_path: Path) -> None:
     html_path.write_text(html, encoding='utf-8')
 
 
-def _make_highlight_filter(
+def _make_step_text_filter(
     color_map: ParamColorMap,
-) -> Callable[[str], Markup]:
-    """Create a Jinja2 filter that highlights {param_name} with color-coded spans."""
+) -> Callable[[dict[str, Any]], Markup]:
+    """Filter usage: `{{ step | step_text }}`.
 
-    def _highlight_params(text: str) -> Markup:
-        def _replace(m: re.Match[str]) -> str:
-            name = m.group(1)
-            if name not in color_map:
-                return m.group(0)
-            color_idx = color_map[name] % _NUM_PARAM_COLORS
-            return f'<span class="param-color-{color_idx}">{escape(m.group(0))}</span>'
+    `step` is a dict with `text` and `text_parts` keys. Dispatches on
+    `text_parts`:
+    - None → render `text` HTML-escaped.
+    - Each part is identified by key presence:
+        - `value` → NarrationLiteral
+        - `rendered` → NarrationValue (.param-value highlight)
+        - `name` → NarrationPlaceholder (color-coded `{name}` token)
+    """
 
-        result = _PARAM_RE.sub(_replace, str(escape(text)))
-        return Markup(result)
+    def _render(node: dict[str, Any]) -> Markup:
+        text = node.get('text', '')
+        parts = node.get('text_parts')
+        if parts is None:
+            return Markup(str(escape(text)))
+        out: list[str] = []
+        for part in parts:
+            if 'value' in part:
+                out.append(str(escape(part['value'])))
+            elif 'rendered' in part:
+                out.append(
+                    f'<span class="param-value">{escape(part["rendered"])}</span>'
+                )
+            else:
+                name = part['name']
+                color_idx = color_map.get(name, 0) % _NUM_PARAM_COLORS
+                label = _placeholder_token(part)
+                out.append(
+                    f'<span class="param-color-{color_idx}">{escape(label)}</span>'
+                )
+        return Markup(''.join(out))
 
-    return _highlight_params
+    return _render
+
+
+def _placeholder_token(part: dict[str, Any]) -> str:
+    """Reconstruct the source-side `{name!conv:spec}` token from a placeholder
+    dict, so the merged template view preserves the author's format intent."""
+    inner: str = part['name']
+    conversion = part.get('conversion')
+    if conversion:
+        inner += '!' + conversion
+    spec = part.get('format_spec')
+    if spec:
+        inner += ':' + spec
+    return '{' + inner + '}'
+
+
+def _make_scenario_name_filter(
+    color_map: ParamColorMap,
+) -> Callable[[dict[str, Any]], Markup]:
+    """Filter usage: `{{ scenario | scenario_name }}`.
+
+    Adapts `name`/`name_parts` to the step_text input shape so the same
+    dispatch logic applies.
+    """
+    inner = _make_step_text_filter(color_map)
+
+    def _render(scenario: dict[str, Any]) -> Markup:
+        adapter = {
+            'text': scenario.get('name', ''),
+            'text_parts': scenario.get('name_parts'),
+        }
+        return inner(adapter)
+
+    return _render

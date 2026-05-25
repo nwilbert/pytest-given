@@ -71,10 +71,10 @@
     {%- if step.children and step.children | length > 0 -%}
       <span class="step-toggle" @click="toggleStep('{{ step_id }}')">
         <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['{{ step_id }}'] }"></span>
-        {{ step.text | highlight_params }}
+        {{ step | step_text }}
       </span>
     {%- else -%}
-      {{ step.text | highlight_params }}
+      {{ step | step_text }}
     {%- endif -%}
   </div>
   {%- if step.children and step.children | length > 0 -%}
@@ -108,7 +108,7 @@
     <div class="scenario-header" @click="toggleScenario({{ loop.index0 }})">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span>
-        <span class="scenario-name">{{ scenario.name }}</span>
+        <span class="scenario-name">{{ scenario | scenario_name }}</span>
         {% for tag in scenario.tags %}
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
         {% endfor %}

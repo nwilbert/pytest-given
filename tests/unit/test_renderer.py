@@ -137,8 +137,8 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
     assert '- 1' in content
 
 
-def test_render_parameterized_with_color_coded_placeholders(tmp_path: Path) -> None:
-    """Parameterized scenarios get color-coded placeholders in step text and headers."""
+def test_render_parameterized_step_with_text_parts(tmp_path: Path) -> None:
+    """Merged parametric step renders placeholder with color span and {name} token."""
     json_path = tmp_path / 'data.json'
     json_path.write_text(
         json.dumps(
@@ -153,6 +153,7 @@ def test_render_parameterized_with_color_coded_placeholders(tmp_path: Path) -> N
                     {
                         'id': 'test.py::test_p',
                         'name': 'Param scenario',
+                        'name_parts': None,
                         'module': 'mod',
                         'tags': [],
                         'status': 'passed',
@@ -160,11 +161,20 @@ def test_render_parameterized_with_color_coded_placeholders(tmp_path: Path) -> N
                         'steps': [
                             {
                                 'phase': 'when',
-                                'text': 'I insert {euros} into {unknown}',
+                                'text': 'I insert 1 into shop',
                                 'status': 'passed',
                                 'children': [],
                                 'attachments': [],
                                 'error': None,
+                                'text_parts': [
+                                    {'value': 'I insert '},
+                                    {
+                                        'name': 'euros',
+                                        'format_spec': '',
+                                        'conversion': None,
+                                    },
+                                    {'value': ' into shop'},
+                                ],
                             }
                         ],
                         'parameters': {
@@ -191,13 +201,183 @@ def test_render_parameterized_with_color_coded_placeholders(tmp_path: Path) -> N
     html_path = tmp_path / 'report.html'
     render_html(json_path, html_path)
     content = html_path.read_text(encoding='utf-8')
-    # Placeholder in step text should be wrapped in a color span
     assert 'param-color-0' in content
-    # Column header should use the same color class
+    # The merged step shows the {name} token
+    assert '{euros}' in content
+    # The header still gets its color
     assert '<th class="param-color-0">euros</th>' in content
     assert '<th class="param-color-1">expect</th>' in content
-    # Unknown placeholders are left as plain text (not wrapped in a color span)
-    assert '{unknown}' in content
+
+
+def test_render_merged_placeholder_preserves_format_spec_and_conversion(
+    tmp_path: Path,
+) -> None:
+    """Merged-template view shows {name!conv:spec} so the author's format
+    intent stays visible to the reader."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'i',
+                        'name': 'n',
+                        'name_parts': None,
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'error': None,
+                        'parameters': {
+                            'names': ['n', 'obj'],
+                            'cases': [
+                                {
+                                    'values': [7, 'hi'],
+                                    'status': 'passed',
+                                    'error': None,
+                                },
+                            ],
+                        },
+                        'steps': [
+                            {
+                                'phase': 'when',
+                                'text': 'x',
+                                'status': 'passed',
+                                'children': [],
+                                'attachments': [],
+                                'error': None,
+                                'text_parts': [
+                                    {
+                                        'name': 'n',
+                                        'format_spec': '03d',
+                                        'conversion': None,
+                                    },
+                                    {'value': ' '},
+                                    {
+                                        'name': 'obj',
+                                        'format_spec': '',
+                                        'conversion': 'r',
+                                    },
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert '{n:03d}' in content
+    assert '{obj!r}' in content
+
+
+def test_render_plain_str_step_with_no_text_parts_escapes_braces(
+    tmp_path: Path,
+) -> None:
+    """A plain-string step renders verbatim, with no regex pass over braces."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'i',
+                        'name': 'n',
+                        'name_parts': None,
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'parameters': None,
+                        'error': None,
+                        'steps': [
+                            {
+                                'phase': 'when',
+                                'text': 'config: {key: value}',
+                                'status': 'passed',
+                                'children': [],
+                                'attachments': [],
+                                'error': None,
+                                'text_parts': None,
+                            }
+                        ],
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert 'config: {key: value}' in content
+
+
+def test_render_value_part_uses_param_value_class(tmp_path: Path) -> None:
+    """A NarrationValue (non-param t-string interpolation) gets .param-value."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'i',
+                        'name': 'n',
+                        'name_parts': None,
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'parameters': None,
+                        'error': None,
+                        'steps': [
+                            {
+                                'phase': 'when',
+                                'text': 'cost: 12.0',
+                                'status': 'passed',
+                                'children': [],
+                                'attachments': [],
+                                'error': None,
+                                'text_parts': [
+                                    {'value': 'cost: '},
+                                    {
+                                        'rendered': '12.0',
+                                        'expression': 'price * 1.2',
+                                        'format_spec': '',
+                                        'conversion': None,
+                                    },
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert 'param-value' in content
+    assert '12.0' in content
 
 
 def test_render_self_contained(tmp_path: Path) -> None:
