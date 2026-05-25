@@ -25,13 +25,28 @@ Individual sessions:
 
 ## Architecture
 
-- `src/pytest_given/__init__.py` — Public API: `scenario`, `given`, `when`, `then`, `attach`
+- `src/pytest_given/__init__.py` — Public API: `scenario`, `given`, `when`, `then`, `attach`, `Template`
 - `src/pytest_given/decorators.py` — `StepDescriptor` + `ScenarioDecorator`: dual context-manager/decorator, cross-phase nesting detection, thread-local state
+- `src/pytest_given/template.py` — `Template` (deferred brace substitution for `@scenario(...)`) + structured narration dataclasses (`NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationPart` union) and `parse_tstring(...)` for t-string ingestion
 - `src/pytest_given/collector.py` — Step stack, collects scenario data during test execution
-- `src/pytest_given/plugin.py` — pytest hooks, parametrized test grouping
-- `src/pytest_given/renderer.py` — JSON to self-contained HTML (Jinja2 + Alpine.js)
+- `src/pytest_given/plugin.py` — pytest hooks, parametrized test grouping, structural templatize
+- `src/pytest_given/renderer.py` — JSON to self-contained HTML (Jinja2 + Alpine.js); structural `step_text` / `scenario_name` filters
 - `src/pytest_given/cli.py` — Standalone `pytest-given report` command
 - `src/pytest_given/templates/` — Jinja2 template, CSS, bundled Alpine.js
+
+### Step text & placeholders
+
+Three authoring forms (see [README](README.md#step-text--placeholders) for user-facing docs and the [design spec](docs/superpowers/specs/2026-05-23-structured-step-text-design.md)):
+
+| Context | Form |
+|---|---|
+| Test body, dynamic | `with given(t'a {cup_size} cup')` (eager t-string) |
+| Test body, static | `with given('static text')` |
+| `@scenario(name)`, dynamic | `@scenario(Template('Brew {cup_size} ml'))` (deferred, parametrize-bound) |
+| `@scenario(name)`, static | `@scenario('static name')` |
+| Fixture decorator | `@given('static label')` only |
+
+Lanes don't overlap: `pytest_given.Template` is rejected in `given/when/then/attach`; t-strings are rejected in `@scenario`. `Template` accepts bare identifiers only (no attribute access, no expressions) — t-strings have full expression syntax in test bodies. Parametrized scenarios use case 1's step structure as the merged-template view; if narration *structure* varies per case, split the test instead.
 
 ## Report testing
 

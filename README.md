@@ -109,17 +109,46 @@ with when('I place a large order'):
         ...
 ```
 
-Parameterized tests are automatically grouped into a single scenario with a parameter table; values appearing in step text are templatized into `{name}` placeholders:
+Parameterized tests are automatically grouped into a single scenario with a parameter table. Use **t-strings** (`t'...'`) to interpolate parameter values into step text — the plugin recognizes parameter names in t-string interpolations and color-codes them in the report:
 
 ```python
 @scenario('Pricing')
 @pytest.mark.parametrize('euros,expect', [(1, False), (2, True), (3, True)])
 def test_pricing(machine, euros, expect):
-    with when(f'I insert ${euros}'):
+    with when(t'I insert ${euros}'):
         can_buy = euros >= machine['price']
-    with then(f'can_buy is {expect}'):
+    with then(t'can_buy is {expect}'):
         assert can_buy == expect
 ```
+
+For a parametrized **scenario name**, use `pytest_given.Template` — deferred substitution against the parametrize columns:
+
+```python
+from pytest_given import Template, scenario
+
+@scenario(Template('Brew {cup_size} ml'))
+@pytest.mark.parametrize('cup_size', [200, 300])
+def test_brew(cup_size):
+    ...
+```
+
+#### Step text & placeholders
+
+Three authoring forms, one `{...}` placeholder syntax, no regex special case:
+
+| Context | Form | Effect |
+|---|---|---|
+| Test body, values in scope | `with given(t'a {cup_size} cup')` | Eager t-string interpolation; value color-coded when the interpolation expression matches a parametrize column, otherwise neutrally highlighted. |
+| `@scenario(name)` | `@scenario(Template('Brew {cup_size} ml'))` | Deferred substitution at report time. Unmatched placeholders raise `PytestGivenError` at collection. |
+| Static label | `with given('static text')` | Literal — braces are braces. No regex pass. |
+
+Three things worth knowing:
+
+1. **`pytest_given.Template` only accepts bare identifiers** — `{name}`, `{name:spec}`, `{name!conv}`. Attribute access (`{obj.attr}`), indexing (`{d[key]}`), and arbitrary expressions (`{x + 1}`) raise `PytestGivenError` at construction. Workaround: parametrize by the attributes directly, or move the step into a test-body t-string (which supports full expression syntax).
+
+2. **`Template` is for `@scenario(...)`, not test bodies.** In a test body, values are in scope — use a t-string. `given(Template(...))` / `when(Template(...))` / `then(Template(...))` raise `PytestGivenError`. T-strings in `@scenario(...)` are rejected for the symmetric reason: parametrize columns aren't in scope at module-import time.
+
+3. **First case is the template (parametrized scenarios).** The merged report shows case 1's step structure for all rows of the parameter table. Correct for the common pattern (every case runs the same code, only values differ). **Misleading** when the narration *structure* varies per case — e.g., a conditional `with given(t'...')` inside a parametrized test will only show case 1's branch. Workarounds: split into separate `@scenario` tests, or parametrize by a column whose value *is* the variant (e.g., `parametrize('case_label', ['small', 'big'])` and `t'{case_label}: ...'`).
 
 ### `attach(label, content)`
 
