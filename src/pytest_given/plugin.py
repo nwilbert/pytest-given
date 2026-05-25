@@ -37,6 +37,7 @@ from pytest_given.template import (
     NarrationPart,
     NarrationPlaceholder,
     NarrationValue,
+    Template,
 )
 
 collector = Collector()
@@ -66,6 +67,45 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     """Reset the collector at the start of each session."""
     global collector
     collector = Collector()
+
+
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    """Validate Template-named scenarios eagerly at collection time.
+
+    Two checks:
+    1. A Template-named scenario must be parametrized (its substitution source
+       is `callspec.params`).
+    2. Every Template placeholder must match a parametrize column name —
+       catches typos at `pytest --collect-only` rather than at session-finish
+       merge, where the error would escape `pytest_sessionfinish` opaquely.
+
+    Deferred to collection time (rather than decoration time) because
+    @scenario and @pytest.mark.parametrize can appear in either order, and
+    decoration-time inspection only sees markers from earlier (bottom-up)
+    decorators.
+    """
+    for item in items:
+        marker = _get_scenario_marker(item)
+        if marker is None:
+            continue
+        if not isinstance(marker.name, Template):
+            continue
+        callspec = getattr(item, 'callspec', None)
+        if callspec is None:
+            raise PytestGivenError(
+                f'@scenario(Template(...)) on {item.nodeid!r} requires '
+                f'@pytest.mark.parametrize; the substitution source is '
+                f'callspec.params only. Use a plain string for static '
+                f'scenario names, or add @pytest.mark.parametrize.'
+            )
+        param_names = list(callspec.params.keys())
+        for placeholder in marker.name.get_identifiers():
+            if placeholder not in param_names:
+                raise PytestGivenError(
+                    f"pytest_given.Template placeholder '{{{placeholder}}}' "
+                    f'in @scenario(...) on {item.nodeid!r} does not match '
+                    f'any parametrize column (have: {sorted(param_names)}).'
+                )
 
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)

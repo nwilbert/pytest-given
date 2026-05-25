@@ -721,3 +721,39 @@ def test_static_str_with_literal_braces_renders_verbatim(pytester, tmp_path):
     step = data['scenarios'][0]['steps'][0]
     assert step['text'] == 'config: {key: value}'
     assert step['text_parts'] is None
+
+
+def test_template_in_scenario_without_parametrize_raises_at_collection(
+    pytester, tmp_path
+):
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, then, Template
+
+        @scenario(Template('Brew {cup_size} ml'))
+        def test_brew():
+            with then('ok'):
+                pass
+        """
+    )
+    result = pytester.runpytest('--collect-only')
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*requires @pytest.mark.parametrize*'])
+
+
+def test_template_placeholder_typo_raises_helpful_error(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then, Template
+
+        @scenario(Template('Brew {cup_zize} ml'))
+        @pytest.mark.parametrize('cup_size', [200])
+        def test_brew(cup_size):
+            with then('ok'):
+                pass
+        """
+    )
+    result = pytester.runpytest('-v')
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*cup_zize*'])
