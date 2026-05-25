@@ -153,33 +153,28 @@ Rejection happens in `StepDescriptor.__call__(func)`: any `text_parts is not Non
 ### Step model additions
 
 ```python
-from typing import Literal
-
 @dataclass(frozen=True, kw_only=True)
 class TextLiteral:
     value: str
-    kind: Literal['literal'] = 'literal'
 
 @dataclass(frozen=True, kw_only=True)
 class TextValue:
     """A t-string interpolation — value already known."""
     rendered: str            # str(value) post-conversion+format_spec
     expression: str          # source expression text
-    format_spec: str = ''    # preserved so merge can hand it to TextPlaceholder
+    format_spec: str = ''    # preserved so templatize can hand it to TextPlaceholder
     conversion: str | None = None
-    kind: Literal['value'] = 'value'
 
 @dataclass(frozen=True, kw_only=True)
 class TextPlaceholder:
     """A deferred placeholder — resolved at render time against per-case mapping.
 
-    Produced by pytest_given.Template, or by merge when a TextValue's expression
-    matches a parametrize name.
+    Produced by pytest_given.Template, or by templatize when a TextValue's
+    expression matches a parametrize name.
     """
     name: str
     format_spec: str = ''
     conversion: str | None = None
-    kind: Literal['placeholder'] = 'placeholder'
 
 type TextPart = TextLiteral | TextValue | TextPlaceholder
 
@@ -188,6 +183,8 @@ class Step:
     ...
     text_parts: list[TextPart] | None = None  # None for plain-str authoring
 ```
+
+Python-side dispatch uses `match` over `TextPart` (the union narrows exhaustively); the field sets are disjoint — `TextLiteral` has `value`, `TextValue` has `rendered`/`expression`, `TextPlaceholder` has `name` — so no `kind` discriminator is needed.
 
 ## Resolution Rules
 
@@ -225,7 +222,7 @@ class Step:
 
    The old `highlight_params` filter and `_PARAM_RE` are removed.
 
-5. **JSON model.** `text_parts` and the scenario-name `Template` serialize via `dataclasses.asdict` as dicts with a `kind` discriminator. The renderer loads JSON as raw dict via `json.loads` (renderer.py:21); absent or `null` `text_parts` falls through to the literal-render path. Back-compatible: old reports still render (without the new highlights since they have no `text_parts`).
+5. **JSON model.** `text_parts` and the scenario-name `Template` serialize via `dataclasses.asdict` as plain field-shaped dicts. The renderer loads JSON as raw dict via `json.loads` (renderer.py:21); absent or `null` `text_parts` falls through to the literal-render path. Back-compatible: old reports still render (without the new highlights since they have no `text_parts`). Discrimination is structural — `TextLiteral` is the only part shape with a `value` key, `TextValue` is the only one with `rendered`+`expression`, and `TextPlaceholder` is the only one with `name`; no explicit `kind` field is needed.
 
    Plain-`str` steps and scenarios serialize `"text_parts": null` / `"name_parts": null` unconditionally — we don't strip `None` values from the dump. **Intentional**: it keeps a single dispatch shape on read (one branch on `is None`, no `dict.get(...)` ladder) and makes the JSON schema predictable for external consumers. The size impact is negligible.
 
