@@ -3,6 +3,7 @@ import inspect
 import json
 import types
 import warnings
+from string import templatelib
 from typing import Any, Self
 
 import pytest
@@ -10,6 +11,7 @@ import pytest
 from pytest_given.collector import get_active_collector
 from pytest_given.errors import PytestGivenError
 from pytest_given.model import Phase
+from pytest_given.template import NarrationPart, Template, parse_tstring
 
 
 class StepDescriptor:
@@ -25,9 +27,19 @@ class StepDescriptor:
             ...
     """
 
-    def __init__(self, phase: Phase, text: str) -> None:
+    def __init__(
+        self,
+        phase: Phase,
+        text: str | templatelib.Template,
+    ) -> None:
         self.phase = phase
-        self.text = text
+        if isinstance(text, templatelib.Template):
+            rendered, parts = parse_tstring(text)
+            self.text: str = rendered
+            self.text_parts: list[NarrationPart] | None = parts
+        else:
+            self.text = text
+            self.text_parts = None
 
     def __enter__(self) -> Self:
         collector = get_active_collector()
@@ -59,6 +71,13 @@ class StepDescriptor:
         collector.pop_step()
 
     def __call__(self, func: Any) -> Any:
+        if self.text_parts is not None:
+            raise PytestGivenError(
+                "@given(t'...') / @given(Template(...)) is not allowed on a "
+                "fixture; the fixture's argument values aren't in scope at "
+                'decoration time. Use a plain string label, or move the step '
+                'into the test body.'
+            )
         if inspect.isgeneratorfunction(func):
 
             @functools.wraps(func)
@@ -79,8 +98,8 @@ class StepDescriptor:
 class ScenarioDecorator:
     """Decorator that marks a test for inclusion in the report."""
 
-    def __init__(self, name: str, tags: list[str]) -> None:
-        self.name = name
+    def __init__(self, name: str | Template, tags: list[str]) -> None:
+        self.name: str | Template = name
         self.tags = tags
 
     def __call__(self, func: Any) -> Any:
@@ -92,27 +111,48 @@ class ScenarioDecorator:
         return wrapper
 
 
-def given(text: str) -> StepDescriptor:
+def given(text: str | templatelib.Template) -> StepDescriptor:
     """Create a Given step (context manager or decorator)."""
+    _reject_pytest_given_template(text, 'given')
     return StepDescriptor('given', text)
 
 
-def when(text: str) -> StepDescriptor:
+def when(text: str | templatelib.Template) -> StepDescriptor:
     """Create a When step (context manager or decorator)."""
+    _reject_pytest_given_template(text, 'when')
     return StepDescriptor('when', text)
 
 
-def then(text: str) -> StepDescriptor:
+def then(text: str | templatelib.Template) -> StepDescriptor:
     """Create a Then step (context manager or decorator)."""
+    _reject_pytest_given_template(text, 'then')
     return StepDescriptor('then', text)
 
 
-def attach(label: str, content: object) -> None:
+def _reject_pytest_given_template(text: object, fn_name: str) -> None:
+    if isinstance(text, Template):
+        raise PytestGivenError(
+            f'{fn_name}(Template(...)) is not supported in a test body; use a '
+            f't-string for dynamic values, or a plain string for static labels. '
+            f'Template is for @scenario(...) (and the future Annotated fixture '
+            f'form), where deferred substitution from callspec.params is the '
+            f'only sensible option.'
+        )
+
+
+def attach(label: str | templatelib.Template, content: object) -> None:
     """Attach data to the current step.
 
     If *content* is a ``str`` it is stored verbatim.  Any other type is
     serialised as indented JSON.
     """
+    if isinstance(label, Template):
+        raise PytestGivenError(
+            'attach(Template(...)) is not supported; use a t-string (eager) '
+            'or a plain string.'
+        )
+    if isinstance(label, templatelib.Template):
+        label, _ = parse_tstring(label)
     collector = get_active_collector()
     if collector is None or collector.state == 'idle':
         if collector is not None and collector.inside_unannotated_test:
@@ -136,6 +176,16 @@ def attach(label: str, content: object) -> None:
         )
 
 
-def scenario(name: str, tags: list[str] | None = None) -> ScenarioDecorator:
+def scenario(
+    name: str | Template,
+    tags: list[str] | None = None,
+) -> ScenarioDecorator:
     """Mark a test for inclusion in the report."""
+    if isinstance(name, templatelib.Template):
+        raise PytestGivenError(
+            't-string in @scenario(...) is not supported; @scenario runs at '
+            'module-import time, so the parametrize parameters are not yet in '
+            'scope. Use pytest_given.Template(...) for parametrized scenario '
+            'names, or a plain string for static names.'
+        )
     return ScenarioDecorator(name, tags or [])
