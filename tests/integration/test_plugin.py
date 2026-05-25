@@ -150,9 +150,9 @@ def test_parameterized_test_as_table(pytester, tmp_path):
         @scenario("Param test", tags=["math"])
         @pytest.mark.parametrize("a,b,expected", [(1, 2, 3), (2, 3, 5)])
         def test_add(a, b, expected):
-            with given(f"a={a} and b={b}"):
+            with given(t"a={a} and b={b}"):
                 pass
-            with then(f"sum is {expected}"):
+            with then(t"sum is {expected}"):
                 assert a + b == expected
         """
     )
@@ -170,6 +170,13 @@ def test_parameterized_test_as_table(pytester, tmp_path):
     assert s['parameters']['cases'][0]['values'] == [1, 2, 3]
     assert s['parameters']['cases'][0]['status'] == 'passed'
     assert s['parameters']['cases'][1]['values'] == [2, 3, 5]
+    # The merged step's text_parts carry placeholders for matching param names.
+    given_parts = s['steps'][0]['text_parts']
+    placeholder_names = [p['name'] for p in given_parts if 'name' in p]
+    assert placeholder_names == ['a', 'b']
+    then_parts = s['steps'][1]['text_parts']
+    then_placeholders = [p['name'] for p in then_parts if 'name' in p]
+    assert then_placeholders == ['expected']
 
 
 def test_parameterized_with_failure(pytester, tmp_path):
@@ -182,7 +189,7 @@ def test_parameterized_with_failure(pytester, tmp_path):
         @scenario("Fail param")
         @pytest.mark.parametrize("n", [1, 2])
         def test_check(n):
-            with then(f"n={n} is 1"):
+            with then(t"n={n} is 1"):
                 assert n == 1
         """
     )
@@ -499,86 +506,6 @@ def test_class_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
         assert s['steps'][0]['children'][0]['text'] == 'navigated to /'
 
 
-def test_parametrized_fixture_records_per_variant(pytester, tmp_path):
-    """Each parametrize variant of a fixture produces a case in the parameter table.
-
-    In pytest >= 9, direct fixture params (via `params=[...]`) ARE included in
-    callspec.params, so both variants get grouped into one scenario with a
-    parameter table — just like indirect parametrize.  The fixture body's step
-    text is templatized to the `{shop}` placeholder and both values appear in
-    the cases table.
-    """
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, given, then
-
-        @pytest.fixture(params=[3, 7])
-        @given("a shop")
-        def shop(request):
-            with given(f"with {request.param} items"):
-                pass
-            return request.param
-
-        @scenario("Shop test")
-        def test_shop(shop):
-            with then(f"count is {shop}"):
-                assert shop in (3, 7)
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}')
-    result.assert_outcomes(passed=2)
-    data = json.loads(json_path.read_text())
-    # pytest >= 9 puts direct fixture params in callspec.params, so the two
-    # variants are grouped into one scenario with a parameter table.
-    assert len(data['scenarios']) == 1
-    s = data['scenarios'][0]
-    assert s['parameters'] is not None
-    case_values = [c['values'] for c in s['parameters']['cases']]
-    assert [3] in case_values
-    assert [7] in case_values
-    # The fixture body's nested step text is templatized.
-    nested_text = s['steps'][0]['children'][0]['text']
-    assert nested_text == 'with {shop} items'
-
-
-def test_indirect_parametrize_templatizes_fixture_step_text(pytester, tmp_path):
-    """Indirect parametrize of a fixture lets the templatizer collapse step
-    text in the fixture body into a `{name}` placeholder."""
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, given, then
-
-        @pytest.fixture
-        @given("a shop")
-        def shop(request):
-            with given(f"with {request.param} items"):
-                pass
-            return request.param
-
-        @scenario("Shop test")
-        @pytest.mark.parametrize("shop", [3, 7], indirect=True)
-        def test_shop(shop):
-            with then("ok"):
-                assert shop in (3, 7)
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}')
-    result.assert_outcomes(passed=2)
-    data = json.loads(json_path.read_text())
-    # Indirect parametrize is in callspec.params → templatized to one scenario.
-    assert len(data['scenarios']) == 1
-    s = data['scenarios'][0]
-    assert s['parameters'] is not None
-    # Inside the fixture's recorded child step, the variant value is replaced
-    # with the param name placeholder.
-    nested = s['steps'][0]['children'][0]['text']
-    assert nested == 'with {shop} items'
-
-
 def test_nested_step_fixtures_appear_as_siblings(pytester, tmp_path):
     """Fixture B depending on fixture A: both recordings graft as top-level."""
     pytester.makepyfile(
@@ -620,3 +547,177 @@ def test_nested_step_fixtures_appear_as_siblings(pytester, tmp_path):
     user_step = next(s for s in steps if s['text'] == 'an authenticated user')
     assert db_step['children'][0]['text'] == 'seeded'
     assert user_step['children'][0]['text'] == 'with admin role'
+
+
+def test_tstring_in_non_parametrized_scenario_renders_value_with_no_placeholder(
+    pytester, tmp_path
+):
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario('Static')
+        def test_one():
+            cup_size = 200
+            with when(t'a {cup_size} ml cup'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    step = data['scenarios'][0]['steps'][0]
+    assert step['text'] == 'a 200 ml cup'
+    parts = step['text_parts']
+    # Three parts: literal / value / literal — value preserved (no parametrize match)
+    assert len(parts) == 3
+    assert parts[1].get('rendered') == '200'
+    assert parts[1].get('expression') == 'cup_size'
+
+
+def test_tstring_expression_not_a_param_stays_as_value(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, when
+
+        @scenario('Cost')
+        @pytest.mark.parametrize('price', [10, 20])
+        def test_cost(price):
+            with when(t'cost: {price * 1.2}'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    data = json.loads(json_path.read_text())
+    parts = data['scenarios'][0]['steps'][0]['text_parts']
+    # Expression doesn't match any param name → stays as a value, not a placeholder
+    val_parts = [p for p in parts if 'rendered' in p]
+    assert len(val_parts) == 1
+    assert val_parts[0]['expression'] == 'price * 1.2'
+
+
+def test_tstring_same_value_different_names_disambiguates(pytester, tmp_path):
+    """Two params with the same value get distinguished — str.replace couldn't."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, when
+
+        @scenario('Dual')
+        @pytest.mark.parametrize('cup_size,beans_g', [(200, 200)])
+        def test_dual(cup_size, beans_g):
+            with when(t'{cup_size}, {beans_g}'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    parts = data['scenarios'][0]['steps'][0]['text_parts']
+    placeholder_names = [p['name'] for p in parts if 'name' in p]
+    assert placeholder_names == ['cup_size', 'beans_g']
+
+
+def test_scenario_with_template_name_merges_and_renders(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then, Template
+
+        @scenario(Template('Brew {cup_size} ml'))
+        @pytest.mark.parametrize('cup_size', [200, 300])
+        def test_brew(cup_size):
+            with then('ok'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    data = json.loads(json_path.read_text())
+    # All cases share the Template's raw text as merge key → one scenario
+    assert len(data['scenarios']) == 1
+    s = data['scenarios'][0]
+    assert s['name'] == 'Brew {cup_size} ml'
+    assert s['name_parts'] is not None
+    assert s['parameters']['names'] == ['cup_size']
+    assert [c['values'] for c in s['parameters']['cases']] == [[200], [300]]
+
+
+def test_template_in_given_raises(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, given, Template
+
+        @scenario('x')
+        def test_x():
+            with given(Template('a {y} cup')):
+                pass
+        """
+    )
+    result = pytester.runpytest('-v')
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*not supported in a test body*'])
+
+
+def test_given_with_template_on_fixture_raises(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture
+        @given(t'value')   # t-string on a fixture is rejected
+        def value():
+            return 1
+
+        @scenario('x')
+        def test_x(value):
+            with then('ok'):
+                pass
+        """
+    )
+    result = pytester.runpytest('-v')
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*not allowed on a fixture*'])
+
+
+def test_attach_with_template_raises(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, then, attach, Template
+
+        @scenario('x')
+        def test_x():
+            with then('ok'):
+                attach(Template('label {x}'), 'content')
+        """
+    )
+    result = pytester.runpytest('-v')
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*attach*not supported*'])
+
+
+def test_static_str_with_literal_braces_renders_verbatim(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario('Static braces')
+        def test_static():
+            with when('config: {key: value}'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    step = data['scenarios'][0]['steps'][0]
+    assert step['text'] == 'config: {key: value}'
+    assert step['text_parts'] is None

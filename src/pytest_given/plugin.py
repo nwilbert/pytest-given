@@ -32,6 +32,12 @@ from pytest_given.model import (
     Scenario,
     Step,
 )
+from pytest_given.template import (
+    NarrationLiteral,
+    NarrationPart,
+    NarrationPlaceholder,
+    NarrationValue,
+)
 
 collector = Collector()
 
@@ -272,16 +278,10 @@ def _group_parameterized(
     for key in group_order:
         group = groups[key]
         first = group[0]
-        param_names, first_values = param_info[first.id]
+        param_names, _ = param_info[first.id]
 
-        # Pre-sort replacements by length (longest first) to avoid
-        # partial matches (e.g., replacing "1" inside "10").
-        replacements = sorted(
-            zip(param_names, [str(v) for v in first_values], strict=True),
-            key=lambda p: len(p[1]),
-            reverse=True,
-        )
-        template_steps = _templatize_steps(first.steps, replacements)
+        template_steps = _templatize_steps(first.steps, param_names)
+        merged_name_parts = _templatize_parts(first.name_parts, param_names)
 
         cases: list[ParameterCase] = []
         any_failed = False
@@ -308,6 +308,7 @@ def _group_parameterized(
             duration_ms=total_duration,
             steps=template_steps,
             parameters=ParameterTable(names=param_names, cases=cases),
+            name_parts=merged_name_parts,
         )
         result.append(merged)
 
@@ -316,22 +317,54 @@ def _group_parameterized(
 
 def _templatize_steps(
     steps: list[Step],
-    replacements: list[tuple[str, str]],
+    param_names: list[str],
 ) -> list[Step]:
-    """Create template steps by replacing param values with {name} placeholders."""
+    """Walk steps and templatize their structured text_parts."""
     result: list[Step] = []
     for step in steps:
-        new_text = _templatize_step_text(step.text, replacements)
-        new_children = _templatize_steps(step.children, replacements)
-        result.append(dataclasses.replace(step, text=new_text, children=new_children))
+        new_parts = _templatize_parts(step.text_parts, param_names)
+        new_children = _templatize_steps(step.children, param_names)
+        result.append(
+            dataclasses.replace(step, text_parts=new_parts, children=new_children)
+        )
     return result
 
 
-def _templatize_step_text(text: str, replacements: list[tuple[str, str]]) -> str:
-    """Replace parameter values in step text with {param_name} placeholders."""
-    result = text
-    for name, str_value in replacements:
-        # Simple text replacement — may match unrelated occurrences of the same
-        # value in the step text. Longest-first ordering mitigates partial matches.
-        result = result.replace(str_value, '{' + name + '}')
-    return result
+def _templatize_parts(
+    parts: list[NarrationPart] | None,
+    param_names: list[str],
+) -> list[NarrationPart] | None:
+    """Convert matching NarrationValue entries to NarrationPlaceholder.
+
+    NarrationLiteral parts pass through unchanged. A NarrationValue whose
+    `expression` matches a parametrize column becomes a NarrationPlaceholder;
+    otherwise it stays verbatim (the rendered value is shared across cases).
+    A NarrationPlaceholder must reference a known parametrize column.
+    """
+    if parts is None:
+        return None
+    out: list[NarrationPart] = []
+    for part in parts:
+        match part:
+            case NarrationLiteral():
+                out.append(part)
+            case NarrationValue(expression=expression, format_spec=fs, conversion=conv):
+                if expression in param_names:
+                    out.append(
+                        NarrationPlaceholder(
+                            name=expression,
+                            format_spec=fs,
+                            conversion=conv,
+                        )
+                    )
+                else:
+                    out.append(part)
+            case NarrationPlaceholder(name=name):
+                if name not in param_names:
+                    raise PytestGivenError(
+                        f"pytest_given.Template placeholder '{{{name}}}' does "
+                        f'not match any parametrize column (have: '
+                        f'{sorted(param_names)}).'
+                    )
+                out.append(part)
+    return out
