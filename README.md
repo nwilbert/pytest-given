@@ -188,6 +188,7 @@ See [`examples/test_examples.py`](examples/test_examples.py) for a tour of every
 - Helper functions that record their own steps
 - Top-level `given` blocks and deeply nested steps
 - Failure rendering
+- Skipped scenarios with reason (including all-skipped parametrizes)
 
 A pre-rendered report is committed under [`examples/`](examples/): the JSON ([`report-data.json`](examples/report-data.json)) and the rendered HTML ([`report.html`](examples/report.html) — [live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/report.html)). Run `nox -s examples` to regenerate both.
 
