@@ -13,7 +13,6 @@
 - [ ] UI improvements in report
   - highlight on hover for parametrization table)
   - search box improvements 
-- [ ] Display skip reason for skipped scenarios — see `docs/superpowers/specs/proposed/2026-05-26-skip-reason-rendering-design.md`
 - [ ] Think about UL support (e.g., by connecting the report to a glossary)
 - [ ] Provide an agent skill for work with pytest-given
 - [ ] Add `@scenario(group_parametrized=False)` option to opt out of parametrize merging 
