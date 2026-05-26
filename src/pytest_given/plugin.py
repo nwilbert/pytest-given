@@ -238,7 +238,7 @@ def _extract_skip_reason(longrepr: object) -> str | None:
     if not isinstance(message, str):
         return None
     if message.startswith('Skipped: '):
-        message = message[len('Skipped: '):]
+        message = message[len('Skipped: ') :]
     message = message.strip()
     if not message or message in ('<Skipped instance>', 'unconditional skip'):
         return None
@@ -371,7 +371,6 @@ def _group_parameterized(
         merged_narration = _templatize_narration(first.narration, param_names)
 
         cases: list[ParameterCase] = []
-        any_failed = False
         total_duration = 0
         for scenario in group:
             _, values = param_info[scenario.id]
@@ -382,16 +381,21 @@ def _group_parameterized(
                     error=scenario.error,
                 )
             )
-            if scenario.status == 'failed':
-                any_failed = True
             total_duration += scenario.duration_ms
+
+        if any(c.status == 'failed' for c in cases):
+            merged_status = 'failed'
+        elif all(c.status == 'skipped' for c in cases):
+            merged_status = 'skipped'
+        else:
+            merged_status = 'passed'
 
         merged = Scenario(
             id=first.id,
             narration=merged_narration,
             module=first.module,
             tags=first.tags,
-            status='failed' if any_failed else 'passed',
+            status=merged_status,
             duration_ms=total_duration,
             steps=template_steps,
             parameters=ParameterTable(names=param_names, cases=cases),

@@ -11,7 +11,7 @@ from pytest_given import plugin
 from pytest_given.collector import Collector, get_active_collector, set_active_collector
 from pytest_given.decorators import StepDescriptor
 from pytest_given.errors import PytestGivenError
-from pytest_given.model import NodeId
+from pytest_given.model import NodeId, ParamSpec, Scenario
 from pytest_given.template import Narration, NarrationPlaceholder
 
 
@@ -222,3 +222,48 @@ def test_extract_skip_reason_returns_none_for_unrecognized_shapes() -> None:
     assert plugin._extract_skip_reason('just a string') is None
     assert plugin._extract_skip_reason(('only', 'two')) is None
     assert plugin._extract_skip_reason(('t.py', 12, 42)) is None
+
+
+def test_group_parameterized_all_skipped_merges_as_skipped() -> None:
+    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
+    scenarios = [
+        Scenario(id=nid1, narration=Narration(text='x'), module='m', status='skipped'),
+        Scenario(id=nid2, narration=Narration(text='x'), module='m', status='skipped'),
+    ]
+    param_info = {
+        nid1: ParamSpec(names=['n'], values=[1]),
+        nid2: ParamSpec(names=['n'], values=[2]),
+    }
+    merged = plugin._group_parameterized(scenarios, param_info)
+    assert len(merged) == 1
+    assert merged[0].status == 'skipped'
+
+
+def test_group_parameterized_mixed_pass_skip_merges_as_passed() -> None:
+    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
+    scenarios = [
+        Scenario(id=nid1, narration=Narration(text='x'), module='m', status='passed'),
+        Scenario(id=nid2, narration=Narration(text='x'), module='m', status='skipped'),
+    ]
+    param_info = {
+        nid1: ParamSpec(names=['n'], values=[1]),
+        nid2: ParamSpec(names=['n'], values=[2]),
+    }
+    merged = plugin._group_parameterized(scenarios, param_info)
+    assert merged[0].status == 'passed'
+
+
+def test_group_parameterized_any_failed_merges_as_failed() -> None:
+    nid1, nid2, nid3 = NodeId('t::x[1]'), NodeId('t::x[2]'), NodeId('t::x[3]')
+    scenarios = [
+        Scenario(id=nid1, narration=Narration(text='x'), module='m', status='passed'),
+        Scenario(id=nid2, narration=Narration(text='x'), module='m', status='failed'),
+        Scenario(id=nid3, narration=Narration(text='x'), module='m', status='skipped'),
+    ]
+    param_info = {
+        nid1: ParamSpec(names=['n'], values=[1]),
+        nid2: ParamSpec(names=['n'], values=[2]),
+        nid3: ParamSpec(names=['n'], values=[3]),
+    }
+    merged = plugin._group_parameterized(scenarios, param_info)
+    assert merged[0].status == 'failed'

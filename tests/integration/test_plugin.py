@@ -841,3 +841,30 @@ def test_call_time_pytest_skip_captures_reason(pytester, tmp_path):
     pytester.runpytest(f'--given-json={json_path}').assert_outcomes(skipped=1)
     data = json.loads(json_path.read_text())
     assert data['scenarios'][0]['skip_reason'] == 'missing prerequisite'
+
+
+def test_parametrized_all_cases_skipped_merges_as_skipped(pytester, tmp_path):
+    """A parametrize where every case is skipped merges to status='skipped'."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then
+
+        @scenario("All cases skipped")
+        @pytest.mark.parametrize(
+            "n",
+            [
+                pytest.param(1, marks=pytest.mark.skip(reason="not yet")),
+                pytest.param(2, marks=pytest.mark.skip(reason="not yet")),
+            ],
+        )
+        def test_all_skipped(n):
+            with then("never runs"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(skipped=2)
+    data = json.loads(json_path.read_text())
+    assert len(data['scenarios']) == 1
+    assert data['scenarios'][0]['status'] == 'skipped'
