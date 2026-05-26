@@ -24,6 +24,9 @@
   --color-error-bg: #fff5f5;
   --color-error-border: #f5c6cb;
 
+  --color-skip-bg: #fffbea;
+  --color-skip-border: #ffe69c;
+
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 12px;
@@ -316,6 +319,26 @@ body {
   line-height: 1.5;
   white-space: pre-wrap;
   font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+}
+
+/* Skip reason */
+.skip-reason {
+  margin-top: var(--space-sm);
+  background: var(--color-skip-bg);
+  border: 1px solid var(--color-skip-border);
+  border-left: 3px solid var(--color-skipped);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+.skip-reason-label {
+  color: #856404;
+  font-weight: 600;
+  margin-right: var(--space-xs);
+}
+.skip-reason-text {
+  font-style: italic;
 }
 
 /* Attachments */

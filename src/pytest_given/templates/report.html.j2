@@ -101,7 +101,7 @@
   {%- endmacro -%}
 
   {% for scenario in scenarios %}
-  {%- set has_body = scenario.steps or scenario.parameters or scenario.error -%}
+  {%- set has_body = scenario.steps or scenario.parameters or scenario.error or scenario.skip_reason -%}
   <div class="scenario {{ scenario.status }}"
        x-show="isVisible({{ loop.index0 }})"
        :id="'scenario-' + {{ loop.index0 }}"
@@ -123,6 +123,12 @@
     </div>
 
     <div x-show="expandedScenarios[{{ loop.index0 }}]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+      {% if scenario.skip_reason %}
+      <div class="skip-reason">
+        <span class="skip-reason-label">Skipped:</span>
+        <span class="skip-reason-text">{{ scenario.skip_reason }}</span>
+      </div>
+      {% endif %}
       <div class="steps">
         {%- set scenario_idx = loop.index0 -%}
         {%- set ns = namespace(prev_phase=None) -%}
@@ -154,7 +160,7 @@
             <td>{{ val }}</td>
             {% endfor %}
             <td style="text-align:right">
-              {% if case.status == 'passed' %}<span class="dot-passed">✓</span>{% else %}<span class="dot-failed">✗</span>{% endif %}
+              {% if case.status == 'passed' %}<span class="dot-passed">✓</span>{% elif case.status == 'skipped' %}<span class="dot-skipped">○</span>{% else %}<span class="dot-failed">✗</span>{% endif %}
             </td>
           </tr>
           {% if case.error %}

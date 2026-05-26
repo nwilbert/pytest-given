@@ -518,3 +518,117 @@ def test_render_status_filter_pills(tmp_path: Path) -> None:
     assert 'showPassed' in content
     assert 'showFailed' in content
     assert 'showSkipped' in content
+
+
+def test_render_includes_skip_reason_block_and_chevron(tmp_path: Path) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 't::x',
+                        'narration': _narration('Skipped one'),
+                        'module': 'mod',
+                        'tags': [],
+                        'status': 'skipped',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                        'skip_reason': 'awaiting fixture',
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert 'awaiting fixture' in content
+    assert 'skip-reason' in content
+    # Chevron present (scenario has a body): the placeholder span element is absent.
+    assert '<span class="scenario-chevron-placeholder">' not in content
+
+
+def test_render_skipped_without_reason_has_no_chevron(tmp_path: Path) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 't::x',
+                        'narration': _narration('Skipped no reason'),
+                        'module': 'mod',
+                        'tags': [],
+                        'status': 'skipped',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                        'skip_reason': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert '<span class="scenario-chevron-placeholder">' in content
+    assert 'class="skip-reason"' not in content
+
+
+def test_render_parameter_table_skipped_case_uses_dot_skipped(tmp_path: Path) -> None:
+    """Skipped parametrize cases render ○ (dot-skipped), not ✗ (dot-failed)."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 't::x',
+                        'narration': _narration('All skipped'),
+                        'module': 'mod',
+                        'tags': [],
+                        'status': 'skipped',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': {
+                            'names': ['n'],
+                            'cases': [
+                                {'values': [1], 'status': 'skipped', 'error': None},
+                                {'values': [2], 'status': 'skipped', 'error': None},
+                            ],
+                        },
+                        'error': None,
+                        'skip_reason': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert '<span class="dot-skipped">○</span>' in content
+    assert '<span class="dot-failed">✗</span>' not in content

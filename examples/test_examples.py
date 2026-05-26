@@ -138,3 +138,16 @@ def test_failing(machine):
 def test_skipped(machine):
     with then('this step never runs'):
         assert machine['coffees'] == 10
+
+
+@scenario('All cases skipped')
+@pytest.mark.parametrize(
+    'n',
+    [
+        pytest.param(1, marks=pytest.mark.skip(reason='awaiting fixture')),
+        pytest.param(2, marks=pytest.mark.skip(reason='awaiting fixture')),
+    ],
+)
+def test_parametrized_all_skipped(machine, n):
+    with then('this case never runs'):
+        assert machine['coffees'] == n
