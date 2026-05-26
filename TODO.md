@@ -2,11 +2,8 @@
 
 ## Now
 
-- [ ] Work on t-string step-text spec (preferred placeholder mechanism; bumps baseline to 3.14)
-
 ## Next
 
-- [ ] Cleanup examples (test title "Not enough money", `can_buy` in narration, passive tone)
 - [ ] Add option to not generate the JSON file, rethink default behavior
 - [ ] Link report to source code
 

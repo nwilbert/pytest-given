@@ -1,14 +1,17 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-05-25T16:24:42.545259+00:00",
+    "timestamp": "2026-05-26T06:07:11.133157+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0"
   },
   "scenarios": [
     {
       "id": "examples/test_examples.py::test_buy_coffee",
-      "name": "Basic scenario with when/then and a JSON attachment",
+      "narration": {
+        "text": "Basic scenario with when/then and a JSON attachment",
+        "parts": []
+      },
       "module": "test_examples",
       "tags": [
         "billing",
@@ -19,25 +22,32 @@
       "steps": [
         {
           "phase": "given",
-          "text": "a coffee machine",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "when",
-          "text": "I insert $2",
+          "narration": {
+            "text": "I insert $2",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "then",
-          "text": "I get a coffee",
+          "narration": {
+            "text": "I get a coffee",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [
@@ -47,17 +57,18 @@
               "content_type": "json"
             }
           ],
-          "error": null,
-          "text_parts": null
+          "error": null
         }
       ],
       "parameters": null,
-      "error": null,
-      "name_parts": null
+      "error": null
     },
     {
       "id": "examples/test_examples.py::test_text_attachment",
-      "name": "Plain text attachment",
+      "narration": {
+        "text": "Plain text attachment",
+        "parts": []
+      },
       "module": "test_examples",
       "tags": [
         "billing"
@@ -67,25 +78,32 @@
       "steps": [
         {
           "phase": "given",
-          "text": "a coffee machine",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "when",
-          "text": "I print the receipt",
+          "narration": {
+            "text": "I print the receipt",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "then",
-          "text": "the receipt is recorded verbatim",
+          "narration": {
+            "text": "the receipt is recorded verbatim",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [
@@ -95,17 +113,18 @@
               "content_type": "text"
             }
           ],
-          "error": null,
-          "text_parts": null
+          "error": null
         }
       ],
       "parameters": null,
-      "error": null,
-      "name_parts": null
+      "error": null
     },
     {
       "id": "examples/test_examples.py::test_generator_fixture",
-      "name": "Generator fixture with teardown",
+      "narration": {
+        "text": "Generator fixture with teardown",
+        "parts": []
+      },
       "module": "test_examples",
       "tags": [],
       "status": "passed",
@@ -113,82 +132,47 @@
       "steps": [
         {
           "phase": "given",
-          "text": "a database connection",
+          "narration": {
+            "text": "a database connection",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "when",
-          "text": "I run a query",
+          "narration": {
+            "text": "I run a query",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "then",
-          "text": "the connection is open and the query was logged",
+          "narration": {
+            "text": "the connection is open and the query was logged",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         }
       ],
       "parameters": null,
-      "error": null,
-      "name_parts": null
-    },
-    {
-      "id": "examples/test_examples.py::test_not_enough",
-      "name": "Not enough money",
-      "module": "test_examples",
-      "tags": [
-        "billing",
-        "edge-case"
-      ],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "text": "a coffee machine",
-          "status": "passed",
-          "children": [],
-          "attachments": [],
-          "error": null,
-          "text_parts": null
-        },
-        {
-          "phase": "when",
-          "text": "I insert $1",
-          "status": "passed",
-          "children": [],
-          "attachments": [],
-          "error": null,
-          "text_parts": null
-        },
-        {
-          "phase": "then",
-          "text": "I don't get a coffee",
-          "status": "passed",
-          "children": [],
-          "attachments": [],
-          "error": null,
-          "text_parts": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "name_parts": null
+      "error": null
     },
     {
       "id": "examples/test_examples.py::test_buy_with_validation",
-      "name": "Helper functions can record their own steps",
+      "narration": {
+        "text": "Helper functions can record their own steps",
+        "parts": []
+      },
       "module": "test_examples",
       "tags": [
         "billing"
@@ -198,58 +182,51 @@
       "steps": [
         {
           "phase": "given",
-          "text": "a coffee machine",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "when",
-          "text": "I insert $2",
-          "status": "passed",
-          "children": [
-            {
-              "phase": "when",
-              "text": "validating coin... accepted",
-              "status": "passed",
-              "children": [],
-              "attachments": [],
-              "error": null,
-              "text_parts": null
-            },
-            {
-              "phase": "when",
-              "text": "updating balance",
-              "status": "passed",
-              "children": [],
-              "attachments": [],
-              "error": null,
-              "text_parts": null
-            }
-          ],
-          "attachments": [],
-          "error": null,
-          "text_parts": null
-        },
-        {
-          "phase": "then",
-          "text": "the coin is accepted",
+          "narration": {
+            "text": "I insert $2",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "then",
-          "text": "a coffee is dispensed",
+          "narration": {
+            "text": "the coin is accepted",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a coffee is dispensed",
+            "parts": []
+          },
           "status": "passed",
           "children": [
             {
               "phase": "then",
-              "text": "the machine state is consistent",
+              "narration": {
+                "text": "the machine state is consistent",
+                "parts": []
+              },
               "status": "passed",
               "children": [],
               "attachments": [
@@ -259,22 +236,22 @@
                   "content_type": "json"
                 }
               ],
-              "error": null,
-              "text_parts": null
+              "error": null
             }
           ],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         }
       ],
       "parameters": null,
-      "error": null,
-      "name_parts": null
+      "error": null
     },
     {
       "id": "examples/test_examples.py::test_complex_order",
-      "name": "Top-level `given` block and deeply nested steps",
+      "narration": {
+        "text": "Top-level `given` block and deeply nested steps",
+        "parts": []
+      },
       "module": "test_examples",
       "tags": [
         "billing"
@@ -284,91 +261,116 @@
       "steps": [
         {
           "phase": "given",
-          "text": "a coffee machine",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "given",
-          "text": "a loyalty card with 5 points",
+          "narration": {
+            "text": "a loyalty card with 5 points",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "when",
-          "text": "I place a large order",
+          "narration": {
+            "text": "I place a large order",
+            "parts": []
+          },
           "status": "passed",
           "children": [
             {
               "phase": "when",
-              "text": "I select 3 coffees",
+              "narration": {
+                "text": "I select 3 coffees",
+                "parts": []
+              },
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null,
-              "text_parts": null
+              "error": null
             },
             {
               "phase": "when",
-              "text": "I apply loyalty discount",
+              "narration": {
+                "text": "I apply loyalty discount",
+                "parts": []
+              },
               "status": "passed",
               "children": [
                 {
                   "phase": "when",
-                  "text": "validating loyalty card",
+                  "narration": {
+                    "text": "the loyalty card is validated",
+                    "parts": []
+                  },
                   "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null,
-                  "text_parts": null
+                  "error": null
                 },
                 {
                   "phase": "when",
-                  "text": "calculating discount",
+                  "narration": {
+                    "text": "the discount is calculated",
+                    "parts": []
+                  },
                   "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null,
-                  "text_parts": null
+                  "error": null
                 }
               ],
               "attachments": [],
-              "error": null,
-              "text_parts": null
+              "error": null
             }
           ],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "then",
-          "text": "the order is processed correctly",
+          "narration": {
+            "text": "the order is processed correctly",
+            "parts": []
+          },
           "status": "passed",
           "children": [
             {
               "phase": "then",
-              "text": "the coffee count is updated",
+              "narration": {
+                "text": "the coffee count is updated",
+                "parts": []
+              },
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null,
-              "text_parts": null
+              "error": null
             },
             {
               "phase": "then",
-              "text": "the loyalty points are deducted",
+              "narration": {
+                "text": "the loyalty points are deducted",
+                "parts": []
+              },
               "status": "passed",
               "children": [
                 {
                   "phase": "then",
-                  "text": "the remaining points are valid",
+                  "narration": {
+                    "text": "the remaining points are valid",
+                    "parts": []
+                  },
                   "status": "passed",
                   "children": [],
                   "attachments": [
@@ -378,22 +380,22 @@
                       "content_type": "json"
                     }
                   ],
-                  "error": null,
-                  "text_parts": null
+                  "error": null
                 }
               ],
               "attachments": [],
-              "error": null,
-              "text_parts": null
+              "error": null
             }
           ],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "then",
-          "text": "the machine state is consistent",
+          "narration": {
+            "text": "the machine state is consistent",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [
@@ -403,17 +405,18 @@
               "content_type": "json"
             }
           ],
-          "error": null,
-          "text_parts": null
+          "error": null
         }
       ],
       "parameters": null,
-      "error": null,
-      "name_parts": null
+      "error": null
     },
     {
       "id": "examples/test_examples.py::test_failing",
-      "name": "Failure rendering (intentionally failing)",
+      "narration": {
+        "text": "Failure rendering (intentionally failing)",
+        "parts": []
+      },
       "module": "test_examples",
       "tags": [],
       "status": "failed",
@@ -421,33 +424,39 @@
       "steps": [
         {
           "phase": "given",
-          "text": "a coffee machine",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "then",
-          "text": "the machine has 20 coffees",
+          "narration": {
+            "text": "the machine has 20 coffees",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         }
       ],
       "parameters": null,
       "error": {
         "message": "assert 10 == 20",
-        "diff": ".nox/examples/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call\n    yield\n.nox/examples/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/runner.py:179: in pytest_runtest_call\n    item.runtest()\n.nox/examples/lib/python3.14/site-packages/_pytest/python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.nox/examples/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc/pytest_given/decorators.py:108: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples/test_examples.py:133: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
-      },
-      "name_parts": null
+        "diff": ".nox/examples/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call\n    yield\n.nox/examples/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/runner.py:179: in pytest_runtest_call\n    item.runtest()\n.nox/examples/lib/python3.14/site-packages/_pytest/python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.nox/examples/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc/pytest_given/decorators.py:102: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples/test_examples.py:133: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
+      }
     },
     {
       "id": "examples/test_examples.py::test_pricing[1-False]",
-      "name": "Parameterized test (renders as a parameter table)",
+      "narration": {
+        "text": "Parameterized test (renders as a parameter table)",
+        "parts": []
+      },
       "module": "test_examples",
       "tags": [
         "billing"
@@ -457,48 +466,54 @@
       "steps": [
         {
           "phase": "given",
-          "text": "a coffee machine",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "when",
-          "text": "I insert $1",
+          "narration": {
+            "text": "I insert $1",
+            "parts": [
+              {
+                "value": "I insert $"
+              },
+              {
+                "name": "euros",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": [
-            {
-              "value": "I insert $"
-            },
-            {
-              "name": "euros",
-              "format_spec": "",
-              "conversion": null
-            }
-          ]
+          "error": null
         },
         {
           "phase": "then",
-          "text": "can_buy is False",
+          "narration": {
+            "text": "the purchase is allowed: False",
+            "parts": [
+              {
+                "value": "the purchase is allowed: "
+              },
+              {
+                "name": "expect",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": [
-            {
-              "value": "can_buy is "
-            },
-            {
-              "name": "expect",
-              "format_spec": "",
-              "conversion": null
-            }
-          ]
+          "error": null
         }
       ],
       "parameters": {
@@ -533,12 +548,26 @@
           }
         ]
       },
-      "error": null,
-      "name_parts": null
+      "error": null
     },
     {
       "id": "examples/test_examples.py::test_brew[200]",
-      "name": "Brew {cup_size} ml (templated scenario name)",
+      "narration": {
+        "text": "Brew {cup_size} ml (templated scenario name)",
+        "parts": [
+          {
+            "value": "Brew "
+          },
+          {
+            "name": "cup_size",
+            "format_spec": "",
+            "conversion": null
+          },
+          {
+            "value": " ml (templated scenario name)"
+          }
+        ]
+      },
       "module": "test_examples",
       "tags": [
         "billing"
@@ -548,42 +577,48 @@
       "steps": [
         {
           "phase": "given",
-          "text": "a coffee machine",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         },
         {
           "phase": "when",
-          "text": "I brew a 200 ml cup",
+          "narration": {
+            "text": "I brew a 200 ml cup",
+            "parts": [
+              {
+                "value": "I brew a "
+              },
+              {
+                "name": "cup_size",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " ml cup"
+              }
+            ]
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": [
-            {
-              "value": "I brew a "
-            },
-            {
-              "name": "cup_size",
-              "format_spec": "",
-              "conversion": null
-            },
-            {
-              "value": " ml cup"
-            }
-          ]
+          "error": null
         },
         {
           "phase": "then",
-          "text": "the machine has one fewer coffee",
+          "narration": {
+            "text": "the machine has one fewer coffee",
+            "parts": []
+          },
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
-          "text_parts": null
+          "error": null
         }
       ],
       "parameters": {
@@ -607,20 +642,7 @@
           }
         ]
       },
-      "error": null,
-      "name_parts": [
-        {
-          "value": "Brew "
-        },
-        {
-          "name": "cup_size",
-          "format_spec": "",
-          "conversion": null
-        },
-        {
-          "value": " ml (templated scenario name)"
-        }
-      ]
+      "error": null
     }
   ]
 }

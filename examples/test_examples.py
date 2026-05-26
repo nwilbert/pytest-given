@@ -46,14 +46,6 @@ def test_generator_fixture(db):
         assert db['queries'] == ['SELECT 1']
 
 
-@scenario('Not enough money', tags=['billing', 'edge-case'])
-def test_not_enough(machine):
-    with when('I insert $1'):
-        paid = 1
-    with then("I don't get a coffee"):
-        assert paid < machine['price']
-
-
 @scenario(
     'Parameterized test (renders as a parameter table)',
     tags=['billing'],
@@ -61,9 +53,9 @@ def test_not_enough(machine):
 @pytest.mark.parametrize('euros,expect', [(1, False), (2, True), (3, True)])
 def test_pricing(machine, euros, expect):
     with when(t'I insert ${euros}'):
-        can_buy = euros >= machine['price']
-    with then(t'can_buy is {expect}'):
-        assert can_buy == expect
+        purchase_allowed = euros >= machine['price']
+    with then(t'the purchase is allowed: {expect}'):
+        assert purchase_allowed == expect
 
 
 @scenario(
@@ -78,12 +70,20 @@ def test_brew(machine, cup_size):
         assert machine['coffees'] < 10
 
 
+@when('the coin is validated')
+def validate_coin_step(machine, amount):
+    return amount >= machine['price']
+
+
+@when('the balance is updated')
+def update_balance_step(machine, valid):
+    if valid:
+        machine['coffees'] -= 1
+
+
 def validate_coin(machine, amount):
-    with when(f'validating coin... {"accepted" if amount >= machine["price"] else "rejected"}'):
-        valid = amount >= machine['price']
-    with when('updating balance'):
-        if valid:
-            machine['coffees'] -= 1
+    valid = validate_coin_step(machine, amount)
+    update_balance_step(machine, valid)
     return valid
 
 
@@ -108,9 +108,9 @@ def test_complex_order(machine):
         with when('I select 3 coffees'):
             order_count = 3
         with when('I apply loyalty discount'):
-            with when('validating loyalty card'):
+            with when('the loyalty card is validated'):
                 assert loyalty['points'] >= 3
-            with when('calculating discount'):
+            with when('the discount is calculated'):
                 discount = min(loyalty['points'], order_count)
                 loyalty['points'] -= discount
     with then('the order is processed correctly'):
