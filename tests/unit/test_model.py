@@ -3,6 +3,7 @@ from pytest_given.model import (
     ErrorInfo,
     FixtureRecording,
     Metadata,
+    NodeId,
     ParameterCase,
     ParameterTable,
     RecordingState,
@@ -137,3 +138,8 @@ def test_step_narration_accepts_parts() -> None:
 def test_scenario_narration_defaults_to_plain_text() -> None:
     s = Scenario(id='id', narration=_n('hello'), module='m')
     assert s.narration.parts == []
+
+
+def test_scenario_skip_reason_defaults_to_none() -> None:
+    s = Scenario(id=NodeId('t::x'), narration=Narration(text='x'), module='m')
+    assert s.skip_reason is None

@@ -3,7 +3,7 @@ import pytest
 from pytest_given import Template
 from pytest_given.collector import Collector
 from pytest_given.errors import PytestGivenError
-from pytest_given.model import FixtureRecording, Step
+from pytest_given.model import FixtureRecording, NodeId, Step
 from pytest_given.template import (
     Narration,
     NarrationLiteral,
@@ -367,3 +367,17 @@ def test_start_scenario_with_plain_str_has_empty_parts() -> None:
     scenario = collector.finish_scenario(status='passed', duration_ms=0)
     assert scenario.narration.text == 'plain name'
     assert scenario.narration.parts == []
+
+
+def test_finish_scenario_records_skip_reason() -> None:
+    c = Collector()
+    c.start_scenario(NodeId('t::x'), name='x', module='m', tags=[])
+    s = c.finish_scenario(status='skipped', duration_ms=0, skip_reason='because')
+    assert s.skip_reason == 'because'
+
+
+def test_finish_scenario_skip_reason_defaults_to_none() -> None:
+    c = Collector()
+    c.start_scenario(NodeId('t::x'), name='x', module='m', tags=[])
+    s = c.finish_scenario(status='passed', duration_ms=0)
+    assert s.skip_reason is None

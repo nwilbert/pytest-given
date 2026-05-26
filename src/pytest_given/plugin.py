@@ -223,6 +223,28 @@ def _get_scenario_marker(item: pytest.Item) -> Any | None:
     return getattr(func, '_scenario', None)
 
 
+def _extract_skip_reason(longrepr: object) -> str | None:
+    """Return a human-readable reason from pytest's TestReport.longrepr, or None.
+
+    Pytest emits skipped longrepr as (path, lineno, message), where message is
+    typically "Skipped: <reason>" (mark-based) or "<reason>" (call-time).
+    Returns None for empty messages, the reasonless `<Skipped instance>`
+    placeholder, pytest's default "unconditional skip" (emitted when
+    @pytest.mark.skip is used with no reason), or any shape we don't recognise.
+    """
+    if not isinstance(longrepr, tuple) or len(longrepr) != 3:
+        return None
+    message = longrepr[2]
+    if not isinstance(message, str):
+        return None
+    if message.startswith('Skipped: '):
+        message = message[len('Skipped: '):]
+    message = message.strip()
+    if not message or message in ('<Skipped instance>', 'unconditional skip'):
+        return None
+    return message
+
+
 def _graft_fixture_recordings(item: pytest.Item) -> None:
     """Graft this item's step-fixture recordings in setup order.
 
@@ -291,7 +313,10 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
     elapsed = time.monotonic() - collector.start_times.pop(node_id, time.monotonic())
     duration_ms = int(elapsed * 1000)
     status = 'passed' if report.passed else 'failed' if report.failed else 'skipped'
-    collector.finish_scenario(status=status, duration_ms=duration_ms)
+    skip_reason = _extract_skip_reason(report.longrepr) if status == 'skipped' else None
+    collector.finish_scenario(
+        status=status, duration_ms=duration_ms, skip_reason=skip_reason
+    )
 
 
 def pytest_sessionfinish(session: pytest.Session) -> None:

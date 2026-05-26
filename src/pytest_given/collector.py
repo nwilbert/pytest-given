@@ -99,10 +99,16 @@ class Collector:
         self._state = 'test'
         self.inside_unannotated_test = False
 
-    def finish_scenario(self, status: str, duration_ms: int) -> Scenario:
+    def finish_scenario(
+        self,
+        status: str,
+        duration_ms: int,
+        skip_reason: str | None = None,
+    ) -> Scenario:
         assert self._current_scenario is not None
         self._current_scenario.status = status
         self._current_scenario.duration_ms = duration_ms
+        self._current_scenario.skip_reason = skip_reason
         scenario = self._current_scenario
         self._scenarios.append(scenario)
         self._current_scenario = None

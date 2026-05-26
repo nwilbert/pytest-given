@@ -781,3 +781,63 @@ def test_template_placeholder_typo_raises_helpful_error(pytester, tmp_path):
     result = pytester.runpytest('-v')
     assert result.ret != 0
     result.stdout.fnmatch_lines(['*cup_zize*'])
+
+
+def test_skipped_scenario_captures_mark_reason(pytester, tmp_path):
+    """@pytest.mark.skip(reason=...) surfaces the reason in JSON."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then
+
+        @scenario("Skipped with reason")
+        @pytest.mark.skip(reason="awaiting fixture")
+        def test_skip():
+            with then("never runs"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(skipped=1)
+    data = json.loads(json_path.read_text())
+    assert data['scenarios'][0]['status'] == 'skipped'
+    assert data['scenarios'][0]['skip_reason'] == 'awaiting fixture'
+
+
+def test_skipped_scenario_without_reason_has_none(pytester, tmp_path):
+    """@pytest.mark.skip with no reason leaves skip_reason as None."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then
+
+        @scenario("Skipped no reason")
+        @pytest.mark.skip
+        def test_skip():
+            with then("never runs"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(skipped=1)
+    data = json.loads(json_path.read_text())
+    assert data['scenarios'][0]['skip_reason'] is None
+
+
+def test_call_time_pytest_skip_captures_reason(pytester, tmp_path):
+    """An in-body pytest.skip('msg') surfaces 'msg' as skip_reason."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, when
+
+        @scenario("Skipped mid-test")
+        def test_skip():
+            with when("we bail"):
+                pytest.skip("missing prerequisite")
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(skipped=1)
+    data = json.loads(json_path.read_text())
+    assert data['scenarios'][0]['skip_reason'] == 'missing prerequisite'

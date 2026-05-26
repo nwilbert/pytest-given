@@ -95,6 +95,7 @@ class Scenario:
     steps: list[Step] = field(default_factory=list)
     parameters: ParameterTable | None = None
     error: ErrorInfo | None = None
+    skip_reason: str | None = None
 
 
 @dataclass

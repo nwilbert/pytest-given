@@ -188,3 +188,37 @@ def test_templatize_narration_rejects_unknown_placeholder() -> None:
     narration = Narration(text='', parts=[NarrationPlaceholder(name='cup_zize')])
     with pytest.raises(PytestGivenError, match='cup_zize'):
         plugin._templatize_narration(narration, ['cup_size'])
+
+
+def test_extract_skip_reason_parses_canonical_tuple() -> None:
+    assert plugin._extract_skip_reason(('t.py', 12, 'Skipped: because')) == 'because'
+
+
+def test_extract_skip_reason_strips_prefix_when_present() -> None:
+    assert plugin._extract_skip_reason(('t.py', 12, 'Skipped: mid-test')) == 'mid-test'
+
+
+def test_extract_skip_reason_handles_no_prefix() -> None:
+    assert plugin._extract_skip_reason(('t.py', 12, 'mid-test')) == 'mid-test'
+
+
+def test_extract_skip_reason_returns_none_for_placeholder() -> None:
+    assert (
+        plugin._extract_skip_reason(('t.py', 12, 'Skipped: <Skipped instance>')) is None
+    )
+    # pytest 9+: @pytest.mark.skip with no reason emits 'unconditional skip'
+    assert (
+        plugin._extract_skip_reason(('t.py', 12, 'Skipped: unconditional skip')) is None
+    )
+
+
+def test_extract_skip_reason_returns_none_for_empty_message() -> None:
+    assert plugin._extract_skip_reason(('t.py', 12, 'Skipped: ')) is None
+    assert plugin._extract_skip_reason(('t.py', 12, '')) is None
+
+
+def test_extract_skip_reason_returns_none_for_unrecognized_shapes() -> None:
+    assert plugin._extract_skip_reason(None) is None
+    assert plugin._extract_skip_reason('just a string') is None
+    assert plugin._extract_skip_reason(('only', 'two')) is None
+    assert plugin._extract_skip_reason(('t.py', 12, 42)) is None
