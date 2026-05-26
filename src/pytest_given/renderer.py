@@ -68,9 +68,9 @@ def _make_narration_filter(
     """
 
     def _render(narration: dict[str, Any]) -> Markup:
-        parts = narration.get('parts') or []
+        parts = narration['parts']
         if not parts:
-            return Markup(str(escape(narration.get('text', ''))))
+            return Markup(str(escape(narration['text'])))
         out: list[str] = []
         for part in parts:
             if 'value' in part:

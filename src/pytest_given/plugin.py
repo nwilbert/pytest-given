@@ -228,8 +228,7 @@ def _graft_fixture_recordings(item: pytest.Item) -> None:
 
     `collector._recordings` is insertion-ordered by setup time, so iterating it
     preserves narrative order even when `item.fixturenames` lists dependents
-    before their dependencies. Function-scoped recordings are dropped after
-    grafting so the dict doesn't grow unboundedly across the session.
+    before their dependencies.
     """
     assert hasattr(item, 'fixturenames'), f'expected fixturenames on {item!r}'
     fm = item.session._fixturemanager
@@ -245,6 +244,8 @@ def _graft_fixture_recordings(item: pytest.Item) -> None:
             continue
         key: FixtureInstanceKey = (id(fixturedef), fixturedef.cached_result[1])
         expected[key] = fixturedef.scope
+    # Function-scoped recordings won't be re-consumed; drop after grafting so
+    # the recordings dict doesn't grow unboundedly across the session.
     to_drop: list[FixtureInstanceKey] = []
     for key, recording in collector.recordings():
         if key in expected:

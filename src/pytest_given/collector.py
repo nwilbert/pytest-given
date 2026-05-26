@@ -148,8 +148,6 @@ class Collector:
         return iter(self._recordings.items())
 
     def drop_recording(self, key: FixtureInstanceKey) -> None:
-        """Remove a stored recording. Used to bound memory for function-scoped
-        recordings once they've been grafted into their owning scenario."""
         self._recordings.pop(key, None)
 
     def graft_recording(self, recording: FixtureRecording) -> None:
