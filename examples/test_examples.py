@@ -131,3 +131,10 @@ def test_complex_order(machine):
 def test_failing(machine):
     with then('the machine has 20 coffees'):
         assert machine['coffees'] == 20
+
+
+@scenario('Skipped scenario rendering')
+@pytest.mark.skip(reason='demonstrates skipped status')
+def test_skipped(machine):
+    with then('this step never runs'):
+        assert machine['coffees'] == 10

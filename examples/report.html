@@ -230,6 +230,13 @@ body {
   margin-right: var(--space-sm);
 }
 .scenario-chevron-open { transform: rotate(45deg); }
+.scenario-chevron-placeholder {
+  display: inline-block;
+  width: 8px;
+  flex-shrink: 0;
+  margin-right: var(--space-sm);
+}
+.scenario-header-empty { cursor: default; }
 .scenario-name { font-size: var(--font-size-md); font-weight: 500; }
 .scenario-tag {
   display: inline-block;
@@ -418,8 +425,7 @@ body {
       </div>
       <div class="header-meta">pytest 9.0.3 · pytest-given 0.1.0 · <span x-text="formattedTimestamp"></span></div>
     </div>
-  </div>
-  <div class="scenario passed"
+  </div><div class="scenario passed"
        x-show="isVisible(0)"
        :id="'scenario-' + 0"
        :class="{ 'scenario-expanded': expandedScenarios[0] }">
@@ -461,7 +467,6 @@ body {
       
     </div>
   </div>
-  
   <div class="scenario passed"
        x-show="isVisible(1)"
        :id="'scenario-' + 1"
@@ -501,7 +506,6 @@ Total:        $2.00</pre></div>
       
     </div>
   </div>
-  
   <div class="scenario passed"
        x-show="isVisible(2)"
        :id="'scenario-' + 2"
@@ -534,7 +538,6 @@ Total:        $2.00</pre></div>
       
     </div>
   </div>
-  
   <div class="scenario passed"
        x-show="isVisible(3)"
        :id="'scenario-' + 3"
@@ -580,7 +583,6 @@ Total:        $2.00</pre></div>
       
     </div>
   </div>
-  
   <div class="scenario passed"
        x-show="isVisible(4)"
        :id="'scenario-' + 4"
@@ -642,7 +644,6 @@ Total:        $2.00</pre></div>
       
     </div>
   </div>
-  
   <div class="scenario failed"
        x-show="isVisible(5)"
        :id="'scenario-' + 5"
@@ -657,7 +658,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">55ms</span>
+        <span class="scenario-duration">86ms</span>
       </span>
     </div>
 
@@ -673,57 +674,82 @@ Total:        $2.00</pre></div>
       
       <div class="error-block">
         <div class="error-message">assert 10 == 20</div>
-        <pre class="error-diff">.nox/examples/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call
+        <pre class="error-diff">.nox\examples\Lib\site-packages\_pytest\runner.py:353: in from_call
     result: TResult | None = func()
                              ^^^^^^
-.nox/examples/lib/python3.14/site-packages/_pytest/runner.py:245: in &lt;lambda&gt;
+.nox\examples\Lib\site-packages\_pytest\runner.py:245: in &lt;lambda&gt;
     lambda: runtest_hook(item=item, **kwds),
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.nox/examples/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__
+.nox\examples\Lib\site-packages\pluggy\_hooks.py:512: in __call__
     return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.nox/examples/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec
+.nox\examples\Lib\site-packages\pluggy\_manager.py:120: in _hookexec
     return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.nox/examples/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call
+.nox\examples\Lib\site-packages\_pytest\logging.py:850: in pytest_runtest_call
     yield
-.nox/examples/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call
+.nox\examples\Lib\site-packages\_pytest\capture.py:900: in pytest_runtest_call
     return (yield)
             ^^^^^
-.nox/examples/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call
+.nox\examples\Lib\site-packages\_pytest\skipping.py:268: in pytest_runtest_call
     return (yield)
             ^^^^^
-.nox/examples/lib/python3.14/site-packages/_pytest/runner.py:179: in pytest_runtest_call
+.nox\examples\Lib\site-packages\_pytest\runner.py:179: in pytest_runtest_call
     item.runtest()
-.nox/examples/lib/python3.14/site-packages/_pytest/python.py:1720: in runtest
+.nox\examples\Lib\site-packages\_pytest\python.py:1720: in runtest
     self.ihook.pytest_pyfunc_call(pyfuncitem=self)
-.nox/examples/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__
+.nox\examples\Lib\site-packages\pluggy\_hooks.py:512: in __call__
     return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.nox/examples/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec
+.nox\examples\Lib\site-packages\pluggy\_manager.py:120: in _hookexec
     return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.nox/examples/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call
+.nox\examples\Lib\site-packages\_pytest\python.py:166: in pytest_pyfunc_call
     result = testfunction(**testargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^
-src/pytest_given/decorators.py:102: in wrapper
+src\pytest_given\decorators.py:102: in wrapper
     return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^
-examples/test_examples.py:133: in test_failing
+examples\test_examples.py:133: in test_failing
     assert machine[&#39;coffees&#39;] == 20
 E   assert 10 == 20</pre>
       </div>
       
     </div>
   </div>
-  
-  <div class="scenario passed"
+  <div class="scenario skipped"
        x-show="isVisible(6)"
        :id="'scenario-' + 6"
        :class="{ 'scenario-expanded': expandedScenarios[6] }">
-    <div class="scenario-header" @click="toggleScenario(6)">
+    <div class="scenario-header scenario-header-empty">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[6] }"></span>
+        <span class="scenario-chevron-placeholder"></span>
+        <span class="scenario-name">Skipped scenario rendering</span>
+        
+      </div>
+      <span class="scenario-meta">
+        <span class="scenario-status skipped">
+          ○ skipped
+        </span>
+        <span class="scenario-duration">0ms</span>
+      </span>
+    </div>
+
+    <div x-show="expandedScenarios[6]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+      <div class="steps"></div>
+
+      
+
+      
+    </div>
+  </div>
+  <div class="scenario passed"
+       x-show="isVisible(7)"
+       :id="'scenario-' + 7"
+       :class="{ 'scenario-expanded': expandedScenarios[7] }">
+    <div class="scenario-header" @click="toggleScenario(7)">
+      <div style="display:flex; align-items:center;">
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[7] }"></span>
         <span class="scenario-name">Parameterized test (renders as a parameter table)</span>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
@@ -737,7 +763,7 @@ E   assert 10 == 20</pre>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[6]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div x-show="expandedScenarios[7]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
@@ -803,14 +829,13 @@ E   assert 10 == 20</pre>
       
     </div>
   </div>
-  
   <div class="scenario passed"
-       x-show="isVisible(7)"
-       :id="'scenario-' + 7"
-       :class="{ 'scenario-expanded': expandedScenarios[7] }">
-    <div class="scenario-header" @click="toggleScenario(7)">
+       x-show="isVisible(8)"
+       :id="'scenario-' + 8"
+       :class="{ 'scenario-expanded': expandedScenarios[8] }">
+    <div class="scenario-header" @click="toggleScenario(8)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[7] }"></span>
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[8] }"></span>
         <span class="scenario-name">Brew <span class="param-color-2">{cup_size}</span> ml (templated scenario name)</span>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
@@ -824,7 +849,7 @@ E   assert 10 == 20</pre>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[7]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div x-show="expandedScenarios[8]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
@@ -879,7 +904,7 @@ E   assert 10 == 20</pre>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-05-26T06:07:11.133157+00:00",
+    "timestamp": "2026-05-26T17:12:58.103002+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0"
   },
@@ -1298,7 +1323,7 @@ window.__REPORT_DATA__ = {
       "module": "test_examples",
       "tags": [],
       "status": "failed",
-      "duration_ms": 55,
+      "duration_ms": 86,
       "steps": [
         {
           "phase": "given",
@@ -1326,8 +1351,22 @@ window.__REPORT_DATA__ = {
       "parameters": null,
       "error": {
         "message": "assert 10 == 20",
-        "diff": ".nox/examples/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call\n    yield\n.nox/examples/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/runner.py:179: in pytest_runtest_call\n    item.runtest()\n.nox/examples/lib/python3.14/site-packages/_pytest/python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.nox/examples/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc/pytest_given/decorators.py:102: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples/test_examples.py:133: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
+        "diff": ".nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\logging.py:850: in pytest_runtest_call\n    yield\n.nox\\examples\\Lib\\site-packages\\_pytest\\capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:179: in pytest_runtest_call\n    item.runtest()\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc\\pytest_given\\decorators.py:102: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples\\test_examples.py:133: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
       }
+    },
+    {
+      "id": "examples/test_examples.py::test_skipped",
+      "narration": {
+        "text": "Skipped scenario rendering",
+        "parts": []
+      },
+      "module": "test_examples",
+      "tags": [],
+      "status": "skipped",
+      "duration_ms": 0,
+      "steps": [],
+      "parameters": null,
+      "error": null
     },
     {
       "id": "examples/test_examples.py::test_pricing[1-False]",

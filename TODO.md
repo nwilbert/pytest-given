@@ -13,6 +13,7 @@
 - [ ] UI improvements in report
   - highlight on hover for parametrization table)
   - search box improvements 
+- [ ] Display skip reason for skipped scenarios (capture `report.longrepr` reason in plugin, render in expanded body; today skipped scenarios render with no chevron since there's nothing to show)
 - [ ] Think about UL support (e.g., by connecting the report to a glossary)
 - [ ] Provide an agent skill for work with pytest-given
 - [ ] Add `@scenario(group_parametrized=False)` option to opt out of parametrize merging 

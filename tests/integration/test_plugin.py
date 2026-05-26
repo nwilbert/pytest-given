@@ -77,6 +77,28 @@ def test_failed_scenario(pytester, tmp_path):
     assert s['error'] is not None
 
 
+def test_skipped_scenario(pytester, tmp_path):
+    """A scenario marked with @pytest.mark.skip is reported with skipped status."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then
+
+        @scenario("Skipped test")
+        @pytest.mark.skip(reason="demo")
+        def test_skip():
+            with then("never runs"):
+                assert False
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(skipped=1)
+    data = json.loads(json_path.read_text())
+    assert len(data['scenarios']) == 1
+    assert data['scenarios'][0]['status'] == 'skipped'
+
+
 def test_unannotated_test_not_in_report(pytester, tmp_path):
     """Tests without @scenario don't appear in the report."""
     pytester.makepyfile(

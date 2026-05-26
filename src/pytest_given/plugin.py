@@ -280,10 +280,13 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
 
 @pytest.hookimpl(trylast=True)
 def pytest_runtest_logreport(report: pytest.TestReport) -> None:
-    if report.when != 'call':
-        return
     node_id = NodeId(report.nodeid)
     if collector.active_scenario_id != node_id:
+        return
+    # Tests marked @pytest.mark.skip skip at setup time; in-body pytest.skip()
+    # surfaces during 'call'. Both reach finish_scenario via this hook.
+    setup_skip = report.when == 'setup' and report.skipped
+    if report.when != 'call' and not setup_skip:
         return
     elapsed = time.monotonic() - collector.start_times.pop(node_id, time.monotonic())
     duration_ms = int(elapsed * 1000)

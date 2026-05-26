@@ -101,13 +101,14 @@
   {%- endmacro -%}
 
   {% for scenario in scenarios %}
+  {%- set has_body = scenario.steps or scenario.parameters or scenario.error -%}
   <div class="scenario {{ scenario.status }}"
        x-show="isVisible({{ loop.index0 }})"
        :id="'scenario-' + {{ loop.index0 }}"
        :class="{ 'scenario-expanded': expandedScenarios[{{ loop.index0 }}] }">
-    <div class="scenario-header" @click="toggleScenario({{ loop.index0 }})">
+    <div class="scenario-header{% if not has_body %} scenario-header-empty{% endif %}"{% if has_body %} @click="toggleScenario({{ loop.index0 }})"{% endif %}>
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span>
+        {% if has_body %}<span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
         <span class="scenario-name">{{ scenario.narration | narration }}</span>
         {% for tag in scenario.tags %}
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>

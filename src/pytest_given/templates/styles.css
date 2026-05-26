@@ -223,6 +223,13 @@ body {
   margin-right: var(--space-sm);
 }
 .scenario-chevron-open { transform: rotate(45deg); }
+.scenario-chevron-placeholder {
+  display: inline-block;
+  width: 8px;
+  flex-shrink: 0;
+  margin-right: var(--space-sm);
+}
+.scenario-header-empty { cursor: default; }
 .scenario-name { font-size: var(--font-size-md); font-weight: 500; }
 .scenario-tag {
   display: inline-block;
