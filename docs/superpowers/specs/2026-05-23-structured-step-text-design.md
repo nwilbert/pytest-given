@@ -307,7 +307,7 @@ In-repo migration (`tests/examples/test_examples.py` + example report regenerati
 
 ## Relationship to the deferred Annotated spec
 
-`2026-05-23-annotated-fixture-labels-design.md` stays **deferred**. When revisited, it inherits `pytest_given.Template` as the canonical authoring form for Annotated — `Annotated[int, given(Template('a {cup_size} ml cup'))]` — replacing the previous bare-`str`-with-`{name}` proposal. With t-strings covering parametrize narration in test bodies, the Annotated revisit's remaining motivators (per-consumer fixture relabeling, undecorated-fixture promotion) may justify a narrower follow-up or be dropped entirely.
+`proposed/2026-05-23-annotated-fixture-labels-design.md` stays **deferred**. When revisited, it inherits `pytest_given.Template` as the canonical authoring form for Annotated — `Annotated[int, given(Template('a {cup_size} ml cup'))]` — replacing the previous bare-`str`-with-`{name}` proposal. With t-strings covering parametrize narration in test bodies, the Annotated revisit's remaining motivators (per-consumer fixture relabeling, undecorated-fixture promotion) may justify a narrower follow-up or be dropped entirely.
 
 ## Caveats
 

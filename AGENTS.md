@@ -70,4 +70,5 @@ A Playwright MCP server is available for visually inspecting the HTML report. Op
 - Commit messages: single line, no co-author trailers, no leading file/area labels like `TODO:` or `README:` — just describe the change ("note example cleanup as todo", not "TODO: note example cleanup"). Conventional-commit-style scope prefixes like `docs:` / `examples:` / `renderer:` are fine when they add information.
 - Keep commits coherent: each commit should represent one logical change. Don't split "do X", "tests for X", and "review-fixup for X" into separate commits — squash them before pushing. Don't bundle unrelated changes either.
 - Plan files under `docs/superpowers/plans/` are scratch artifacts — never commit them. Spec files under `docs/superpowers/specs/` are committed.
+- New specs land under `docs/superpowers/specs/proposed/`. When a spec's implementation lands, `git mv` it up one level into `docs/superpowers/specs/` in the same commit. `ls specs/proposed` is the canonical list of outstanding design work.
 - Always run `uv run nox` (or at minimum `uv run nox -s format lint mypy test`) before committing
