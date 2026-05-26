@@ -12,16 +12,16 @@ uv sync --group dev
 
 ## Quality gates
 
-Run all checks: `nox`
+Run all checks: `uv run nox`
 
 Individual sessions:
-- `nox -s format` — ruff format
-- `nox -s lint` — ruff check
-- `nox -s mypy` — type checking (strict)
-- `nox -s test` — pytest
-- `nox -s coverage` — 100% coverage target
-- `nox -s audit` — pip-audit
-- `nox -s examples` — regenerate `examples/report-data.json` and `examples/report.html`. Run after changes to the renderer, templates, plugin output schema, or `examples/test_examples.py` itself, and commit the updated JSON.
+- `uv run nox -s format` — ruff format
+- `uv run nox -s lint` — ruff check
+- `uv run nox -s mypy` — type checking (strict)
+- `uv run nox -s test` — pytest
+- `uv run nox -s coverage` — 100% coverage target
+- `uv run nox -s audit` — pip-audit
+- `uv run nox -s examples` — regenerate `examples/report-data.json` and `examples/report.html`. Run after changes to the renderer, templates, plugin output schema, or `examples/test_examples.py` itself, and commit the updated JSON.
 
 ## Architecture
 
@@ -50,7 +50,7 @@ Lanes don't overlap: `pytest_given.Template` is rejected in `given/when/then/att
 
 ## Report testing
 
-A Playwright MCP server is available for visually inspecting the HTML report. Open it with `file:///` URLs pointing to `examples/report.html` (regenerate via `nox -s examples`). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
+A Playwright MCP server is available for visually inspecting the HTML report. Open it with `file:///` URLs pointing to `examples/report.html` (regenerate via `uv run nox -s examples`). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
 
 - The report targets desktop only — assume a minimum viewport width of ~900px. No mobile/responsive layout needed.
 - Traceback display and header metadata formatting are known limitations, not current priorities.
@@ -70,4 +70,4 @@ A Playwright MCP server is available for visually inspecting the HTML report. Op
 - Commit messages: single line, no co-author trailers, no leading file/area labels like `TODO:` or `README:` — just describe the change ("note example cleanup as todo", not "TODO: note example cleanup"). Conventional-commit-style scope prefixes like `docs:` / `examples:` / `renderer:` are fine when they add information.
 - Keep commits coherent: each commit should represent one logical change. Don't split "do X", "tests for X", and "review-fixup for X" into separate commits — squash them before pushing. Don't bundle unrelated changes either.
 - Plan files under `docs/superpowers/plans/` are scratch artifacts — never commit them. Spec files under `docs/superpowers/specs/` are committed.
-- Always run `nox` (or at minimum `nox -s format lint mypy test`) before committing
+- Always run `uv run nox` (or at minimum `uv run nox -s format lint mypy test`) before committing
