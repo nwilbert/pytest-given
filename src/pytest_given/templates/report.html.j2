@@ -43,7 +43,7 @@
               <template x-for="s in group.scenarios" :key="s.id">
                 <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
                   <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
-                  <span x-text="s.name"></span>
+                  <span x-text="s.narration.text"></span>
                 </div>
               </template>
             </div>
@@ -71,10 +71,10 @@
     {%- if step.children and step.children | length > 0 -%}
       <span class="step-toggle" @click="toggleStep('{{ step_id }}')">
         <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['{{ step_id }}'] }"></span>
-        {{ step | step_text }}
+        {{ step.narration | narration }}
       </span>
     {%- else -%}
-      {{ step | step_text }}
+      {{ step.narration | narration }}
     {%- endif -%}
   </div>
   {%- if step.children and step.children | length > 0 -%}
@@ -108,7 +108,7 @@
     <div class="scenario-header" @click="toggleScenario({{ loop.index0 }})">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span>
-        <span class="scenario-name">{{ scenario | scenario_name }}</span>
+        <span class="scenario-name">{{ scenario.narration | narration }}</span>
         {% for tag in scenario.tags %}
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
         {% endfor %}

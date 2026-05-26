@@ -11,6 +11,11 @@ from pytest_given.model import (
     Scenario,
     Step,
 )
+from pytest_given.template import Narration
+
+
+def _n(text: str) -> Narration:
+    return Narration(text=text)
 
 
 def test_serialize_empty_report() -> None:
@@ -40,21 +45,18 @@ def test_serialize_scenario_with_steps() -> None:
         scenarios=[
             Scenario(
                 id='test.py::test_x',
-                name='Test X',
+                narration=_n('Test X'),
                 module='test_mod',
                 tags=['billing'],
                 status='passed',
                 duration_ms=42,
                 steps=[
-                    Step(
-                        phase='given',
-                        text='a machine',
-                    ),
+                    Step(phase='given', narration=_n('a machine')),
                     Step(
                         phase='when',
-                        text='I press start',
+                        narration=_n('I press start'),
                         children=[
-                            Step(phase='when', text='validating'),
+                            Step(phase='when', narration=_n('validating')),
                         ],
                     ),
                 ],
@@ -63,7 +65,7 @@ def test_serialize_scenario_with_steps() -> None:
     )
     data = asdict(report)
     scenario = data['scenarios'][0]
-    assert scenario['name'] == 'Test X'
+    assert scenario['narration']['text'] == 'Test X'
     assert scenario['tags'] == ['billing']
     assert len(scenario['steps']) == 2
     assert len(scenario['steps'][1]['children']) == 1
@@ -78,7 +80,7 @@ def test_serialize_with_parameters() -> None:
         scenarios=[
             Scenario(
                 id='test.py::test_param',
-                name='Param test',
+                narration=_n('Param test'),
                 module='mod',
                 status='failed',
                 parameters=ParameterTable(
@@ -110,12 +112,12 @@ def test_serialize_with_attachments() -> None:
         scenarios=[
             Scenario(
                 id='id',
-                name='n',
+                narration=_n('n'),
                 module='m',
                 steps=[
                     Step(
                         phase='then',
-                        text='check',
+                        narration=_n('check'),
                         attachments=[Attachment(label='Log', content='data')],
                     )
                 ],

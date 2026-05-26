@@ -27,10 +27,10 @@ Individual sessions:
 
 - `src/pytest_given/__init__.py` — Public API: `scenario`, `given`, `when`, `then`, `attach`, `Template`
 - `src/pytest_given/decorators.py` — `StepDescriptor` + `ScenarioDecorator`: dual context-manager/decorator, cross-phase nesting detection, thread-local state
-- `src/pytest_given/template.py` — `Template` (deferred brace substitution for `@scenario(...)`) + structured narration dataclasses (`NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationPart` union) and `parse_tstring(...)` for t-string ingestion
+- `src/pytest_given/template.py` — `Template` (deferred brace substitution for `@scenario(...)`) + `Narration` dataclass (`text` + `parts`) with structured part dataclasses (`NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationPart` union); `narration_from(...)` dispatches `str` / `Template` / t-string into a `Narration`
 - `src/pytest_given/collector.py` — Step stack, collects scenario data during test execution
 - `src/pytest_given/plugin.py` — pytest hooks, parametrized test grouping, structural templatize
-- `src/pytest_given/renderer.py` — JSON to self-contained HTML (Jinja2 + Alpine.js); structural `step_text` / `scenario_name` filters
+- `src/pytest_given/renderer.py` — JSON to self-contained HTML (Jinja2 + Alpine.js); single structural `narration` filter dispatching on serialized `Narration` parts
 - `src/pytest_given/cli.py` — Standalone `pytest-given report` command
 - `src/pytest_given/templates/` — Jinja2 template, CSS, bundled Alpine.js
 

@@ -10,13 +10,23 @@ from pytest_given.model import (
     Scenario,
     Step,
 )
-from pytest_given.template import NarrationLiteral, NarrationPart, NarrationPlaceholder
+from pytest_given.template import (
+    Narration,
+    NarrationLiteral,
+    NarrationPart,
+    NarrationPlaceholder,
+)
+
+
+def _n(text: str) -> Narration:
+    return Narration(text=text)
 
 
 def test_step_defaults() -> None:
-    step = Step(phase='given', text='a coffee machine')
+    step = Step(phase='given', narration=_n('a coffee machine'))
     assert step.phase == 'given'
-    assert step.text == 'a coffee machine'
+    assert step.narration.text == 'a coffee machine'
+    assert step.narration.parts == []
     assert step.status == 'passed'
     assert step.children == []
     assert step.attachments == []
@@ -25,10 +35,10 @@ def test_step_defaults() -> None:
 
 
 def test_step_with_children() -> None:
-    child = Step(phase='when', text='validating coin')
-    parent = Step(phase='when', text='insert money', children=[child])
+    child = Step(phase='when', narration=_n('validating coin'))
+    parent = Step(phase='when', narration=_n('insert money'), children=[child])
     assert len(parent.children) == 1
-    assert parent.children[0].text == 'validating coin'
+    assert parent.children[0].narration.text == 'validating coin'
 
 
 def test_attachment() -> None:
@@ -51,7 +61,7 @@ def test_error_info_without_diff() -> None:
 def test_scenario_defaults() -> None:
     s = Scenario(
         id='test_file.py::test_foo',
-        name='Foo scenario',
+        narration=_n('Foo scenario'),
         module='test_file',
     )
     assert s.tags == []
@@ -103,27 +113,27 @@ def test_recording_state_literals() -> None:
 
 
 def test_fixture_recording_holds_root_step_and_stack() -> None:
-    root = Step(phase='given', text='a shop')
+    root = Step(phase='given', narration=_n('a shop'))
     recording = FixtureRecording(root=root)
     assert recording.root is root
     assert recording.stack == [root]
 
 
-def test_step_text_parts_defaults_to_none() -> None:
-    step = Step(phase='given', text='hello')
-    assert step.text_parts is None
+def test_step_narration_defaults_to_plain_text() -> None:
+    step = Step(phase='given', narration=_n('hello'))
+    assert step.narration.parts == []
 
 
-def test_step_text_parts_accepts_list() -> None:
+def test_step_narration_accepts_parts() -> None:
     parts: list[NarrationPart] = [
         NarrationLiteral(value='Brew '),
         NarrationPlaceholder(name='cup_size'),
         NarrationLiteral(value=' ml'),
     ]
-    step = Step(phase='given', text='Brew 200 ml', text_parts=parts)
-    assert step.text_parts == parts
+    step = Step(phase='given', narration=Narration(text='Brew 200 ml', parts=parts))
+    assert step.narration.parts == parts
 
 
-def test_scenario_name_parts_defaults_to_none() -> None:
-    s = Scenario(id='id', name='hello', module='m')
-    assert s.name_parts is None
+def test_scenario_narration_defaults_to_plain_text() -> None:
+    s = Scenario(id='id', narration=_n('hello'), module='m')
+    assert s.narration.parts == []

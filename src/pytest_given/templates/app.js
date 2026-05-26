@@ -65,7 +65,7 @@ function reportApp() {
       if (this.activeTag && !s.tags.includes(this.activeTag)) return false;
       if (this.search) {
         const q = this.search.toLowerCase();
-        const text = (s.name + ' ' + s.tags.join(' ')).toLowerCase();
+        const text = (s.narration.text + ' ' + s.tags.join(' ')).toLowerCase();
         if (!text.includes(q)) return false;
       }
       return true;

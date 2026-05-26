@@ -1,11 +1,11 @@
-from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass, field
 from string import Formatter, templatelib
 from typing import Any
 
 from pytest_given.errors import PytestGivenError
 
-_CONVERSIONS: dict[str, Callable[[Any], str]] = {'s': str, 'r': repr, 'a': ascii}
+_FORMATTER = Formatter()
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -35,6 +35,29 @@ class NarrationPlaceholder:
 type NarrationPart = NarrationLiteral | NarrationValue | NarrationPlaceholder
 
 
+@dataclass(frozen=True)
+class Narration:
+    """The text of a step or scenario, plus optional structured parts.
+
+    `text` is the rendered string for display. `parts` is empty for plain-string
+    inputs; non-empty when the source was a t-string or a `Template`, in which
+    case the parts reconstruct `text` and carry per-part highlighting metadata.
+    """
+
+    text: str
+    parts: list[NarrationPart] = field(default_factory=list)
+
+
+def narration_from(value: str | Template | templatelib.Template) -> Narration:
+    """Build a Narration from a plain string, a Template, or a t-string."""
+    if isinstance(value, templatelib.Template):
+        text, parts = parse_tstring(value)
+        return Narration(text=text, parts=parts)
+    if isinstance(value, Template):
+        return Narration(text=value.template, parts=list(value.parts))
+    return Narration(text=value)
+
+
 class Template:
     """Deferred brace-style template. Same `{...}` syntax as f/t-strings.
 
@@ -45,9 +68,8 @@ class Template:
 
     def __init__(self, template: str) -> None:
         self.template = template
-        formatter = Formatter()
         parts: list[NarrationPart] = []
-        for literal, name, spec, conversion in formatter.parse(template):
+        for literal, name, spec, conversion in _FORMATTER.parse(template):
             if literal:
                 parts.append(NarrationLiteral(value=literal))
             if name is not None:
@@ -76,9 +98,7 @@ class Template:
                 case NarrationPlaceholder(name=name, format_spec=spec, conversion=conv):
                     if name not in mapping:
                         raise KeyError(name)
-                    resolved = mapping[name]
-                    if conv is not None:
-                        resolved = _CONVERSIONS[conv](resolved)
+                    resolved = _FORMATTER.convert_field(mapping[name], conv)
                     out.append(format(resolved, spec))
         return ''.join(out)
 
@@ -110,9 +130,9 @@ def parse_tstring(
                 conversion=conversion,
                 format_spec=format_spec,
             ):
-                if conversion is not None:
-                    value = _CONVERSIONS[conversion](value)
-                rendered = format(value, format_spec)
+                rendered = format(
+                    _FORMATTER.convert_field(value, conversion), format_spec
+                )
                 parts.append(
                     NarrationValue(
                         rendered=rendered,

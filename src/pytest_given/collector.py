@@ -16,7 +16,7 @@ from pytest_given.model import (
     Scenario,
     Step,
 )
-from pytest_given.template import NarrationPart, Template
+from pytest_given.template import Narration, Template, narration_from
 
 
 @dataclass(frozen=True)
@@ -89,18 +89,11 @@ class Collector:
         module: str,
         tags: list[str],
     ) -> None:
-        if isinstance(name, Template):
-            name_str = name.template
-            name_parts: list[NarrationPart] | None = list(name.parts)
-        else:
-            name_str = name
-            name_parts = None
         self._current_scenario = Scenario(
             id=scenario_id,
-            name=name_str,
+            narration=narration_from(name),
             module=module,
             tags=tags,
-            name_parts=name_parts,
         )
         self._step_stack = []
         self._state = 'test'
@@ -154,26 +147,27 @@ class Collector:
         """(key, recording) pairs in storage (setup) order."""
         return iter(self._recordings.items())
 
+    def drop_recording(self, key: FixtureInstanceKey) -> None:
+        """Remove a stored recording. Used to bound memory for function-scoped
+        recordings once they've been grafted into their owning scenario."""
+        self._recordings.pop(key, None)
+
     def graft_recording(self, recording: FixtureRecording) -> None:
         """Deep-copy the recording's root into the active scenario's steps."""
         if self._current_scenario is None:
             return
         self._current_scenario.steps.append(copy.deepcopy(recording.root))
 
-    def push_step(
-        self,
-        phase: Phase,
-        text: str,
-        text_parts: list[NarrationPart] | None,
-    ) -> Step:
+    def push_step(self, phase: Phase, narration: Narration) -> Step:
         if self._state == 'idle':
             raise PytestGivenError(
-                f"Cannot record '{phase}: {text}' — no active scenario or fixture."
+                f"Cannot record '{phase}: {narration.text}' — "
+                'no active scenario or fixture.'
             )
         if self._state == 'fixture_teardown':
             raise PytestGivenError(
-                f"Cannot record '{phase}: {text}' from fixture teardown — "
-                'teardown is technical, not narrative.'
+                f"Cannot record '{phase}: {narration.text}' from fixture "
+                'teardown — teardown is technical, not narrative.'
             )
         stack = self._target_stack()
         if stack and stack[-1].phase != phase:
@@ -181,7 +175,7 @@ class Collector:
                 f"Cannot nest '{phase}' inside '{stack[-1].phase}'"
                 ' — restructure your test or use a phase-neutral helper'
             )
-        step = Step(phase=phase, text=text, text_parts=text_parts)
+        step = Step(phase=phase, narration=narration)
         if stack:
             stack[-1].children.append(step)
         elif self._state == 'test' and self._current_scenario is not None:

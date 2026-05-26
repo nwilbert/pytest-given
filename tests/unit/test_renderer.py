@@ -4,6 +4,10 @@ from pathlib import Path
 from pytest_given.renderer import render_html
 
 
+def _narration(text: str, parts: list | None = None) -> dict:
+    return {'text': text, 'parts': parts or []}
+
+
 def test_render_produces_html_file(tmp_path: Path) -> None:
     json_path = tmp_path / 'data.json'
     json_path.write_text(
@@ -41,7 +45,7 @@ def test_render_includes_scenario_data(tmp_path: Path) -> None:
                 'scenarios': [
                     {
                         'id': 'test.py::test_x',
-                        'name': 'My Scenario',
+                        'narration': _narration('My Scenario'),
                         'module': 'test_mod',
                         'tags': ['billing'],
                         'status': 'passed',
@@ -49,7 +53,7 @@ def test_render_includes_scenario_data(tmp_path: Path) -> None:
                         'steps': [
                             {
                                 'phase': 'given',
-                                'text': 'a thing',
+                                'narration': _narration('a thing'),
                                 'status': 'passed',
                                 'children': [],
                                 'attachments': [],
@@ -86,7 +90,7 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
                 'scenarios': [
                     {
                         'id': 'test.py::test_x',
-                        'name': 'Err Scenario',
+                        'narration': _narration('Err Scenario'),
                         'module': 'test_mod',
                         'tags': [],
                         'status': 'failed',
@@ -94,12 +98,12 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
                         'steps': [
                             {
                                 'phase': 'then',
-                                'text': 'check value',
+                                'narration': _narration('check value'),
                                 'status': 'failed',
                                 'children': [
                                     {
                                         'phase': 'then',
-                                        'text': 'nested check',
+                                        'narration': _narration('nested check'),
                                         'status': 'passed',
                                         'children': [],
                                         'attachments': [],
@@ -137,7 +141,7 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
     assert '- 1' in content
 
 
-def test_render_parameterized_step_with_text_parts(tmp_path: Path) -> None:
+def test_render_parameterized_step_with_structured_narration(tmp_path: Path) -> None:
     """Merged parametric step renders placeholder with color span and {name} token."""
     json_path = tmp_path / 'data.json'
     json_path.write_text(
@@ -152,8 +156,7 @@ def test_render_parameterized_step_with_text_parts(tmp_path: Path) -> None:
                 'scenarios': [
                     {
                         'id': 'test.py::test_p',
-                        'name': 'Param scenario',
-                        'name_parts': None,
+                        'narration': _narration('Param scenario'),
                         'module': 'mod',
                         'tags': [],
                         'status': 'passed',
@@ -161,20 +164,22 @@ def test_render_parameterized_step_with_text_parts(tmp_path: Path) -> None:
                         'steps': [
                             {
                                 'phase': 'when',
-                                'text': 'I insert 1 into shop',
+                                'narration': _narration(
+                                    'I insert 1 into shop',
+                                    [
+                                        {'value': 'I insert '},
+                                        {
+                                            'name': 'euros',
+                                            'format_spec': '',
+                                            'conversion': None,
+                                        },
+                                        {'value': ' into shop'},
+                                    ],
+                                ),
                                 'status': 'passed',
                                 'children': [],
                                 'attachments': [],
                                 'error': None,
-                                'text_parts': [
-                                    {'value': 'I insert '},
-                                    {
-                                        'name': 'euros',
-                                        'format_spec': '',
-                                        'conversion': None,
-                                    },
-                                    {'value': ' into shop'},
-                                ],
                             }
                         ],
                         'parameters': {
@@ -227,8 +232,7 @@ def test_render_merged_placeholder_preserves_format_spec_and_conversion(
                 'scenarios': [
                     {
                         'id': 'i',
-                        'name': 'n',
-                        'name_parts': None,
+                        'narration': _narration('n'),
                         'module': 'm',
                         'tags': [],
                         'status': 'passed',
@@ -247,24 +251,26 @@ def test_render_merged_placeholder_preserves_format_spec_and_conversion(
                         'steps': [
                             {
                                 'phase': 'when',
-                                'text': 'x',
+                                'narration': _narration(
+                                    'x',
+                                    [
+                                        {
+                                            'name': 'n',
+                                            'format_spec': '03d',
+                                            'conversion': None,
+                                        },
+                                        {'value': ' '},
+                                        {
+                                            'name': 'obj',
+                                            'format_spec': '',
+                                            'conversion': 'r',
+                                        },
+                                    ],
+                                ),
                                 'status': 'passed',
                                 'children': [],
                                 'attachments': [],
                                 'error': None,
-                                'text_parts': [
-                                    {
-                                        'name': 'n',
-                                        'format_spec': '03d',
-                                        'conversion': None,
-                                    },
-                                    {'value': ' '},
-                                    {
-                                        'name': 'obj',
-                                        'format_spec': '',
-                                        'conversion': 'r',
-                                    },
-                                ],
                             }
                         ],
                     }
@@ -279,7 +285,7 @@ def test_render_merged_placeholder_preserves_format_spec_and_conversion(
     assert '{obj!r}' in content
 
 
-def test_render_plain_str_step_with_no_text_parts_escapes_braces(
+def test_render_plain_str_step_with_empty_parts_escapes_braces(
     tmp_path: Path,
 ) -> None:
     """A plain-string step renders verbatim, with no regex pass over braces."""
@@ -296,8 +302,7 @@ def test_render_plain_str_step_with_no_text_parts_escapes_braces(
                 'scenarios': [
                     {
                         'id': 'i',
-                        'name': 'n',
-                        'name_parts': None,
+                        'narration': _narration('n'),
                         'module': 'm',
                         'tags': [],
                         'status': 'passed',
@@ -307,12 +312,11 @@ def test_render_plain_str_step_with_no_text_parts_escapes_braces(
                         'steps': [
                             {
                                 'phase': 'when',
-                                'text': 'config: {key: value}',
+                                'narration': _narration('config: {key: value}'),
                                 'status': 'passed',
                                 'children': [],
                                 'attachments': [],
                                 'error': None,
-                                'text_parts': None,
                             }
                         ],
                     }
@@ -341,8 +345,7 @@ def test_render_value_part_uses_param_value_class(tmp_path: Path) -> None:
                 'scenarios': [
                     {
                         'id': 'i',
-                        'name': 'n',
-                        'name_parts': None,
+                        'narration': _narration('n'),
                         'module': 'm',
                         'tags': [],
                         'status': 'passed',
@@ -352,20 +355,22 @@ def test_render_value_part_uses_param_value_class(tmp_path: Path) -> None:
                         'steps': [
                             {
                                 'phase': 'when',
-                                'text': 'cost: 12.0',
+                                'narration': _narration(
+                                    'cost: 12.0',
+                                    [
+                                        {'value': 'cost: '},
+                                        {
+                                            'rendered': '12.0',
+                                            'expression': 'price * 1.2',
+                                            'format_spec': '',
+                                            'conversion': None,
+                                        },
+                                    ],
+                                ),
                                 'status': 'passed',
                                 'children': [],
                                 'attachments': [],
                                 'error': None,
-                                'text_parts': [
-                                    {'value': 'cost: '},
-                                    {
-                                        'rendered': '12.0',
-                                        'expression': 'price * 1.2',
-                                        'format_spec': '',
-                                        'conversion': None,
-                                    },
-                                ],
                             }
                         ],
                     }
@@ -420,7 +425,7 @@ def test_render_clickable_tag_badges(tmp_path: Path) -> None:
                 'scenarios': [
                     {
                         'id': 'test.py::test_x',
-                        'name': 'Tagged Scenario',
+                        'narration': _narration('Tagged Scenario'),
                         'module': 'test_mod',
                         'tags': ['billing', 'happy-path'],
                         'status': 'passed',
@@ -456,7 +461,7 @@ def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -
                 'scenarios': [
                     {
                         'id': 'test.py::test_pass',
-                        'name': 'Passing',
+                        'narration': _narration('Passing'),
                         'module': 'mod',
                         'tags': [],
                         'status': 'passed',
@@ -467,7 +472,7 @@ def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -
                     },
                     {
                         'id': 'test.py::test_fail',
-                        'name': 'Failing',
+                        'narration': _narration('Failing'),
                         'module': 'mod',
                         'tags': [],
                         'status': 'failed',

@@ -24,12 +24,12 @@ def test_basic_scenario_generates_json(pytester, tmp_path):
     data = json.loads(json_path.read_text())
     assert len(data['scenarios']) == 1
     s = data['scenarios'][0]
-    assert s['name'] == 'My scenario'
+    assert s['narration']['text'] == 'My scenario'
     assert s['tags'] == ['smoke']
     assert s['status'] == 'passed'
     assert len(s['steps']) == 3
     assert s['steps'][0]['phase'] == 'given'
-    assert s['steps'][0]['text'] == 'a value'
+    assert s['steps'][0]['narration']['text'] == 'a value'
 
 
 def test_nested_steps(pytester, tmp_path):
@@ -51,9 +51,9 @@ def test_nested_steps(pytester, tmp_path):
     data = json.loads(json_path.read_text())
     steps = data['scenarios'][0]['steps']
     assert len(steps) == 1
-    assert steps[0]['text'] == 'outer'
+    assert steps[0]['narration']['text'] == 'outer'
     assert len(steps[0]['children']) == 1
-    assert steps[0]['children'][0]['text'] == 'inner'
+    assert steps[0]['children'][0]['narration']['text'] == 'inner'
 
 
 def test_failed_scenario(pytester, tmp_path):
@@ -137,7 +137,7 @@ def test_step_fixture_appears_as_given_step(pytester, tmp_path):
     data = json.loads(json_path.read_text())
     steps = data['scenarios'][0]['steps']
     assert steps[0]['phase'] == 'given'
-    assert steps[0]['text'] == 'a prepared value'
+    assert steps[0]['narration']['text'] == 'a prepared value'
 
 
 def test_parameterized_test_as_table(pytester, tmp_path):
@@ -163,18 +163,18 @@ def test_parameterized_test_as_table(pytester, tmp_path):
     # Parameterized tests are grouped into one scenario with a parameter table
     assert len(data['scenarios']) == 1
     s = data['scenarios'][0]
-    assert s['name'] == 'Param test'
+    assert s['narration']['text'] == 'Param test'
     assert s['parameters'] is not None
     assert s['parameters']['names'] == ['a', 'b', 'expected']
     assert len(s['parameters']['cases']) == 2
     assert s['parameters']['cases'][0]['values'] == [1, 2, 3]
     assert s['parameters']['cases'][0]['status'] == 'passed'
     assert s['parameters']['cases'][1]['values'] == [2, 3, 5]
-    # The merged step's text_parts carry placeholders for matching param names.
-    given_parts = s['steps'][0]['text_parts']
+    # The merged step's narration parts carry placeholders for matching param names.
+    given_parts = s['steps'][0]['narration']['parts']
     placeholder_names = [p['name'] for p in given_parts if 'name' in p]
     assert placeholder_names == ['a', 'b']
-    then_parts = s['steps'][1]['text_parts']
+    then_parts = s['steps'][1]['narration']['parts']
     then_placeholders = [p['name'] for p in then_parts if 'name' in p]
     assert then_placeholders == ['expected']
 
@@ -245,7 +245,7 @@ def test_full_html_report_generation(pytester, tmp_path):
     # Verify JSON structure
     data = json.loads(json_path.read_text())
     assert len(data['scenarios']) == 2
-    names = {s['name'] for s in data['scenarios']}
+    names = {s['narration']['text'] for s in data['scenarios']}
     assert names == {'Basic addition', 'Failing test'}
 
     # Verify HTML content
@@ -301,10 +301,10 @@ def test_with_given_inside_fixture_body_is_captured(pytester, tmp_path):
     result.assert_outcomes(passed=1)
     data = json.loads(json_path.read_text())
     steps = data['scenarios'][0]['steps']
-    assert steps[0]['text'] == 'a shop'
+    assert steps[0]['narration']['text'] == 'a shop'
     assert len(steps[0]['children']) == 1
-    assert steps[0]['children'][0]['text'] == 'with 3 items'
-    assert steps[1]['text'] == 'items == 3'
+    assert steps[0]['children'][0]['narration']['text'] == 'with 3 items'
+    assert steps[1]['narration']['text'] == 'items == 3'
 
 
 def test_given_in_fixture_teardown_raises(pytester, tmp_path):
@@ -434,11 +434,11 @@ def test_session_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
     result = pytester.runpytest(f'--given-json={json_path}')
     result.assert_outcomes(passed=2)
     data = json.loads(json_path.read_text())
-    scenarios = {s['name']: s for s in data['scenarios']}
+    scenarios = {s['narration']['text']: s for s in data['scenarios']}
     for name in ('First consumer', 'Second consumer'):
         steps = scenarios[name]['steps']
-        assert steps[0]['text'] == 'a database'
-        assert steps[0]['children'][0]['text'] == 'seeded with 2 users'
+        assert steps[0]['narration']['text'] == 'a database'
+        assert steps[0]['children'][0]['narration']['text'] == 'seeded with 2 users'
 
 
 def test_module_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
@@ -470,7 +470,7 @@ def test_module_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
     result.assert_outcomes(passed=2)
     data = json.loads(json_path.read_text())
     for s in data['scenarios']:
-        assert s['steps'][0]['children'][0]['text'] == 'with credentials'
+        assert s['steps'][0]['children'][0]['narration']['text'] == 'with credentials'
 
 
 def test_class_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
@@ -503,7 +503,7 @@ def test_class_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
     result.assert_outcomes(passed=2)
     data = json.loads(json_path.read_text())
     for s in data['scenarios']:
-        assert s['steps'][0]['children'][0]['text'] == 'navigated to /'
+        assert s['steps'][0]['children'][0]['narration']['text'] == 'navigated to /'
 
 
 def test_nested_step_fixtures_appear_as_siblings(pytester, tmp_path):
@@ -538,15 +538,17 @@ def test_nested_step_fixtures_appear_as_siblings(pytester, tmp_path):
     result.assert_outcomes(passed=1)
     data = json.loads(json_path.read_text())
     steps = data['scenarios'][0]['steps']
-    top_texts = [s['text'] for s in steps]
+    top_texts = [s['narration']['text'] for s in steps]
     assert 'a database' in top_texts
     assert 'an authenticated user' in top_texts
     # `db` is set up before `user`, so its recording grafts first.
     assert top_texts.index('a database') < top_texts.index('an authenticated user')
-    db_step = next(s for s in steps if s['text'] == 'a database')
-    user_step = next(s for s in steps if s['text'] == 'an authenticated user')
-    assert db_step['children'][0]['text'] == 'seeded'
-    assert user_step['children'][0]['text'] == 'with admin role'
+    db_step = next(s for s in steps if s['narration']['text'] == 'a database')
+    user_step = next(
+        s for s in steps if s['narration']['text'] == 'an authenticated user'
+    )
+    assert db_step['children'][0]['narration']['text'] == 'seeded'
+    assert user_step['children'][0]['narration']['text'] == 'with admin role'
 
 
 def test_tstring_in_non_parametrized_scenario_renders_value_with_no_placeholder(
@@ -568,8 +570,8 @@ def test_tstring_in_non_parametrized_scenario_renders_value_with_no_placeholder(
     result.assert_outcomes(passed=1)
     data = json.loads(json_path.read_text())
     step = data['scenarios'][0]['steps'][0]
-    assert step['text'] == 'a 200 ml cup'
-    parts = step['text_parts']
+    assert step['narration']['text'] == 'a 200 ml cup'
+    parts = step['narration']['parts']
     # Three parts: literal / value / literal — value preserved (no parametrize match)
     assert len(parts) == 3
     assert parts[1].get('rendered') == '200'
@@ -593,7 +595,7 @@ def test_tstring_expression_not_a_param_stays_as_value(pytester, tmp_path):
     result = pytester.runpytest(f'--given-json={json_path}')
     result.assert_outcomes(passed=2)
     data = json.loads(json_path.read_text())
-    parts = data['scenarios'][0]['steps'][0]['text_parts']
+    parts = data['scenarios'][0]['steps'][0]['narration']['parts']
     # Expression doesn't match any param name → stays as a value, not a placeholder
     val_parts = [p for p in parts if 'rendered' in p]
     assert len(val_parts) == 1
@@ -618,7 +620,7 @@ def test_tstring_same_value_different_names_disambiguates(pytester, tmp_path):
     result = pytester.runpytest(f'--given-json={json_path}')
     result.assert_outcomes(passed=1)
     data = json.loads(json_path.read_text())
-    parts = data['scenarios'][0]['steps'][0]['text_parts']
+    parts = data['scenarios'][0]['steps'][0]['narration']['parts']
     placeholder_names = [p['name'] for p in parts if 'name' in p]
     assert placeholder_names == ['cup_size', 'beans_g']
 
@@ -643,8 +645,8 @@ def test_scenario_with_template_name_merges_and_renders(pytester, tmp_path):
     # All cases share the Template's raw text as merge key → one scenario
     assert len(data['scenarios']) == 1
     s = data['scenarios'][0]
-    assert s['name'] == 'Brew {cup_size} ml'
-    assert s['name_parts'] is not None
+    assert s['narration']['text'] == 'Brew {cup_size} ml'
+    assert s['narration']['parts'] != []
     assert s['parameters']['names'] == ['cup_size']
     assert [c['values'] for c in s['parameters']['cases']] == [[200], [300]]
 
@@ -719,8 +721,8 @@ def test_static_str_with_literal_braces_renders_verbatim(pytester, tmp_path):
     result.assert_outcomes(passed=1)
     data = json.loads(json_path.read_text())
     step = data['scenarios'][0]['steps'][0]
-    assert step['text'] == 'config: {key: value}'
-    assert step['text_parts'] is None
+    assert step['narration']['text'] == 'config: {key: value}'
+    assert step['narration']['parts'] == []
 
 
 def test_template_in_scenario_without_parametrize_raises_at_collection(

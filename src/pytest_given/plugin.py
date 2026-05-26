@@ -33,6 +33,7 @@ from pytest_given.model import (
     Step,
 )
 from pytest_given.template import (
+    Narration,
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
@@ -161,7 +162,7 @@ def pytest_fixture_setup(
         yield
         return
     _ensure_teardown_wrapped(fixturedef)
-    recording = FixtureRecording(root=Step(phase=desc.phase, text=desc.text))
+    recording = FixtureRecording(root=Step(phase=desc.phase, narration=desc.narration))
     token = collector.enter_fixture_setup(recording)
     try:
         yield
@@ -223,10 +224,16 @@ def _get_scenario_marker(item: pytest.Item) -> Any | None:
 
 
 def _graft_fixture_recordings(item: pytest.Item) -> None:
-    """Graft this item's step-fixture recordings in setup order."""
+    """Graft this item's step-fixture recordings in setup order.
+
+    `collector._recordings` is insertion-ordered by setup time, so iterating it
+    preserves narrative order even when `item.fixturenames` lists dependents
+    before their dependencies. Function-scoped recordings are dropped after
+    grafting so the dict doesn't grow unboundedly across the session.
+    """
     assert hasattr(item, 'fixturenames'), f'expected fixturenames on {item!r}'
     fm = item.session._fixturemanager
-    expected: set[FixtureInstanceKey] = set()
+    expected: dict[FixtureInstanceKey, str] = {}
     for name in item.fixturenames:
         defs = fm.getfixturedefs(name, item)
         if not defs:
@@ -236,10 +243,16 @@ def _graft_fixture_recordings(item: pytest.Item) -> None:
             continue
         if fixturedef.cached_result is None:
             continue
-        expected.add((id(fixturedef), fixturedef.cached_result[1]))
+        key: FixtureInstanceKey = (id(fixturedef), fixturedef.cached_result[1])
+        expected[key] = fixturedef.scope
+    to_drop: list[FixtureInstanceKey] = []
     for key, recording in collector.recordings():
         if key in expected:
             collector.graft_recording(recording)
+            if expected[key] == 'function':
+                to_drop.append(key)
+    for key in to_drop:
+        collector.drop_recording(key)
 
 
 @pytest.hookimpl(trylast=True)
@@ -312,7 +325,7 @@ def _group_parameterized(
 
     for scenario in scenarios:
         if scenario.id in param_info:
-            key = (scenario.name, scenario.module)
+            key = (scenario.narration.text, scenario.module)
             if key not in groups:
                 groups[key] = []
                 group_order.append(key)
@@ -326,7 +339,7 @@ def _group_parameterized(
         param_names, _ = param_info[first.id]
 
         template_steps = _templatize_steps(first.steps, param_names)
-        merged_name_parts = _templatize_parts(first.name_parts, param_names)
+        merged_narration = _templatize_narration(first.narration, param_names)
 
         cases: list[ParameterCase] = []
         any_failed = False
@@ -346,14 +359,13 @@ def _group_parameterized(
 
         merged = Scenario(
             id=first.id,
-            name=first.name,
+            narration=merged_narration,
             module=first.module,
             tags=first.tags,
             status='failed' if any_failed else 'passed',
             duration_ms=total_duration,
             steps=template_steps,
             parameters=ParameterTable(names=param_names, cases=cases),
-            name_parts=merged_name_parts,
         )
         result.append(merged)
 
@@ -364,21 +376,21 @@ def _templatize_steps(
     steps: list[Step],
     param_names: list[str],
 ) -> list[Step]:
-    """Walk steps and templatize their structured text_parts."""
+    """Walk steps and templatize their narration."""
     result: list[Step] = []
     for step in steps:
-        new_parts = _templatize_parts(step.text_parts, param_names)
+        new_narration = _templatize_narration(step.narration, param_names)
         new_children = _templatize_steps(step.children, param_names)
         result.append(
-            dataclasses.replace(step, text_parts=new_parts, children=new_children)
+            dataclasses.replace(step, narration=new_narration, children=new_children)
         )
     return result
 
 
-def _templatize_parts(
-    parts: list[NarrationPart] | None,
+def _templatize_narration(
+    narration: Narration,
     param_names: list[str],
-) -> list[NarrationPart] | None:
+) -> Narration:
     """Convert matching NarrationValue entries to NarrationPlaceholder.
 
     NarrationLiteral parts pass through unchanged. A NarrationValue whose
@@ -386,10 +398,10 @@ def _templatize_parts(
     otherwise it stays verbatim (the rendered value is shared across cases).
     A NarrationPlaceholder must reference a known parametrize column.
     """
-    if parts is None:
-        return None
+    if not narration.parts:
+        return narration
     out: list[NarrationPart] = []
-    for part in parts:
+    for part in narration.parts:
         match part:
             case NarrationLiteral():
                 out.append(part)
@@ -412,4 +424,4 @@ def _templatize_parts(
                         f'{sorted(param_names)}).'
                     )
                 out.append(part)
-    return out
+    return dataclasses.replace(narration, parts=out)

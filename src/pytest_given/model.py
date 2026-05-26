@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any, Literal, NamedTuple, NewType
 
-from pytest_given.template import NarrationPart
+from pytest_given.template import Narration
 
 # Pytest node ID, e.g. "tests/test_billing.py::test_buy_coffee[1-2-3]"
 NodeId = NewType('NodeId', str)
@@ -46,12 +46,11 @@ class ErrorInfo:
 @dataclass
 class Step:
     phase: Phase
-    text: str
+    narration: Narration
     status: str = 'passed'
     children: list[Step] = field(default_factory=list)
     attachments: list[Attachment] = field(default_factory=list)
     error: ErrorInfo | None = None
-    text_parts: list[NarrationPart] | None = None
 
 
 @dataclass
@@ -88,7 +87,7 @@ class ParameterTable:
 @dataclass
 class Scenario:
     id: NodeId
-    name: str
+    narration: Narration
     module: str
     tags: list[str] = field(default_factory=list)
     status: str = 'passed'
@@ -96,7 +95,6 @@ class Scenario:
     steps: list[Step] = field(default_factory=list)
     parameters: ParameterTable | None = None
     error: ErrorInfo | None = None
-    name_parts: list[NarrationPart] | None = None
 
 
 @dataclass

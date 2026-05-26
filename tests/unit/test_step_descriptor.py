@@ -4,14 +4,14 @@ from pytest_given import Template
 from pytest_given.collector import Collector, set_active_collector
 from pytest_given.decorators import StepDescriptor, attach, given, scenario, then, when
 from pytest_given.errors import PytestGivenError
-from pytest_given.template import NarrationLiteral, NarrationValue
+from pytest_given.template import Narration, NarrationLiteral, NarrationValue
 
 
 def test_context_manager_basic() -> None:
-    """StepDescriptor exposes phase and text attributes."""
+    """StepDescriptor exposes phase and narration attributes."""
     desc = StepDescriptor('given', 'a coffee machine')
     assert desc.phase == 'given'
-    assert desc.text == 'a coffee machine'
+    assert desc.narration.text == 'a coffee machine'
 
 
 def test_decorator_basic() -> None:
@@ -24,7 +24,7 @@ def test_decorator_basic() -> None:
 
     assert insert_money() == 'done'
     assert hasattr(insert_money, '_step_descriptor')
-    assert insert_money._step_descriptor.text == 'inserting money'
+    assert insert_money._step_descriptor.narration.text == 'inserting money'
 
 
 def test_decorator_preserves_function_metadata() -> None:
@@ -49,7 +49,7 @@ def test_context_manager_records_step_in_collector() -> None:
             pass
         scenario = collector.finish_scenario(status='passed', duration_ms=0)
         assert len(scenario.steps) == 1
-        assert scenario.steps[0].text == 'a coffee machine'
+        assert scenario.steps[0].narration.text == 'a coffee machine'
     finally:
         set_active_collector(None)
 
@@ -111,7 +111,7 @@ def test_attach_unannotated_test_warns_instead_of_raises() -> None:
 def test_attach_non_string_content_serializes_as_json() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('given', 'a step', None)
+    collector.push_step('given', Narration(text='a step'))
     set_active_collector(collector)
     try:
         attach('payload', {'a': 1, 'b': [2, 3]})
@@ -127,10 +127,10 @@ def test_attach_non_string_content_serializes_as_json() -> None:
     assert '3' in att.content
 
 
-def test_step_descriptor_with_plain_str_has_no_text_parts() -> None:
+def test_step_descriptor_with_plain_str_has_empty_narration_parts() -> None:
     desc = StepDescriptor('given', 'a thing')
-    assert desc.text == 'a thing'
-    assert desc.text_parts is None
+    assert desc.narration.text == 'a thing'
+    assert desc.narration.parts == []
 
 
 def test_step_descriptor_decorator_on_fixture_rejects_structured_text() -> None:
@@ -166,7 +166,7 @@ def test_scenario_with_tstring_raises() -> None:
 def test_attach_with_tstring_label_renders_eagerly() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('given', 'a step', None)
+    collector.push_step('given', Narration(text='a step'))
     set_active_collector(collector)
     try:
         size = 200
@@ -184,19 +184,19 @@ def test_attach_with_pytest_given_template_raises() -> None:
         attach(Template('cup {size}'), 'content')
 
 
-def test_step_descriptor_with_tstring_no_interpolations_still_has_text_parts() -> None:
-    """A t-string with only literal text produces structured parts — text_parts
-    is present iff the author used a t-string, not iff the text was dynamic."""
+def test_step_descriptor_with_tstring_no_interpolations_still_has_parts() -> None:
+    """A t-string with only literal text produces structured parts — parts is
+    non-empty iff the author used a t-string, not iff the text was dynamic."""
     desc = given(t'just a label')
-    assert desc.text == 'just a label'
-    assert desc.text_parts == [NarrationLiteral(value='just a label')]
+    assert desc.narration.text == 'just a label'
+    assert desc.narration.parts == [NarrationLiteral(value='just a label')]
 
 
 def test_step_descriptor_with_tstring_records_rendered_text_and_parts() -> None:
     cup_size = 200
     desc = given(t'a {cup_size} ml cup')
-    assert desc.text == 'a 200 ml cup'
-    assert desc.text_parts == [
+    assert desc.narration.text == 'a 200 ml cup'
+    assert desc.narration.parts == [
         NarrationLiteral(value='a '),
         NarrationValue(
             rendered='200',

@@ -27,7 +27,6 @@ def render_html(json_path: Path, html_path: Path) -> None:
         autoescape=True,
     )
 
-    # Build param color map from all parameterized scenarios
     param_color_map: ParamColorMap = {}
     color_idx = 0
     for scenario in data['scenarios']:
@@ -38,8 +37,7 @@ def render_html(json_path: Path, html_path: Path) -> None:
                     param_color_map[name] = color_idx
                     color_idx += 1
 
-    env.filters['step_text'] = _make_step_text_filter(param_color_map)
-    env.filters['scenario_name'] = _make_scenario_name_filter(param_color_map)
+    env.filters['narration'] = _make_narration_filter(param_color_map)
     template = env.get_template('report.html.j2')
     html = template.render(
         metadata=data['metadata'],
@@ -55,25 +53,24 @@ def render_html(json_path: Path, html_path: Path) -> None:
     html_path.write_text(html, encoding='utf-8')
 
 
-def _make_step_text_filter(
+def _make_narration_filter(
     color_map: ParamColorMap,
 ) -> Callable[[dict[str, Any]], Markup]:
-    """Filter usage: `{{ step | step_text }}`.
+    """Filter usage: `{{ step.narration | narration }}` or
+    `{{ scenario.narration | narration }}`.
 
-    `step` is a dict with `text` and `text_parts` keys. Dispatches on
-    `text_parts`:
-    - None → render `text` HTML-escaped.
-    - Each part is identified by key presence:
-        - `value` → NarrationLiteral
-        - `rendered` → NarrationValue (.param-value highlight)
-        - `name` → NarrationPlaceholder (color-coded `{name}` token)
+    The narration dict has `text` (plain rendering) and `parts` (a list of
+    serialized NarrationPart variants). Empty `parts` → escape `text` and emit.
+    Otherwise each part is identified by its unique key:
+      - `value` → NarrationLiteral
+      - `rendered` → NarrationValue (.param-value highlight)
+      - `name` → NarrationPlaceholder (color-coded `{name}` token)
     """
 
-    def _render(node: dict[str, Any]) -> Markup:
-        text = node.get('text', '')
-        parts = node.get('text_parts')
-        if parts is None:
-            return Markup(str(escape(text)))
+    def _render(narration: dict[str, Any]) -> Markup:
+        parts = narration.get('parts') or []
+        if not parts:
+            return Markup(str(escape(narration.get('text', ''))))
         out: list[str] = []
         for part in parts:
             if 'value' in part:
@@ -105,23 +102,3 @@ def _placeholder_token(part: dict[str, Any]) -> str:
     if spec:
         inner += ':' + spec
     return '{' + inner + '}'
-
-
-def _make_scenario_name_filter(
-    color_map: ParamColorMap,
-) -> Callable[[dict[str, Any]], Markup]:
-    """Filter usage: `{{ scenario | scenario_name }}`.
-
-    Adapts `name`/`name_parts` to the step_text input shape so the same
-    dispatch logic applies.
-    """
-    inner = _make_step_text_filter(color_map)
-
-    def _render(scenario: dict[str, Any]) -> Markup:
-        adapter = {
-            'text': scenario.get('name', ''),
-            'text_parts': scenario.get('name_parts'),
-        }
-        return inner(adapter)
-
-    return _render

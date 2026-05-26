@@ -11,7 +11,7 @@ import pytest
 from pytest_given.collector import get_active_collector
 from pytest_given.errors import PytestGivenError
 from pytest_given.model import Phase
-from pytest_given.template import NarrationPart, Template, parse_tstring
+from pytest_given.template import Narration, Template, narration_from
 
 
 class StepDescriptor:
@@ -33,30 +33,24 @@ class StepDescriptor:
         text: str | templatelib.Template,
     ) -> None:
         self.phase = phase
-        if isinstance(text, templatelib.Template):
-            rendered, parts = parse_tstring(text)
-            self.text: str = rendered
-            self.text_parts: list[NarrationPart] | None = parts
-        else:
-            self.text = text
-            self.text_parts = None
+        self.narration: Narration = narration_from(text)
 
     def __enter__(self) -> Self:
         collector = get_active_collector()
         if collector is None or collector.state == 'idle':
             if collector is not None and collector.inside_unannotated_test:
                 warnings.warn(
-                    f"'{self.phase}: {self.text}' recorded in a test without "
-                    '@scenario — step will not appear in the report.',
+                    f"'{self.phase}: {self.narration.text}' recorded in a test "
+                    'without @scenario — step will not appear in the report.',
                     pytest.PytestWarning,
                     stacklevel=2,
                 )
                 return self
             raise PytestGivenError(
-                f"Cannot enter '{self.phase}: {self.text}' — "
+                f"Cannot enter '{self.phase}: {self.narration.text}' — "
                 'no active scenario or fixture.'
             )
-        collector.push_step(self.phase, self.text, self.text_parts)
+        collector.push_step(self.phase, self.narration)
         return self
 
     def __exit__(
@@ -71,7 +65,7 @@ class StepDescriptor:
         collector.pop_step()
 
     def __call__(self, func: Any) -> Any:
-        if self.text_parts is not None:
+        if self.narration.parts:
             raise PytestGivenError(
                 "@given(t'...') / @given(Template(...)) is not allowed on a "
                 "fixture; the fixture's argument values aren't in scope at "
@@ -152,7 +146,7 @@ def attach(label: str | templatelib.Template, content: object) -> None:
             'or a plain string.'
         )
     if isinstance(label, templatelib.Template):
-        label, _ = parse_tstring(label)
+        label = narration_from(label).text
     collector = get_active_collector()
     if collector is None or collector.state == 'idle':
         if collector is not None and collector.inside_unannotated_test:
