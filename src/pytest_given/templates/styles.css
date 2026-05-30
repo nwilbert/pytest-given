@@ -381,4 +381,4 @@ body {
 .param-color-3, th.param-color-3 { color: #ca8a04; font-weight: 600; }
 .param-color-4, th.param-color-4 { color: #7c3aed; font-weight: 600; }
 .param-color-5, th.param-color-5 { color: #e85d04; font-weight: 600; }
-.param-value { color: var(--text-secondary); font-weight: 500; }
+.param-value { color: var(--text-primary); font-weight: 700; }

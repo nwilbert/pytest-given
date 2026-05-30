@@ -134,13 +134,11 @@ def test_brew(cup_size):
 
 #### Step text & placeholders
 
-Three authoring forms, one `{...}` placeholder syntax, no regex special case:
-
-| Context | Form | Effect |
+| Form | Example | How it renders |
 |---|---|---|
-| Test body, values in scope | `with given(t'a {cup_size} cup')` | Eager t-string interpolation; value color-coded when the interpolation expression matches a parametrize column, otherwise neutrally highlighted. |
-| `@scenario(name)` | `@scenario(Template('Brew {cup_size} ml'))` | Deferred substitution at report time. Unmatched placeholders raise `PytestGivenError` at collection. |
-| Static label | `with given('static text')` | Literal — braces are braces. No regex pass. |
+| Plain string (including f-strings) | `with given('a cup')` <br> `with given(f'a {cup_size} cup')` | Rendered verbatim. F-string interpolation happens before pytest-given runs, so values aren't highlighted. |
+| T-string | `with given(t'a {cup_size} cup')` | pytest-given interpolates at runtime. Values are color-coded when the interpolation expression matches a parametrize column; otherwise highlighted neutrally. |
+| `Template` (currently only in `@scenario(...)`) | `@scenario(Template('Brew {cup_size} ml'))` | Deferred substitution against parametrize columns at report time. Unmatched placeholders raise `PytestGivenError` at collection. |
 
 Three things worth knowing:
 
@@ -148,7 +146,7 @@ Three things worth knowing:
 
 2. **`Template` is for `@scenario(...)`, not test bodies.** In a test body, values are in scope — use a t-string. `given(Template(...))` / `when(Template(...))` / `then(Template(...))` raise `PytestGivenError`. T-strings in `@scenario(...)` are rejected for the symmetric reason: parametrize columns aren't in scope at module-import time.
 
-3. **First case is the template (parametrized scenarios).** The merged report shows case 1's step structure for all rows of the parameter table. Correct for the common pattern (every case runs the same code, only values differ). **Misleading** when the narration *structure* varies per case — e.g., a conditional `with given(t'...')` inside a parametrized test will only show case 1's branch. Workarounds: split into separate `@scenario` tests, or parametrize by a column whose value *is* the variant (e.g., `parametrize('case_label', ['small', 'big'])` and `t'{case_label}: ...'`).
+3. **Parametrized scenarios use the first case's steps as the template.** All rows of the parameter table share the step structure recorded by case 1, with values substituted per row. That's the right behaviour when every case runs the same code with different values — and misleading when the steps themselves vary, e.g. a conditional `with given(t'...')` will only show case 1's branch. If steps diverge per case, split into separate `@scenario` tests.
 
 ### `attach(label, content)`
 
@@ -185,6 +183,7 @@ See [`examples/test_examples.py`](examples/test_examples.py) for a tour of every
 - Generator fixtures with teardown
 - Plain text and JSON attachments
 - Parameterized tests rendered as parameter tables
+- T-string interpolation of non-parametrize values (neutral highlight)
 - Helper functions that record their own steps
 - Top-level `given` blocks and deeply nested steps
 - Failure rendering

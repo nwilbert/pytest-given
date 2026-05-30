@@ -388,7 +388,7 @@ body {
 .param-color-3, th.param-color-3 { color: #ca8a04; font-weight: 600; }
 .param-color-4, th.param-color-4 { color: #7c3aed; font-weight: 600; }
 .param-color-5, th.param-color-5 { color: #e85d04; font-weight: 600; }
-.param-value { color: var(--text-secondary); font-weight: 500; }
+.param-value { color: var(--text-primary); font-weight: 700; }
 
 </style>
 </head>
@@ -571,9 +571,7 @@ Total:        $2.00</pre></div>
     <div class="scenario-header" @click="toggleScenario(3)">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span>
-        <span class="scenario-name">Helper functions can record their own steps</span>
-        
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        <span class="scenario-name">T-string with a non-parametrize value (neutral highlight)</span>
         
       </div>
       <span class="scenario-meta">
@@ -588,21 +586,12 @@ Total:        $2.00</pre></div>
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I insert $2</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the coin is accepted</div>
           </div><div class="phase-steps">
-            <div class="step-text"><span class="step-toggle" @click="toggleStep('s3_3')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s3_3'] }"></span>
-        a coffee is dispensed
-      </span></div><div class="step-children" x-show="expandedSteps['s3_3']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the machine state is consistent</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s3_3_0_att_0')">📎 Final state</span>
-      <div class="attachment-content" x-show="expandedAttachments['s3_3_0_att_0']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{
-  &#34;coffees&#34;: 9,
-  &#34;price&#34;: 2
-}</pre></div>
-    </div></div>
+            <div class="step-text">I have some coins in hand</div>
+          </div><div class="phase-label">When</div><div class="phase-steps">
+            <div class="step-text">I insert $<span class="param-value">5</span></div>
+          </div><div class="phase-label">Then</div><div class="phase-steps">
+            <div class="step-text">the machine has <span class="param-value">9</span> coffees left</div>
           </div></div>
 
       
@@ -617,7 +606,7 @@ Total:        $2.00</pre></div>
     <div class="scenario-header" @click="toggleScenario(4)">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[4] }"></span>
-        <span class="scenario-name">Top-level `given` block and deeply nested steps</span>
+        <span class="scenario-name">Helper functions can record their own steps</span>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
@@ -634,33 +623,79 @@ Total:        $2.00</pre></div>
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
+          </div><div class="phase-label">When</div><div class="phase-steps">
+            <div class="step-text">I insert $2</div>
+          </div><div class="phase-label">Then</div><div class="phase-steps">
+            <div class="step-text">the coin is accepted</div>
+          </div><div class="phase-steps">
+            <div class="step-text"><span class="step-toggle" @click="toggleStep('s4_3')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s4_3'] }"></span>
+        a coffee is dispensed
+      </span></div><div class="step-children" x-show="expandedSteps['s4_3']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the machine state is consistent</div><div>
+      <span class="attachment-badge" @click="toggleAttachment('s4_3_0_att_0')">📎 Final state</span>
+      <div class="attachment-content" x-show="expandedAttachments['s4_3_0_att_0']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{
+  &#34;coffees&#34;: 9,
+  &#34;price&#34;: 2
+}</pre></div>
+    </div></div>
+          </div></div>
+
+      
+
+      
+    </div>
+  </div>
+  <div class="scenario passed"
+       x-show="isVisible(5)"
+       :id="'scenario-' + 5"
+       :class="{ 'scenario-expanded': expandedScenarios[5] }">
+    <div class="scenario-header" @click="toggleScenario(5)">
+      <div style="display:flex; align-items:center;">
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[5] }"></span>
+        <span class="scenario-name">Top-level `given` block and deeply nested steps</span>
+        
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        
+      </div>
+      <span class="scenario-meta">
+        <span class="scenario-status passed">
+          ✓ passed
+        </span>
+        <span class="scenario-duration">0ms</span>
+      </span>
+    </div>
+
+    <div x-show="expandedScenarios[5]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+      
+      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
+            <div class="step-text">a coffee machine</div>
           </div><div class="phase-steps">
             <div class="step-text">a loyalty card with 5 points</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="step-toggle" @click="toggleStep('s4_2')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s4_2'] }"></span>
+            <div class="step-text"><span class="step-toggle" @click="toggleStep('s5_2')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s5_2'] }"></span>
         I place a large order
-      </span></div><div class="step-children" x-show="expandedSteps['s4_2']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">I select 3 coffees</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s4_2_1')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s4_2_1'] }"></span>
+      </span></div><div class="step-children" x-show="expandedSteps['s5_2']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">I select 3 coffees</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s5_2_1')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s5_2_1'] }"></span>
         I apply loyalty discount
-      </span></div><div class="step-children" x-show="expandedSteps['s4_2_1']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the loyalty card is validated</div><div class="step-text">the discount is calculated</div></div></div>
+      </span></div><div class="step-children" x-show="expandedSteps['s5_2_1']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the loyalty card is validated</div><div class="step-text">the discount is calculated</div></div></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text"><span class="step-toggle" @click="toggleStep('s4_3')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s4_3'] }"></span>
+            <div class="step-text"><span class="step-toggle" @click="toggleStep('s5_3')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s5_3'] }"></span>
         the order is processed correctly
-      </span></div><div class="step-children" x-show="expandedSteps['s4_3']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the coffee count is updated</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s4_3_1')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s4_3_1'] }"></span>
+      </span></div><div class="step-children" x-show="expandedSteps['s5_3']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the coffee count is updated</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s5_3_1')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s5_3_1'] }"></span>
         the loyalty points are deducted
-      </span></div><div class="step-children" x-show="expandedSteps['s4_3_1']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the remaining points are valid</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s4_3_1_0_att_0')">📎 Loyalty state</span>
-      <div class="attachment-content" x-show="expandedAttachments['s4_3_1_0_att_0']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{
+      </span></div><div class="step-children" x-show="expandedSteps['s5_3_1']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the remaining points are valid</div><div>
+      <span class="attachment-badge" @click="toggleAttachment('s5_3_1_0_att_0')">📎 Loyalty state</span>
+      <div class="attachment-content" x-show="expandedAttachments['s5_3_1_0_att_0']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{
   &#34;points&#34;: 2
 }</pre></div>
     </div></div></div>
           </div><div class="phase-steps">
             <div class="step-text">the machine state is consistent</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s4_4_att_0')">📎 Final machine state</span>
-      <div class="attachment-content" x-show="expandedAttachments['s4_4_att_0']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{
+      <span class="attachment-badge" @click="toggleAttachment('s5_4_att_0')">📎 Final machine state</span>
+      <div class="attachment-content" x-show="expandedAttachments['s5_4_att_0']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{
   &#34;coffees&#34;: 7,
   &#34;price&#34;: 2
 }</pre></div>
@@ -673,12 +708,12 @@ Total:        $2.00</pre></div>
     </div>
   </div>
   <div class="scenario failed"
-       x-show="isVisible(5)"
-       :id="'scenario-' + 5"
-       :class="{ 'scenario-expanded': expandedScenarios[5] }">
-    <div class="scenario-header" @click="toggleScenario(5)">
+       x-show="isVisible(6)"
+       :id="'scenario-' + 6"
+       :class="{ 'scenario-expanded': expandedScenarios[6] }">
+    <div class="scenario-header" @click="toggleScenario(6)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[5] }"></span>
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[6] }"></span>
         <span class="scenario-name">Failure rendering (intentionally failing)</span>
         
       </div>
@@ -686,11 +721,11 @@ Total:        $2.00</pre></div>
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">87ms</span>
+        <span class="scenario-duration">84ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[5]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div x-show="expandedScenarios[6]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
@@ -739,7 +774,7 @@ Total:        $2.00</pre></div>
 src\pytest_given\decorators.py:102: in wrapper
     return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^
-examples\test_examples.py:133: in test_failing
+examples\test_examples.py:143: in test_failing
     assert machine[&#39;coffees&#39;] == 20
 E   assert 10 == 20</pre>
       </div>
@@ -747,12 +782,12 @@ E   assert 10 == 20</pre>
     </div>
   </div>
   <div class="scenario skipped"
-       x-show="isVisible(6)"
-       :id="'scenario-' + 6"
-       :class="{ 'scenario-expanded': expandedScenarios[6] }">
-    <div class="scenario-header" @click="toggleScenario(6)">
+       x-show="isVisible(7)"
+       :id="'scenario-' + 7"
+       :class="{ 'scenario-expanded': expandedScenarios[7] }">
+    <div class="scenario-header" @click="toggleScenario(7)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[6] }"></span>
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[7] }"></span>
         <span class="scenario-name">Skipped scenario rendering</span>
         
       </div>
@@ -764,7 +799,7 @@ E   assert 10 == 20</pre>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[6]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div x-show="expandedScenarios[7]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
       
       <div class="skip-reason">
         <span class="skip-reason-label">Skipped:</span>
@@ -779,12 +814,12 @@ E   assert 10 == 20</pre>
     </div>
   </div>
   <div class="scenario passed"
-       x-show="isVisible(7)"
-       :id="'scenario-' + 7"
-       :class="{ 'scenario-expanded': expandedScenarios[7] }">
-    <div class="scenario-header" @click="toggleScenario(7)">
+       x-show="isVisible(8)"
+       :id="'scenario-' + 8"
+       :class="{ 'scenario-expanded': expandedScenarios[8] }">
+    <div class="scenario-header" @click="toggleScenario(8)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[7] }"></span>
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[8] }"></span>
         <span class="scenario-name">Parameterized test (renders as a parameter table)</span>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
@@ -798,7 +833,7 @@ E   assert 10 == 20</pre>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[7]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div x-show="expandedScenarios[8]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
@@ -866,12 +901,12 @@ E   assert 10 == 20</pre>
     </div>
   </div>
   <div class="scenario passed"
-       x-show="isVisible(8)"
-       :id="'scenario-' + 8"
-       :class="{ 'scenario-expanded': expandedScenarios[8] }">
-    <div class="scenario-header" @click="toggleScenario(8)">
+       x-show="isVisible(9)"
+       :id="'scenario-' + 9"
+       :class="{ 'scenario-expanded': expandedScenarios[9] }">
+    <div class="scenario-header" @click="toggleScenario(9)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[8] }"></span>
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[9] }"></span>
         <span class="scenario-name">Brew <span class="param-color-2">{cup_size}</span> ml (templated scenario name)</span>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
@@ -885,7 +920,7 @@ E   assert 10 == 20</pre>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[8]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div x-show="expandedScenarios[9]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
@@ -935,12 +970,12 @@ E   assert 10 == 20</pre>
     </div>
   </div>
   <div class="scenario skipped"
-       x-show="isVisible(9)"
-       :id="'scenario-' + 9"
-       :class="{ 'scenario-expanded': expandedScenarios[9] }">
-    <div class="scenario-header" @click="toggleScenario(9)">
+       x-show="isVisible(10)"
+       :id="'scenario-' + 10"
+       :class="{ 'scenario-expanded': expandedScenarios[10] }">
+    <div class="scenario-header" @click="toggleScenario(10)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[9] }"></span>
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[10] }"></span>
         <span class="scenario-name">All cases skipped</span>
         
       </div>
@@ -952,7 +987,7 @@ E   assert 10 == 20</pre>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[9]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div x-show="expandedScenarios[10]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
       
       <div class="steps"></div>
 
@@ -1002,7 +1037,7 @@ E   assert 10 == 20</pre>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-05-26T20:15:33.441635+00:00",
+    "timestamp": "2026-05-30T09:53:57.664905+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0"
   },
@@ -1160,6 +1195,89 @@ window.__REPORT_DATA__ = {
           "narration": {
             "text": "the connection is open and the query was logged",
             "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null
+    },
+    {
+      "id": "examples/test_examples.py::test_neutral_highlight",
+      "narration": {
+        "text": "T-string with a non-parametrize value (neutral highlight)",
+        "parts": []
+      },
+      "module": "test_examples",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "I have some coins in hand",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I insert $5",
+            "parts": [
+              {
+                "value": "I insert $"
+              },
+              {
+                "rendered": "5",
+                "expression": "amount",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the machine has 9 coffees left",
+            "parts": [
+              {
+                "value": "the machine has "
+              },
+              {
+                "rendered": "9",
+                "expression": "machine[\"coffees\"]",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " coffees left"
+              }
+            ]
           },
           "status": "passed",
           "children": [],
@@ -1426,7 +1544,7 @@ window.__REPORT_DATA__ = {
       "module": "test_examples",
       "tags": [],
       "status": "failed",
-      "duration_ms": 87,
+      "duration_ms": 84,
       "steps": [
         {
           "phase": "given",
@@ -1454,7 +1572,7 @@ window.__REPORT_DATA__ = {
       "parameters": null,
       "error": {
         "message": "assert 10 == 20",
-        "diff": ".nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\logging.py:850: in pytest_runtest_call\n    yield\n.nox\\examples\\Lib\\site-packages\\_pytest\\capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:179: in pytest_runtest_call\n    item.runtest()\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc\\pytest_given\\decorators.py:102: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples\\test_examples.py:133: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
+        "diff": ".nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\logging.py:850: in pytest_runtest_call\n    yield\n.nox\\examples\\Lib\\site-packages\\_pytest\\capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:179: in pytest_runtest_call\n    item.runtest()\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc\\pytest_given\\decorators.py:102: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples\\test_examples.py:143: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
       },
       "skip_reason": null
     },

@@ -58,6 +58,16 @@ def test_pricing(machine, euros, expect):
         assert purchase_allowed == expect
 
 
+@scenario('T-string with a non-parametrize value (neutral highlight)')
+def test_neutral_highlight(machine):
+    with given('I have some coins in hand'):
+        amount = 5
+    with when(t'I insert ${amount}'):
+        machine['coffees'] -= 1
+    with then(t'the machine has {machine["coffees"]} coffees left'):
+        assert machine['coffees'] == 9
+
+
 @scenario(
     Template('Brew {cup_size} ml (templated scenario name)'),
     tags=['billing'],
