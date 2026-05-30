@@ -2,10 +2,11 @@
 
 ## Now
 
+- [ ] Link report to source code — see `docs/superpowers/specs/proposed/2026-05-30-source-link-design.md`
+
 ## Next
 
 - [ ] Add option to not generate the JSON file, rethink default behavior
-- [ ] Link report to source code
 
 ## Later
 
