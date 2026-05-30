@@ -112,5 +112,9 @@ def examples(session: nox.Session) -> None:
         '--given-json=examples/report-data.json',
         '--given-html',
         '--given-html-output=examples/report.html',
+        '--tb=no',
+        '--no-header',
+        '-q',
         success_codes=[0, 1],
     )
+    session.log('Note: 1 intentional failure is expected (demonstrates failure rendering).')
