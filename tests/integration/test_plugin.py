@@ -868,3 +868,58 @@ def test_parametrized_all_cases_skipped_merges_as_skipped(pytester, tmp_path):
     data = json.loads(json_path.read_text())
     assert len(data['scenarios']) == 1
     assert data['scenarios'][0]['status'] == 'skipped'
+
+
+def test_helper_function_decorator_records_step(pytester, tmp_path):
+    """A @when-decorated plain helper records a step when called from a scenario."""
+    pytester.makepyfile(
+        """
+        import json
+        import pytest
+        from pytest_given import scenario, given, when, then
+
+        @pytest.fixture
+        @given('a machine')
+        def machine():
+            return {'balance': 0}
+
+        @when('I insert money')
+        def insert(machine, amount):
+            machine['balance'] += amount
+
+        @scenario('Helper records its own step')
+        def test_buy(machine):
+            with when('I pay'):
+                insert(machine, 2)
+            with then('the balance is 2'):
+                assert machine['balance'] == 2
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}', '-v')
+    assert result.ret == 0
+    data = json.loads(json_path.read_text())
+    [scn] = data['scenarios']
+    top_texts = [s['narration']['text'] for s in scn['steps']]
+    assert top_texts == ['a machine', 'I pay', 'the balance is 2']
+    when_step = scn['steps'][1]
+    child_texts = [c['narration']['text'] for c in when_step['children']]
+    assert child_texts == ['I insert money']
+
+
+def test_helper_function_decorator_called_outside_scenario_is_silent(pytester):
+    """A @when helper called from a non-@scenario test runs without warning or error."""
+    pytester.makepyfile(
+        """
+        from pytest_given import when
+
+        @when('does work')
+        def do_work():
+            return 42
+
+        def test_plain():
+            assert do_work() == 42
+        """
+    )
+    result = pytester.runpytest('-W', 'error', '-v')
+    assert result.ret == 0

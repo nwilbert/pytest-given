@@ -25,6 +25,7 @@ class StateToken:
 
     previous_state: RecordingState
     previous_recording: FixtureRecording | None
+    previous_fixture_descriptor: object | None
 
 
 type FixtureInstanceKey = tuple[object, object]
@@ -57,6 +58,7 @@ class Collector:
         self.param_info: ParamInfo = {}
         self._state: RecordingState = 'idle'
         self._active_recording: FixtureRecording | None = None
+        self._active_fixture_descriptor: object | None = None
         self._recordings: dict[FixtureInstanceKey, FixtureRecording] = {}
         self.inside_unannotated_test: bool = False
 
@@ -81,6 +83,17 @@ class Collector:
         if stack:
             return stack[-1].phase
         return None
+
+    @property
+    def active_fixture_descriptor(self) -> object | None:
+        """The descriptor pytest_fixture_setup pinned for the current fixture call.
+
+        Used by StepDescriptor's helper-decorator wrapper to recognise the case
+        where pytest is invoking it as a fixture body (in which case
+        pytest_fixture_setup has already created the recording's root step from
+        the descriptor's narration, and the wrapper must not push a duplicate).
+        """
+        return self._active_fixture_descriptor
 
     def start_scenario(
         self,
@@ -116,23 +129,31 @@ class Collector:
         self._state = 'idle'
         return scenario
 
-    def enter_fixture_setup(self, recording: FixtureRecording) -> StateToken:
+    def enter_fixture_setup(
+        self,
+        recording: FixtureRecording,
+        descriptor: object | None = None,
+    ) -> StateToken:
         token = StateToken(
             previous_state=self._state,
             previous_recording=self._active_recording,
+            previous_fixture_descriptor=self._active_fixture_descriptor,
         )
         self._state = 'fixture_setup'
         self._active_recording = recording
+        self._active_fixture_descriptor = descriptor
         return token
 
     def exit_fixture_setup(self, token: StateToken) -> None:
         self._state = token.previous_state
         self._active_recording = token.previous_recording
+        self._active_fixture_descriptor = token.previous_fixture_descriptor
 
     def enter_fixture_teardown(self) -> StateToken:
         token = StateToken(
             previous_state=self._state,
             previous_recording=self._active_recording,
+            previous_fixture_descriptor=self._active_fixture_descriptor,
         )
         self._state = 'fixture_teardown'
         return token
@@ -140,6 +161,7 @@ class Collector:
     def exit_fixture_teardown(self, token: StateToken) -> None:
         self._state = token.previous_state
         self._active_recording = token.previous_recording
+        self._active_fixture_descriptor = token.previous_fixture_descriptor
 
     def store_recording(
         self, key: FixtureInstanceKey, recording: FixtureRecording

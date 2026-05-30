@@ -83,7 +83,18 @@ class StepDescriptor:
 
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            return func(*args, **kwargs)
+            collector = get_active_collector()
+            if (
+                collector is None
+                or collector.state == 'idle'
+                or collector.active_fixture_descriptor is self
+            ):
+                return func(*args, **kwargs)
+            collector.push_step(self.phase, self.narration)
+            try:
+                return func(*args, **kwargs)
+            finally:
+                collector.pop_step()
 
         wrapper._step_descriptor = self  # type: ignore[attr-defined]
         return wrapper

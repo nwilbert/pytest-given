@@ -163,7 +163,7 @@ def pytest_fixture_setup(
         return
     _ensure_teardown_wrapped(fixturedef)
     recording = FixtureRecording(root=Step(phase=desc.phase, narration=desc.narration))
-    token = collector.enter_fixture_setup(recording)
+    token = collector.enter_fixture_setup(recording, descriptor=desc)
     try:
         yield
     finally:

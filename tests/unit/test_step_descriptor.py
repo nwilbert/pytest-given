@@ -4,6 +4,7 @@ from pytest_given import Template
 from pytest_given.collector import Collector, set_active_collector
 from pytest_given.decorators import StepDescriptor, attach, given, scenario, then, when
 from pytest_given.errors import PytestGivenError
+from pytest_given.model import FixtureRecording, Step
 from pytest_given.template import Narration, NarrationLiteral, NarrationValue
 
 
@@ -221,3 +222,134 @@ def test_when_with_pytest_given_template_raises() -> None:
 def test_then_with_pytest_given_template_raises() -> None:
     with pytest.raises(PytestGivenError, match='not supported in a test body'):
         then(Template('x {y}'))
+
+
+def test_decorator_records_step_when_called_inside_scenario() -> None:
+    """A @when-decorated plain helper pushes a step on call and pops on return."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+
+        @when('inserting money')
+        def insert(amount: int) -> int:
+            return amount * 2
+
+        assert insert(5) == 10
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert len(scenario.steps) == 1
+    step = scenario.steps[0]
+    assert step.phase == 'when'
+    assert step.narration.text == 'inserting money'
+    assert step.children == []
+
+
+def test_decorator_outside_scenario_is_silent() -> None:
+    """A decorated helper called when the collector is idle / absent just runs."""
+    set_active_collector(None)
+
+    @when('helper')
+    def helper() -> int:
+        return 42
+
+    assert helper() == 42  # no exception, no warning
+
+    collector = Collector()
+    set_active_collector(collector)
+    try:
+        assert helper() == 42  # collector idle: still silent
+    finally:
+        set_active_collector(None)
+
+
+def test_decorator_pops_step_on_exception() -> None:
+    """If the helper raises, the step is popped so the stack stays balanced."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+
+        @when('boom')
+        def boom() -> None:
+            raise RuntimeError('nope')
+
+        with pytest.raises(RuntimeError, match='nope'):
+            boom()
+        with given('after'):
+            pass
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert [s.narration.text for s in scenario.steps] == ['boom', 'after']
+
+
+def test_decorator_nested_inside_active_step_becomes_child() -> None:
+    """A @when helper called inside `with when(...):` becomes a child step."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+
+        @when('inner')
+        def inner() -> None:
+            return None
+
+        with when('outer'):
+            inner()
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert len(scenario.steps) == 1
+    outer = scenario.steps[0]
+    assert outer.narration.text == 'outer'
+    assert [c.narration.text for c in outer.children] == ['inner']
+
+
+def test_decorator_skips_push_when_active_fixture_descriptor_matches() -> None:
+    """When the wrapper is called as the fixture body, push/pop are skipped —
+    pytest_fixture_setup has already pre-created the recording's root step."""
+    desc = StepDescriptor('given', 'a coffee machine')
+
+    @desc
+    def fixture_body() -> str:
+        return 'value'
+
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    root = Step(phase='given', narration=Narration(text='a coffee machine'))
+    recording = FixtureRecording(root=root)
+    token = collector.enter_fixture_setup(recording, descriptor=desc)
+    set_active_collector(collector)
+    try:
+        assert fixture_body() == 'value'
+        assert recording.stack == [root]
+        assert root.children == []
+    finally:
+        collector.exit_fixture_setup(token)
+        set_active_collector(None)
+
+
+def test_decorator_records_when_called_from_inside_fixture_body() -> None:
+    """A *different* @given helper called from inside a fixture body records
+    into that fixture's recording (active descriptor doesn't match)."""
+    outer_desc = StepDescriptor('given', 'a coffee machine')
+    inner_desc = StepDescriptor('given', 'inserting money')
+
+    @inner_desc
+    def insert() -> None:
+        return None
+
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    root = Step(phase='given', narration=Narration(text='a coffee machine'))
+    recording = FixtureRecording(root=root)
+    token = collector.enter_fixture_setup(recording, descriptor=outer_desc)
+    set_active_collector(collector)
+    try:
+        insert()
+    finally:
+        collector.exit_fixture_setup(token)
+        set_active_collector(None)
+    assert [c.narration.text for c in root.children] == ['inserting money']
