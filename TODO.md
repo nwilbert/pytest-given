@@ -16,6 +16,7 @@
   - search box improvements 
 - [ ] Think about UL support (e.g., by connecting the report to a glossary)
 - [ ] Provide an agent skill for work with pytest-given
+- [ ] Template substitution from helper-function args — see `docs/superpowers/specs/proposed/2026-05-30-template-helper-args-design.md`
 - [ ] Add `@scenario(group_parametrized=False)` option to opt out of parametrize merging 
   - emit each case as its own scenario (named per case via Template substitution, or by appending the parametrize id to a `str` name).
   - Needed when narration structure genuinely varies per case; today's behavior silently shows case 1's structure for all rows. See caveat in `docs/superpowers/specs/2026-05-23-structured-step-text-design.md`.
