@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] Template substitution from helper-function args — see `docs/superpowers/specs/proposed/2026-05-30-template-helper-args-design.md`
 - [ ] Link report to source code — see `docs/superpowers/specs/proposed/2026-05-30-source-link-design.md`
 
 ## Next

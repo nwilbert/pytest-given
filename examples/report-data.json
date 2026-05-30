@@ -1,7 +1,7 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-05-30T11:12:40.054235+00:00",
+    "timestamp": "2026-05-30T11:35:46.949453+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0"
   },
@@ -288,8 +288,18 @@
             {
               "phase": "when",
               "narration": {
-                "text": "the coin is validated",
-                "parts": []
+                "text": "the coin is validated for $2",
+                "parts": [
+                  {
+                    "value": "the coin is validated for $"
+                  },
+                  {
+                    "rendered": "2",
+                    "expression": "amount",
+                    "format_spec": "",
+                    "conversion": null
+                  }
+                ]
               },
               "status": "passed",
               "children": [],
@@ -300,7 +310,11 @@
               "phase": "when",
               "narration": {
                 "text": "the balance is updated",
-                "parts": []
+                "parts": [
+                  {
+                    "value": "the balance is updated"
+                  }
+                ]
               },
               "status": "passed",
               "children": [],
@@ -531,7 +545,7 @@
       "module": "test_examples",
       "tags": [],
       "status": "failed",
-      "duration_ms": 87,
+      "duration_ms": 89,
       "steps": [
         {
           "phase": "given",
@@ -559,7 +573,7 @@
       "parameters": null,
       "error": {
         "message": "assert 10 == 20",
-        "diff": ".nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\logging.py:850: in pytest_runtest_call\n    yield\n.nox\\examples\\Lib\\site-packages\\_pytest\\capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:179: in pytest_runtest_call\n    item.runtest()\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc\\pytest_given\\decorators.py:113: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples\\test_examples.py:143: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
+        "diff": ".nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\logging.py:850: in pytest_runtest_call\n    yield\n.nox\\examples\\Lib\\site-packages\\_pytest\\capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:179: in pytest_runtest_call\n    item.runtest()\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc\\pytest_given\\decorators.py:192: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples\\test_examples.py:143: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
       },
       "skip_reason": null
     },

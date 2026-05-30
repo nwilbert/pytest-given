@@ -45,8 +45,10 @@ Three authoring forms (see [README](README.md#step-text--placeholders) for user-
 | `@scenario(name)`, dynamic | `@scenario(Template('Brew {cup_size} ml'))` (deferred, parametrize-bound) |
 | `@scenario(name)`, static | `@scenario('static name')` |
 | Fixture decorator | `@given('static label')` only |
+| Helper-function decorator, dynamic | `@when(Template('I insert ${amount}'))` (deferred, helper-arg-bound) |
+| Helper-function decorator, static | `@when('static label')` |
 
-Lanes don't overlap: `pytest_given.Template` is rejected in `given/when/then/attach`; t-strings are rejected in `@scenario`. `Template` accepts bare identifiers only (no attribute access, no expressions) — t-strings have full expression syntax in test bodies. Parametrized scenarios use case 1's step structure as the merged-template view; if narration *structure* varies per case, split the test instead.
+Lanes don't overlap: t-strings are rejected in `@scenario` and on any decorator (their values aren't in scope at decoration time); `pytest_given.Template` is rejected in `with given/when/then(...)` (test-body t-strings handle that case) and on fixtures (use a plain string label). `Template` accepts bare identifiers only (no attribute access, no expressions) — t-strings have full expression syntax in test bodies. Helper-function `Template` placeholders must name a positional-or-keyword parameter; `*args` / `**kwargs` placeholders raise at decoration time. Parametrized scenarios use case 1's step structure as the merged-template view; if narration *structure* varies per case, split the test instead.
 
 ## Report testing
 

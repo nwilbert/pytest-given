@@ -156,6 +156,12 @@ def pytest_fixture_setup(
             'but only @given is allowed on fixtures (fixtures are setup). '
             'Use @given(...) on the fixture, or move the step into the test body.'
         )
+    if isinstance(desc._source, Template):
+        raise PytestGivenError(
+            f'@given(Template(...)) on fixture {fixturedef.argname!r} is not '
+            'yet supported; use a plain string label, or move the step into a '
+            'helper function.'
+        )
     if collector.state == 'idle':
         # Fixture is being set up outside any tracked scenario (e.g. unannotated
         # test pulling in a step fixture). Don't record.

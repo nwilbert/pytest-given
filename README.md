@@ -91,10 +91,14 @@ def db():
     conn.close()
 ```
 
-As a helper-function decorator (any phase):
+As a helper-function decorator (any phase). The helper records its own step on each call; for dynamic narration, use `pytest_given.Template` and reference the helper's parameters:
 
 ```python
 @when('inserting money')
+def insert(amount):
+    ...
+
+@when(Template('I insert ${amount}'))
 def insert(amount):
     ...
 ```
@@ -138,13 +142,14 @@ def test_brew(cup_size):
 |---|---|---|
 | Plain string (including f-strings) | `with given('a cup')` <br> `with given(f'a {cup_size} cup')` | Rendered verbatim. F-string interpolation happens before pytest-given runs, so values aren't highlighted. |
 | T-string | `with given(t'a {cup_size} cup')` | pytest-given interpolates at runtime. Values are color-coded when the interpolation expression matches a parametrize column; otherwise highlighted neutrally. |
-| `Template` (currently only in `@scenario(...)`) | `@scenario(Template('Brew {cup_size} ml'))` | Deferred substitution against parametrize columns at report time. Unmatched placeholders raise `PytestGivenError` at collection. |
+| `Template` in `@scenario(...)` | `@scenario(Template('Brew {cup_size} ml'))` | Deferred substitution against parametrize columns at report time. Unmatched placeholders raise `PytestGivenError` at collection. |
+| `Template` on a helper-function decorator | `@when(Template('I insert {amount}'))` | Deferred substitution against the function's bound arguments at each call. Placeholders must name a positional-or-keyword parameter of the helper. Unmatched placeholders raise `PytestGivenError` at decoration time. |
 
 Three things worth knowing:
 
 1. **`pytest_given.Template` only accepts bare identifiers** — `{name}`, `{name:spec}`, `{name!conv}`. Attribute access (`{obj.attr}`), indexing (`{d[key]}`), and arbitrary expressions (`{x + 1}`) raise `PytestGivenError` at construction. Workaround: parametrize by the attributes directly, or move the step into a test-body t-string (which supports full expression syntax).
 
-2. **`Template` is for `@scenario(...)`, not test bodies.** In a test body, values are in scope — use a t-string. `given(Template(...))` / `when(Template(...))` / `then(Template(...))` raise `PytestGivenError`. T-strings in `@scenario(...)` are rejected for the symmetric reason: parametrize columns aren't in scope at module-import time.
+2. **`Template` is for deferred substitution.** It works on `@scenario(...)` (against parametrize columns) and on helper-function decorators like `@when(Template(...))` (against the helper's bound arguments). It is **not** allowed in a test body — values are in scope there, so use a t-string. `with given(Template(...))` / `when(Template(...))` / `then(Template(...))` raise `PytestGivenError` at entry. T-strings in `@scenario(...)` or on a fixture/helper decorator are rejected for the symmetric reason: the values aren't in scope at decoration time.
 
 3. **Parametrized scenarios use the first case's steps as the template.** All rows of the parameter table share the step structure recorded by case 1, with values substituted per row. That's the right behaviour when every case runs the same code with different values — and misleading when the steps themselves vary, e.g. a conditional `with given(t'...')` will only show case 1's branch. If steps diverge per case, split into separate `@scenario` tests.
 

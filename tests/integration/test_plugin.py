@@ -907,6 +907,107 @@ def test_helper_function_decorator_records_step(pytester, tmp_path):
     assert child_texts == ['I insert money']
 
 
+def test_helper_function_decorator_with_template_substitutes_args(pytester, tmp_path):
+    """@when(Template('...${arg}...')) renders per call from bound args."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, when, then, Template
+
+        @when(Template('I insert ${amount}'))
+        def insert(amount):
+            return amount
+
+        @scenario('Helper template substitutes args')
+        def test_buy():
+            insert(2)
+            with then('done'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}', '-v')
+    assert result.ret == 0
+    data = json.loads(json_path.read_text())
+    [scn] = data['scenarios']
+    helper_step = scn['steps'][0]
+    assert helper_step['narration']['text'] == 'I insert $2'
+    parts = helper_step['narration']['parts']
+    assert parts[0] == {'value': 'I insert $'}
+    assert parts[1]['rendered'] == '2'
+    assert parts[1]['expression'] == 'amount'
+
+
+def test_helper_function_decorator_with_template_called_twice_records_two_steps(
+    pytester, tmp_path
+):
+    """Two calls with different args produce two distinct steps with their own text."""
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when, then, Template
+
+        @when(Template('I insert ${amount}'))
+        def insert(amount):
+            return amount
+
+        @scenario('Helper called twice')
+        def test_buy():
+            insert(2)
+            insert(5)
+            with then('done'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}', '-v')
+    assert result.ret == 0
+    data = json.loads(json_path.read_text())
+    [scn] = data['scenarios']
+    texts = [s['narration']['text'] for s in scn['steps'][:2]]
+    assert texts == ['I insert $2', 'I insert $5']
+
+
+def test_helper_function_template_placeholder_not_in_signature_raises(
+    pytester, tmp_path
+):
+    """Placeholder name absent from the helper signature → collection error."""
+    pytester.makepyfile(
+        """
+        from pytest_given import when, Template
+
+        @when(Template('I insert ${amount}'))
+        def insert(other):
+            return other
+        """
+    )
+    result = pytester.runpytest('-v')
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*placeholder*amount*'])
+
+
+def test_helper_function_template_on_fixture_raises(pytester, tmp_path):
+    """@given(Template(...)) on a fixture is rejected with 'not yet supported'."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then, Template
+
+        @pytest.fixture
+        @given(Template('a balance of ${initial}'))
+        def balance(initial=10):
+            return initial
+
+        @scenario('x')
+        def test_x(balance):
+            with then('ok'):
+                pass
+        """
+    )
+    result = pytester.runpytest('-v')
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*not yet supported*'])
+
+
 def test_helper_function_decorator_called_outside_scenario_is_silent(pytester):
     """A @when helper called from a non-@scenario test runs without warning or error."""
     pytester.makepyfile(

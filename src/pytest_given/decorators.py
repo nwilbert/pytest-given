@@ -3,7 +3,8 @@ import inspect
 import json
 import types
 import warnings
-from string import templatelib
+from collections.abc import Mapping
+from string import Formatter, templatelib
 from typing import Any, Self
 
 import pytest
@@ -11,7 +12,23 @@ import pytest
 from pytest_given.collector import get_active_collector
 from pytest_given.errors import PytestGivenError
 from pytest_given.model import Phase
-from pytest_given.template import Narration, Template, narration_from
+from pytest_given.template import (
+    Narration,
+    NarrationLiteral,
+    NarrationPart,
+    NarrationPlaceholder,
+    NarrationValue,
+    Template,
+    narration_from,
+)
+
+_TEMPLATE_PARAM_KINDS = frozenset(
+    {
+        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        inspect.Parameter.KEYWORD_ONLY,
+        inspect.Parameter.POSITIONAL_ONLY,
+    }
+)
 
 
 class StepDescriptor:
@@ -30,12 +47,21 @@ class StepDescriptor:
     def __init__(
         self,
         phase: Phase,
-        text: str | templatelib.Template,
+        text: str | templatelib.Template | Template,
     ) -> None:
         self.phase = phase
+        self._source: str | templatelib.Template | Template = text
         self.narration: Narration = narration_from(text)
 
     def __enter__(self) -> Self:
+        if isinstance(self._source, Template):
+            raise PytestGivenError(
+                f'{self.phase}(Template(...)) is not supported in a test body; '
+                f'use a t-string for dynamic values, or a plain string for '
+                f'static labels. Template is for @scenario(...) and helper-'
+                f'function decorators, where deferred substitution is the only '
+                f'sensible option.'
+            )
         collector = get_active_collector()
         if collector is None or collector.state == 'idle':
             if collector is not None and collector.inside_unannotated_test:
@@ -65,13 +91,29 @@ class StepDescriptor:
         collector.pop_step()
 
     def __call__(self, func: Any) -> Any:
-        if self.narration.parts:
+        is_fixture = (
+            getattr(func, '_fixture_function_marker', None) is not None
+            or getattr(func, '_pytestfixturefunction', None) is not None
+        )
+        if isinstance(self._source, templatelib.Template):
             raise PytestGivenError(
-                "@given(t'...') / @given(Template(...)) is not allowed on a "
-                "fixture; the fixture's argument values aren't in scope at "
-                'decoration time. Use a plain string label, or move the step '
-                'into the test body.'
+                f"@{self.phase}(t'...') is not allowed on a fixture or helper; "
+                "the function's argument values aren't in scope at decoration "
+                'time. Use a plain string label, pytest_given.Template for '
+                'deferred substitution from bound args, or move the step into '
+                'the test body.'
             )
+        if isinstance(self._source, Template) and is_fixture:
+            raise PytestGivenError(
+                f'@{self.phase}(Template(...)) on a fixture is not yet '
+                'supported; use a plain string label, or move the step into a '
+                'helper function.'
+            )
+        sig = (
+            self._validate_template_against_signature(func)
+            if isinstance(self._source, Template)
+            else None
+        )
         if inspect.isgeneratorfunction(func):
 
             @functools.wraps(func)
@@ -90,7 +132,12 @@ class StepDescriptor:
                 or collector.active_fixture_descriptor is self
             ):
                 return func(*args, **kwargs)
-            collector.push_step(self.phase, self.narration)
+            narration = (
+                self._narration_for_call(sig, args, kwargs)
+                if sig is not None
+                else self.narration
+            )
+            collector.push_step(self.phase, narration)
             try:
                 return func(*args, **kwargs)
             finally:
@@ -98,6 +145,38 @@ class StepDescriptor:
 
         wrapper._step_descriptor = self  # type: ignore[attr-defined]
         return wrapper
+
+    def _validate_template_against_signature(self, func: Any) -> inspect.Signature:
+        assert isinstance(self._source, Template)
+        sig = inspect.signature(func)
+        for name in self._source.get_identifiers():
+            param = sig.parameters.get(name)
+            if param is None or param.kind not in _TEMPLATE_PARAM_KINDS:
+                available = sorted(
+                    n
+                    for n, p in sig.parameters.items()
+                    if p.kind in _TEMPLATE_PARAM_KINDS
+                )
+                raise PytestGivenError(
+                    f'@{self.phase}(Template({self._source.template!r})) '
+                    f'references placeholder {{{name}}} which is not a '
+                    f'positional-or-keyword parameter of {func.__name__}. '
+                    f'Available parameters: {available}. Rename the '
+                    f'placeholder, or add the parameter.'
+                )
+        return sig
+
+    def _narration_for_call(
+        self,
+        sig: inspect.Signature,
+        args: tuple[Any, ...],
+        kwargs: Mapping[str, Any],
+    ) -> Narration:
+        assert isinstance(self._source, Template)
+        bound = sig.bind(*args, **kwargs)
+        bound.apply_defaults()
+        parts = _resolve_template_parts(self.narration.parts, bound.arguments)
+        return Narration(text=self._source.substitute(bound.arguments), parts=parts)
 
 
 class ScenarioDecorator:
@@ -116,33 +195,47 @@ class ScenarioDecorator:
         return wrapper
 
 
-def given(text: str | templatelib.Template) -> StepDescriptor:
+def given(text: str | templatelib.Template | Template) -> StepDescriptor:
     """Create a Given step (context manager or decorator)."""
-    _reject_pytest_given_template(text, 'given')
     return StepDescriptor('given', text)
 
 
-def when(text: str | templatelib.Template) -> StepDescriptor:
+def when(text: str | templatelib.Template | Template) -> StepDescriptor:
     """Create a When step (context manager or decorator)."""
-    _reject_pytest_given_template(text, 'when')
     return StepDescriptor('when', text)
 
 
-def then(text: str | templatelib.Template) -> StepDescriptor:
+def then(text: str | templatelib.Template | Template) -> StepDescriptor:
     """Create a Then step (context manager or decorator)."""
-    _reject_pytest_given_template(text, 'then')
     return StepDescriptor('then', text)
 
 
-def _reject_pytest_given_template(text: object, fn_name: str) -> None:
-    if isinstance(text, Template):
-        raise PytestGivenError(
-            f'{fn_name}(Template(...)) is not supported in a test body; use a '
-            f't-string for dynamic values, or a plain string for static labels. '
-            f'Template is for @scenario(...) (and the future Annotated fixture '
-            f'form), where deferred substitution from callspec.params is the '
-            f'only sensible option.'
+_FORMATTER = Formatter()
+
+
+def _resolve_template_parts(
+    parts: list[NarrationPart],
+    mapping: Mapping[str, Any],
+) -> list[NarrationPart]:
+    out: list[NarrationPart] = []
+    for part in parts:
+        assert not isinstance(part, NarrationValue), (
+            'pytest_given.Template never yields NarrationValue'
         )
+        match part:
+            case NarrationLiteral():
+                out.append(part)
+            case NarrationPlaceholder(name=name, format_spec=spec, conversion=conv):
+                resolved = _FORMATTER.convert_field(mapping[name], conv)
+                out.append(
+                    NarrationValue(
+                        rendered=format(resolved, spec),
+                        expression=name,
+                        format_spec=spec,
+                        conversion=conv,
+                    )
+                )
+    return out
 
 
 def attach(label: str | templatelib.Template, content: object) -> None:

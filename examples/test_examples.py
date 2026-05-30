@@ -80,12 +80,12 @@ def test_brew(machine, cup_size):
         assert machine['coffees'] < 10
 
 
-@when('the coin is validated')
+@when(Template('the coin is validated for ${amount}'))
 def validate_coin_step(machine, amount):
     return amount >= machine['price']
 
 
-@when('the balance is updated')
+@when(Template('the balance is updated'))
 def update_balance_step(machine, valid):
     if valid:
         machine['coffees'] -= 1

@@ -209,19 +209,47 @@ def test_step_descriptor_with_tstring_records_rendered_text_and_parts() -> None:
     ]
 
 
-def test_given_with_pytest_given_template_raises() -> None:
-    with pytest.raises(PytestGivenError, match='not supported in a test body'):
-        given(Template('a {cup_size} ml cup'))
+def test_given_with_pytest_given_template_as_context_manager_raises() -> None:
+    """`with given(Template(...))` is rejected — t-strings handle the body case."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with (
+            pytest.raises(PytestGivenError, match='not supported in a test body'),
+            given(Template('a {cup_size} ml cup')),
+        ):
+            pass
+    finally:
+        set_active_collector(None)
 
 
-def test_when_with_pytest_given_template_raises() -> None:
-    with pytest.raises(PytestGivenError, match='not supported in a test body'):
-        when(Template('x {y}'))
+def test_when_with_pytest_given_template_as_context_manager_raises() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with (
+            pytest.raises(PytestGivenError, match='not supported in a test body'),
+            when(Template('x {y}')),
+        ):
+            pass
+    finally:
+        set_active_collector(None)
 
 
-def test_then_with_pytest_given_template_raises() -> None:
-    with pytest.raises(PytestGivenError, match='not supported in a test body'):
-        then(Template('x {y}'))
+def test_then_with_pytest_given_template_as_context_manager_raises() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with (
+            pytest.raises(PytestGivenError, match='not supported in a test body'),
+            then(Template('x {y}')),
+        ):
+            pass
+    finally:
+        set_active_collector(None)
 
 
 def test_decorator_records_step_when_called_inside_scenario() -> None:
@@ -329,6 +357,146 @@ def test_decorator_skips_push_when_active_fixture_descriptor_matches() -> None:
     finally:
         collector.exit_fixture_setup(token)
         set_active_collector(None)
+
+
+def test_decorator_with_template_validates_placeholder_in_signature() -> None:
+    """@when(Template('{amount}')) accepts a function with `amount` in its signature."""
+
+    @when(Template('I insert ${amount}'))
+    def insert(machine: dict[str, int], amount: int) -> None:
+        machine['balance'] += amount
+
+    assert hasattr(insert, '_step_descriptor')
+    assert insert._step_descriptor.narration.text == 'I insert ${amount}'
+
+
+def test_decorator_with_template_placeholder_not_in_signature_raises() -> None:
+    """Placeholder name absent from the signature → PytestGivenError at decoration."""
+    with pytest.raises(PytestGivenError, match='amount'):
+
+        @when(Template('I insert ${amount}'))
+        def insert(machine: dict[str, int]) -> None: ...
+
+
+def test_decorator_template_error_lists_available_parameters() -> None:
+    with pytest.raises(PytestGivenError, match='machine'):
+
+        @when(Template('I insert ${amount}'))
+        def insert(machine: dict[str, int]) -> None: ...
+
+
+def test_decorator_template_placeholder_matching_var_positional_raises() -> None:
+    """Placeholder referencing *args is rejected at decoration time."""
+    with pytest.raises(PytestGivenError, match='positional-or-keyword'):
+
+        @when(Template('values: ${args}'))
+        def helper(*args: int) -> None: ...
+
+
+def test_decorator_template_placeholder_matching_var_keyword_raises() -> None:
+    """Placeholder referencing **kwargs is rejected at decoration time."""
+    with pytest.raises(PytestGivenError, match='positional-or-keyword'):
+
+        @when(Template('values: ${kwargs}'))
+        def helper(**kwargs: int) -> None: ...
+
+
+def test_decorator_template_records_substituted_narration_per_call() -> None:
+    """Each call substitutes its bound arg values into the recorded step."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+
+        @when(Template('I insert ${amount}'))
+        def insert(amount: int) -> int:
+            return amount * 2
+
+        assert insert(2) == 4
+        assert insert(5) == 10
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    texts = [s.narration.text for s in scenario.steps]
+    assert texts == ['I insert $2', 'I insert $5']
+
+
+def test_decorator_template_records_structured_value_parts() -> None:
+    """Substituted placeholders surface in `parts` as NarrationValue."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+
+        @when(Template('I insert ${amount}'))
+        def insert(amount: int) -> None: ...
+
+        insert(7)
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    [step] = scenario.steps
+    assert step.narration.text == 'I insert $7'
+    assert step.narration.parts == [
+        NarrationLiteral(value='I insert $'),
+        NarrationValue(
+            rendered='7',
+            expression='amount',
+            format_spec='',
+            conversion=None,
+        ),
+    ]
+
+
+def test_decorator_template_uses_default_when_caller_omits_arg() -> None:
+    """Defaulted parameter not passed at the call → default substituted."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+
+        @when(Template('I insert ${amount}'))
+        def insert(amount: int = 1) -> None: ...
+
+        insert()
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert scenario.steps[0].narration.text == 'I insert $1'
+
+
+def test_decorator_template_preserves_format_spec_and_conversion() -> None:
+    """Format spec and `!r` conversion flow through to the rendered step."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+
+        @given(Template('a balance of {initial:.2f}'))
+        def setup(initial: float) -> None: ...
+
+        @then(Template('the receipt says {message!r}'))
+        def assert_receipt(message: str) -> None: ...
+
+        setup(3.5)
+        assert_receipt('paid')
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    texts = [s.narration.text for s in scenario.steps]
+    assert texts == ['a balance of 3.50', "the receipt says 'paid'"]
+
+
+def test_decorator_template_on_fixture_raises() -> None:
+    """pytest_given.Template on a fixture is rejected with the documented message."""
+
+    @pytest.fixture
+    def fixture_body() -> int:
+        return 1
+
+    desc = StepDescriptor('given', Template('value ${x}'))
+    with pytest.raises(PytestGivenError, match='not yet supported'):
+        desc(fixture_body)
 
 
 def test_decorator_records_when_called_from_inside_fixture_body() -> None:
