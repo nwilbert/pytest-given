@@ -2,6 +2,8 @@
 
 A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests. Inspired by [JGiven](https://jgiven.org/) (Java). The code is the single source of truth — no separate Gherkin DSL.
 
+**[See a live example report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/report.html)**
+
 ## Quick start
 
 ```python
