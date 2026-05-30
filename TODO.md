@@ -14,6 +14,7 @@
 - [ ] UI improvements in report
   - highlight on hover for parametrization table)
   - search box improvements 
+  - animate expand/collapse of scenario
 - [ ] Think about UL support (e.g., by connecting the report to a glossary)
 - [ ] Provide an agent skill for work with pytest-given
 - [ ] Add `@scenario(group_parametrized=False)` option to opt out of parametrize merging 
