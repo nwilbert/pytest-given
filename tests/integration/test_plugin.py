@@ -1049,6 +1049,32 @@ def test_scenario_source_captured_in_json(pytester, tmp_path):
     assert src['line'] >= 1
 
 
+def test_parameterized_scenario_source_captured_in_json(pytester, tmp_path):
+    """Parameterized scenarios survive grouping with their source intact."""
+    pytester.makepyfile(
+        test_src_link_param="""
+        import pytest
+        from pytest_given import scenario, when
+
+        @scenario("A")
+        @pytest.mark.parametrize("x", [1, 2])
+        def test_a(x):
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    data = json.loads(json_path.read_text())
+    assert len(data['scenarios']) == 1
+    src = data['scenarios'][0]['source']
+    assert src is not None
+    assert src['relpath'].endswith('test_src_link_param.py')
+    assert isinstance(src['line'], int)
+    assert src['line'] >= 1
+
+
 def test_metadata_commit_sha_captured(pytester, tmp_path, monkeypatch):
     """metadata.commit_sha is populated from env vars."""
     monkeypatch.setenv('GITHUB_SHA', 'integration-sha')

@@ -430,6 +430,7 @@ def _group_parameterized(
             duration_ms=total_duration,
             steps=template_steps,
             parameters=ParameterTable(names=param_names, cases=cases),
+            source=first.source,
         )
         result.append(merged)
 
