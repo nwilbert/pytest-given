@@ -37,6 +37,16 @@ Resolution order: CLI flag → ini value → default `"none"`.
 | `cursor`  | `cursor://file/{path}:{line}`                                                                  |
 | `zed`     | `zed://file/{path}:{line}`                                                                     |
 | `pycharm` | `jetbrains://pycharm/navigate/reference?project={project}&path={relpath}:{line}`               |
+| `github`  | `https://github.com/<org>/<repo>/blob/{sha}/{relpath}#L{line}` — `<org>/<repo>` auto-detected (see below) |
+
+The `github` preset is the canonical choice for CI-archived reports: it produces SHA-pinned permalinks without the user having to hardcode org/repo in their config. `<org>/<repo>` is detected once at config-resolution time in this order:
+
+1. `GITHUB_REPOSITORY` env var (set by GitHub Actions, format `org/repo`).
+2. `git remote get-url origin`, parsed for both forms:
+   - HTTPS: `https://github.com/<org>/<repo>(.git)?`
+   - SSH:   `git@github.com:<org>/<repo>(.git)?`
+
+If neither yields a GitHub remote, `resolve_template` raises `PytestGivenError` pointing the user at the raw-template form (the example in the README). The detected `org/repo` is baked into the returned template — no new `{org}`/`{repo}` variables are exposed.
 
 ### Template variables
 
@@ -62,7 +72,12 @@ given_source_link = "jetbrains://pycharm/navigate/reference?project=MyMonorepo&p
 # Zed (raw template; no preset would differ here, but shown for symmetry):
 given_source_link = "zed://file/{path}:{line}"
 
-# CI archives → GitHub permalinks:
+# CI archives → GitHub permalinks (auto-detects org/repo from git remote
+# or GITHUB_REPOSITORY env var):
+given_source_link = "github"
+
+# Same thing as a raw template — pin org/repo explicitly. Useful when the
+# remote is non-standard (mirrored repo, monorepo subdirectory, fork URL):
 given_source_link = "https://github.com/myorg/myrepo/blob/{sha}/{relpath}#L{line}"
 ```
 
@@ -70,6 +85,7 @@ given_source_link = "https://github.com/myorg/myrepo/blob/{sha}/{relpath}#L{line
 
 - VSCode / Cursor / Zed presets resolve `{path}` from the render-time current working directory; re-rendering a CI-downloaded JSON from the wrong directory will produce broken links.
 - The GitHub-permalink template is SHA-pinned, so links remain stable after the line moves — exactly what an archived CI report wants.
+- The `github` preset is resolved at config-resolution time (session start / CLI invocation), not at render time. If the JSON is re-rendered later from a different machine, the org/repo baked in is the one detected on the original run — usually what you want for CI archives.
 - Pytest 9+ uses `[tool.pytest]`; older pytest used `[tool.pytest.ini_options]` (still accepted by pytest 9 for back-compat).
 
 ## Data model changes
@@ -103,9 +119,9 @@ class Metadata:
 ### `template.py` (new module section or new file `source_link.py`)
 
 ```python
-type SourceLinkPreset = Literal['vscode', 'cursor', 'zed', 'pycharm']
+type SourceLinkPreset = Literal['vscode', 'cursor', 'zed', 'pycharm', 'github']
 
-_PRESETS: dict[SourceLinkPreset, str] = {
+_STATIC_PRESETS: dict[str, str] = {
     'vscode':  'vscode://file/{path}:{line}',
     'cursor':  'cursor://file/{path}:{line}',
     'zed':     'zed://file/{path}:{line}',
@@ -117,8 +133,18 @@ _VALID_VARS = frozenset({'path', 'relpath', 'line', 'project', 'sha'})
 def resolve_template(value: str) -> str | None:
     """Resolve a config value into a template string (or None for 'none').
 
-    Raises PytestGivenError for unknown presets / malformed input.
+    Static presets ('vscode' / 'cursor' / 'zed' / 'pycharm') map directly.
+    The 'github' preset detects org/repo (GITHUB_REPOSITORY env, then
+    `git remote get-url origin`) and bakes them into a permalink template.
+
+    Raises PytestGivenError for unknown presets, malformed input, or a
+    'github' preset that can't resolve org/repo.
     """
+
+def _detect_github_repo() -> tuple[str, str] | None:
+    """Return (org, repo) from GITHUB_REPOSITORY env or `git remote get-url
+    origin`, parsing both HTTPS and SSH GitHub URL forms. None if neither
+    yields a recognisable GitHub remote."""
 
 def format_source_link(
     template: str,
@@ -262,6 +288,7 @@ Same DOM in both modes; the `<a>` wrapper is the only difference. CSS: small fon
 | Situation                                                       | Behavior                                                                                              |
 |-----------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
 | `given_source_link` is unknown preset and not a template        | `PytestGivenError` at config resolution time, listing valid presets                                   |
+| `given_source_link = "github"` but no GitHub remote detected    | `PytestGivenError` at config resolution time: explains the detection rules and points to the raw-template form |
 | Template uses `{sha}` but `commit_sha` is `None`                | `PytestGivenError` at render time: explains how to provide a SHA (env var or git repo)                |
 | Template uses an unknown variable like `{branch}`               | `PytestGivenError` at render time, listing valid variables                                            |
 | `git rev-parse HEAD` fails / git not installed                  | Silently fall back to `commit_sha = None`; only relevant if `{sha}` is referenced                     |
@@ -273,9 +300,11 @@ Template resolution happens once (not per scenario); malformed templates fail fa
 ## Testing
 
 - `tests/unit/test_source_link.py`:
-  - `resolve_template`: each preset name resolves; `'none'` → `None`; raw template strings pass through; unknown values raise with a clear error listing valid options.
+  - `resolve_template`: each static preset name resolves; `'none'` → `None`; raw template strings pass through; unknown values raise with a clear error listing valid options.
+  - `resolve_template('github')`: org/repo baked into the returned template from `GITHUB_REPOSITORY`, from HTTPS remote, from SSH remote; raises when neither is parseable as a GitHub URL (use `monkeypatch.setenv` / patched `subprocess.run`).
   - `format_source_link`: each template variable substitutes correctly; missing `{sha}` raises; unknown variable raises; POSIX path normalization preserved on Windows-style input.
   - `_detect_commit_sha`: each env var detected in priority order; subprocess fake for the git fallback; returns `None` when both fail (use `monkeypatch` to clear env and patch `subprocess.run`).
+  - `_detect_github_repo`: HTTPS form (`https://github.com/o/r.git`), SSH form (`git@github.com:o/r.git`), `.git` suffix optional in both, env var beats remote, non-GitHub remote (e.g. GitLab URL) returns None.
 - `tests/integration/test_plugin.py`:
   - End-to-end run with `--given-source-link=vscode`: JSON contains `source: {relpath, line}` for each scenario and `metadata.commit_sha` is set; HTML contains `<a href="vscode://file/.../test_*.py:N">` in the expanded card.
   - End-to-end run with default (`given_source_link` unset): JSON still contains `source` data; HTML contains plain `<span>` (no link).
