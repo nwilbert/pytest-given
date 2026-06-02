@@ -112,6 +112,7 @@ def examples(session: nox.Session) -> None:
         '--given-json=examples/report-data.json',
         '--given-html',
         '--given-html-output=examples/report.html',
+        '--given-source-link=github',
         '--tb=no',
         '--no-header',
         '-q',

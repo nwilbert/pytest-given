@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-01T20:00:23.402576+00:00",
+    "timestamp": "2026-06-02T15:55:56.305621+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "9e88c786fd870d469a2b08ffce0c6966748ea2b5"
+    "commit_sha": "20f8c61cf687dbebb3b4acd830e3da199bcd859b"
   },
   "scenarios": [
     {
@@ -724,7 +724,10 @@
       },
       "error": null,
       "skip_reason": null,
-      "source": null
+      "source": {
+        "relpath": "examples/test_examples.py",
+        "line": 49
+      }
     },
     {
       "id": "examples/test_examples.py::test_brew[200]",
@@ -820,7 +823,10 @@
       },
       "error": null,
       "skip_reason": null,
-      "source": null
+      "source": {
+        "relpath": "examples/test_examples.py",
+        "line": 71
+      }
     },
     {
       "id": "examples/test_examples.py::test_parametrized_all_skipped[1]",
@@ -856,7 +862,10 @@
       },
       "error": null,
       "skip_reason": null,
-      "source": null
+      "source": {
+        "relpath": "examples/test_examples.py",
+        "line": 153
+      }
     }
   ]
 }

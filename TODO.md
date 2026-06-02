@@ -2,6 +2,8 @@
 
 ## Now
 
+- [ ] introduce subpackage structure
+
 ## Next
 
 - [ ] Add option to not generate the JSON file, rethink default behavior
@@ -13,6 +15,8 @@
   - highlight on hover for parametrization table)
   - search box improvements 
   - animate expand/collapse of scenario
+  - traceback verbosity (Consider trimming site-packages/_pytest/..., pluggy/..., and decorators.py frames by default with an "Show internal frames" toggle, mirroring pytest's --tb=short)
+  - URL-hash format — #failed=0 reads as "failed equals zero" rather than "hide failed". Consider #hide=failed or #status=passed,skipped for self-documenting share-links.
 - [ ] Think about UL support (e.g., by connecting the report to a glossary)
 - [ ] Provide an agent skill for work with pytest-given
 - [ ] Add `@scenario(group_parametrized=False)` option to opt out of parametrize merging 
