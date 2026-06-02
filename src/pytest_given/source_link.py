@@ -22,9 +22,7 @@ _STATIC_PRESETS: dict[str, str] = {
     'vscode': 'vscode://file/{path}:{line}',
     'cursor': 'cursor://file/{path}:{line}',
     'zed': 'zed://file/{path}:{line}',
-    'pycharm': (
-        'jetbrains://pycharm/navigate/reference?project={project}&path={relpath}:{line}'
-    ),
+    'pycharm': 'pycharm://open?file={path}&line={line}',
 }
 
 # `github` is a preset but resolves via _detect_github_repo (next task), not

@@ -34,9 +34,7 @@ def test_resolve_template_zed_preset() -> None:
 
 
 def test_resolve_template_pycharm_preset() -> None:
-    assert resolve_template('pycharm') == (
-        'jetbrains://pycharm/navigate/reference?project={project}&path={relpath}:{line}'
-    )
+    assert resolve_template('pycharm') == 'pycharm://open?file={path}&line={line}'
 
 
 def test_resolve_template_raw_template_passes_through() -> None:
@@ -175,19 +173,18 @@ def test_format_vscode_uses_absolute_path(
     assert url == f'vscode://file/{expected}:7'
 
 
-def test_format_pycharm_uses_relpath_and_project(
+def test_format_pycharm_uses_absolute_path(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.chdir(tmp_path)
     url = format_source_link(
-        'jetbrains://pycharm/navigate/reference?project={project}&path={relpath}:{line}',
+        'pycharm://open?file={path}&line={line}',
         source=_src(),
         project='myproj',
         commit_sha=None,
     )
-    assert url == (
-        'jetbrains://pycharm/navigate/reference?project=myproj&path=tests/test_x.py:7'
-    )
+    expected = (tmp_path / 'tests/test_x.py').resolve().as_posix()
+    assert url == f'pycharm://open?file={expected}&line=7'
 
 
 def test_format_github_uses_sha_and_relpath() -> None:

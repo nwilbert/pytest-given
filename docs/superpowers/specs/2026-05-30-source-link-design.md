@@ -8,7 +8,7 @@ Let devs jump from a scenario in the HTML report straight to the test source in 
 
 Today the report shows the scenario narration, steps, parameters, status, duration — but no way to navigate from the report back to the test code. Devs viewing the report locally have to manually find the test file. CI archives have no link to the source on GitHub either.
 
-Modern editors register URL handlers (`vscode://`, `cursor://`, `zed://`, `jetbrains://`) that open a file at a specific line when a browser follows that URL. GitHub permalinks (`https://github.com/<org>/<repo>/blob/<sha>/<path>#L<line>`) provide the same affordance for archived reports.
+Modern editors register URL handlers (`vscode://`, `cursor://`, `zed://`, `pycharm://`) that open a file at a specific line when a browser follows that URL. GitHub permalinks (`https://github.com/<org>/<repo>/blob/<sha>/<path>#L<line>`) provide the same affordance for archived reports.
 
 ## User-facing API
 
@@ -36,7 +36,7 @@ Resolution order: CLI flag → ini value → default `"none"`.
 | `vscode`  | `vscode://file/{path}:{line}`                                                                  |
 | `cursor`  | `cursor://file/{path}:{line}`                                                                  |
 | `zed`     | `zed://file/{path}:{line}`                                                                     |
-| `pycharm` | `jetbrains://pycharm/navigate/reference?project={project}&path={relpath}:{line}`               |
+| `pycharm` | `pycharm://open?file={path}&line={line}`                                                       |
 | `github`  | `https://github.com/<org>/<repo>/blob/{sha}/{relpath}#L{line}` — `<org>/<repo>` auto-detected (see below) |
 
 The `github` preset is the canonical choice for CI-archived reports: it produces SHA-pinned permalinks without the user having to hardcode org/repo in their config. `<org>/<repo>` is detected once at config-resolution time in this order:
@@ -61,13 +61,9 @@ If neither yields a GitHub remote, `resolve_template` raises `PytestGivenError` 
 ### Worked examples for the README
 
 ```toml
-# JetBrains preset — auto-derives {project} from rootdir name
+# PyCharm preset — uses the pycharm:// scheme registered by PyCharm.app
 [tool.pytest]
 given_source_link = "pycharm"
-
-# If the IDE project name differs from the directory (e.g. monorepo),
-# inline the project name in a raw template:
-given_source_link = "jetbrains://pycharm/navigate/reference?project=MyMonorepo&path={relpath}:{line}"
 
 # Zed (raw template; no preset would differ here, but shown for symmetry):
 given_source_link = "zed://file/{path}:{line}"
@@ -83,7 +79,8 @@ given_source_link = "https://github.com/myorg/myrepo/blob/{sha}/{relpath}#L{line
 
 ### Caveats documented in README
 
-- VSCode / Cursor / Zed presets resolve `{path}` from the render-time current working directory; re-rendering a CI-downloaded JSON from the wrong directory will produce broken links.
+- VSCode / Cursor / Zed / PyCharm presets resolve `{path}` from the render-time current working directory; re-rendering a CI-downloaded JSON from the wrong directory will produce broken links.
+- The `pycharm` preset uses the direct `pycharm://open` scheme registered by `PyCharm.app`, not the Toolbox `jetbrains://pycharm/navigate/reference?...` URL. The Toolbox URL is theoretically more flexible (specifies project + relpath, doesn't depend on a `pycharm://` handler being claimed by a specific IDE), but in practice the Toolbox-managed PyCharm Professional install on macOS rejects it with `launch method not available` — see [JetBrains support thread](https://intellij-support.jetbrains.com/hc/en-us/community/posts/21787338788882). The direct scheme works for both Community and Professional, but if multiple JetBrains IDEs are installed, `pycharm://` resolves to whichever one most recently registered the handler.
 - The GitHub-permalink template is SHA-pinned, so links remain stable after the line moves — exactly what an archived CI report wants.
 - The `github` preset is resolved at config-resolution time (session start / CLI invocation), not at render time. If the JSON is re-rendered later from a different machine, the org/repo baked in is the one detected on the original run — usually what you want for CI archives.
 - Pytest 9+ uses `[tool.pytest]`; older pytest used `[tool.pytest.ini_options]` (still accepted by pytest 9 for back-compat).
@@ -125,7 +122,7 @@ _STATIC_PRESETS: dict[str, str] = {
     'vscode':  'vscode://file/{path}:{line}',
     'cursor':  'cursor://file/{path}:{line}',
     'zed':     'zed://file/{path}:{line}',
-    'pycharm': 'jetbrains://pycharm/navigate/reference?project={project}&path={relpath}:{line}',
+    'pycharm': 'pycharm://open?file={path}&line={line}',
 }
 
 _VALID_VARS = frozenset({'path', 'relpath', 'line', 'project', 'sha'})

@@ -193,7 +193,7 @@ Or pass it on the CLI: `pytest --given-html --given-source-link=vscode`.
 | `vscode`  | VS Code      | `vscode://file/{path}:{line}`                                                          |
 | `cursor`  | Cursor       | `cursor://file/{path}:{line}`                                                          |
 | `zed`     | Zed          | `zed://file/{path}:{line}`                                                             |
-| `pycharm` | PyCharm/IDEA | `jetbrains://pycharm/navigate/reference?project={project}&path={relpath}:{line}`       |
+| `pycharm` | PyCharm      | `pycharm://open?file={path}&line={line}`                                               |
 | `github`  | GitHub (web) | `https://github.com/<org>/<repo>/blob/{sha}/{relpath}#L{line}` — `<org>/<repo>` auto-detected from `GITHUB_REPOSITORY` or `git remote get-url origin` (HTTPS and SSH forms both supported) |
 
 For a raw template, use any of these variables:
@@ -209,9 +209,6 @@ For a raw template, use any of these variables:
 Examples:
 
 ```toml
-# Monorepo: IDE project name differs from directory name
-given_source_link = "jetbrains://pycharm/navigate/reference?project=MyMonorepo&path={relpath}:{line}"
-
 # CI archives → SHA-pinned GitHub permalinks (preset auto-detects org/repo)
 given_source_link = "github"
 
