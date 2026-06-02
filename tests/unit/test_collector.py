@@ -3,7 +3,7 @@ import pytest
 from pytest_given import Template
 from pytest_given.collector import Collector
 from pytest_given.errors import PytestGivenError
-from pytest_given.model import FixtureRecording, NodeId, Step
+from pytest_given.model import FixtureRecording, NodeId, SourceLocation, Step
 from pytest_given.template import (
     Narration,
     NarrationLiteral,
@@ -381,3 +381,29 @@ def test_finish_scenario_skip_reason_defaults_to_none() -> None:
     c.start_scenario(NodeId('t::x'), name='x', module='m', tags=[])
     s = c.finish_scenario(status='passed', duration_ms=0)
     assert s.skip_reason is None
+
+
+def test_start_scenario_stores_source() -> None:
+    collector = Collector()
+    src = SourceLocation(relpath='tests/test_x.py', line=5)
+    collector.start_scenario(
+        scenario_id=NodeId('tests/test_x.py::test_y'),
+        name='S',
+        module='m',
+        tags=[],
+        source=src,
+    )
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    assert scenario.source == src
+
+
+def test_start_scenario_source_defaults_to_none() -> None:
+    collector = Collector()
+    collector.start_scenario(
+        scenario_id=NodeId('t::y'),
+        name='S',
+        module='m',
+        tags=[],
+    )
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    assert scenario.source is None

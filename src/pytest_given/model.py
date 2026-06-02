@@ -37,6 +37,19 @@ class Attachment:
     content_type: ContentType = 'text'
 
 
+@dataclass(frozen=True)
+class SourceLocation:
+    """A file/line pointer to a scenario's test function.
+
+    `relpath` is POSIX-normalized and relative to pytest's rootdir; `line` is
+    1-indexed. Stored on Scenario; rootdir is never serialized to avoid
+    leaking local paths.
+    """
+
+    relpath: str
+    line: int
+
+
 @dataclass
 class ErrorInfo:
     message: str
@@ -96,6 +109,7 @@ class Scenario:
     parameters: ParameterTable | None = None
     error: ErrorInfo | None = None
     skip_reason: str | None = None
+    source: SourceLocation | None = None
 
 
 @dataclass
@@ -104,6 +118,7 @@ class Metadata:
     timestamp: str
     pytest_version: str
     plugin_version: str
+    commit_sha: str | None = None
 
 
 @dataclass

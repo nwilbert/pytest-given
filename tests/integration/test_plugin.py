@@ -1024,3 +1024,148 @@ def test_helper_function_decorator_called_outside_scenario_is_silent(pytester):
     )
     result = pytester.runpytest('-W', 'error', '-v')
     assert result.ret == 0
+
+
+def test_scenario_source_captured_in_json(pytester, tmp_path):
+    """Each scenario in the JSON carries a source {relpath, line}."""
+    pytester.makepyfile(
+        test_src_link="""
+        from pytest_given import scenario, when
+
+        @scenario("A")
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    src = data['scenarios'][0]['source']
+    assert src is not None
+    assert src['relpath'].endswith('test_src_link.py')
+    assert isinstance(src['line'], int)
+    assert src['line'] >= 1
+
+
+def test_metadata_commit_sha_captured(pytester, tmp_path, monkeypatch):
+    """metadata.commit_sha is populated from env vars."""
+    monkeypatch.setenv('GITHUB_SHA', 'integration-sha')
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario("A")
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    assert data['metadata']['commit_sha'] == 'integration-sha'
+
+
+def test_given_source_link_cli_flag_emits_anchor(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario("A")
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    html_path = tmp_path / 'report.html'
+    result = pytester.runpytest(
+        f'--given-json={json_path}',
+        '--given-html',
+        f'--given-html-output={html_path}',
+        '--given-source-link=vscode',
+    )
+    result.assert_outcomes(passed=1)
+    content = html_path.read_text(encoding='utf-8')
+    assert '<a href="vscode://file/' in content
+    assert '<div class="scenario-source">' in content
+
+
+def test_given_source_link_ini_value(pytester, tmp_path):
+    pytester.makeini(
+        """
+        [pytest]
+        given_source_link = zed
+        """
+    )
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario("A")
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    html_path = tmp_path / 'report.html'
+    pytester.runpytest(
+        f'--given-json={json_path}',
+        '--given-html',
+        f'--given-html-output={html_path}',
+    )
+    content = html_path.read_text(encoding='utf-8')
+    assert '<a href="zed://file/' in content
+
+
+def test_given_source_link_cli_overrides_ini(pytester, tmp_path):
+    pytester.makeini(
+        """
+        [pytest]
+        given_source_link = zed
+        """
+    )
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario("A")
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    html_path = tmp_path / 'report.html'
+    pytester.runpytest(
+        f'--given-json={json_path}',
+        '--given-html',
+        f'--given-html-output={html_path}',
+        '--given-source-link=vscode',
+    )
+    content = html_path.read_text(encoding='utf-8')
+    assert '<a href="vscode://file/' in content
+    assert 'zed://file/' not in content
+
+
+def test_given_source_link_unknown_preset_raises(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario("A")
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(
+        f'--given-json={json_path}',
+        '--given-html',
+        '--given-source-link=emacs',
+    )
+    assert 'emacs' in (result.stderr.str() + result.stdout.str())

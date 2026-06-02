@@ -1,3 +1,7 @@
+import dataclasses
+
+import pytest
+
 from pytest_given.model import (
     Attachment,
     ErrorInfo,
@@ -9,6 +13,7 @@ from pytest_given.model import (
     RecordingState,
     ReportData,
     Scenario,
+    SourceLocation,
     Step,
 )
 from pytest_given.template import (
@@ -143,3 +148,25 @@ def test_scenario_narration_defaults_to_plain_text() -> None:
 def test_scenario_skip_reason_defaults_to_none() -> None:
     s = Scenario(id=NodeId('t::x'), narration=Narration(text='x'), module='m')
     assert s.skip_reason is None
+
+
+def test_source_location_is_frozen() -> None:
+    src = SourceLocation(relpath='tests/test_x.py', line=42)
+    assert src.relpath == 'tests/test_x.py'
+    assert src.line == 42
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        src.line = 99  # type: ignore[misc]
+
+
+def test_scenario_source_defaults_to_none() -> None:
+    s = Scenario(
+        id=NodeId('test.py::t'),
+        narration=_n('n'),
+        module='mod',
+    )
+    assert s.source is None
+
+
+def test_metadata_commit_sha_defaults_to_none() -> None:
+    m = Metadata(project='p', timestamp='t', pytest_version='9', plugin_version='0.1')
+    assert m.commit_sha is None

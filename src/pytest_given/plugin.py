@@ -8,7 +8,7 @@ import json
 import time
 from collections.abc import Generator
 from datetime import UTC, datetime
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Any, cast
 
 import pytest
@@ -30,8 +30,12 @@ from pytest_given.model import (
     ParamSpec,
     ReportData,
     Scenario,
+    SourceLocation,
     Step,
 )
+from pytest_given.renderer import render_html
+from pytest_given.serde import report_to_dict
+from pytest_given.source_link import detect_commit_sha, resolve_template
 from pytest_given.template import (
     Narration,
     NarrationLiteral,
@@ -61,6 +65,20 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         '--given-html-output',
         default='given-report/report.html',
         help='Output path for HTML report (default: given-report/report.html)',
+    )
+    group.addoption(
+        '--given-source-link',
+        default=None,
+        help=(
+            'Source-link template or preset (vscode, cursor, zed, pycharm, '
+            'github, none). See README for available variables.'
+        ),
+    )
+    parser.addini(
+        'given_source_link',
+        type='string',
+        default='none',
+        help='Source-link template or preset name (CLI flag overrides this).',
     )
 
 
@@ -123,11 +141,17 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     mod = getattr(item, 'module', None)
     module = mod.__name__ if mod else item.nodeid.split('::')[0]
     node_id = NodeId(item.nodeid)
+    relpath_raw, lineno0, _ = item.location
+    source = SourceLocation(
+        relpath=PurePath(relpath_raw).as_posix(),
+        line=(lineno0 or 0) + 1,
+    )
     collector.start_scenario(
         scenario_id=node_id,
         name=scenario_marker.name,
         module=module,
         tags=scenario_marker.tags,
+        source=source,
     )
     set_active_collector(collector)
     callspec = getattr(item, 'callspec', None)
@@ -335,18 +359,19 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             timestamp=datetime.now(tz=UTC).isoformat(),
             pytest_version=pytest.__version__,
             plugin_version='0.1.0',
+            commit_sha=detect_commit_sha(),
         ),
         scenarios=scenarios,
     )
     json_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(
-        json.dumps(dataclasses.asdict(report), indent=2), encoding='utf-8'
-    )
+    json_path.write_text(json.dumps(report_to_dict(report), indent=2), encoding='utf-8')
     if session.config.getoption('given_html'):
-        from pytest_given.renderer import render_html
-
+        raw_link = session.config.getoption(
+            'given_source_link'
+        ) or session.config.getini('given_source_link')
+        template = resolve_template(raw_link)
         html_path = Path(session.config.getoption('given_html_output'))
-        render_html(json_path, html_path)
+        render_html(json_path, html_path, source_link_template=template)
 
 
 def _group_parameterized(

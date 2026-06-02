@@ -14,6 +14,7 @@ from pytest_given.model import (
     Phase,
     RecordingState,
     Scenario,
+    SourceLocation,
     Step,
 )
 from pytest_given.template import Narration, Template, narration_from
@@ -101,12 +102,14 @@ class Collector:
         name: str | Template,
         module: str,
         tags: list[str],
+        source: SourceLocation | None = None,
     ) -> None:
         self._current_scenario = Scenario(
             id=scenario_id,
             narration=narration_from(name),
             module=module,
             tags=tags,
+            source=source,
         )
         self._step_stack = []
         self._state = 'test'
