@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 from pytest_given.renderer import render_html
+from pytest_given.source_link import resolve_template
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -23,6 +24,14 @@ def main(argv: list[str] | None = None) -> int:
         default=Path('given-report/report.html'),
         help='Output HTML file path (default: given-report/report.html)',
     )
+    report_parser.add_argument(
+        '--source-link',
+        default='none',
+        help=(
+            'Source-link template or preset (vscode, cursor, zed, pycharm, '
+            'github, none). See README for variables.'
+        ),
+    )
 
     args = parser.parse_args(argv)
 
@@ -30,7 +39,8 @@ def main(argv: list[str] | None = None) -> int:
         if not args.json_file.exists():
             print(f'Error: {args.json_file} not found', file=sys.stderr)
             return 1
-        render_html(args.json_file, args.output)
+        template = resolve_template(args.source_link)
+        render_html(args.json_file, args.output, source_link_template=template)
         print(f'Report generated: {args.output}')
         return 0
 

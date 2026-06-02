@@ -173,14 +173,70 @@ The JSON report is **always written** whenever the plugin is loaded — every `p
 | `--given-json=PATH` | `given-report/report-data.json` | JSON output path (always written) |
 | `--given-html` | off | Also generate the HTML report |
 | `--given-html-output=PATH` | `given-report/report.html` | HTML output path (used only with `--given-html`) |
+| `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card. See [Source links](#source-links). |
+
+## Source links
+
+Add a clickable file:line anchor to each scenario card so devs can jump straight to the test source.
+
+```toml
+# pyproject.toml — pytest 9+ canonical form
+[tool.pytest]
+given_source_link = "vscode"
+```
+
+Or pass it on the CLI: `pytest --given-html --given-source-link=vscode`.
+
+| Preset    | Opens in     | Template                                                                              |
+|-----------|--------------|----------------------------------------------------------------------------------------|
+| `none`    | (no link)    | —                                                                                      |
+| `vscode`  | VS Code      | `vscode://file/{path}:{line}`                                                          |
+| `cursor`  | Cursor       | `cursor://file/{path}:{line}`                                                          |
+| `zed`     | Zed          | `zed://file/{path}:{line}`                                                             |
+| `pycharm` | PyCharm/IDEA | `jetbrains://pycharm/navigate/reference?project={project}&path={relpath}:{line}`       |
+| `github`  | GitHub (web) | `https://github.com/<org>/<repo>/blob/{sha}/{relpath}#L{line}` — `<org>/<repo>` auto-detected from `GITHUB_REPOSITORY` or `git remote get-url origin` (HTTPS and SSH forms both supported) |
+
+For a raw template, use any of these variables:
+
+| Variable     | Source                                                                                                   |
+|--------------|----------------------------------------------------------------------------------------------------------|
+| `{path}`     | Absolute POSIX path (resolved at render time against the cwd)                                            |
+| `{relpath}`  | POSIX path relative to pytest's rootdir                                                                  |
+| `{line}`     | 1-indexed line of the scenario's `def`                                                                   |
+| `{project}`  | Basename of pytest's rootdir                                                                             |
+| `{sha}`      | Commit SHA from `GITHUB_SHA` / `CI_COMMIT_SHA` / `BUILDKITE_COMMIT`, falling back to `git rev-parse HEAD` |
+
+Examples:
+
+```toml
+# Monorepo: IDE project name differs from directory name
+given_source_link = "jetbrains://pycharm/navigate/reference?project=MyMonorepo&path={relpath}:{line}"
+
+# CI archives → SHA-pinned GitHub permalinks (preset auto-detects org/repo)
+given_source_link = "github"
+
+# Same as a raw template — pin org/repo explicitly. Useful when origin is a
+# mirror, fork URL, or non-standard remote that the preset can't parse:
+given_source_link = "https://github.com/myorg/myrepo/blob/{sha}/{relpath}#L{line}"
+```
+
+Caveats:
+
+- Editor presets (`vscode` / `cursor` / `zed`) resolve `{path}` from the current working directory at render time. Re-rendering a CI-downloaded JSON from a different directory will produce broken links.
+- The GitHub-permalink template is SHA-pinned, so links remain stable after the line moves — what an archived CI report wants.
+- The `github` preset bakes the detected org/repo into the template at config-resolution time (session start / CLI invocation). If you later re-render the same JSON elsewhere, the org/repo in the link is the one detected on the original run.
+- Pytest 9 uses `[tool.pytest]`; older pytest used `[tool.pytest.ini_options]` (still accepted for back-compat).
 
 ## Standalone CLI
 
 Regenerate the HTML from a saved JSON file at any time:
 
 ```bash
-pytest-given report path/to/report-data.json -o path/to/report.html
+pytest-given report path/to/report-data.json -o path/to/report.html \
+    --source-link=vscode
 ```
+
+`--source-link` accepts the same presets and raw templates as `--given-source-link` (see [Source links](#source-links)). Omit it (or pass `--source-link=none`) to render plain file:line text without an anchor.
 
 ## Examples
 

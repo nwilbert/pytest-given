@@ -156,7 +156,7 @@
         <tbody>
           {% for case in scenario.parameters.cases %}
           <tr class="{{ 'failed-row' if case.status == 'failed' else '' }}">
-            {% for val in case["values"] %}
+            {% for val in case.values %}
             <td>{{ val }}</td>
             {% endfor %}
             <td style="text-align:right">
@@ -182,6 +182,17 @@
       <div class="error-block">
         <div class="error-message">{{ scenario.error.message }}</div>
         {% if scenario.error.diff %}<pre class="error-diff">{{ scenario.error.diff }}</pre>{% endif %}
+      </div>
+      {% endif %}
+
+      {% if scenario.source %}
+      <div class="scenario-source">
+        {%- set src_url = source_urls.get(loop.index0) -%}
+        {%- if src_url -%}
+        <a href="{{ src_url }}">{{ scenario.source.relpath }}:{{ scenario.source.line }}</a>
+        {%- else -%}
+        <span>{{ scenario.source.relpath }}:{{ scenario.source.line }}</span>
+        {%- endif -%}
       </div>
       {% endif %}
     </div>

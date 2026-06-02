@@ -53,3 +53,4 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Renderer** | Converts a JSON report into a self-contained HTML page. |
 | **Parameter coloring** | Each parametrize column gets a stable highlight color; placeholders and matching values share that color wherever they appear in step text and the parameter table. |
 | **Value highlight** | A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column (e.g., a computed expression like `price * 1.2`). |
+| **Source link** | A clickable file:line anchor on a scenario card. Resolved from the `given_source_link` config (preset name like `vscode` / `github`, or a raw URL template). Captured per-scenario as a `SourceLocation` (POSIX relpath + 1-indexed line) from `pytest.Item.location`. Disabled by default. |

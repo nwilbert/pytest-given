@@ -632,3 +632,117 @@ def test_render_parameter_table_skipped_case_uses_dot_skipped(tmp_path: Path) ->
     content = html_path.read_text(encoding='utf-8')
     assert '<span class="dot-skipped">○</span>' in content
     assert '<span class="dot-failed">✗</span>' not in content
+
+
+def test_renderer_emits_source_links_when_template_set(tmp_path: Path) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                    'commit_sha': None,
+                },
+                'scenarios': [
+                    {
+                        'id': 'i',
+                        'narration': _narration('S'),
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                        'source': {'relpath': 'tests/test_x.py', 'line': 9},
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(
+        json_path, html_path, source_link_template='vscode://file/{path}:{line}'
+    )
+    content = html_path.read_text(encoding='utf-8')
+    assert 'tests/test_x.py:9' in content
+    assert 'vscode://file/' in content
+    assert '<a href="vscode://file/' in content
+
+
+def test_renderer_without_template_renders_plain_relpath(tmp_path: Path) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'i',
+                        'narration': _narration('S'),
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                        'source': {'relpath': 'tests/test_x.py', 'line': 9},
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert 'tests/test_x.py:9' in content
+    assert '<a href="vscode' not in content
+
+
+def test_renderer_skips_link_block_when_scenario_has_no_source(
+    tmp_path: Path,
+) -> None:
+    """Older JSON without `source` simply doesn't render the link row."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'i',
+                        'narration': _narration('S'),
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(
+        json_path, html_path, source_link_template='vscode://file/{path}:{line}'
+    )
+    content = html_path.read_text(encoding='utf-8')
+    # The CSS class is always emitted in the stylesheet; what we care about
+    # is that no scenario-source <div> was rendered for this scenario.
+    assert '<div class="scenario-source">' not in content

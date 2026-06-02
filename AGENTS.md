@@ -28,10 +28,13 @@ Individual sessions:
 - `src/pytest_given/__init__.py` — Public API: `scenario`, `given`, `when`, `then`, `attach`, `Template`
 - `src/pytest_given/decorators.py` — `StepDescriptor` + `ScenarioDecorator`: dual context-manager/decorator, cross-phase nesting detection, thread-local state
 - `src/pytest_given/template.py` — `Template` (deferred brace substitution for `@scenario(...)`) + `Narration` dataclass (`text` + `parts`) with structured part dataclasses (`NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationPart` union); `narration_from(...)` dispatches `str` / `Template` / t-string into a `Narration`
+- `src/pytest_given/model.py` — Frozen / mutable dataclasses for the report tree (`ReportData`, `Metadata`, `Scenario`, `Step`, `Attachment`, `ErrorInfo`, `ParameterTable`, `ParameterCase`, `SourceLocation`); plus `NodeId` / `Phase` aliases
 - `src/pytest_given/collector.py` — Step stack, collects scenario data during test execution
-- `src/pytest_given/plugin.py` — pytest hooks, parametrized test grouping, structural templatize
-- `src/pytest_given/renderer.py` — JSON to self-contained HTML (Jinja2 + Alpine.js); single structural `narration` filter dispatching on serialized `Narration` parts
-- `src/pytest_given/cli.py` — Standalone `pytest-given report` command
+- `src/pytest_given/plugin.py` — pytest hooks, parametrized test grouping, structural templatize, scenario-source capture from `item.location`
+- `src/pytest_given/source_link.py` — Preset resolution (`vscode` / `cursor` / `zed` / `pycharm` / `github`), template variable substitution, GitHub org/repo + commit-SHA detection for `--given-source-link`
+- `src/pytest_given/serde.py` — `report_to_dict` / `report_from_dict` boundary between JSON and the dataclass model; discriminates the three `NarrationPart` variants by key
+- `src/pytest_given/renderer.py` — Reads JSON via `report_from_dict` and walks typed dataclasses; emits self-contained HTML (Jinja2 + Alpine.js); single structural `narration` filter dispatching on `NarrationPart` variants via `match`/`case`
+- `src/pytest_given/cli.py` — Standalone `pytest-given report` command (mirrors `--given-source-link` as `--source-link`)
 - `src/pytest_given/templates/` — Jinja2 template, CSS, bundled Alpine.js
 
 ### Step text & placeholders

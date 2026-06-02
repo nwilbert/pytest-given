@@ -117,4 +117,6 @@ def examples(session: nox.Session) -> None:
         '-q',
         success_codes=[0, 1],
     )
-    session.log('Note: 1 intentional failure is expected (demonstrates failure rendering).')
+    session.log(
+        'Note: 1 intentional failure is expected (demonstrates failure rendering).'
+    )
