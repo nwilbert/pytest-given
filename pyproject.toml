@@ -45,31 +45,7 @@ exclude-newer = "7d"
 quote-style = "single"
 
 [tool.ruff.lint]
-select = ["B", "C4", "E", "F", "I", "PT", "RUF", "SIM", "TID251", "TID253", "UP", "W", "PYI"]
-
-[tool.ruff.lint.flake8-tidy-imports]
-# TID253: enforced in report/ — bans imports of capture/ and of model/ submodules.
-banned-module-level-imports = [
-    "pytest_given.capture",
-    "pytest_given.model.schema",
-    "pytest_given.model.serde",
-    "pytest_given.model.errors",
-]
-
-[tool.ruff.lint.flake8-tidy-imports.banned-api]
-# TID251: enforced in capture/ — bans imports of report/ and of model/ submodules.
-"pytest_given.report" = { msg = "capture/ may not depend on report/. Both capture and report depend on model; they do not depend on each other." }
-"pytest_given.model.schema" = { msg = "Cross-subpackage code must import from pytest_given.model, not its submodules." }
-"pytest_given.model.serde" = { msg = "Cross-subpackage code must import from pytest_given.model, not its submodules." }
-"pytest_given.model.errors" = { msg = "Cross-subpackage code must import from pytest_given.model, not its submodules." }
-
-[tool.ruff.lint.per-file-ignores]
-"src/pytest_given/__init__.py" = ["TID251", "TID253"]
-"src/pytest_given/plugin.py" = ["TID251", "TID253"]
-"src/pytest_given/capture/**" = ["TID253"]
-"src/pytest_given/report/**" = ["TID251"]
-"src/pytest_given/model/**" = ["TID251", "TID253"]
-"tests/**" = ["TID251", "TID253"]
+select = ["B", "C4", "E", "F", "I", "PT", "RUF", "SIM", "UP", "W", "PYI"]
 
 [tool.pytest]
 testpaths = ["tests"]

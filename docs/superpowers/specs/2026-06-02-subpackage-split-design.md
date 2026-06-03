@@ -61,34 +61,16 @@ Rationale: this matches modern Python library convention (Black, Rich, Pydantic,
 
 Tests and other code outside `src/pytest_given/` use absolute imports as usual (`from pytest_given.model import Scenario`).
 
-### Boundary and direction enforcement (lint rule)
+### Boundary and direction (convention, not lint-enforced)
 
-Two ruff rules under `flake8-tidy-imports` together enforce both the submodule boundary and the dependency direction:
+The convention has two parts, both carried by reviewer/agent discipline rather than by a lint rule:
 
-1. **Submodule boundary** — siblings must go through the subpackage root, not into its submodules.
-2. **Dependency direction** — `capture` and `report` must not depend on each other; both may depend on `model`.
+1. **Dependency direction** — `capture` and `report` must not depend on each other; both may depend on `model`.
+2. **Submodule boundary** — siblings should go through the subpackage root (`from ..model import Scenario`) rather than reaching into submodules (`from ..model.schema import Scenario`).
 
-A single rule cannot express this because ruff resolves the `from` clause prefix-matches against banned-api entries: banning `pytest_given.capture` would catch `from .x import Y` inside `capture/` itself (the relative import resolves to a path under `pytest_given.capture`). Per-file-ignores disable a rule entirely for matched files, not per-entry. So we split into two rules with disjoint ban lists, per-file-ignored on opposite sides:
+An earlier draft of this spec proposed enforcing both via ruff's `flake8-tidy-imports` (`TID251` + `TID253`) with per-file-ignores. The implementation worked but the config was hard to maintain: ruff prefix-matches the `from` clause against banned-api entries, which forced a two-rule scheme with mirrored ban lists and per-file-ignores arranged in opposing pairs. We backed it out in favor of the convention-only approach plus AGENTS.md documentation. If we later want lint-level enforcement, `import-linter` is the canonical tool — its `layers` contract expresses the direction rule cleanly in one block.
 
-| Rule | Bans | Enforced in | Per-file-ignored in |
-|---|---|---|---|
-| `TID251` (banned-api) | `pytest_given.report`, `pytest_given.model.schema`, `.serde`, `.errors` | `capture/` | `report/**`, `model/**`, `src/pytest_given/__init__.py`, `tests/**` |
-| `TID253` (banned-module-level-imports) | `pytest_given.capture`, `pytest_given.model.schema`, `.serde`, `.errors` | `report/` | `capture/**`, `model/**`, `src/pytest_given/__init__.py`, `tests/**` |
-
-The ruff `select` list explicitly enables `TID251` and `TID253` only — **not** the umbrella `TID`, which would also enable `TID252` (forbid all parent-relative imports) and conflict with the chosen import style.
-
-`TID253` only fires on module-level imports; this is compatible with the existing project rule that all imports must be module-level (see `AGENTS.md`).
-
-**Per-file ignore rationale:**
-
-- `src/pytest_given/__init__.py` is fully exempt — it's the package's public-API assembly point and must reach into all three subpackages.
-- `src/pytest_given/plugin.py` is fully exempt — as the pytest11 orchestrator it sits above the subpackages and is allowed to import from all of them (capture for the collector and decorator hooks, report for `render_html`/`resolve_template`/`detect_commit_sha`, model for schema types).
-- `tests/**` is fully exempt — tests may import any internal path.
-- `capture/**` ignores `TID253` because `TID253` bans `pytest_given.capture` (so it would fire on `capture/`'s own `from .x` imports via prefix match). `TID251` still fires in `capture/` for `pytest_given.report` and `pytest_given.model.<submodule>`.
-- `report/**` ignores `TID251` for the symmetric reason. `TID253` still fires in `report/` for `pytest_given.capture` and `pytest_given.model.<submodule>`.
-- `model/**` ignores both — `model` is the leaf subpackage and has no need to import from `capture` or `report`. (Minor weakness: a stray cross-subpackage import written inside `model/` would slip through; this relies on review to catch, since such imports would be architecturally surprising.)
-
-Exact ruff configuration is settled in the implementation plan.
+Inside the package, use relative imports throughout (`from .schema import X` for siblings, `from ..model import X` for cross-subpackage through the root). The top-level `__init__.py` and `plugin.py` use absolute imports — both reach into all subpackages by design.
 
 ## File renames and content moves
 
@@ -108,7 +90,6 @@ No content merging, splitting, or restructuring beyond what's listed above.
 
 - `[project.entry-points."pytest11"] given` — stays at `pytest_given.plugin` (plugin.py remains at the top level as the orchestrator).
 - `[project.scripts] pytest-given` — change from `pytest_given.cli:main` to `pytest_given.report.cli:main`.
-- Add `TID251` and `TID253` (explicitly, not the umbrella `TID`) to `[tool.ruff.lint] select`. Configure `[tool.ruff.lint.flake8-tidy-imports]` `banned-module-level-imports`, `[tool.ruff.lint.flake8-tidy-imports.banned-api]`, and `[tool.ruff.lint.per-file-ignores]` per the two-rule scheme described above.
 
 ### Top-level `pytest_given/__init__.py`
 
@@ -158,7 +139,7 @@ tests/unit/
 
 `AGENTS.md` gets a new entry under **Conventions** documenting the import convention so it carries beyond this refactor. Approximate wording:
 
-> Subpackage boundaries: each subpackage under `src/pytest_given/` (`capture/`, `report/`, `model/`) has a public surface defined by its `__init__.py`. Cross-subpackage code goes through the subpackage root (`from ..model import Scenario`), never reaches into submodules. Dependency direction: `capture` and `report` both depend on `model`; neither may depend on the other. Both rules are enforced by ruff `TID251`. Within a subpackage, prefer single-dot relative imports (`from .schema import Scenario`). Tests are exempt — they may import internals directly.
+> Subpackage boundaries (convention, not lint-enforced): each subpackage under `src/pytest_given/` (`capture/`, `report/`, `model/`) has a public surface defined by its `__init__.py`. Dependency direction: `capture` and `report` both depend on `model`; neither may depend on the other. `plugin.py` at the top level is the orchestrator and imports from all subpackages. Inside the package, use relative imports — single-dot for siblings, double-dot through the subpackage root for cross-subpackage. The top-level `__init__.py` and `plugin.py` use absolute imports. Tests use absolute imports and may reach into any internal path.
 
 `GLOSSARY.md`, `README.md`, and other docs are not expected to need changes — the public API surface is unchanged.
 
