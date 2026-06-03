@@ -14,13 +14,13 @@ from typing import Any, cast
 import pytest
 from _pytest.fixtures import SubRequest
 
-from pytest_given.capture import (
+from .capture import (
     Collector,
     FixtureInstanceKey,
     Template,
     set_active_collector,
 )
-from pytest_given.model import (
+from .model import (
     FixtureRecording,
     Metadata,
     Narration,
@@ -40,7 +40,7 @@ from pytest_given.model import (
     Step,
     report_to_dict,
 )
-from pytest_given.report import detect_commit_sha, render_html, resolve_template
+from .report import detect_commit_sha, render_html, resolve_template
 
 collector = Collector()
 
