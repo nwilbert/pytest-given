@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from pytest_given.cli import main
+from pytest_given.report.cli import main
 
 
 def test_cli_generates_html(tmp_path: Path) -> None:

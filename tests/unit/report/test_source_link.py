@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from pytest_given.model import PytestGivenError, SourceLocation
-from pytest_given.source_link import (
+from pytest_given.report.source_link import (
     detect_commit_sha,
     format_source_link,
     resolve_template,

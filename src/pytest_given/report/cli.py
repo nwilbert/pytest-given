@@ -2,8 +2,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from pytest_given.renderer import render_html
-from pytest_given.source_link import resolve_template
+from .renderer import render_html
+from .source_link import resolve_template
 
 
 def main(argv: list[str] | None = None) -> int:

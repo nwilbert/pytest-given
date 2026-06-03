@@ -15,7 +15,7 @@ dependencies = [
 given = "pytest_given.plugin"
 
 [project.scripts]
-pytest-given = "pytest_given.cli:main"
+pytest-given = "pytest_given.report.cli:main"
 
 [dependency-groups]
 lint = ["ruff>=0.15.13"]

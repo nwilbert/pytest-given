@@ -40,8 +40,7 @@ from pytest_given.model import (
     Step,
     report_to_dict,
 )
-from pytest_given.renderer import render_html
-from pytest_given.source_link import detect_commit_sha, resolve_template
+from pytest_given.report import detect_commit_sha, render_html, resolve_template
 
 collector = Collector()
 

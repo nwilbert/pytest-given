@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from pytest_given.renderer import render_html
+from pytest_given.report.renderer import render_html
 
 
 def _narration(text: str, parts: list | None = None) -> dict:
