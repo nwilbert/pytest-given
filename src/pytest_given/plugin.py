@@ -14,14 +14,20 @@ from typing import Any, cast
 import pytest
 from _pytest.fixtures import SubRequest
 
-from pytest_given.collector import (
+from pytest_given.capture import (
     Collector,
     FixtureInstanceKey,
+    Template,
     set_active_collector,
 )
 from pytest_given.model import (
     FixtureRecording,
     Metadata,
+    Narration,
+    NarrationLiteral,
+    NarrationPart,
+    NarrationPlaceholder,
+    NarrationValue,
     NodeId,
     ParameterCase,
     ParameterTable,
@@ -36,14 +42,6 @@ from pytest_given.model import (
 )
 from pytest_given.renderer import render_html
 from pytest_given.source_link import detect_commit_sha, resolve_template
-from pytest_given.template import (
-    Narration,
-    NarrationLiteral,
-    NarrationPart,
-    NarrationPlaceholder,
-    NarrationValue,
-    Template,
-)
 
 collector = Collector()
 

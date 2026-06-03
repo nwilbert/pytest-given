@@ -1,19 +1,17 @@
 import pytest
 
 from pytest_given import Template
-from pytest_given.collector import Collector
+from pytest_given.capture.collector import Collector
 from pytest_given.model import (
     FixtureRecording,
-    NodeId,
-    PytestGivenError,
-    SourceLocation,
-    Step,
-)
-from pytest_given.template import (
     Narration,
     NarrationLiteral,
     NarrationPart,
     NarrationValue,
+    NodeId,
+    PytestGivenError,
+    SourceLocation,
+    Step,
 )
 
 

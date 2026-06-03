@@ -5,14 +5,15 @@ from pathlib import Path
 import jinja2
 from markupsafe import Markup, escape
 
-from pytest_given.model import Scenario, report_from_dict
-from pytest_given.source_link import format_source_link
-from pytest_given.template import (
+from pytest_given.model import (
     Narration,
     NarrationLiteral,
     NarrationPlaceholder,
     NarrationValue,
+    Scenario,
+    report_from_dict,
 )
+from pytest_given.source_link import format_source_link
 
 _NUM_PARAM_COLORS = 6
 

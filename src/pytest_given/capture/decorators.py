@@ -9,17 +9,17 @@ from typing import Any, Self
 
 import pytest
 
-from pytest_given.collector import get_active_collector
-from pytest_given.model import Phase, PytestGivenError
-from pytest_given.template import (
+from ..model import (
     Narration,
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
     NarrationValue,
-    Template,
-    narration_from,
+    Phase,
+    PytestGivenError,
 )
+from .collector import get_active_collector
+from .template import Template, narration_from
 
 _TEMPLATE_PARAM_KINDS = frozenset(
     {

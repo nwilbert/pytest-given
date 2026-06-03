@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from string import Formatter, templatelib
 from typing import Any
 
-from pytest_given.model import (
+from ..model import (
     Narration,
     NarrationLiteral,
     NarrationPart,

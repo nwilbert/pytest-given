@@ -3,11 +3,12 @@ from collections.abc import Iterator
 from contextvars import ContextVar
 from dataclasses import dataclass
 
-from pytest_given.model import (
+from ..model import (
     Attachment,
     ContentType,
     ErrorInfo,
     FixtureRecording,
+    Narration,
     NodeId,
     ParamInfo,
     Phase,
@@ -17,7 +18,7 @@ from pytest_given.model import (
     SourceLocation,
     Step,
 )
-from pytest_given.template import Narration, Template, narration_from
+from .template import Template, narration_from
 
 
 @dataclass(frozen=True)

@@ -2,13 +2,12 @@ from string import templatelib
 
 import pytest
 
-from pytest_given.model import PytestGivenError
-from pytest_given.template import (
+from pytest_given.capture.template import Template, parse_tstring
+from pytest_given.model import (
     NarrationLiteral,
     NarrationPlaceholder,
     NarrationValue,
-    Template,
-    parse_tstring,
+    PytestGivenError,
 )
 
 

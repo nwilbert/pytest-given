@@ -1,10 +1,23 @@
 import pytest
 
 from pytest_given import Template
-from pytest_given.collector import Collector, set_active_collector
-from pytest_given.decorators import StepDescriptor, attach, given, scenario, then, when
-from pytest_given.model import FixtureRecording, PytestGivenError, Step
-from pytest_given.template import Narration, NarrationLiteral, NarrationValue
+from pytest_given.capture.collector import Collector, set_active_collector
+from pytest_given.capture.decorators import (
+    StepDescriptor,
+    attach,
+    given,
+    scenario,
+    then,
+    when,
+)
+from pytest_given.model import (
+    FixtureRecording,
+    Narration,
+    NarrationLiteral,
+    NarrationValue,
+    PytestGivenError,
+    Step,
+)
 
 
 def test_context_manager_basic() -> None:
