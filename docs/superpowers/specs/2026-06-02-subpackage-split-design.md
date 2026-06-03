@@ -144,7 +144,7 @@ tests/unit/
     test_renderer.py
     test_source_link.py
   model/
-    test_model.py
+    test_schema.py
     test_serde.py
     test_serializer.py
     test_errors.py
