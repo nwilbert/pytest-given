@@ -7,6 +7,10 @@ from pytest_given.model import (
     ErrorInfo,
     FixtureRecording,
     Metadata,
+    Narration,
+    NarrationLiteral,
+    NarrationPart,
+    NarrationPlaceholder,
     NodeId,
     ParameterCase,
     ParameterTable,
@@ -15,12 +19,6 @@ from pytest_given.model import (
     Scenario,
     SourceLocation,
     Step,
-)
-from pytest_given.template import (
-    Narration,
-    NarrationLiteral,
-    NarrationPart,
-    NarrationPlaceholder,
 )
 
 

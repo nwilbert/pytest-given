@@ -10,8 +10,7 @@ import pytest
 from pytest_given import plugin
 from pytest_given.collector import Collector, get_active_collector, set_active_collector
 from pytest_given.decorators import StepDescriptor
-from pytest_given.errors import PytestGivenError
-from pytest_given.model import NodeId, ParamSpec, Scenario
+from pytest_given.model import NodeId, ParamSpec, PytestGivenError, Scenario
 from pytest_given.template import Narration, NarrationPlaceholder
 
 

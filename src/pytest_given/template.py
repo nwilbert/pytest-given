@@ -1,51 +1,17 @@
 from collections.abc import Mapping
-from dataclasses import dataclass, field
 from string import Formatter, templatelib
 from typing import Any
 
-from pytest_given.errors import PytestGivenError
+from pytest_given.model import (
+    Narration,
+    NarrationLiteral,
+    NarrationPart,
+    NarrationPlaceholder,
+    NarrationValue,
+    PytestGivenError,
+)
 
 _FORMATTER = Formatter()
-
-
-@dataclass(frozen=True, kw_only=True)
-class NarrationLiteral:
-    value: str
-
-
-@dataclass(frozen=True, kw_only=True)
-class NarrationValue:
-    """A t-string interpolation — value already known at construction time."""
-
-    rendered: str
-    expression: str
-    format_spec: str = ''
-    conversion: str | None = None
-
-
-@dataclass(frozen=True, kw_only=True)
-class NarrationPlaceholder:
-    """A deferred placeholder — resolved at render time from a per-case mapping."""
-
-    name: str
-    format_spec: str = ''
-    conversion: str | None = None
-
-
-type NarrationPart = NarrationLiteral | NarrationValue | NarrationPlaceholder
-
-
-@dataclass(frozen=True)
-class Narration:
-    """The text of a step or scenario, plus optional structured parts.
-
-    `text` is the rendered string for display. `parts` is empty for plain-string
-    inputs; non-empty when the source was a t-string or a `Template`, in which
-    case the parts reconstruct `text` and carry per-part highlighting metadata.
-    """
-
-    text: str
-    parts: list[NarrationPart] = field(default_factory=list)
 
 
 def narration_from(value: str | Template | templatelib.Template) -> Narration:

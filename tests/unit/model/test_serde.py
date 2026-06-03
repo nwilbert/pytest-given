@@ -2,25 +2,24 @@ import dataclasses
 
 import pytest
 
-from pytest_given.errors import PytestGivenError
 from pytest_given.model import (
     Attachment,
     ErrorInfo,
     Metadata,
-    NodeId,
-    ParameterCase,
-    ParameterTable,
-    ReportData,
-    Scenario,
-    SourceLocation,
-    Step,
-)
-from pytest_given.serde import report_from_dict, report_to_dict
-from pytest_given.template import (
     Narration,
     NarrationLiteral,
     NarrationPlaceholder,
     NarrationValue,
+    NodeId,
+    ParameterCase,
+    ParameterTable,
+    PytestGivenError,
+    ReportData,
+    Scenario,
+    SourceLocation,
+    Step,
+    report_from_dict,
+    report_to_dict,
 )
 
 

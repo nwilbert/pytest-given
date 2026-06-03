@@ -2,8 +2,13 @@ import pytest
 
 from pytest_given import Template
 from pytest_given.collector import Collector
-from pytest_given.errors import PytestGivenError
-from pytest_given.model import FixtureRecording, NodeId, SourceLocation, Step
+from pytest_given.model import (
+    FixtureRecording,
+    NodeId,
+    PytestGivenError,
+    SourceLocation,
+    Step,
+)
 from pytest_given.template import (
     Narration,
     NarrationLiteral,

@@ -5,13 +5,13 @@ from pytest_given.model import (
     Attachment,
     ErrorInfo,
     Metadata,
+    Narration,
     ParameterCase,
     ParameterTable,
     ReportData,
     Scenario,
     Step,
 )
-from pytest_given.template import Narration
 
 
 def _n(text: str) -> Narration:

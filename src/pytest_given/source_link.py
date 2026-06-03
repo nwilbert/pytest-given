@@ -13,8 +13,7 @@ import subprocess
 from pathlib import Path
 from typing import Literal
 
-from pytest_given.errors import PytestGivenError
-from pytest_given.model import SourceLocation
+from pytest_given.model import PytestGivenError, SourceLocation
 
 type SourceLinkPreset = Literal['vscode', 'cursor', 'zed', 'pycharm', 'github']
 

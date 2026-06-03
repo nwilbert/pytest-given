@@ -3,7 +3,6 @@ from collections.abc import Iterator
 from contextvars import ContextVar
 from dataclasses import dataclass
 
-from pytest_given.errors import PytestGivenError
 from pytest_given.model import (
     Attachment,
     ContentType,
@@ -12,6 +11,7 @@ from pytest_given.model import (
     NodeId,
     ParamInfo,
     Phase,
+    PytestGivenError,
     RecordingState,
     Scenario,
     SourceLocation,

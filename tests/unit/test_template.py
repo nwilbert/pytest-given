@@ -2,7 +2,7 @@ from string import templatelib
 
 import pytest
 
-from pytest_given.errors import PytestGivenError
+from pytest_given.model import PytestGivenError
 from pytest_given.template import (
     NarrationLiteral,
     NarrationPlaceholder,

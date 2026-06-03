@@ -5,8 +5,7 @@ from pathlib import Path
 import jinja2
 from markupsafe import Markup, escape
 
-from pytest_given.model import Scenario
-from pytest_given.serde import report_from_dict
+from pytest_given.model import Scenario, report_from_dict
 from pytest_given.source_link import format_source_link
 from pytest_given.template import (
     Narration,

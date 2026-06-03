@@ -19,7 +19,6 @@ from pytest_given.collector import (
     FixtureInstanceKey,
     set_active_collector,
 )
-from pytest_given.errors import PytestGivenError
 from pytest_given.model import (
     FixtureRecording,
     Metadata,
@@ -28,13 +27,14 @@ from pytest_given.model import (
     ParameterTable,
     ParamInfo,
     ParamSpec,
+    PytestGivenError,
     ReportData,
     Scenario,
     SourceLocation,
     Step,
+    report_to_dict,
 )
 from pytest_given.renderer import render_html
-from pytest_given.serde import report_to_dict
 from pytest_given.source_link import detect_commit_sha, resolve_template
 from pytest_given.template import (
     Narration,

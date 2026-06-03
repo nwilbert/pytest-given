@@ -13,12 +13,17 @@ the parent type but each carry a distinct key (`value` / `rendered` / `name`).
 import dataclasses
 from typing import Any
 
-from pytest_given.errors import PytestGivenError
-from pytest_given.model import (
+from .errors import PytestGivenError
+from .schema import (
     Attachment,
     ContentType,
     ErrorInfo,
     Metadata,
+    Narration,
+    NarrationLiteral,
+    NarrationPart,
+    NarrationPlaceholder,
+    NarrationValue,
     NodeId,
     ParameterCase,
     ParameterTable,
@@ -27,13 +32,6 @@ from pytest_given.model import (
     Scenario,
     SourceLocation,
     Step,
-)
-from pytest_given.template import (
-    Narration,
-    NarrationLiteral,
-    NarrationPart,
-    NarrationPlaceholder,
-    NarrationValue,
 )
 
 

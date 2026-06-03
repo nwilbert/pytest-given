@@ -1,7 +1,46 @@
 from dataclasses import dataclass, field
 from typing import Any, Literal, NamedTuple, NewType
 
-from pytest_given.template import Narration
+
+@dataclass(frozen=True, kw_only=True)
+class NarrationLiteral:
+    value: str
+
+
+@dataclass(frozen=True, kw_only=True)
+class NarrationValue:
+    """A t-string interpolation — value already known at construction time."""
+
+    rendered: str
+    expression: str
+    format_spec: str = ''
+    conversion: str | None = None
+
+
+@dataclass(frozen=True, kw_only=True)
+class NarrationPlaceholder:
+    """A deferred placeholder — resolved at render time from a per-case mapping."""
+
+    name: str
+    format_spec: str = ''
+    conversion: str | None = None
+
+
+type NarrationPart = NarrationLiteral | NarrationValue | NarrationPlaceholder
+
+
+@dataclass(frozen=True)
+class Narration:
+    """The text of a step or scenario, plus optional structured parts.
+
+    `text` is the rendered string for display. `parts` is empty for plain-string
+    inputs; non-empty when the source was a t-string or a `Template`, in which
+    case the parts reconstruct `text` and carry per-part highlighting metadata.
+    """
+
+    text: str
+    parts: list[NarrationPart] = field(default_factory=list)
+
 
 # Pytest node ID, e.g. "tests/test_billing.py::test_buy_coffee[1-2-3]"
 NodeId = NewType('NodeId', str)

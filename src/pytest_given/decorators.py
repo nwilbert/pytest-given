@@ -10,8 +10,7 @@ from typing import Any, Self
 import pytest
 
 from pytest_given.collector import get_active_collector
-from pytest_given.errors import PytestGivenError
-from pytest_given.model import Phase
+from pytest_given.model import Phase, PytestGivenError
 from pytest_given.template import (
     Narration,
     NarrationLiteral,

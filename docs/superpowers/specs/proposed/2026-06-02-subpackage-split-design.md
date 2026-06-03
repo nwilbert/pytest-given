@@ -11,9 +11,9 @@ This is a pure refactor: no behavioral changes, no public-API changes for downst
 ```
 src/pytest_given/
   __init__.py                  # re-exports public API
+  plugin.py                    # pytest11 orchestrator (top-level, imports from all subpackages)
   capture/
     __init__.py                # re-exports cross-boundary names
-    plugin.py
     decorators.py
     collector.py
     template.py                # Template + narration_from + parse_tstring (was top-level)
@@ -31,9 +31,10 @@ src/pytest_given/
 
 ### Subpackage responsibilities
 
-- **`capture/`** — pytest integration and authoring API: the plugin entry point, GWT decorators, scenario collector, and the `Template` class users construct in their tests (plus the t-string handling that converts user input into `Narration`).
-- **`report/`** — post-run HTML generation: Jinja-based renderer, source-link rewriting, and the `pytest-given` CLI.
-- **`model/`** — the shared schema (dataclasses for `Scenario`, `Step`, `ReportData`, plus the `Narration*` dataclasses used to carry structured step text), JSON serde, and the package's exception type.
+- **`plugin.py` (top-level)** — pytest11 entry point and orchestrator. Implements pytest hooks, wires the collector to test events, and (when `--given-html` is set) triggers the integrated HTML render. As the orchestrator it sits above the three subpackages and is allowed to import from all of them.
+- **`capture/`** — pure capture machinery: GWT decorators, scenario collector, and the `Template` class users construct in their tests (plus the t-string handling that converts user input into `Narration`). Does not depend on `report/`.
+- **`report/`** — post-run HTML generation: Jinja-based renderer, source-link rewriting, and the `pytest-given` CLI. Does not depend on `capture/`.
+- **`model/`** — the shared schema (dataclasses for `Scenario`, `Step`, `ReportData`, plus the `Narration*` dataclasses used to carry structured step text), JSON serde, and the package's exception type. Leaf subpackage.
 
 ### Dependency direction
 
@@ -81,6 +82,7 @@ The ruff `select` list explicitly enables `TID251` and `TID253` only — **not**
 **Per-file ignore rationale:**
 
 - `src/pytest_given/__init__.py` is fully exempt — it's the package's public-API assembly point and must reach into all three subpackages.
+- `src/pytest_given/plugin.py` is fully exempt — as the pytest11 orchestrator it sits above the subpackages and is allowed to import from all of them (capture for the collector and decorator hooks, report for `render_html`/`resolve_template`/`detect_commit_sha`, model for schema types).
 - `tests/**` is fully exempt — tests may import any internal path.
 - `capture/**` ignores `TID253` because `TID253` bans `pytest_given.capture` (so it would fire on `capture/`'s own `from .x` imports via prefix match). `TID251` still fires in `capture/` for `pytest_given.report` and `pytest_given.model.<submodule>`.
 - `report/**` ignores `TID251` for the symmetric reason. `TID253` still fires in `report/` for `pytest_given.capture` and `pytest_given.model.<submodule>`.
@@ -104,7 +106,7 @@ No content merging, splitting, or restructuring beyond what's listed above.
 
 ### `pyproject.toml`
 
-- `[project.entry-points."pytest11"] given` — change from `pytest_given.plugin` to `pytest_given.capture.plugin`.
+- `[project.entry-points."pytest11"] given` — stays at `pytest_given.plugin` (plugin.py remains at the top level as the orchestrator).
 - `[project.scripts] pytest-given` — change from `pytest_given.cli:main` to `pytest_given.report.cli:main`.
 - Add `TID251` and `TID253` (explicitly, not the umbrella `TID`) to `[tool.ruff.lint] select`. Configure `[tool.ruff.lint.flake8-tidy-imports]` `banned-module-level-imports`, `[tool.ruff.lint.flake8-tidy-imports.banned-api]`, and `[tool.ruff.lint.per-file-ignores]` per the two-rule scheme described above.
 
@@ -133,8 +135,8 @@ Mirror the source layout under `tests/unit/`:
 
 ```
 tests/unit/
+  test_plugin.py                # tests for the top-level plugin.py orchestrator
   capture/
-    test_plugin.py
     test_collector.py
     test_step_descriptor.py     # tests decorator behavior
     test_template.py            # tests Template + narration_from + parse_tstring
