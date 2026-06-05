@@ -142,8 +142,80 @@ The library now covers this project's use case cleanly — every rule is one lin
 
 No other gaps. The current API expresses every rule we want, including the model-is-the-leaf addition.
 
+## Tool comparison: pytestarch
+
+The closest alternative is [`pytestarch`](https://github.com/zyskarch/pytestarch) — more mature (on PyPI, broader feature set including `LayeredArchitecture`, PlantUML import, and dependency-graph visualization), but a worse fit for this project's four rules.
+
+The same four rules in pytestarch:
+
+```python
+import pytest
+from pytestarch import EvaluableArchitecture, Rule, get_evaluable_architecture
+
+@pytest.fixture(scope="session")
+def arch() -> EvaluableArchitecture:
+    return get_evaluable_architecture(
+        "src/pytest_given", "src/pytest_given", ("*__pycache__",),
+    )
+
+# 1. Dependency direction — one Rule per edge
+def test_capture_does_not_import_report(arch):
+    Rule().modules_that().are_named("pytest_given.capture") \
+        .should_not().import_modules_that().are_named("pytest_given.report") \
+        .assert_applies(arch)
+
+def test_report_does_not_import_capture(arch):
+    Rule().modules_that().are_named("pytest_given.report") \
+        .should_not().import_modules_that().are_named("pytest_given.capture") \
+        .assert_applies(arch)
+
+def test_model_is_a_leaf(arch):
+    Rule().modules_that().are_named("pytest_given.model") \
+        .should_not().import_modules_that() \
+        .are_named(["pytest_given.capture", "pytest_given.report"]) \
+        .assert_applies(arch)
+
+# 2. Submodule boundary — inverted perspective (object, not subject); one Rule per subpackage
+def test_capture_internals_encapsulated(arch):
+    Rule().modules_that().are_submodules_of("pytest_given.capture") \
+        .should_not().be_imported_by_modules_except_modules_that() \
+        .are_named("pytest_given.capture") \
+        .assert_applies(arch)
+# … repeated for report and model
+
+# 3. Intra-package relative imports — NOT EXPRESSIBLE
+# pytestarch has no via='absolute'|'relative' filter on import edges.
+
+# 4. No private imports — approximation via regex on module names
+def test_no_private_imports(arch):
+    Rule().modules_that().have_name_matching(r".*\._[^.]+(\..*)?$") \
+        .should_not().be_imported_by_anything() \
+        .assert_applies(arch)
+# Misses `from public_module import _symbol`: pytestarch tracks module-to-module
+# edges, so a private *symbol* imported from a public module isn't visible.
+# pytest-imports's resolver treats the symbol as the trailing dot-path part and
+# checks every part for `_`-prefix.
+```
+
+Comparison:
+
+| Aspect | pytest-imports | pytestarch |
+|---|---|---|
+| Rule packaging | One dict per test; scopes and predicates batched | One `Rule()` object per assertion |
+| Our 4 tests in lines | ~25 | ~55+ |
+| Dependency direction | One dict entry per edge; list-target batches model→{capture,report} | One `Rule` per edge; list-target works the same way |
+| Submodule encapsulation | Subject-side: "outside-X must not import X.internals" | Inverted: "X.internals must not be imported by anything except X" — equivalent, but reads object-first |
+| **Intra-package relative imports** | `must_not_import(internal(), via='absolute')` — one line | **Not expressible.** No import-style predicate. |
+| **No private imports** | `must_not_import_private()` predicate; sees private *names* via dot-path parts | Regex on module names only; misses `from public import _symbol`. Catching `pytest._pytest` also requires `exclude_external_libraries=False`, which bloats the graph. |
+| "Internal" notion | First-class `internal()` target | Implicit via `exclude_external_libraries` at construction time |
+| Failure reporting | All failures collected per `check()` call | One `AssertionError` per `Rule.assert_applies` — re-run after each fix |
+| Maturity | Pre-release, git-only pin | On PyPI, broader feature set |
+| Project scope | Narrow: import rules only | Broader: layered architecture, diagram-driven rules, visualization |
+
+**Verdict.** Rule 3 is the dealbreaker — "intra-package imports must be relative" can't be expressed in pytestarch at all, so adopting it would force a mixed setup (e.g. ruff `TID252` alongside pytestarch, with the same per-file-ignore problems that pushed us off ruff in the first place). Rule 4 is awkward for the same family of reasons. pytestarch's strengths (layered architecture, PlantUML import, visualization) don't apply to a three-subpackage project with a fixed dependency direction. If pytest-imports ever fell over for our needs, the natural escape hatch is to add a missing predicate upstream, not to switch tools.
+
 ## Out of scope
 
-- Adopting a different architecture-test tool (`import-linter`, `pytestarch`, `pytest-archon`). `pytest-imports` was chosen and used; revisiting tool choice is a separate decision.
+- Adopting `import-linter` or `pytest-archon`. `pytestarch` is covered above; `import-linter` and `pytest-archon` weren't evaluated in depth — `pytest-imports` already covers our four rules cleanly.
 - Enforcing the "module-level imports only — no inline/function-level imports" convention (see [Recommendations](#recommendations-for-pytest-imports)).
 - Stricter rules on third-party imports (e.g. forbidding `pytest._pytest` reach-ins beyond what `must_not_import_private` already catches).
