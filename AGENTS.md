@@ -12,16 +12,10 @@ uv sync --group dev
 
 ## Quality gates
 
-Run all checks: `uv run nox`
+Run all checks: `uv run nox`. List individual sessions with `uv run nox -l`.
 
-Individual sessions:
-- `uv run nox -s format` — ruff format
-- `uv run nox -s lint` — ruff check
-- `uv run nox -s mypy` — type checking (strict)
-- `uv run nox -s test` — pytest
-- `uv run nox -s coverage` — 100% coverage target
-- `uv run nox -s audit` — pip-audit
-- `uv run nox -s examples` — regenerate `examples/report-data.json` and `examples/report.html`. Run after changes to the renderer, templates, plugin output schema, or `examples/test_examples.py` itself, and commit the updated JSON.
+- `uv run nox -s examples` regenerates `examples/report-data.json` and `examples/report.html`. Run after changes to the renderer, templates, plugin output schema, or `examples/test_examples.py` itself, and commit the updated JSON.
+- `uv run nox -s coverage` enforces a 100% coverage target.
 
 ## Architecture
 
@@ -65,9 +59,7 @@ A Playwright MCP server is available for visually inspecting the HTML report. Op
 ## Conventions
 
 - Use the project's canonical vocabulary — see [GLOSSARY.md](GLOSSARY.md). Renames touch the glossary in the same commit.
-- src layout with hatchling build
-- Single quotes (ruff format)
-- Strict mypy (`disallow_untyped_defs`). Avoid `Any` — use precise types, generics, `TYPE_CHECKING` imports, or `ContextVar[T]` over untyped `threading.local`.
+- Avoid `Any` — use precise types, generics, `TYPE_CHECKING` imports, or `ContextVar[T]` over untyped `threading.local`.
 - Use `NewType` for domain-specific IDs (e.g., `NodeId`) and PEP 695 `type` statements for aliases. Avoid raw complex types like `dict[str, tuple[list[str], list[Any]]]` — introduce named types instead.
 - Only module-level imports — no inline/function-level imports.
 - Subpackage boundaries (convention, not lint-enforced): `src/pytest_given/` is split into three subpackages with a strict dependency direction. `model/` is the leaf; `capture/` and `report/` both depend on `model/`; they do not depend on each other. `plugin.py` sits at the top level as the orchestrator and is allowed to import from all three. Inside the package, use relative imports throughout — `from .schema import Scenario` for siblings, `from ..model import Scenario` for cross-subpackage (always through the subpackage root, not into its submodules). The top-level `__init__.py` and `plugin.py` also use relative imports (`from .capture import …`). Tests use absolute imports and may reach into any internal path.
