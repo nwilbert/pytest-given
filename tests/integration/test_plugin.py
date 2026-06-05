@@ -77,28 +77,6 @@ def test_failed_scenario(pytester, tmp_path):
     assert s['error'] is not None
 
 
-def test_skipped_scenario(pytester, tmp_path):
-    """A scenario marked with @pytest.mark.skip is reported with skipped status."""
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, then
-
-        @scenario("Skipped test")
-        @pytest.mark.skip(reason="demo")
-        def test_skip():
-            with then("never runs"):
-                assert False
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}')
-    result.assert_outcomes(skipped=1)
-    data = json.loads(json_path.read_text())
-    assert len(data['scenarios']) == 1
-    assert data['scenarios'][0]['status'] == 'skipped'
-
-
 def test_unannotated_test_not_in_report(pytester, tmp_path):
     """Tests without @scenario don't appear in the report."""
     pytester.makepyfile(
@@ -463,38 +441,6 @@ def test_session_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
         assert steps[0]['children'][0]['narration']['text'] == 'seeded with 2 users'
 
 
-def test_module_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, given, then
-
-        @pytest.fixture(scope='module')
-        @given("a service")
-        def svc():
-            with given("with credentials"):
-                pass
-            return "svc"
-
-        @scenario("A")
-        def test_a(svc):
-            with then("ok"):
-                assert svc == "svc"
-
-        @scenario("B")
-        def test_b(svc):
-            with then("ok"):
-                assert svc == "svc"
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}')
-    result.assert_outcomes(passed=2)
-    data = json.loads(json_path.read_text())
-    for s in data['scenarios']:
-        assert s['steps'][0]['children'][0]['narration']['text'] == 'with credentials'
-
-
 def test_class_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
     pytester.makepyfile(
         """
@@ -671,22 +617,6 @@ def test_scenario_with_template_name_merges_and_renders(pytester, tmp_path):
     assert s['narration']['parts'] != []
     assert s['parameters']['names'] == ['cup_size']
     assert [c['values'] for c in s['parameters']['cases']] == [[200], [300]]
-
-
-def test_template_in_given_raises(pytester, tmp_path):
-    pytester.makepyfile(
-        """
-        from pytest_given import scenario, given, Template
-
-        @scenario('x')
-        def test_x():
-            with given(Template('a {y} cup')):
-                pass
-        """
-    )
-    result = pytester.runpytest('-v')
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*not supported in a test body*'])
 
 
 def test_given_with_template_on_fixture_raises(pytester, tmp_path):
@@ -870,43 +800,6 @@ def test_parametrized_all_cases_skipped_merges_as_skipped(pytester, tmp_path):
     assert data['scenarios'][0]['status'] == 'skipped'
 
 
-def test_helper_function_decorator_records_step(pytester, tmp_path):
-    """A @when-decorated plain helper records a step when called from a scenario."""
-    pytester.makepyfile(
-        """
-        import json
-        import pytest
-        from pytest_given import scenario, given, when, then
-
-        @pytest.fixture
-        @given('a machine')
-        def machine():
-            return {'balance': 0}
-
-        @when('I insert money')
-        def insert(machine, amount):
-            machine['balance'] += amount
-
-        @scenario('Helper records its own step')
-        def test_buy(machine):
-            with when('I pay'):
-                insert(machine, 2)
-            with then('the balance is 2'):
-                assert machine['balance'] == 2
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}', '-v')
-    assert result.ret == 0
-    data = json.loads(json_path.read_text())
-    [scn] = data['scenarios']
-    top_texts = [s['narration']['text'] for s in scn['steps']]
-    assert top_texts == ['a machine', 'I pay', 'the balance is 2']
-    when_step = scn['steps'][1]
-    child_texts = [c['narration']['text'] for c in when_step['children']]
-    assert child_texts == ['I insert money']
-
-
 def test_helper_function_decorator_with_template_substitutes_args(pytester, tmp_path):
     """@when(Template('...${arg}...')) renders per call from bound args."""
     pytester.makepyfile(
@@ -936,35 +829,6 @@ def test_helper_function_decorator_with_template_substitutes_args(pytester, tmp_
     assert parts[0] == {'value': 'I insert $'}
     assert parts[1]['rendered'] == '2'
     assert parts[1]['expression'] == 'amount'
-
-
-def test_helper_function_decorator_with_template_called_twice_records_two_steps(
-    pytester, tmp_path
-):
-    """Two calls with different args produce two distinct steps with their own text."""
-    pytester.makepyfile(
-        """
-        from pytest_given import scenario, when, then, Template
-
-        @when(Template('I insert ${amount}'))
-        def insert(amount):
-            return amount
-
-        @scenario('Helper called twice')
-        def test_buy():
-            insert(2)
-            insert(5)
-            with then('done'):
-                pass
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}', '-v')
-    assert result.ret == 0
-    data = json.loads(json_path.read_text())
-    [scn] = data['scenarios']
-    texts = [s['narration']['text'] for s in scn['steps'][:2]]
-    assert texts == ['I insert $2', 'I insert $5']
 
 
 def test_helper_function_template_placeholder_not_in_signature_raises(

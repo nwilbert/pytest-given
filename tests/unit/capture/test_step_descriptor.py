@@ -221,43 +221,19 @@ def test_step_descriptor_with_tstring_records_rendered_text_and_parts() -> None:
     ]
 
 
-def test_given_with_pytest_given_template_as_context_manager_raises() -> None:
-    """`with given(Template(...))` is rejected — t-strings handle the body case."""
+@pytest.mark.parametrize('phase_factory', [given, when, then])
+def test_phase_with_pytest_given_template_as_context_manager_raises(
+    phase_factory,
+) -> None:
+    """`with given/when/then(Template(...))` is rejected — t-strings handle
+    the body case."""
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
     set_active_collector(collector)
     try:
         with (
             pytest.raises(PytestGivenError, match='not supported in a test body'),
-            given(Template('a {cup_size} ml cup')),
-        ):
-            pass
-    finally:
-        set_active_collector(None)
-
-
-def test_when_with_pytest_given_template_as_context_manager_raises() -> None:
-    collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
-    set_active_collector(collector)
-    try:
-        with (
-            pytest.raises(PytestGivenError, match='not supported in a test body'),
-            when(Template('x {y}')),
-        ):
-            pass
-    finally:
-        set_active_collector(None)
-
-
-def test_then_with_pytest_given_template_as_context_manager_raises() -> None:
-    collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
-    set_active_collector(collector)
-    try:
-        with (
-            pytest.raises(PytestGivenError, match='not supported in a test body'),
-            then(Template('x {y}')),
+            phase_factory(Template('a {cup_size} ml cup')),
         ):
             pass
     finally:

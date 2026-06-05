@@ -72,19 +72,14 @@ def test_template_unclosed_brace_raises_value_error() -> None:
         Template('a {cup_size')
 
 
-def test_template_attribute_access_raises_pytest_given_error() -> None:
+@pytest.mark.parametrize(
+    'text',
+    ['count={obj.attr}', '{d[key]}', '{x + 1}'],
+    ids=['attribute', 'indexing', 'expression'],
+)
+def test_template_non_identifier_raises_pytest_given_error(text: str) -> None:
     with pytest.raises(PytestGivenError, match='bare identifiers'):
-        Template('count={obj.attr}')
-
-
-def test_template_indexing_raises_pytest_given_error() -> None:
-    with pytest.raises(PytestGivenError, match='bare identifiers'):
-        Template('{d[key]}')
-
-
-def test_template_expression_raises_pytest_given_error() -> None:
-    with pytest.raises(PytestGivenError, match='bare identifiers'):
-        Template('{x + 1}')
+        Template(text)
 
 
 def test_parse_tstring_literal_only() -> None:

@@ -153,20 +153,11 @@ def test_current_phase() -> None:
     assert collector.current_phase is None
 
 
-def test_collector_starts_idle() -> None:
+def test_collector_state_transitions_idle_test_idle() -> None:
     collector = Collector()
     assert collector.state == 'idle'
-
-
-def test_start_scenario_transitions_to_test() -> None:
-    collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
     assert collector.state == 'test'
-
-
-def test_finish_scenario_returns_to_idle() -> None:
-    collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
     collector.finish_scenario(status='passed', duration_ms=0)
     assert collector.state == 'idle'
 
