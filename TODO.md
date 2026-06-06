@@ -2,15 +2,14 @@
 
 ## Now
 
-- [ ] introduce subpackage structure
-
 ## Next
 
+- [ ] Implement Annotated fixture/parametrize labels (`docs/superpowers/specs/proposed/2026-05-23-annotated-fixture-labels-design.md`)
 - [ ] Add option to not generate the JSON file, rethink default behavior
 
 ## Later
 
-- [ ] Revisit Annotated fixture/parametrize labels spec — deferred pending structured step text (see `docs/superpowers/specs/proposed/2026-05-23-annotated-fixture-labels-design.md`)
+- [ ] Maybe: implement flat-step-display — opt-in body hiding on `given`/`when`/`then` (see `docs/superpowers/specs/proposed/2026-06-06-flat-step-display-design.md`)
 - [ ] UI improvements in report
   - highlight on hover for parametrization table)
   - search box improvements 

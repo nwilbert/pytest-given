@@ -28,32 +28,27 @@ Today, a fixture appears as a labeled `given` step in the report only if it is d
 def machine(): ...
 ```
 
-The label is fixed at decoration time and applies to every consumer scenario. There is no per-consumer override and no way to label an undecorated fixture without editing it. `@pytest.mark.parametrize` values appear in the report as a column table (`plugin.py:_group_parameterized`) but have no narrative position in the scenario's step list — the reader has to translate `{name}` placeholders back to the table mentally.
+The label is fixed at decoration time and applies to every consumer scenario. There is no per-consumer override and no way to label an undecorated fixture without editing it. `@pytest.mark.parametrize` values appear in the report as a column table (`plugin.py:_group_parameterized`) but have no narrative position in the scenario's step list — the reader has to translate parameter values back to the table mentally.
 
 ## Approach
 
 Read `Annotated` metadata from the test function signature in `pytest_runtest_setup`, after fixture setup, before the test body runs. For each test parameter:
 
 - If its annotation carries a `StepDescriptor` (returned by `given(...)`), use it to graft or override a step in the active scenario.
-- The descriptor's text replaces (or supplies, when absent) the fixture's labeled step. Recorded body steps from a decorated fixture are preserved by default and can be dropped with `flat=True`.
-- For parametrize parameters, the descriptor produces a leaf `given` step in the scenario's step list; the existing param templatizer rewrites embedded values into `{name}` placeholders.
+- The descriptor's `Narration` replaces (or supplies, when absent) the fixture's labeled step. Recorded body steps from a decorated fixture are preserved.
+- For parametrize parameters, the descriptor produces a leaf `given` step in the scenario's step list. Dynamic per-case text uses `pytest_given.Template(...)` (the same deferred-substitution form `@scenario(Template(...))` uses).
 
-The recording machinery added by the fixture-step-recording spec is reused without changes. Only the grafting path is extended.
+The recording machinery added by the fixture-step-recording spec is reused without changes. The grafting path is rewritten to walk `item.fixturenames` order so Annotated-driven parametrize leaves interleave naturally with fixture grafts.
 
 ## API
 
-### `given(text, *, flat=False)`
+`given()` is unchanged. `Annotated[..., given(text)]` accepts the same forms `given()` already accepts in other contexts, with one form forbidden:
 
-`given()` continues to return a `StepDescriptor`. New keyword:
-
-```python
-def given(text: str, *, flat: bool = False) -> StepDescriptor: ...
-```
-
-- `flat=False` (default): when used to override a decorated fixture, the recorded body (children and attachments under the fixture's root step) is preserved.
-- `flat=True`: drop the recorded `root.children` and `root.attachments`; render only the leaf label.
-
-`when()` and `then()` retain their current signatures. They are not extended with `flat`, and they are rejected when used inside `Annotated` (see "Forbidden usage" below).
+| Form | Accepted in `Annotated` | Why |
+|---|---|---|
+| `given('static text')` | Yes | Plain label, no substitution needed. |
+| `given(Template('a {cup_size} ml cup'))` | Yes | Deferred placeholder, substituted from `callspec.params` per case — the same mechanism `@scenario(Template(...))` uses. |
+| `given(t'a {cup_size} ml cup')` | **No** | T-strings evaluate at function-definition time; the parameter name isn't in scope, so the t-string would `NameError` (or, for an unrelated in-scope name, eagerly interpolate the wrong value). Rejected with `PytestGivenError`. |
 
 ### Usage
 
@@ -61,38 +56,33 @@ def given(text: str, *, flat: bool = False) -> StepDescriptor: ...
 # Override a decorated fixture's label, keep its recorded body
 def test_a(machine: Annotated[Machine, given('a fancy espresso machine')]): ...
 
-# Same, but drop the body and render only the leaf
-def test_b(machine: Annotated[Machine, given('a fancy espresso machine', flat=True)]): ...
-
 # Label an undecorated fixture (leaf step; no body recording possible)
-def test_c(beans: Annotated[Beans, given('freshly ground beans')]): ...
+def test_b(beans: Annotated[Beans, given('freshly ground beans')]): ...
 
-# Label a parametrize value (leaf step; placeholder rendered per case)
+# Label a parametrize value with a dynamic per-case placeholder
 @pytest.mark.parametrize('cup_size', [200, 300])
-def test_d(cup_size: Annotated[int, given('a {cup_size} ml cup')]): ...
+def test_c(cup_size: Annotated[int, given(Template('a {cup_size} ml cup'))]): ...
 ```
 
 ### Parametrize parameters and placeholder syntax
 
-`Annotated` metadata is evaluated **at function-definition time**, so the parameter name in the test signature is not a value in scope — `f'a {cup_size} ml cup'` would `NameError`, and a bare `'a {cup_size} ml cup'` is the only thing that does anything useful. This differs from the `with given(f'a {cup_size} ml cup')` idiom inside the test body, where the f-string interpolates the runtime value before recording.
+For dynamic per-case narration on parametrize parameters, use `pytest_given.Template(...)`. This is the canonical deferred-substitution form across the project — `@scenario(Template(...))` and decorated helpers (per the template-helper-args spec) use it the same way.
 
-For parametrize parameters, **write `{name}` placeholders directly** in the Annotated text. The renderer (`renderer.py:_make_highlight_filter`) preserves and color-codes `{name}` tokens; per-case values appear in the parameter table below the step list.
+`Annotated[int, given(Template('a {cup_size} ml cup'))]` produces a `StepDescriptor` whose `Narration` carries structured `NarrationPlaceholder` parts. At render time, `_templatize_narration` (`plugin.py`) discovers the matching parametrize column and the renderer's structural `narration` filter color-codes the placeholder. Per-case values appear in the parameter table below the step list.
 
-The existing `_templatize_step_text` value-substitution path still runs over Annotated text, but in the placeholder form it is a no-op (the literal value of the first case is not present in the text, so nothing is replaced). Writing a literal value instead — e.g. `given('a 200 ml cup')` — happens to work for the first case (the templatizer rewrites `200` → `{cup_size}`) but is order-dependent and fragile; prefer placeholders.
+A plain string `given('a {cup_size} ml cup')` is not interpreted as a template — `narration_from(str)` produces a `Narration` with empty `parts`, so the renderer emits the literal text `a {cup_size} ml cup` (braces and all). If the test author wanted a placeholder, they need `Template(...)`. Mistakes here are loud, not silent.
 
 Multi-name parametrize is handled per parameter — each name is its own entry in `callspec.params` and `item.fixturenames`, and the resolution rules in the next section fire independently per parameter:
 
 ```python
 @pytest.mark.parametrize('cup_size,beans_g', [(200, 18), (300, 22)])
 def test_e(
-    cup_size: Annotated[int, given('a {cup_size} ml cup')],
-    beans_g: Annotated[int, given('{beans_g} g of beans')],
+    cup_size: Annotated[int, given(Template('a {cup_size} ml cup'))],
+    beans_g: Annotated[int, given(Template('{beans_g} g of beans'))],
 ): ...
 ```
 
 A parametrize parameter **without** Annotated continues to appear only in the parameter table — no step is synthesized (current behavior, unchanged).
-
-> **Footgun (pre-existing, not introduced here).** `_templatize_step_text` uses plain `str.replace`, so a literal parameter value appearing as a substring of unrelated text in a step (e.g. `'a 200 ml cup with 200 beans'` when `cup_size=200`) will be double-substituted into `{cup_size}`. The placeholder form sidesteps this; a future spec may tighten the templatizer.
 
 ## Resolution Rules
 
@@ -111,20 +101,21 @@ For each parameter in the test function signature, excluding `self` and `cls`:
 | Annotated `given(...)` on param | Fixture has `@given` decorator | Behavior |
 |---|---|---|
 | No | No | No graft (current behavior for parametrize params; nothing to record for undecorated fixtures). |
-| No | Yes | Current behavior: graft the recorded subtree with the decorator's label. |
-| Yes (fixture) | No | Synthesize a leaf `given` step with the Annotated text. `with given(...)` inside the fixture body still raises (unchanged — undecorated fixtures cannot record). |
-| Yes (fixture) | Yes | Deep-copy the recorded subtree, replace `root.text` with the Annotated descriptor's text. `root.phase` stays `given`. If `flat=True`, also clear `root.children` and `root.attachments`. |
-| Yes (parametrize) | n/a | Synthesize a leaf `given` step with the Annotated text. Users should embed `{name}` placeholders directly (see "Parametrize parameters and placeholder syntax" above); the existing `_templatize_step_text` pass still runs and would also rewrite literal first-case values into `{name}` placeholders, but the placeholder form is the recommended idiom. |
+| No | Yes | Current behavior: graft the recorded subtree with the decorator's narration. |
+| Yes (fixture) | No | Synthesize a leaf `given` step with the Annotated `Narration`. `with given(...)` inside the fixture body still raises (unchanged — undecorated fixtures cannot record). |
+| Yes (fixture) | Yes | Deep-copy the recorded subtree, replace `root.narration` with the Annotated descriptor's narration. `root.phase` stays `given`; `root.children` and `root.attachments` are preserved as-is. |
+| Yes (parametrize) | n/a | Synthesize a leaf `given` step with the Annotated `Narration`. For per-case dynamic text, the descriptor wraps a `Template(...)` (see "Parametrize parameters and placeholder syntax" above); `_templatize_narration` then rewrites matching `NarrationPlaceholder` parts to point at the parametrize column. |
 
    (`@when` / `@then` on fixtures are already rejected at fixture-setup time, so only `@given` is reachable here.)
 
-5. **Ordering.** Grafted steps (decorator recordings + Annotated leaves + Annotated-overridden recordings) follow `item.fixturenames` order, unchanged from today. Direct parametrize parameters are injected into `item.fixturenames` by pytest's metafunc machinery (the same list that drives fixture resolution), so they interleave naturally with fixture grafts at the top of the scenario, before test body steps. Integration test 9 below pins the observed order.
+5. **Ordering.** Grafted steps interleave fixture-recording grafts with Annotated leaves following `item.fixturenames` order — pytest's metafunc machinery puts direct parametrize parameters in the same list that drives fixture resolution, so iterating it gives a natural top-of-scenario layout before test-body steps. This replaces today's setup-order iteration over `collector.recordings()` (which works for fixture-only grafts but can't position Annotated leaves on parametrize params, since those have no recording to be ordered by setup time). In practice setup order and `fixturenames` order coincide for pure fixture grafts (dependencies set up before dependents); the change is necessary for the parametrize case and a no-op for the existing fixture case. Integration test 9 below pins the observed order.
 
 ### Forbidden usage
 
 Hard errors (raise `PytestGivenError` during `pytest_runtest_setup`, failing the scenario with a clear message):
 
 - `Annotated[..., when('...')]` or `Annotated[..., then('...')]` on any parameter.
+- `Annotated[..., given(t'...')]` on any parameter (t-strings are nonsensical in Annotated metadata; see the API table).
 - Multiple `StepDescriptor`s on a single parameter.
 - `Annotated[..., given('...')]` on a parameter that is neither a fixture nor a parametrize value.
 
@@ -136,40 +127,36 @@ Hard errors (raise `PytestGivenError` during `pytest_runtest_setup`, failing the
 
 | File | Change |
 |---|---|
-| `src/pytest_given/decorators.py` | Extend `given(text)` to `given(text, *, flat: bool = False)`. Store `flat` on `StepDescriptor`. Default `flat=False` preserves current behavior. |
-| `src/pytest_given/plugin.py` | In `pytest_runtest_setup`, replace `_graft_fixture_recordings(item)` with a new function that walks `item.fixturenames` in order, resolves Annotated metadata per parameter via `typing.get_type_hints(item.function, include_extras=True)`, and either grafts a fixture recording (optionally overriding label/dropping body) or synthesizes a leaf step. The recording lookup logic is reused. |
-| `src/pytest_given/collector.py` | Add `graft_leaf_given(text: str)` that appends a leaf `Step(phase='given', text=text)` to the current scenario. Extend `graft_recording(recording, *, override_text: str \| None = None, flat: bool = False)` so the existing call site (no overrides) is unaffected while Annotated paths can override text and drop body. |
-| `src/pytest_given/errors.py` | No new error type; reuse `PytestGivenError`. |
-| `tests/unit/test_step_descriptor.py` (or new `tests/unit/test_decorators.py`) | Test that `given('x', flat=True)` stores the flag; that `when`/`then` retain their signatures. |
+| `src/pytest_given/plugin.py` | In `pytest_runtest_setup`, replace `_graft_fixture_recordings(item)` with a new function that walks `item.fixturenames` in order, resolves Annotated metadata per parameter via `typing.get_type_hints(item.function, include_extras=True)`, and either grafts a fixture recording (optionally overriding the root narration) or synthesizes a leaf step. Reject t-strings on extracted descriptors here (the Annotated resolution path is the natural choke point). The recording lookup logic (`fm.getfixturedefs`, `_step_descriptor`, `cached_result`) is reused. |
+| `src/pytest_given/capture/collector.py` | Add `graft_leaf_given(narration: Narration)` that appends a leaf `Step(phase='given', narration=narration)` to the current scenario. Extend `graft_recording(recording, *, override_narration: Narration \| None = None)` so the existing call site (no overrides) is unaffected while the Annotated path can override the root narration. |
+| `src/pytest_given/capture/decorators.py` | No change. `given/when/then` signatures stay as-is. |
+| `src/pytest_given/model/errors.py` | No change. Reuse `PytestGivenError`. |
 | `tests/integration/test_plugin.py` | New end-to-end tests (see below). |
 
-No changes to the JSON data model. No changes to the renderer. The templatizer at `plugin.py:_templatize_steps` already walks the full scenario step tree and needs no extension — Annotated text is a plain string that flows through the same path.
+No changes to the JSON data model. No changes to the renderer. No new unit tests are needed by this spec — the Annotated → descriptor → narration plumbing is exercised end-to-end. The structural templatize at `plugin.py:_templatize_narration` already walks the full scenario step tree and rewrites matching `NarrationValue` / `NarrationPlaceholder` parts against parametrize columns — Annotated narrations from `Template(...)` flow through the same path unchanged.
 
 ## Test Coverage
 
 Integration tests in `tests/integration/test_plugin.py`:
 
-1. **Undecorated fixture + Annotated** → leaf `given` step appears with the Annotated text; the fixture body is not bracketed for recording, and `with given(...)` inside it still raises.
-2. **Decorated fixture + Annotated, no `flat`** → recorded subtree is grafted with the Annotated label as the root; body children survive.
-3. **Decorated fixture + Annotated, `flat=True`** → recorded subtree is grafted with the Annotated label; root has no children and no attachments.
-4. **Parametrize param + Annotated** → leaf `given` step appears in the scenario; `{name}` placeholders in the Annotated text survive parametric grouping unchanged and render with the existing param highlight. A second variant uses `@pytest.mark.parametrize('a,b', [...])` with Annotated on both names to pin per-parameter handling.
+1. **Undecorated fixture + Annotated** → leaf `given` step appears with the Annotated narration; the fixture body is not bracketed for recording, and `with given(...)` inside it still raises.
+2. **Decorated fixture + Annotated** → recorded subtree is grafted with the Annotated narration as the root; body children and attachments survive.
+3. **Parametrize param + Annotated (`Template`)** → leaf `given` step appears in the scenario; the `Template`'s `NarrationPlaceholder` parts survive parametric grouping and render color-coded by the `narration` filter. A second variant uses `@pytest.mark.parametrize('a,b', [...])` with `Template`-wrapped Annotated on both names to pin per-parameter handling.
 
    Also assert that a parametrize parameter **without** Annotated remains absent from the step list (only the parameter table reflects it).
+4. **Parametrize param + Annotated (plain string)** → the literal text (including any `{name}` braces) renders verbatim in every case — no substitution, no highlight. Confirms `Template(...)` is the only path to per-case dynamic narration.
 5. **Annotated `when(...)` / `then(...)`** → `PytestGivenError`.
-6. **Annotated `given(...)` on a non-fixture / non-parametrize parameter** → `PytestGivenError`.
-7. **Multiple `StepDescriptor`s on one parameter** → `PytestGivenError`.
-8. **Indirect parametrize fixture**: a fixture parametrized via `@pytest.mark.parametrize('name', [...], indirect=True)` with Annotated override behaves like the fixture case — label is overridden, body preserved (or dropped with `flat`).
-9. **Mixed usage in the same scenario** — one decorator-only fixture, one Annotated-override fixture, one parametrize Annotated — all appear in `item.fixturenames` order at the top of the scenario.
-10. **Class-based test method** — `self` is skipped without error; Annotated on other params behaves as elsewhere.
-
-Unit tests in `tests/unit/`:
-
-- `StepDescriptor.flat` defaults to `False` and is set when `given(text, flat=True)` is used.
-- `when()` and `then()` do not accept `flat` (TypeError on misuse — comes from the function signature, not custom code).
+6. **Annotated `given(t'...')`** → `PytestGivenError` (t-strings are forbidden in Annotated metadata).
+7. **Annotated `given(...)` on a non-fixture / non-parametrize parameter** → `PytestGivenError`.
+8. **Multiple `StepDescriptor`s on one parameter** → `PytestGivenError`.
+9. **Indirect parametrize fixture**: a fixture parametrized via `@pytest.mark.parametrize('name', [...], indirect=True)` with Annotated override behaves like the fixture case — narration is overridden, body preserved.
+10. **Mixed usage in the same scenario** — one decorator-only fixture, one Annotated-override fixture, one parametrize Annotated — all appear in `item.fixturenames` order at the top of the scenario.
+11. **Class-based test method** — `self` is skipped without error; Annotated on other params behaves as elsewhere.
 
 ## Out of Scope
 
 - `Annotated` carrying `when(...)` or `then(...)` — explicitly forbidden. The narrative for actions and assertions lives in the test body via `with when(...)` / `with then(...)`.
-- A fixture-side opt-in for "this fixture's body is always implementation detail" (i.e., decorating a fixture so that all consumers get `flat=True` by default). May be useful later; not needed now.
-- Auto-templatization of Annotated text against fixture-resolved values that are not parametric (e.g., interpolating a constant from a session-scoped fixture into the label). Annotated metadata is evaluated at function-definition time and cannot reference runtime values; users use the existing `with given(f'... {value}')` pattern inside the test body for that.
+- T-strings inside `Annotated` metadata — forbidden, see the API table.
+- Auto-templatization of Annotated narration against fixture-resolved values that are not parametric (e.g., interpolating a constant from a session-scoped fixture into the label). Annotated metadata is evaluated at function-definition time and cannot reference runtime values; users use the existing `with given(t'... {value}')` pattern inside the test body for that.
 - Reordering grafted steps by phase. All grafts follow `item.fixturenames` order; phase is not used to reorder.
+- Hiding a decorated fixture's recorded body when overriding its label from `Annotated`. The override always preserves the body.
