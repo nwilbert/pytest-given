@@ -103,12 +103,14 @@ def test_active_scenario_id_set() -> None:
 
 
 def test_cross_phase_nesting_raises() -> None:
-    """Nesting a different phase inside another raises an error."""
+    """Nesting a different phase inside another raises PytestGivenError, like
+    every other lifecycle violation in this file — so callers catching the
+    documented public sentinel see this case too."""
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
     collector.push_step('then', _n('result is correct'))
     with pytest.raises(
-        RuntimeError,
+        PytestGivenError,
         match="Cannot nest 'given' inside 'then'",
     ):
         collector.push_step('given', _n('some precondition'))

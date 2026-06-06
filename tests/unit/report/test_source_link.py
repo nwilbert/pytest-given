@@ -224,6 +224,32 @@ def test_format_with_trailing_literal_text(monkeypatch: pytest.MonkeyPatch) -> N
     assert url == 'a.py/done'
 
 
+def test_format_attribute_access_raises_clear_error() -> None:
+    """`{path.parent}` passes head-only validation but explodes at format()
+    time with a confusing AttributeError on str — reject it up front."""
+    with pytest.raises(PytestGivenError) as exc:
+        format_source_link(
+            'foo://x/{path.parent}',
+            source=_src(),
+            project='p',
+            commit_sha=None,
+        )
+    msg = str(exc.value)
+    assert 'path.parent' in msg or 'attribute' in msg.lower()
+
+
+def test_format_index_access_raises_clear_error() -> None:
+    with pytest.raises(PytestGivenError) as exc:
+        format_source_link(
+            'foo://x/{relpath[0]}',
+            source=_src(),
+            project='p',
+            commit_sha=None,
+        )
+    msg = str(exc.value)
+    assert 'relpath[0]' in msg or 'index' in msg.lower() or 'attribute' in msg.lower()
+
+
 def test_format_unknown_variable_raises() -> None:
     with pytest.raises(PytestGivenError) as exc:
         format_source_link(

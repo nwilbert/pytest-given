@@ -95,14 +95,22 @@ def format_source_link(
 
 def _extract_field_names(template: str) -> list[str]:
     """Return the field names referenced inside `{...}` placeholders, using
-    str.format semantics."""
+    str.format semantics. Rejects attribute / index access up front rather
+    than letting `template.format()` surface it as an opaque AttributeError
+    on a substituted string."""
     fields: list[str] = []
     for _literal, field_name, _spec, _conv in string.Formatter().parse(template):
         if field_name is None:
             continue
-        head = re.split(r'[.\[]', field_name, maxsplit=1)[0]
-        if head and not head.isdigit():
-            fields.append(head)
+        if '.' in field_name or '[' in field_name:
+            valid = ', '.join(sorted(_VALID_VARS))
+            raise PytestGivenError(
+                f'Source-link template field {{{field_name}}} uses attribute '
+                f'or index access; only bare variable names are supported. '
+                f'Valid: {valid}.'
+            )
+        if field_name and not field_name.isdigit():
+            fields.append(field_name)
     return fields
 
 

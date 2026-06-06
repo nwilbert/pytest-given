@@ -256,6 +256,73 @@ def test_full_html_report_generation(pytester, tmp_path):
     assert 'x-data' in html  # Alpine.js reactive
 
 
+def test_fixture_setup_failure_appears_in_report(pytester, tmp_path):
+    """A scenario whose fixture errors during setup still appears as failed,
+    not silently dropped — pytest_runtest_logreport must finish the scenario
+    at the setup phase when no call phase will run."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then
+
+        @pytest.fixture
+        def broken():
+            raise RuntimeError("fixture boom")
+
+        @scenario("Setup-failed")
+        def test_a(broken):
+            with then("never runs"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    assert len(data['scenarios']) == 1
+    s = data['scenarios'][0]
+    assert s['narration']['text'] == 'Setup-failed'
+    assert s['status'] == 'failed'
+    assert s['error'] is not None
+    assert 'fixture boom' in s['error']['message']
+
+
+def test_unannotated_after_setup_failure_is_not_contaminated(pytester, tmp_path):
+    """When a @scenario test's fixture fails and is followed by an unannotated
+    test, the next test's `with given(...)` must warn (not push into the
+    orphaned scenario)."""
+    pytester.makepyfile(
+        """
+        import warnings
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture
+        def broken():
+            raise RuntimeError("boom")
+
+        @scenario("Failing scenario")
+        def test_a(broken):
+            with then("never runs"):
+                pass
+
+        def test_b():
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter('always')
+                with given('a thing'):
+                    pass
+                assert any('without @scenario' in str(w.message) for w in caught)
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    failing = [
+        s for s in data['scenarios'] if s['narration']['text'] == 'Failing scenario'
+    ]
+    assert len(failing) == 1
+    assert failing[0]['steps'] == []
+
+
 def test_given_inside_unannotated_test_warns(pytester, tmp_path):
     """A `with given(...)` inside a non-@scenario test warns, doesn't crash."""
     pytester.makepyfile(

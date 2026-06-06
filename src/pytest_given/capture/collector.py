@@ -201,7 +201,7 @@ class Collector:
             )
         stack = self._target_stack()
         if stack and stack[-1].phase != phase:
-            raise RuntimeError(
+            raise PytestGivenError(
                 f"Cannot nest '{phase}' inside '{stack[-1].phase}'"
                 ' — restructure your test or use a phase-neutral helper'
             )

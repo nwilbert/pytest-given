@@ -320,7 +320,10 @@ def pytest_runtest_teardown(item: pytest.Item) -> None:
 def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) -> None:
     if collector.active_scenario_id != NodeId(item.nodeid):
         return
-    if call.when == 'call' and call.excinfo is not None:
+    # Capture errors from both setup (fixture exception) and call (test-body
+    # failure). Without the setup branch, fixture failures would silently
+    # bypass fail_scenario and the scenario would carry no error info.
+    if call.when in ('setup', 'call') and call.excinfo is not None:
         error_repr = call.excinfo.getrepr(style='short')
         message = str(call.excinfo.value)
         diff = str(error_repr)
@@ -332,10 +335,15 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
     node_id = NodeId(report.nodeid)
     if collector.active_scenario_id != node_id:
         return
-    # Tests marked @pytest.mark.skip skip at setup time; in-body pytest.skip()
-    # surfaces during 'call'. Both reach finish_scenario via this hook.
+    # Tests marked @pytest.mark.skip skip at setup time; fixture exceptions
+    # produce a failed setup report and no call report at all; in-body
+    # pytest.skip() / failures surface during 'call'. All three terminal cases
+    # must reach finish_scenario, otherwise _current_scenario is orphaned
+    # (silently dropped from the report, and any later unannotated test's
+    # `with given(...)` would push into the orphan since state != 'idle').
     setup_skip = report.when == 'setup' and report.skipped
-    if report.when != 'call' and not setup_skip:
+    setup_fail = report.when == 'setup' and report.failed
+    if report.when != 'call' and not setup_skip and not setup_fail:
         return
     elapsed = time.monotonic() - collector.start_times.pop(node_id, time.monotonic())
     duration_ms = int(elapsed * 1000)

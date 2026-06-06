@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-02T15:55:56.305621+00:00",
+    "timestamp": "2026-06-06T10:28:52.332432+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "20f8c61cf687dbebb3b4acd830e3da199bcd859b"
+    "commit_sha": "63075153286d6da9f034feb81e2269de92336f3e"
   },
   "scenarios": [
     {
@@ -570,7 +570,7 @@
       "module": "test_examples",
       "tags": [],
       "status": "failed",
-      "duration_ms": 57,
+      "duration_ms": 95,
       "steps": [
         {
           "phase": "given",
@@ -598,7 +598,7 @@
       "parameters": null,
       "error": {
         "message": "assert 10 == 20",
-        "diff": ".nox/examples/lib/python3.14/site-packages/_pytest/runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call\n    yield\n.nox/examples/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/runner.py:179: in pytest_runtest_call\n    item.runtest()\n.nox/examples/lib/python3.14/site-packages/_pytest/python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.nox/examples/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox/examples/lib/python3.14/site-packages/_pytest/python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc/pytest_given/decorators.py:192: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples/test_examples.py:143: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
+        "diff": ".nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\logging.py:850: in pytest_runtest_call\n    yield\n.nox\\examples\\Lib\\site-packages\\_pytest\\capture.py:900: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\skipping.py:268: in pytest_runtest_call\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:179: in pytest_runtest_call\n    item.runtest()\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:1720: in runtest\n    self.ihook.pytest_pyfunc_call(pyfuncitem=self)\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\python.py:166: in pytest_pyfunc_call\n    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\nsrc\\pytest_given\\capture\\decorators.py:191: in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\nexamples\\test_examples.py:143: in test_failing\n    assert machine['coffees'] == 20\nE   assert 10 == 20"
       },
       "skip_reason": null,
       "source": {
@@ -615,10 +615,13 @@
       "module": "test_examples",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 0,
+      "duration_ms": 26,
       "steps": [],
       "parameters": null,
-      "error": null,
+      "error": {
+        "message": "demonstrates skipped status",
+        "diff": ".nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_callers.py:53: in run_old_style_hookwrapper\n    return result.get_result()\n           ^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_callers.py:38: in run_old_style_hookwrapper\n    res = yield\n          ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\logging.py:843: in pytest_runtest_setup\n    yield\n.nox\\examples\\Lib\\site-packages\\_pytest\\capture.py:895: in pytest_runtest_setup\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\skipping.py:251: in pytest_runtest_setup\n    raise skip.Exception(skipped.reason, _use_item_location=True)\nE   Skipped: demonstrates skipped status"
+      },
       "skip_reason": "demonstrates skipped status",
       "source": {
         "relpath": "examples/test_examples.py",
@@ -837,7 +840,7 @@
       "module": "test_examples",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 0,
+      "duration_ms": 53,
       "steps": [],
       "parameters": {
         "names": [
@@ -849,14 +852,20 @@
               1
             ],
             "status": "skipped",
-            "error": null
+            "error": {
+              "message": "awaiting fixture",
+              "diff": ".nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_callers.py:53: in run_old_style_hookwrapper\n    return result.get_result()\n           ^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_callers.py:38: in run_old_style_hookwrapper\n    res = yield\n          ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\logging.py:843: in pytest_runtest_setup\n    yield\n.nox\\examples\\Lib\\site-packages\\_pytest\\capture.py:895: in pytest_runtest_setup\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\skipping.py:251: in pytest_runtest_setup\n    raise skip.Exception(skipped.reason, _use_item_location=True)\nE   Skipped: awaiting fixture"
+            }
           },
           {
             "values": [
               2
             ],
             "status": "skipped",
-            "error": null
+            "error": {
+              "message": "awaiting fixture",
+              "diff": ".nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:353: in from_call\n    result: TResult | None = func()\n                             ^^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:245: in <lambda>\n    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_hooks.py:512: in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_manager.py:120: in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_callers.py:53: in run_old_style_hookwrapper\n    return result.get_result()\n           ^^^^^^^^^^^^^^^^^^^\n.nox\\examples\\Lib\\site-packages\\pluggy\\_callers.py:38: in run_old_style_hookwrapper\n    res = yield\n          ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\logging.py:843: in pytest_runtest_setup\n    yield\n.nox\\examples\\Lib\\site-packages\\_pytest\\capture.py:895: in pytest_runtest_setup\n    return (yield)\n            ^^^^^\n.nox\\examples\\Lib\\site-packages\\_pytest\\skipping.py:251: in pytest_runtest_setup\n    raise skip.Exception(skipped.reason, _use_item_location=True)\nE   Skipped: awaiting fixture"
+            }
           }
         ]
       },

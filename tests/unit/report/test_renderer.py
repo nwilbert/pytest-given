@@ -385,6 +385,60 @@ def test_render_value_part_uses_param_value_class(tmp_path: Path) -> None:
     assert '12.0' in content
 
 
+def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
+    """Attachment content containing `</script>` must not break out of the
+    inline `<script>` block — JSON doesn't escape `</` inside string literals,
+    so the renderer must escape it on the way in."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'i',
+                        'narration': _narration('XSS'),
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'parameters': None,
+                        'error': None,
+                        'steps': [
+                            {
+                                'phase': 'then',
+                                'narration': _narration('check'),
+                                'status': 'passed',
+                                'children': [],
+                                'attachments': [
+                                    {
+                                        'label': 'payload',
+                                        'content': '</script><script>alert(1)</script>',
+                                    }
+                                ],
+                                'error': None,
+                            }
+                        ],
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    # The template emits exactly two `</script>` tags (data block + alpine block).
+    # An unescaped attachment payload would add a third.
+    assert content.count('</script>') == 2
+    # The escaped form must be present in the embedded JSON.
+    assert '<\\/script>' in content
+
+
 def test_render_self_contained(tmp_path: Path) -> None:
     """The output HTML has no external dependencies."""
     json_path = tmp_path / 'data.json'

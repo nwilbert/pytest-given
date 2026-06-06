@@ -34,6 +34,11 @@ def render_html(
     """
     raw_json = json_path.read_text(encoding='utf-8')
     report = report_from_dict(json.loads(raw_json))
+    # JSON doesn't escape `</` inside string literals, but we embed `raw_json`
+    # inside an inline <script>; an attachment containing `</script>` would
+    # close the tag and yield stored XSS. `\/` is a valid JSON/JS escape for
+    # `/`, so this preserves the parsed value while neutering the HTML parser.
+    safe_report_json = raw_json.replace('</', '<\\/')
 
     templates_dir = Path(__file__).parent / 'templates'
     css = (templates_dir / 'styles.css').read_text(encoding='utf-8')
@@ -58,7 +63,7 @@ def render_html(
     html = template.render(
         metadata=report.metadata,
         scenarios=report.scenarios,
-        report_json=Markup(raw_json),
+        report_json=Markup(safe_report_json),
         css=Markup(css),
         app_js=Markup(app_js),
         alpine_js=Markup(alpine_js),
