@@ -49,6 +49,7 @@ def render_html(
         loader=jinja2.FileSystemLoader(str(templates_dir)),
         autoescape=True,
     )
+    env.globals['zip'] = zip
 
     param_color_map = _build_param_color_map(report.scenarios)
     source_urls = _compute_source_urls(
@@ -141,8 +142,17 @@ def _make_narration_filter(
                 case NarrationPlaceholder(name=name):
                     color_idx = color_map.get(name, 0) % _NUM_PARAM_COLORS
                     label = _placeholder_token(part)
+                    # Single-quote the JS arg because the HTML attribute is "..."
+                    # and parametrize names are Python identifiers (no `'`).
+                    safe_name = escape(name)
+                    enter = f"setHoverParam('{safe_name}', $event.currentTarget)"
+                    leave = 'setHoverParam(null, $event.currentTarget)'
                     out.append(
-                        f'<span class="param-color-{color_idx}">{escape(label)}</span>'
+                        f'<span class="param-color-{color_idx}" '
+                        f'data-param="{safe_name}" '
+                        f'@mouseenter="{enter}" '
+                        f'@mouseleave="{leave}"'
+                        f'>{escape(label)}</span>'
                     )
         return Markup(''.join(out))
 

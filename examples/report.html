@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>pytest-given — pytest-given Report</title>
+<title>pytest-given â€” pytest-given Report</title>
 <style>
 /* === Design Tokens === */
 :root {
@@ -75,9 +75,14 @@ body {
   color: var(--text-primary);
   margin-bottom: var(--space-lg);
 }
-.sidebar input[type="text"] {
+/* Search box (wraps input + icons) */
+.search-box {
+  position: relative;
+  display: block;
+}
+.search-box input[type="text"] {
   width: 100%;
-  padding: 6px 10px;
+  padding: 6px 28px 6px 28px;
   background: var(--bg-page);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -85,7 +90,34 @@ body {
   font-size: var(--font-size-sm);
   outline: none;
 }
-.sidebar input[type="text"]:focus { border-color: var(--color-accent); }
+.search-box input[type="text"]:focus { border-color: var(--color-accent); }
+.search-box-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.search-box-clear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  padding: 2px;
+  margin: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-box-clear:hover { color: var(--color-accent); }
+.search-box-clear svg { width: 14px; height: 14px; }
 
 .sidebar-section {
   margin-top: var(--space-xl);
@@ -240,6 +272,19 @@ body {
   margin-right: var(--space-sm);
 }
 .scenario-header-empty { cursor: default; }
+
+/* Scenario expand/collapse â€” grid-rows animates 0frâ†’1fr both ways */
+.scenario-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms ease-out;
+}
+.scenario-body.expanded { grid-template-rows: 1fr; }
+.scenario-body-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
 .scenario-name { font-size: var(--font-size-md); font-weight: 500; }
 .scenario-tag {
   display: inline-block;
@@ -266,10 +311,29 @@ body {
 .phase-label { font-weight: 600; color: var(--text-muted); margin-top: var(--space-xs); }
 .phase-steps { padding-left: var(--space-lg); }
 .step-text { color: var(--text-secondary); }
+.step-expand,
+.attachment-expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms ease-out;
+}
+.step-expand.expanded,
+.attachment-expand.expanded { grid-template-rows: 1fr; }
+/* `.step-children` doubles as the overflow trap because it only adds
+   horizontal padding/border, which doesn't grow the grid track's vertical
+   intrinsic size. `.attachment-content` has vertical padding + margin, so it
+   needs a separate trap (`.attachment-expand-inner`) â€” otherwise the track
+   sizes up to fit its padding and leaks a 16-20px sliver when collapsed. */
 .step-children {
+  overflow: hidden;
+  min-height: 0;
   margin-left: 6px;
   padding-left: var(--space-lg);
   border-left: 1.5px dashed var(--border);
+}
+.attachment-expand-inner {
+  overflow: hidden;
+  min-height: 0;
 }
 .step-toggle { cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 2px; }
 .step-chevron {
@@ -310,6 +374,19 @@ body {
   border-top: 1px solid var(--border);
 }
 .param-table tr.failed-row { background: var(--color-error-bg); }
+.param-table tbody tr { transition: background-color 120ms ease-out; }
+.param-table tbody tr:hover:not(.failed-row) { background: var(--color-accent-bg); }
+
+/* Crosshair: triggered by JS hovering a th/td. Highlights the matching column
+   header, every cell in the column, and any narration placeholders bound to
+   the same parameter name. */
+.param-table th.param-highlight,
+.param-table td.param-highlight { background: var(--color-accent-bg); }
+.param-table tbody tr:hover td.param-highlight { background: #cfe2ff; }
+span.param-highlight {
+  background: var(--color-accent-bg);
+  border-radius: 2px;
+}
 
 /* Error */
 .error-block {
@@ -360,6 +437,13 @@ body {
   margin-top: var(--space-xs);
 }
 .attachment-badge:hover { background: var(--border); }
+.attachment-badge-icon {
+  width: 12px;
+  height: 12px;
+  vertical-align: -2px;
+  margin-right: 4px;
+  color: inherit;
+}
 .attachment-content {
   background: var(--bg-page);
   padding: var(--space-sm) var(--space-md);
@@ -376,12 +460,7 @@ body {
 .dot-failed { color: var(--color-failed); }
 .dot-skipped { color: var(--color-skipped); }
 
-/* Transitions */
-.transition-enter { transition: opacity 0.15s ease, transform 0.15s ease; }
-.transition-enter-start { opacity: 0; transform: translateY(-4px); }
-.transition-enter-end { opacity: 1; transform: translateY(0); }
-
-/* Parameter colors — light-background variants */
+/* Parameter colors â€” light-background variants */
 .param-color-0, th.param-color-0 { color: #d63384; font-weight: 600; }
 .param-color-1, th.param-color-1 { color: #198754; font-weight: 600; }
 .param-color-2, th.param-color-2 { color: #0d6efd; font-weight: 600; }
@@ -412,14 +491,20 @@ body {
 
 <div class="sidebar">
   <div class="sidebar-title">pytest-given</div>
-  <input type="text" placeholder="🔍 Search scenarios..." x-model="search">
+  <label class="search-box">
+    <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input type="text" placeholder="Search scenarios..." x-model="search">
+    <button type="button" class="search-box-clear" @click="search = ''" x-show="search" aria-label="Clear search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </label>
 
   <div class="sidebar-section">
     <div class="sidebar-label">Status</div>
     <div class="status-pills">
-      <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
-      <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
-      <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
+      <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">âœ“ Passed <span x-text="counts.passed"></span></span>
+      <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">âœ— Failed <span x-text="counts.failed"></span></span>
+      <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">â—‹ Skipped <span x-text="counts.skipped"></span></span>
     </div>
   </div>
 
@@ -433,16 +518,16 @@ body {
       <template x-for="group in groups" :key="group.name">
         <div>
           <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
-            <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
+            <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? 'â–¾' : 'â–¸'"></span>
             <span class="nav-group-name" x-text="group.name"></span>
-            <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
+            <span class="nav-group-dismiss" x-show="activeTag === group.name">Ã—</span>
             <span class="nav-group-count" x-text="group.scenarios.length"></span>
           </div>
           <template x-if="expandedGroups[group.name]">
             <div>
               <template x-for="s in group.scenarios" :key="s.id">
                 <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
-                  <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
+                  <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? 'âœ“' : s.status === 'failed' ? 'âœ—' : 'â—‹'"></span>
                   <span x-text="s.narration.text"></span>
                 </div>
               </template>
@@ -460,9 +545,9 @@ body {
       <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
         <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
         <div class="header-context" x-text="filterSummary"></div>
-        <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
+        <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all â†‘' : 'Expand all â†“'"></button>
       </div>
-      <div class="header-meta">pytest 9.0.3 · pytest-given 0.1.0 · <span x-text="formattedTimestamp"></span></div>
+      <div class="header-meta">pytest 9.0.3 Â· pytest-given 0.1.0 Â· <span x-text="formattedTimestamp"></span></div>
     </div>
   </div><div class="scenario passed"
        x-show="isVisible(0)"
@@ -480,13 +565,14 @@ body {
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          ✓ passed
+          âœ“ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[0]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[0] }">
+    <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
@@ -494,11 +580,15 @@ body {
             <div class="step-text">I insert $2</div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text">I get a coffee</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s0_2_att_0')">📎 Machine state</span>
-      <div class="attachment-content" x-show="expandedAttachments['s0_2_att_0']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{
+      <span class="attachment-badge" @click="toggleAttachment('s0_2_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Machine state</span>
+      <div class="attachment-expand" :class="{ expanded: expandedAttachments['s0_2_att_0'] }">
+        <div class="attachment-expand-inner">
+          <div class="attachment-content"><pre>{
   &#34;coffees&#34;: 9,
   &#34;price&#34;: 2
 }</pre></div>
+        </div>
+      </div>
     </div>
           </div></div>
 
@@ -507,8 +597,9 @@ body {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/63075153286d6da9f034feb81e2269de92336f3e/examples/test_examples.py#L20">examples/test_examples.py:20</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L20">examples/test_examples.py:20</a></div>
       
+    </div>
     </div>
   </div>
   <div class="scenario passed"
@@ -525,13 +616,14 @@ body {
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          ✓ passed
+          âœ“ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[1]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[1] }">
+    <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
@@ -539,10 +631,14 @@ body {
             <div class="step-text">I print the receipt</div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text">the receipt is recorded verbatim</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s1_2_att_0')">📎 Receipt</span>
-      <div class="attachment-content" x-show="expandedAttachments['s1_2_att_0']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>Coffee x1     $2.00
+      <span class="attachment-badge" @click="toggleAttachment('s1_2_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Receipt</span>
+      <div class="attachment-expand" :class="{ expanded: expandedAttachments['s1_2_att_0'] }">
+        <div class="attachment-expand-inner">
+          <div class="attachment-content"><pre>Coffee x1     $2.00
 ----------------
 Total:        $2.00</pre></div>
+        </div>
+      </div>
     </div>
           </div></div>
 
@@ -551,8 +647,9 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/63075153286d6da9f034feb81e2269de92336f3e/examples/test_examples.py#L32">examples/test_examples.py:32</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L32">examples/test_examples.py:32</a></div>
       
+    </div>
     </div>
   </div>
   <div class="scenario passed"
@@ -567,13 +664,14 @@ Total:        $2.00</pre></div>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          ✓ passed
+          âœ“ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[2]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[2] }">
+    <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a database connection</div>
@@ -588,8 +686,9 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/63075153286d6da9f034feb81e2269de92336f3e/examples/test_examples.py#L40">examples/test_examples.py:40</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L40">examples/test_examples.py:40</a></div>
       
+    </div>
     </div>
   </div>
   <div class="scenario passed"
@@ -604,13 +703,14 @@ Total:        $2.00</pre></div>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          ✓ passed
+          âœ“ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[3]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[3] }">
+    <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
@@ -627,8 +727,9 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/63075153286d6da9f034feb81e2269de92336f3e/examples/test_examples.py#L61">examples/test_examples.py:61</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L61">examples/test_examples.py:61</a></div>
       
+    </div>
     </div>
   </div>
   <div class="scenario passed"
@@ -645,13 +746,14 @@ Total:        $2.00</pre></div>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          ✓ passed
+          âœ“ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[4]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[4] }">
+    <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
@@ -659,20 +761,28 @@ Total:        $2.00</pre></div>
             <div class="step-text"><span class="step-toggle" @click="toggleStep('s4_1')">
         <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s4_1'] }"></span>
         I insert $2
-      </span></div><div class="step-children" x-show="expandedSteps['s4_1']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the coin is validated for $<span class="param-value">2</span></div><div class="step-text">the balance is updated</div></div>
+      </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s4_1'] }">
+      <div class="step-children"><div class="step-text">the coin is validated for $<span class="param-value">2</span></div><div class="step-text">the balance is updated</div></div>
+    </div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text">the coin is accepted</div>
           </div><div class="phase-steps">
             <div class="step-text"><span class="step-toggle" @click="toggleStep('s4_3')">
         <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s4_3'] }"></span>
         a coffee is dispensed
-      </span></div><div class="step-children" x-show="expandedSteps['s4_3']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the machine state is consistent</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s4_3_0_att_0')">📎 Final state</span>
-      <div class="attachment-content" x-show="expandedAttachments['s4_3_0_att_0']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{
+      </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s4_3'] }">
+      <div class="step-children"><div class="step-text">the machine state is consistent</div><div>
+      <span class="attachment-badge" @click="toggleAttachment('s4_3_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Final state</span>
+      <div class="attachment-expand" :class="{ expanded: expandedAttachments['s4_3_0_att_0'] }">
+        <div class="attachment-expand-inner">
+          <div class="attachment-content"><pre>{
   &#34;coffees&#34;: 9,
   &#34;price&#34;: 2
 }</pre></div>
+        </div>
+      </div>
     </div></div>
+    </div>
           </div></div>
 
       
@@ -680,8 +790,9 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/63075153286d6da9f034feb81e2269de92336f3e/examples/test_examples.py#L100">examples/test_examples.py:100</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L100">examples/test_examples.py:100</a></div>
       
+    </div>
     </div>
   </div>
   <div class="scenario passed"
@@ -698,13 +809,14 @@ Total:        $2.00</pre></div>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          ✓ passed
+          âœ“ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[5]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[5] }">
+    <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
@@ -714,30 +826,46 @@ Total:        $2.00</pre></div>
             <div class="step-text"><span class="step-toggle" @click="toggleStep('s5_2')">
         <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s5_2'] }"></span>
         I place a large order
-      </span></div><div class="step-children" x-show="expandedSteps['s5_2']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">I select 3 coffees</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s5_2_1')">
+      </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s5_2'] }">
+      <div class="step-children"><div class="step-text">I select 3 coffees</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s5_2_1')">
         <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s5_2_1'] }"></span>
         I apply loyalty discount
-      </span></div><div class="step-children" x-show="expandedSteps['s5_2_1']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the loyalty card is validated</div><div class="step-text">the discount is calculated</div></div></div>
+      </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s5_2_1'] }">
+      <div class="step-children"><div class="step-text">the loyalty card is validated</div><div class="step-text">the discount is calculated</div></div>
+    </div></div>
+    </div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text"><span class="step-toggle" @click="toggleStep('s5_3')">
         <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s5_3'] }"></span>
         the order is processed correctly
-      </span></div><div class="step-children" x-show="expandedSteps['s5_3']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the coffee count is updated</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s5_3_1')">
+      </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s5_3'] }">
+      <div class="step-children"><div class="step-text">the coffee count is updated</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s5_3_1')">
         <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s5_3_1'] }"></span>
         the loyalty points are deducted
-      </span></div><div class="step-children" x-show="expandedSteps['s5_3_1']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><div class="step-text">the remaining points are valid</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s5_3_1_0_att_0')">📎 Loyalty state</span>
-      <div class="attachment-content" x-show="expandedAttachments['s5_3_1_0_att_0']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{
+      </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s5_3_1'] }">
+      <div class="step-children"><div class="step-text">the remaining points are valid</div><div>
+      <span class="attachment-badge" @click="toggleAttachment('s5_3_1_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Loyalty state</span>
+      <div class="attachment-expand" :class="{ expanded: expandedAttachments['s5_3_1_0_att_0'] }">
+        <div class="attachment-expand-inner">
+          <div class="attachment-content"><pre>{
   &#34;points&#34;: 2
 }</pre></div>
-    </div></div></div>
+        </div>
+      </div>
+    </div></div>
+    </div></div>
+    </div>
           </div><div class="phase-steps">
             <div class="step-text">the machine state is consistent</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s5_4_att_0')">📎 Final machine state</span>
-      <div class="attachment-content" x-show="expandedAttachments['s5_4_att_0']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{
+      <span class="attachment-badge" @click="toggleAttachment('s5_4_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Final machine state</span>
+      <div class="attachment-expand" :class="{ expanded: expandedAttachments['s5_4_att_0'] }">
+        <div class="attachment-expand-inner">
+          <div class="attachment-content"><pre>{
   &#34;coffees&#34;: 7,
   &#34;price&#34;: 2
 }</pre></div>
+        </div>
+      </div>
     </div>
           </div></div>
 
@@ -746,8 +874,9 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/63075153286d6da9f034feb81e2269de92336f3e/examples/test_examples.py#L113">examples/test_examples.py:113</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L113">examples/test_examples.py:113</a></div>
       
+    </div>
     </div>
   </div>
   <div class="scenario failed"
@@ -762,13 +891,14 @@ Total:        $2.00</pre></div>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status failed">
-          ✗ failed
+          âœ— failed
         </span>
-        <span class="scenario-duration">95ms</span>
+        <span class="scenario-duration">91ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[6]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[6] }">
+    <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
@@ -824,8 +954,9 @@ E   assert 10 == 20</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/63075153286d6da9f034feb81e2269de92336f3e/examples/test_examples.py#L140">examples/test_examples.py:140</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L140">examples/test_examples.py:140</a></div>
       
+    </div>
     </div>
   </div>
   <div class="scenario skipped"
@@ -840,13 +971,14 @@ E   assert 10 == 20</pre>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status skipped">
-          ○ skipped
+          â—‹ skipped
         </span>
-        <span class="scenario-duration">26ms</span>
+        <span class="scenario-duration">27ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[7]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[7] }">
+    <div class="scenario-body-inner">
       
       <div class="skip-reason">
         <span class="skip-reason-label">Skipped:</span>
@@ -890,8 +1022,9 @@ E   Skipped: demonstrates skipped status</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/63075153286d6da9f034feb81e2269de92336f3e/examples/test_examples.py#L146">examples/test_examples.py:146</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L146">examples/test_examples.py:146</a></div>
       
+    </div>
     </div>
   </div>
   <div class="scenario passed"
@@ -908,20 +1041,21 @@ E   Skipped: demonstrates skipped status</pre>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          ✓ passed
+          âœ“ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[8]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[8] }">
+    <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I insert $<span class="param-color-0">{euros}</span></div>
+            <div class="step-text">I insert $<span class="param-color-0" data-param="euros" @mouseenter="setHoverParam('euros', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{euros}</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the purchase is allowed: <span class="param-color-1">{expect}</span></div>
+            <div class="step-text">the purchase is allowed: <span class="param-color-1" data-param="expect" @mouseenter="setHoverParam('expect', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{expect}</span></div>
           </div></div>
 
       
@@ -929,9 +1063,13 @@ E   Skipped: demonstrates skipped status</pre>
         <thead>
           <tr>
             
-            <th class="param-color-0">euros</th>
+            <th class="param-color-0" data-param="euros"
+                @mouseenter="setHoverParam('euros', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">euros</th>
             
-            <th class="param-color-1">expect</th>
+            <th class="param-color-1" data-param="expect"
+                @mouseenter="setHoverParam('expect', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">expect</th>
             
             <th style="text-align:right">status</th>
           </tr>
@@ -940,36 +1078,48 @@ E   Skipped: demonstrates skipped status</pre>
           
           <tr class="">
             
-            <td>1</td>
+            <td data-param="euros"
+                @mouseenter="setHoverParam('euros', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">1</td>
             
-            <td>False</td>
+            <td data-param="expect"
+                @mouseenter="setHoverParam('expect', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">False</td>
             
             <td style="text-align:right">
-              <span class="dot-passed">✓</span>
+              <span class="dot-passed">âœ“</span>
             </td>
           </tr>
           
           
           <tr class="">
             
-            <td>2</td>
+            <td data-param="euros"
+                @mouseenter="setHoverParam('euros', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">2</td>
             
-            <td>True</td>
+            <td data-param="expect"
+                @mouseenter="setHoverParam('expect', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">True</td>
             
             <td style="text-align:right">
-              <span class="dot-passed">✓</span>
+              <span class="dot-passed">âœ“</span>
             </td>
           </tr>
           
           
           <tr class="">
             
-            <td>3</td>
+            <td data-param="euros"
+                @mouseenter="setHoverParam('euros', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">3</td>
             
-            <td>True</td>
+            <td data-param="expect"
+                @mouseenter="setHoverParam('expect', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">True</td>
             
             <td style="text-align:right">
-              <span class="dot-passed">✓</span>
+              <span class="dot-passed">âœ“</span>
             </td>
           </tr>
           
@@ -981,8 +1131,9 @@ E   Skipped: demonstrates skipped status</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/63075153286d6da9f034feb81e2269de92336f3e/examples/test_examples.py#L49">examples/test_examples.py:49</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L49">examples/test_examples.py:49</a></div>
       
+    </div>
     </div>
   </div>
   <div class="scenario passed"
@@ -992,25 +1143,26 @@ E   Skipped: demonstrates skipped status</pre>
     <div class="scenario-header" @click="toggleScenario(9)">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[9] }"></span>
-        <span class="scenario-name">Brew <span class="param-color-2">{cup_size}</span> ml (templated scenario name)</span>
+        <span class="scenario-name">Brew <span class="param-color-2" data-param="cup_size" @mouseenter="setHoverParam('cup_size', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{cup_size}</span> ml (templated scenario name)</span>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          ✓ passed
+          âœ“ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[9]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[9] }">
+    <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I brew a <span class="param-color-2">{cup_size}</span> ml cup</div>
+            <div class="step-text">I brew a <span class="param-color-2" data-param="cup_size" @mouseenter="setHoverParam('cup_size', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{cup_size}</span> ml cup</div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text">the machine has one fewer coffee</div>
           </div></div>
@@ -1020,7 +1172,9 @@ E   Skipped: demonstrates skipped status</pre>
         <thead>
           <tr>
             
-            <th class="param-color-2">cup_size</th>
+            <th class="param-color-2" data-param="cup_size"
+                @mouseenter="setHoverParam('cup_size', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">cup_size</th>
             
             <th style="text-align:right">status</th>
           </tr>
@@ -1029,20 +1183,24 @@ E   Skipped: demonstrates skipped status</pre>
           
           <tr class="">
             
-            <td>200</td>
+            <td data-param="cup_size"
+                @mouseenter="setHoverParam('cup_size', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">200</td>
             
             <td style="text-align:right">
-              <span class="dot-passed">✓</span>
+              <span class="dot-passed">âœ“</span>
             </td>
           </tr>
           
           
           <tr class="">
             
-            <td>300</td>
+            <td data-param="cup_size"
+                @mouseenter="setHoverParam('cup_size', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">300</td>
             
             <td style="text-align:right">
-              <span class="dot-passed">✓</span>
+              <span class="dot-passed">âœ“</span>
             </td>
           </tr>
           
@@ -1054,8 +1212,9 @@ E   Skipped: demonstrates skipped status</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/63075153286d6da9f034feb81e2269de92336f3e/examples/test_examples.py#L71">examples/test_examples.py:71</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L71">examples/test_examples.py:71</a></div>
       
+    </div>
     </div>
   </div>
   <div class="scenario skipped"
@@ -1070,13 +1229,14 @@ E   Skipped: demonstrates skipped status</pre>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status skipped">
-          ○ skipped
+          â—‹ skipped
         </span>
         <span class="scenario-duration">53ms</span>
       </span>
     </div>
 
-    <div x-show="expandedScenarios[10]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[10] }">
+    <div class="scenario-body-inner">
       
       <div class="steps"></div>
 
@@ -1085,7 +1245,9 @@ E   Skipped: demonstrates skipped status</pre>
         <thead>
           <tr>
             
-            <th class="param-color-3">n</th>
+            <th class="param-color-3" data-param="n"
+                @mouseenter="setHoverParam('n', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">n</th>
             
             <th style="text-align:right">status</th>
           </tr>
@@ -1094,10 +1256,12 @@ E   Skipped: demonstrates skipped status</pre>
           
           <tr class="">
             
-            <td>1</td>
+            <td data-param="n"
+                @mouseenter="setHoverParam('n', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">1</td>
             
             <td style="text-align:right">
-              <span class="dot-skipped">○</span>
+              <span class="dot-skipped">â—‹</span>
             </td>
           </tr>
           
@@ -1138,10 +1302,12 @@ E   Skipped: awaiting fixture</pre>
           
           <tr class="">
             
-            <td>2</td>
+            <td data-param="n"
+                @mouseenter="setHoverParam('n', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">2</td>
             
             <td style="text-align:right">
-              <span class="dot-skipped">○</span>
+              <span class="dot-skipped">â—‹</span>
             </td>
           </tr>
           
@@ -1187,8 +1353,9 @@ E   Skipped: awaiting fixture</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/63075153286d6da9f034feb81e2269de92336f3e/examples/test_examples.py#L153">examples/test_examples.py:153</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L153">examples/test_examples.py:153</a></div>
       
+    </div>
     </div>
   </div>
   
@@ -1198,10 +1365,10 @@ E   Skipped: awaiting fixture</pre>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-06T10:28:52.332432+00:00",
+    "timestamp": "2026-06-06T16:38:29.949358+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "63075153286d6da9f034feb81e2269de92336f3e"
+    "commit_sha": "4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3"
   },
   "scenarios": [
     {
@@ -1767,7 +1934,7 @@ window.__REPORT_DATA__ = {
       "module": "test_examples",
       "tags": [],
       "status": "failed",
-      "duration_ms": 95,
+      "duration_ms": 91,
       "steps": [
         {
           "phase": "given",
@@ -1812,7 +1979,7 @@ window.__REPORT_DATA__ = {
       "module": "test_examples",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 26,
+      "duration_ms": 27,
       "steps": [],
       "parameters": null,
       "error": {
@@ -2103,7 +2270,7 @@ function reportApp() {
         if (shown.length) parts.push(shown.join(', '));
       }
       if (this.search) parts.push('"' + this.search + '"');
-      return parts.length ? parts.join(' · ') : 'All Scenarios';
+      return parts.length ? parts.join(' Â· ') : 'All Scenarios';
     },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
@@ -2197,6 +2364,15 @@ function reportApp() {
       if (this.expandedAttachments[key]) delete this.expandedAttachments[key];
       else this.expandedAttachments[key] = true;
     },
+    setHoverParam(name, el) {
+      const scope = el?.closest('.scenario') || document;
+      scope.querySelectorAll('.param-highlight').forEach(e => e.classList.remove('param-highlight'));
+      if (!name) return;
+      const safe = CSS.escape(name);
+      scope.querySelectorAll(
+        `th[data-param="${safe}"], td[data-param="${safe}"], span[data-param="${safe}"]`,
+      ).forEach(e => e.classList.add('param-highlight'));
+    },
     init() {
       this._readHash();
       ['search', 'activeTag', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
@@ -2208,18 +2384,34 @@ function reportApp() {
       const params = new URLSearchParams(window.location.hash.slice(1));
       if (params.has('tag')) this.activeTag = params.get('tag');
       else this.activeTag = null;
-      if (params.has('passed')) this.showPassed = params.get('passed') !== '0';
-      if (params.has('failed')) this.showFailed = params.get('failed') !== '0';
-      if (params.has('skipped')) this.showSkipped = params.get('skipped') !== '0';
+      if (params.has('status')) {
+        const shown = new Set(params.get('status').split(',').filter(Boolean));
+        this.showPassed = shown.has('passed');
+        this.showFailed = shown.has('failed');
+        this.showSkipped = shown.has('skipped');
+      } else {
+        this.showPassed = true;
+        this.showFailed = true;
+        this.showSkipped = true;
+      }
       if (params.has('q')) this.search = params.get('q');
       else this.search = '';
     },
     _writeHash() {
       const params = new URLSearchParams();
       if (this.activeTag) params.set('tag', this.activeTag);
-      if (!this.showPassed) params.set('passed', '0');
-      if (!this.showFailed) params.set('failed', '0');
-      if (!this.showSkipped) params.set('skipped', '0');
+
+      const present = new Set(data.scenarios.map(s => s.status));
+      const shown = [];
+      if (this.showPassed) shown.push('passed');
+      if (this.showFailed) shown.push('failed');
+      if (this.showSkipped) shown.push('skipped');
+      const shownInReport = shown.filter(s => present.has(s));
+      const presentList = ['passed', 'failed', 'skipped'].filter(s => present.has(s));
+      if (shownInReport.length !== presentList.length) {
+        params.set('status', shownInReport.join(','));
+      }
+
       if (this.search) params.set('q', this.search);
       const hash = params.toString();
       history.replaceState(null, '', hash ? '#' + hash : window.location.pathname);

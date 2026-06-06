@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 
 from pytest_given.report.renderer import render_html
@@ -209,9 +210,9 @@ def test_render_parameterized_step_with_structured_narration(tmp_path: Path) -> 
     assert 'param-color-0' in content
     # The merged step shows the {name} token
     assert '{euros}' in content
-    # The header still gets its color
-    assert '<th class="param-color-0">euros</th>' in content
-    assert '<th class="param-color-1">expect</th>' in content
+    # Headers carry color class + data-param so the crosshair JS can light them up
+    assert re.search(r'<th[^>]*\bparam-color-0\b[^>]*\bdata-param="euros"', content)
+    assert re.search(r'<th[^>]*\bparam-color-1\b[^>]*\bdata-param="expect"', content)
 
 
 def test_render_merged_placeholder_preserves_format_spec_and_conversion(
@@ -800,3 +801,119 @@ def test_renderer_skips_link_block_when_scenario_has_no_source(
     # The CSS class is always emitted in the stylesheet; what we care about
     # is that no scenario-source <div> was rendered for this scenario.
     assert '<div class="scenario-source">' not in content
+
+
+def test_render_placeholder_gets_data_param_attribute(tmp_path: Path) -> None:
+    """Crosshair hover needs every placeholder span tagged with its param name."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_p',
+                        'narration': _narration('Param scenario'),
+                        'module': 'mod',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [
+                            {
+                                'phase': 'when',
+                                'narration': _narration(
+                                    'I insert 1',
+                                    [
+                                        {'value': 'I insert '},
+                                        {
+                                            'name': 'euros',
+                                            'format_spec': '',
+                                            'conversion': None,
+                                        },
+                                    ],
+                                ),
+                                'status': 'passed',
+                                'children': [],
+                                'attachments': [],
+                                'error': None,
+                            }
+                        ],
+                        'parameters': {
+                            'names': ['euros'],
+                            'cases': [
+                                {'values': [1], 'status': 'passed', 'error': None},
+                            ],
+                        },
+                        'error': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert 'data-param="euros"' in content
+    # The placeholder span carries both class and data-param
+    assert 'class="param-color-0" data-param="euros"' in content
+
+
+def test_render_param_table_cells_get_data_param(tmp_path: Path) -> None:
+    """Crosshair hover needs every <th>/<td> tagged with the column's param name."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_p',
+                        'narration': _narration('Param scenario'),
+                        'module': 'mod',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': {
+                            'names': ['euros', 'expect'],
+                            'cases': [
+                                {
+                                    'values': [1, False],
+                                    'status': 'passed',
+                                    'error': None,
+                                },
+                                {
+                                    'values': [2, True],
+                                    'status': 'passed',
+                                    'error': None,
+                                },
+                            ],
+                        },
+                        'error': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    # Header carries data-param
+    assert 'data-param="euros"' in content
+    assert 'data-param="expect"' in content
+    # td values are wrapped with data-param matching their column name; tolerate
+    # additional attributes (Alpine handlers, etc.) between data-param and content
+    assert re.search(r'<td[^>]*\bdata-param="euros"[^>]*>\s*1\s*</td>', content)
+    assert re.search(r'<td[^>]*\bdata-param="expect"[^>]*>\s*False\s*</td>', content)
+    assert re.search(r'<td[^>]*\bdata-param="euros"[^>]*>\s*2\s*</td>', content)
+    assert re.search(r'<td[^>]*\bdata-param="expect"[^>]*>\s*True\s*</td>', content)

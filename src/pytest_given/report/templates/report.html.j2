@@ -12,7 +12,13 @@
 
 <div class="sidebar">
   <div class="sidebar-title">{{ metadata.project }}</div>
-  <input type="text" placeholder="🔍 Search scenarios..." x-model="search">
+  <label class="search-box">
+    <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input type="text" placeholder="Search scenarios..." x-model="search">
+    <button type="button" class="search-box-clear" @click="search = ''" x-show="search" aria-label="Clear search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </label>
 
   <div class="sidebar-section">
     <div class="sidebar-label">Status</div>
@@ -78,17 +84,23 @@
     {%- endif -%}
   </div>
   {%- if step.children and step.children | length > 0 -%}
-    <div class="step-children" x-show="expandedSteps['{{ step_id }}']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
-      {%- for child in step.children -%}
-        {{ render_step(child, step_id ~ '_' ~ loop.index0) }}
-      {%- endfor -%}
+    <div class="step-expand" :class="{ expanded: expandedSteps['{{ step_id }}'] }">
+      <div class="step-children">
+        {%- for child in step.children -%}
+          {{ render_step(child, step_id ~ '_' ~ loop.index0) }}
+        {%- endfor -%}
+      </div>
     </div>
   {%- endif -%}
   {%- if step.attachments -%}
     {%- for att in step.attachments -%}
     <div>
-      <span class="attachment-badge" @click="toggleAttachment('{{ step_id }}_att_{{ loop.index0 }}')">📎 {{ att.label }}</span>
-      <div class="attachment-content" x-show="expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}']" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end"><pre>{{ att.content }}</pre></div>
+      <span class="attachment-badge" @click="toggleAttachment('{{ step_id }}_att_{{ loop.index0 }}')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>{{ att.label }}</span>
+      <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}'] }">
+        <div class="attachment-expand-inner">
+          <div class="attachment-content"><pre>{{ att.content }}</pre></div>
+        </div>
+      </div>
     </div>
     {%- endfor -%}
   {%- endif -%}
@@ -122,7 +134,8 @@
       </span>
     </div>
 
-    <div x-show="expandedScenarios[{{ loop.index0 }}]" x-transition:enter="transition-enter" x-transition:enter-start="transition-enter-start" x-transition:enter-end="transition-enter-end">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[{{ loop.index0 }}] }">
+    <div class="scenario-body-inner">
       {% if scenario.skip_reason %}
       <div class="skip-reason">
         <span class="skip-reason-label">Skipped:</span>
@@ -148,7 +161,9 @@
         <thead>
           <tr>
             {% for name in scenario.parameters.names %}
-            <th class="param-color-{{ param_color_map.get(name, 0) % num_param_colors }}">{{ name }}</th>
+            <th class="param-color-{{ param_color_map.get(name, 0) % num_param_colors }}" data-param="{{ name }}"
+                @mouseenter="setHoverParam('{{ name }}', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">{{ name }}</th>
             {% endfor %}
             <th style="text-align:right">status</th>
           </tr>
@@ -156,8 +171,10 @@
         <tbody>
           {% for case in scenario.parameters.cases %}
           <tr class="{{ 'failed-row' if case.status == 'failed' else '' }}">
-            {% for val in case.values %}
-            <td>{{ val }}</td>
+            {% for name, val in zip(scenario.parameters.names, case.values) %}
+            <td data-param="{{ name }}"
+                @mouseenter="setHoverParam('{{ name }}', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">{{ val }}</td>
             {% endfor %}
             <td style="text-align:right">
               {% if case.status == 'passed' %}<span class="dot-passed">✓</span>{% elif case.status == 'skipped' %}<span class="dot-skipped">○</span>{% else %}<span class="dot-failed">✗</span>{% endif %}
@@ -195,6 +212,7 @@
         {%- endif -%}
       </div>
       {% endif %}
+    </div>
     </div>
   </div>
   {% endfor %}

@@ -120,6 +120,15 @@ function reportApp() {
       if (this.expandedAttachments[key]) delete this.expandedAttachments[key];
       else this.expandedAttachments[key] = true;
     },
+    setHoverParam(name, el) {
+      const scope = el?.closest('.scenario') || document;
+      scope.querySelectorAll('.param-highlight').forEach(e => e.classList.remove('param-highlight'));
+      if (!name) return;
+      const safe = CSS.escape(name);
+      scope.querySelectorAll(
+        `th[data-param="${safe}"], td[data-param="${safe}"], span[data-param="${safe}"]`,
+      ).forEach(e => e.classList.add('param-highlight'));
+    },
     init() {
       this._readHash();
       ['search', 'activeTag', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
@@ -131,18 +140,34 @@ function reportApp() {
       const params = new URLSearchParams(window.location.hash.slice(1));
       if (params.has('tag')) this.activeTag = params.get('tag');
       else this.activeTag = null;
-      if (params.has('passed')) this.showPassed = params.get('passed') !== '0';
-      if (params.has('failed')) this.showFailed = params.get('failed') !== '0';
-      if (params.has('skipped')) this.showSkipped = params.get('skipped') !== '0';
+      if (params.has('status')) {
+        const shown = new Set(params.get('status').split(',').filter(Boolean));
+        this.showPassed = shown.has('passed');
+        this.showFailed = shown.has('failed');
+        this.showSkipped = shown.has('skipped');
+      } else {
+        this.showPassed = true;
+        this.showFailed = true;
+        this.showSkipped = true;
+      }
       if (params.has('q')) this.search = params.get('q');
       else this.search = '';
     },
     _writeHash() {
       const params = new URLSearchParams();
       if (this.activeTag) params.set('tag', this.activeTag);
-      if (!this.showPassed) params.set('passed', '0');
-      if (!this.showFailed) params.set('failed', '0');
-      if (!this.showSkipped) params.set('skipped', '0');
+
+      const present = new Set(data.scenarios.map(s => s.status));
+      const shown = [];
+      if (this.showPassed) shown.push('passed');
+      if (this.showFailed) shown.push('failed');
+      if (this.showSkipped) shown.push('skipped');
+      const shownInReport = shown.filter(s => present.has(s));
+      const presentList = ['passed', 'failed', 'skipped'].filter(s => present.has(s));
+      if (shownInReport.length !== presentList.length) {
+        params.set('status', shownInReport.join(','));
+      }
+
       if (this.search) params.set('q', this.search);
       const hash = params.toString();
       history.replaceState(null, '', hash ? '#' + hash : window.location.pathname);

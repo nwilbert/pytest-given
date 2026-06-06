@@ -50,11 +50,15 @@ Lanes don't overlap: t-strings are rejected in `@scenario` and on any decorator 
 
 ## Report testing
 
-A Playwright MCP server is available for visually inspecting the HTML report. Open it with `file:///` URLs pointing to `examples/report.html` (regenerate via `uv run nox -s examples`). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
+Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filter in `renderer.py` **must** be Playwright-verified before commit — Python-side regex tests on rendered HTML do not catch broken Alpine expressions, malformed `:class` bindings, or other runtime browser issues (the substring matches even when the attribute is unparseable). Open `examples/report.html` (regenerate via `uv run nox -s examples`) with the Playwright MCP server, check `browser_console_messages` for errors after init, then drive the changed surface (hover, click, URL hash). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
+
+- **Don't write Python tests that pin frontend markup** (specific class names, wrapper structure, inline-handler shape, SVG strings). They check implementation details, not behavior, and rot the moment the renderer is refactored. The project has no JS-side UI tests; Playwright is the only verification for frontend concerns. Python tests stay on the renderer's data-shaped contract (what `data-param` value, which scenario IDs, which counts) — not on how the markup is assembled.
+- **Don't TDD frontend changes** for the same reason: a failing markup assertion isn't proving the bug exists in the browser, and a passing one isn't proving the fix works. Apply the change, regenerate `examples/`, drive it in Playwright, capture the result.
 
 - The report targets desktop only — assume a minimum viewport width of ~900px. No mobile/responsive layout needed.
 - Traceback display and header metadata formatting are known limitations, not current priorities.
 - Never save Playwright screenshots into the project directory. Use `/tmp/` or omit the `filename` parameter.
+- If the Playwright MCP browser install hangs after the download reaches 100% (microsoft/playwright#40998 in alpha builds), switch `.mcp.json` from `--browser chromium` to `--browser chrome` to use system Chrome.
 
 ## Conventions
 

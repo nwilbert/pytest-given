@@ -68,9 +68,14 @@ body {
   color: var(--text-primary);
   margin-bottom: var(--space-lg);
 }
-.sidebar input[type="text"] {
+/* Search box (wraps input + icons) */
+.search-box {
+  position: relative;
+  display: block;
+}
+.search-box input[type="text"] {
   width: 100%;
-  padding: 6px 10px;
+  padding: 6px 28px 6px 28px;
   background: var(--bg-page);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -78,7 +83,34 @@ body {
   font-size: var(--font-size-sm);
   outline: none;
 }
-.sidebar input[type="text"]:focus { border-color: var(--color-accent); }
+.search-box input[type="text"]:focus { border-color: var(--color-accent); }
+.search-box-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.search-box-clear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  padding: 2px;
+  margin: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-box-clear:hover { color: var(--color-accent); }
+.search-box-clear svg { width: 14px; height: 14px; }
 
 .sidebar-section {
   margin-top: var(--space-xl);
@@ -233,6 +265,19 @@ body {
   margin-right: var(--space-sm);
 }
 .scenario-header-empty { cursor: default; }
+
+/* Scenario expand/collapse — grid-rows animates 0fr→1fr both ways */
+.scenario-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms ease-out;
+}
+.scenario-body.expanded { grid-template-rows: 1fr; }
+.scenario-body-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
 .scenario-name { font-size: var(--font-size-md); font-weight: 500; }
 .scenario-tag {
   display: inline-block;
@@ -259,10 +304,29 @@ body {
 .phase-label { font-weight: 600; color: var(--text-muted); margin-top: var(--space-xs); }
 .phase-steps { padding-left: var(--space-lg); }
 .step-text { color: var(--text-secondary); }
+.step-expand,
+.attachment-expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms ease-out;
+}
+.step-expand.expanded,
+.attachment-expand.expanded { grid-template-rows: 1fr; }
+/* `.step-children` doubles as the overflow trap because it only adds
+   horizontal padding/border, which doesn't grow the grid track's vertical
+   intrinsic size. `.attachment-content` has vertical padding + margin, so it
+   needs a separate trap (`.attachment-expand-inner`) — otherwise the track
+   sizes up to fit its padding and leaks a 16-20px sliver when collapsed. */
 .step-children {
+  overflow: hidden;
+  min-height: 0;
   margin-left: 6px;
   padding-left: var(--space-lg);
   border-left: 1.5px dashed var(--border);
+}
+.attachment-expand-inner {
+  overflow: hidden;
+  min-height: 0;
 }
 .step-toggle { cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 2px; }
 .step-chevron {
@@ -303,6 +367,19 @@ body {
   border-top: 1px solid var(--border);
 }
 .param-table tr.failed-row { background: var(--color-error-bg); }
+.param-table tbody tr { transition: background-color 120ms ease-out; }
+.param-table tbody tr:hover:not(.failed-row) { background: var(--color-accent-bg); }
+
+/* Crosshair: triggered by JS hovering a th/td. Highlights the matching column
+   header, every cell in the column, and any narration placeholders bound to
+   the same parameter name. */
+.param-table th.param-highlight,
+.param-table td.param-highlight { background: var(--color-accent-bg); }
+.param-table tbody tr:hover td.param-highlight { background: #cfe2ff; }
+span.param-highlight {
+  background: var(--color-accent-bg);
+  border-radius: 2px;
+}
 
 /* Error */
 .error-block {
@@ -353,6 +430,13 @@ body {
   margin-top: var(--space-xs);
 }
 .attachment-badge:hover { background: var(--border); }
+.attachment-badge-icon {
+  width: 12px;
+  height: 12px;
+  vertical-align: -2px;
+  margin-right: 4px;
+  color: inherit;
+}
 .attachment-content {
   background: var(--bg-page);
   padding: var(--space-sm) var(--space-md);
@@ -368,11 +452,6 @@ body {
 .dot-passed { color: var(--color-passed); }
 .dot-failed { color: var(--color-failed); }
 .dot-skipped { color: var(--color-skipped); }
-
-/* Transitions */
-.transition-enter { transition: opacity 0.15s ease, transform 0.15s ease; }
-.transition-enter-start { opacity: 0; transform: translateY(-4px); }
-.transition-enter-end { opacity: 1; transform: translateY(0); }
 
 /* Parameter colors — light-background variants */
 .param-color-0, th.param-color-0 { color: #d63384; font-weight: 600; }
