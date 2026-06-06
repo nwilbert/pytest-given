@@ -2,15 +2,20 @@
 
 ## Now
 
+- [ ] fix unicode icons encoding issue
+- [ ] remove pip exclude-newer workaround
+- [ ] add ruff rule to flag unused ignore comments
+- [ ] reuse nox venvs by default
+
 ## Next
 
 - [ ] Implement Annotated fixture/parametrize labels (`docs/superpowers/specs/proposed/2026-05-23-annotated-fixture-labels-design.md`)
-- [ ] Add option to not generate the JSON file, rethink default behavior
+- [ ] Add option to not generate the JSON file on test run, rethink default behavior
 
 ## Later
 
 - [ ] Maybe: implement flat-step-display — opt-in body hiding on `given`/`when`/`then` (see `docs/superpowers/specs/proposed/2026-06-06-flat-step-display-design.md`)
-- [ ] UI improvements in report (not covered by the polish spec)
+- [ ] UI improvements in report
   - traceback verbosity (Consider trimming site-packages/_pytest/..., pluggy/..., and decorators.py frames by default with an "Show internal frames" toggle, mirroring pytest's --tb=short)
 - [ ] Think about UL support (e.g., by connecting the report to a glossary)
 - [ ] Provide an agent skill for work with pytest-given
