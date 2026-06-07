@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-06T16:35:46.415645+00:00",
+    "timestamp": "2026-06-07T09:42:16.992225+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3"
+    "commit_sha": "fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2"
   },
   "scenarios": [
     {
@@ -570,7 +570,7 @@
       "module": "test_examples",
       "tags": [],
       "status": "failed",
-      "duration_ms": 89,
+      "duration_ms": 91,
       "steps": [
         {
           "phase": "given",

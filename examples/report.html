@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>pytest-given â€” pytest-given Report</title>
+<title>pytest-given — pytest-given Report</title>
 <style>
 /* === Design Tokens === */
 :root {
@@ -273,7 +273,7 @@ body {
 }
 .scenario-header-empty { cursor: default; }
 
-/* Scenario expand/collapse â€” grid-rows animates 0frâ†’1fr both ways */
+/* Scenario expand/collapse — grid-rows animates 0fr→1fr both ways */
 .scenario-body {
   display: grid;
   grid-template-rows: 0fr;
@@ -322,7 +322,7 @@ body {
 /* `.step-children` doubles as the overflow trap because it only adds
    horizontal padding/border, which doesn't grow the grid track's vertical
    intrinsic size. `.attachment-content` has vertical padding + margin, so it
-   needs a separate trap (`.attachment-expand-inner`) â€” otherwise the track
+   needs a separate trap (`.attachment-expand-inner`) — otherwise the track
    sizes up to fit its padding and leaks a 16-20px sliver when collapsed. */
 .step-children {
   overflow: hidden;
@@ -460,7 +460,7 @@ span.param-highlight {
 .dot-failed { color: var(--color-failed); }
 .dot-skipped { color: var(--color-skipped); }
 
-/* Parameter colors â€” light-background variants */
+/* Parameter colors — light-background variants */
 .param-color-0, th.param-color-0 { color: #d63384; font-weight: 600; }
 .param-color-1, th.param-color-1 { color: #198754; font-weight: 600; }
 .param-color-2, th.param-color-2 { color: #0d6efd; font-weight: 600; }
@@ -502,9 +502,9 @@ span.param-highlight {
   <div class="sidebar-section">
     <div class="sidebar-label">Status</div>
     <div class="status-pills">
-      <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">âœ“ Passed <span x-text="counts.passed"></span></span>
-      <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">âœ— Failed <span x-text="counts.failed"></span></span>
-      <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">â—‹ Skipped <span x-text="counts.skipped"></span></span>
+      <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
+      <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
+      <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
     </div>
   </div>
 
@@ -518,16 +518,16 @@ span.param-highlight {
       <template x-for="group in groups" :key="group.name">
         <div>
           <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
-            <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? 'â–¾' : 'â–¸'"></span>
+            <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
             <span class="nav-group-name" x-text="group.name"></span>
-            <span class="nav-group-dismiss" x-show="activeTag === group.name">Ã—</span>
+            <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
             <span class="nav-group-count" x-text="group.scenarios.length"></span>
           </div>
           <template x-if="expandedGroups[group.name]">
             <div>
               <template x-for="s in group.scenarios" :key="s.id">
                 <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
-                  <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? 'âœ“' : s.status === 'failed' ? 'âœ—' : 'â—‹'"></span>
+                  <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
                   <span x-text="s.narration.text"></span>
                 </div>
               </template>
@@ -545,9 +545,9 @@ span.param-highlight {
       <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
         <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
         <div class="header-context" x-text="filterSummary"></div>
-        <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all â†‘' : 'Expand all â†“'"></button>
+        <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
       </div>
-      <div class="header-meta">pytest 9.0.3 Â· pytest-given 0.1.0 Â· <span x-text="formattedTimestamp"></span></div>
+      <div class="header-meta">pytest 9.0.3 · pytest-given 0.1.0 · <span x-text="formattedTimestamp"></span></div>
     </div>
   </div><div class="scenario passed"
        x-show="isVisible(0)"
@@ -565,7 +565,7 @@ span.param-highlight {
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          âœ“ passed
+          ✓ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
@@ -597,7 +597,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L20">examples/test_examples.py:20</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2/examples/test_examples.py#L20">examples/test_examples.py:20</a></div>
       
     </div>
     </div>
@@ -616,7 +616,7 @@ span.param-highlight {
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          âœ“ passed
+          ✓ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
@@ -647,7 +647,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L32">examples/test_examples.py:32</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2/examples/test_examples.py#L32">examples/test_examples.py:32</a></div>
       
     </div>
     </div>
@@ -664,7 +664,7 @@ Total:        $2.00</pre></div>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          âœ“ passed
+          ✓ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
@@ -686,7 +686,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L40">examples/test_examples.py:40</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2/examples/test_examples.py#L40">examples/test_examples.py:40</a></div>
       
     </div>
     </div>
@@ -703,7 +703,7 @@ Total:        $2.00</pre></div>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          âœ“ passed
+          ✓ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
@@ -727,7 +727,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L61">examples/test_examples.py:61</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2/examples/test_examples.py#L61">examples/test_examples.py:61</a></div>
       
     </div>
     </div>
@@ -746,7 +746,7 @@ Total:        $2.00</pre></div>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          âœ“ passed
+          ✓ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
@@ -790,7 +790,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L100">examples/test_examples.py:100</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2/examples/test_examples.py#L100">examples/test_examples.py:100</a></div>
       
     </div>
     </div>
@@ -809,7 +809,7 @@ Total:        $2.00</pre></div>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          âœ“ passed
+          ✓ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
@@ -874,7 +874,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L113">examples/test_examples.py:113</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2/examples/test_examples.py#L113">examples/test_examples.py:113</a></div>
       
     </div>
     </div>
@@ -891,7 +891,7 @@ Total:        $2.00</pre></div>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status failed">
-          âœ— failed
+          ✗ failed
         </span>
         <span class="scenario-duration">91ms</span>
       </span>
@@ -954,7 +954,7 @@ E   assert 10 == 20</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L140">examples/test_examples.py:140</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2/examples/test_examples.py#L140">examples/test_examples.py:140</a></div>
       
     </div>
     </div>
@@ -971,9 +971,9 @@ E   assert 10 == 20</pre>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status skipped">
-          â—‹ skipped
+          ○ skipped
         </span>
-        <span class="scenario-duration">27ms</span>
+        <span class="scenario-duration">26ms</span>
       </span>
     </div>
 
@@ -1022,7 +1022,7 @@ E   Skipped: demonstrates skipped status</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L146">examples/test_examples.py:146</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2/examples/test_examples.py#L146">examples/test_examples.py:146</a></div>
       
     </div>
     </div>
@@ -1041,7 +1041,7 @@ E   Skipped: demonstrates skipped status</pre>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          âœ“ passed
+          ✓ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
@@ -1087,7 +1087,7 @@ E   Skipped: demonstrates skipped status</pre>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">False</td>
             
             <td style="text-align:right">
-              <span class="dot-passed">âœ“</span>
+              <span class="dot-passed">✓</span>
             </td>
           </tr>
           
@@ -1103,7 +1103,7 @@ E   Skipped: demonstrates skipped status</pre>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">True</td>
             
             <td style="text-align:right">
-              <span class="dot-passed">âœ“</span>
+              <span class="dot-passed">✓</span>
             </td>
           </tr>
           
@@ -1119,7 +1119,7 @@ E   Skipped: demonstrates skipped status</pre>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">True</td>
             
             <td style="text-align:right">
-              <span class="dot-passed">âœ“</span>
+              <span class="dot-passed">✓</span>
             </td>
           </tr>
           
@@ -1131,7 +1131,7 @@ E   Skipped: demonstrates skipped status</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L49">examples/test_examples.py:49</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2/examples/test_examples.py#L49">examples/test_examples.py:49</a></div>
       
     </div>
     </div>
@@ -1150,7 +1150,7 @@ E   Skipped: demonstrates skipped status</pre>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
-          âœ“ passed
+          ✓ passed
         </span>
         <span class="scenario-duration">0ms</span>
       </span>
@@ -1188,7 +1188,7 @@ E   Skipped: demonstrates skipped status</pre>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">200</td>
             
             <td style="text-align:right">
-              <span class="dot-passed">âœ“</span>
+              <span class="dot-passed">✓</span>
             </td>
           </tr>
           
@@ -1200,7 +1200,7 @@ E   Skipped: demonstrates skipped status</pre>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">300</td>
             
             <td style="text-align:right">
-              <span class="dot-passed">âœ“</span>
+              <span class="dot-passed">✓</span>
             </td>
           </tr>
           
@@ -1212,7 +1212,7 @@ E   Skipped: demonstrates skipped status</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L71">examples/test_examples.py:71</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2/examples/test_examples.py#L71">examples/test_examples.py:71</a></div>
       
     </div>
     </div>
@@ -1229,9 +1229,9 @@ E   Skipped: demonstrates skipped status</pre>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status skipped">
-          â—‹ skipped
+          ○ skipped
         </span>
-        <span class="scenario-duration">53ms</span>
+        <span class="scenario-duration">52ms</span>
       </span>
     </div>
 
@@ -1261,7 +1261,7 @@ E   Skipped: demonstrates skipped status</pre>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">1</td>
             
             <td style="text-align:right">
-              <span class="dot-skipped">â—‹</span>
+              <span class="dot-skipped">○</span>
             </td>
           </tr>
           
@@ -1307,7 +1307,7 @@ E   Skipped: awaiting fixture</pre>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">2</td>
             
             <td style="text-align:right">
-              <span class="dot-skipped">â—‹</span>
+              <span class="dot-skipped">○</span>
             </td>
           </tr>
           
@@ -1353,7 +1353,7 @@ E   Skipped: awaiting fixture</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3/examples/test_examples.py#L153">examples/test_examples.py:153</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2/examples/test_examples.py#L153">examples/test_examples.py:153</a></div>
       
     </div>
     </div>
@@ -1365,10 +1365,10 @@ E   Skipped: awaiting fixture</pre>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-06T16:38:29.949358+00:00",
+    "timestamp": "2026-06-07T09:42:16.992225+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "4f6c8b0090e18bd0d9723eeff9c133dfc9887cf3"
+    "commit_sha": "fd5d5e947abc292c9328cb8bcebfa35c6cbe94c2"
   },
   "scenarios": [
     {
@@ -1979,7 +1979,7 @@ window.__REPORT_DATA__ = {
       "module": "test_examples",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 27,
+      "duration_ms": 26,
       "steps": [],
       "parameters": null,
       "error": {
@@ -2204,7 +2204,7 @@ window.__REPORT_DATA__ = {
       "module": "test_examples",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 53,
+      "duration_ms": 52,
       "steps": [],
       "parameters": {
         "names": [
@@ -2270,7 +2270,7 @@ function reportApp() {
         if (shown.length) parts.push(shown.join(', '));
       }
       if (this.search) parts.push('"' + this.search + '"');
-      return parts.length ? parts.join(' Â· ') : 'All Scenarios';
+      return parts.length ? parts.join(' · ') : 'All Scenarios';
     },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
