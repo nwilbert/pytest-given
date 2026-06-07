@@ -12,7 +12,7 @@
 ## Later
 
 - [ ] Maybe: implement flat-step-display — opt-in body hiding on `given`/`when`/`then` (see `docs/superpowers/specs/proposed/2026-06-06-flat-step-display-design.md`)
-- [ ] Think about UL support (e.g., by connecting the report to a glossary)
+- [ ] Implement Domain Storytelling + UL glossary integration (`docs/superpowers/specs/proposed/2026-06-07-domain-storytelling-design.md`)
 - [ ] Provide an agent skill for work with pytest-given
 - [ ] Add `@scenario(group_parametrized=False)` option to opt out of parametrize merging 
   - emit each case as its own scenario (named per case via Template substitution, or by appending the parametrize id to a `str` name).
