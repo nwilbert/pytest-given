@@ -2,10 +2,7 @@
 
 ## Now
 
-- [ ] fix unicode icons encoding issue
 - [ ] remove pip exclude-newer workaround
-- [ ] add ruff rule to flag unused ignore comments
-- [ ] reuse nox venvs by default
 
 ## Next
 
