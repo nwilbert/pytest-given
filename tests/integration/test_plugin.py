@@ -74,7 +74,16 @@ def test_failed_scenario(pytester, tmp_path):
     data = json.loads(json_path.read_text())
     s = data['scenarios'][0]
     assert s['status'] == 'failed'
-    assert s['error'] is not None
+    error = s['error']
+    assert error is not None
+    assert isinstance(error['frames'], list)
+    assert error['frames'], 'expected at least one frame'
+    user_frames = [f for f in error['frames'] if not f['is_internal']]
+    assert any(f['func'] == 'test_fail' for f in user_frames), (
+        f'expected a user frame for test_fail, got {error["frames"]!r}'
+    )
+    assert error['error_tail'] is not None
+    assert 'assert 1 == 2' in error['error_tail']
 
 
 def test_unannotated_test_not_in_report(pytester, tmp_path):

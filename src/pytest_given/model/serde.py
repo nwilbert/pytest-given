@@ -32,6 +32,7 @@ from .schema import (
     Scenario,
     SourceLocation,
     Step,
+    TracebackFrame,
 )
 
 
@@ -97,7 +98,21 @@ def _attachment_from_dict(d: dict[str, Any]) -> Attachment:
 def _error_from_dict(d: dict[str, Any] | None) -> ErrorInfo | None:
     if d is None:
         return None
-    return ErrorInfo(message=d['message'], diff=d.get('diff'))
+    return ErrorInfo(
+        message=d['message'],
+        frames=[_frame_from_dict(f) for f in d.get('frames', [])],
+        error_tail=d.get('error_tail'),
+    )
+
+
+def _frame_from_dict(d: dict[str, Any]) -> TracebackFrame:
+    return TracebackFrame(
+        path=d['path'],
+        lineno=d['lineno'],
+        func=d['func'],
+        code=d['code'],
+        is_internal=d['is_internal'],
+    )
 
 
 def _param_table_from_dict(d: dict[str, Any] | None) -> ParameterTable | None:

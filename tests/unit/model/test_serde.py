@@ -111,7 +111,11 @@ def test_step_with_attachment_and_error_and_children() -> None:
                     'status': 'failed',
                     'duration_ms': 1,
                     'parameters': None,
-                    'error': {'message': 'boom', 'diff': '- a\n+ b'},
+                    'error': {
+                        'message': 'boom',
+                        'frames': [],
+                        'error_tail': '- a\n+ b',
+                    },
                     'steps': [
                         {
                             'phase': 'then',
@@ -124,7 +128,11 @@ def test_step_with_attachment_and_error_and_children() -> None:
                                     'content_type': 'text',
                                 }
                             ],
-                            'error': {'message': 'boom', 'diff': None},
+                            'error': {
+                                'message': 'boom',
+                                'frames': [],
+                                'error_tail': None,
+                            },
                             'children': [
                                 {
                                     'phase': 'then',
@@ -142,7 +150,7 @@ def test_step_with_attachment_and_error_and_children() -> None:
         }
     )
     s = report.scenarios[0]
-    assert s.error == ErrorInfo(message='boom', diff='- a\n+ b')
+    assert s.error == ErrorInfo(message='boom', error_tail='- a\n+ b')
     assert len(s.steps) == 1
     step = s.steps[0]
     assert isinstance(step, Step)
@@ -151,7 +159,7 @@ def test_step_with_attachment_and_error_and_children() -> None:
     assert step.attachments == [
         Attachment(label='log', content='x', content_type='text')
     ]
-    assert step.error == ErrorInfo(message='boom', diff=None)
+    assert step.error == ErrorInfo(message='boom')
     assert len(step.children) == 1
     assert step.children[0].narration.text == 'inner'
 
@@ -177,7 +185,11 @@ def test_parameter_table_round_trips() -> None:
                             {
                                 'values': [2, True],
                                 'status': 'failed',
-                                'error': {'message': 'boom', 'diff': None},
+                                'error': {
+                                    'message': 'boom',
+                                    'frames': [],
+                                    'error_tail': None,
+                                },
                             },
                         ],
                     },
@@ -193,9 +205,63 @@ def test_parameter_table_round_trips() -> None:
         ParameterCase(
             values=[2, True],
             status='failed',
-            error=ErrorInfo(message='boom', diff=None),
+            error=ErrorInfo(message='boom'),
         ),
     ]
+
+
+def test_error_info_with_frames_round_trips() -> None:
+    report = report_from_dict(
+        {
+            'metadata': _minimal_metadata_dict(),
+            'scenarios': [
+                {
+                    'id': 'i',
+                    'narration': {'text': 'n', 'parts': []},
+                    'module': 'm',
+                    'tags': [],
+                    'status': 'failed',
+                    'duration_ms': 0,
+                    'steps': [],
+                    'parameters': None,
+                    'error': {
+                        'message': 'boom',
+                        'frames': [
+                            {
+                                'path': 'tests/t.py',
+                                'lineno': 5,
+                                'func': 'test_x',
+                                'code': '    assert False',
+                                'is_internal': False,
+                            },
+                            {
+                                'path': '.venv/lib/site-packages/_pytest/runner.py',
+                                'lineno': 200,
+                                'func': 'runtest',
+                                'code': '    item.runtest()',
+                                'is_internal': True,
+                            },
+                        ],
+                        'error_tail': 'E   assert False',
+                    },
+                }
+            ],
+        }
+    )
+    err = report.scenarios[0].error
+    assert err is not None
+    assert len(err.frames) == 2
+    assert err.frames[0].path == 'tests/t.py'
+    assert err.frames[0].func == 'test_x'
+    assert err.frames[0].is_internal is False
+    assert err.frames[1].is_internal is True
+    assert err.error_tail == 'E   assert False'
+
+    roundtripped = report_to_dict(report)
+    err_dict = roundtripped['scenarios'][0]['error']
+    assert err_dict['frames'][0]['path'] == 'tests/t.py'
+    assert err_dict['frames'][1]['is_internal'] is True
+    assert err_dict['error_tail'] == 'E   assert False'
 
 
 def test_narration_literal_part() -> None:

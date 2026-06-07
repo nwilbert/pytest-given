@@ -119,14 +119,16 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
                                 ],
                                 'error': {
                                     'message': 'assert 1 == 2',
-                                    'diff': '- 1\n+ 2',
+                                    'frames': [],
+                                    'error_tail': '- 1\n+ 2',
                                 },
                             }
                         ],
                         'parameters': None,
                         'error': {
                             'message': 'assert 1 == 2',
-                            'diff': '- 1\n+ 2',
+                            'frames': [],
+                            'error_tail': '- 1\n+ 2',
                         },
                     }
                 ],
@@ -536,7 +538,8 @@ def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -
                         'parameters': None,
                         'error': {
                             'message': 'boom',
-                            'diff': None,
+                            'frames': [],
+                            'error_tail': None,
                         },
                     },
                 ],

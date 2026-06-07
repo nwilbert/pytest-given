@@ -89,10 +89,29 @@ class SourceLocation:
     line: int
 
 
+@dataclass(frozen=True)
+class TracebackFrame:
+    """One frame from a parsed pytest short-style traceback.
+
+    `path` is POSIX-normalized (backslashes converted) so renderer logic
+    doesn't need per-OS branches. `code` may span multiple lines (caret
+    rows, multi-line statements); newlines are preserved verbatim.
+    `is_internal` flags pluggy/_pytest/decorator-wrapper frames that the
+    UI hides by default.
+    """
+
+    path: str
+    lineno: int
+    func: str
+    code: str
+    is_internal: bool
+
+
 @dataclass
 class ErrorInfo:
     message: str
-    diff: str | None = None
+    frames: list[TracebackFrame] = field(default_factory=list)
+    error_tail: str | None = None
 
 
 @dataclass

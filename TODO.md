@@ -12,8 +12,6 @@
 ## Later
 
 - [ ] Maybe: implement flat-step-display — opt-in body hiding on `given`/`when`/`then` (see `docs/superpowers/specs/proposed/2026-06-06-flat-step-display-design.md`)
-- [ ] UI improvements in report
-  - traceback verbosity (Consider trimming site-packages/_pytest/..., pluggy/..., and decorators.py frames by default with an "Show internal frames" toggle, mirroring pytest's --tb=short)
 - [ ] Think about UL support (e.g., by connecting the report to a glossary)
 - [ ] Provide an agent skill for work with pytest-given
 - [ ] Add `@scenario(group_parametrized=False)` option to opt out of parametrize merging 

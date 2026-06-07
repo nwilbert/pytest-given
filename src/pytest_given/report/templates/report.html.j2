@@ -72,6 +72,31 @@
     </div>
   </div>
 
+  {%- macro render_error(error) -%}
+    {%- set internal_count = error.frames | selectattr('is_internal') | list | length -%}
+    <div class="error-block"{% if internal_count %} x-data="{ showInternal: false }"{% endif %}>
+      <div class="error-message">{{ error.message }}</div>
+      {%- if internal_count -%}
+        <button class="error-toggle" type="button" @click="showInternal = !showInternal">
+          <span x-show="!showInternal">Show {{ internal_count }} internal frame{{ '' if internal_count == 1 else 's' }}</span>
+          <span x-show="showInternal" x-cloak>Hide internal frames</span>
+        </button>
+      {%- endif -%}
+      {%- if error.frames -%}
+        <div class="error-frames">
+          {%- for f in error.frames -%}
+            <div class="error-frame{% if f.is_internal %} error-frame-internal{% endif %}"
+                 {%- if f.is_internal %} x-show="showInternal" x-cloak{% endif -%}>
+              <div class="error-frame-loc">{{ f.path }}:{{ f.lineno }}: in {{ f.func }}</div>
+              <pre class="error-frame-code">{{ f.code }}</pre>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+      {%- if error.error_tail -%}<pre class="error-tail">{{ error.error_tail }}</pre>{%- endif -%}
+    </div>
+  {%- endmacro -%}
+
   {%- macro render_step(step, step_id) -%}
   <div class="step-text">
     {%- if step.children and step.children | length > 0 -%}
@@ -105,10 +130,7 @@
     {%- endfor -%}
   {%- endif -%}
   {%- if step.error -%}
-    <div class="error-block">
-      <div class="error-message">{{ step.error.message }}</div>
-      {%- if step.error.diff -%}<pre class="error-diff">{{ step.error.diff }}</pre>{%- endif -%}
-    </div>
+    {{ render_error(step.error) }}
   {%- endif -%}
   {%- endmacro -%}
 
@@ -183,10 +205,7 @@
           {% if case.error %}
           <tr>
             <td colspan="{{ scenario.parameters.names | length + 1 }}">
-              <div class="error-block">
-                <div class="error-message">{{ case.error.message }}</div>
-                {% if case.error.diff %}<pre class="error-diff">{{ case.error.diff }}</pre>{% endif %}
-              </div>
+              {{ render_error(case.error) }}
             </td>
           </tr>
           {% endif %}
@@ -196,10 +215,7 @@
       {% endif %}
 
       {% if scenario.error %}
-      <div class="error-block">
-        <div class="error-message">{{ scenario.error.message }}</div>
-        {% if scenario.error.diff %}<pre class="error-diff">{{ scenario.error.diff }}</pre>{% endif %}
-      </div>
+      {{ render_error(scenario.error) }}
       {% endif %}
 
       {% if scenario.source %}

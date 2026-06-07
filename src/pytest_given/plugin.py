@@ -18,6 +18,7 @@ from .capture import (
     Collector,
     FixtureInstanceKey,
     Template,
+    parse_short_repr,
     set_active_collector,
 )
 from .model import (
@@ -326,8 +327,8 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
     if call.when in ('setup', 'call') and call.excinfo is not None:
         error_repr = call.excinfo.getrepr(style='short')
         message = str(call.excinfo.value)
-        diff = str(error_repr)
-        collector.fail_scenario(message=message, diff=diff)
+        frames, error_tail = parse_short_repr(str(error_repr))
+        collector.fail_scenario(message=message, frames=frames, error_tail=error_tail)
 
 
 @pytest.hookimpl(trylast=True)

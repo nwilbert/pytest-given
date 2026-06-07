@@ -17,6 +17,7 @@ from ..model import (
     Scenario,
     SourceLocation,
     Step,
+    TracebackFrame,
 )
 from .template import Template, narration_from
 
@@ -251,13 +252,31 @@ class Collector:
             return self._active_recording.stack
         return self._step_stack
 
-    def fail_scenario(self, message: str, diff: str | None = None) -> None:
+    def fail_scenario(
+        self,
+        message: str,
+        frames: list[TracebackFrame] | None = None,
+        error_tail: str | None = None,
+    ) -> None:
         if self._current_scenario is not None:
             self._current_scenario.status = 'failed'
-            self._current_scenario.error = ErrorInfo(message=message, diff=diff)
+            self._current_scenario.error = ErrorInfo(
+                message=message,
+                frames=frames or [],
+                error_tail=error_tail,
+            )
 
-    def fail_current_step(self, message: str, diff: str | None = None) -> None:
+    def fail_current_step(
+        self,
+        message: str,
+        frames: list[TracebackFrame] | None = None,
+        error_tail: str | None = None,
+    ) -> None:
         if self._step_stack:
             step = self._step_stack[-1]
             step.status = 'failed'
-            step.error = ErrorInfo(message=message, diff=diff)
+            step.error = ErrorInfo(
+                message=message,
+                frames=frames or [],
+                error_tail=error_tail,
+            )

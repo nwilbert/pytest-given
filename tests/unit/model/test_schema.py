@@ -19,6 +19,7 @@ from pytest_given.model import (
     Scenario,
     SourceLocation,
     Step,
+    TracebackFrame,
 )
 
 
@@ -51,15 +52,30 @@ def test_attachment() -> None:
     assert att.content == 'log line 1\nlog line 2'
 
 
-def test_error_info() -> None:
-    err = ErrorInfo(message='assert 1 == 2', diff='- 1\n+ 2')
+def test_error_info_with_frames_and_tail() -> None:
+    err = ErrorInfo(
+        message='assert 1 == 2',
+        frames=[
+            TracebackFrame(
+                path='tests/test_x.py',
+                lineno=10,
+                func='test_x',
+                code='    assert 1 == 2',
+                is_internal=False,
+            ),
+        ],
+        error_tail='E   assert 1 == 2',
+    )
     assert err.message == 'assert 1 == 2'
-    assert err.diff == '- 1\n+ 2'
+    assert len(err.frames) == 1
+    assert err.frames[0].is_internal is False
+    assert err.error_tail == 'E   assert 1 == 2'
 
 
-def test_error_info_without_diff() -> None:
+def test_error_info_defaults() -> None:
     err = ErrorInfo(message='assert False')
-    assert err.diff is None
+    assert err.frames == []
+    assert err.error_tail is None
 
 
 def test_scenario_defaults() -> None:

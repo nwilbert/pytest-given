@@ -22,6 +22,7 @@ from .schema import (
     Scenario,
     SourceLocation,
     Step,
+    TracebackFrame,
 )
 from .serde import report_from_dict, report_to_dict
 
@@ -49,6 +50,7 @@ __all__ = [
     'Scenario',
     'SourceLocation',
     'Step',
+    'TracebackFrame',
     'report_from_dict',
     'report_to_dict',
 ]

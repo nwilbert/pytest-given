@@ -75,7 +75,7 @@ def test_step_failure() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
     collector.push_step('then', _n('should fail'))
-    collector.fail_current_step('assert 1 == 2', diff='- 1\n+ 2')
+    collector.fail_current_step('assert 1 == 2', error_tail='E   assert 1 == 2')
     collector.pop_step()
     scenario = collector.finish_scenario(status='failed', duration_ms=0)
     step = scenario.steps[0]
