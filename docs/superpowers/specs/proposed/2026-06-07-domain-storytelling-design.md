@@ -5,34 +5,51 @@
 Turn the pytest-given HTML report into an executable artifact of Domain-Driven Design discovery. Add three pieces, each optional and independently useful:
 
 1. A suite-wide **Ubiquitous Language glossary** — terms tagged as actor / object / verb, with definitions.
-2. **Domain Stories** — sequence-numbered activity timelines that reference glossary terms.
+2. **Domain Stories** — sequence-numbered activity timelines that reference glossary terms. The format follows [Domain Storytelling](https://domainstorytelling.org/quick-start-guide): actors / work objects / verbs as the three-kind vocabulary, sequence-numbered activities, and the same kind-driven rendering rules (actors consolidated across a diagram, work objects per-activity). v1 covers the core sentence grammar and timeline rendering; advanced DS constructs (Groups, Annotations) are out of scope — see below.
 3. **Scenario↔activity binding** — explicit on `@scenario(...)` / step `activity=`, or implicit from the glossary terms referenced in step narration.
 
 The report grows a top-level tabbed navigation: **Scenarios** (today's view, unchanged), **Stories**, **Glossary**. Each tab is hidden when its data is empty. A suite using neither DS nor UL is unaffected.
+
+## Terminology mapping (DS ↔ this spec)
+
+| Domain Storytelling | This spec | Notes |
+|---|---|---|
+| Actor | `actor` (glossary kind) | Person, organization, or IT system that acts. |
+| Work object | `work_object` (glossary kind) | Document, information, or physical object acted upon. |
+| Activity (numbered sentence) | `Activity` | A numbered row in the story; may contain multiple arrows. |
+| Sequence number | `Activity.id` | The `1`, `2`, `3`… labelling activities. |
+| Arrow label (verb) | `verb` (glossary kind), `ActivityTerm` | DS doesn't promote verbs to a first-class category — they're just labels on arrows. We make `verb` a glossary kind because DDD's ubiquitous language treats verbs (commands, domain events) as first-class vocabulary alongside nouns. This is an honest DDD enrichment over pure DS, not a deviation. |
+| — (no DS analogue) | `ActivityPath` | Internal carrier for the arrow structure *within* one activity. A DS activity can contain multiple arrows (joining flows, parallel branches); each `ActivityPath` carries one linear sequence. Authors usually pass parts directly to `activity(...)` and we synthesize a single path; only multi-arrow shapes surface `path(...)`. |
+| — (no DS analogue) | `ActivityEntity` | Internal grammar marker unifying actors and work objects in entity-position. Not user-facing. |
+| Annotation | *out of scope (v1)* | Freeform notes on activities; data model can extend later. |
+| Group | *out of scope (v1)* | Labelled wrappers around activity ranges; data model can extend later. |
+
+In short: actors / work objects / activities / sequence numbers follow DS faithfully; verbs are a DDD-UL enrichment; paths and entities are internal carriers that authors rarely name directly.
 
 ## Scope
 
 In:
 
-- `Glossary` + `GlossaryTerm` (kinds: `actor` / `object` / `verb`) at suite level.
-- `Story`, `Activity`, `ActivityPath`, and three `ActivityPart` variants (`ActivityEntity`, `ActivityTerm`, `ActivityWord`).
-- New narration variant `NarrationTermRef` replacing the placeholder for entity / verb-term references in t-strings.
-- Public API: `actor`, `work_object`, `verb`, `story`, `activity`, `path`; fixture-decorator forms of `actor` / `work_object`; scenario kwarg `story=` / `activities=`; step kwarg `activity=`.
+- `Glossary` + `GlossaryTerm` (kinds: `actor` / `object` / `verb`), declared by the user as a single explicit `Glossary` instance (no module-import global registry, no name field).
+- `Story`, `Activity`, `ActivityPath`, and `ActivityPart` variants (`ActivityEntity`, `ActivityTerm`, `ActivityWord`) — defined as a PEP 695 union to mirror `NarrationPart`.
+- New narration variant `NarrationTermRef` for entity / verb-term references in t-strings (sits alongside the existing `NarrationPlaceholder`, which still handles parametrize-column interpolations).
+- Public API: `Glossary` class with term-registration methods (`actor` / `work_object` / `verb`) and `story(...)`; module-level `activity` / `path` constructors; scenario kwarg `story=` / `activities=`; step kwarg `activity=`.
 - Implicit binding inference from step term-refs.
 - Three-view report navigation; story timeline with per-row scenario badges and bidirectional anchors; glossary view grouped by kind.
 - Pass/fail propagation onto activities, with count chip.
-- Per-use inflection via call syntax (`dispense('dispenses')`, `cup('Cups')`).
+- Per-use display via call syntax — verb inflections (`dispense('dispenses')`) and noun instances (`cup('Big Cup')`). Inflections share identity with the canonical verb; instances carry distinct identity (see *Instances and inflections*).
 
 Out:
 
+- **Domain Storytelling Groups and Annotations** — DS lets modelers wrap activities in labelled Groups (subprocesses, parallel branches) and attach freeform Annotations to activities or sentences. v1 ships neither; the data model can be extended later without breaking the timeline view.
+- Multiple `Glossary` instances per suite (one-per-Bounded-Context) — v1 assumes exactly one; the plugin raises on more. See follow-ups for the multi-BC extension.
 - Example Mapping rule / example / question authoring (separate spec).
 - egon.io file import or export (`.dst`, `.egn`, SVG, PNG).
 - External glossary file formats (YAML / JSON / Markdown).
 - Event Storming integration.
-- Glossary synonyms, anchoring against non-narration text, external doc links from term entries.
-- Pictogrammatic story rendering (egon.io-style); the data model leaves graph rendering open for a later spec.
+- Glossary synonyms, external doc links.
+- Pictogrammatic / graph-view rendering of stories — only the timeline view ships in v1; the data model is graph-ready.
 - Custom `format_spec` semantics in t-strings — type detection is the only mechanism.
-- A graph view of activities. The schema supports one via `ActivityPath` parts, but only the timeline view ships in v1.
 
 ## Background
 
@@ -44,12 +61,7 @@ pytest-given today captures each test as a `Scenario` with a tree of `Step`s and
 
 The dispatch lives in `_make_narration_filter` (`src/pytest_given/report/renderer.py`), discriminating by Python type via `match`/`case`.
 
-Per AGENTS.md the project is pre-release; JSON schema changes are not hedged ([[project-prerelease-status]]).
-
-Two TODOs in `TODO.md` motivate this spec:
-
-- "Think about UL support (e.g., by connecting the report to a glossary)".
-- "Provide an agent skill for work with pytest-given" — the spec deliberately leaves room for that follow-up.
+Per AGENTS.md the project is pre-release; JSON schema changes are not hedged ([[project-prerelease-status]]). The motivating `TODO.md` items are "UL support" (this spec's main thrust) and "agent skill for pytest-given" (deferred — likely benefits from this design's vocabulary).
 
 ## Approach
 
@@ -63,75 +75,166 @@ ActivityId = NewType('ActivityId', int)
 StoryId = NewType('StoryId', str)
 ```
 
-Glossary:
+Glossary term (frozen leaf — no `kind`-bearing dependents need it denormalized; the renderer resolves kind via the glossary):
 
 ```python
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class GlossaryTerm:
     id: TermId
     kind: Literal['actor', 'object', 'verb']
     canonical: str
     definition: str
-
-@dataclass(frozen=True)
-class Glossary:
-    terms: tuple[GlossaryTerm, ...]
 ```
 
-Stories:
+Glossary (mutable container — terms are added at user-module import time via methods; same instance is snapshotted onto `ReportData`):
 
 ```python
-class ActivityPart: ...
+@dataclass
+class Glossary:
+    terms: list[GlossaryTerm] = field(default_factory=list)
 
-@dataclass(frozen=True)
-class ActivityEntity(ActivityPart):
-    kind: Literal['actor', 'object']
+    # term-registration methods (signatures in the API table below)
+    def actor(self, name: str, *, definition: str = '') -> Actor: ...
+    def work_object(self, name: str, *, definition: str = '') -> WorkObject: ...
+    def verb(self, name: str, *, definition: str = '') -> Verb: ...
+```
+
+`Glossary` is a mutable container (matching the existing `Step` / `Scenario` / `ReportData` convention of mutable aggregate, frozen leaves). The user holds the instance; the plugin neither creates nor clears it. Each `Actor` / `WorkObject` / `Verb` returned by the methods carries a back-reference to its `Glossary` so a `Story` can later compute the set of glossaries it touches.
+
+`Story` is intentionally *not* owned by `Glossary`. Domain Stories may span multiple Bounded Contexts in DDD (cross-context interactions, context maps), and the multi-glossary follow-up needs a story to reference terms from more than one `Glossary`. v1 enforces a single glossary per story, but the data model leaves the door open.
+
+`GlossaryTerm.id` and `Story.id` are **internal** identifiers, auto-derived from `canonical` / `title` for serde anchoring and cross-references inside `ReportData`. They are not exposed as kwargs (see *Id auto-derivation*).
+
+Story / activity / path:
+
+```python
+@dataclass(frozen=True, kw_only=True)
+class ActivityEntity:
+    """Part referencing a term whose kind is 'actor' or 'object'."""
     entity_id: TermId
     display: str
 
-@dataclass(frozen=True)
-class ActivityTerm(ActivityPart):
-    term_id: TermId          # kind == 'verb'
+@dataclass(frozen=True, kw_only=True)
+class ActivityTerm:
+    """Part referencing a term whose kind is 'verb'."""
+    term_id: TermId
     display: str
 
-@dataclass(frozen=True)
-class ActivityWord(ActivityPart):
+@dataclass(frozen=True, kw_only=True)
+class ActivityWord:
+    """Bare-string connective (preposition, article, etc.). Carries no kind."""
     text: str
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
+class ActivityPlaceholder:
+    """A draft (kind-tagged but not glossary-registered) entity or verb."""
+    kind: Literal['actor', 'object', 'verb']
+    text: str
+
+type ActivityPart = ActivityEntity | ActivityTerm | ActivityWord | ActivityPlaceholder
+
+@dataclass(frozen=True, kw_only=True)
 class ActivityPath:
     parts: tuple[ActivityPart, ...]
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class Activity:
     id: ActivityId
     paths: tuple[ActivityPath, ...]
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class Story:
     id: StoryId
     title: str
     activities: tuple[Activity, ...]
 ```
 
-New narration part variant (replaces my earlier draft's `NarrationEntity`):
+`ActivityEntity` and `ActivityTerm` encode the structural role of a *typed* reference (entity-position vs verb-position) backed by a `GlossaryTerm`. `ActivityPlaceholder` is the analogous "drafted but not yet promoted" form — kind is known, glossary commitment is deferred. `ActivityWord` is reserved for connective text (prepositions, articles, conjunctions) that carries no kind by intent.
+
+**Field-naming convention:** parts that reference something (have an `entity_id` / `term_id`) use `display` for their rendered form — capturing inflections / capitalizations that vary from the underlying term's `canonical`. Parts that are literal content (no reference) use `text`. So `ActivityEntity.display`, `ActivityTerm.display`, `NarrationTermRef.display` versus `ActivityWord.text`, `ActivityPlaceholder.text`. `Narration.text` (existing) is the joined top-level string and matches the literal-content side of the same convention.
+
+`path(...)` constructs:
+- `ActivityEntity` for any `Actor`/`WorkObject` argument, or for `ActorInstance`/`WorkObjectInstance` (returned by call syntax on an `Actor`/`WorkObject` — see *Instances* below).
+- `ActivityTerm` for any `Verb` argument, or for `InflectedVerb` (returned by call syntax on a `Verb` — see *Inflections* below).
+- `ActivityPlaceholder` for any value returned by `draft.actor(...)` / `draft.work_object(...)` / `draft.verb(...)`.
+- `ActivityWord` for any bare-string argument.
+
+The renderer reads kind from the glossary for typed references, and from the placeholder itself for drafts.
+
+**Instances and inflections — the kind-driven split.** Call syntax on a noun (actor / work object) creates an *instance*; call syntax on a verb creates an *inflection*. Different identity semantics:
+
+- `customer('Jimmy')` → `ActorInstance(actor=customer, display='Jimmy')`. The instance has a distinct identity from the canonical `customer`. Used when you need to distinguish "Customer Jimmy" from "Customer Alice" in the same story.
+- `cup('Big Cup')` → `WorkObjectInstance(work_object=cup, display='Big Cup')`. Same — distinct identity.
+- `place('places')` → `InflectedVerb(verb=place, display='places')`. *Same identity* as canonical `place` — inflection is purely morphological, the verb is one verb.
+
+These three are intermediate value classes consumed by `path(...)` and `narration_from(...)`; they never appear in the persisted schema (which stores `ActivityEntity` / `ActivityTerm` / `NarrationTermRef` with `term_id` + `display`).
+
+**Identity is derived from `display`, not stored.** Two rules:
+
+- Entity refs (actor / work object): `display == term.canonical` means the canonical concept (identity = `(term_id, None)`); any other `display` means an instance (identity = `(term_id, id_derive(display))`).
+- Verb refs: any `display` resolves to the same identity (`term_id`); display variation is purely cosmetic.
+
+The renderer / coverage module looks up `glossary[term_id].kind` to choose the interpretation. No `instance_id` field on the parts — the canonical lookup is essentially free given the glossary is already in hand.
+
+**Grammar.** Each `ActivityPath` enforces Domain Storytelling's canonical sentence shape — *subject → action → noun* — at its leading triple:
+
+1. **Position 0: an actor** — `Actor` (typed), `ActorInstance`, or `DraftActor`. The subject of the sentence.
+2. **Position 1: a verb** — `Verb` (typed), `InflectedVerb`, or `DraftVerb`. The action.
+3. **Position 2: an anchored noun** — `Actor`, `ActorInstance`, `WorkObject`, `WorkObjectInstance`, `DraftActor`, or `DraftWorkObject`. The object of the action (DS allows it to be either another actor or a work object).
+
+Beyond position 2 the path is free-form: any further parts (additional nouns, bare-string connectives like `'into'`, additional verbs) are accepted in any order. Multi-arrow activities use multiple `path(...)` calls.
+
+The check is purely structural — `path(...)` discriminates by Python argument type, no glossary lookup needed. The iterative-authoring path stays open via `draft.*` for any noun or verb the team hasn't committed yet.
+
+Typical authoring mistakes the rules catch, each with a targeted message:
+- `activity(cup, place('placed'), customer)` — work-object-initiated; rule 1 fails. Suggest active-voice rephrasing.
+- `activity(customer, cup)` — verbless; rule 2 fails. Prompt for the action.
+- `activity(customer, place('places'), 'the cup')` — bare string in object position; rule 3 fails. Suggest `g.work_object('Cup')` or `draft.work_object('cup')`.
+
+**Identity, consolidation, and the future graph view.** Typed references identify by `term_id`; drafts by `(kind, id_derive(text))` using the same normalization as glossary-term ids. The timeline view in v1 doesn't apply any consolidation (each activity is its own row), but DS's pictographic rules — actors drawn once, work objects drawn per activity — are a kind-driven policy the future graph view can apply directly: group `ActivityEntity` / `ActivityPlaceholder` instances by identity, consolidate when kind is `actor`, keep separate when kind is `object`. Coverage matching treats drafts differently from typed refs — see *Scenario ↔ story activity binding*.
+
+New narration part variant:
 
 ```python
-@dataclass(frozen=True)
-class NarrationTermRef(NarrationPart):
-    kind: Literal['actor', 'object', 'verb']
+@dataclass(frozen=True, kw_only=True)
+class NarrationTermRef:
+    """Reference to a glossary term — kind resolved via glossary[term_id].kind."""
     term_id: TermId
     display: str
     param_column: str | None = None   # set iff the interpolation matched a parametrize column
 ```
 
+`NarrationPart` is extended:
+
+```python
+type NarrationPart = NarrationLiteral | NarrationValue | NarrationPlaceholder | NarrationTermRef
+```
+
+Kind on `NarrationTermRef` is resolved at render time via `glossary[term_id].kind` (no denormalization).
+
+**Drafts are story/activity-only.** They have no narration-side variant, and interpolating a draft into a step t-string raises at capture (see *Error handling* — "Draft interpolated in narration"). Drafts are about sketching the *story* before the glossary is settled; once the team is writing tests against an activity, the corresponding vocabulary must be promoted to the glossary first (or the step can use a plain string). See *Scenario ↔ story activity binding* for how drafts interact with coverage.
+
 Additions on existing types:
 
-- `ReportData.glossary: Glossary` (default: empty `Glossary(terms=())`).
-- `ReportData.stories: tuple[Story, ...]` (default: `()`).
+- `ReportData.glossary: Glossary | None = None` — the single declared glossary, or `None` if the suite uses no glossary at all.
+- `ReportData.stories: list[Story] = field(default_factory=list)` — stories referenced by any scenario, snapshotted at session-finish. Top-level (not nested under `glossary`) so a future multi-BC story can hold references into more than one `Glossary`.
 - `Scenario.story_id: StoryId | None = None`.
-- `Scenario.activity_ids: tuple[ActivityId, ...] = ()` — explicit floor; `()` means *infer from steps*.
+- `Scenario.activity_ids: tuple[ActivityId, ...] = ()` — explicit cap (steps may not cover activities outside this set); `()` means *infer from steps*.
 - `Step.activity_ids: tuple[ActivityId, ...] = ()` — explicit tighter binding (a step may cover one or more activities); `()` means *infer from this step's term-refs*.
+
+#### Runtime lookup pattern
+
+The schema stores ordered collections as lists (canonical, JSON-friendly), but lookups by id need to be O(1) for the renderer and coverage matching. Each container maintains a derived id→element index alongside its list, kept in sync by the container's own methods and rebuilt in `__post_init__` after deserialization. The index is excluded from `repr` and never serialized; it's purely an in-memory acceleration over the list.
+
+| Container | Storage (serialized) | Index (in-memory) | Public lookup |
+|---|---|---|---|
+| `Glossary` | `terms: list[GlossaryTerm]` | `_by_id: dict[TermId, GlossaryTerm]` | `glossary[term_id]`, `glossary.get(term_id)` |
+| `Story` | `activities: tuple[Activity, ...]` | `_by_id: dict[ActivityId, Activity]` | `story[activity_id]`, `story.get(activity_id)` |
+| `ReportData` | `scenarios: list[Scenario]`, `stories: list[Story]` | `_scn_by_id`, `_story_by_id` | `report_data.scenario(node_id)`, `.story(story_id)` |
+
+The Glossary's `actor` / `work_object` / `verb` methods (and `Story`'s activity insertion) write through to both the list and the dict atomically, so uniqueness conflicts are detected with an O(1) lookup before append. Renderer and coverage code never touch the lists directly — they go through `__getitem__` or `get`.
+
+JSON shape is unaffected: only the lists are serialized. External consumers reading the JSON see the same flat structure as today.
 
 ### Authoring API (`src/pytest_given/__init__.py` exports; implementation in new modules)
 
@@ -139,141 +242,315 @@ Public surface:
 
 | Name | Signature | Effect |
 |---|---|---|
-| `actor` | `(name: str, *, id: str \| None = None, definition: str = '') -> Actor` | Returns an `Actor`; registers a `GlossaryTerm(kind='actor')` |
-| `work_object` | `(name: str, *, id: str \| None = None, definition: str = '') -> WorkObject` | Same, kind `'object'` |
-| `verb` | `(canonical: str, *, id: str \| None = None, definition: str = '') -> Verb` | Same, kind `'verb'` |
-| `@actor(...)` | Applied to a `@pytest.fixture`-decorated function | Wraps return value in entity proxy |
-| `@work_object(...)` | Same | Same |
-| `path` | `(*parts: Actor \| WorkObject \| Verb \| InflectedRef \| str) -> ActivityPath` | Validates grammar |
-| `activity` | `(*parts_or_paths, id: int \| None = None) -> Activity` | Single-path (positional parts) or multi-path (positional `Path`s) |
-| `story` | `(title: str, *, id: str \| None = None, activities: tuple[Activity, ...] = ()) -> Story` | Registers `Story` |
-| `@scenario` | Existing decorator + `story=Story \| str \| None`, `activities=Sequence[int] = ()` | Scenario-level binding |
-| `given` / `when` / `then` | Existing context-managers + kwarg `activity: int \| Sequence[int] \| None = None` | Step-level binding |
+| `Glossary()` | `() -> Glossary` | Construct the glossary instance the user holds for the suite. |
+| `Glossary.actor` | `(name: str, *, definition: str = '') -> Actor` | Registers a `GlossaryTerm(kind='actor')` on this glossary; returns the `Actor` handle. |
+| `Glossary.work_object` | `(name: str, *, definition: str = '') -> WorkObject` | Same, kind `'object'`. |
+| `Glossary.verb` | `(name: str, *, definition: str = '') -> Verb` | Same, kind `'verb'`. The verb's canonical form is the registered name; inflections are per-call via `verb('inflected')`. |
+| `draft.actor` | `(text: str) -> DraftActor` | Module-level singleton method. Returns a kind-tagged placeholder; no glossary registration. |
+| `draft.work_object` | `(text: str) -> DraftWorkObject` | Same, kind `'object'`. |
+| `draft.verb` | `(text: str) -> DraftVerb` | Same, kind `'verb'`. |
+| `story` | `(title: str, *, activities: tuple[Activity, ...] = ()) -> Story` | Module-level constructor. Inspects activity parts to compute the set of glossaries referenced; in v1 the set must have size ≤ 1 (a story made entirely of drafts is legal — its glossary set is empty). Drafts don't contribute to this set. |
+| `Actor.__call__` / `WorkObject.__call__` | `(display: str) -> ActorInstance` / `WorkObjectInstance` | Call syntax on a noun creates an *instance* — distinct identity from the canonical concept (e.g., `customer('Jimmy')` distinguishes from `customer`). |
+| `Verb.__call__` | `(display: str) -> InflectedVerb` | Call syntax on a verb creates an *inflection* — same identity as canonical (e.g., `place('places')` is still the `place` verb in a different form). |
+| `path` | `(*parts: Actor \| WorkObject \| Verb \| ActorInstance \| WorkObjectInstance \| InflectedVerb \| DraftActor \| DraftWorkObject \| DraftVerb \| str) -> ActivityPath` | Validates the DS sentence grammar: leading triple is *actor → verb → noun* (anchored, typed or draft). Beyond position 2 the path is free-form. Bare strings are reserved for connectives. See *Grammar* in the data model section. |
+| `activity` | `(*parts_or_paths, id: int \| None = None) -> Activity` | Single-path (positional parts) or multi-path (positional `Path`s). Optional `id=` overrides the auto-assigned sequence number; see below. |
+| `@scenario` | Existing decorator + `story: Story \| None = None, activities: Sequence[int] = ()` | Scenario-level binding. |
+| `given` / `when` / `then` (context-manager form) | Existing context-managers + kwarg `activity: int \| Sequence[int] \| None = None` | Step-level binding. Narration accepts plain strings and t-strings with term/instance/inflection interpolation. Drafts (`DraftActor`/`DraftWorkObject`/`DraftVerb`) are not permitted in narrations — interpolating one raises at capture. |
+| `@given` / `@when` / `@then` (fixture-decorator form) | Existing decorators applied to `@pytest.fixture`-decorated functions | Records the fixture's setup narration; **does not** change the fixture's return value. Accepts the same narration forms as the context-manager — t-strings interpolating `Actor` / `WorkObject` / `Verb` / `ActorInstance` / `WorkObjectInstance` / `InflectedVerb` produce `NarrationTermRef` parts that flow into the Glossary view's "Instances" / "Also used as" aggregation (with fixture provenance annotated). |
 
-Id auto-derivation: lowercase `name` / `canonical`, replace runs of non-alphanumerics with `-`, strip leading/trailing `-`. `"Customer"` → `"customer"`; `"Order received"` → `"order-received"`. Explicit `id=` always wins.
+Note: no `id=` parameter is exposed on the *vocabulary* surface — `GlossaryTerm.id` and `Story.id` are internal and always derived from `name` / `title`. To get a specific id, pick the name that derives to it. `Activity.id` is different in nature (a user-visible sequence number rendered as the row number in the story timeline) and remains settable via `activity(..., id=N)`.
 
-Story id auto-derivation: same rule applied to `title`.
+No dedicated fixture-decorator forms like `@actor` / `@work_object` are introduced. The fixture-to-term relationship is M:N for concepts (one fixture might yield instances of several actors; one actor might be produced by several fixtures), so attaching a term-as-concept to a fixture symbol is misleading. Where authors want to *document* that a fixture corresponds to a specific instance, they reach for the existing `@given` / `@when` / `@then` fixture-decorator forms with a t-string that interpolates the instance — e.g., `@given(t'our guest {guest("Alice")}')`. This keeps the fixture's return type unchanged and reuses already-familiar narration machinery.
 
-Activity sequence numbers: the `Story` constructor assigns `1..N` from positional order. An `Activity` constructed with explicit `id=N` (or a leading integer positional) keeps that id; the story validates uniqueness across activities and a strictly increasing order is preferred but not enforced (gaps are allowed for future inserts).
+#### Id auto-derivation
 
-Inflection at use site: `Actor`, `WorkObject`, `Verb` are callable with a single string argument returning an `InflectedRef(term, display)`. Activities and t-strings both accept the bare term (canonical display) or the inflected form. No `forms` field on `GlossaryTerm`; observed displays are aggregated at render time.
+For both `GlossaryTerm.id` (from the registration `name`, stored as `canonical`) and `Story.id` (from `title`):
 
-Worked example:
+1. Lowercase the input.
+2. Replace every maximal run of characters *not* in `[a-z0-9]` with a single ASCII hyphen `-`.
+3. Strip leading and trailing `-`.
+4. If the result is the empty string, raise `PytestGivenError` (e.g., a name of `"---"` or `"  "`).
+
+Worked rule output:
+
+| Input | Id |
+|---|---|
+| `"Customer"` | `"customer"` |
+| `"Order received"` | `"order-received"` |
+| `"  Work Object  "` | `"work-object"` |
+| `"do_the_thing"` | `"do-the-thing"` (underscore is non-alphanumeric under `[a-z0-9]`) |
+| `"Buy / sell"` | `"buy-sell"` |
+| `"Customer #1"` | `"customer-1"` |
+| `"café"` | `"caf"` (non-ASCII letters are treated as non-alphanumeric in v1; Unicode-aware folding is a follow-up) |
+| `"---"` | *raises* |
+
+The derivation is deterministic, so serialized reports remain stable across runs as long as canonical names don't change.
+
+#### Activity sequence numbers
+
+The `story(...)` constructor assigns `1..N` from positional order. An `Activity` constructed with explicit `id=N` keeps that number; the story validates uniqueness across activities, and a strictly increasing order is preferred but not enforced (gaps are allowed for future inserts).
+
+**Stability note.** Activity ids double as cross-reference keys for `scenario.activity_ids` and `step.activity_ids`. Reordering or inserting unnumbered activities therefore shifts the numbers and breaks any code (test or report) that referenced them. Once a scenario or step binds explicitly to an activity, pin the activity's id with `activity(..., id=N)` so subsequent re-orderings don't silently re-target the binding. Implicit (term-ref) coverage is unaffected — it identifies activities by their term refs, not by id.
+
+Call-site display variation, kind-driven: every `Actor`, `WorkObject`, and `Verb` is callable with a single string argument; the resulting type and identity depend on kind. `Actor`/`WorkObject` produce `ActorInstance` / `WorkObjectInstance` (distinct identity from canonical — used to disambiguate "Customer Jimmy" from "Customer Alice"). `Verb` produces `InflectedVerb` (same identity as canonical — used for "places" vs "place", "dispenses" vs "dispense"). Activities and t-strings both accept the bare term (canonical display) or the call-syntax form. No `forms` / `instances` fields on `GlossaryTerm`; observed displays are aggregated at render time and surfaced under each term in the Glossary view.
+
+Worked example — *Online Hotel Booking* (same domain as `examples/test_hotel_booking.py`):
 
 ```python
 # domain.py
-from pytest_given import actor, work_object, verb, story, activity
+from pytest_given import Glossary, story, activity, draft
 
-customer = actor('Customer', definition='Person buying coffee.')
-machine  = actor('Machine',  definition='Automated coffee dispenser.')
-cup      = work_object('Cup',    definition='Container for coffee.')
-coin     = work_object('Coin',   definition='Unit of currency.')
-beans    = work_object('Beans',  definition='Roasted coffee beans.')
-coffee   = work_object('Coffee', definition='Brewed coffee in a cup.')
-button   = work_object('Button', definition='Selection button.')
+g = Glossary()
 
-place    = verb('place',    definition='Set the cup under the dispenser.')
-insert   = verb('insert',   definition='Drop a coin into the slot.')
-press    = verb('press',    definition='Push a selection button.')
-grind    = verb('grind',    definition='Mill beans into grounds.')
-dispense = verb('dispense', definition='Deliver coffee from the spout.')
+guest          = g.actor('Guest',          definition='Person booking accommodation.')
+booking_system = g.actor('Booking System', definition='Automated reservation system.')
 
-order_coffee = story('Order Coffee', activities=(
-    activity(customer, place('places'),       cup),
-    activity(customer, insert('inserts'),     coin),
-    activity(customer, press('presses'),      button),
-    activity(machine,  grind('grinds'),       beans),
-    activity(machine,  dispense('dispenses'), coffee, 'into', cup),
+room         = g.work_object('Room',         definition='A bookable hotel room.')
+booking      = g.work_object('Booking',      definition='A reservation for a room.')
+payment      = g.work_object('Payment',      definition='Money transferred for a booking.')
+confirmation = g.work_object('Confirmation', definition='Notification of a successful booking.')
+
+search  = g.verb('search',  definition='Look up available options.')
+select  = g.verb('select',  definition='Choose one option from a set.')
+submit  = g.verb('submit',  definition='Send to the system for processing.')
+confirm = g.verb('confirm', definition='Finalize and acknowledge.')
+send    = g.verb('send',    definition='Deliver to a recipient.')
+
+# `loyalty bonus` and the `redeems` verb appear as drafts in activity 7 — the
+# team hasn't decided yet whether they belong in the ubiquitous language.
+
+book_a_shared_room = story('Book a Shared Room', activities=(
+    # 1. Canonical activity — any specific guest searching satisfies this.
+    #    Scenarios that mention guest('Alice') or guest('Bob') will both cover
+    #    this row via the canonical-fallback rule.
+    activity(guest, search('searches for'), room),
+    # 2. Actor instance + work-object instance: Alice selects the Deluxe Suite.
+    activity(guest('Alice'), select('selects'),  room('Deluxe Suite')),
+    # 3. Same actor instance; canonical work object.
+    activity(guest('Alice'), submit('submits'),  payment),
+    # 4. Confirmation references TWO distinct guest instances.
+    activity(booking_system, confirm('confirms'), booking,
+             'for', guest('Alice'), 'and', guest('Bob')),
+    # 5. Send to Alice — distinct from the Bob version on the next line.
+    activity(booking_system, send('sends'), confirmation, 'to', guest('Alice')),
+    # 6. Identical activity shape, different guest instance → different identity.
+    activity(booking_system, send('sends'), confirmation, 'to', guest('Bob')),
+    # 7. Draft verb + draft work object — Alice redeems a loyalty bonus.
+    activity(guest('Alice'), draft.verb('redeems'), draft.work_object('loyalty bonus')),
 ))
 ```
 
 ```python
-# tests/test_orders.py
+# tests/test_booking.py
+import pytest
 from pytest_given import scenario, given, when, then
-from domain import (order_coffee, customer, machine, cup, coin, coffee,
-                    button, place, insert, press, dispense)
+from domain import (book_a_shared_room, guest, booking_system, room, booking,
+                    payment, confirmation, select, submit, confirm, send)
 
-@scenario('Buy coffee', story=order_coffee)
-def test_buy_coffee():
-    with given(t'the {customer} has a {coin}'):
+# Fixture-decorator form of `@given` — the fixture's return value is unchanged
+# (still a plain User), but its `given` narration records the instance binding.
+# The Glossary view will surface "Alice" and "Bob" as observed instances of
+# Guest, annotated with the originating fixture name.
+
+@pytest.fixture
+@given(t'our guest {guest('Alice')}')
+def alice():
+    return User(name='Alice', email='alice@example.com')
+
+@pytest.fixture
+@given(t'our guest {guest('Bob')}')
+def bob():
+    return User(name='Bob', email='bob@example.com')
+
+@scenario('Alice books a shared room with Bob', story=book_a_shared_room)
+def test_book_shared(alice, bob):
+    # `alice` and `bob` are plain User objects — use them as such in the body.
+    # The fixture-level @given already records that they're the Alice/Bob
+    # instances; the test starts directly with the booking actions.
+    with when(t'{guest('Alice')} {search('searches for')} a {room}'):
+        alice.search_rooms()
+    with when(t'{guest('Alice')} {select('selects')} the {room('Deluxe Suite')}'):
+        alice.select_room('Deluxe Suite')
+    with when(t'{guest('Alice')} {submit('submits')} the {payment}'):
+        alice.submit_payment(...)
+    with then(t'the {booking_system} {confirm('confirms')} the {booking} for {guest('Alice')} and {guest('Bob')}'):
         ...
-    with when(t'the {customer} {place('places')} the {cup}'):
+    with then(t'the {booking_system} {send('sends')} a {confirmation} to {guest('Alice')}'):
         ...
-    with when(t'the {customer} {insert('inserts')} the {coin}'):
-        ...
-    with when(t'the {customer} {press('presses')} the {button}'):
-        ...
-    with then(t'the {machine} {dispense('dispenses')} the {coffee} into the {cup}'):
+    with then(t'the {booking_system} {send('sends')} a {confirmation} to {guest('Bob')}'):
         ...
 ```
 
-No explicit `activity=` anywhere; scenario coverage is `{1, 2, 3, 5}` inferred from step term-refs.
+No explicit `activity=` anywhere; scenario coverage is `{1, 2, 3, 4, 5, 6}` — every typed activity gets covered. Activity 7 is the gap because both its verb (`redeems`) and its object (`loyalty bonus`) are drafts; draft-bearing activities are excluded from implicit coverage. See the worked walk-through below for the per-step `A_refs` / `S` derivation and the design payoffs the table makes concrete.
 
-### Registration model (`src/pytest_given/capture/registry.py`, new module)
+### Registration model (no global registry)
 
-Process-global registries — one for the Glossary, one for Stories — populated at module import time by the constructors. Snapshotted into `ReportData.glossary` / `ReportData.stories` at session start (existing `pytest_sessionfinish` flow). Both registries are mutable during collection and frozen for emission.
+State lives entirely in user-held `Glossary` and `Story` objects — no module-import side effects, no plugin-managed registry. Repeated pytest subprocess invocations naturally re-execute the user's module top-level code.
 
-Conflict semantics:
+Plugin-side discovery at session finish:
 
-- Re-registering the same term `id` is idempotent if all fields match exactly; raises `PytestGivenError` if any field differs.
-- Cross-kind id collision (e.g. `actor('foo')` and `verb('foo')`) raises with a message naming both kinds and source-module hints.
-- Re-registering a `Story` id raises unconditionally.
+1. Walk collected `Scenario` instances; for each with `story_id` set, the `Story` is reachable through the captured `@scenario(story=...)` reference on `Scenario`.
+2. Collect those stories into `ReportData.stories`.
+3. From each story's parts, collect the set of referenced `Glossary` instances. v1 invariant: size ≤ 1; if 2+ distinct glossaries are reached, raise with the offending story and its glossaries.
+4. If no story is referenced, scan the conftest module(s) for a `Glossary` attribute as a last-resort discovery (so a Glossary-only suite still surfaces). Multiple distinct Glossary instances on conftest also raise.
 
-Test isolation: registries are cleared at session start before conftest collection, so pytest's own subprocess invocations and repeated test runs do not accumulate state.
+Conflict semantics, enforced inside `Glossary` methods:
+
+- Re-registering the same term id is idempotent iff *all* fields (kind, canonical, definition) match; raises on any divergence.
+- Cross-kind id collision within one glossary raises with both call sites.
+
+Story-id duplicates are detected by the module-level `story(...)` constructor via a process-scoped duplicate-tracking dict of `(StoryId, declaration site)`. This is a fast-feedback authoring aid, not the canonical store of stories (which lives on `ReportData.stories` at session finish). The dict is cleared at session start so repeated pytest invocations in the same process (e.g. `pytest --looponfail`) get fresh state. It does not hold story content — only ids and source locations — so it doesn't contradict the "user holds the `Story` objects" model.
 
 ### Capture (`src/pytest_given/capture/template.py`, `src/pytest_given/capture/decorators.py`)
 
 `narration_from(...)` already dispatches `str` / `Template` / t-string into a `Narration`. Extend the t-string branch:
 
 - For each interpolation, after current parametrize-name matching:
-  - If the interpolation value `isinstance(value, Actor | WorkObject | Verb | InflectedRef)`: produce a `NarrationTermRef(kind=…, term_id=…, display=…, param_column=<col if matched else None>)`.
-  - If the value is an `InflectedRef`: the display is the inflected form, term_id is the underlying term.
+  - If the interpolation value is one of `Actor` / `WorkObject` / `Verb` / `ActorInstance` / `WorkObjectInstance` / `InflectedVerb`: produce `NarrationTermRef(term_id=…, display=…, param_column=<col if matched else None>)`. `display` is the canonical for bare terms, the instance display for `ActorInstance`/`WorkObjectInstance`, or the inflected form for `InflectedVerb`. `term_id` is the underlying term's id in every case.
+  - If the interpolation value is a `DraftActor` / `DraftWorkObject` / `DraftVerb`: raise `PytestGivenError` — drafts are story-side only (see *Error handling*).
   - Else fall back to existing `NarrationValue` / `NarrationPlaceholder` paths.
 
-Scenario binding capture (`src/pytest_given/plugin.py`, in `pytest_collection_modifyitems` or wherever `@scenario` metadata is read): read `story=` (may be a `Story`, its id string, or `None`) and `activities=` (validated as a tuple of ints, each present in the story's activity ids when explicit). Store in `Scenario.story_id` / `Scenario.activity_ids`.
+Scenario binding capture (`src/pytest_given/plugin.py`, in `pytest_collection_modifyitems` or wherever `@scenario` metadata is read): read `story=` (a `Story` instance or `None`) and `activities=` (validated as a tuple of ints, each present in the story's activity ids when explicit). Store `Scenario.story_id = story.id` and `Scenario.activity_ids`. Also retain a session-scoped mapping from `StoryId → Story` so the discovery walk in the Registration model can recover the full `Story` objects without re-reaching into user code.
 
 Step binding capture (`given` / `when` / `then` context-manager entry): accept `activity: int | Sequence[int] | None`. Normalize to `tuple[ActivityId, ...]`. Store in `Step.activity_ids` (a single int becomes a 1-tuple; `None` leaves the field as `()`).
 
-### Implicit binding (renderer-time, no schema cost)
+### Scenario ↔ story activity binding
 
-Algorithm at render time, for any `Scenario` with `activity_ids == ()` whose `story_id` is set:
+This section consolidates how a `Scenario` ends up associated with one or more `Activity` instances of its `Story`. There are two levels of binding (scenario→story, step→activities) and three sources (scenario-level explicit, step-level explicit, term-ref inference). The renderer needs a single `dict[ActivityId, set[StepRef]]` per scenario; everything below describes how that map is produced.
 
-For each `Step` reachable from the scenario:
-1. If `step.activity_ids != ()`: those are the step's covered activities (explicit override).
-2. Else compute the step's term-ref set `S = {tr.term_id for tr in step.narration.parts if isinstance(tr, NarrationTermRef)}`.
-3. For each activity `A` in the bound story: collect its term-ref set `A_refs` = union over all paths of `entity_id` / `term_id` from `ActivityEntity` and `ActivityTerm` (ignore `ActivityWord`). Activity `A` is covered by step iff `A_refs ⊆ S`.
-4. Scenario coverage = union of all step coverages.
+#### Inputs
 
-The subset rule transparently handles verb and entity matching: if `A` has a verb term, that term must appear in `S`; if `A` is verbless (only `ActivityWord` between entities), only the entities need to match. For multi-path activities the union across paths means the step must reference every term across every path — strict semantics for v1; per-path partial coverage is a follow-up.
+After capture, each `Scenario` carries:
 
-Empty cases: scenario has no story → not on the Stories view at all. Scenario has story but no step covers any activity → renders under the story with zero activity coverage badges; activity rows render as gaps.
+- `story_id: StoryId | None` — set iff `@scenario(story=…)` was provided.
+- `activity_ids: tuple[ActivityId, ...]` — set iff `@scenario(activities=[…])` was provided; otherwise `()`.
 
-The algorithm runs in `src/pytest_given/report/coverage.py` (new module). It is pure (input: `Scenario`, `Story`; output: `dict[ActivityId, set[StepRef]]`). Renderer calls it once per (scenario, story) pair.
+Each `Step` carries:
+
+- `activity_ids: tuple[ActivityId, ...]` — set iff `given(…, activity=…)` (or `when` / `then`) was provided; otherwise `()`.
+- `narration.parts` — possibly containing `NarrationTermRef` instances, each with a `term_id`.
+
+Each `Activity` of the bound `Story` has:
+
+- a set of referenced **identities**, `A_refs`. An identity is computed per-part using *strict* matching (no canonical-fallback — that asymmetry lives only on the step side, see *Step → activity binding*):
+  - `ActivityEntity` (actor or work object): identity is `(entity_id, instance_id_of(display))` where `instance_id_of` returns `None` when `display == glossary[entity_id].canonical` and `id_derive(display)` otherwise.
+  - `ActivityTerm` (verb): identity is `(term_id, None)` regardless of display. Verb inflection is a 1:1 morphological variation — `place` and `place('places')` are the same verb in different forms, never distinct things — so no instance-style identity arises.
+  - `ActivityWord` and `ActivityPlaceholder`: contribute nothing.
+
+  **Drafts do not participate in coverage matching** — an activity must use glossary-typed references to be eligible for implicit coverage. Entity instances *do* participate, with their distinct identity: `customer('Alice')` and `customer('Bob')` are different identities, both different from canonical `customer`.
+
+#### Scenario → story binding
+
+A scenario is "on a story" iff `scenario.story_id is not None`. Scenarios without a story do not appear in the Stories view at all; they still appear (unchanged) in the Scenarios view. The `story=` kwarg takes the `Story` object directly (not its id string) so that user code keeps a live reference — the id is stored only for serde.
+
+#### Step → activity binding
+
+For each step, the set of activities it "covers" is computed by the following precedence:
+
+1. **Explicit step binding.** If `step.activity_ids != ()`, those are the covered activities. No further inference.
+2. **Term-ref inference.** Otherwise, compute the step's identity set `S` from each `NarrationTermRef` in the narration:
+   - **Verb ref**: contributes `(term_id, None)`. Inflections (e.g., `place('places')` vs canonical `place`) are synonymous — same identity — because verb inflection is a 1:1 morphological variation, not a many-to-one relationship.
+   - **Entity ref to the canonical** (`display == canonical`): contributes `(term_id, None)`.
+   - **Entity ref to a specific instance** (`display != canonical`): contributes *both* `(term_id, instance_id_of(display))` *and* `(term_id, None)`.
+
+   The dual contribution from instance refs is the **canonical-fallback rule**: a scenario saying "Alice does X" implicitly *also* says "some Customer does X", so it should cover a canonical activity `activity(customer, …)`. The reverse is asymmetric: a scenario saying "a Customer does X" doesn't claim Alice specifically, so it doesn't cover `activity(customer('Alice'), …)`.
+
+   For each activity `A` in the bound story, `A` is covered by this step iff `A_refs ⊆ S` (`A_refs` itself uses strict identity — no expansion). A step with no term-refs and no explicit `activity=` covers nothing.
+
+   Coverage cheat-sheet:
+
+   | Story activity uses | Scenario step uses | Covers? |
+   |---|---|---|
+   | canonical (`customer`) | canonical (`customer`) | ✓ |
+   | canonical (`customer`) | instance (`customer('Alice')`) | ✓ — instance adds the canonical identity to `S` |
+   | instance (`customer('Alice')`) | instance (`customer('Alice')`) | ✓ |
+   | instance (`customer('Alice')`) | instance (`customer('Bob')`) | ❌ — different instance identity |
+   | instance (`customer('Alice')`) | canonical (`customer`) | ❌ — bare canonical doesn't claim a specific instance |
+   | verb canonical (`place`) | verb inflection (`place('places')`) | ✓ — inflection is synonymous |
+   | verb inflection (`place('places')`) | verb canonical (`place`) | ✓ — same direction, same identity |
+
+The subset rule handles verb and entity matching uniformly: every `ActivityEntity` and `ActivityTerm` in the path contributes to `A_refs`, and all of them must appear in `S`. For multi-path activities `A_refs` is the union across paths, so a step must reference every term across every path — strict v1 semantics; per-path partial coverage is a follow-up.
+
+**Drafts and bare strings in coverage.** `ActivityWord` (bare connective) contributes nothing to `A_refs`. `ActivityPlaceholder` (draft) is stronger: **an activity containing any draft is excluded from implicit (term-ref) coverage entirely** — the subset rule is not even evaluated. Only an explicit step `activity=N` binding can cover a draft-bearing activity. (Drafts can't appear in narrations at all — capture rejects them — so there's no step-side draft channel to reason about.) To bring a draft-bearing activity into implicit coverage, promote the draft to a glossary term; the activity's `A_refs` then includes the new term and matching resumes normally. The hard exclusion is the deliberate forcing function: missing vocabulary keeps the activity visibly uncovered until the team commits a name.
+
+#### Scenario → activity coverage
+
+The scenario's activity-coverage map is built from its steps:
+
+- If `scenario.activity_ids != ()`: the scenario is *constrained* to that explicit set. Each step is still processed by the step-level rule above, but any step coverage falling outside `scenario.activity_ids` is an error caught at capture time (see *Error handling* — "Step `activity=` outside scenario scope"). The scenario as a whole "covers" `scenario.activity_ids`; the step-level map provides the per-step breakdown.
+- Otherwise (`activity_ids == ()`): the scenario covers the union of all step coverages — *implicit inference*.
+
+#### Worked walk-through
+
+Using the "Book a Shared Room" example above (activities 1–7, no explicit `activity=` anywhere). `A_refs` uses *strict* identity (no canonical expansion — the canonical-fallback rule applies only at the step side):
+
+| # | Activity (parts) | A_refs |
+|---|---|---|
+| 1 | `guest search room` (all canonical) | `{(guest, ∅), (search, ∅), (room, ∅)}` |
+| 2 | `guest('Alice') select room('Deluxe Suite')` | `{(guest, alice), (select, ∅), (room, deluxe-suite)}` |
+| 3 | `guest('Alice') submit payment` | `{(guest, alice), (submit, ∅), (payment, ∅)}` |
+| 4 | `booking-system confirm booking 'for' guest('Alice') 'and' guest('Bob')` | `{(booking-system, ∅), (confirm, ∅), (booking, ∅), (guest, alice), (guest, bob)}` |
+| 5 | `booking-system send confirmation 'to' guest('Alice')` | `{(booking-system, ∅), (send, ∅), (confirmation, ∅), (guest, alice)}` |
+| 6 | `booking-system send confirmation 'to' guest('Bob')` | `{(booking-system, ∅), (send, ∅), (confirmation, ∅), (guest, bob)}` |
+| 7 | `guest('Alice') draft·redeems draft·loyalty-bonus` | *excluded — draft-bearing* |
+
+Each step's `S` applies the **canonical-fallback rule**: every entity instance ref contributes both its specific identity *and* the canonical `(term_id, ∅)`. Verb refs contribute `(term_id, ∅)` always. (Fixture-level `@given` narrations also contribute term-refs to the report, but they don't participate in step→activity coverage — only the in-test `given` / `when` / `then` steps do.)
+
+| Step | S (with canonical fallback) | Covers |
+|---|---|---|
+| `when {guest('Alice')} {searches for} a {room}` | `{(guest, alice), (guest, ∅), (search, ∅), (room, ∅)}` | **1** *(canonical activity, matched via fallback)* |
+| `when {guest('Alice')} {selects} the {room('Deluxe Suite')}` | `{(guest, alice), (guest, ∅), (select, ∅), (room, deluxe-suite), (room, ∅)}` | **2** |
+| `when {guest('Alice')} {submits} the {payment}` | `{(guest, alice), (guest, ∅), (submit, ∅), (payment, ∅)}` | **3** |
+| `then the {booking-system} {confirms} the {booking} for {guest('Alice')} and {guest('Bob')}` | `{(booking-system, ∅), (confirm, ∅), (booking, ∅), (guest, alice), (guest, bob), (guest, ∅)}` | **4** |
+| `then the {booking-system} {sends} a {confirmation} to {guest('Alice')}` | `{(booking-system, ∅), (send, ∅), (confirmation, ∅), (guest, alice), (guest, ∅)}` | **5** |
+| `then the {booking-system} {sends} a {confirmation} to {guest('Bob')}` | `{(booking-system, ∅), (send, ∅), (confirmation, ∅), (guest, bob), (guest, ∅)}` | **6** |
+
+Scenario coverage = union = `{1, 2, 3, 4, 5, 6}`. **Activity 7** (`Alice draft.redeems draft.loyalty-bonus`) is excluded from implicit coverage by the draft rule above and stays visibly uncovered. Once the team promotes `redeems` to `g.verb(...)` and `loyalty bonus` to `g.work_object(...)`, the activity rejoins normal matching — `A_refs` becomes `{(guest, alice), (redeem, ∅), (loyalty-bonus, ∅)}`, and the scenario needs a step that mentions all three to cover it.
+
+**Two design payoffs the table makes concrete:**
+
+- **Activity 1 (canonical) is covered by an instance step.** The search step mentions `guest('Alice')`; under canonical fallback, `S` includes both `(guest, alice)` *and* `(guest, ∅)`, so the canonical activity `A_refs = {(guest, ∅), …}` is satisfied. A scenario about Bob would cover row 1 the same way — canonical activities welcome any instance.
+- **Activities 5 and 6 are not conflated.** Same booking_system, same `send`, same `confirmation` — they differ only by guest instance. The instance carries distinct identity, so each activity matches only its own step. The negative case is explicit: the Alice-step's `S` contains `(guest, alice)` and `(guest, ∅)` but *not* `(guest, bob)`, so it doesn't cover activity 6's `A_refs` (which requires `(guest, bob)`). Without instances the two activities would collapse to one identity and conflate.
+
+#### Mechanics
+
+The algorithm is implemented in `src/pytest_given/report/coverage.py` as a pure function:
+
+```python
+def compute_coverage(scenario: Scenario, story: Story) -> dict[ActivityId, set[StepRef]]: ...
+```
+
+The renderer calls it once per (scenario, story) pair. `StepRef` is a lightweight identifier (probably `tuple[NodeId, list[int]]` for the path through `Step.children`) so the renderer can build the per-activity scenario badges without re-walking trees.
+
+Empty cases: scenario has no story → not on the Stories view at all. Scenario has a story but no step covers any activity → renders under the story with zero activity coverage badges; activity rows render as gaps.
 
 ### Serde (`src/pytest_given/model/serde.py`)
 
-Round-trip the new types. `ActivityPart` variants discriminate on a `kind` key, mirroring how `NarrationPart` already discriminates:
+Round-trip the new types. `ActivityPart` variants discriminate on a `type` key, mirroring how `NarrationPart` already discriminates. The `type` reflects the structural variant (entity / term / word / placeholder), *not* the term's kind for typed references (which lives on `GlossaryTerm`):
 
 ```json
-{"type": "actor",  "entity_id": "customer", "display": "Customer"}
-{"type": "object", "entity_id": "cup",      "display": "Cup"}
-{"type": "verb",   "term_id":   "dispense", "display": "dispenses"}
-{"type": "word",   "text":      "into"}
+{"type": "entity",      "entity_id": "customer", "display": "Customer"}
+{"type": "entity",      "entity_id": "cup",      "display": "Cup"}
+{"type": "term",        "term_id":   "dispense", "display": "dispenses"}
+{"type": "word",        "text":      "into"}
+{"type": "placeholder", "kind":      "actor",    "text": "Barista"}
+{"type": "placeholder", "kind":      "verb",     "text": "inserts"}
 ```
 
-The `NarrationTermRef` follows the same pattern:
+Narration parts add only `term_ref`; drafts have no narration variant.
 
 ```json
-{"type": "term-ref", "kind": "actor", "term_id": "customer",
- "display": "Customer", "param_column": null}
+{"type": "term_ref", "term_id": "customer", "display": "Customer", "param_column": null}
 ```
+
+`GlossaryTerm` still carries `kind` (authoritative for typed references); `ActivityPlaceholder` carries its own `kind` directly since it has no glossary backing.
 
 `ReportData` gains:
 
 ```json
 {
-  "glossary": {"terms": [...]},
-  "stories":  [...],
+  "glossary":  {"terms": [...]} | null,
+  "stories":   [...],
   "scenarios": [...]
 }
 ```
@@ -286,9 +563,9 @@ Existing fields unchanged.
 
 A top-level tab strip rendered in `report.html.j2`:
 
-- Tab visibility (canonical): `Scenarios` always; `Stories` shown iff `len(stories) > 0`; `Glossary` shown iff `len(glossary.terms) > 0`. See *Optional support* below for the practical implication that any non-empty Stories implies a non-empty Glossary.
 - Active tab tracked via `x-data` on the body with `view: 'scenarios' | 'stories' | 'glossary'`; URL hash carries `#view=stories&story=order-coffee` or similar.
 - Sidebar contents bound to the active tab.
+- Tab visibility rules: see *Optional support* below.
 
 #### Scenarios view (unchanged structure)
 
@@ -332,30 +609,42 @@ Term entries, grouped by kind:
 - The chevron is the existing `.scenario-chevron` shape — 8×8 corner border, -45° → 45° on toggle, 0.15s ease — used here on per-term toggle.
 - Term name as a pill in its kind colour (`.term-actor` / `.term-obj` for actor/object; `.term-verb` for verbs uses cyan text with dotted underline — matches the narration styling).
 - Definition paragraph, regular weight, default text colour. Empty definitions render with a muted-italic "No definition yet." placeholder so gaps are visible without erroring.
-- "Also used as: *forms*" — observed inflections auto-aggregated from every `display` value seen across `ActivityEntity` / `ActivityTerm` / `NarrationTermRef` instances; deduplicated, sorted by frequency, canonical excluded. Suppressed when the only observed form is canonical.
+- For **verb** terms: "Also used as: *forms*" — observed inflections aggregated from every `display` value seen across `ActivityTerm` / verb-referencing `NarrationTermRef` instances; deduped, sorted by frequency, canonical excluded. Suppressed when the only observed form is canonical.
+- For **actor / work-object** terms: "Instances: *names*" — observed instance displays (where `display != canonical`) aggregated from `ActivityEntity` / entity-referencing `NarrationTermRef` instances. Aggregation includes both **step narrations** (in-test `given` / `when` / `then`) and **fixture-level narrations** (fixture-decorator `@given` / `@when` / `@then`). When an instance is first observed in a fixture's `@given`, the chip is annotated with the originating fixture name — e.g., *Alice (fixture: alice)* — so readers can navigate from the Glossary to the fixture definition. Deduped, sorted by frequency. Suppressed when only the canonical form is observed.
 
 Refs block (collapsible, per-term):
 
 - Container uses the same `grid-template-rows: 0fr ↔ 1fr` 200ms ease-out animation as `.scenario-body`. Per-term expansion state keyed by `term.id`.
 - Content padding-left aligns the chips with the description column above (`18 + 14 + 180 + 14 = 226px` under the entry-head grid; spec values may be tuned to actual rendered widths).
-- Two inline lines, each suppressed when empty:
-  - **Stories:** chips of the form *Order Coffee · acts 1, 5* — one chip per story this term participates in.
-  - **Scenarios:** chips of the form *Buy coffee · when, then* — one chip per scenario whose narration references the term.
+- Two inline lines, each suppressed when empty (examples below are drawn from the worked example, with the relevant term annotated in parens):
+  - **Stories:** chips of the form *Book a Shared Room · acts 1, 2* (for the `room` term — appearing only in the search and select activities) — one chip per story this term participates in.
+  - **Scenarios:** chips of the form *Alice books a shared room · when, then* (for the `guest` term — referenced in both `when` and `then` steps) — one chip per scenario whose narration references the term.
+  - **Instances** (actor/object terms only): chips of the form *Alice* · *Bob* (for the `guest` term) or *Deluxe Suite* (for the `room` term) — observed instance displays, deduped, with frequency count on hover. Suppressed when only the canonical form is observed.
 - Labels use the same typography as `.entry-forms .label` (muted, regular weight, no transform). Chips are clickable; clicking jumps to the matching activity row in the Stories view or scenario card in the Scenarios view.
 
-Visual hierarchy in an expanded entry: term pill (heaviest) > definition (regular text) > "Also used as" / "Stories" / "Scenarios" labels (all quieter, matching). The three "label : chip(s)" lines form a consistent family of metadata annotations under each definition.
+Visual hierarchy in an expanded entry: term pill (heaviest) > definition (regular text) > "Also used as" / "Instances" / "Stories" / "Scenarios" labels (all quieter, matching). These metadata lines form a consistent family of annotations under each definition.
 
 #### Narration styling (`styles.css`)
 
-Two CSS classes per kind. `NarrationTermRef`:
+`NarrationTermRef` is rendered with a single class chosen at template time by looking up the kind: `glossary[part.term_id].kind` (via the `Glossary.__getitem__` index — never the underlying list). The renderer exposes a small helper (Jinja test or filter, e.g. `term_kind(part)`) so the template stays terse.
 
-- `kind="actor"`: `.term-ref-actor` — `background:#fef3c7; color:#92400e; border:1px solid #fcd34d; border-radius:4px; padding:1px 6px; font-weight:500; cursor:pointer;`
-- `kind="object"`: `.term-ref-object` — `background:#ccfbf1; color:#0f766e; border:1px solid #5eead4; border-radius:4px; padding:1px 6px; cursor:pointer;`
-- `kind="verb"`: `.term-ref-verb` — `color:#0e7490; border-bottom:1px dotted #0e7490; cursor:pointer; font-weight:500;` (text-only, no background)
+- kind `actor` → `.term-ref-actor` — `background:#fef3c7; color:#92400e; border:1px solid #fcd34d; border-radius:4px; padding:1px 6px; font-weight:500; cursor:pointer;`
+- kind `object` → `.term-ref-object` — `background:#ccfbf1; color:#0f766e; border:1px solid #5eead4; border-radius:4px; padding:1px 6px; cursor:pointer;`
+- kind `verb` → `.term-ref-verb` — `color:#0e7490; border-bottom:1px dotted #0e7490; cursor:pointer; font-weight:500;` (text-only, no background)
 
-Combined case (param_column != None): adds a 2px border in the matching `.param-color-N` hue, replacing the kind border. Implemented as a small modifier class.
+Combined case (`param_column != None`): adds a 2px border in the matching `.param-color-N` hue, replacing the kind border. Implemented as a small modifier class.
 
 Pointer cursor on all three kinds — clicking jumps to the Glossary tab. The term's definition shows via a `title` attribute on the span for native tooltips; a richer hover affordance is a polish task for a later spec.
+
+#### Activity-timeline draft styling (`styles.css`)
+
+`ActivityPlaceholder` parts in the Stories timeline use the kind-colour palette with a **draft cue**: a `1px dashed` border (instead of solid) for actors and objects, and a dashed underline (instead of dotted) for verbs. The text is italicized; the cursor is `default` (no Glossary entry to jump to); a `title` attribute reads "Draft — promote to glossary to lock in" so authors discover the migration path on hover.
+
+- kind `actor` → `.term-ref-actor.is-draft`
+- kind `object` → `.term-ref-object.is-draft`
+- kind `verb` → `.term-ref-verb.is-draft`
+
+The Glossary view does *not* list drafts (they have no glossary entry); a future enhancement may add a "Drafts" sidebar section as a parking lot for promotion candidates. Drafts can't appear in scenario narrations at all — capture rejects them at the t-string interpolation site — so the visual "promote me" cue is needed only in the story timeline.
 
 #### Reused existing styles
 
@@ -381,7 +670,12 @@ New classes (defined in `styles.css`):
 
 #### Coverage chip
 
-Existing scenario status palette (`--color-passed`, `--color-failed`, `--color-skipped`) reused. Count chip: small subscript-style block `m/n` next to the status colour.
+Existing scenario status palette reused for the pass/fail/skip cases (`--color-passed`, `--color-failed`, `--color-skipped`). Activity coverage adds two new tokens defined alongside the existing ones in `styles.css`:
+
+- `--color-mixed` — yellow, used when an activity has both passing and failing covering scenarios.
+- `--color-uncovered` — neutral gray, used for activities no scenario covers (draft-bearing or otherwise gapped).
+
+Count chip: small subscript-style block `m/n` next to the status colour.
 
 #### Tab strip and view switching (`app.js`)
 
@@ -399,84 +693,114 @@ The three view containers (`#view-scenarios`, `#view-stories`, `#view-glossary`)
 
 ### Optional support
 
-Three independence guarantees, all governed by the same two emptiness checks:
+Glossary and Stories are each independently optional; the three usage modes (no DS/UL → only Scenarios; Glossary only → Scenarios + Glossary; Story declared → all three) emerge from the tab visibility rules:
 
-- **No story, no terms** → only the Scenarios view; tab strip hidden (single-tab degenerate state matches today's report).
-- **Glossary declared, no story** → Scenarios + Glossary tabs. Narration uses term refs for highlighting; the Glossary view stands alone.
-- **Story declared** → Stories + Scenarios + Glossary tabs. The grammar invariant on `ActivityPath` (`Entity (Word+ Entity)+`) guarantees a declared story has at least two entities, each of which auto-registers a glossary term — so a non-empty Stories implies a non-empty Glossary.
-
-Tab visibility rules:
 - Scenarios: always visible.
 - Stories: `len(ReportData.stories) > 0`.
-- Glossary: `len(ReportData.glossary.terms) > 0`.
+- Glossary: `ReportData.glossary is not None and len(ReportData.glossary.terms) > 0`.
 
-These are explicit guards in the Jinja tab strip; no further per-case logic.
+When only one tab is visible, the tab strip itself is hidden — degenerate to today's single-view report.
 
 ## Components touched
 
-- `src/pytest_given/model/schema.py` — all new dataclasses (`Glossary`, `GlossaryTerm`, `Story`, `Activity`, `ActivityPath`, `ActivityEntity`, `ActivityTerm`, `ActivityWord`, `NarrationTermRef`); NewType aliases; additions on `ReportData`, `Scenario`, `Step`.
-- `src/pytest_given/model/serde.py` — encode/decode all new types, including the `kind`-discriminated `ActivityPart` and `NarrationTermRef` variants.
+- `src/pytest_given/model/schema.py` — new dataclasses and union types per the *Data model* section; additions on `ReportData`, `Scenario`, `Step`.
+- `src/pytest_given/model/serde.py` — encode/decode for the new types; `type` discriminator for `ActivityPart` and `NarrationPart` variants.
 - `src/pytest_given/model/__init__.py` — re-export new types.
-- `src/pytest_given/capture/registry.py` — new module; process-global Glossary + Stories registries with session-start clear and snapshot.
-- `src/pytest_given/capture/glossary.py` — new module: `actor`, `work_object`, `verb` constructors; `Actor` / `WorkObject` / `Verb` / `InflectedRef` classes; fixture-decorator forms.
-- `src/pytest_given/capture/story.py` — new module: `path`, `activity`, `story` constructors; grammar validation; multi-path support.
-- `src/pytest_given/capture/template.py` — extend `narration_from` t-string branch to emit `NarrationTermRef` on entity / verb-term values.
-- `src/pytest_given/capture/decorators.py` — accept `activity=` kwarg on `given` / `when` / `then`; normalize to `tuple[ActivityId, ...]`; record on `Step`.
-- `src/pytest_given/plugin.py` — accept `story=` / `activities=` on `@scenario`; resolve `story` arg (Story or id); validate activity ids; snapshot registries at session start.
-- `src/pytest_given/report/coverage.py` — new module: pure implicit-binding inference.
-- `src/pytest_given/report/renderer.py` — extend `_make_narration_filter` to handle `NarrationTermRef`; pass glossary / stories / coverage maps to Jinja env.
-- `src/pytest_given/report/templates/report.html.j2` — tab strip; three view containers; Stories view markup (sidebar list, story header, activity timeline, scenario cards section with badge strips); Glossary view markup (kind filters, term entries).
-- `src/pytest_given/report/templates/styles.css` — entity pill classes; verb dotted-underline class; tab strip; story timeline rows; coverage chip; scenario badge strip; "Covers:" strip on scenario cards.
-- `src/pytest_given/report/templates/app.js` — `view` state in Alpine root; hash sync; sync-highlight `hoveredActivity` / `hoveredScenario`.
-- `src/pytest_given/__init__.py` — re-export `actor`, `work_object`, `verb`, `story`, `activity`, `path`.
-- `README.md` and `GLOSSARY.md` — document the new authoring API and update the canonical-vocabulary list.
-- `examples/test_examples.py` — add an "Order Coffee" story example exercising all three views; regenerate via `uv run nox -s examples`.
+- `src/pytest_given/capture/glossary.py` — `Glossary` class; `Actor`/`WorkObject`/`Verb` value classes (with glossary back-refs); call-syntax overloads producing `ActorInstance` / `WorkObjectInstance` (for nouns) and `InflectedVerb` (for verbs); id auto-derivation; conflict enforcement.
+- `src/pytest_given/capture/draft.py` — `draft` singleton, `DraftActor`/`DraftWorkObject`/`DraftVerb` value classes (kind+text, no glossary back-ref).
+- `src/pytest_given/capture/story.py` — `path`, `activity`, `story` constructors; grammar validation; multi-path; per-process story-id uniqueness set.
+- `src/pytest_given/capture/template.py` — extend `narration_from` t-string branch to emit `NarrationTermRef`.
+- `src/pytest_given/capture/decorators.py` — `activity=` kwarg on `given`/`when`/`then`.
+- `src/pytest_given/plugin.py` — `story=` / `activities=` on `@scenario`; session-finish discovery walk populating `ReportData.stories` and `ReportData.glossary`.
+- `src/pytest_given/report/coverage.py` — pure implicit-binding inference (`compute_coverage`).
+- `src/pytest_given/report/renderer.py` — handle `NarrationTermRef` via glossary lookup; pass glossary / stories / coverage maps and a `term_kind(part)` Jinja helper.
+- `src/pytest_given/report/templates/report.html.j2` — tab strip; Scenarios / Stories / Glossary view markup.
+- `src/pytest_given/report/templates/styles.css` — entity/verb/draft styling; tab strip; timeline rows; coverage chip; scenario badge strip.
+- `src/pytest_given/report/templates/app.js` — `view` state; hash sync; sync-highlight.
+- `src/pytest_given/__init__.py` — re-export `Glossary`, `draft`, `story`, `activity`, `path`.
+- `README.md`, `GLOSSARY.md` — document the new authoring API.
+- `examples/test_examples.py` → renamed to `examples/test_coffeeshop.py` — preserves today's showcase of the basic pytest-given features (no DS/UL content; the rename keeps the file's purpose explicit now that a second example exists).
+- `examples/test_hotel_booking.py` — **new** example showcasing the DDD/DS features end-to-end: a `Glossary` for the Online Hotel Booking domain (actors like Guest and Booking System; work objects like Room, Booking, Payment, Confirmation; verbs like search, select, book, pay, confirm), a `story('Book a Room', …)` connecting them, and a couple of scenarios bound to it (covering both implicit term-ref inference and explicit `activity=`). Includes at least one draft (e.g., `draft.work_object('loyalty bonus')`) to demonstrate iterative-authoring. Deliberately narrow — doesn't repeat parametrize / fixture / failure showcases that already live in `test_coffeeshop.py`.
+- **One report per example file.** Each example produces its own JSON + HTML pair:
+  - `examples/coffeeshop.html` + `examples/coffeeshop-data.json` (from `test_coffeeshop.py`)
+  - `examples/hotel-booking.html` + `examples/hotel-booking-data.json` (from `test_hotel_booking.py`)
+
+  These replace the current single-output `examples/report.html` / `examples/report-data.json`.
+- `noxfile.py` — the `examples` session runs pytest twice (once per example file), regenerating both report pairs above. The current single-invocation form is replaced; factor the shared pytest args into a helper if it stays readable.
 
 ## Error handling
 
-- **Term id conflict on mismatch.** `PytestGivenError` naming both sites (module / line) and the differing field(s).
-- **Cross-kind id collision.** `PytestGivenError` naming both kinds.
-- **Story id conflict.** `PytestGivenError` naming both story declarations.
-- **Activity grammar violation.** `PytestGivenError` raised by `path(...)` (and the implicit single-path inside `activity(...)`); message names the offending position (e.g. "two adjacent entities at parts[2]:parts[3]") and the malformed activity's parts as repr.
-- **Unknown story in `@scenario(story=...)`.** Resolved at collection time (`pytest_collection_modifyitems`); raises with the list of registered story ids.
-- **Activity id not in story.** Same time; raises with the story's valid activity ids.
-- **Step `activity=` outside scenario scope.** When scenario has explicit `activities=[...]`, the step's `activity_ids` must be a subset; raises with both sets in the message. When the scenario uses implicit binding (`activities=()`), the step's `activity_ids` is validated against the story's full activity-id set.
-- **Inflection of an entity inside narration that's neither callable nor wrapped.** Type detection requires the interpolation value to be an `Actor` / `WorkObject` / `Verb` / `InflectedRef` instance; ordinary strings continue to render via `NarrationValue` / `NarrationPlaceholder`. No error; just no pill.
+- **Term id conflict on mismatch.** Raised by the `Glossary` method when re-registration with the same derived id has divergent fields. Message names both call sites (module / line) and the differing field(s).
+- **Cross-kind id collision within a glossary.** Same site, same call; message names both kinds.
+- **Empty derived id.** Raised by `Glossary.actor` / `work_object` / `verb` and module-level `story(...)` when the auto-derivation rule yields the empty string.
+- **Story id conflict.** Raised by module-level `story(...)` when two stories derive to the same id; message names both declaration sites.
+- **Story spans multiple glossaries (v1).** Raised by `story(...)` at construction when its parts reference more than one distinct `Glossary` instance; message lists the offending glossaries.
+- **Activity grammar violation.** Raised by `path(...)` (and the implicit single-path inside `activity(...)`) when any of the three leading-triple rules fails:
+  - Position 0 is not an actor → message names the offending first-part type and suggests active-voice rephrasing (e.g., for `activity(cup, place, customer)`: "did you mean `activity(customer, place, cup)`?").
+  - Position 1 is not a verb → message indicates the activity has a subject but no action.
+  - Position 2 is not an anchored noun (actor or work object, typed or draft) → message suggests promoting the bare string to `g.work_object(...)` / `g.actor(...)` or wrapping it with `draft.*`.
+  - Path has fewer than 3 parts → message indicates the activity is incomplete.
 
-All errors are pytest-collection errors (raised before test execution), so authors see them during `pytest --collect-only` or at startup.
+  Each variant includes the malformed activity's parts as repr.
+- **Empty draft text.** Raised by `draft.actor(...)` / `draft.work_object(...)` / `draft.verb(...)` when the supplied text is empty or whitespace-only. Drafts are required to display *something*; an empty draft would render as a styled blank.
+- **`@scenario(story=...)` not a `Story`.** Raised at collection (`pytest_collection_modifyitems`); message shows the offending type.
+- **Activity id not in story.** Same time; raises with the story's valid activity ids.
+- **Step `activity=` outside scenario scope.** When the scenario has explicit `activities=[...]`, the step's `activity_ids` must be a subset; raises with both sets in the message. When the scenario uses implicit binding (`activities=()`), the step's `activity_ids` is validated against the story's full activity-id set.
+- **Multiple `Glossary` instances reached at session finish.** Raised by the plugin; message lists each glossary's id-set and the stories that pulled it in.
+- **Term-like value inside narration that's neither typed nor wrapped.** Type detection requires the interpolation value to be an `Actor` / `WorkObject` / `Verb` / `ActorInstance` / `WorkObjectInstance` / `InflectedVerb` instance; ordinary strings continue to render via `NarrationValue` / `NarrationPlaceholder`. No error; just no pill.
+- **Draft interpolated in narration.** Raised by `narration_from(...)` (the t-string capture path) when an interpolation value is a `DraftActor` / `DraftWorkObject` / `DraftVerb`. Message names the draft's text and kind and suggests either promoting it to a glossary term (with the corresponding `g.actor(...)` / `g.work_object(...)` / `g.verb(...)` snippet) or replacing the interpolation with a plain string.
+
+All errors except the construction-time ones above are pytest-collection or session-finish errors (raised before / immediately after test execution); construction-time errors fire at module-import time, so authors see them during `pytest --collect-only` or at startup.
 
 ## Testing
 
 ### Unit
 
 - `tests/unit/capture/test_glossary.py` (new):
-  - `actor('Customer')` returns an `Actor` whose `.entity_id == 'customer'`; idempotent re-registration; conflict on mismatched definition raises.
-  - `verb('dispense')` registers with kind `'verb'`; cross-kind id collision raises.
-  - Id auto-derivation: `'Order received'` → `'order-received'`; explicit `id=` wins.
-  - Inflection: `customer('Customers')` returns `InflectedRef(term=customer, display='Customers')`.
+  - `Glossary().actor('Customer')` returns an `Actor` whose underlying term has `id == 'customer'` and `kind == 'actor'`; the actor carries a back-ref to its glossary.
+  - Idempotent re-registration (same args) returns an equivalent handle; conflict on mismatched definition raises.
+  - Cross-kind id collision within a single glossary raises (`g.actor('Foo')` + `g.verb('foo')`).
+  - Id auto-derivation: `'Order received'` → `'order-received'`; underscores collapse; non-ASCII letters strip; empty derived id raises.
+  - Call syntax on a noun: `customer('Jimmy')` returns `ActorInstance(actor=customer, display='Jimmy')`; `cup('Big Cup')` returns `WorkObjectInstance(work_object=cup, display='Big Cup')`. Identity is derived from display ≠ canonical.
+  - Call syntax on a verb: `place('places')` returns `InflectedVerb(verb=place, display='places')`. Identity stays `term_id` regardless of display.
 - `tests/unit/capture/test_story.py` (new):
-  - `path(...)` grammar: rejects leading/trailing word, rejects two adjacent entities, accepts multi-word phrases between entities.
+  - `path(...)` leading-triple grammar — position 0 must be an actor; a `WorkObject` / `Verb` / `DraftWorkObject` / `DraftVerb` / bare string in position 0 raises.
+  - `path(...)` position 1 must be a verb (`Verb`, `InflectedVerb`, or `DraftVerb`); an `Actor` / `WorkObject` / bare string in position 1 raises.
+  - `path(...)` position 2 must be an anchored noun (`Actor` / `WorkObject` / `ActorInstance` / `WorkObjectInstance` / `DraftActor` / `DraftWorkObject`); a bare string or `Verb` in position 2 raises.
+  - `path(...)` paths with fewer than 3 parts raise.
+  - `path(...)` accepts free-form parts beyond position 2: a 5-part `(actor, verb, work_object, 'into', work_object)` path validates cleanly.
+  - `path(...)` part dispatch: `Actor`/`WorkObject`/`ActorInstance`/`WorkObjectInstance` → `ActivityEntity`; `Verb`/`InflectedVerb` → `ActivityTerm`; `DraftActor`/`DraftWorkObject`/`DraftVerb` → `ActivityPlaceholder`; bare `str` → `ActivityWord`.
   - `activity(...)` accepts positional single-path; multi-path via `path(...)` calls; mixing raises.
   - `story(...)` auto-numbers activities in declaration order; explicit `id=` on an activity keeps it; uniqueness checked.
+  - `story(...)` across two distinct `Glossary` instances raises (v1 invariant). Drafts do not contribute to the glossary-set check.
+  - Story-id duplicate detection raises on second declaration of the same title.
+- `tests/unit/capture/test_draft.py` (new):
+  - `draft.actor('Barista')` returns a `DraftActor` with `kind='actor'`, `text='Barista'`.
+  - Empty/whitespace draft text raises.
+  - Two `draft.actor('Barista')` calls produce equal-valued instances (data equality, not necessarily identity).
+  - `str(draft.actor('Barista')) == 'Barista'` — drafts stringify to their text for `repr` / debug use. T-string interpolation rejects them at capture, separately covered in `test_template.py`.
 - `tests/unit/capture/test_template.py`:
-  - T-string interpolation of `Actor` → `NarrationTermRef(kind='actor', ...)`.
-  - T-string interpolation of `InflectedRef` → `NarrationTermRef` with the inflected display.
+  - T-string interpolation of `Actor` → `NarrationTermRef(term_id='customer', display='Customer', param_column=None)` — no `kind` field on the part.
+  - T-string interpolation of `ActorInstance` / `WorkObjectInstance` → `NarrationTermRef` with the instance display, `term_id` of the underlying term.
+  - T-string interpolation of `InflectedVerb` → `NarrationTermRef` with the inflected display, `term_id` of the verb.
   - Interpolation matching a parametrize column AND carrying an entity value → `NarrationTermRef(..., param_column=<col>)`.
-- `tests/unit/capture/test_registry.py` (new):
-  - Session-start clear isolates terms across runs.
-  - Snapshotting yields a frozen `Glossary` / `Story` tuple.
+  - T-string interpolation of a `DraftActor` / `DraftWorkObject` / `DraftVerb` raises `PytestGivenError` — drafts are not permitted in narrations.
 - `tests/unit/model/test_schema.py` / `test_serde.py`:
   - All new dataclasses round-trip through `report_to_dict` / `report_from_dict`.
-  - `ActivityPart` variants discriminate correctly on a `type` key.
-  - Empty `Glossary` and empty stories tuple round-trip.
+  - `ActivityPart` variants discriminate correctly on a structural `type` key (`entity` / `term` / `word`); kind is not on the part.
+  - `NarrationTermRef` round-trips without a `kind` field.
+  - `ReportData.glossary == None` and `ReportData.stories == []` round-trip.
 - `tests/unit/report/test_coverage.py` (new):
-  - Implicit binding: step references full set → covers activity; missing verb → does not cover; verbless activity matched by entities alone.
+  - Implicit binding: step references full set → covers activity; missing verb or missing entity → does not cover.
+  - Draft exclusion: activity containing any `ActivityPlaceholder` is excluded from implicit coverage; only explicit step `activity=N` brings it in.
   - Multi-step scenario: scenario coverage is the union of step coverage.
   - Explicit step `activity_ids` overrides inference for that step but not others.
   - Multi-path activity: any one path's term-set may participate; satisfying *one* path suffices (refined: the activity counts as covered iff the union of its parts' refs is a subset of the step's refs).
+  - Drafts hard-exclude from implicit coverage: an activity containing any `ActivityPlaceholder` is excluded from term-ref inference entirely, regardless of how many of its typed terms a step mentions. Explicit step `activity=N` is the only way to cover it.
+  - Promoting a draft to a glossary term changes the coverage outcome: the activity rejoins implicit coverage with the promoted term added to `A_refs`, and steps must mention every term in `A_refs` to keep coverage.
 - `tests/unit/report/test_renderer.py`:
-  - The narration filter dispatches `NarrationTermRef` to the appropriate kind class; combined case adds the `param-color-N` modifier.
-  - Tab visibility flags surface to the template context based on `ReportData.glossary` / `ReportData.stories` emptiness.
+  - The narration filter resolves `NarrationTermRef` to the matching CSS class via glossary lookup (`actor`/`object`/`verb`); combined case adds the `param-color-N` modifier.
+  - Tab visibility flags surface to the template context based on `ReportData.glossary` being `None`-or-empty / `ReportData.stories` emptiness.
   - Coverage map structure (per scenario, per activity) reaches the template.
 
 Per [[feedback-no-frontend-markup-tests]] these stay on the data-shape contract — no asserts on raw HTML / class strings.
@@ -484,7 +808,7 @@ Per [[feedback-no-frontend-markup-tests]] these stay on the data-shape contract 
 ### Integration
 
 - `tests/integration/test_domain_storytelling.py` (new):
-  - A small "Order Coffee" suite with glossary, story, and three scenarios runs cleanly; JSON output has populated `glossary`, `stories`, `scenario.story_id`, and per-step term-refs.
+  - A small DDD/DS suite (using the same Online Hotel Booking domain as the example file, or a focused subset) with glossary, story, and three scenarios runs cleanly; JSON output has populated `glossary`, `stories`, `scenario.story_id`, and per-step term-refs.
   - Scenario with `activities=()` and matching steps yields inferred scenario coverage equal to the set of activities its steps reference.
   - Scenario with explicit `activities=[1, 2]` plus a step bound to `activity=5` raises at collection.
 
@@ -492,14 +816,14 @@ Per [[feedback-no-frontend-markup-tests]] these stay on the data-shape contract 
 
 Per [[feedback-no-frontend-markup-tests]], Playwright is the only verification for renderer correctness.
 
-- Regenerate `examples/report-data.json` and `examples/report.html` via `uv run nox -s examples` after extending `examples/test_examples.py` with an Order Coffee story.
+- Regenerate both reports via `uv run nox -s examples` after the rename to `examples/test_coffeeshop.py` and the addition of `examples/test_hotel_booking.py`. The session produces two pairs: `examples/coffeeshop.{html,-data.json}` (basic-feature showcase, no DS/UL tabs visible — sanity check that the optional features stay optional) and `examples/hotel-booking.{html,-data.json}` (Online Hotel Booking — the DDD/DS demo). The Playwright assertions below target the hotel-booking report.
 - Open in Playwright and verify:
   - Three tabs present and switchable; URL hash updates.
   - Stories view: timeline rendering, status colours, scenario badge clicks anchor down to the matching card.
   - Bidirectional sync-highlight: hovering an activity row highlights matching scenarios; hovering a scenario card highlights matching activity rows.
   - Glossary view: kind filters toggle term groups; "Used in" links navigate cross-view.
   - Cursor on all entity refs is pointer; clicking jumps to the Glossary entry.
-  - Activity 3 (no coverage in the example) renders with the gap state.
+  - At least one activity in the hotel-booking story is uncovered (the draft-bearing one — e.g., the `loyalty bonus` activity) and renders with the gap state; draft parts render with the dashed `is-draft` styling.
 - Console messages clean after init.
 
 ### Coverage gate
@@ -508,10 +832,13 @@ Per [[feedback-no-frontend-markup-tests]], Playwright is the only verification f
 
 ## Open follow-ups (not in scope, tracked here)
 
+- **Multiple `Glossary` instances per suite (one per Bounded Context).** Adds: a `Glossary(name=...)` field for disambiguation; a glossary selector in the Glossary view (shown only when `len(glossaries) > 1`); context-grouping in the Stories sidebar; stories that span multiple BCs (cross-context interactions, context maps); `ReportData.glossaries: list[Glossary]` instead of the single `glossary` field. The v1 data model deliberately keeps `Story` independent of any particular `Glossary` to leave this path open.
 - Example Mapping integration: rule / question authoring atop the story↔scenario substrate.
 - egon.io import: parse `.dst` JSON into a `Story`; emit `.dst` from a declared `Story`.
 - External glossary file ingestion (YAML / Markdown).
 - Glossary synonyms and external doc-link fields.
-- Pictogrammatic activity rendering (graph view) — the data model is graph-ready (`ActivityPath` enforces `Entity (Word+ Entity)+`).
+- Pictogrammatic activity rendering (graph view) — the data model is graph-ready and supports the kind-driven consolidation rule from Domain Storytelling (actors consolidated, work objects per-activity).
+- Domain Storytelling Groups (labelled wrappers around activity ranges — subprocesses, parallel branches) and Annotations (freeform notes attached to activities or sentences). Both extend the schema additively; the timeline view can grow group-row headers and an annotation gutter without disturbing existing rendering.
 - Step's `activity_ids` ergonomics: a sentinel like `activity='all'` to cover the whole story explicitly.
+- Unicode-aware id auto-derivation (NFKD fold for non-ASCII letters) — v1 strips them.
 - Agent skill for pytest-given authoring (existing TODO; likely benefits from this design's vocabulary).
