@@ -14,14 +14,25 @@ from typing import Any
 
 from .errors import PytestGivenError
 from .schema import (
+    Activity,
+    ActivityEntity,
+    ActivityId,
+    ActivityPart,
+    ActivityPath,
+    ActivityPlaceholder,
+    ActivityTerm,
+    ActivityWord,
     Attachment,
     ContentType,
     ErrorInfo,
+    Glossary,
+    GlossaryTerm,
     Metadata,
     Narration,
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
+    NarrationTermRef,
     NarrationValue,
     NodeId,
     ParameterCase,
@@ -31,6 +42,9 @@ from .schema import (
     Scenario,
     SourceLocation,
     Step,
+    Story,
+    StoryId,
+    TermId,
     TracebackFrame,
 )
 
@@ -62,6 +76,8 @@ def report_from_dict(d: dict[str, Any]) -> ReportData:
     return ReportData(
         metadata=_metadata_from_dict(d['metadata']),
         scenarios=[_scenario_from_dict(s) for s in d['scenarios']],
+        stories=[_story_from_dict(s) for s in d.get('stories', [])],
+        glossary=_glossary_from_dict(d.get('glossary')),
     )
 
 
@@ -72,6 +88,65 @@ def _metadata_from_dict(d: dict[str, Any]) -> Metadata:
         pytest_version=d['pytest_version'],
         plugin_version=d['plugin_version'],
         commit_sha=d.get('commit_sha'),
+    )
+
+
+def _glossary_from_dict(d: dict[str, Any] | None) -> Glossary | None:
+    if d is None:
+        return None
+    return Glossary(
+        terms=[_glossary_term_from_dict(t) for t in d.get('terms', [])],
+    )
+
+
+def _glossary_term_from_dict(d: dict[str, Any]) -> GlossaryTerm:
+    return GlossaryTerm(
+        id=TermId(d['id']),
+        kind=d['kind'],
+        canonical=d['canonical'],
+        definition=d.get('definition', ''),
+    )
+
+
+def _story_from_dict(d: dict[str, Any]) -> Story:
+    return Story(
+        id=StoryId(d['id']),
+        title=d['title'],
+        activities=tuple(_activity_from_dict(a) for a in d.get('activities', [])),
+    )
+
+
+def _activity_from_dict(d: dict[str, Any]) -> Activity:
+    return Activity(
+        id=ActivityId(d['id']),
+        paths=tuple(_activity_path_from_dict(p) for p in d.get('paths', [])),
+    )
+
+
+def _activity_path_from_dict(d: dict[str, Any]) -> ActivityPath:
+    return ActivityPath(
+        parts=tuple(_activity_part_from_dict(p) for p in d.get('parts', [])),
+    )
+
+
+def _activity_part_from_dict(d: dict[str, Any]) -> ActivityPart:
+    if 'entity_id' in d:
+        return ActivityEntity(
+            entity_id=TermId(d['entity_id']),
+            display=d['display'],
+        )
+    if 'term_id' in d:
+        return ActivityTerm(
+            term_id=TermId(d['term_id']),
+            display=d['display'],
+        )
+    if 'kind' in d:
+        return ActivityPlaceholder(kind=d['kind'], text=d['text'])
+    if 'text' in d:
+        return ActivityWord(text=d['text'])
+    raise PytestGivenError(
+        f'unknown ActivityPart shape (keys: {sorted(d)!r}). Expected one of '
+        '"entity_id", "term_id", "kind", "text".'
     )
 
 
@@ -91,6 +166,8 @@ def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
         source=SourceLocation(relpath=src['relpath'], line=src['line'])
         if src is not None
         else None,
+        story_id=StoryId(d['story_id']) if d.get('story_id') else None,
+        activity_ids=tuple(ActivityId(i) for i in d.get('activity_ids') or ()),
     )
 
 
@@ -103,6 +180,7 @@ def _step_from_dict(d: dict[str, Any]) -> Step:
         children=[_step_from_dict(c) for c in d.get('children', [])],
         attachments=[_attachment_from_dict(a) for a in d.get('attachments', [])],
         error=_error_from_dict(d.get('error')),
+        activity_ids=tuple(ActivityId(i) for i in d.get('activity_ids') or ()),
     )
 
 
@@ -156,10 +234,18 @@ def _narration_from_dict(d: dict[str, Any]) -> Narration:
 
 
 def _narration_part_from_dict(d: dict[str, Any]) -> NarrationPart:
-    """Discriminate by unique key: `value` → Literal, `rendered` → Value,
-    `name` → Placeholder. Unknown shapes are a serialization bug; raise."""
+    """Discriminate by unique key: `value` → Literal, `term_id` → TermRef,
+    `rendered` → Value, `name` → Placeholder. Unknown shapes are a
+    serialization bug; raise."""
     if 'value' in d:
         return NarrationLiteral(value=d['value'])
+    if 'term_id' in d:
+        return NarrationTermRef(
+            term_id=TermId(d['term_id']),
+            display=d['display'],
+            expression=d.get('expression', ''),
+            param_column=d.get('param_column'),
+        )
     if 'rendered' in d:
         return NarrationValue(
             rendered=d['rendered'],
@@ -175,5 +261,5 @@ def _narration_part_from_dict(d: dict[str, Any]) -> NarrationPart:
         )
     raise PytestGivenError(
         f'Unknown narration part shape (keys: {sorted(d)!r}). Expected one of '
-        '"value", "rendered", or "name".'
+        '"value", "rendered", "name", or "term_id".'
     )

@@ -1,12 +1,22 @@
 import pytest
 
 from pytest_given.model import (
+    Activity,
+    ActivityEntity,
+    ActivityId,
+    ActivityPath,
+    ActivityPlaceholder,
+    ActivityTerm,
+    ActivityWord,
     Attachment,
     ErrorInfo,
+    Glossary,
+    GlossaryTerm,
     Metadata,
     Narration,
     NarrationLiteral,
     NarrationPlaceholder,
+    NarrationTermRef,
     NarrationValue,
     NodeId,
     ParameterCase,
@@ -16,10 +26,21 @@ from pytest_given.model import (
     Scenario,
     SourceLocation,
     Step,
+    Story,
+    StoryId,
+    TermId,
     report_from_dict,
     report_to_dict,
 )
 from pytest_given.model.serde import _asdict_filtered
+
+
+def _round_trip(report):
+    return report_from_dict(report_to_dict(report))
+
+
+def _meta():
+    return Metadata(project='p', timestamp='t', pytest_version='8', plugin_version='0')
 
 
 def _minimal_metadata_dict() -> dict:
@@ -454,3 +475,103 @@ def test_asdict_filtered_handles_dict_values() -> None:
     """_asdict_filtered handles plain dict values (not just lists/dataclasses)."""
     result = _asdict_filtered({'key': 'value', 'nested': {'a': 1}})
     assert result == {'key': 'value', 'nested': {'a': 1}}
+
+
+def test_activity_part_variants_round_trip():
+    parts = (
+        ActivityEntity(entity_id=TermId('guest'), display='Guest'),
+        ActivityTerm(term_id=TermId('search'), display='searches'),
+        ActivityWord(text='for'),
+        ActivityPlaceholder(kind='object', text='loyalty bonus'),
+    )
+    path = ActivityPath(parts=parts)
+    activity = Activity(id=ActivityId(1), paths=(path,))
+    story = Story(id=StoryId('s'), title='S', activities=(activity,))
+    report = ReportData(metadata=_meta(), stories=[story])
+    rt = _round_trip(report)
+    rt_parts = rt.stories[0].activities[0].paths[0].parts
+    assert rt_parts == parts
+
+
+def test_glossary_round_trips_and_rebuilds_index():
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    report = ReportData(metadata=_meta(), glossary=g)
+    rt = _round_trip(report)
+    assert rt.glossary is not None
+    assert rt.glossary[TermId('guest')].canonical == 'Guest'
+    assert rt.glossary[TermId('room')].kind == 'object'
+
+
+def test_narration_term_ref_round_trips():
+    narration = Narration(
+        text='Alice arrives',
+        parts=[
+            NarrationLiteral(value='Hello '),
+            NarrationTermRef(
+                term_id=TermId('guest'),
+                display='Alice',
+                expression='guest',
+                param_column='guest',
+            ),
+        ],
+    )
+    scn = Scenario(id=NodeId('n'), narration=narration, module='m')
+    report = ReportData(metadata=_meta(), scenarios=[scn])
+    rt = _round_trip(report)
+    assert rt.scenarios[0].narration.parts == narration.parts
+
+
+def test_report_data_with_no_glossary_or_stories_round_trips():
+    report = ReportData(metadata=_meta())
+    rt = _round_trip(report)
+    assert rt.glossary is None
+    assert rt.stories == []
+
+
+def test_scenario_story_id_and_activity_ids_round_trip():
+    scn = Scenario(
+        id=NodeId('n'),
+        narration=Narration(text='x'),
+        module='m',
+        story_id=StoryId('book'),
+        activity_ids=(ActivityId(1), ActivityId(2)),
+    )
+    report = ReportData(metadata=_meta(), scenarios=[scn])
+    rt = _round_trip(report)
+    assert rt.scenarios[0].story_id == 'book'
+    assert rt.scenarios[0].activity_ids == (1, 2)
+
+
+def test_step_activity_ids_round_trip():
+    scn = Scenario(
+        id=NodeId('n'),
+        narration=Narration(text='x'),
+        module='m',
+        steps=[
+            Step(
+                phase='given',
+                narration=Narration(text='s'),
+                activity_ids=(ActivityId(7),),
+            )
+        ],
+    )
+    report = ReportData(metadata=_meta(), scenarios=[scn])
+    rt = _round_trip(report)
+    assert rt.scenarios[0].steps[0].activity_ids == (7,)
+
+
+def test_activity_part_unknown_shape_raises():
+    from pytest_given.model.serde import _activity_part_from_dict
+
+    with pytest.raises(PytestGivenError, match='unknown ActivityPart shape'):
+        _activity_part_from_dict({'unknown_key': 'x'})
+
+
+def test_narration_part_unknown_shape_raises():
+    """Pre-existing behavior — covered to keep 100% after extending the branch."""
+    from pytest_given.model.serde import _narration_part_from_dict
+
+    with pytest.raises(PytestGivenError, match='Unknown narration part shape'):
+        _narration_part_from_dict({'mystery': 'x'})
