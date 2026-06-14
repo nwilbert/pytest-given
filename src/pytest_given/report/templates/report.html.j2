@@ -139,23 +139,23 @@
   {% if visible_count > 1 %}
   <nav class="frame-nav" role="tablist">
     <button class="nav-tab" role="tab"
-            :class="{ 'nav-tab-active': view === 'scenarios' }"
-            @click="view = 'scenarios'">Scenarios</button>
+            :class="{ 'nav-tab-active': mainView === 'scenarios' }"
+            @click="mainView = 'scenarios'">Scenarios</button>
     {% if tab_visibility.stories %}
     <button class="nav-tab" role="tab"
-            :class="{ 'nav-tab-active': view === 'stories' }"
-            @click="view = 'stories'">Stories</button>
+            :class="{ 'nav-tab-active': mainView === 'stories' }"
+            @click="mainView = 'stories'">Stories</button>
     {% endif %}
     {% if tab_visibility.glossary %}
     <button class="nav-tab" role="tab"
-            :class="{ 'nav-tab-active': view === 'glossary' }"
-            @click="view = 'glossary'">Glossary</button>
+            :class="{ 'nav-tab-active': mainView === 'glossary' }"
+            @click="mainView = 'glossary'">Glossary</button>
     {% endif %}
   </nav>
   {% endif %}
   {% endif %}
 
-  <div id="view-scenarios" x-show="view === 'scenarios'">
+  <div id="view-scenarios" x-show="mainView === 'scenarios'">
 
   {% for scenario in scenarios %}
   {%- set has_body = scenario.steps or scenario.parameters or scenario.error or scenario.skip_reason -%}
@@ -258,7 +258,7 @@
 
   </div>{# end #view-scenarios #}
 
-  <div id="view-stories" x-show="view === 'stories'" x-cloak>
+  <div id="view-stories" x-show="mainView === 'stories'" x-cloak>
   {% if stories %}
   <div class="stories-layout">
     <div class="story-sidebar">
@@ -348,7 +348,7 @@
   </div>
   {% endif %}
   </div>
-  <div id="view-glossary" x-show="view === 'glossary'" x-cloak>
+  <div id="view-glossary" x-show="mainView === 'glossary'" x-cloak>
   {% if glossary %}
   <div class="glossary-layout">
     <div class="sidebar">
@@ -475,6 +475,8 @@
 
 <script>
 window.__REPORT_DATA__ = {{ report_json }};
+window.__storyIds = {{ story_ids_json }};
+window.__termIds = {{ term_ids_json }};
 {{ app_js }}
 </script>
 <script>{{ alpine_js }}</script>

@@ -114,6 +114,15 @@ def render_html(
         sid: len(scns) for sid, scns in scenarios_by_story_id.items()
     }
 
+    story_ids_json = Markup(json.dumps([story.id for story in report.stories]))
+    term_ids_json = Markup(
+        json.dumps(
+            [term.id for term in report.glossary.terms]
+            if report.glossary is not None
+            else []
+        )
+    )
+
     env.filters['narration'] = _make_narration_filter(
         param_color_map,
         glossary=report.glossary,
@@ -134,6 +143,8 @@ def render_html(
         scn_covers=scn_covers,
         total_scenarios_per_story=total_scenarios_per_story,
         report_json=Markup(safe_report_json),
+        story_ids_json=story_ids_json,
+        term_ids_json=term_ids_json,
         css=Markup(css),
         app_js=Markup(app_js),
         alpine_js=Markup(alpine_js),

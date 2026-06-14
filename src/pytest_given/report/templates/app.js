@@ -1,8 +1,39 @@
+// --- Hash helpers ---
+function parseHash() {
+  return new URLSearchParams(window.location.hash.slice(1));
+}
+
+function serializeHash(params) {
+  const s = params.toString();
+  history.replaceState(null, '', s ? '#' + s : window.location.pathname);
+}
+
+function deserializeView(params) {
+  const v = params.get('view');
+  if (v === 'stories' || v === 'glossary') return v;
+  return 'scenarios';
+}
+
+function deserializeStory(params) {
+  const s = params.get('story');
+  const ids = window.__storyIds || [];
+  return (s && ids.includes(s)) ? s : (ids[0] || null);
+}
+
+// --- Alpine app ---
 function reportApp() {
   const data = window.__REPORT_DATA__;
+  const storyIds = window.__storyIds || [];
   return {
     search: '',
     view: 'tags',
+    mainView: 'scenarios',
+    selectedStory: storyIds[0] || null,
+    glossarySearch: '',
+    glossaryKindFilter: { actor: true, object: true, verb: true },
+    expandedTerms: {},
+    hoveredActivity: null,
+    hoveredScenario: null,
     showPassed: true,
     showFailed: true,
     showSkipped: true,
@@ -11,6 +42,18 @@ function reportApp() {
     expandedAttachments: {},
     expandedScenarios: {},
     activeTag: null,
+    get anyTermsExpanded() {
+      return Object.keys(this.expandedTerms).length > 0;
+    },
+    toggleAllTerms() {
+      const expand = !this.anyTermsExpanded;
+      const ids = window.__termIds || [];
+      if (expand) {
+        ids.forEach(id => { this.expandedTerms[id] = true; });
+      } else {
+        this.expandedTerms = {};
+      }
+    },
     get filterSummary() {
       const parts = [];
       if (this.activeTag) parts.push('Tag: ' + this.activeTag);
@@ -134,10 +177,12 @@ function reportApp() {
       ['search', 'activeTag', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
         this.$watch(key, () => this._writeHash());
       });
+      this.$watch('mainView', () => this._writeHash());
+      this.$watch('selectedStory', () => this._writeHash());
       window.addEventListener('hashchange', () => this._readHash());
     },
     _readHash() {
-      const params = new URLSearchParams(window.location.hash.slice(1));
+      const params = parseHash();
       if (params.has('tag')) this.activeTag = params.get('tag');
       else this.activeTag = null;
       if (params.has('status')) {
@@ -152,9 +197,13 @@ function reportApp() {
       }
       if (params.has('q')) this.search = params.get('q');
       else this.search = '';
+      this.mainView = deserializeView(params);
+      this.selectedStory = deserializeStory(params);
     },
     _writeHash() {
       const params = new URLSearchParams();
+      if (this.mainView !== 'scenarios') params.set('view', this.mainView);
+      if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
       if (this.activeTag) params.set('tag', this.activeTag);
 
       const present = new Set(data.scenarios.map(s => s.status));
@@ -169,8 +218,7 @@ function reportApp() {
       }
 
       if (this.search) params.set('q', this.search);
-      const hash = params.toString();
-      history.replaceState(null, '', hash ? '#' + hash : window.location.pathname);
+      serializeHash(params);
     },
   };
 }
