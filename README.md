@@ -2,7 +2,9 @@
 
 A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests. Inspired by [JGiven](https://jgiven.org/) (Java). The code is the single source of truth — no separate Gherkin DSL.
 
-**[See a live example report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/report.html)**
+Live examples:
+- **[Coffeeshop report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop.html)** — tour of the core features.
+- **[Hotel-booking report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking.html)** — Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
 
 ## Quick start
 
@@ -155,6 +157,53 @@ Three things worth knowing:
 
 3. **Parametrized scenarios use the first case's steps as the template.** All rows of the parameter table share the step structure recorded by case 1, with values substituted per row. That's the right behaviour when every case runs the same code with different values — and misleading when the steps themselves vary, e.g. a conditional `with given(t'...')` will only show case 1's branch. If steps diverge per case, split into separate `@scenario` tests.
 
+### Domain Storytelling
+
+Three optional pillars layer **Domain-Driven Design** on top of the core surface. Adopt any one independently — or all three for a full vocabulary-and-story workflow. The HTML report adds a tabbed view: **Scenarios** (always present), **Stories**, and **Glossary** (each only shown when populated).
+
+**1. Ubiquitous-language `Glossary`** — declare the actors, work objects, and verbs your tests speak about:
+
+```python
+from pytest_given import Glossary
+
+g = Glossary()
+guest = g.actor('Guest', definition='Person booking accommodation.')
+room = g.work_object('Room', definition='A bookable hotel room.')
+search = g.verb('search', definition='Look up available options.')
+```
+
+Use the captured handles directly in t-strings — `t'a {guest} {search("searches for")} a {room}'`. Each interpolation becomes a kind-coloured pill in the rendered step, with the term's definition as a tooltip. Glossary terms feed the Glossary tab.
+
+**2. Domain Stories** — model a flow as a sequence of `activity(...)` rows tied together by `story(...)`:
+
+```python
+from pytest_given import activity, story
+
+book_a_shared_room = story('Book a Shared Room', activities=(
+    activity(guest, search('searches for'), room),
+    activity(guest('Alice'), search('looks up'), room('Deluxe Suite')),
+))
+```
+
+An activity reads left-to-right: actor → verb → work object (with optional connective words). `path(...)` lets a story branch where alternate activity sequences share a prefix.
+
+**3. Scenario ↔ activity binding** — link a scenario (and individual steps) to the story it implements:
+
+```python
+@scenario('Alice books a shared room', story=book_a_shared_room)
+def test_book_shared(alice):
+    with when(t'{guest("Alice")} {search("searches for")} a {room}'):
+        ...
+```
+
+Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it. A step can also bind explicitly with `given(text, activity=...)`.
+
+**Draft vocabulary** — `draft.actor('Some Name')`, `draft.work_object(...)`, `draft.verb(...)` mark in-progress terms that aren't yet ready to land in the glossary. Drafts render with a striped/italic cue in the report so reviewers see what still needs to be defined.
+
+**Glossary-only mode** — if you want the Glossary tab without writing stories yet, put `g = Glossary()` in a `conftest.py` so the plugin discovers it.
+
+See the [domain-storytelling design spec](docs/superpowers/specs/2026-06-07-domain-storytelling-design.md) for the full surface and the [hotel-booking example](examples/test_hotel_booking.py) for an end-to-end usage.
+
 ### `attach(label, content)`
 
 Attach data to the current step. Strings are stored verbatim; other types are JSON-serialized.
@@ -237,19 +286,12 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
 
 ## Examples
 
-See [`examples/test_examples.py`](examples/test_examples.py) for a tour of every supported feature:
+Two example suites live under [`examples/`](examples/), each with pre-rendered JSON + HTML committed:
 
-- Basic `when`/`then` blocks
-- Generator fixtures with teardown
-- Plain text and JSON attachments
-- Parameterized tests rendered as parameter tables
-- T-string interpolation of non-parametrize values (neutral highlight)
-- Helper functions that record their own steps
-- Top-level `given` blocks and deeply nested steps
-- Failure rendering
-- Skipped scenarios with reason (including all-skipped parametrizes)
+- [`test_coffeeshop.py`](examples/test_coffeeshop.py) — a tour of the core feature surface: `when`/`then` blocks, generator fixtures with teardown, plain text and JSON attachments, parameterized tests rendered as tables, t-string interpolation, helper functions that record their own steps, top-level `given` blocks, deeply nested steps, failure rendering, and skipped scenarios. Output: [`coffeeshop.html`](examples/coffeeshop.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop.html)).
+- [`test_hotel_booking.py`](examples/test_hotel_booking.py) — Domain Storytelling features: a `Glossary` of actors / work objects / verbs, a `story(...)` with `activity(...)` rows, scenarios bound to a story with per-activity coverage, and `draft.*` placeholders for in-progress vocabulary. Output: [`hotel-booking.html`](examples/hotel-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking.html)).
 
-A pre-rendered report is committed under [`examples/`](examples/): the JSON ([`report-data.json`](examples/report-data.json)) and the rendered HTML ([`report.html`](examples/report.html) — [live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/report.html)). Run `nox -s examples` to regenerate both.
+Run `nox -s examples` to regenerate both.
 
 ## Working with LLMs
 

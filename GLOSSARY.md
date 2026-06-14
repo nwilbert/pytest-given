@@ -54,3 +54,27 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Parameter coloring** | Each parametrize column gets a stable highlight color; placeholders and matching values share that color wherever they appear in step text and the parameter table. |
 | **Value highlight** | A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column (e.g., a computed expression like `price * 1.2`). |
 | **Source link** | A clickable file:line anchor on a scenario card. Resolved from the `given_source_link` config (preset name like `vscode` / `github`, or a raw URL template). Captured per-scenario as a `SourceLocation` (POSIX relpath + 1-indexed line) from `pytest.Item.location`. Disabled by default. |
+
+## Domain Storytelling
+
+The Domain-Driven Design layer atop the core surface. All terms here are optional features: a test suite can use none, some, or all.
+
+| Term | Meaning |
+|---|---|
+| **glossary** (lowercase) | The Ubiquitous-Language concept: the shared vocabulary a domain speaks in. |
+| **Glossary** (capitalized) | The class that holds glossary terms — `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.verb(...)` registration methods. |
+| **Term** | A registered glossary entry: an Actor, Work Object, or Verb. Each carries an id (slug), a canonical name, a kind, and an optional definition. |
+| **Actor** | A glossary term for a participant in the domain (e.g., *Guest*). Renders with the actor pill style. |
+| **Work Object** | A glossary term for a thing acted on (e.g., *Room*, *Booking*). Renders with the work-object pill style. |
+| **Verb** | A glossary term for an action (e.g., *book*, *confirm*). Verbs accept inflections — calling `book('books')` records *books* as a surface form of the canonical *book*. |
+| **Term ref** | An occurrence of a term inside narration. Modelled as `NarrationTermRef` in step text and as `ActivityEntity` / `ActivityTerm` inside activity prose. |
+| **Instance** | A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). Instances aggregate in the Glossary tab's refs block. |
+| **Inflection** | A surface form of a Verb other than its canonical name (e.g., *searches for* as an inflection of *search*). Reported under "Also used as:" in the Glossary. |
+| **Draft** | A placeholder vocabulary item authored via `draft.actor(...)`, `draft.work_object(...)`, `draft.verb(...)`. Not registered in the Glossary; rendered with an "is-draft" cue so reviewers see what still needs to land. |
+| **Story** | A named flow modelled as a sequence of activities. Constructed by `story('Title', activities=(...))`. Stories are first-class report tabs and the unit of coverage. |
+| **Activity** | One row in a story — typically `actor + verb + work_object` plus optional connective words. Constructed by `activity(...)`. |
+| **ActivityPart** | The four-variant union making up an activity's prose: `ActivityEntity` (actor/object ref), `ActivityTerm` (verb ref), `ActivityWord` (plain word), `ActivityPlaceholder` (draft). |
+| **Path** | A branching segment inside a story — `path(...)` lets alternate activity sequences share a prefix. |
+| **Scenario↔activity binding** | The link between a scenario (or step) and one or more story activities. Carried by `@scenario(story=, activities=)` and the `activity=` kwarg on `given`/`when`/`then`. |
+| **Coverage** | The "did this scenario touch that activity" relation. Computed by the *A_refs ⊆ S* rule: an activity is covered when its set of term references (as identities, with a canonical fallback) is a subset of the union of term-reference identities across the scenario's steps. |
+| **Glossary-only mode** | A suite that declares a `Glossary` in `conftest.py` but no stories. Renders the Glossary tab alone; the Stories tab is suppressed when no stories exist. |
