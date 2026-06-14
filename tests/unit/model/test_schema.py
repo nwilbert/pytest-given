@@ -49,8 +49,13 @@ def test_step_defaults() -> None:
     assert step.status == 'passed'
     assert step.children == []
     assert step.attachments == []
-
     assert step.error is None
+    assert step.fixture_name is None
+
+
+def test_step_fixture_name_is_set_when_provided() -> None:
+    step = Step(phase='given', narration=_n('our guest'), fixture_name='alice')
+    assert step.fixture_name == 'alice'
 
 
 def test_step_with_children() -> None:

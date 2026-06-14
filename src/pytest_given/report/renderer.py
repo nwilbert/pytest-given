@@ -6,12 +6,19 @@ import jinja2
 from markupsafe import Markup, escape
 
 from ..model import (
+    Glossary,
     Narration,
     NarrationLiteral,
     NarrationPlaceholder,
+    NarrationTermRef,
     NarrationValue,
     Scenario,
     report_from_dict,
+)
+from .aggregations import (
+    build_coverage_maps,
+    build_glossary_aggregations,
+    tab_visibility,
 )
 from .source_link import format_source_link
 
@@ -59,11 +66,23 @@ def render_html(
         source_link_template=source_link_template,
     )
 
-    env.filters['narration'] = _make_narration_filter(param_color_map)
+    coverage_maps = build_coverage_maps(report)
+    glossary_aggregations = build_glossary_aggregations(report)
+    visibility = tab_visibility(report)
+
+    env.filters['narration'] = _make_narration_filter(
+        param_color_map,
+        glossary=report.glossary,
+    )
     template = env.get_template('report.html.j2')
     html = template.render(
         metadata=report.metadata,
         scenarios=report.scenarios,
+        stories=report.stories,
+        glossary=report.glossary,
+        coverage_maps=coverage_maps,
+        glossary_aggregations=glossary_aggregations,
+        tab_visibility=visibility,
         report_json=Markup(safe_report_json),
         css=Markup(css),
         app_js=Markup(app_js),
@@ -116,7 +135,8 @@ def _compute_source_urls(
 
 
 def _make_narration_filter(
-    color_map: ParamColorMap,
+    param_color_map: ParamColorMap,
+    glossary: Glossary | None = None,
 ) -> Callable[[Narration], Markup]:
     """Filter usage: `{{ step.narration | narration }}` or
     `{{ scenario.narration | narration }}`.
@@ -126,6 +146,7 @@ def _make_narration_filter(
       - `NarrationLiteral` → escape `value`
       - `NarrationValue`   → `.param-value` highlight around `rendered`
       - `NarrationPlaceholder` → color-coded `{name!conv:spec}` token
+      - `NarrationTermRef` → kind-coloured pill resolved via glossary
     Empty parts → escape `text` and emit verbatim.
     """
 
@@ -140,7 +161,7 @@ def _make_narration_filter(
                 case NarrationValue(rendered=rendered):
                     out.append(f'<span class="param-value">{escape(rendered)}</span>')
                 case NarrationPlaceholder(name=name):
-                    color_idx = color_map.get(name, 0) % _NUM_PARAM_COLORS
+                    color_idx = param_color_map.get(name, 0) % _NUM_PARAM_COLORS
                     label = _placeholder_token(part)
                     # Single-quote the JS arg because the HTML attribute is "..."
                     # and parametrize names are Python identifiers (no `'`).
@@ -154,9 +175,38 @@ def _make_narration_filter(
                         f'@mouseleave="{leave}"'
                         f'>{escape(label)}</span>'
                     )
+                case NarrationTermRef():
+                    out.append(_render_term_ref(part, glossary, param_color_map))
         return Markup(''.join(out))
 
     return _render
+
+
+def _render_term_ref(
+    part: NarrationTermRef,
+    glossary: Glossary | None,
+    param_color_map: ParamColorMap,
+) -> str:
+    term = glossary.get(part.term_id) if glossary is not None else None
+    if term is None:
+        return str(escape(part.display))
+    kind_class = {
+        'actor': 'term-ref-actor',
+        'object': 'term-ref-object',
+        'verb': 'term-ref-verb',
+    }[term.kind]
+    classes = [kind_class]
+    if part.param_column is not None:
+        color_idx = param_color_map.get(part.param_column, 0) % _NUM_PARAM_COLORS
+        classes.append(f'param-color-{color_idx}')
+    safe_term_id = escape(part.term_id)
+    title = escape(term.definition or '')
+    return (
+        f'<span class="{" ".join(classes)}" '
+        f'data-term-id="{safe_term_id}" '
+        f'title="{title}"'
+        f'>{escape(part.display)}</span>'
+    )
 
 
 def _placeholder_token(part: NarrationPlaceholder) -> str:

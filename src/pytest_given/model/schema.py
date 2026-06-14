@@ -258,6 +258,7 @@ class Step:
     attachments: list[Attachment] = field(default_factory=list)
     error: ErrorInfo | None = None
     activity_ids: tuple[ActivityId, ...] = ()
+    fixture_name: str | None = None
 
 
 @dataclass

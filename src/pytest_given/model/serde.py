@@ -181,6 +181,7 @@ def _step_from_dict(d: dict[str, Any]) -> Step:
         attachments=[_attachment_from_dict(a) for a in d.get('attachments', [])],
         error=_error_from_dict(d.get('error')),
         activity_ids=tuple(ActivityId(i) for i in d.get('activity_ids') or ()),
+        fixture_name=d.get('fixture_name'),
     )
 
 

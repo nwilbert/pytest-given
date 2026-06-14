@@ -920,3 +920,109 @@ def test_render_param_table_cells_get_data_param(tmp_path: Path) -> None:
     assert re.search(r'<td[^>]*\bdata-param="expect"[^>]*>\s*False\s*</td>', content)
     assert re.search(r'<td[^>]*\bdata-param="euros"[^>]*>\s*2\s*</td>', content)
     assert re.search(r'<td[^>]*\bdata-param="expect"[^>]*>\s*True\s*</td>', content)
+
+
+# ---------------------------------------------------------------------------
+# Task 10.1 — NarrationTermRef rendering
+# ---------------------------------------------------------------------------
+
+from pytest_given.model import (  # noqa: E402
+    Glossary,
+    GlossaryTerm,
+    Narration,
+    NarrationTermRef,
+    TermId,
+)
+from pytest_given.report.renderer import _make_narration_filter  # noqa: E402
+
+
+def _glossary() -> Glossary:
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    return g
+
+
+def test_narration_filter_renders_actor_term_ref_with_actor_class() -> None:
+    g = _glossary()
+    f = _make_narration_filter(param_color_map={}, glossary=g)
+    n = Narration(
+        text='Guest',
+        parts=[
+            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+        ],
+    )
+    assert 'term-ref-actor' in str(f(n))
+
+
+def test_narration_filter_renders_object_term_ref_with_object_class() -> None:
+    g = _glossary()
+    f = _make_narration_filter(param_color_map={}, glossary=g)
+    n = Narration(
+        text='Room',
+        parts=[
+            NarrationTermRef(term_id=TermId('room'), display='Room'),
+        ],
+    )
+    assert 'term-ref-object' in str(f(n))
+
+
+def test_narration_filter_renders_verb_term_ref_with_verb_class() -> None:
+    g = _glossary()
+    f = _make_narration_filter(param_color_map={}, glossary=g)
+    n = Narration(
+        text='search',
+        parts=[
+            NarrationTermRef(term_id=TermId('search'), display='searches'),
+        ],
+    )
+    assert 'term-ref-verb' in str(f(n))
+
+
+def test_narration_filter_includes_param_color_when_term_ref_has_param_column() -> None:
+    g = _glossary()
+    color_map = {'guest_name': 2}
+    f = _make_narration_filter(param_color_map=color_map, glossary=g)
+    n = Narration(
+        text='Alice',
+        parts=[
+            NarrationTermRef(
+                term_id=TermId('guest'),
+                display='Alice',
+                param_column='guest_name',
+            ),
+        ],
+    )
+    out = str(f(n))
+    assert 'term-ref-actor' in out
+    assert 'param-color-2' in out
+
+
+def test_narration_filter_handles_term_ref_with_no_glossary_match() -> None:
+    g = _glossary()
+    f = _make_narration_filter(param_color_map={}, glossary=g)
+    n = Narration(
+        text='X',
+        parts=[
+            NarrationTermRef(term_id=TermId('missing'), display='X'),
+        ],
+    )
+    out = str(f(n))
+    assert 'X' in out
+    assert 'term-ref' not in out
+
+
+def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
+    """When the renderer is invoked with glossary=None (e.g. no glossary
+    declared), NarrationTermRef still renders as escaped text."""
+    f = _make_narration_filter(param_color_map={})  # glossary defaults to None
+    n = Narration(
+        text='X',
+        parts=[
+            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+        ],
+    )
+    out = str(f(n))
+    assert 'Guest' in out
+    assert 'term-ref' not in out

@@ -1,0 +1,411 @@
+from pytest_given.model import (
+    Activity,
+    ActivityEntity,
+    ActivityId,
+    ActivityPath,
+    ActivityTerm,
+    Glossary,
+    GlossaryTerm,
+    Metadata,
+    Narration,
+    NarrationTermRef,
+    NodeId,
+    ReportData,
+    Scenario,
+    Step,
+    Story,
+    StoryId,
+    TermId,
+)
+from pytest_given.report.aggregations import (
+    build_coverage_maps,
+    build_glossary_aggregations,
+    tab_visibility,
+)
+
+
+def _ent(tid: str, display: str) -> ActivityEntity:
+    return ActivityEntity(entity_id=TermId(tid), display=display)
+
+
+def _verb_part(tid: str) -> ActivityTerm:
+    return ActivityTerm(term_id=TermId(tid), display=tid)
+
+
+def _g() -> Glossary:
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    return g
+
+
+def _meta() -> Metadata:
+    return Metadata(project='p', timestamp='t', pytest_version='8', plugin_version='0')
+
+
+def test_tab_visibility_only_scenarios_visible_with_empty_report() -> None:
+    rd = ReportData(metadata=_meta())
+    assert tab_visibility(rd) == {
+        'scenarios': True,
+        'stories': False,
+        'glossary': False,
+    }
+
+
+def test_tab_visibility_stories_visible_when_stories_non_empty() -> None:
+    a = Activity(
+        id=ActivityId(1),
+        paths=(
+            ActivityPath(
+                parts=(
+                    _ent('guest', 'Guest'),
+                    _verb_part('search'),
+                    _ent('room', 'Room'),
+                )
+            ),
+        ),
+    )
+    s = Story(id=StoryId('s'), title='S', activities=(a,))
+    rd = ReportData(metadata=_meta(), stories=[s])
+    assert tab_visibility(rd)['stories'] is True
+
+
+def test_tab_visibility_glossary_visible_when_glossary_has_terms() -> None:
+    rd = ReportData(metadata=_meta(), glossary=_g())
+    assert tab_visibility(rd)['glossary'] is True
+
+
+def test_tab_visibility_glossary_hidden_when_glossary_is_empty() -> None:
+    rd = ReportData(metadata=_meta(), glossary=Glossary())
+    assert tab_visibility(rd)['glossary'] is False
+
+
+def test_build_coverage_maps_produces_per_scenario_dicts() -> None:
+    g = _g()
+    a = Activity(
+        id=ActivityId(1),
+        paths=(
+            ActivityPath(
+                parts=(
+                    _ent('guest', 'Guest'),
+                    _verb_part('search'),
+                    _ent('room', 'Room'),
+                )
+            ),
+        ),
+    )
+    story = Story(id=StoryId('book'), title='Book', activities=(a,))
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='x',
+            parts=[
+                NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+                NarrationTermRef(term_id=TermId('search'), display='search'),
+                NarrationTermRef(term_id=TermId('room'), display='Room'),
+            ],
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('test::x'),
+        narration=Narration(text='scn'),
+        module='m',
+        steps=[step],
+        story_id=StoryId('book'),
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
+    maps = build_coverage_maps(rd)
+    assert ActivityId(1) in maps[NodeId('test::x')]
+
+
+def test_build_coverage_maps_empty_for_scenario_without_story() -> None:
+    g = _g()
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[],
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
+    maps = build_coverage_maps(rd)
+    assert maps[NodeId('t')] == {}
+
+
+def test_build_coverage_maps_empty_when_no_glossary() -> None:
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[],
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn])
+    maps = build_coverage_maps(rd)
+    assert maps == {NodeId('t'): {}}
+
+
+def test_build_glossary_aggregations_empty_when_no_glossary() -> None:
+    rd = ReportData(metadata=_meta())
+    assert build_glossary_aggregations(rd) == {}
+
+
+def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
+    g = _g()
+    a = Activity(
+        id=ActivityId(1),
+        paths=(
+            ActivityPath(
+                parts=(
+                    _ent('guest', 'Alice'),
+                    ActivityTerm(term_id=TermId('search'), display='searches for'),
+                    _ent('room', 'Deluxe Suite'),
+                )
+            ),
+        ),
+    )
+    story = Story(id=StoryId('book'), title='Book', activities=(a,))
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='x',
+            parts=[
+                NarrationTermRef(term_id=TermId('guest'), display='Alice'),
+                NarrationTermRef(term_id=TermId('search'), display='searches'),
+                NarrationTermRef(term_id=TermId('room'), display='Deluxe Suite'),
+            ],
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[step],
+        story_id=StoryId('book'),
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    guest_agg = aggs[TermId('guest')]
+    assert 'Alice' in [i.display for i in guest_agg.instances]
+    room_agg = aggs[TermId('room')]
+    assert 'Deluxe Suite' in [i.display for i in room_agg.instances]
+    search_agg = aggs[TermId('search')]
+    forms = [f.display for f in search_agg.forms]
+    assert 'searches for' in forms
+    assert 'search' not in forms
+
+
+def test_build_glossary_aggregations_skips_unknown_term_in_scenario_narration() -> None:
+    """Defensive: a NarrationTermRef whose term_id isn't in the glossary is
+    silently skipped (the renderer also defensively falls back)."""
+    g = _g()
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='x',
+            parts=[
+                NarrationTermRef(term_id=TermId('missing'), display='X'),
+            ],
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[step],
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    # missing term has no aggregation entry.
+    assert TermId('missing') not in aggs
+
+
+def test_build_glossary_aggregations_walks_nested_steps() -> None:
+    g = _g()
+    inner = Step(
+        phase='when',
+        narration=Narration(
+            text='x',
+            parts=[
+                NarrationTermRef(term_id=TermId('guest'), display='Alice'),
+            ],
+        ),
+    )
+    outer = Step(phase='when', narration=Narration(text='y'), children=[inner])
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[outer],
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    assert 'Alice' in [i.display for i in aggs[TermId('guest')].instances]
+
+
+def test_build_glossary_aggregations_records_story_refs_via_activities() -> None:
+    g = _g()
+    a = Activity(
+        id=ActivityId(1),
+        paths=(
+            ActivityPath(
+                parts=(
+                    _ent('guest', 'Guest'),
+                    _verb_part('search'),
+                    _ent('room', 'Room'),
+                )
+            ),
+        ),
+    )
+    story = Story(id=StoryId('book'), title='Book', activities=(a,))
+    rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    assert aggs[TermId('guest')].stories == [StoryId('book')]
+    assert aggs[TermId('search')].stories == [StoryId('book')]
+
+
+def test_build_coverage_maps_empty_for_scenario_with_unknown_story_id() -> None:
+    """Scenario has a story_id that doesn't match any story in the report."""
+    g = _g()
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[],
+        story_id=StoryId('nonexistent'),
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
+    maps = build_coverage_maps(rd)
+    assert maps[NodeId('t')] == {}
+
+
+def test_build_glossary_aggregations_verb_in_step_not_collected_as_instance() -> None:
+    """A verb NarrationTermRef in a scenario step is skipped for instance
+    collection (verbs have no instances, only forms from activity paths)."""
+    g = _g()
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='x',
+            parts=[
+                NarrationTermRef(term_id=TermId('search'), display='searches'),
+            ],
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[step],
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    # Verb terms from scenario steps are not added to aggs as instances.
+    assert TermId('search') not in aggs
+
+
+def test_build_glossary_aggregations_skips_non_term_ref_narration_parts() -> None:
+    """NarrationLiteral / NarrationValue parts in a step are skipped."""
+    from pytest_given.model import NarrationLiteral
+
+    g = _g()
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='plain text step',
+            parts=[NarrationLiteral(value='plain text step')],
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[step],
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    assert aggs == {}
+
+
+def test_build_glossary_aggregations_skips_unknown_entity_in_activity() -> None:
+    """An ActivityEntity whose entity_id isn't in the glossary is silently skipped."""
+    g = _g()
+    a = Activity(
+        id=ActivityId(1),
+        paths=(
+            ActivityPath(
+                parts=(
+                    ActivityEntity(
+                        entity_id=TermId('unknown-entity'), display='Unknown'
+                    ),
+                )
+            ),
+        ),
+    )
+    story = Story(id=StoryId('s'), title='S', activities=(a,))
+    rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    assert TermId('unknown-entity') not in aggs
+
+
+def test_build_glossary_aggregations_skips_unknown_verb_in_activity() -> None:
+    """An ActivityTerm whose term_id isn't in the glossary is silently skipped."""
+    g = _g()
+    a = Activity(
+        id=ActivityId(1),
+        paths=(
+            ActivityPath(
+                parts=(ActivityTerm(term_id=TermId('unknown-verb'), display='unknown'),)
+            ),
+        ),
+    )
+    story = Story(id=StoryId('s'), title='S', activities=(a,))
+    rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    assert TermId('unknown-verb') not in aggs
+
+
+def test_glossary_aggregations_annotates_fixture_provenance() -> None:
+    g = _g()
+    fixture_step = Step(
+        phase='given',
+        narration=Narration(
+            text='our guest Alice',
+            parts=[
+                NarrationTermRef(term_id=TermId('guest'), display='Alice'),
+            ],
+        ),
+        fixture_name='alice',
+    )
+    body_step = Step(
+        phase='when',
+        narration=Narration(
+            text='Alice does',
+            parts=[
+                NarrationTermRef(term_id=TermId('guest'), display='Alice'),
+            ],
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[fixture_step, body_step],
+        story_id=StoryId('book'),
+    )
+    a = Activity(
+        id=ActivityId(1),
+        paths=(
+            ActivityPath(
+                parts=(
+                    _ent('guest', 'Guest'),
+                    _verb_part('search'),
+                    _ent('room', 'Room'),
+                )
+            ),
+        ),
+    )
+    story = Story(id=StoryId('book'), title='Book', activities=(a,))
+    rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    alice = next(i for i in aggs[TermId('guest')].instances if i.display == 'Alice')
+    assert alice.fixture_name == 'alice'
