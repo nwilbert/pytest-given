@@ -8,6 +8,7 @@ Three helpers are exposed:
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 from ..model import (
@@ -224,11 +225,9 @@ def _record_story_ref(
         agg.stories.append(story_id)
 
 
-def _walk_steps_flat(steps: list[Step]) -> list[Step]:
-    """Return all steps and their descendants in depth-first order."""
-    result: list[Step] = []
+def _walk_steps_flat(steps: list[Step]) -> Iterable[Step]:
+    """Yield all steps and their descendants in depth-first order."""
     for step in steps:
-        result.append(step)
+        yield step
         if step.children:
-            result.extend(_walk_steps_flat(step.children))
-    return result
+            yield from _walk_steps_flat(step.children)

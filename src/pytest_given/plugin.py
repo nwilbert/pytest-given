@@ -523,6 +523,8 @@ def _group_parameterized(
             steps=template_steps,
             parameters=ParameterTable(names=param_names, cases=cases),
             source=first.source,
+            story_id=first.story_id,
+            activity_ids=first.activity_ids,
         )
         result.append(merged)
 

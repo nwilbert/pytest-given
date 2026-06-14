@@ -35,9 +35,10 @@ def instance_id_of(
     term_id: TermId,
     display: str,
 ) -> str | None:
-    """None for the canonical display, otherwise the slug of the display."""
-    term = glossary[term_id]
-    if display == term.canonical:
+    """None for the canonical display (or an unknown term), otherwise the
+    slug of the display."""
+    term = glossary.get(term_id)
+    if term is None or display == term.canonical:
         return None
     return id_derive(display)
 
@@ -120,23 +121,26 @@ def compute_coverage(
         else {a.id for a in story.activities}
     )
     activities_in_scope = [a for a in story.activities if a.id in scope]
+    refs_by_activity: dict[ActivityId, set[Identity] | None] = {
+        a.id: a_refs(glossary, a) for a in activities_in_scope
+    }
     result: dict[ActivityId, set[StepRef]] = {}
     for path_index, step in _walk_steps(scenario):
         ref: StepRef = (scenario.id, path_index)
+        s_cache: set[Identity] | None = None
         for activity in activities_in_scope:
-            if _step_covers(glossary, step, activity):
+            if step.activity_ids:
+                if activity.id in step.activity_ids:
+                    result.setdefault(activity.id, set()).add(ref)
+                continue
+            refs = refs_by_activity[activity.id]
+            if refs is None:
+                continue
+            if s_cache is None:
+                s_cache = s_for_step(glossary, step)
+            if refs.issubset(s_cache):
                 result.setdefault(activity.id, set()).add(ref)
     return result
-
-
-def _step_covers(glossary: Glossary, step: Step, activity: Activity) -> bool:
-    if step.activity_ids:
-        return activity.id in step.activity_ids
-    refs = a_refs(glossary, activity)
-    if refs is None:
-        return False
-    s = s_for_step(glossary, step)
-    return refs.issubset(s)
 
 
 def _walk_steps(

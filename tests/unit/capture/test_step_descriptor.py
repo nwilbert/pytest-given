@@ -4,6 +4,7 @@ from pytest_given import Template
 from pytest_given.capture.collector import Collector, set_active_collector
 from pytest_given.capture.decorators import (
     StepDescriptor,
+    _normalize_activity,
     attach,
     given,
     scenario,
@@ -583,6 +584,21 @@ def test_scenario_decorator_defaults_story_none_and_activities_empty():
 def test_scenario_decorator_rejects_non_story_object():
     with pytest.raises(PytestGivenError, match='Story instance'):
         scenario('test', story='not-a-story')  # type: ignore[arg-type]
+
+
+def test_normalize_activity_rejects_str():
+    with pytest.raises(TypeError, match='int or a Sequence'):
+        _normalize_activity('3')  # type: ignore[arg-type]
+
+
+def test_normalize_activity_rejects_bool():
+    with pytest.raises(TypeError, match='int or a Sequence'):
+        _normalize_activity(True)  # type: ignore[arg-type]
+
+
+def test_normalize_activity_rejects_non_int_in_sequence():
+    with pytest.raises(TypeError, match='must contain int values'):
+        _normalize_activity((1, 'x'))  # type: ignore[list-item]
 
 
 def test_step_check_activity_scope_raises_when_aid_not_in_story_no_scope() -> None:

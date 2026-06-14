@@ -130,6 +130,11 @@ def activity(
         for g in getattr(p, '_glossaries', ()):
             seen.setdefault(_obj_id(g), g)
     glossary_objects = tuple(seen.values())
+    if id == 0:
+        raise PytestGivenError(
+            'activity(id=0) is reserved as the unset sentinel; '
+            'use id=1.. or omit to take the auto-assigned sequence number.'
+        )
     a = Activity(id=ActivityId(id if id is not None else 0), paths=paths)
     object.__setattr__(a, '_glossary_ids', glossary_ids)
     object.__setattr__(a, '_glossaries', glossary_objects)

@@ -166,6 +166,8 @@ class StepDescriptor:
                 if sig is not None
                 else self.narration
             )
+            if self.activity_ids:
+                self._check_activity_scope(collector)
             collector.push_step(self.phase, narration, activity_ids=self.activity_ids)
             try:
                 return func(*args, **kwargs)
@@ -239,6 +241,10 @@ def _normalize_activity(
     """Normalize the ``activity=`` kwarg to a tuple of ActivityId values."""
     if activity is None:
         return ()
+    if isinstance(activity, bool | str):
+        raise TypeError(
+            f'activity must be an int or a Sequence[int], got {type(activity)!r}'
+        )
     if isinstance(activity, int):
         return (ActivityId(activity),)
     if isinstance(activity, Sequence):

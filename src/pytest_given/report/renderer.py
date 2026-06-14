@@ -243,6 +243,28 @@ def _make_narration_filter(
     return _render
 
 
+_TERM_KIND_CLASSES = {
+    'actor': 'term-ref-actor',
+    'object': 'term-ref-object',
+    'verb': 'term-ref-verb',
+}
+
+
+def _term_pill(
+    *,
+    classes: list[str],
+    display: str,
+    term_id: str | None = None,
+    title: str = '',
+) -> str:
+    attrs = [f'class="{" ".join(classes)}"']
+    if term_id is not None:
+        attrs.append(f'data-term-id="{escape(term_id)}"')
+    if title:
+        attrs.append(f'title="{escape(title)}"')
+    return f'<span {" ".join(attrs)}>{escape(display)}</span>'
+
+
 def _render_term_ref(
     part: NarrationTermRef,
     glossary: Glossary | None,
@@ -251,22 +273,15 @@ def _render_term_ref(
     term = glossary.get(part.term_id) if glossary is not None else None
     if term is None:
         return str(escape(part.display))
-    kind_class = {
-        'actor': 'term-ref-actor',
-        'object': 'term-ref-object',
-        'verb': 'term-ref-verb',
-    }[term.kind]
-    classes = [kind_class]
+    classes = [_TERM_KIND_CLASSES[term.kind]]
     if part.param_column is not None:
         color_idx = param_color_map.get(part.param_column, 0) % _NUM_PARAM_COLORS
         classes.append(f'param-color-{color_idx}')
-    safe_term_id = escape(part.term_id)
-    title = escape(term.definition or '')
-    return (
-        f'<span class="{" ".join(classes)}" '
-        f'data-term-id="{safe_term_id}" '
-        f'title="{title}"'
-        f'>{escape(part.display)}</span>'
+    return _term_pill(
+        classes=classes,
+        display=part.display,
+        term_id=part.term_id,
+        title=term.definition or '',
     )
 
 
@@ -293,33 +308,36 @@ def _make_activity_part_filter(
         match part:
             case ActivityEntity(entity_id=tid, display=display):
                 term = glossary.get(tid) if glossary else None
-                if term and term.kind == 'actor':
-                    kind_class = 'term-ref-actor'
-                elif term and term.kind == 'object':
-                    kind_class = 'term-ref-object'
-                else:
-                    kind_class = 'term-ref-unknown'
+                kind_class = (
+                    _TERM_KIND_CLASSES[term.kind]
+                    if term is not None
+                    else 'term-ref-unknown'
+                )
                 return Markup(
-                    f'<span class="{kind_class}" data-term-id="{escape(tid)}"'
-                    f' title="{escape(term.definition if term else "")}">'
-                    f'{escape(display)}</span>'
+                    _term_pill(
+                        classes=[kind_class],
+                        display=display,
+                        term_id=tid,
+                        title=term.definition if term else '',
+                    )
                 )
             case ActivityTerm(term_id=tid, display=display):
                 return Markup(
-                    f'<span class="term-ref-verb" data-term-id="{escape(tid)}">'
-                    f'{escape(display)}</span>'
+                    _term_pill(
+                        classes=[_TERM_KIND_CLASSES['verb']],
+                        display=display,
+                        term_id=tid,
+                    )
                 )
             case ActivityWord(text=text):
                 return Markup(f'<span class="activity-word">{escape(text)}</span>')
             case ActivityPlaceholder(kind=kind, text=text):
-                cls = {
-                    'actor': 'term-ref-actor is-draft',
-                    'object': 'term-ref-object is-draft',
-                    'verb': 'term-ref-verb is-draft',
-                }[kind]
-                title = 'Draft — promote to glossary to lock in'
                 return Markup(
-                    f'<span class="{cls}" title="{title}">{escape(text)}</span>'
+                    _term_pill(
+                        classes=[_TERM_KIND_CLASSES[kind], 'is-draft'],
+                        display=text,
+                        title='Draft — promote to glossary to lock in',
+                    )
                 )
 
     return _render

@@ -1235,6 +1235,29 @@ def test_step_activity_outside_scenario_scope_raises(pytester):
     result.stdout.fnmatch_lines(['*step activity*2*outside scenario scope*'])
 
 
+def test_decorator_form_helper_step_with_activity_validates_scope(pytester):
+    pytester.makepyfile("""
+        from pytest_given import Glossary, activity, given, scenario, story
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Book', activities=(activity(guest, search, room),))
+
+        @given('a setup', activity=99)
+        def helper():
+            return None
+
+        @scenario('x', story=s)
+        def test_x():
+            helper()
+    """)
+    result = pytester.runpytest()
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*step activity=99 not in story*'])
+
+
 def test_step_activity_without_scenario_story_raises(pytester):
     pytester.makepyfile("""
         from pytest_given import given, scenario

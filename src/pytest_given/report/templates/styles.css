@@ -45,7 +45,8 @@ body {
   background: var(--bg-page);
   color: var(--text-primary);
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   font-size: var(--font-size-base);
   line-height: 1.5;
 }
@@ -54,19 +55,12 @@ body {
 .sidebar {
   width: 260px;
   background: var(--bg-sidebar);
-  border-right: 1px solid var(--border);
   padding: var(--space-lg);
   flex-shrink: 0;
   overflow-y: auto;
   max-height: 100vh;
   position: sticky;
   top: 0;
-}
-.sidebar-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: var(--space-lg);
 }
 /* Search box (wraps input + icons) */
 .search-box {
@@ -202,7 +196,21 @@ body {
 .nav-status-icon { font-size: 0.625rem; }
 
 /* === Main === */
-.main { flex: 1; padding: var(--space-xl); overflow-y: auto; }
+.main {
+  flex: 1;
+  padding: var(--space-xl);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+/* View layout: sticky .sidebar (260px) + .view-main with consistent padding.
+   The layout grows to fill remaining vertical space so the sidebar stretches
+   to a consistent height across views regardless of content size. */
+#view-scenarios,
+#view-stories,
+#view-glossary { flex: 1; min-height: 0; display: flex; }
+.view-layout { display: flex; flex: 1; min-height: 0; }
+.view-main { flex: 1; min-width: 0; min-height: 0; padding: var(--space-xl); overflow-y: auto; }
 .header {
   margin-bottom: var(--space-xl);
   padding-bottom: var(--space-lg);
@@ -214,7 +222,6 @@ body {
   font-weight: 500;
 }
 .header-title { font-size: var(--font-size-lg); font-weight: 600; }
-.header-meta { color: var(--text-muted); font-size: var(--font-size-sm); }
 .collapse-all-btn {
   background: none;
   border: none;
@@ -578,6 +585,24 @@ span.param-highlight {
   color: var(--text-secondary);
 }
 
+/* === Topbar === */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+.topbar-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.topbar-meta {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
 /* === Tab strip === */
 :root {
   --color-mixed: #ca8a04;
@@ -586,7 +611,6 @@ span.param-highlight {
 .frame-nav {
   display: flex;
   gap: var(--space-xs);
-  margin-bottom: var(--space-lg);
   border-bottom: 2px solid var(--border);
   padding-bottom: 0;
 }
@@ -609,15 +633,6 @@ span.param-highlight {
 }
 
 /* === Story layout === */
-.stories-layout {
-  display: flex;
-  gap: var(--space-xl);
-}
-.story-sidebar {
-  width: 220px;
-  flex-shrink: 0;
-}
-.story-main { flex: 1; }
 .story-sidebar-item {
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-md);
@@ -633,9 +648,6 @@ span.param-highlight {
 }
 .story-sidebar-title { font-weight: 600; font-size: var(--font-size-md); }
 .story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
-.story-head { margin-bottom: var(--space-lg); }
-.story-title { font-size: var(--font-size-lg); font-weight: 600; margin-bottom: var(--space-xs); }
-.story-stats { font-size: var(--font-size-sm); color: var(--text-muted); }
 
 /* === Activity timeline === */
 .activity-timeline { display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-xl); }
@@ -707,21 +719,6 @@ span.param-highlight {
 }
 .scn-act-label { color: var(--text-muted); font-weight: 600; }
 .scn-act-strip-section { margin-top: var(--space-xl); }
-
-/* === Glossary layout === */
-.glossary-layout { display: flex; }
-.glossary-layout .sidebar {
-  width: 260px;
-  background: var(--bg-sidebar);
-  border-right: 1px solid var(--border);
-  padding: var(--space-lg);
-  flex-shrink: 0;
-  overflow-y: auto;
-  max-height: 100vh;
-  position: sticky;
-  top: 0;
-}
-.glossary-layout .main { flex: 1; padding: var(--space-xl); overflow-y: auto; }
 
 /* Kind filter rows in sidebar */
 .kind-filter-row {

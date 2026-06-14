@@ -10,67 +10,7 @@
 </head>
 <body x-data="reportApp()">
 
-<div class="sidebar">
-  <div class="sidebar-title">{{ metadata.project }}</div>
-  <label class="search-box">
-    <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    <input type="text" placeholder="Search scenarios..." x-model="search">
-    <button type="button" class="search-box-clear" @click="search = ''" x-show="search" aria-label="Clear search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-    </button>
-  </label>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Status</div>
-    <div class="status-pills">
-      <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
-      <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
-      <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Browse by</div>
-    <div class="view-toggle">
-      <div class="view-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
-      <div class="view-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
-    </div>
-    <div class="nav-tree">
-      <template x-for="group in groups" :key="group.name">
-        <div>
-          <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
-            <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
-            <span class="nav-group-name" x-text="group.name"></span>
-            <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
-            <span class="nav-group-count" x-text="group.scenarios.length"></span>
-          </div>
-          <template x-if="expandedGroups[group.name]">
-            <div>
-              <template x-for="s in group.scenarios" :key="s.id">
-                <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
-                  <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
-                  <span x-text="s.narration.text"></span>
-                </div>
-              </template>
-            </div>
-          </template>
-        </div>
-      </template>
-    </div>
-  </div>
-</div>
-
 <div class="main">
-  <div class="header">
-    <div style="display:flex; justify-content:space-between; align-items:baseline;">
-      <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-        <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
-        <div class="header-context" x-text="filterSummary"></div>
-        <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
-      </div>
-      <div class="header-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · <span x-text="formattedTimestamp"></span></div>
-    </div>
-  </div>
 
   {%- macro render_error(error) -%}
     {%- set internal_count = error.frames | selectattr('is_internal') | list | length -%}
@@ -134,6 +74,11 @@
   {%- endif -%}
   {%- endmacro -%}
 
+  <header class="topbar">
+    <div class="topbar-title">{{ metadata.project }}</div>
+    <div class="topbar-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · <span x-text="formattedTimestamp"></span></div>
+  </header>
+
   {% if tab_visibility.scenarios or tab_visibility.stories or tab_visibility.glossary %}
   {% set visible_count = (tab_visibility.scenarios|int) + (tab_visibility.stories|int) + (tab_visibility.glossary|int) %}
   {% if visible_count > 1 %}
@@ -156,6 +101,63 @@
   {% endif %}
 
   <div id="view-scenarios" x-show="mainView === 'scenarios'">
+  <div class="view-layout">
+  <div class="sidebar">
+    <label class="search-box">
+      <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" placeholder="Search scenarios..." x-model="search">
+      <button type="button" class="search-box-clear" @click="search = ''" x-show="search" aria-label="Clear search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </label>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Status</div>
+      <div class="status-pills">
+        <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
+        <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
+        <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Browse by</div>
+      <div class="view-toggle">
+        <div class="view-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
+        <div class="view-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+      </div>
+      <div class="nav-tree">
+        <template x-for="group in groups" :key="group.name">
+          <div>
+            <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
+              <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
+              <span class="nav-group-name" x-text="group.name"></span>
+              <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
+              <span class="nav-group-count" x-text="group.scenarios.length"></span>
+            </div>
+            <template x-if="expandedGroups[group.name]">
+              <div>
+                <template x-for="s in group.scenarios" :key="s.id">
+                  <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
+                    <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
+                    <span x-text="s.narration.text"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+  <div class="view-main">
+  <div class="header">
+    <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+      <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
+      <div class="header-context" x-text="filterSummary"></div>
+      <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
+    </div>
+  </div>
 
   {% for scenario in scenarios %}
   {%- set has_body = scenario.steps or scenario.parameters or scenario.error or scenario.skip_reason -%}
@@ -256,12 +258,15 @@
   </div>
   {% endfor %}
 
+  </div>{# end .view-main #}
+  </div>{# end .view-layout #}
   </div>{# end #view-scenarios #}
 
   <div id="view-stories" x-show="mainView === 'stories'" x-cloak>
   {% if stories %}
-  <div class="stories-layout">
-    <div class="story-sidebar">
+  <div class="view-layout">
+    <div class="sidebar">
+      <div class="sidebar-label">Stories</div>
       {% for story in stories %}
       {% set scns = scenarios_for_story.get(story.id, []) %}
       <div class="story-sidebar-item" :class="{ active: selectedStory === '{{ story.id }}' }"
@@ -271,14 +276,14 @@
       </div>
       {% endfor %}
     </div>
-    <div class="story-main">
+    <div class="view-main">
       {% for story in stories %}
       <div x-show="selectedStory === '{{ story.id }}'">
-        <div class="story-head">
-          <div class="story-title">{{ story.title }}</div>
-          <div class="story-stats">
+        <div class="header">
+          <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+            <div class="header-title">{{ story.title }}</div>
             {% set story_scns = scenarios_for_story.get(story.id, []) %}
-            {{ story.activities | length }} activities · {{ story_scns | length }} scenario{{ 's' if story_scns | length != 1 else '' }}
+            <div class="header-context">{{ story.activities | length }} activities · {{ story_scns | length }} scenario{{ 's' if story_scns | length != 1 else '' }}</div>
           </div>
         </div>
         <div class="activity-timeline">
@@ -309,7 +314,7 @@
               {% for scn in scenarios_for_story.get(story.id, []) %}
               {% if scn.id in cov.scenario_ids %}
               <a class="use-chip use-chip-{{ scn.status }}"
-                 href="#" @click.prevent="view = 'scenarios'; $nextTick(() => scrollToAndExpand('{{ scn.id }}'))">
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('{{ scn.id }}'))">
                 <span class="dot-{{ scn.status }}">{{ '✓' if scn.status == 'passed' else ('✗' if scn.status == 'failed' else '○') }}</span>
                 {{ scn.narration.text | truncate(30) }}
               </a>
@@ -323,8 +328,10 @@
           {% for scn in scenarios_for_story.get(story.id, []) %}
           <div class="scenario {{ scn.status }}" style="margin-bottom: var(--space-sm);">
             <div class="scenario-header scenario-header-empty">
-              <span class="scenario-chevron-placeholder"></span>
-              <span class="scenario-name">{{ scn.narration.text }}</span>
+              <div style="display:flex; align-items:center;">
+                <span class="scenario-chevron-placeholder"></span>
+                <span class="scenario-name">{{ scn.narration.text }}</span>
+              </div>
               <span class="scenario-meta">
                 <span class="scenario-status {{ scn.status }}">
                   {{ '✓ passed' if scn.status == 'passed' else ('✗ failed' if scn.status == 'failed' else '○ skipped') }}
@@ -350,7 +357,7 @@
   </div>
   <div id="view-glossary" x-show="mainView === 'glossary'" x-cloak>
   {% if glossary %}
-  <div class="glossary-layout">
+  <div class="view-layout">
     <div class="sidebar">
       <label class="search-box">
         <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -386,20 +393,18 @@
       </div>
     </div>
 
-    <div class="main">
+    <div class="view-main">
       <div class="header">
-        <div style="display:flex; justify-content:space-between; align-items:baseline;">
-          <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-            <div class="header-title">Glossary</div>
-            <div class="header-context">
-              {{ glossary.terms | length }} terms ·
-              {{ actor_count }} actor{{ 's' if actor_count != 1 else '' }} ·
-              {{ object_count }} work object{{ 's' if object_count != 1 else '' }} ·
-              {{ verb_count }} verb{{ 's' if verb_count != 1 else '' }}
-            </div>
-            <button class="collapse-all-btn" @click="toggleAllTerms()"
-                    x-text="anyTermsExpanded ? 'Collapse all references ↑' : 'Expand all references ↓'"></button>
+        <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+          <div class="header-title">Glossary</div>
+          <div class="header-context">
+            {{ glossary.terms | length }} terms ·
+            {{ actor_count }} actor{{ 's' if actor_count != 1 else '' }} ·
+            {{ object_count }} work object{{ 's' if object_count != 1 else '' }} ·
+            {{ verb_count }} verb{{ 's' if verb_count != 1 else '' }}
           </div>
+          <button class="collapse-all-btn" @click="toggleAllTerms()"
+                  x-text="anyTermsExpanded ? 'Collapse all references ↑' : 'Expand all references ↓'"></button>
         </div>
       </div>
 
@@ -425,8 +430,9 @@
               <div class="entry-def">{{ term.definition if term.definition else '' }}<span class="entry-def-placeholder" {% if term.definition %}style="display:none"{% endif %}>No definition yet.</span></div>
               <div class="entry-summary">
                 {% if agg %}
-                  {% if kind_key in ('actor', 'object') and agg.instances %}{{ agg.instances | length }} instance{{ 's' if agg.instances | length != 1 else '' }}{% endif %}
-                  {% if agg.stories %} · used in {{ agg.stories | length }} stor{{ 'ies' if agg.stories | length != 1 else 'y' }}{% endif %}
+                {% set show_instances = kind_key in ('actor', 'object') and agg.instances %}
+                {% if show_instances %}{{ agg.instances | length }} instance{{ 's' if agg.instances | length != 1 else '' }}{% endif %}
+                {% if agg.stories %}{% if show_instances %} · {% endif %}used in {{ agg.stories | length }} stor{{ 'ies' if agg.stories | length != 1 else 'y' }}{% endif %}
                 {% endif %}
               </div>
             </div>
@@ -438,7 +444,7 @@
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   {% for sid in agg.stories %}
-                  <a class="use-chip" href="#" @click.prevent="view = 'stories'; selectedStory = '{{ sid }}'">{{ sid }}</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = '{{ sid }}'">{{ sid }}</a>
                   {% endfor %}
                 </div>
                 {% endif %}

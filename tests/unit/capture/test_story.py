@@ -224,6 +224,11 @@ def test_activity_explicit_id_overrides_default(guest, search, room):
     assert a.id == 7
 
 
+def test_activity_explicit_id_zero_raises(guest, search, room):
+    with pytest.raises(PytestGivenError, match=r'id=0.*reserved'):
+        activity(guest, search, room, id=0)
+
+
 def test_activity_explicit_id_with_multipath(guest, search, room):
     p1 = path(guest, search, room)
     p2 = path(guest('Bob'), search, room)
