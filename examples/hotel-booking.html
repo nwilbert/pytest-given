@@ -922,7 +922,7 @@ span.param-highlight {
     <div class="scenario-header" @click="toggleScenario(0)">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span>
-        <span class="scenario-name">Alice books a shared room with Bob</span>
+        <span class="scenario-name">Carol picks a suite for the group</span>
         
       </div>
       <span class="scenario-meta">
@@ -937,21 +937,15 @@ span.param-highlight {
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">our guest Alice</div>
+            <div class="step-text">our organizer <span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span></div>
           </div><div class="phase-steps">
-            <div class="step-text">our guest Bob</div>
+            <div class="step-text">the <span class="term-ref-object" data-term-id="room" title="A bookable hotel room.">Deluxe Suite</span> is listed as available</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Alice</span> <span class="term-ref-verb" data-term-id="search" title="Look up available options.">searches for</span> a <span class="term-ref-object" data-term-id="room" title="A bookable hotel room.">Room</span></div>
+            <div class="step-text"><span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span> <span class="term-ref-verb" data-term-id="search" title="Look up available options.">searches for</span> a <span class="term-ref-object" data-term-id="room" title="A bookable hotel room.">Room</span></div>
           </div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Alice</span> <span class="term-ref-verb" data-term-id="select" title="Choose one option from a set.">selects</span> the <span class="term-ref-object" data-term-id="room" title="A bookable hotel room.">Deluxe Suite</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Alice</span> <span class="term-ref-verb" data-term-id="submit" title="Send to the system for processing.">submits</span> the <span class="term-ref-object" data-term-id="payment" title="Money transferred for a booking.">Payment</span></div>
+            <div class="step-text"><span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span> <span class="term-ref-verb" data-term-id="select" title="Choose one option from a set.">selects</span> the <span class="term-ref-object" data-term-id="room" title="A bookable hotel room.">Deluxe Suite</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation system.">Booking System</span> <span class="term-ref-verb" data-term-id="confirm" title="Finalize and acknowledge.">confirms</span> the <span class="term-ref-object" data-term-id="booking" title="A reservation for a room.">Booking</span> for <span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Alice</span> and <span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Bob</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation system.">Booking System</span> <span class="term-ref-verb" data-term-id="send" title="Deliver to a recipient.">sends</span> a <span class="term-ref-object" data-term-id="confirmation" title="Notification of a successful booking.">Confirmation</span> to <span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Alice</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation system.">Booking System</span> <span class="term-ref-verb" data-term-id="send" title="Deliver to a recipient.">sends</span> a <span class="term-ref-object" data-term-id="confirmation" title="Notification of a successful booking.">Confirmation</span> to <span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Bob</span></div>
+            <div class="step-text">the <span class="term-ref-object" data-term-id="room" title="A bookable hotel room.">Deluxe Suite</span> is held for <span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span></div>
           </div></div>
 
       
@@ -959,7 +953,103 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/76e35fb374df2e77422dc399a24171f7596e804f/examples/test_hotel_booking.py#L76">examples/test_hotel_booking.py:76</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e95ce5bcf00ca2dc40bb0e8d0c0d1bf118405761/examples/test_hotel_booking.py#L124">examples/test_hotel_booking.py:124</a></div>
+      
+    </div>
+    </div>
+  </div>
+  <div class="scenario passed"
+       x-show="isVisible(1)"
+       :id="'scenario-' + 1"
+       :class="{ 'scenario-expanded': expandedScenarios[1] }">
+    <div class="scenario-header" @click="toggleScenario(1)">
+      <div style="display:flex; align-items:center;">
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span>
+        <span class="scenario-name">Carol completes the booking for both guests</span>
+        
+      </div>
+      <span class="scenario-meta">
+        <span class="scenario-status passed">
+          ✓ passed
+        </span>
+        <span class="scenario-duration">0ms</span>
+      </span>
+    </div>
+
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[1] }">
+    <div class="scenario-body-inner">
+      
+      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
+            <div class="step-text">our organizer <span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span></div>
+          </div><div class="phase-steps">
+            <div class="step-text">our guest <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Alice</span></div>
+          </div><div class="phase-steps">
+            <div class="step-text">our guest <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Bob</span></div>
+          </div><div class="phase-steps">
+            <div class="step-text"><span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span> has <span class="term-ref-verb" data-term-id="select" title="Choose one option from a set.">selected</span> the <span class="term-ref-object" data-term-id="room" title="A bookable hotel room.">Deluxe Suite</span></div>
+          </div><div class="phase-label">When</div><div class="phase-steps">
+            <div class="step-text"><span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span> <span class="term-ref-verb" data-term-id="add" title="Attach a member to a collection.">adds</span> <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Alice</span> and <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Bob</span> to the <span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span></div>
+          </div><div class="phase-steps">
+            <div class="step-text"><span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span> <span class="term-ref-verb" data-term-id="submit" title="Send to the system for processing.">submits</span> the <span class="term-ref-object" data-term-id="payment" title="Money transferred for a booking.">Payment</span> for the <span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span></div>
+          </div><div class="phase-label">Then</div><div class="phase-steps">
+            <div class="step-text">the <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span> <span class="term-ref-verb" data-term-id="confirm" title="Finalize and acknowledge.">confirms</span> the <span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span></div>
+          </div><div class="phase-steps">
+            <div class="step-text">the <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span> <span class="term-ref-verb" data-term-id="send" title="Deliver to a recipient.">sends</span> the <span class="term-ref-object" data-term-id="confirmation" title="Notification of a successful booking.">Confirmation</span> to <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Alice</span> and <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Bob</span></div>
+          </div></div>
+
+      
+
+      
+
+      
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e95ce5bcf00ca2dc40bb0e8d0c0d1bf118405761/examples/test_hotel_booking.py#L138">examples/test_hotel_booking.py:138</a></div>
+      
+    </div>
+    </div>
+  </div>
+  <div class="scenario passed"
+       x-show="isVisible(2)"
+       :id="'scenario-' + 2"
+       :class="{ 'scenario-expanded': expandedScenarios[2] }">
+    <div class="scenario-header" @click="toggleScenario(2)">
+      <div style="display:flex; align-items:center;">
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span>
+        <span class="scenario-name">Payment is declined — the booking is not finalized</span>
+        
+      </div>
+      <span class="scenario-meta">
+        <span class="scenario-status passed">
+          ✓ passed
+        </span>
+        <span class="scenario-duration">0ms</span>
+      </span>
+    </div>
+
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[2] }">
+    <div class="scenario-body-inner">
+      
+      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
+            <div class="step-text">our organizer <span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span></div>
+          </div><div class="phase-steps">
+            <div class="step-text">our guest <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Alice</span></div>
+          </div><div class="phase-steps">
+            <div class="step-text">our guest <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Bob</span></div>
+          </div><div class="phase-steps">
+            <div class="step-text"><span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span> has <span class="term-ref-verb" data-term-id="add" title="Attach a member to a collection.">added</span> <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Alice</span> and <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Bob</span> to the <span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span></div>
+          </div><div class="phase-label">When</div><div class="phase-steps">
+            <div class="step-text"><span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span> <span class="term-ref-verb" data-term-id="submit" title="Send to the system for processing.">submits</span> the <span class="term-ref-object" data-term-id="payment" title="Money transferred for a booking.">Payment</span> for the <span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span></div>
+          </div><div class="phase-label">Then</div><div class="phase-steps">
+            <div class="step-text">the <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span> <span class="term-ref-verb" data-term-id="reject" title="Refuse to process or accept.">rejects</span> the <span class="term-ref-object" data-term-id="payment" title="Money transferred for a booking.">Payment</span> because of insufficient funds</div>
+          </div><div class="phase-steps">
+            <div class="step-text">the <span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span> stays pending and no <span class="term-ref-object" data-term-id="confirmation" title="Notification of a successful booking.">Confirmation</span> is sent to <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Alice</span> or <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Bob</span></div>
+          </div></div>
+
+      
+
+      
+
+      
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e95ce5bcf00ca2dc40bb0e8d0c0d1bf118405761/examples/test_hotel_booking.py#L171">examples/test_hotel_booking.py:171</a></div>
       
     </div>
     </div>
@@ -977,33 +1067,33 @@ span.param-highlight {
       <div class="sidebar-label">Stories</div>
       
       
-      <div class="story-sidebar-item" :class="{ active: selectedStory === 'book-a-shared-room' }"
-           @click="selectedStory = 'book-a-shared-room'">
-        <div class="story-sidebar-title">Book a Shared Room</div>
-        <div class="story-sidebar-meta">7 activities · 1 scenario</div>
+      <div class="story-sidebar-item" :class="{ active: selectedStory === 'book-a-group-trip' }"
+           @click="selectedStory = 'book-a-group-trip'">
+        <div class="story-sidebar-title">Book a Group Trip</div>
+        <div class="story-sidebar-meta">7 activities · 3 scenarios</div>
       </div>
       
     </div>
     <div class="view-main">
       
-      <div x-show="selectedStory === 'book-a-shared-room'">
+      <div x-show="selectedStory === 'book-a-group-trip'">
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-            <div class="header-title">Book a Shared Room</div>
+            <div class="header-title">Book a Group Trip</div>
             
-            <div class="header-context">7 activities · 1 scenario</div>
+            <div class="header-context">7 activities · 3 scenarios</div>
           </div>
         </div>
         <div class="activity-timeline">
           
           
           
-          <div class="activity-row" id="activity-book-a-shared-room-1">
+          <div class="activity-row" id="activity-book-a-group-trip-1">
             <div class="activity-num">1</div>
             <div class="activity-body">
               
               <div class="activity-path">
-                <span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Guest</span><span class="term-ref-verb" data-term-id="search">searches for</span><span class="term-ref-object" data-term-id="room" title="A bookable hotel room.">Room</span>
+                <span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Organizer</span><span class="term-ref-verb" data-term-id="search">searches for</span><span class="term-ref-object" data-term-id="room" title="A bookable hotel room.">Room</span>
               </div>
               
             </div>
@@ -1016,10 +1106,14 @@ span.param-highlight {
               
               
               <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_book_shared'))">
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_pick_suite'))">
                 <span class="dot-passed">✓</span>
-                Alice books a shared room with Bob
+                Carol picks a suite for the group
               </a>
+              
+              
+              
+              
               
               
             </div>
@@ -1027,28 +1121,38 @@ span.param-highlight {
           
           
           
-          <div class="activity-row" id="activity-book-a-shared-room-2">
+          <div class="activity-row" id="activity-book-a-group-trip-2">
             <div class="activity-num">2</div>
             <div class="activity-body">
               
               <div class="activity-path">
-                <span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Alice</span><span class="term-ref-verb" data-term-id="select">selects</span><span class="term-ref-object" data-term-id="room" title="A bookable hotel room.">Deluxe Suite</span>
+                <span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span><span class="term-ref-verb" data-term-id="select">selects</span><span class="term-ref-object" data-term-id="room" title="A bookable hotel room.">Deluxe Suite</span>
               </div>
               
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">1/1</span>
+              <span class="cov-chip cov-passed">2/2</span>
               
             </div>
             <div class="activity-badges">
               
               
               <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_book_shared'))">
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_pick_suite'))">
                 <span class="dot-passed">✓</span>
-                Alice books a shared room with Bob
+                Carol picks a suite for the group
               </a>
+              
+              
+              
+              <a class="use-chip use-chip-passed"
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_complete_booking'))">
+                <span class="dot-passed">✓</span>
+                Carol completes the...
+              </a>
+              
+              
               
               
             </div>
@@ -1056,27 +1160,41 @@ span.param-highlight {
           
           
           
-          <div class="activity-row" id="activity-book-a-shared-room-3">
+          <div class="activity-row" id="activity-book-a-group-trip-3">
             <div class="activity-num">3</div>
             <div class="activity-body">
               
               <div class="activity-path">
-                <span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Alice</span><span class="term-ref-verb" data-term-id="submit">submits</span><span class="term-ref-object" data-term-id="payment" title="Money transferred for a booking.">Payment</span>
+                <span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span><span class="term-ref-verb" data-term-id="add">adds</span><span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Alice</span><span class="activity-word">to</span><span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span>
+              </div>
+              
+              <div class="activity-path">
+                <span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span><span class="term-ref-verb" data-term-id="add">adds</span><span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Bob</span><span class="activity-word">to</span><span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span>
               </div>
               
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">1/1</span>
+              <span class="cov-chip cov-passed">2/2</span>
               
             </div>
             <div class="activity-badges">
               
               
+              
+              
               <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_book_shared'))">
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_complete_booking'))">
                 <span class="dot-passed">✓</span>
-                Alice books a shared room with Bob
+                Carol completes the...
+              </a>
+              
+              
+              
+              <a class="use-chip use-chip-passed"
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_payment_declined'))">
+                <span class="dot-passed">✓</span>
+                Payment is declined — the...
               </a>
               
               
@@ -1085,27 +1203,37 @@ span.param-highlight {
           
           
           
-          <div class="activity-row" id="activity-book-a-shared-room-4">
+          <div class="activity-row" id="activity-book-a-group-trip-4">
             <div class="activity-num">4</div>
             <div class="activity-body">
               
               <div class="activity-path">
-                <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation system.">Booking System</span><span class="term-ref-verb" data-term-id="confirm">confirms</span><span class="term-ref-object" data-term-id="booking" title="A reservation for a room.">Booking</span><span class="activity-word">for</span><span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Alice</span><span class="activity-word">and</span><span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Bob</span>
+                <span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span><span class="term-ref-verb" data-term-id="submit">submits</span><span class="term-ref-object" data-term-id="payment" title="Money transferred for a booking.">Payment</span><span class="activity-word">for</span><span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span>
               </div>
               
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">1/1</span>
+              <span class="cov-chip cov-passed">2/2</span>
               
             </div>
             <div class="activity-badges">
               
               
+              
+              
               <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_book_shared'))">
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_complete_booking'))">
                 <span class="dot-passed">✓</span>
-                Alice books a shared room with Bob
+                Carol completes the...
+              </a>
+              
+              
+              
+              <a class="use-chip use-chip-passed"
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_payment_declined'))">
+                <span class="dot-passed">✓</span>
+                Payment is declined — the...
               </a>
               
               
@@ -1114,12 +1242,12 @@ span.param-highlight {
           
           
           
-          <div class="activity-row" id="activity-book-a-shared-room-5">
+          <div class="activity-row" id="activity-book-a-group-trip-5">
             <div class="activity-num">5</div>
             <div class="activity-body">
               
               <div class="activity-path">
-                <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation system.">Booking System</span><span class="term-ref-verb" data-term-id="send">sends</span><span class="term-ref-object" data-term-id="confirmation" title="Notification of a successful booking.">Confirmation</span><span class="activity-word">to</span><span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Alice</span>
+                <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span><span class="term-ref-verb" data-term-id="confirm">confirms</span><span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span>
               </div>
               
             </div>
@@ -1131,11 +1259,15 @@ span.param-highlight {
             <div class="activity-badges">
               
               
+              
+              
               <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_book_shared'))">
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_complete_booking'))">
                 <span class="dot-passed">✓</span>
-                Alice books a shared room with Bob
+                Carol completes the...
               </a>
+              
+              
               
               
             </div>
@@ -1143,12 +1275,16 @@ span.param-highlight {
           
           
           
-          <div class="activity-row" id="activity-book-a-shared-room-6">
+          <div class="activity-row" id="activity-book-a-group-trip-6">
             <div class="activity-num">6</div>
             <div class="activity-body">
               
               <div class="activity-path">
-                <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation system.">Booking System</span><span class="term-ref-verb" data-term-id="send">sends</span><span class="term-ref-object" data-term-id="confirmation" title="Notification of a successful booking.">Confirmation</span><span class="activity-word">to</span><span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Bob</span>
+                <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span><span class="term-ref-verb" data-term-id="send">sends</span><span class="term-ref-object" data-term-id="confirmation" title="Notification of a successful booking.">Confirmation</span><span class="activity-word">to</span><span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Alice</span>
+              </div>
+              
+              <div class="activity-path">
+                <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span><span class="term-ref-verb" data-term-id="send">sends</span><span class="term-ref-object" data-term-id="confirmation" title="Notification of a successful booking.">Confirmation</span><span class="activity-word">to</span><span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Bob</span>
               </div>
               
             </div>
@@ -1160,11 +1296,15 @@ span.param-highlight {
             <div class="activity-badges">
               
               
+              
+              
               <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_book_shared'))">
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_complete_booking'))">
                 <span class="dot-passed">✓</span>
-                Alice books a shared room with Bob
+                Carol completes the...
               </a>
+              
+              
               
               
             </div>
@@ -1172,21 +1312,25 @@ span.param-highlight {
           
           
           
-          <div class="activity-row" id="activity-book-a-shared-room-7">
+          <div class="activity-row" id="activity-book-a-group-trip-7">
             <div class="activity-num">7</div>
             <div class="activity-body">
               
               <div class="activity-path">
-                <span class="term-ref-actor" data-term-id="guest" title="Person booking accommodation.">Alice</span><span class="term-ref-verb is-draft" title="Draft — promote to glossary to lock in">redeems</span><span class="term-ref-object is-draft" title="Draft — promote to glossary to lock in">loyalty bonus</span>
+                <span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span><span class="term-ref-verb is-draft" title="Draft — promote to glossary to lock in">redeems</span><span class="term-ref-object is-draft" title="Draft — promote to glossary to lock in">loyalty points</span>
               </div>
               
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-uncovered">0/1</span>
+              <span class="cov-chip cov-uncovered">0/3</span>
               
             </div>
             <div class="activity-badges">
+              
+              
+              
+              
               
               
               
@@ -1200,7 +1344,7 @@ span.param-highlight {
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <span class="scenario-chevron-placeholder"></span>
-                <span class="scenario-name">Alice books a shared room with Bob</span>
+                <span class="scenario-name">Carol picks a suite for the group</span>
               </div>
               <span class="scenario-meta">
                 <span class="scenario-status passed">
@@ -1212,17 +1356,63 @@ span.param-highlight {
             <div class="scn-act-strip">
               <span class="scn-act-label">Covers:</span>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-shared-room-1').scrollIntoView({behavior:'smooth'})">1</a>
+              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-1').scrollIntoView({behavior:'smooth'})">1</a>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-shared-room-2').scrollIntoView({behavior:'smooth'})">2</a>
+              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-2').scrollIntoView({behavior:'smooth'})">2</a>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-shared-room-3').scrollIntoView({behavior:'smooth'})">3</a>
+            </div>
+            
+          </div>
+          
+          <div class="scenario passed" style="margin-bottom: var(--space-sm);">
+            <div class="scenario-header scenario-header-empty">
+              <div style="display:flex; align-items:center;">
+                <span class="scenario-chevron-placeholder"></span>
+                <span class="scenario-name">Carol completes the booking for both guests</span>
+              </div>
+              <span class="scenario-meta">
+                <span class="scenario-status passed">
+                  ✓ passed
+                </span>
+              </span>
+            </div>
+            
+            <div class="scn-act-strip">
+              <span class="scn-act-label">Covers:</span>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-shared-room-4').scrollIntoView({behavior:'smooth'})">4</a>
+              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-2').scrollIntoView({behavior:'smooth'})">2</a>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-shared-room-5').scrollIntoView({behavior:'smooth'})">5</a>
+              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-3').scrollIntoView({behavior:'smooth'})">3</a>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-shared-room-6').scrollIntoView({behavior:'smooth'})">6</a>
+              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-4').scrollIntoView({behavior:'smooth'})">4</a>
+              
+              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-5').scrollIntoView({behavior:'smooth'})">5</a>
+              
+              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-6').scrollIntoView({behavior:'smooth'})">6</a>
+              
+            </div>
+            
+          </div>
+          
+          <div class="scenario passed" style="margin-bottom: var(--space-sm);">
+            <div class="scenario-header scenario-header-empty">
+              <div style="display:flex; align-items:center;">
+                <span class="scenario-chevron-placeholder"></span>
+                <span class="scenario-name">Payment is declined — the booking is not finalized</span>
+              </div>
+              <span class="scenario-meta">
+                <span class="scenario-status passed">
+                  ✓ passed
+                </span>
+              </span>
+            </div>
+            
+            <div class="scn-act-strip">
+              <span class="scn-act-label">Covers:</span>
+              
+              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-3').scrollIntoView({behavior:'smooth'})">3</a>
+              
+              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-4').scrollIntoView({behavior:'smooth'})">4</a>
               
             </div>
             
@@ -1256,7 +1446,7 @@ span.param-highlight {
           <input type="checkbox" x-model="glossaryKindFilter.actor">
           <span class="kind-swatch kind-swatch-actor"></span>
           <span>Actors</span>
-          <span class="nav-group-count">2</span>
+          <span class="nav-group-count">3</span>
         </label>
         <label class="kind-filter-row">
           <input type="checkbox" x-model="glossaryKindFilter.object">
@@ -1268,7 +1458,7 @@ span.param-highlight {
           <input type="checkbox" x-model="glossaryKindFilter.verb">
           <span class="kind-swatch kind-swatch-verb"></span>
           <span>Verbs</span>
-          <span class="nav-group-count">5</span>
+          <span class="nav-group-count">7</span>
         </label>
       </div>
     </div>
@@ -1278,10 +1468,10 @@ span.param-highlight {
         <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
           <div class="header-title">Glossary</div>
           <div class="header-context">
-            11 terms ·
-            2 actors ·
+            14 terms ·
+            3 actors ·
             4 work objects ·
-            5 verbs
+            7 verbs
           </div>
           <button class="collapse-all-btn" @click="toggleAllTerms()"
                   x-text="anyTermsExpanded ? 'Collapse all references ↑' : 'Expand all references ↓'"></button>
@@ -1294,24 +1484,71 @@ span.param-highlight {
       <div x-show="glossaryKindFilter.actor">
         <div class="kind-header">
           <span class="kind-title term-actor">Actors</span>
-          <span class="kind-meta">2 terms</span>
+          <span class="kind-meta">3 terms</span>
         </div>
         
         
         
         <div class="entry"
-             x-show="!glossarySearch || 'guest person booking accommodation.'.includes(glossarySearch.toLowerCase())">
+             x-show="!glossarySearch || 'organizer person booking accommodation on behalf of a group.'.includes(glossarySearch.toLowerCase())">
+          <div class="entry-head" @click="expandedTerms['organizer'] ? delete expandedTerms['organizer'] : (expandedTerms['organizer'] = true)">
+            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['organizer'] }"></span>
+            <span class="entry-name">
+              <span class="term-pill term-actor">Organizer</span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Person booking accommodation on behalf of a group.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-summary">
+                
+                
+                2 instances
+                 · used in 1 story
+                
+              </div>
+            </div>
+          </div>
+          <div class="refs scenario-body" :class="{ expanded: expandedTerms['organizer'] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
+                  
+                </div>
+                
+                
+                <div class="refs-line">
+                  <span class="refs-label">Instances:</span>
+                  
+                  <span class="use-chip">Carol <span class="refs-fixture">(fixture: carol)</span></span>
+                  
+                  <span class="use-chip">Organizer</span>
+                  
+                </div>
+                
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
+        <div class="entry"
+             x-show="!glossarySearch || 'guest individual traveler in the group.'.includes(glossarySearch.toLowerCase())">
           <div class="entry-head" @click="expandedTerms['guest'] ? delete expandedTerms['guest'] : (expandedTerms['guest'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['guest'] }"></span>
             <span class="entry-name">
               <span class="term-pill term-actor">Guest</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">Person booking accommodation.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-def">Individual traveler in the group.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
               <div class="entry-summary">
                 
                 
-                3 instances
+                2 instances
                  · used in 1 story
                 
               </div>
@@ -1324,7 +1561,7 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-shared-room'">book-a-shared-room</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
                 </div>
                 
@@ -1332,11 +1569,9 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Instances:</span>
                   
-                  <span class="use-chip">Alice</span>
+                  <span class="use-chip">Alice <span class="refs-fixture">(fixture: alice)</span></span>
                   
-                  <span class="use-chip">Bob</span>
-                  
-                  <span class="use-chip">Guest</span>
+                  <span class="use-chip">Bob <span class="refs-fixture">(fixture: bob)</span></span>
                   
                 </div>
                 
@@ -1349,14 +1584,14 @@ span.param-highlight {
         
         
         <div class="entry"
-             x-show="!glossarySearch || 'booking system automated reservation system.'.includes(glossarySearch.toLowerCase())">
+             x-show="!glossarySearch || 'booking system automated reservation back-end.'.includes(glossarySearch.toLowerCase())">
           <div class="entry-head" @click="expandedTerms['booking-system'] ? delete expandedTerms['booking-system'] : (expandedTerms['booking-system'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['booking-system'] }"></span>
             <span class="entry-name">
               <span class="term-pill term-actor">Booking System</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">Automated reservation system.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-def">Automated reservation back-end.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
               <div class="entry-summary">
                 
                 
@@ -1373,7 +1608,7 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-shared-room'">book-a-shared-room</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
                 </div>
                 
@@ -1429,7 +1664,7 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-shared-room'">book-a-shared-room</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
                 </div>
                 
@@ -1437,9 +1672,9 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Instances:</span>
                   
-                  <span class="use-chip">Room</span>
-                  
                   <span class="use-chip">Deluxe Suite</span>
+                  
+                  <span class="use-chip">Room</span>
                   
                 </div>
                 
@@ -1452,14 +1687,14 @@ span.param-highlight {
         
         
         <div class="entry"
-             x-show="!glossarySearch || 'booking a reservation for a room.'.includes(glossarySearch.toLowerCase())">
+             x-show="!glossarySearch || 'booking a reservation for one or more rooms.'.includes(glossarySearch.toLowerCase())">
           <div class="entry-head" @click="expandedTerms['booking'] ? delete expandedTerms['booking'] : (expandedTerms['booking'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['booking'] }"></span>
             <span class="entry-name">
               <span class="term-pill term-obj">Booking</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">A reservation for a room.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-def">A reservation for one or more rooms.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
               <div class="entry-summary">
                 
                 
@@ -1476,7 +1711,7 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-shared-room'">book-a-shared-room</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
                 </div>
                 
@@ -1521,7 +1756,7 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-shared-room'">book-a-shared-room</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
                 </div>
                 
@@ -1566,7 +1801,7 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-shared-room'">book-a-shared-room</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
                 </div>
                 
@@ -1592,7 +1827,7 @@ span.param-highlight {
       <div x-show="glossaryKindFilter.verb">
         <div class="kind-header">
           <span class="kind-title term-verb">Verbs</span>
-          <span class="kind-meta">5 terms</span>
+          <span class="kind-meta">7 terms</span>
         </div>
         
         
@@ -1622,7 +1857,7 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-shared-room'">book-a-shared-room</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
                 </div>
                 
@@ -1667,7 +1902,7 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-shared-room'">book-a-shared-room</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
                 </div>
                 
@@ -1677,6 +1912,51 @@ span.param-highlight {
                   <span class="refs-label">Also used as:</span>
                   
                   <span class="use-chip">selects</span>
+                  
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
+        <div class="entry"
+             x-show="!glossarySearch || 'add attach a member to a collection.'.includes(glossarySearch.toLowerCase())">
+          <div class="entry-head" @click="expandedTerms['add'] ? delete expandedTerms['add'] : (expandedTerms['add'] = true)">
+            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['add'] }"></span>
+            <span class="entry-name">
+              <span class="term-pill term-verb">add</span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Attach a member to a collection.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-summary">
+                
+                
+                
+                used in 1 story
+                
+              </div>
+            </div>
+          </div>
+          <div class="refs scenario-body" :class="{ expanded: expandedTerms['add'] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
+                  
+                </div>
+                
+                
+                
+                <div class="refs-line">
+                  <span class="refs-label">Also used as:</span>
+                  
+                  <span class="use-chip">adds</span>
                   
                 </div>
                 
@@ -1712,7 +1992,7 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-shared-room'">book-a-shared-room</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
                 </div>
                 
@@ -1757,7 +2037,7 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-shared-room'">book-a-shared-room</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
                 </div>
                 
@@ -1802,7 +2082,7 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-shared-room'">book-a-shared-room</a>
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
                 </div>
                 
@@ -1814,6 +2094,33 @@ span.param-highlight {
                   <span class="use-chip">sends</span>
                   
                 </div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
+        <div class="entry"
+             x-show="!glossarySearch || 'reject refuse to process or accept.'.includes(glossarySearch.toLowerCase())">
+          <div class="entry-head" @click="expandedTerms['reject'] ? delete expandedTerms['reject'] : (expandedTerms['reject'] = true)">
+            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['reject'] }"></span>
+            <span class="entry-name">
+              <span class="term-pill term-verb">reject</span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Refuse to process or accept.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-summary">
+                
+              </div>
+            </div>
+          </div>
+          <div class="refs scenario-body" :class="{ expanded: expandedTerms['reject'] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                
                 
               </div>
             </div>
@@ -1834,16 +2141,16 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-14T11:50:54.501134+00:00",
+    "timestamp": "2026-06-14T12:40:20.513761+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "76e35fb374df2e77422dc399a24171f7596e804f"
+    "commit_sha": "e95ce5bcf00ca2dc40bb0e8d0c0d1bf118405761"
   },
   "scenarios": [
     {
-      "id": "examples/test_hotel_booking.py::test_book_shared",
+      "id": "examples/test_hotel_booking.py::test_pick_suite",
       "narration": {
-        "text": "Alice books a shared room with Bob",
+        "text": "Carol picks a suite for the group",
         "parts": []
       },
       "module": "test_hotel_booking",
@@ -1854,38 +2161,61 @@ window.__REPORT_DATA__ = {
         {
           "phase": "given",
           "narration": {
-            "text": "our guest Alice",
-            "parts": []
+            "text": "our organizer Carol",
+            "parts": [
+              {
+                "value": "our organizer "
+              },
+              {
+                "term_id": "organizer",
+                "display": "Carol",
+                "expression": "organizer(\"Carol\")",
+                "param_column": null
+              }
+            ]
           },
           "status": "passed",
           "children": [],
           "attachments": [],
           "error": null,
           "activity_ids": [],
-          "fixture_name": "alice"
+          "fixture_name": "carol"
         },
         {
           "phase": "given",
           "narration": {
-            "text": "our guest Bob",
-            "parts": []
+            "text": "the Deluxe Suite is listed as available",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "room",
+                "display": "Deluxe Suite",
+                "expression": "room(\"Deluxe Suite\")",
+                "param_column": null
+              },
+              {
+                "value": " is listed as available"
+              }
+            ]
           },
           "status": "passed",
           "children": [],
           "attachments": [],
           "error": null,
           "activity_ids": [],
-          "fixture_name": "bob"
+          "fixture_name": null
         },
         {
           "phase": "when",
           "narration": {
-            "text": "Alice searches for a Room",
+            "text": "Carol searches for a Room",
             "parts": [
               {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")",
+                "term_id": "organizer",
+                "display": "Carol",
+                "expression": "organizer(\"Carol\")",
                 "param_column": null
               },
               {
@@ -1918,12 +2248,12 @@ window.__REPORT_DATA__ = {
         {
           "phase": "when",
           "narration": {
-            "text": "Alice selects the Deluxe Suite",
+            "text": "Carol selects the Deluxe Suite",
             "parts": [
               {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")",
+                "term_id": "organizer",
+                "display": "Carol",
+                "expression": "organizer(\"Carol\")",
                 "param_column": null
               },
               {
@@ -1954,14 +2284,231 @@ window.__REPORT_DATA__ = {
           "fixture_name": null
         },
         {
-          "phase": "when",
+          "phase": "then",
           "narration": {
-            "text": "Alice submits the Payment",
+            "text": "the Deluxe Suite is held for Carol",
             "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "room",
+                "display": "Deluxe Suite",
+                "expression": "room(\"Deluxe Suite\")",
+                "param_column": null
+              },
+              {
+                "value": " is held for "
+              },
+              {
+                "term_id": "organizer",
+                "display": "Carol",
+                "expression": "organizer(\"Carol\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/test_hotel_booking.py",
+        "line": 124
+      },
+      "story_id": "book-a-group-trip",
+      "activity_ids": []
+    },
+    {
+      "id": "examples/test_hotel_booking.py::test_complete_booking",
+      "narration": {
+        "text": "Carol completes the booking for both guests",
+        "parts": []
+      },
+      "module": "test_hotel_booking",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "our organizer Carol",
+            "parts": [
+              {
+                "value": "our organizer "
+              },
+              {
+                "term_id": "organizer",
+                "display": "Carol",
+                "expression": "organizer(\"Carol\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "carol"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "our guest Alice",
+            "parts": [
+              {
+                "value": "our guest "
+              },
               {
                 "term_id": "guest",
                 "display": "Alice",
                 "expression": "guest(\"Alice\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "alice"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "our guest Bob",
+            "parts": [
+              {
+                "value": "our guest "
+              },
+              {
+                "term_id": "guest",
+                "display": "Bob",
+                "expression": "guest(\"Bob\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "bob"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "Carol has selected the Deluxe Suite",
+            "parts": [
+              {
+                "term_id": "organizer",
+                "display": "Carol",
+                "expression": "organizer(\"Carol\")",
+                "param_column": null
+              },
+              {
+                "value": " has "
+              },
+              {
+                "term_id": "select",
+                "display": "selected",
+                "expression": "select(\"selected\")",
+                "param_column": null
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "room",
+                "display": "Deluxe Suite",
+                "expression": "room(\"Deluxe Suite\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Carol adds Alice and Bob to the Booking",
+            "parts": [
+              {
+                "term_id": "organizer",
+                "display": "Carol",
+                "expression": "organizer(\"Carol\")",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "add",
+                "display": "adds",
+                "expression": "add(\"adds\")",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              },
+              {
+                "value": " and "
+              },
+              {
+                "term_id": "guest",
+                "display": "Bob",
+                "expression": "guest(\"Bob\")",
+                "param_column": null
+              },
+              {
+                "value": " to the "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Carol submits the Payment for the Booking",
+            "parts": [
+              {
+                "term_id": "organizer",
+                "display": "Carol",
+                "expression": "organizer(\"Carol\")",
                 "param_column": null
               },
               {
@@ -1981,6 +2528,15 @@ window.__REPORT_DATA__ = {
                 "display": "Payment",
                 "expression": "payment",
                 "param_column": null
+              },
+              {
+                "value": " for the "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking",
+                "param_column": null
               }
             ]
           },
@@ -1994,7 +2550,7 @@ window.__REPORT_DATA__ = {
         {
           "phase": "then",
           "narration": {
-            "text": "the Booking System confirms the Booking for Alice and Bob",
+            "text": "the Booking System confirms the Booking",
             "parts": [
               {
                 "value": "the "
@@ -2022,9 +2578,50 @@ window.__REPORT_DATA__ = {
                 "display": "Booking",
                 "expression": "booking",
                 "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Booking System sends the Confirmation to Alice and Bob",
+            "parts": [
+              {
+                "value": "the "
               },
               {
-                "value": " for "
+                "term_id": "booking-system",
+                "display": "Booking System",
+                "expression": "booking_system",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "send",
+                "display": "sends",
+                "expression": "send(\"sends\")",
+                "param_column": null
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "confirmation",
+                "display": "Confirmation",
+                "expression": "confirmation",
+                "param_column": null
+              },
+              {
+                "value": " to "
               },
               {
                 "term_id": "guest",
@@ -2049,41 +2646,59 @@ window.__REPORT_DATA__ = {
           "error": null,
           "activity_ids": [],
           "fixture_name": null
-        },
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/test_hotel_booking.py",
+        "line": 138
+      },
+      "story_id": "book-a-group-trip",
+      "activity_ids": []
+    },
+    {
+      "id": "examples/test_hotel_booking.py::test_payment_declined",
+      "narration": {
+        "text": "Payment is declined \u2014 the booking is not finalized",
+        "parts": []
+      },
+      "module": "test_hotel_booking",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
         {
-          "phase": "then",
+          "phase": "given",
           "narration": {
-            "text": "the Booking System sends a Confirmation to Alice",
+            "text": "our organizer Carol",
             "parts": [
               {
-                "value": "the "
+                "value": "our organizer "
               },
               {
-                "term_id": "booking-system",
-                "display": "Booking System",
-                "expression": "booking_system",
+                "term_id": "organizer",
+                "display": "Carol",
+                "expression": "organizer(\"Carol\")",
                 "param_column": null
-              },
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "carol"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "our guest Alice",
+            "parts": [
               {
-                "value": " "
-              },
-              {
-                "term_id": "send",
-                "display": "sends",
-                "expression": "send(\"sends\")",
-                "param_column": null
-              },
-              {
-                "value": " a "
-              },
-              {
-                "term_id": "confirmation",
-                "display": "Confirmation",
-                "expression": "confirmation",
-                "param_column": null
-              },
-              {
-                "value": " to "
+                "value": "our guest "
               },
               {
                 "term_id": "guest",
@@ -2098,12 +2713,138 @@ window.__REPORT_DATA__ = {
           "attachments": [],
           "error": null,
           "activity_ids": [],
+          "fixture_name": "alice"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "our guest Bob",
+            "parts": [
+              {
+                "value": "our guest "
+              },
+              {
+                "term_id": "guest",
+                "display": "Bob",
+                "expression": "guest(\"Bob\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "bob"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "Carol has added Alice and Bob to the Booking",
+            "parts": [
+              {
+                "term_id": "organizer",
+                "display": "Carol",
+                "expression": "organizer(\"Carol\")",
+                "param_column": null
+              },
+              {
+                "value": " has "
+              },
+              {
+                "term_id": "add",
+                "display": "added",
+                "expression": "add(\"added\")",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              },
+              {
+                "value": " and "
+              },
+              {
+                "term_id": "guest",
+                "display": "Bob",
+                "expression": "guest(\"Bob\")",
+                "param_column": null
+              },
+              {
+                "value": " to the "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Carol submits the Payment for the Booking",
+            "parts": [
+              {
+                "term_id": "organizer",
+                "display": "Carol",
+                "expression": "organizer(\"Carol\")",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "submit",
+                "display": "submits",
+                "expression": "submit(\"submits\")",
+                "param_column": null
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "payment",
+                "display": "Payment",
+                "expression": "payment",
+                "param_column": null
+              },
+              {
+                "value": " for the "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
           "fixture_name": null
         },
         {
           "phase": "then",
           "narration": {
-            "text": "the Booking System sends a Confirmation to Bob",
+            "text": "the Booking System rejects the Payment because of insufficient funds",
             "parts": [
               {
                 "value": "the "
@@ -2118,13 +2859,48 @@ window.__REPORT_DATA__ = {
                 "value": " "
               },
               {
-                "term_id": "send",
-                "display": "sends",
-                "expression": "send(\"sends\")",
+                "term_id": "reject",
+                "display": "rejects",
+                "expression": "reject(\"rejects\")",
                 "param_column": null
               },
               {
-                "value": " a "
+                "value": " the "
+              },
+              {
+                "term_id": "payment",
+                "display": "Payment",
+                "expression": "payment",
+                "param_column": null
+              },
+              {
+                "value": " because of insufficient funds"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Booking stays pending and no Confirmation is sent to Alice or Bob",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking",
+                "param_column": null
+              },
+              {
+                "value": " stays pending and no "
               },
               {
                 "term_id": "confirmation",
@@ -2133,7 +2909,16 @@ window.__REPORT_DATA__ = {
                 "param_column": null
               },
               {
-                "value": " to "
+                "value": " is sent to "
+              },
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              },
+              {
+                "value": " or "
               },
               {
                 "term_id": "guest",
@@ -2156,25 +2941,31 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_hotel_booking.py",
-        "line": 76
+        "line": 171
       },
-      "story_id": "book-a-shared-room",
+      "story_id": "book-a-group-trip",
       "activity_ids": []
     }
   ],
   "glossary": {
     "terms": [
       {
+        "id": "organizer",
+        "kind": "actor",
+        "canonical": "Organizer",
+        "definition": "Person booking accommodation on behalf of a group."
+      },
+      {
         "id": "guest",
         "kind": "actor",
         "canonical": "Guest",
-        "definition": "Person booking accommodation."
+        "definition": "Individual traveler in the group."
       },
       {
         "id": "booking-system",
         "kind": "actor",
         "canonical": "Booking System",
-        "definition": "Automated reservation system."
+        "definition": "Automated reservation back-end."
       },
       {
         "id": "room",
@@ -2186,7 +2977,7 @@ window.__REPORT_DATA__ = {
         "id": "booking",
         "kind": "object",
         "canonical": "Booking",
-        "definition": "A reservation for a room."
+        "definition": "A reservation for one or more rooms."
       },
       {
         "id": "payment",
@@ -2213,6 +3004,12 @@ window.__REPORT_DATA__ = {
         "definition": "Choose one option from a set."
       },
       {
+        "id": "add",
+        "kind": "verb",
+        "canonical": "add",
+        "definition": "Attach a member to a collection."
+      },
+      {
         "id": "submit",
         "kind": "verb",
         "canonical": "submit",
@@ -2229,13 +3026,19 @@ window.__REPORT_DATA__ = {
         "kind": "verb",
         "canonical": "send",
         "definition": "Deliver to a recipient."
+      },
+      {
+        "id": "reject",
+        "kind": "verb",
+        "canonical": "reject",
+        "definition": "Refuse to process or accept."
       }
     ]
   },
   "stories": [
     {
-      "id": "book-a-shared-room",
-      "title": "Book a Shared Room",
+      "id": "book-a-group-trip",
+      "title": "Book a Group Trip",
       "activities": [
         {
           "id": 1,
@@ -2243,8 +3046,8 @@ window.__REPORT_DATA__ = {
             {
               "parts": [
                 {
-                  "entity_id": "guest",
-                  "display": "Guest"
+                  "entity_id": "organizer",
+                  "display": "Organizer"
                 },
                 {
                   "term_id": "search",
@@ -2264,8 +3067,8 @@ window.__REPORT_DATA__ = {
             {
               "parts": [
                 {
-                  "entity_id": "guest",
-                  "display": "Alice"
+                  "entity_id": "organizer",
+                  "display": "Carol"
                 },
                 {
                   "term_id": "select",
@@ -2285,8 +3088,59 @@ window.__REPORT_DATA__ = {
             {
               "parts": [
                 {
+                  "entity_id": "organizer",
+                  "display": "Carol"
+                },
+                {
+                  "term_id": "add",
+                  "display": "adds"
+                },
+                {
                   "entity_id": "guest",
                   "display": "Alice"
+                },
+                {
+                  "text": "to"
+                },
+                {
+                  "entity_id": "booking",
+                  "display": "Booking"
+                }
+              ]
+            },
+            {
+              "parts": [
+                {
+                  "entity_id": "organizer",
+                  "display": "Carol"
+                },
+                {
+                  "term_id": "add",
+                  "display": "adds"
+                },
+                {
+                  "entity_id": "guest",
+                  "display": "Bob"
+                },
+                {
+                  "text": "to"
+                },
+                {
+                  "entity_id": "booking",
+                  "display": "Booking"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "entity_id": "organizer",
+                  "display": "Carol"
                 },
                 {
                   "term_id": "submit",
@@ -2295,13 +3149,20 @@ window.__REPORT_DATA__ = {
                 {
                   "entity_id": "payment",
                   "display": "Payment"
+                },
+                {
+                  "text": "for"
+                },
+                {
+                  "entity_id": "booking",
+                  "display": "Booking"
                 }
               ]
             }
           ]
         },
         {
-          "id": 4,
+          "id": 5,
           "paths": [
             {
               "parts": [
@@ -2316,27 +3177,13 @@ window.__REPORT_DATA__ = {
                 {
                   "entity_id": "booking",
                   "display": "Booking"
-                },
-                {
-                  "text": "for"
-                },
-                {
-                  "entity_id": "guest",
-                  "display": "Alice"
-                },
-                {
-                  "text": "and"
-                },
-                {
-                  "entity_id": "guest",
-                  "display": "Bob"
                 }
               ]
             }
           ]
         },
         {
-          "id": 5,
+          "id": 6,
           "paths": [
             {
               "parts": [
@@ -2360,12 +3207,7 @@ window.__REPORT_DATA__ = {
                   "display": "Alice"
                 }
               ]
-            }
-          ]
-        },
-        {
-          "id": 6,
-          "paths": [
+            },
             {
               "parts": [
                 {
@@ -2397,8 +3239,8 @@ window.__REPORT_DATA__ = {
             {
               "parts": [
                 {
-                  "entity_id": "guest",
-                  "display": "Alice"
+                  "entity_id": "organizer",
+                  "display": "Carol"
                 },
                 {
                   "kind": "verb",
@@ -2406,7 +3248,7 @@ window.__REPORT_DATA__ = {
                 },
                 {
                   "kind": "object",
-                  "text": "loyalty bonus"
+                  "text": "loyalty points"
                 }
               ]
             }
@@ -2416,8 +3258,8 @@ window.__REPORT_DATA__ = {
     }
   ]
 };
-window.__storyIds = ["book-a-shared-room"];
-window.__termIds = ["guest", "booking-system", "room", "booking", "payment", "confirmation", "search", "select", "submit", "confirm", "send"];
+window.__storyIds = ["book-a-group-trip"];
+window.__termIds = ["organizer", "guest", "booking-system", "room", "booking", "payment", "confirmation", "search", "select", "add", "submit", "confirm", "send", "reject"];
 // --- Hash helpers ---
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));

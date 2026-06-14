@@ -249,7 +249,7 @@ Public surface:
 | `draft.actor` | `(text: str) -> DraftActor` | Module-level singleton method. Returns a kind-tagged placeholder; no glossary registration. |
 | `draft.work_object` | `(text: str) -> DraftWorkObject` | Same, kind `'object'`. |
 | `draft.verb` | `(text: str) -> DraftVerb` | Same, kind `'verb'`. |
-| `story` | `(title: str, *, activities: tuple[Activity, ...] = ()) -> Story` | Module-level constructor. Inspects activity parts to compute the set of glossaries referenced; in v1 the set must have size ≤ 1 (a story made entirely of drafts is legal — its glossary set is empty). Drafts don't contribute to this set. |
+| `story` | `(title: str, activities: Sequence[Activity] = ()) -> Story` | Module-level constructor. Activities are positional (no kwarg) — pass a list. Inspects activity parts to compute the set of glossaries referenced; in v1 the set must have size ≤ 1 (a story made entirely of drafts is legal — its glossary set is empty). Drafts don't contribute to this set. |
 | `Actor.__call__` / `WorkObject.__call__` | `(display: str) -> ActorInstance` / `WorkObjectInstance` | Call syntax on a noun creates an *instance* — distinct identity from the canonical concept (e.g., `guest('Alice')` distinguishes from `guest`). |
 | `Verb.__call__` | `(display: str) -> InflectedVerb` | Call syntax on a verb creates an *inflection* — same identity as canonical (e.g., `confirm('confirms')` is still the `confirm` verb in a different form). |
 | `path` | `(*parts: Actor \| WorkObject \| Verb \| ActorInstance \| WorkObjectInstance \| InflectedVerb \| DraftActor \| DraftWorkObject \| DraftVerb \| str) -> ActivityPath` | Validates the DS sentence grammar: leading triple is *actor → verb → noun* (anchored, typed or draft). Beyond position 2 the path is free-form. Bare strings are reserved for connectives. The union covers *which kinds of arguments are accepted at all*; per-position constraints (e.g., no `Verb` in position 2) are enforced at runtime by `path(...)`, not in the type. See *Grammar* in the data model section. |
@@ -319,7 +319,7 @@ send    = g.verb('send',    definition='Deliver to a recipient.')
 # `loyalty bonus` and the `redeems` verb appear as drafts in activity 7 — the
 # team hasn't decided yet whether they belong in the ubiquitous language.
 
-book_a_shared_room = story('Book a Shared Room', activities=(
+book_a_shared_room = story('Book a Shared Room', [
     # 1. Canonical activity — any specific guest searching satisfies this.
     #    Scenarios that mention guest('Alice') or guest('Bob') will both cover
     #    this row via the canonical-fallback rule.
@@ -337,7 +337,7 @@ book_a_shared_room = story('Book a Shared Room', activities=(
     activity(booking_system, send('sends'), confirmation, 'to', guest('Bob')),
     # 7. Draft verb + draft work object — Alice redeems a loyalty bonus.
     activity(guest('Alice'), draft.verb('redeems'), draft.work_object('loyalty bonus')),
-))
+])
 ```
 
 ```python

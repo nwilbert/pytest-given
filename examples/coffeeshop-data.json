@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-14T11:50:54.130114+00:00",
+    "timestamp": "2026-06-14T12:40:20.157256+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "76e35fb374df2e77422dc399a24171f7596e804f"
+    "commit_sha": "e95ce5bcf00ca2dc40bb0e8d0c0d1bf118405761"
   },
   "scenarios": [
     {
@@ -646,7 +646,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 92,
+      "duration_ms": 96,
       "steps": [
         {
           "phase": "given",
@@ -765,7 +765,7 @@
           },
           {
             "path": "src/pytest_given/capture/decorators.py",
-            "lineno": 232,
+            "lineno": 224,
             "func": "wrapper",
             "code": "    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
@@ -797,7 +797,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 26,
+      "duration_ms": 30,
       "steps": [],
       "parameters": null,
       "error": {
@@ -1105,7 +1105,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 52,
+      "duration_ms": 51,
       "steps": [],
       "parameters": {
         "names": [

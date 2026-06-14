@@ -695,26 +695,30 @@ def test_scenario_with_template_name_merges_and_renders(pytester, tmp_path):
     assert [c['values'] for c in s['parameters']['cases']] == [[200], [300]]
 
 
-def test_given_with_template_on_fixture_raises(pytester, tmp_path):
+def test_given_with_tstring_on_fixture_works(pytester, tmp_path):
+    """T-strings on fixture @given decorators evaluate at module load time.
+    Module-level values (e.g. Glossary handles) are in scope and interpolate."""
     pytester.makepyfile(
         """
         import pytest
-        from pytest_given import scenario, given, then
+        from pytest_given import Glossary, scenario, given, then
+
+        g = Glossary()
+        guest = g.actor('Guest')
 
         @pytest.fixture
-        @given(t'value')   # t-string on a fixture is rejected
-        def value():
-            return 1
+        @given(t'our guest {guest("Alice")}')
+        def alice():
+            return 'Alice'
 
         @scenario('x')
-        def test_x(value):
+        def test_x(alice):
             with then('ok'):
                 pass
         """
     )
     result = pytester.runpytest('-v')
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*not allowed on a fixture*'])
+    assert result.ret == 0
 
 
 def test_attach_with_template_raises(pytester, tmp_path):
@@ -1145,11 +1149,10 @@ def test_step_activity_kwarg_propagates_to_report(pytester):
         guest = g.actor('Guest')
         search = g.verb('search')
         room = g.work_object('Room')
-        s = story('Activity Propagation', activities=(
+        s = story('Activity Propagation', [
             activity(guest, search, room),
             activity(guest('Alice'), search, room),
-            activity(guest, search, room('Suite')),
-        ))
+            activity(guest, search, room('Suite'))])
 
         @scenario('a scenario', story=s, activities=[1, 2, 3])
         def test_x():
@@ -1177,7 +1180,7 @@ def test_scenario_story_id_appears_in_report(pytester):
         guest = g.actor('Guest')
         search = g.verb('search')
         room = g.work_object('Room')
-        s = story('Book', activities=(activity(guest, search, room),))
+        s = story('Book', [activity(guest, search, room)])
 
         @scenario('x', story=s, activities=[1])
         def test_x():
@@ -1202,7 +1205,7 @@ def test_scenario_activity_id_not_in_story_raises_at_collection(pytester):
         guest = g.actor('Guest')
         search = g.verb('search')
         room = g.work_object('Room')
-        s = story('Book', activities=(activity(guest, search, room),))
+        s = story('Book', [activity(guest, search, room)])
 
         @scenario('x', story=s, activities=[99])
         def test_x():
@@ -1220,10 +1223,9 @@ def test_step_activity_outside_scenario_scope_raises(pytester):
         guest = g.actor('Guest')
         search = g.verb('search')
         room = g.work_object('Room')
-        s = story('Book', activities=(
+        s = story('Book', [
             activity(guest, search, room),
-            activity(guest('Alice'), search, room),
-        ))
+            activity(guest('Alice'), search, room)])
 
         @scenario('x', story=s, activities=[1])
         def test_x():
@@ -1243,7 +1245,7 @@ def test_decorator_form_helper_step_with_activity_validates_scope(pytester):
         guest = g.actor('Guest')
         search = g.verb('search')
         room = g.work_object('Room')
-        s = story('Book', activities=(activity(guest, search, room),))
+        s = story('Book', [activity(guest, search, room)])
 
         @given('a setup', activity=99)
         def helper():
@@ -1283,7 +1285,7 @@ def test_session_finish_populates_report_stories_and_glossary(pytester):
         guest = g.actor('Guest')
         search = g.verb('search')
         room = g.work_object('Room')
-        s = story('Book', activities=(activity(guest, search, room),))
+        s = story('Book', [activity(guest, search, room)])
 
         @scenario('x', story=s)
         def test_x():
@@ -1320,7 +1322,7 @@ def test_report_json_excludes_underscore_fields(pytester):
         guest = g.actor('Guest')
         search = g.verb('search')
         room = g.work_object('Room')
-        s = story('Book JSON Filter', activities=(activity(guest, search, room),))
+        s = story('Book JSON Filter', [activity(guest, search, room)])
 
         @scenario('x', story=s)
         def test_x():

@@ -71,7 +71,7 @@ The Domain-Driven Design layer atop the core surface. All terms here are optiona
 | **Instance** | A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). Instances aggregate in the Glossary tab's refs block. |
 | **Inflection** | A surface form of a Verb other than its canonical name (e.g., *searches for* as an inflection of *search*). Reported under "Also used as:" in the Glossary. |
 | **Draft** | A placeholder vocabulary item authored via `draft.actor(...)`, `draft.work_object(...)`, `draft.verb(...)`. Not registered in the Glossary; rendered with an "is-draft" cue so reviewers see what still needs to land. |
-| **Story** | A named flow modelled as a sequence of activities. Constructed by `story('Title', activities=(...))`. Stories are first-class report tabs and the unit of coverage. |
+| **Story** | A named flow modelled as a sequence of activities. Constructed by `story('Title', [activity(...), ...])`. Stories are first-class report tabs and the unit of coverage. |
 | **Activity** | One row in a story — typically `actor + verb + work_object` plus optional connective words. Constructed by `activity(...)`. |
 | **ActivityPart** | The four-variant union making up an activity's prose: `ActivityEntity` (actor/object ref), `ActivityTerm` (verb ref), `ActivityWord` (plain word), `ActivityPlaceholder` (draft). |
 | **Path** | A branching segment inside a story — `path(...)` lets alternate activity sequences share a prefix. |

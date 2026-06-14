@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+from collections.abc import Sequence
 
 from ..model import (
     Activity,
@@ -159,12 +160,12 @@ def _register_story(sid: StoryId, title: str) -> None:
     _STORY_REGISTRY[sid] = site
 
 
-def story(title: str, *, activities: tuple[Activity, ...] = ()) -> Story:
+def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     """Construct a Story. Reassigns auto-numbered ids, validates uniqueness,
     and enforces v1's single-glossary invariant."""
     sid = StoryId(id_derive(title))
     _register_story(sid, title)
-    numbered = _assign_sequence_numbers(activities)
+    numbered = _assign_sequence_numbers(tuple(activities))
     _check_unique_ids(numbered)
     _check_single_glossary(title, numbered)
     return Story(id=sid, title=title, activities=numbered)

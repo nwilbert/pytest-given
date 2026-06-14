@@ -179,10 +179,10 @@ Use the captured handles directly in t-strings — `t'a {guest} {search("searche
 ```python
 from pytest_given import activity, story
 
-book_a_shared_room = story('Book a Shared Room', activities=(
-    activity(guest, search('searches for'), room),
-    activity(guest('Alice'), search('looks up'), room('Deluxe Suite')),
-))
+book_a_group_trip = story('Book a Group Trip', [
+    activity(organizer, search('searches for'), room),
+    activity(organizer('Carol'), select('selects'), room('Deluxe Suite')),
+])
 ```
 
 An activity reads left-to-right: actor → verb → work object (with optional connective words). `path(...)` lets a story branch where alternate activity sequences share a prefix.
@@ -190,9 +190,9 @@ An activity reads left-to-right: actor → verb → work object (with optional c
 **3. Scenario ↔ activity binding** — link a scenario (and individual steps) to the story it implements:
 
 ```python
-@scenario('Alice books a shared room', story=book_a_shared_room)
-def test_book_shared(alice):
-    with when(t'{guest("Alice")} {search("searches for")} a {room}'):
+@scenario('Carol selects a suite', story=book_a_group_trip)
+def test_select_suite(carol):
+    with when(t'{organizer("Carol")} {search("searches for")} a {room}'):
         ...
 ```
 

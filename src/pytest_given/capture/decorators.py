@@ -124,14 +124,6 @@ class StepDescriptor:
             getattr(func, '_fixture_function_marker', None) is not None
             or getattr(func, '_pytestfixturefunction', None) is not None
         )
-        if isinstance(self._source, templatelib.Template):
-            raise PytestGivenError(
-                f"@{self.phase}(t'...') is not allowed on a fixture or helper; "
-                "the function's argument values aren't in scope at decoration "
-                'time. Use a plain string label, pytest_given.Template for '
-                'deferred substitution from bound args, or move the step into '
-                'the test body.'
-            )
         if isinstance(self._source, Template) and is_fixture:
             raise PytestGivenError(
                 f'@{self.phase}(Template(...)) on a fixture is not yet '

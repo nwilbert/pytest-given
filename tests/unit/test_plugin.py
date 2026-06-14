@@ -358,8 +358,8 @@ def test_resolve_glossary_raises_with_two_distinct_glossaries_via_stories() -> N
     search2 = g2.verb('book')
     room2 = g2.work_object('Suite')
 
-    s1 = story_fn('Coverage Story A', activities=(activity_fn(guest1, search1, room1),))
-    s2 = story_fn('Coverage Story B', activities=(activity_fn(guest2, search2, room2),))
+    s1 = story_fn('Coverage Story A', [activity_fn(guest1, search1, room1)])
+    s2 = story_fn('Coverage Story B', [activity_fn(guest2, search2, room2)])
 
     fake_session = SimpleNamespace(
         config=SimpleNamespace(pluginmanager=SimpleNamespace(get_plugins=lambda: []))

@@ -165,16 +165,21 @@ def test_step_descriptor_with_plain_str_has_empty_narration_parts() -> None:
     assert desc.narration.parts == []
 
 
-def test_step_descriptor_decorator_on_fixture_rejects_structured_text() -> None:
-    """@given(t'...') on a fixture raises — fixture args aren't in scope."""
-    cup_size = 200
-    desc = StepDescriptor('given', t'a {cup_size} ml cup')
+def test_step_descriptor_decorator_accepts_tstring() -> None:
+    """T-strings on decorators evaluate eagerly at module load; module-level
+    values (e.g. Glossary handles) interpolate, and the wrapped function
+    records the step on each call. For helpers needing bound-arg interpolation,
+    pytest_given.Template is the canonical form."""
+    g = Glossary()
+    guest = g.actor('Guest')
+    desc = StepDescriptor('given', t'our guest {guest("Alice")}')
 
-    def fixture_body() -> int:
-        return cup_size
+    def fixture_body() -> str:
+        return 'Alice'
 
-    with pytest.raises(PytestGivenError, match='not allowed on a fixture'):
-        desc(fixture_body)
+    wrapped = desc(fixture_body)
+    assert wrapped is not None  # didn't raise
+    assert desc.narration.text == 'our guest Alice'
 
 
 def test_scenario_with_plain_str_keeps_name() -> None:
@@ -563,9 +568,7 @@ def test_scenario_decorator_accepts_story_kwarg():
     guest = g.actor('Guest')
     search = g.verb('search')
     room = g.work_object('Room')
-    s = story_fn(
-        'Book Scenario Decorator', activities=(activity_fn(guest, search, room),)
-    )
+    s = story_fn('Book Scenario Decorator', [activity_fn(guest, search, room)])
     deco = scenario('test', story=s)
     assert deco.story is s
 
@@ -610,9 +613,7 @@ def test_step_check_activity_scope_raises_when_aid_not_in_story_no_scope() -> No
     guest = g.actor('Guest')
     search = g.verb('search')
     room = g.work_object('Room')
-    s = story_fn(
-        'Step Scope No Restriction', activities=(activity_fn(guest, search, room),)
-    )
+    s = story_fn('Step Scope No Restriction', [activity_fn(guest, search, room)])
     collector.start_scenario('id', 'a', 'mod', [], story=s, activity_ids=())
     set_active_collector(collector)
     desc = StepDescriptor('given', 'a thing', activity_ids=(ActivityId(99),))

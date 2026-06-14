@@ -243,10 +243,7 @@ def test_activity_explicit_id_with_multipath(guest, search, room):
 def test_story_auto_numbers_activities_from_one(guest, search, room):
     s = story(
         'Book a Room',
-        activities=(
-            activity(guest, search, room),
-            activity(guest('Alice'), search, room),
-        ),
+        [activity(guest, search, room), activity(guest('Alice'), search, room)],
     )
     assert s.activities[0].id == 1
     assert s.activities[1].id == 2
@@ -255,10 +252,7 @@ def test_story_auto_numbers_activities_from_one(guest, search, room):
 def test_story_keeps_explicit_activity_ids(guest, search, room):
     s = story(
         'Book a Room',
-        activities=(
-            activity(guest, search, room, id=10),
-            activity(guest('Alice'), search, room),
-        ),
+        [activity(guest, search, room, id=10), activity(guest('Alice'), search, room)],
     )
     assert s.activities[0].id == 10
     assert s.activities[1].id == 1
@@ -268,15 +262,15 @@ def test_story_rejects_duplicate_activity_ids(guest, search, room):
     with pytest.raises(PytestGivenError, match='duplicate activity id'):
         story(
             'Book',
-            activities=(
+            [
                 activity(guest, search, room, id=1),
                 activity(guest('Alice'), search, room, id=1),
-            ),
+            ],
         )
 
 
 def test_story_derives_id_from_title():
-    s = story('Book a Room', activities=())
+    s = story('Book a Room', [])
     assert s.id == StoryId('book-a-room')
 
 
@@ -286,45 +280,42 @@ def test_story_rejects_two_glossaries(guest, search, room):
     with pytest.raises(PytestGivenError, match='spans multiple glossaries'):
         story(
             'Book',
-            activities=(
-                activity(guest, search, room),
-                activity(guest, other_search, room),
-            ),
+            [activity(guest, search, room), activity(guest, other_search, room)],
         )
 
 
 def test_story_with_only_drafts_has_empty_glossary_set():
     s = story(
         'Sketch',
-        activities=(
+        [
             activity(
                 draft.actor('Concierge'),
                 draft.verb('redeems'),
                 draft.work_object('loyalty bonus'),
-            ),
-        ),
+            )
+        ],
     )
     assert s.activities[0].paths[0].parts[0].kind == 'actor'
 
 
 def test_story_empty_title_raises():
     with pytest.raises(PytestGivenError, match='derived id is empty'):
-        story('---', activities=())
+        story('---', [])
 
 
 # --- Task 4.5: story-id duplicate detection ---
 
 
 def test_story_id_collision_raises_with_both_sites():
-    story('Book a Room', activities=())
+    story('Book a Room', [])
     with pytest.raises(PytestGivenError, match='already declared'):
-        story('book-a-room', activities=())
+        story('book-a-room', [])
 
 
 def test_story_id_collision_does_not_fire_after_registry_clear():
-    story('Book', activities=())
+    story('Book', [])
     _clear_story_registry()
-    story('Book', activities=())
+    story('Book', [])
 
 
 def test_path_carries_glossaries_attribute(guest, search, room):
@@ -357,5 +348,5 @@ def test_top_level_imports():
     room = g.work_object('Room')
     p = path(guest, search, room)
     a = activity(p, path(draft.actor('Concierge'), search, room))
-    s = story('Smoke', activities=(a,))
+    s = story('Smoke', [a])
     assert s.title == 'Smoke'
