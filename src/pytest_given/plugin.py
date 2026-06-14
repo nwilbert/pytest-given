@@ -21,6 +21,7 @@ from .capture import (
     parse_short_repr,
     set_active_collector,
 )
+from .capture.story import _clear_story_registry
 from .model import (
     FixtureRecording,
     Metadata,
@@ -84,6 +85,7 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     """Reset the collector at the start of each session."""
     global collector
     collector = Collector()
+    _clear_story_registry()
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
