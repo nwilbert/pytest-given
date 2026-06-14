@@ -1,19 +1,19 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-07T10:26:04.044527+00:00",
+    "timestamp": "2026-06-14T06:27:44.291819+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "cefdae8e1da6b9da70358f18b434949ebcac89f2"
+    "commit_sha": "51b4c2ece13f0263a01d420a60c54c637f31b352"
   },
   "scenarios": [
     {
-      "id": "examples/test_examples.py::test_buy_coffee",
+      "id": "examples/test_coffeeshop.py::test_buy_coffee",
       "narration": {
         "text": "Basic scenario with when/then and a JSON attachment",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing",
         "happy-path"
@@ -30,7 +30,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -41,7 +43,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -58,24 +62,28 @@
               "content_type": "json"
             }
           ],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 20
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_text_attachment",
+      "id": "examples/test_coffeeshop.py::test_text_attachment",
       "narration": {
         "text": "Plain text attachment",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -91,7 +99,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -102,7 +112,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -119,24 +131,28 @@
               "content_type": "text"
             }
           ],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 32
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_generator_fixture",
+      "id": "examples/test_coffeeshop.py::test_generator_fixture",
       "narration": {
         "text": "Generator fixture with teardown",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "passed",
       "duration_ms": 0,
@@ -150,7 +166,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "db"
         },
         {
           "phase": "when",
@@ -161,7 +179,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -172,24 +192,28 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 40
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_neutral_highlight",
+      "id": "examples/test_coffeeshop.py::test_neutral_highlight",
       "narration": {
         "text": "T-string with a non-parametrize value (neutral highlight)",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "passed",
       "duration_ms": 0,
@@ -203,7 +227,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "given",
@@ -214,7 +240,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "when",
@@ -235,7 +263,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -259,24 +289,28 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 61
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_buy_with_validation",
+      "id": "examples/test_coffeeshop.py::test_buy_with_validation",
       "narration": {
         "text": "Helper functions can record their own steps",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -292,7 +326,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -321,7 +357,9 @@
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             },
             {
               "phase": "when",
@@ -336,11 +374,15 @@
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -351,7 +393,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -376,28 +420,34 @@
                   "content_type": "json"
                 }
               ],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 100
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_complex_order",
+      "id": "examples/test_coffeeshop.py::test_complex_order",
       "narration": {
         "text": "Top-level `given` block and deeply nested steps",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -413,7 +463,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "given",
@@ -424,7 +476,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "when",
@@ -443,7 +497,9 @@
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             },
             {
               "phase": "when",
@@ -462,7 +518,9 @@
                   "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null
+                  "error": null,
+                  "activity_ids": [],
+                  "fixture_name": null
                 },
                 {
                   "phase": "when",
@@ -473,15 +531,21 @@
                   "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null
+                  "error": null,
+                  "activity_ids": [],
+                  "fixture_name": null
                 }
               ],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -500,7 +564,9 @@
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             },
             {
               "phase": "then",
@@ -525,15 +591,21 @@
                       "content_type": "json"
                     }
                   ],
-                  "error": null
+                  "error": null,
+                  "activity_ids": [],
+                  "fixture_name": null
                 }
               ],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -550,27 +622,31 @@
               "content_type": "json"
             }
           ],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 113
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_failing",
+      "id": "examples/test_coffeeshop.py::test_failing",
       "narration": {
         "text": "Failure rendering (intentionally failing)",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 96,
+      "duration_ms": 89,
       "steps": [
         {
           "phase": "given",
@@ -581,7 +657,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "then",
@@ -592,7 +670,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
@@ -685,13 +765,13 @@
           },
           {
             "path": "src/pytest_given/capture/decorators.py",
-            "lineno": 191,
+            "lineno": 230,
             "func": "wrapper",
             "code": "    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": "examples/test_examples.py",
+            "path": "examples/test_coffeeshop.py",
             "lineno": 143,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
@@ -702,20 +782,22 @@
       },
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 140
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_skipped",
+      "id": "examples/test_coffeeshop.py::test_skipped",
       "narration": {
         "text": "Skipped scenario rendering",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 27,
+      "duration_ms": 25,
       "steps": [],
       "parameters": null,
       "error": {
@@ -789,17 +871,19 @@
       },
       "skip_reason": "demonstrates skipped status",
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 146
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_pricing[1-False]",
+      "id": "examples/test_coffeeshop.py::test_pricing[1-False]",
       "narration": {
         "text": "Parameterized test (renders as a parameter table)",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -815,7 +899,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -835,7 +921,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -855,7 +943,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": {
@@ -893,12 +983,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 49
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_brew[200]",
+      "id": "examples/test_coffeeshop.py::test_brew[200]",
       "narration": {
         "text": "Brew {cup_size} ml (templated scenario name)",
         "parts": [
@@ -915,7 +1007,7 @@
           }
         ]
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -931,7 +1023,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -954,7 +1048,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -965,7 +1061,9 @@
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": {
@@ -992,20 +1090,22 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 71
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_parametrized_all_skipped[1]",
+      "id": "examples/test_coffeeshop.py::test_parametrized_all_skipped[1]",
       "narration": {
         "text": "All cases skipped",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 56,
+      "duration_ms": 50,
       "steps": [],
       "parameters": {
         "names": [
@@ -1167,9 +1267,13 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 153
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     }
-  ]
+  ],
+  "glossary": null,
+  "stories": []
 }

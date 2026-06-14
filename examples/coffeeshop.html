@@ -534,6 +534,301 @@ span.param-highlight {
   text-underline-offset: 2px;
 }
 
+/* === Term-ref pills (actor / object / verb) and draft cue variants === */
+.term-ref-actor {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.term-ref-object {
+  background: #ccfbf1;
+  color: #0f766e;
+  border: 1px solid #5eead4;
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  cursor: pointer;
+}
+.term-ref-verb {
+  color: #0e7490;
+  border-bottom: 1px dotted #0e7490;
+  cursor: pointer;
+  font-weight: 500;
+}
+.term-ref-unknown {
+  background: #f3f4f6;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+}
+/* Draft cue: dashed border for actors/objects, dashed underline for verbs */
+.term-ref-actor.is-draft {
+  border-style: dashed;
+  font-style: italic;
+  cursor: default;
+}
+.term-ref-object.is-draft {
+  border-style: dashed;
+  font-style: italic;
+  cursor: default;
+}
+.term-ref-verb.is-draft {
+  border-bottom-style: dashed;
+  font-style: italic;
+  cursor: default;
+}
+.activity-word {
+  color: var(--text-secondary);
+}
+
+/* === Tab strip === */
+:root {
+  --color-mixed: #ca8a04;
+  --color-uncovered: #9ca3af;
+}
+.frame-nav {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0;
+}
+.nav-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.15s, border-color 0.15s;
+}
+.nav-tab:hover { color: var(--color-accent); }
+.nav-tab-active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* === Story layout === */
+.stories-layout {
+  display: flex;
+  gap: var(--space-xl);
+}
+.story-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+}
+.story-main { flex: 1; }
+.story-sidebar-item {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 1px solid transparent;
+  margin-bottom: var(--space-xs);
+}
+.story-sidebar-item:hover { background: var(--bg-card); border-color: var(--border); }
+.story-sidebar-item.active {
+  background: var(--color-accent-bg);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.story-sidebar-title { font-weight: 600; font-size: var(--font-size-md); }
+.story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
+.story-head { margin-bottom: var(--space-lg); }
+.story-title { font-size: var(--font-size-lg); font-weight: 600; margin-bottom: var(--space-xs); }
+.story-stats { font-size: var(--font-size-sm); color: var(--text-muted); }
+
+/* === Activity timeline === */
+.activity-timeline { display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-xl); }
+.activity-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+}
+.activity-num {
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  color: #fff;
+  border-radius: 50%;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+
+/* === Coverage chip === */
+.activity-cov { flex-shrink: 0; }
+.cov-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+.cov-chip.cov-passed { background: #d4edda; color: #155724; }
+.cov-chip.cov-failed { background: #f8d7da; color: #721c24; }
+.cov-chip.cov-mixed { background: #fff3cd; color: #856404; }
+.cov-chip.cov-uncovered { background: #f3f4f6; color: var(--text-muted); }
+
+/* === Scenario badge strip === */
+.activity-badges { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+.use-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+}
+.use-chip:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.use-chip-passed { border-color: var(--color-passed); }
+.use-chip-failed { border-color: var(--color-failed); }
+.use-chip-skipped { border-color: var(--color-skipped); }
+.scn-act-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+  border-top: 1px solid var(--border);
+  margin-top: var(--space-xs);
+  flex-wrap: wrap;
+}
+.scn-act-label { color: var(--text-muted); font-weight: 600; }
+.scn-act-strip-section { margin-top: var(--space-xl); }
+
+/* === Glossary layout === */
+.glossary-layout { display: flex; }
+.glossary-layout .sidebar {
+  width: 260px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  padding: var(--space-lg);
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: 100vh;
+  position: sticky;
+  top: 0;
+}
+.glossary-layout .main { flex: 1; padding: var(--space-xl); overflow-y: auto; }
+
+/* Kind filter rows in sidebar */
+.kind-filter-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 4px 0;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+.kind-filter-row input[type="checkbox"] { flex-shrink: 0; }
+.kind-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.kind-swatch-actor { background: #fcd34d; }
+.kind-swatch-object { background: #5eead4; }
+.kind-swatch-verb { background: #67e8f9; }
+
+/* === Kind section headers === */
+.kind-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--border);
+}
+.kind-title {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+}
+.kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
+
+/* Kind colour classes for kind headers and term pills */
+.term-actor { color: #92400e; }
+.term-obj { color: #0f766e; }
+.term-verb { color: #0e7490; }
+
+/* === Term pills === */
+.term-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: var(--font-size-md);
+}
+.term-pill.term-actor { background: #fef3c7; border: 1px solid #fcd34d; }
+.term-pill.term-obj { background: #ccfbf1; border: 1px solid #5eead4; }
+.term-pill.term-verb { background: #ecfeff; border: 1px solid #67e8f9; }
+
+/* === Glossary entry layout === */
+.entry {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+}
+.entry-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  user-select: none;
+}
+.entry-head .scenario-chevron { margin-top: 6px; flex-shrink: 0; }
+.entry-name { flex-shrink: 0; min-width: 160px; }
+.entry-body { flex: 1; }
+.entry-def { font-size: var(--font-size-md); color: var(--text-primary); }
+.entry-def-placeholder { font-style: italic; color: var(--text-muted); }
+.entry-summary { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
+
+/* === Refs collapsible === */
+.refs { }
+.refs-inner { overflow: hidden; min-height: 0; }
+.refs-content {
+  padding: 0 var(--space-lg) var(--space-md) calc(var(--space-lg) + 8px + var(--space-sm) + 160px + var(--space-sm));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.refs-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+.refs-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.refs-fixture { font-size: var(--font-size-sm); color: var(--text-muted); }
+
 </style>
 </head>
 <body x-data="reportApp()">
@@ -598,7 +893,14 @@ span.param-highlight {
       </div>
       <div class="header-meta">pytest 9.0.3 · pytest-given 0.1.0 · <span x-text="formattedTimestamp"></span></div>
     </div>
-  </div><div class="scenario passed"
+  </div>
+  
+  
+  
+
+  <div id="view-scenarios" x-show="mainView === 'scenarios'">
+
+  <div class="scenario passed"
        x-show="isVisible(0)"
        :id="'scenario-' + 0"
        :class="{ 'scenario-expanded': expandedScenarios[0] }">
@@ -646,7 +948,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L20">examples/test_examples.py:20</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/51b4c2ece13f0263a01d420a60c54c637f31b352/examples/test_coffeeshop.py#L20">examples/test_coffeeshop.py:20</a></div>
       
     </div>
     </div>
@@ -696,7 +998,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L32">examples/test_examples.py:32</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/51b4c2ece13f0263a01d420a60c54c637f31b352/examples/test_coffeeshop.py#L32">examples/test_coffeeshop.py:32</a></div>
       
     </div>
     </div>
@@ -735,7 +1037,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L40">examples/test_examples.py:40</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/51b4c2ece13f0263a01d420a60c54c637f31b352/examples/test_coffeeshop.py#L40">examples/test_coffeeshop.py:40</a></div>
       
     </div>
     </div>
@@ -776,7 +1078,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L61">examples/test_examples.py:61</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/51b4c2ece13f0263a01d420a60c54c637f31b352/examples/test_coffeeshop.py#L61">examples/test_coffeeshop.py:61</a></div>
       
     </div>
     </div>
@@ -839,7 +1141,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L100">examples/test_examples.py:100</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/51b4c2ece13f0263a01d420a60c54c637f31b352/examples/test_coffeeshop.py#L100">examples/test_coffeeshop.py:100</a></div>
       
     </div>
     </div>
@@ -923,7 +1225,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L113">examples/test_examples.py:113</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/51b4c2ece13f0263a01d420a60c54c637f31b352/examples/test_coffeeshop.py#L113">examples/test_coffeeshop.py:113</a></div>
       
     </div>
     </div>
@@ -942,7 +1244,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">96ms</span>
+        <span class="scenario-duration">89ms</span>
       </span>
     </div>
 
@@ -1008,17 +1310,17 @@ Total:        $2.00</pre></div>
               <pre class="error-frame-code">    result = testfunction(**testargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">src/pytest_given/capture/decorators.py:191: in wrapper</div>
+              <div class="error-frame-loc">src/pytest_given/capture/decorators.py:230: in wrapper</div>
               <pre class="error-frame-code">    return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame">
-              <div class="error-frame-loc">examples/test_examples.py:143: in test_failing</div>
+              <div class="error-frame-loc">examples/test_coffeeshop.py:143: in test_failing</div>
               <pre class="error-frame-code">    assert machine[&#39;coffees&#39;] == 20</pre>
             </div></div><pre class="error-tail">E   assert 10 == 20</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L140">examples/test_examples.py:140</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/51b4c2ece13f0263a01d420a60c54c637f31b352/examples/test_coffeeshop.py#L140">examples/test_coffeeshop.py:140</a></div>
       
     </div>
     </div>
@@ -1037,7 +1339,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status skipped">
           ○ skipped
         </span>
-        <span class="scenario-duration">27ms</span>
+        <span class="scenario-duration">25ms</span>
       </span>
     </div>
 
@@ -1096,7 +1398,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L146">examples/test_examples.py:146</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/51b4c2ece13f0263a01d420a60c54c637f31b352/examples/test_coffeeshop.py#L146">examples/test_coffeeshop.py:146</a></div>
       
     </div>
     </div>
@@ -1205,7 +1507,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L49">examples/test_examples.py:49</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/51b4c2ece13f0263a01d420a60c54c637f31b352/examples/test_coffeeshop.py#L49">examples/test_coffeeshop.py:49</a></div>
       
     </div>
     </div>
@@ -1286,7 +1588,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L71">examples/test_examples.py:71</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/51b4c2ece13f0263a01d420a60c54c637f31b352/examples/test_coffeeshop.py#L71">examples/test_coffeeshop.py:71</a></div>
       
     </div>
     </div>
@@ -1305,7 +1607,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status skipped">
           ○ skipped
         </span>
-        <span class="scenario-duration">56ms</span>
+        <span class="scenario-duration">50ms</span>
       </span>
     </div>
 
@@ -1447,31 +1749,41 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L153">examples/test_examples.py:153</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/51b4c2ece13f0263a01d420a60c54c637f31b352/examples/test_coffeeshop.py#L153">examples/test_coffeeshop.py:153</a></div>
       
     </div>
     </div>
   </div>
   
+
+  </div>
+
+  <div id="view-stories" x-show="mainView === 'stories'" x-cloak>
+  
+  </div>
+  <div id="view-glossary" x-show="mainView === 'glossary'" x-cloak>
+  
+  </div>
+
 </div>
 
 <script>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-07T10:26:04.044527+00:00",
+    "timestamp": "2026-06-14T06:27:44.291819+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "cefdae8e1da6b9da70358f18b434949ebcac89f2"
+    "commit_sha": "51b4c2ece13f0263a01d420a60c54c637f31b352"
   },
   "scenarios": [
     {
-      "id": "examples/test_examples.py::test_buy_coffee",
+      "id": "examples/test_coffeeshop.py::test_buy_coffee",
       "narration": {
         "text": "Basic scenario with when/then and a JSON attachment",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing",
         "happy-path"
@@ -1488,7 +1800,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -1499,7 +1813,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1516,24 +1832,28 @@ window.__REPORT_DATA__ = {
               "content_type": "json"
             }
           ],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 20
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_text_attachment",
+      "id": "examples/test_coffeeshop.py::test_text_attachment",
       "narration": {
         "text": "Plain text attachment",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -1549,7 +1869,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -1560,7 +1882,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1577,24 +1901,28 @@ window.__REPORT_DATA__ = {
               "content_type": "text"
             }
           ],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 32
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_generator_fixture",
+      "id": "examples/test_coffeeshop.py::test_generator_fixture",
       "narration": {
         "text": "Generator fixture with teardown",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "passed",
       "duration_ms": 0,
@@ -1608,7 +1936,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "db"
         },
         {
           "phase": "when",
@@ -1619,7 +1949,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1630,24 +1962,28 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 40
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_neutral_highlight",
+      "id": "examples/test_coffeeshop.py::test_neutral_highlight",
       "narration": {
         "text": "T-string with a non-parametrize value (neutral highlight)",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "passed",
       "duration_ms": 0,
@@ -1661,7 +1997,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "given",
@@ -1672,7 +2010,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "when",
@@ -1693,7 +2033,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1717,24 +2059,28 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 61
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_buy_with_validation",
+      "id": "examples/test_coffeeshop.py::test_buy_with_validation",
       "narration": {
         "text": "Helper functions can record their own steps",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -1750,7 +2096,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -1779,7 +2127,9 @@ window.__REPORT_DATA__ = {
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             },
             {
               "phase": "when",
@@ -1794,11 +2144,15 @@ window.__REPORT_DATA__ = {
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1809,7 +2163,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1834,28 +2190,34 @@ window.__REPORT_DATA__ = {
                   "content_type": "json"
                 }
               ],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 100
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_complex_order",
+      "id": "examples/test_coffeeshop.py::test_complex_order",
       "narration": {
         "text": "Top-level `given` block and deeply nested steps",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -1871,7 +2233,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "given",
@@ -1882,7 +2246,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "when",
@@ -1901,7 +2267,9 @@ window.__REPORT_DATA__ = {
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             },
             {
               "phase": "when",
@@ -1920,7 +2288,9 @@ window.__REPORT_DATA__ = {
                   "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null
+                  "error": null,
+                  "activity_ids": [],
+                  "fixture_name": null
                 },
                 {
                   "phase": "when",
@@ -1931,15 +2301,21 @@ window.__REPORT_DATA__ = {
                   "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null
+                  "error": null,
+                  "activity_ids": [],
+                  "fixture_name": null
                 }
               ],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1958,7 +2334,9 @@ window.__REPORT_DATA__ = {
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             },
             {
               "phase": "then",
@@ -1983,15 +2361,21 @@ window.__REPORT_DATA__ = {
                       "content_type": "json"
                     }
                   ],
-                  "error": null
+                  "error": null,
+                  "activity_ids": [],
+                  "fixture_name": null
                 }
               ],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -2008,27 +2392,31 @@ window.__REPORT_DATA__ = {
               "content_type": "json"
             }
           ],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 113
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_failing",
+      "id": "examples/test_coffeeshop.py::test_failing",
       "narration": {
         "text": "Failure rendering (intentionally failing)",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 96,
+      "duration_ms": 89,
       "steps": [
         {
           "phase": "given",
@@ -2039,7 +2427,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "then",
@@ -2050,7 +2440,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
@@ -2143,13 +2535,13 @@ window.__REPORT_DATA__ = {
           },
           {
             "path": "src/pytest_given/capture/decorators.py",
-            "lineno": 191,
+            "lineno": 230,
             "func": "wrapper",
             "code": "    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": "examples/test_examples.py",
+            "path": "examples/test_coffeeshop.py",
             "lineno": 143,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
@@ -2160,20 +2552,22 @@ window.__REPORT_DATA__ = {
       },
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 140
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_skipped",
+      "id": "examples/test_coffeeshop.py::test_skipped",
       "narration": {
         "text": "Skipped scenario rendering",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 27,
+      "duration_ms": 25,
       "steps": [],
       "parameters": null,
       "error": {
@@ -2247,17 +2641,19 @@ window.__REPORT_DATA__ = {
       },
       "skip_reason": "demonstrates skipped status",
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 146
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_pricing[1-False]",
+      "id": "examples/test_coffeeshop.py::test_pricing[1-False]",
       "narration": {
         "text": "Parameterized test (renders as a parameter table)",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -2273,7 +2669,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -2293,7 +2691,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -2313,7 +2713,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": {
@@ -2351,12 +2753,14 @@ window.__REPORT_DATA__ = {
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 49
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_brew[200]",
+      "id": "examples/test_coffeeshop.py::test_brew[200]",
       "narration": {
         "text": "Brew {cup_size} ml (templated scenario name)",
         "parts": [
@@ -2373,7 +2777,7 @@ window.__REPORT_DATA__ = {
           }
         ]
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -2389,7 +2793,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -2412,7 +2818,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -2423,7 +2831,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": {
@@ -2450,20 +2860,22 @@ window.__REPORT_DATA__ = {
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 71
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_parametrized_all_skipped[1]",
+      "id": "examples/test_coffeeshop.py::test_parametrized_all_skipped[1]",
       "narration": {
         "text": "All cases skipped",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 56,
+      "duration_ms": 50,
       "steps": [],
       "parameters": {
         "names": [
@@ -2625,17 +3037,54 @@ window.__REPORT_DATA__ = {
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/test_coffeeshop.py",
         "line": 153
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     }
-  ]
+  ],
+  "glossary": null,
+  "stories": []
 };
+window.__storyIds = [];
+window.__termIds = [];
+// --- Hash helpers ---
+function parseHash() {
+  return new URLSearchParams(window.location.hash.slice(1));
+}
+
+function serializeHash(params) {
+  const s = params.toString();
+  history.replaceState(null, '', s ? '#' + s : window.location.pathname);
+}
+
+function deserializeView(params) {
+  const v = params.get('view');
+  if (v === 'stories' || v === 'glossary') return v;
+  return 'scenarios';
+}
+
+function deserializeStory(params) {
+  const s = params.get('story');
+  const ids = window.__storyIds || [];
+  return (s && ids.includes(s)) ? s : (ids[0] || null);
+}
+
+// --- Alpine app ---
 function reportApp() {
   const data = window.__REPORT_DATA__;
+  const storyIds = window.__storyIds || [];
   return {
     search: '',
     view: 'tags',
+    mainView: 'scenarios',
+    selectedStory: storyIds[0] || null,
+    glossarySearch: '',
+    glossaryKindFilter: { actor: true, object: true, verb: true },
+    expandedTerms: {},
+    hoveredActivity: null,
+    hoveredScenario: null,
     showPassed: true,
     showFailed: true,
     showSkipped: true,
@@ -2644,6 +3093,18 @@ function reportApp() {
     expandedAttachments: {},
     expandedScenarios: {},
     activeTag: null,
+    get anyTermsExpanded() {
+      return Object.keys(this.expandedTerms).length > 0;
+    },
+    toggleAllTerms() {
+      const expand = !this.anyTermsExpanded;
+      const ids = window.__termIds || [];
+      if (expand) {
+        ids.forEach(id => { this.expandedTerms[id] = true; });
+      } else {
+        this.expandedTerms = {};
+      }
+    },
     get filterSummary() {
       const parts = [];
       if (this.activeTag) parts.push('Tag: ' + this.activeTag);
@@ -2767,10 +3228,12 @@ function reportApp() {
       ['search', 'activeTag', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
         this.$watch(key, () => this._writeHash());
       });
+      this.$watch('mainView', () => this._writeHash());
+      this.$watch('selectedStory', () => this._writeHash());
       window.addEventListener('hashchange', () => this._readHash());
     },
     _readHash() {
-      const params = new URLSearchParams(window.location.hash.slice(1));
+      const params = parseHash();
       if (params.has('tag')) this.activeTag = params.get('tag');
       else this.activeTag = null;
       if (params.has('status')) {
@@ -2785,9 +3248,13 @@ function reportApp() {
       }
       if (params.has('q')) this.search = params.get('q');
       else this.search = '';
+      this.mainView = deserializeView(params);
+      this.selectedStory = deserializeStory(params);
     },
     _writeHash() {
       const params = new URLSearchParams();
+      if (this.mainView !== 'scenarios') params.set('view', this.mainView);
+      if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
       if (this.activeTag) params.set('tag', this.activeTag);
 
       const present = new Set(data.scenarios.map(s => s.status));
@@ -2802,8 +3269,7 @@ function reportApp() {
       }
 
       if (this.search) params.set('q', this.search);
-      const hash = params.toString();
-      history.replaceState(null, '', hash ? '#' + hash : window.location.pathname);
+      serializeHash(params);
     },
   };
 }
