@@ -40,7 +40,6 @@ packages = ["src/pytest_given"]
 
 [tool.uv]
 exclude-newer = "7d"
-exclude-newer-package = { pip = "2030-01-01" }
 
 [tool.ruff.format]
 quote-style = "single"
