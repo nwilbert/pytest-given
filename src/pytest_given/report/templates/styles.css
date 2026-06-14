@@ -526,3 +526,298 @@ span.param-highlight {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* === Term-ref pills (actor / object / verb) and draft cue variants === */
+.term-ref-actor {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.term-ref-object {
+  background: #ccfbf1;
+  color: #0f766e;
+  border: 1px solid #5eead4;
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  cursor: pointer;
+}
+.term-ref-verb {
+  color: #0e7490;
+  border-bottom: 1px dotted #0e7490;
+  cursor: pointer;
+  font-weight: 500;
+}
+.term-ref-unknown {
+  background: #f3f4f6;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+}
+/* Draft cue: dashed border for actors/objects, dashed underline for verbs */
+.term-ref-actor.is-draft {
+  border-style: dashed;
+  font-style: italic;
+  cursor: default;
+}
+.term-ref-object.is-draft {
+  border-style: dashed;
+  font-style: italic;
+  cursor: default;
+}
+.term-ref-verb.is-draft {
+  border-bottom-style: dashed;
+  font-style: italic;
+  cursor: default;
+}
+.activity-word {
+  color: var(--text-secondary);
+}
+
+/* === Tab strip === */
+:root {
+  --color-mixed: #ca8a04;
+  --color-uncovered: #9ca3af;
+}
+.frame-nav {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0;
+}
+.nav-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.15s, border-color 0.15s;
+}
+.nav-tab:hover { color: var(--color-accent); }
+.nav-tab-active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* === Story layout === */
+.stories-layout {
+  display: flex;
+  gap: var(--space-xl);
+}
+.story-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+}
+.story-main { flex: 1; }
+.story-sidebar-item {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 1px solid transparent;
+  margin-bottom: var(--space-xs);
+}
+.story-sidebar-item:hover { background: var(--bg-card); border-color: var(--border); }
+.story-sidebar-item.active {
+  background: var(--color-accent-bg);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.story-sidebar-title { font-weight: 600; font-size: var(--font-size-md); }
+.story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
+.story-head { margin-bottom: var(--space-lg); }
+.story-title { font-size: var(--font-size-lg); font-weight: 600; margin-bottom: var(--space-xs); }
+.story-stats { font-size: var(--font-size-sm); color: var(--text-muted); }
+
+/* === Activity timeline === */
+.activity-timeline { display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-xl); }
+.activity-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+}
+.activity-num {
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  color: #fff;
+  border-radius: 50%;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+
+/* === Coverage chip === */
+.activity-cov { flex-shrink: 0; }
+.cov-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+.cov-chip.cov-passed { background: #d4edda; color: #155724; }
+.cov-chip.cov-failed { background: #f8d7da; color: #721c24; }
+.cov-chip.cov-mixed { background: #fff3cd; color: #856404; }
+.cov-chip.cov-uncovered { background: #f3f4f6; color: var(--text-muted); }
+
+/* === Scenario badge strip === */
+.activity-badges { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+.use-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+}
+.use-chip:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.use-chip-passed { border-color: var(--color-passed); }
+.use-chip-failed { border-color: var(--color-failed); }
+.use-chip-skipped { border-color: var(--color-skipped); }
+.scn-act-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+  border-top: 1px solid var(--border);
+  margin-top: var(--space-xs);
+  flex-wrap: wrap;
+}
+.scn-act-label { color: var(--text-muted); font-weight: 600; }
+.scn-act-strip-section { margin-top: var(--space-xl); }
+
+/* === Glossary layout === */
+.glossary-layout { display: flex; }
+.glossary-layout .sidebar {
+  width: 260px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  padding: var(--space-lg);
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: 100vh;
+  position: sticky;
+  top: 0;
+}
+.glossary-layout .main { flex: 1; padding: var(--space-xl); overflow-y: auto; }
+
+/* Kind filter rows in sidebar */
+.kind-filter-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 4px 0;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+.kind-filter-row input[type="checkbox"] { flex-shrink: 0; }
+.kind-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.kind-swatch-actor { background: #fcd34d; }
+.kind-swatch-object { background: #5eead4; }
+.kind-swatch-verb { background: #67e8f9; }
+
+/* === Kind section headers === */
+.kind-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--border);
+}
+.kind-title {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+}
+.kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
+
+/* Kind colour classes for kind headers and term pills */
+.term-actor { color: #92400e; }
+.term-obj { color: #0f766e; }
+.term-verb { color: #0e7490; }
+
+/* === Term pills === */
+.term-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: var(--font-size-md);
+}
+.term-pill.term-actor { background: #fef3c7; border: 1px solid #fcd34d; }
+.term-pill.term-obj { background: #ccfbf1; border: 1px solid #5eead4; }
+.term-pill.term-verb { background: #ecfeff; border: 1px solid #67e8f9; }
+
+/* === Glossary entry layout === */
+.entry {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+}
+.entry-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  user-select: none;
+}
+.entry-head .scenario-chevron { margin-top: 6px; flex-shrink: 0; }
+.entry-name { flex-shrink: 0; min-width: 160px; }
+.entry-body { flex: 1; }
+.entry-def { font-size: var(--font-size-md); color: var(--text-primary); }
+.entry-def-placeholder { font-style: italic; color: var(--text-muted); }
+.entry-summary { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
+
+/* === Refs collapsible === */
+.refs { }
+.refs-inner { overflow: hidden; min-height: 0; }
+.refs-content {
+  padding: 0 var(--space-lg) var(--space-md) calc(var(--space-lg) + 8px + var(--space-sm) + 160px + var(--space-sm));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.refs-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+.refs-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.refs-fixture { font-size: var(--font-size-sm); color: var(--text-muted); }
