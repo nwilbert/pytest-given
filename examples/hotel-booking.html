@@ -953,7 +953,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e95ce5bcf00ca2dc40bb0e8d0c0d1bf118405761/examples/test_hotel_booking.py#L124">examples/test_hotel_booking.py:124</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/422b1b0d04c69604a2fb59fc857e3ef2512810eb/examples/test_hotel_booking.py#L127">examples/test_hotel_booking.py:127</a></div>
       
     </div>
     </div>
@@ -1002,12 +1002,12 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e95ce5bcf00ca2dc40bb0e8d0c0d1bf118405761/examples/test_hotel_booking.py#L138">examples/test_hotel_booking.py:138</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/422b1b0d04c69604a2fb59fc857e3ef2512810eb/examples/test_hotel_booking.py#L141">examples/test_hotel_booking.py:141</a></div>
       
     </div>
     </div>
   </div>
-  <div class="scenario passed"
+  <div class="scenario failed"
        x-show="isVisible(2)"
        :id="'scenario-' + 2"
        :class="{ 'scenario-expanded': expandedScenarios[2] }">
@@ -1018,10 +1018,10 @@ span.param-highlight {
         
       </div>
       <span class="scenario-meta">
-        <span class="scenario-status passed">
-          ✓ passed
+        <span class="scenario-status failed">
+          ✗ failed
         </span>
-        <span class="scenario-duration">0ms</span>
+        <span class="scenario-duration">54ms</span>
       </span>
     </div>
 
@@ -1037,19 +1037,165 @@ span.param-highlight {
           </div><div class="phase-steps">
             <div class="step-text"><span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span> has <span class="term-ref-verb" data-term-id="add" title="Attach a member to a collection.">added</span> <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Alice</span> and <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Bob</span> to the <span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span></div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span> <span class="term-ref-verb" data-term-id="submit" title="Send to the system for processing.">submits</span> the <span class="term-ref-object" data-term-id="payment" title="Money transferred for a booking.">Payment</span> for the <span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span></div>
+            <div class="step-text"><span class="term-ref-actor" data-term-id="organizer" title="Person booking accommodation on behalf of a group.">Carol</span> <span class="term-ref-verb" data-term-id="submit" title="Send to the system for processing.">submits</span> the <span class="term-ref-object" data-term-id="payment" title="Money transferred for a booking.">Payment</span> by <span class="param-color-0" data-param="payment_method" @mouseenter="setHoverParam('payment_method', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{payment_method}</span> for the <span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span> <span class="term-ref-verb" data-term-id="reject" title="Refuse to process or accept.">rejects</span> the <span class="term-ref-object" data-term-id="payment" title="Money transferred for a booking.">Payment</span> because of insufficient funds</div>
+            <div class="step-text">the <span class="term-ref-actor" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span> <span class="term-ref-verb" data-term-id="reject" title="Refuse to process or accept.">rejects</span> the <span class="term-ref-object" data-term-id="payment" title="Money transferred for a booking.">Payment</span> because of <span class="param-color-1" data-param="decline_reason" @mouseenter="setHoverParam('decline_reason', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{decline_reason}</span></div>
           </div><div class="phase-steps">
             <div class="step-text">the <span class="term-ref-object" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span> stays pending and no <span class="term-ref-object" data-term-id="confirmation" title="Notification of a successful booking.">Confirmation</span> is sent to <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Alice</span> or <span class="term-ref-actor" data-term-id="guest" title="Individual traveler in the group.">Bob</span></div>
           </div></div>
 
       
-
+      <table class="param-table">
+        <thead>
+          <tr>
+            
+            <th class="param-color-0" data-param="payment_method"
+                @mouseenter="setHoverParam('payment_method', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">payment_method</th>
+            
+            <th class="param-color-1" data-param="decline_reason"
+                @mouseenter="setHoverParam('decline_reason', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">decline_reason</th>
+            
+            <th style="text-align:right">status</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr class="">
+            
+            <td data-param="payment_method"
+                @mouseenter="setHoverParam('payment_method', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">credit card</td>
+            
+            <td data-param="decline_reason"
+                @mouseenter="setHoverParam('decline_reason', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">insufficient funds</td>
+            
+            <td style="text-align:right">
+              <span class="dot-passed">✓</span>
+            </td>
+          </tr>
+          
+          
+          <tr class="">
+            
+            <td data-param="payment_method"
+                @mouseenter="setHoverParam('payment_method', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">debit card</td>
+            
+            <td data-param="decline_reason"
+                @mouseenter="setHoverParam('decline_reason', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">expired card</td>
+            
+            <td style="text-align:right">
+              <span class="dot-passed">✓</span>
+            </td>
+          </tr>
+          
+          
+          <tr class="">
+            
+            <td data-param="payment_method"
+                @mouseenter="setHoverParam('payment_method', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">bank transfer</td>
+            
+            <td data-param="decline_reason"
+                @mouseenter="setHoverParam('decline_reason', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">fraud check failed</td>
+            
+            <td style="text-align:right">
+              <span class="dot-passed">✓</span>
+            </td>
+          </tr>
+          
+          
+          <tr class="failed-row">
+            
+            <td data-param="payment_method"
+                @mouseenter="setHoverParam('payment_method', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">gift card</td>
+            
+            <td data-param="decline_reason"
+                @mouseenter="setHoverParam('decline_reason', $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">partial balance</td>
+            
+            <td style="text-align:right">
+              <span class="dot-failed">✗</span>
+            </td>
+          </tr>
+          
+          <tr>
+            <td colspan="3">
+              <div class="error-block" x-data="{ showInternal: false }">
+      <div class="error-message">assert &#39;gift card&#39; in {&#39;bank transfer&#39;, &#39;credit card&#39;, &#39;debit card&#39;}</div><button class="error-toggle" type="button" @click="showInternal = !showInternal">
+          <span x-show="!showInternal">Show 13 internal frames</span>
+          <span x-show="showInternal" x-cloak>Hide internal frames</span>
+        </button><div class="error-frames"><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:353: in from_call</div>
+              <pre class="error-frame-code">    result: TResult | None = func()
+                             ^^^^^^</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:245: in &lt;lambda&gt;</div>
+              <pre class="error-frame-code">    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
+              <pre class="error-frame-code">    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
+              <pre class="error-frame-code">    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/logging.py:850: in pytest_runtest_call</div>
+              <pre class="error-frame-code">    yield</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/capture.py:900: in pytest_runtest_call</div>
+              <pre class="error-frame-code">    return (yield)
+            ^^^^^</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/skipping.py:268: in pytest_runtest_call</div>
+              <pre class="error-frame-code">    return (yield)
+            ^^^^^</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:179: in pytest_runtest_call</div>
+              <pre class="error-frame-code">    item.runtest()</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/python.py:1720: in runtest</div>
+              <pre class="error-frame-code">    self.ihook.pytest_pyfunc_call(pyfuncitem=self)</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
+              <pre class="error-frame-code">    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
+              <pre class="error-frame-code">    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/python.py:166: in pytest_pyfunc_call</div>
+              <pre class="error-frame-code">    result = testfunction(**testargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^</pre>
+            </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
+              <div class="error-frame-loc">src/pytest_given/capture/decorators.py:224: in wrapper</div>
+              <pre class="error-frame-code">    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^</pre>
+            </div><div class="error-frame">
+              <div class="error-frame-loc">examples/test_hotel_booking.py:211: in test_payment_declined</div>
+              <pre class="error-frame-code">    assert payment_method in SUPPORTED_PAYMENT_METHODS</pre>
+            </div></div><pre class="error-tail">E   AssertionError: assert &#39;gift card&#39; in {&#39;bank transfer&#39;, &#39;credit card&#39;, &#39;debit card&#39;}</pre></div>
+            </td>
+          </tr>
+          
+          
+        </tbody>
+      </table>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e95ce5bcf00ca2dc40bb0e8d0c0d1bf118405761/examples/test_hotel_booking.py#L171">examples/test_hotel_booking.py:171</a></div>
+
+      
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/422b1b0d04c69604a2fb59fc857e3ef2512810eb/examples/test_hotel_booking.py#L177">examples/test_hotel_booking.py:177</a></div>
       
     </div>
     </div>
@@ -1175,7 +1321,7 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">2/2</span>
+              <span class="cov-chip cov-mixed">1/2</span>
               
             </div>
             <div class="activity-badges">
@@ -1191,9 +1337,9 @@ span.param-highlight {
               
               
               
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_payment_declined'))">
-                <span class="dot-passed">✓</span>
+              <a class="use-chip use-chip-failed"
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]'))">
+                <span class="dot-failed">✗</span>
                 Payment is declined — the...
               </a>
               
@@ -1214,7 +1360,7 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">2/2</span>
+              <span class="cov-chip cov-mixed">1/2</span>
               
             </div>
             <div class="activity-badges">
@@ -1230,9 +1376,9 @@ span.param-highlight {
               
               
               
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_payment_declined'))">
-                <span class="dot-passed">✓</span>
+              <a class="use-chip use-chip-failed"
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]'))">
+                <span class="dot-failed">✗</span>
                 Payment is declined — the...
               </a>
               
@@ -1394,15 +1540,15 @@ span.param-highlight {
             
           </div>
           
-          <div class="scenario passed" style="margin-bottom: var(--space-sm);">
+          <div class="scenario failed" style="margin-bottom: var(--space-sm);">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <span class="scenario-chevron-placeholder"></span>
                 <span class="scenario-name">Payment is declined — the booking is not finalized</span>
               </div>
               <span class="scenario-meta">
-                <span class="scenario-status passed">
-                  ✓ passed
+                <span class="scenario-status failed">
+                  ✗ failed
                 </span>
               </span>
             </div>
@@ -2141,10 +2287,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-14T12:40:20.513761+00:00",
+    "timestamp": "2026-06-14T16:57:20.376198+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "e95ce5bcf00ca2dc40bb0e8d0c0d1bf118405761"
+    "commit_sha": "422b1b0d04c69604a2fb59fc857e3ef2512810eb"
   },
   "scenarios": [
     {
@@ -2321,7 +2467,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_hotel_booking.py",
-        "line": 124
+        "line": 127
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
@@ -2653,21 +2799,21 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_hotel_booking.py",
-        "line": 138
+        "line": 141
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
     },
     {
-      "id": "examples/test_hotel_booking.py::test_payment_declined",
+      "id": "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]",
       "narration": {
         "text": "Payment is declined \u2014 the booking is not finalized",
         "parts": []
       },
       "module": "test_hotel_booking",
       "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
+      "status": "failed",
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -2797,7 +2943,7 @@ window.__REPORT_DATA__ = {
         {
           "phase": "when",
           "narration": {
-            "text": "Carol submits the Payment for the Booking",
+            "text": "Carol submits the Payment by credit card for the Booking",
             "parts": [
               {
                 "term_id": "organizer",
@@ -2822,6 +2968,14 @@ window.__REPORT_DATA__ = {
                 "display": "Payment",
                 "expression": "payment",
                 "param_column": null
+              },
+              {
+                "value": " by "
+              },
+              {
+                "name": "payment_method",
+                "format_spec": "",
+                "conversion": null
               },
               {
                 "value": " for the "
@@ -2874,7 +3028,12 @@ window.__REPORT_DATA__ = {
                 "param_column": null
               },
               {
-                "value": " because of insufficient funds"
+                "value": " because of "
+              },
+              {
+                "name": "decline_reason",
+                "format_spec": "",
+                "conversion": null
               }
             ]
           },
@@ -2936,12 +3095,154 @@ window.__REPORT_DATA__ = {
           "fixture_name": null
         }
       ],
-      "parameters": null,
+      "parameters": {
+        "names": [
+          "payment_method",
+          "decline_reason"
+        ],
+        "cases": [
+          {
+            "values": [
+              "credit card",
+              "insufficient funds"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "debit card",
+              "expired card"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "bank transfer",
+              "fraud check failed"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "gift card",
+              "partial balance"
+            ],
+            "status": "failed",
+            "error": {
+              "message": "assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}",
+              "frames": [
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+                  "lineno": 353,
+                  "func": "from_call",
+                  "code": "    result: TResult | None = func()\n                             ^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+                  "lineno": 245,
+                  "func": "<lambda>",
+                  "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/pluggy/_hooks.py",
+                  "lineno": 512,
+                  "func": "__call__",
+                  "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/pluggy/_manager.py",
+                  "lineno": 120,
+                  "func": "_hookexec",
+                  "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/logging.py",
+                  "lineno": 850,
+                  "func": "pytest_runtest_call",
+                  "code": "    yield",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/capture.py",
+                  "lineno": 900,
+                  "func": "pytest_runtest_call",
+                  "code": "    return (yield)\n            ^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/skipping.py",
+                  "lineno": 268,
+                  "func": "pytest_runtest_call",
+                  "code": "    return (yield)\n            ^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+                  "lineno": 179,
+                  "func": "pytest_runtest_call",
+                  "code": "    item.runtest()",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/python.py",
+                  "lineno": 1720,
+                  "func": "runtest",
+                  "code": "    self.ihook.pytest_pyfunc_call(pyfuncitem=self)",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/pluggy/_hooks.py",
+                  "lineno": 512,
+                  "func": "__call__",
+                  "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/pluggy/_manager.py",
+                  "lineno": 120,
+                  "func": "_hookexec",
+                  "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/python.py",
+                  "lineno": 166,
+                  "func": "pytest_pyfunc_call",
+                  "code": "    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "src/pytest_given/capture/decorators.py",
+                  "lineno": 224,
+                  "func": "wrapper",
+                  "code": "    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "examples/test_hotel_booking.py",
+                  "lineno": 211,
+                  "func": "test_payment_declined",
+                  "code": "    assert payment_method in SUPPORTED_PAYMENT_METHODS",
+                  "is_internal": false
+                }
+              ],
+              "error_tail": "E   AssertionError: assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}"
+            }
+          }
+        ]
+      },
       "error": null,
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_hotel_booking.py",
-        "line": 171
+        "line": 177
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []

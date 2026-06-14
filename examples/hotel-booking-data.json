@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-14T12:40:20.513761+00:00",
+    "timestamp": "2026-06-14T16:57:20.376198+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "e95ce5bcf00ca2dc40bb0e8d0c0d1bf118405761"
+    "commit_sha": "422b1b0d04c69604a2fb59fc857e3ef2512810eb"
   },
   "scenarios": [
     {
@@ -181,7 +181,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_hotel_booking.py",
-        "line": 124
+        "line": 127
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
@@ -513,21 +513,21 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_hotel_booking.py",
-        "line": 138
+        "line": 141
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
     },
     {
-      "id": "examples/test_hotel_booking.py::test_payment_declined",
+      "id": "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]",
       "narration": {
         "text": "Payment is declined \u2014 the booking is not finalized",
         "parts": []
       },
       "module": "test_hotel_booking",
       "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
+      "status": "failed",
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -657,7 +657,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "Carol submits the Payment for the Booking",
+            "text": "Carol submits the Payment by credit card for the Booking",
             "parts": [
               {
                 "term_id": "organizer",
@@ -682,6 +682,14 @@
                 "display": "Payment",
                 "expression": "payment",
                 "param_column": null
+              },
+              {
+                "value": " by "
+              },
+              {
+                "name": "payment_method",
+                "format_spec": "",
+                "conversion": null
               },
               {
                 "value": " for the "
@@ -734,7 +742,12 @@
                 "param_column": null
               },
               {
-                "value": " because of insufficient funds"
+                "value": " because of "
+              },
+              {
+                "name": "decline_reason",
+                "format_spec": "",
+                "conversion": null
               }
             ]
           },
@@ -796,12 +809,154 @@
           "fixture_name": null
         }
       ],
-      "parameters": null,
+      "parameters": {
+        "names": [
+          "payment_method",
+          "decline_reason"
+        ],
+        "cases": [
+          {
+            "values": [
+              "credit card",
+              "insufficient funds"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "debit card",
+              "expired card"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "bank transfer",
+              "fraud check failed"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "gift card",
+              "partial balance"
+            ],
+            "status": "failed",
+            "error": {
+              "message": "assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}",
+              "frames": [
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+                  "lineno": 353,
+                  "func": "from_call",
+                  "code": "    result: TResult | None = func()\n                             ^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+                  "lineno": 245,
+                  "func": "<lambda>",
+                  "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/pluggy/_hooks.py",
+                  "lineno": 512,
+                  "func": "__call__",
+                  "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/pluggy/_manager.py",
+                  "lineno": 120,
+                  "func": "_hookexec",
+                  "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/logging.py",
+                  "lineno": 850,
+                  "func": "pytest_runtest_call",
+                  "code": "    yield",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/capture.py",
+                  "lineno": 900,
+                  "func": "pytest_runtest_call",
+                  "code": "    return (yield)\n            ^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/skipping.py",
+                  "lineno": 268,
+                  "func": "pytest_runtest_call",
+                  "code": "    return (yield)\n            ^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+                  "lineno": 179,
+                  "func": "pytest_runtest_call",
+                  "code": "    item.runtest()",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/python.py",
+                  "lineno": 1720,
+                  "func": "runtest",
+                  "code": "    self.ihook.pytest_pyfunc_call(pyfuncitem=self)",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/pluggy/_hooks.py",
+                  "lineno": 512,
+                  "func": "__call__",
+                  "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/pluggy/_manager.py",
+                  "lineno": 120,
+                  "func": "_hookexec",
+                  "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": ".nox/examples/Lib/site-packages/_pytest/python.py",
+                  "lineno": 166,
+                  "func": "pytest_pyfunc_call",
+                  "code": "    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "src/pytest_given/capture/decorators.py",
+                  "lineno": 224,
+                  "func": "wrapper",
+                  "code": "    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "examples/test_hotel_booking.py",
+                  "lineno": 211,
+                  "func": "test_payment_declined",
+                  "code": "    assert payment_method in SUPPORTED_PAYMENT_METHODS",
+                  "is_internal": false
+                }
+              ],
+              "error_tail": "E   AssertionError: assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}"
+            }
+          }
+        ]
+      },
       "error": null,
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_hotel_booking.py",
-        "line": 171
+        "line": 177
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []

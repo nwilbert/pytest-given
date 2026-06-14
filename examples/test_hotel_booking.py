@@ -14,10 +14,13 @@ Given/When/Then form:
 * `test_complete_booking` — happy path through the rest, covers 2–6.
   Activity 2 is intentionally shared with `test_pick_suite` so the Stories tab
   shows two badges on that row.
-* `test_payment_declined` — error branch using a `reject` verb that lives in
-  the glossary but isn't part of any story activity. Covers 3 and 4, overlapping
-  with `test_complete_booking` to show how a scenario can probe a different
-  aspect (the failure path) of the same activities.
+* `test_payment_declined` — parameterized error branch using a `reject` verb
+  that lives in the glossary but isn't part of any story activity. Cases pair
+  a payment method with its decline reason (credit card / insufficient funds,
+  debit card / expired card, bank transfer / fraud check), all funneling
+  through the same reject path. Covers 3 and 4, overlapping with
+  `test_complete_booking` to show how a scenario can probe a different aspect
+  (the failure path) of the same activities.
 
 Activity 7 stays uncovered (drafts are excluded from implicit coverage), making
 visible the vocabulary the team still has to commit.
@@ -168,10 +171,24 @@ def test_complete_booking(carol, alice, bob):
         assert set(booking_state['notified']) == {'Alice', 'Bob'}
 
 
+SUPPORTED_PAYMENT_METHODS = {'credit card', 'debit card', 'bank transfer'}
+
+
 @scenario(
     'Payment is declined — the booking is not finalized', story=book_a_group_trip
 )
-def test_payment_declined(carol, alice, bob):
+@pytest.mark.parametrize(
+    'payment_method,decline_reason',
+    [
+        ('credit card', 'insufficient funds'),
+        ('debit card', 'expired card'),
+        ('bank transfer', 'fraud check failed'),
+        # Gift cards aren't wired into the decline handler yet — this case
+        # fails on the supported-method guard until the feature lands.
+        ('gift card', 'partial balance'),
+    ],
+)
+def test_payment_declined(carol, alice, bob, payment_method, decline_reason):
     with given(
         t'{organizer("Carol")} has {add("added")} {guest("Alice")} '
         t'and {guest("Bob")} to the {booking}'
@@ -183,15 +200,16 @@ def test_payment_declined(carol, alice, bob):
         }
     with when(
         t'{organizer("Carol")} {submit("submits")} the {payment} '
-        t'for the {booking}'
+        t'by {payment_method} for the {booking}'
     ):
-        # Payment processor reports insufficient funds.
-        declined_reason = 'insufficient funds'
+        # Payment processor reports the parameterized decline reason.
+        processor_response = decline_reason
     with then(
         t'the {booking_system} {reject("rejects")} the {payment} '
-        t'because of insufficient funds'
+        t'because of {decline_reason}'
     ):
-        assert declined_reason == 'insufficient funds'
+        assert payment_method in SUPPORTED_PAYMENT_METHODS
+        assert processor_response == decline_reason
         assert not booking_state['paid']
     with then(
         t'the {booking} stays pending and no {confirmation} is sent '

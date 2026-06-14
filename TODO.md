@@ -2,8 +2,6 @@
 
 ## Now
 
-- [ ] remove pip exclude-newer workaround
-- [ ] add parameterized scenario in hotel example
 - [ ] improve / add links in report, between scenarios, terms / glossary, and stories
 - [ ] use >> for activity paths?
 - [ ] add diagram to readme with Agent <-> Dev <-> Domain Expert

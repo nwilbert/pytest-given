@@ -123,7 +123,8 @@ def examples(session: nox.Session) -> None:
             success_codes=[0, 1],
         )
     session.log(
-        'Note: coffeeshop suite has 1 intentional failure for failure rendering.'
+        'Note: each suite has 1 intentional failure for failure rendering '
+        '(coffeeshop: test_failing; hotel-booking: gift-card decline case).'
     )
 
 
