@@ -145,6 +145,7 @@ def build_glossary_aggregations(
                         agg=_ensure(part.term_id),
                         term_id=part.term_id,
                         display=part.display,
+                        canonical=term.canonical,
                         fixture_name=step.fixture_name,
                         seen_instances=seen_instances,
                     )
@@ -166,6 +167,7 @@ def build_glossary_aggregations(
                             agg=agg,
                             term_id=apath_part.entity_id,
                             display=apath_part.display,
+                            canonical=term.canonical,
                             fixture_name=None,
                             seen_instances=seen_instances,
                         )
@@ -201,10 +203,19 @@ def _record_entity_observation(
     agg: GlossaryAggregation,
     term_id: TermId,
     display: str,
+    canonical: str,
     fixture_name: str | None,
     seen_instances: dict[tuple[TermId, str], str | None],
 ) -> None:
-    """Record a new instance for the given term, if not already seen."""
+    """Record a new instance for the given term, if not already seen.
+
+    A reference whose display matches the term's canonical name is the
+    canonical concept (identity `(term_id, None)`), not an instance, so it is
+    not collected. Only specific instance displays (e.g. ``Alice`` for
+    ``Guest``) end up in the Glossary view's Instances list.
+    """
+    if display == canonical:
+        return
     key = (term_id, display)
     if key not in seen_instances:
         seen_instances[key] = fixture_name

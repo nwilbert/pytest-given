@@ -303,6 +303,47 @@ def test_build_glossary_aggregations_verb_in_step_not_collected_as_instance() ->
     assert TermId('search') not in aggs
 
 
+def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -> None:
+    """A canonical-name entity reference (display == term.canonical) names the
+    canonical concept, not a distinct instance — it must not appear in the
+    Glossary view's Instances list, whether seen in a scenario step narration
+    or in a story activity path."""
+    g = _g()
+    # Story activity uses bare canonical Guest + canonical Room.
+    a = Activity(
+        id=ActivityId(1),
+        paths=(
+            ActivityPath(
+                parts=(
+                    _ent('guest', 'Guest'),
+                    ActivityTerm(term_id=TermId('search'), display='searches for'),
+                    _ent('room', 'Room'),
+                )
+            ),
+        ),
+    )
+    story = Story(id=StoryId('book'), title='Book', activities=(a,))
+    # Scenario narration also references the canonical Guest.
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='x',
+            parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[step],
+        story_id=StoryId('book'),
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    assert aggs[TermId('guest')].instances == []
+    assert aggs[TermId('room')].instances == []
+
+
 def test_build_glossary_aggregations_skips_non_term_ref_narration_parts() -> None:
     """NarrationLiteral / NarrationValue parts in a step are skipped."""
     from pytest_given.model import NarrationLiteral
