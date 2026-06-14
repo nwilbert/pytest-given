@@ -2,24 +2,20 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from typing import Literal
 
-from ..model import Glossary, GlossaryTerm, PytestGivenError, TermId
+from ..model import Glossary, GlossaryTerm, PytestGivenError, TermId, id_derive
 
-_NON_ALNUM = re.compile(r'[^a-z0-9]+')
-
-
-def id_derive(name: str) -> TermId:
-    """Lowercase, collapse non-alphanumeric runs to '-', strip, reject empty."""
-    slug = _NON_ALNUM.sub('-', name.lower()).strip('-')
-    if not slug:
-        raise PytestGivenError(
-            f'derived id is empty for {name!r}; provide a name with at least '
-            f'one ASCII alphanumeric character.'
-        )
-    return TermId(slug)
+__all__ = [
+    'Actor',
+    'ActorInstance',
+    'InflectedVerb',
+    'Verb',
+    'WorkObject',
+    'WorkObjectInstance',
+    'id_derive',
+]
 
 
 @dataclass(frozen=True)
