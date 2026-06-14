@@ -26,7 +26,26 @@ class NarrationPlaceholder:
     conversion: str | None = None
 
 
-type NarrationPart = NarrationLiteral | NarrationValue | NarrationPlaceholder
+# Pytest node ID, e.g. "tests/test_billing.py::test_buy_coffee[1-2-3]"
+NodeId = NewType('NodeId', str)
+
+TermId = NewType('TermId', str)
+ActivityId = NewType('ActivityId', int)
+StoryId = NewType('StoryId', str)
+
+
+@dataclass(frozen=True, kw_only=True)
+class NarrationTermRef:
+    """Reference to a glossary term — kind resolved via glossary[term_id].kind."""
+
+    term_id: TermId
+    display: str
+    param_column: str | None = None
+
+
+type NarrationPart = (
+    NarrationLiteral | NarrationValue | NarrationPlaceholder | NarrationTermRef
+)
 
 
 @dataclass(frozen=True)
@@ -42,8 +61,112 @@ class Narration:
     parts: list[NarrationPart] = field(default_factory=list)
 
 
-# Pytest node ID, e.g. "tests/test_billing.py::test_buy_coffee[1-2-3]"
-NodeId = NewType('NodeId', str)
+@dataclass(frozen=True, kw_only=True)
+class GlossaryTerm:
+    id: TermId
+    kind: Literal['actor', 'object', 'verb']
+    canonical: str
+    definition: str = ''
+
+
+@dataclass(frozen=True, kw_only=True)
+class ActivityEntity:
+    """Part referencing a term whose kind is 'actor' or 'object'."""
+
+    entity_id: TermId
+    display: str
+
+
+@dataclass(frozen=True, kw_only=True)
+class ActivityTerm:
+    """Part referencing a term whose kind is 'verb'."""
+
+    term_id: TermId
+    display: str
+
+
+@dataclass(frozen=True, kw_only=True)
+class ActivityWord:
+    """Bare-string connective (preposition, article, etc.). Carries no kind."""
+
+    text: str
+
+
+@dataclass(frozen=True, kw_only=True)
+class ActivityPlaceholder:
+    """A draft (kind-tagged but not glossary-registered) entity or verb."""
+
+    kind: Literal['actor', 'object', 'verb']
+    text: str
+
+
+type ActivityPart = ActivityEntity | ActivityTerm | ActivityWord | ActivityPlaceholder
+
+
+@dataclass(frozen=True, kw_only=True)
+class ActivityPath:
+    parts: tuple[ActivityPart, ...]
+
+
+@dataclass(frozen=True, kw_only=True)
+class Activity:
+    id: ActivityId
+    paths: tuple[ActivityPath, ...]
+
+
+@dataclass(frozen=True, kw_only=True)
+class Story:
+    id: StoryId
+    title: str
+    activities: tuple[Activity, ...]
+    _by_id: dict[ActivityId, Activity] = field(
+        init=False, repr=False, compare=False, default_factory=dict
+    )
+
+    def __post_init__(self) -> None:
+        index: dict[ActivityId, Activity] = {}
+        for activity in self.activities:
+            index[activity.id] = activity
+        object.__setattr__(self, '_by_id', index)
+
+    def __getitem__(self, key: ActivityId) -> Activity:
+        return self._by_id[key]
+
+    def get(self, key: ActivityId) -> Activity | None:
+        return self._by_id.get(key)
+
+
+@dataclass
+class Glossary:
+    """Mutable container of glossary terms with an id-keyed index.
+
+    The user-facing registration methods (`actor` / `work_object` / `verb`)
+    live in `pytest_given.capture.glossary`; this class only owns storage
+    and atomic write-through. `_register` is the low-level primitive both
+    those methods and the deserializer call.
+    """
+
+    terms: list[GlossaryTerm] = field(default_factory=list)
+    _by_id: dict[TermId, GlossaryTerm] = field(
+        init=False, repr=False, compare=False, default_factory=dict
+    )
+
+    def __post_init__(self) -> None:
+        for term in self.terms:
+            self._by_id[term.id] = term
+
+    def __getitem__(self, key: TermId) -> GlossaryTerm:
+        return self._by_id[key]
+
+    def get(self, key: TermId) -> GlossaryTerm | None:
+        return self._by_id.get(key)
+
+    def _register(self, term: GlossaryTerm) -> None:
+        if term.id in self._by_id:
+            raise ValueError(f'term id {term.id!r} already registered')
+        self.terms.append(term)
+        self._by_id[term.id] = term
+
 
 # Step phase
 type Phase = Literal['given', 'when', 'then']
@@ -122,6 +245,7 @@ class Step:
     children: list[Step] = field(default_factory=list)
     attachments: list[Attachment] = field(default_factory=list)
     error: ErrorInfo | None = None
+    activity_ids: tuple[ActivityId, ...] = ()
 
 
 @dataclass
@@ -168,6 +292,8 @@ class Scenario:
     error: ErrorInfo | None = None
     skip_reason: str | None = None
     source: SourceLocation | None = None
+    story_id: StoryId | None = None
+    activity_ids: tuple[ActivityId, ...] = ()
 
 
 @dataclass
@@ -183,3 +309,5 @@ class Metadata:
 class ReportData:
     metadata: Metadata
     scenarios: list[Scenario] = field(default_factory=list)
+    glossary: Glossary | None = None
+    stories: list[Story] = field(default_factory=list)
