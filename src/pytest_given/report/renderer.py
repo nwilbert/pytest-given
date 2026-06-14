@@ -6,13 +6,21 @@ import jinja2
 from markupsafe import Markup, escape
 
 from ..model import (
+    ActivityEntity,
+    ActivityId,
+    ActivityPart,
+    ActivityPlaceholder,
+    ActivityTerm,
+    ActivityWord,
     Glossary,
     Narration,
     NarrationLiteral,
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
+    NodeId,
     Scenario,
+    StoryId,
     report_from_dict,
 )
 from .aggregations import (
@@ -70,10 +78,47 @@ def render_html(
     glossary_aggregations = build_glossary_aggregations(report)
     visibility = tab_visibility(report)
 
+    scenarios_by_story_id: dict[StoryId, list[Scenario]] = {}
+    for scn in report.scenarios:
+        if scn.story_id is None:
+            continue
+        scenarios_by_story_id.setdefault(scn.story_id, []).append(scn)
+
+    stories_coverage_rollup: dict[StoryId, dict[ActivityId, dict]] = {}
+    stories_coverage_by_scenario: dict[str, list[NodeId]] = {}
+    for story in report.stories:
+        per_activity: dict[ActivityId, dict] = {}
+        for activity in story.activities:
+            covered_by: list[NodeId] = []
+            passed = 0
+            total = 0
+            for scn in scenarios_by_story_id.get(story.id, []):
+                if activity.id in coverage_maps[scn.id]:
+                    covered_by.append(scn.id)
+                    total += 1
+                    if scn.status == 'passed':
+                        passed += 1
+            per_activity[activity.id] = {
+                'scenario_ids': covered_by,
+                'passed': passed,
+                'total': total,
+            }
+            stories_coverage_by_scenario[f'{story.id}:{activity.id}'] = covered_by
+        stories_coverage_rollup[story.id] = per_activity
+
+    scn_covers: dict[NodeId, list[ActivityId]] = {
+        scn.id: sorted(coverage_maps[scn.id].keys()) for scn in report.scenarios
+    }
+
+    total_scenarios_per_story = {
+        sid: len(scns) for sid, scns in scenarios_by_story_id.items()
+    }
+
     env.filters['narration'] = _make_narration_filter(
         param_color_map,
         glossary=report.glossary,
     )
+    env.filters['activity_part'] = _make_activity_part_filter(report.glossary)
     template = env.get_template('report.html.j2')
     html = template.render(
         metadata=report.metadata,
@@ -83,6 +128,11 @@ def render_html(
         coverage_maps=coverage_maps,
         glossary_aggregations=glossary_aggregations,
         tab_visibility=visibility,
+        stories_coverage=stories_coverage_rollup,
+        stories_coverage_by_scenario=stories_coverage_by_scenario,
+        scenarios_for_story=scenarios_by_story_id,
+        scn_covers=scn_covers,
+        total_scenarios_per_story=total_scenarios_per_story,
         report_json=Markup(safe_report_json),
         css=Markup(css),
         app_js=Markup(app_js),
@@ -218,3 +268,47 @@ def _placeholder_token(part: NarrationPlaceholder) -> str:
     if part.format_spec:
         inner += ':' + part.format_spec
     return '{' + inner + '}'
+
+
+def _make_activity_part_filter(
+    glossary: Glossary | None,
+) -> Callable[[ActivityPart], Markup]:
+    """Jinja filter: renders a single `ActivityPart` to HTML.
+
+    Usage: `{{ part | activity_part }}`
+    """
+
+    def _render(part: ActivityPart) -> Markup:
+        match part:
+            case ActivityEntity(entity_id=tid, display=display):
+                term = glossary.get(tid) if glossary else None
+                if term and term.kind == 'actor':
+                    kind_class = 'term-ref-actor'
+                elif term and term.kind == 'object':
+                    kind_class = 'term-ref-object'
+                else:
+                    kind_class = 'term-ref-unknown'
+                return Markup(
+                    f'<span class="{kind_class}" data-term-id="{escape(tid)}"'
+                    f' title="{escape(term.definition if term else "")}">'
+                    f'{escape(display)}</span>'
+                )
+            case ActivityTerm(term_id=tid, display=display):
+                return Markup(
+                    f'<span class="term-ref-verb" data-term-id="{escape(tid)}">'
+                    f'{escape(display)}</span>'
+                )
+            case ActivityWord(text=text):
+                return Markup(f'<span class="activity-word">{escape(text)}</span>')
+            case ActivityPlaceholder(kind=kind, text=text):
+                cls = {
+                    'actor': 'term-ref-actor is-draft',
+                    'object': 'term-ref-object is-draft',
+                    'verb': 'term-ref-verb is-draft',
+                }[kind]
+                title = 'Draft — promote to glossary to lock in'
+                return Markup(
+                    f'<span class="{cls}" title="{title}">{escape(text)}</span>'
+                )
+
+    return _render

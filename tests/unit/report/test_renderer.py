@@ -2,6 +2,8 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 from pytest_given.report.renderer import render_html
 
 
@@ -1026,3 +1028,196 @@ def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
     out = str(f(n))
     assert 'Guest' in out
     assert 'term-ref' not in out
+
+
+# ---------------------------------------------------------------------------
+# Task 11.2 — activity_part filter
+# ---------------------------------------------------------------------------
+
+from pytest_given.model import (  # noqa: E402
+    ActivityEntity,
+    ActivityPlaceholder,
+    ActivityTerm,
+    ActivityWord,
+)
+from pytest_given.report.renderer import _make_activity_part_filter  # noqa: E402
+
+
+def test_activity_part_filter_actor_entity():
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    f = _make_activity_part_filter(g)
+    out = str(f(ActivityEntity(entity_id=TermId('guest'), display='Alice')))
+    assert 'term-ref-actor' in out
+    assert 'Alice' in out
+
+
+def test_activity_part_filter_object_entity():
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    f = _make_activity_part_filter(g)
+    out = str(f(ActivityEntity(entity_id=TermId('room'), display='Room')))
+    assert 'term-ref-object' in out
+
+
+def test_activity_part_filter_unknown_entity_falls_back():
+    f = _make_activity_part_filter(Glossary())  # empty glossary
+    out = str(f(ActivityEntity(entity_id=TermId('missing'), display='X')))
+    assert 'term-ref-unknown' in out
+
+
+def test_activity_part_filter_term_renders_verb_class():
+    f = _make_activity_part_filter(Glossary())
+    out = str(f(ActivityTerm(term_id=TermId('search'), display='searches')))
+    assert 'term-ref-verb' in out
+    assert 'searches' in out
+
+
+def test_activity_part_filter_word_renders_activity_word_class():
+    f = _make_activity_part_filter(None)
+    out = str(f(ActivityWord(text='for')))
+    assert 'activity-word' in out
+    assert 'for' in out
+
+
+@pytest.mark.parametrize(
+    ('kind', 'expected'),
+    [
+        ('actor', 'term-ref-actor is-draft'),
+        ('object', 'term-ref-object is-draft'),
+        ('verb', 'term-ref-verb is-draft'),
+    ],
+)
+def test_activity_part_filter_placeholder_renders_draft_variant(kind, expected):
+    f = _make_activity_part_filter(None)
+    out = str(f(ActivityPlaceholder(kind=kind, text='x')))
+    assert expected in out
+
+
+# ---------------------------------------------------------------------------
+# Task 11.2 — stories coverage rollup computed in render_html
+# ---------------------------------------------------------------------------
+
+
+def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
+    """render_html executes the stories-coverage rollup (lines 85, 90-107)
+    when at least one scenario has a story_id and the report has a story."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'glossary': {
+                    'terms': [
+                        {
+                            'id': 'guest',
+                            'kind': 'actor',
+                            'canonical': 'Guest',
+                            'definition': '',
+                        },
+                        {
+                            'id': 'search',
+                            'kind': 'verb',
+                            'canonical': 'search',
+                            'definition': '',
+                        },
+                        {
+                            'id': 'room',
+                            'kind': 'object',
+                            'canonical': 'Room',
+                            'definition': '',
+                        },
+                    ]
+                },
+                'stories': [
+                    {
+                        'id': 'book-a-room',
+                        'title': 'Book a Room',
+                        'activities': [
+                            {
+                                'id': 1,
+                                'paths': [
+                                    {
+                                        'parts': [
+                                            {
+                                                'type': 'entity',
+                                                'entity_id': 'guest',
+                                                'display': 'Guest',
+                                            },
+                                            {
+                                                'type': 'term',
+                                                'term_id': 'search',
+                                                'display': 'searches',
+                                            },
+                                            {
+                                                'type': 'entity',
+                                                'entity_id': 'room',
+                                                'display': 'Room',
+                                            },
+                                        ]
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ],
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_book',
+                        'narration': _narration('Book a room'),
+                        'module': 'mod',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 5,
+                        'steps': [
+                            {
+                                'phase': 'when',
+                                'narration': _narration(
+                                    'Guest searches Room',
+                                    [
+                                        {
+                                            'type': 'term_ref',
+                                            'term_id': 'guest',
+                                            'display': 'Guest',
+                                            'param_column': None,
+                                        },
+                                        {'value': ' '},
+                                        {
+                                            'type': 'term_ref',
+                                            'term_id': 'search',
+                                            'display': 'searches',
+                                            'param_column': None,
+                                        },
+                                        {'value': ' '},
+                                        {
+                                            'type': 'term_ref',
+                                            'term_id': 'room',
+                                            'display': 'Room',
+                                            'param_column': None,
+                                        },
+                                    ],
+                                ),
+                                'status': 'passed',
+                                'children': [],
+                                'attachments': [],
+                                'error': None,
+                            }
+                        ],
+                        'parameters': None,
+                        'error': None,
+                        'story_id': 'book-a-room',
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert html_path.exists()
+    assert 'Book a Room' in content

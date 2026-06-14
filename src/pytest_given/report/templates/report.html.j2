@@ -134,6 +134,29 @@
   {%- endif -%}
   {%- endmacro -%}
 
+  {% if tab_visibility.scenarios or tab_visibility.stories or tab_visibility.glossary %}
+  {% set visible_count = (tab_visibility.scenarios|int) + (tab_visibility.stories|int) + (tab_visibility.glossary|int) %}
+  {% if visible_count > 1 %}
+  <nav class="frame-nav" role="tablist">
+    <button class="nav-tab" role="tab"
+            :class="{ 'nav-tab-active': view === 'scenarios' }"
+            @click="view = 'scenarios'">Scenarios</button>
+    {% if tab_visibility.stories %}
+    <button class="nav-tab" role="tab"
+            :class="{ 'nav-tab-active': view === 'stories' }"
+            @click="view = 'stories'">Stories</button>
+    {% endif %}
+    {% if tab_visibility.glossary %}
+    <button class="nav-tab" role="tab"
+            :class="{ 'nav-tab-active': view === 'glossary' }"
+            @click="view = 'glossary'">Glossary</button>
+    {% endif %}
+  </nav>
+  {% endif %}
+  {% endif %}
+
+  <div id="view-scenarios" x-show="view === 'scenarios'">
+
   {% for scenario in scenarios %}
   {%- set has_body = scenario.steps or scenario.parameters or scenario.error or scenario.skip_reason -%}
   <div class="scenario {{ scenario.status }}"
@@ -232,6 +255,222 @@
     </div>
   </div>
   {% endfor %}
+
+  </div>{# end #view-scenarios #}
+
+  <div id="view-stories" x-show="view === 'stories'" x-cloak>
+  {% if stories %}
+  <div class="stories-layout">
+    <div class="story-sidebar">
+      {% for story in stories %}
+      {% set scns = scenarios_for_story.get(story.id, []) %}
+      <div class="story-sidebar-item" :class="{ active: selectedStory === '{{ story.id }}' }"
+           @click="selectedStory = '{{ story.id }}'">
+        <div class="story-sidebar-title">{{ story.title }}</div>
+        <div class="story-sidebar-meta">{{ story.activities | length }} activities · {{ scns | length }} scenario{{ 's' if scns | length != 1 else '' }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="story-main">
+      {% for story in stories %}
+      <div x-show="selectedStory === '{{ story.id }}'">
+        <div class="story-head">
+          <div class="story-title">{{ story.title }}</div>
+          <div class="story-stats">
+            {% set story_scns = scenarios_for_story.get(story.id, []) %}
+            {{ story.activities | length }} activities · {{ story_scns | length }} scenario{{ 's' if story_scns | length != 1 else '' }}
+          </div>
+        </div>
+        <div class="activity-timeline">
+          {% for activity in story.activities %}
+          {% set cov = stories_coverage.get(story.id, {}).get(activity.id, {'scenario_ids': [], 'passed': 0, 'total': 0}) %}
+          {% set total_scns = total_scenarios_per_story.get(story.id, 0) %}
+          <div class="activity-row" id="activity-{{ story.id }}-{{ activity.id }}">
+            <div class="activity-num">{{ activity.id }}</div>
+            <div class="activity-body">
+              {% for path in activity.paths %}
+              <div class="activity-path">
+                {% for part in path.parts %}{{ part | activity_part }}{% endfor %}
+              </div>
+              {% endfor %}
+            </div>
+            <div class="activity-cov">
+              {% if cov.total == 0 %}
+              <span class="cov-chip cov-uncovered">0/{{ total_scns }}</span>
+              {% elif cov.passed == cov.total %}
+              <span class="cov-chip cov-passed">{{ cov.passed }}/{{ cov.total }}</span>
+              {% elif cov.passed == 0 %}
+              <span class="cov-chip cov-failed">0/{{ cov.total }}</span>
+              {% else %}
+              <span class="cov-chip cov-mixed">{{ cov.passed }}/{{ cov.total }}</span>
+              {% endif %}
+            </div>
+            <div class="activity-badges">
+              {% for scn in scenarios_for_story.get(story.id, []) %}
+              {% if scn.id in cov.scenario_ids %}
+              <a class="use-chip use-chip-{{ scn.status }}"
+                 href="#" @click.prevent="view = 'scenarios'; $nextTick(() => scrollToAndExpand('{{ scn.id }}'))">
+                <span class="dot-{{ scn.status }}">{{ '✓' if scn.status == 'passed' else ('✗' if scn.status == 'failed' else '○') }}</span>
+                {{ scn.narration.text | truncate(30) }}
+              </a>
+              {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="scn-act-strip-section">
+          {% for scn in scenarios_for_story.get(story.id, []) %}
+          <div class="scenario {{ scn.status }}" style="margin-bottom: var(--space-sm);">
+            <div class="scenario-header scenario-header-empty">
+              <span class="scenario-chevron-placeholder"></span>
+              <span class="scenario-name">{{ scn.narration.text }}</span>
+              <span class="scenario-meta">
+                <span class="scenario-status {{ scn.status }}">
+                  {{ '✓ passed' if scn.status == 'passed' else ('✗ failed' if scn.status == 'failed' else '○ skipped') }}
+                </span>
+              </span>
+            </div>
+            {% if scn_covers.get(scn.id) %}
+            <div class="scn-act-strip">
+              <span class="scn-act-label">Covers:</span>
+              {% for act_id in scn_covers.get(scn.id, []) %}
+              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-{{ story.id }}-{{ act_id }}').scrollIntoView({behavior:'smooth'})">{{ act_id }}</a>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  </div>
+  <div id="view-glossary" x-show="view === 'glossary'" x-cloak>
+  {% if glossary %}
+  <div class="glossary-layout">
+    <div class="sidebar">
+      <label class="search-box">
+        <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="text" placeholder="Search terms..." x-model="glossarySearch">
+        <button type="button" class="search-box-clear" @click="glossarySearch = ''" x-show="glossarySearch" aria-label="Clear search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </label>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Show kinds</div>
+        {% set actor_count = glossary.terms | selectattr('kind', 'equalto', 'actor') | list | length %}
+        {% set object_count = glossary.terms | selectattr('kind', 'equalto', 'object') | list | length %}
+        {% set verb_count = glossary.terms | selectattr('kind', 'equalto', 'verb') | list | length %}
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.actor">
+          <span class="kind-swatch kind-swatch-actor"></span>
+          <span>Actors</span>
+          <span class="nav-group-count">{{ actor_count }}</span>
+        </label>
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.object">
+          <span class="kind-swatch kind-swatch-object"></span>
+          <span>Work Objects</span>
+          <span class="nav-group-count">{{ object_count }}</span>
+        </label>
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.verb">
+          <span class="kind-swatch kind-swatch-verb"></span>
+          <span>Verbs</span>
+          <span class="nav-group-count">{{ verb_count }}</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="header">
+        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+          <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+            <div class="header-title">Glossary</div>
+            <div class="header-context">
+              {{ glossary.terms | length }} terms ·
+              {{ actor_count }} actor{{ 's' if actor_count != 1 else '' }} ·
+              {{ object_count }} work object{{ 's' if object_count != 1 else '' }} ·
+              {{ verb_count }} verb{{ 's' if verb_count != 1 else '' }}
+            </div>
+            <button class="collapse-all-btn" @click="toggleAllTerms()"
+                    x-text="anyTermsExpanded ? 'Collapse all references ↑' : 'Expand all references ↓'"></button>
+          </div>
+        </div>
+      </div>
+
+      {% for kind_label, kind_key, kind_cls in [('Actors', 'actor', 'term-actor'), ('Work Objects', 'object', 'term-obj'), ('Verbs', 'verb', 'term-verb')] %}
+      {% set kind_terms = glossary.terms | selectattr('kind', 'equalto', kind_key) | list %}
+      {% if kind_terms %}
+      <div x-show="glossaryKindFilter.{{ kind_key }}">
+        <div class="kind-header">
+          <span class="kind-title {{ kind_cls }}">{{ kind_label }}</span>
+          <span class="kind-meta">{{ kind_terms | length }} term{{ 's' if kind_terms | length != 1 else '' }}</span>
+        </div>
+        {% for term in kind_terms %}
+        {% set agg = glossary_aggregations.get(term.id) %}
+        {% set q = 'glossarySearch' %}
+        <div class="entry"
+             x-show="!glossarySearch || '{{ (term.canonical + ' ' + term.definition) | lower }}'.includes(glossarySearch.toLowerCase())">
+          <div class="entry-head" @click="expandedTerms['{{ term.id }}'] ? delete expandedTerms['{{ term.id }}'] : (expandedTerms['{{ term.id }}'] = true)">
+            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['{{ term.id }}'] }"></span>
+            <span class="entry-name">
+              <span class="term-pill {{ kind_cls }}">{{ term.canonical }}</span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">{{ term.definition if term.definition else '' }}<span class="entry-def-placeholder" {% if term.definition %}style="display:none"{% endif %}>No definition yet.</span></div>
+              <div class="entry-summary">
+                {% if agg %}
+                  {% if kind_key in ('actor', 'object') and agg.instances %}{{ agg.instances | length }} instance{{ 's' if agg.instances | length != 1 else '' }}{% endif %}
+                  {% if agg.stories %} · used in {{ agg.stories | length }} stor{{ 'ies' if agg.stories | length != 1 else 'y' }}{% endif %}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="refs scenario-body" :class="{ expanded: expandedTerms['{{ term.id }}'] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                {% if agg and agg.stories %}
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  {% for sid in agg.stories %}
+                  <a class="use-chip" href="#" @click.prevent="view = 'stories'; selectedStory = '{{ sid }}'">{{ sid }}</a>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% if agg and kind_key in ('actor', 'object') and agg.instances %}
+                <div class="refs-line">
+                  <span class="refs-label">Instances:</span>
+                  {% for inst in agg.instances %}
+                  <span class="use-chip">{{ inst.display }}{% if inst.fixture_name %} <span class="refs-fixture">(fixture: {{ inst.fixture_name }})</span>{% endif %}</span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% if agg and kind_key == 'verb' and agg.forms %}
+                <div class="refs-line">
+                  <span class="refs-label">Also used as:</span>
+                  {% for form in agg.forms %}
+                  <span class="use-chip">{{ form.display }}</span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  </div>
+
 </div>
 
 <script>
