@@ -104,20 +104,24 @@ def audit(session: nox.Session) -> None:
 
 @nox.session
 def examples(session: nox.Session) -> None:
-    """Regenerate examples/report-data.json and examples/report.html."""
+    """Regenerate coffeeshop and hotel-booking example reports."""
     _sync(session, 'test', include_project=True)
-    session.run(
-        'pytest',
-        'examples/test_examples.py',
-        '--given-json=examples/report-data.json',
-        '--given-html',
-        '--given-html-output=examples/report.html',
-        '--given-source-link=github',
-        '--tb=no',
-        '--no-header',
-        '-q',
-        success_codes=[0, 1],
-    )
+    for test_file, slug in [
+        ('examples/test_coffeeshop.py', 'coffeeshop'),
+        ('examples/test_hotel_booking.py', 'hotel-booking'),
+    ]:
+        session.run(
+            'pytest',
+            test_file,
+            f'--given-json=examples/{slug}-data.json',
+            '--given-html',
+            f'--given-html-output=examples/{slug}.html',
+            '--given-source-link=github',
+            '--tb=no',
+            '--no-header',
+            '-q',
+            success_codes=[0, 1],
+        )
     session.log(
-        'Note: 1 intentional failure is expected (demonstrates failure rendering).'
+        'Note: coffeeshop suite has 1 intentional failure for failure rendering.'
     )

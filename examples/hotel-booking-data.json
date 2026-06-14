@@ -1,0 +1,585 @@
+{
+  "metadata": {
+    "project": "pytest-given",
+    "timestamp": "2026-06-14T06:27:44.656793+00:00",
+    "pytest_version": "9.0.3",
+    "plugin_version": "0.1.0",
+    "commit_sha": "51b4c2ece13f0263a01d420a60c54c637f31b352"
+  },
+  "scenarios": [
+    {
+      "id": "examples/test_hotel_booking.py::test_book_shared",
+      "narration": {
+        "text": "Alice books a shared room with Bob",
+        "parts": []
+      },
+      "module": "test_hotel_booking",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "our guest Alice",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "alice"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "our guest Bob",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "bob"
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Alice searches for a Room",
+            "parts": [
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "search",
+                "display": "searches for",
+                "expression": "search(\"searches for\")",
+                "param_column": null
+              },
+              {
+                "value": " a "
+              },
+              {
+                "term_id": "room",
+                "display": "Room",
+                "expression": "room",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Alice selects the Deluxe Suite",
+            "parts": [
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "select",
+                "display": "selects",
+                "expression": "select(\"selects\")",
+                "param_column": null
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "room",
+                "display": "Deluxe Suite",
+                "expression": "room(\"Deluxe Suite\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Alice submits the Payment",
+            "parts": [
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "submit",
+                "display": "submits",
+                "expression": "submit(\"submits\")",
+                "param_column": null
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "payment",
+                "display": "Payment",
+                "expression": "payment",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Booking System confirms the Booking for Alice and Bob",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "booking-system",
+                "display": "Booking System",
+                "expression": "booking_system",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "confirm",
+                "display": "confirms",
+                "expression": "confirm(\"confirms\")",
+                "param_column": null
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking",
+                "param_column": null
+              },
+              {
+                "value": " for "
+              },
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              },
+              {
+                "value": " and "
+              },
+              {
+                "term_id": "guest",
+                "display": "Bob",
+                "expression": "guest(\"Bob\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Booking System sends a Confirmation to Alice",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "booking-system",
+                "display": "Booking System",
+                "expression": "booking_system",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "send",
+                "display": "sends",
+                "expression": "send(\"sends\")",
+                "param_column": null
+              },
+              {
+                "value": " a "
+              },
+              {
+                "term_id": "confirmation",
+                "display": "Confirmation",
+                "expression": "confirmation",
+                "param_column": null
+              },
+              {
+                "value": " to "
+              },
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Booking System sends a Confirmation to Bob",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "booking-system",
+                "display": "Booking System",
+                "expression": "booking_system",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "send",
+                "display": "sends",
+                "expression": "send(\"sends\")",
+                "param_column": null
+              },
+              {
+                "value": " a "
+              },
+              {
+                "term_id": "confirmation",
+                "display": "Confirmation",
+                "expression": "confirmation",
+                "param_column": null
+              },
+              {
+                "value": " to "
+              },
+              {
+                "term_id": "guest",
+                "display": "Bob",
+                "expression": "guest(\"Bob\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/test_hotel_booking.py",
+        "line": 76
+      },
+      "story_id": "book-a-shared-room",
+      "activity_ids": []
+    }
+  ],
+  "glossary": {
+    "terms": [
+      {
+        "id": "guest",
+        "kind": "actor",
+        "canonical": "Guest",
+        "definition": "Person booking accommodation."
+      },
+      {
+        "id": "booking-system",
+        "kind": "actor",
+        "canonical": "Booking System",
+        "definition": "Automated reservation system."
+      },
+      {
+        "id": "room",
+        "kind": "object",
+        "canonical": "Room",
+        "definition": "A bookable hotel room."
+      },
+      {
+        "id": "booking",
+        "kind": "object",
+        "canonical": "Booking",
+        "definition": "A reservation for a room."
+      },
+      {
+        "id": "payment",
+        "kind": "object",
+        "canonical": "Payment",
+        "definition": "Money transferred for a booking."
+      },
+      {
+        "id": "confirmation",
+        "kind": "object",
+        "canonical": "Confirmation",
+        "definition": "Notification of a successful booking."
+      },
+      {
+        "id": "search",
+        "kind": "verb",
+        "canonical": "search",
+        "definition": "Look up available options."
+      },
+      {
+        "id": "select",
+        "kind": "verb",
+        "canonical": "select",
+        "definition": "Choose one option from a set."
+      },
+      {
+        "id": "submit",
+        "kind": "verb",
+        "canonical": "submit",
+        "definition": "Send to the system for processing."
+      },
+      {
+        "id": "confirm",
+        "kind": "verb",
+        "canonical": "confirm",
+        "definition": "Finalize and acknowledge."
+      },
+      {
+        "id": "send",
+        "kind": "verb",
+        "canonical": "send",
+        "definition": "Deliver to a recipient."
+      }
+    ]
+  },
+  "stories": [
+    {
+      "id": "book-a-shared-room",
+      "title": "Book a Shared Room",
+      "activities": [
+        {
+          "id": 1,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "entity_id": "guest",
+                  "display": "Guest"
+                },
+                {
+                  "term_id": "search",
+                  "display": "searches for"
+                },
+                {
+                  "entity_id": "room",
+                  "display": "Room"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "entity_id": "guest",
+                  "display": "Alice"
+                },
+                {
+                  "term_id": "select",
+                  "display": "selects"
+                },
+                {
+                  "entity_id": "room",
+                  "display": "Deluxe Suite"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "entity_id": "guest",
+                  "display": "Alice"
+                },
+                {
+                  "term_id": "submit",
+                  "display": "submits"
+                },
+                {
+                  "entity_id": "payment",
+                  "display": "Payment"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "entity_id": "booking-system",
+                  "display": "Booking System"
+                },
+                {
+                  "term_id": "confirm",
+                  "display": "confirms"
+                },
+                {
+                  "entity_id": "booking",
+                  "display": "Booking"
+                },
+                {
+                  "text": "for"
+                },
+                {
+                  "entity_id": "guest",
+                  "display": "Alice"
+                },
+                {
+                  "text": "and"
+                },
+                {
+                  "entity_id": "guest",
+                  "display": "Bob"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "entity_id": "booking-system",
+                  "display": "Booking System"
+                },
+                {
+                  "term_id": "send",
+                  "display": "sends"
+                },
+                {
+                  "entity_id": "confirmation",
+                  "display": "Confirmation"
+                },
+                {
+                  "text": "to"
+                },
+                {
+                  "entity_id": "guest",
+                  "display": "Alice"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "entity_id": "booking-system",
+                  "display": "Booking System"
+                },
+                {
+                  "term_id": "send",
+                  "display": "sends"
+                },
+                {
+                  "entity_id": "confirmation",
+                  "display": "Confirmation"
+                },
+                {
+                  "text": "to"
+                },
+                {
+                  "entity_id": "guest",
+                  "display": "Bob"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "entity_id": "guest",
+                  "display": "Alice"
+                },
+                {
+                  "kind": "verb",
+                  "text": "redeems"
+                },
+                {
+                  "kind": "object",
+                  "text": "loyalty bonus"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
