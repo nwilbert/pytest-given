@@ -1,5 +1,3 @@
-import dataclasses
-
 import pytest
 
 from pytest_given.model import (
@@ -21,6 +19,7 @@ from pytest_given.model import (
     report_from_dict,
     report_to_dict,
 )
+from pytest_given.model.serde import _asdict_filtered
 
 
 def _minimal_metadata_dict() -> dict:
@@ -390,8 +389,8 @@ def test_narration_unknown_part_shape_raises() -> None:
     assert 'narration' in str(exc.value).lower()
 
 
-def test_report_to_dict_matches_dataclasses_asdict() -> None:
-    """`report_to_dict` is a thin wrapper over `dataclasses.asdict`."""
+def test_report_to_dict_excludes_underscore_fields() -> None:
+    """report_to_dict skips fields whose names start with '_' (e.g. _by_id)."""
     report = ReportData(
         metadata=Metadata(
             project='p',
@@ -401,7 +400,13 @@ def test_report_to_dict_matches_dataclasses_asdict() -> None:
         ),
         scenarios=[],
     )
-    assert report_to_dict(report) == dataclasses.asdict(report)
+    result = report_to_dict(report)
+    # No underscore-prefixed keys anywhere in the output.
+    assert all(not k.startswith('_') for k in result)
+    assert result['metadata']['project'] == 'p'
+    assert result['scenarios'] == []
+    assert result['glossary'] is None
+    assert result['stories'] == []
 
 
 def test_round_trip_via_to_dict() -> None:
@@ -443,3 +448,9 @@ def test_round_trip_via_to_dict() -> None:
     )
     deserialized = report_from_dict(report_to_dict(original))
     assert deserialized == original
+
+
+def test_asdict_filtered_handles_dict_values() -> None:
+    """_asdict_filtered handles plain dict values (not just lists/dataclasses)."""
+    result = _asdict_filtered({'key': 'value', 'nested': {'a': 1}})
+    assert result == {'key': 'value', 'nested': {'a': 1}}

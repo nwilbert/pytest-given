@@ -583,3 +583,23 @@ def test_scenario_decorator_defaults_story_none_and_activities_empty():
 def test_scenario_decorator_rejects_non_story_object():
     with pytest.raises(PytestGivenError, match='Story instance'):
         scenario('test', story='not-a-story')  # type: ignore[arg-type]
+
+
+def test_step_check_activity_scope_raises_when_aid_not_in_story_no_scope() -> None:
+    """_check_activity_scope must raise when the scenario has no activity scope
+    restriction but the step references an id that is not in the story at all
+    (decorators.py line 106)."""
+    collector = Collector()
+    g = Glossary()
+    guest = g.actor('Guest')
+    search = g.verb('search')
+    room = g.work_object('Room')
+    s = story_fn(
+        'Step Scope No Restriction', activities=(activity_fn(guest, search, room),)
+    )
+    collector.start_scenario('id', 'a', 'mod', [], story=s, activity_ids=())
+    set_active_collector(collector)
+    desc = StepDescriptor('given', 'a thing', activity_ids=(ActivityId(99),))
+    with pytest.raises(PytestGivenError, match='not in story'):
+        desc._check_activity_scope(collector)
+    set_active_collector(None)

@@ -13,8 +13,19 @@ from pytest_given.capture.collector import (
     get_active_collector,
     set_active_collector,
 )
-from pytest_given.capture.decorators import StepDescriptor
+from pytest_given.capture.decorators import ScenarioDecorator, StepDescriptor
+from pytest_given.capture.story import (
+    _clear_story_registry,
+)
+from pytest_given.capture.story import (
+    activity as activity_fn,
+)
+from pytest_given.capture.story import (
+    story as story_fn,
+)
 from pytest_given.model import (
+    ActivityId,
+    Glossary,
     Narration,
     NarrationPlaceholder,
     NarrationTermRef,
@@ -311,3 +322,47 @@ def test_templatize_term_ref_param_column_stays_none_when_no_column_match() -> N
     out = plugin._templatize_narration(narration, param_names=['euros'])
     ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
     assert ref.param_column is None
+
+
+# --- Task 7.2 / 7.4 unit coverage ---
+
+
+@pytest.fixture
+def _reset_story_registry_plugin() -> Any:
+    _clear_story_registry()
+    yield
+    _clear_story_registry()
+
+
+@pytest.mark.usefixtures('_reset_story_registry_plugin')
+def test_validate_scenario_story_binding_activities_without_story_raises() -> None:
+    """_validate_scenario_story_binding must raise when activities= is given
+    without story= (plugin.py line 141)."""
+    marker = ScenarioDecorator('x', [], activity_ids=(ActivityId(1),))
+    item = cast(pytest.Item, SimpleNamespace(nodeid='test_mod.py::test_x'))
+    with pytest.raises(PytestGivenError, match='requires story='):
+        plugin._validate_scenario_story_binding(item, marker)
+
+
+@pytest.mark.usefixtures('_reset_story_registry_plugin')
+def test_resolve_glossary_raises_with_two_distinct_glossaries_via_stories() -> None:
+    """_resolve_glossary must raise when two stories reach different Glossary
+    instances via their activity paths (plugin.py line 427)."""
+    g1 = Glossary()
+    guest1 = g1.actor('Guest One')
+    search1 = g1.verb('search')
+    room1 = g1.work_object('Room')
+
+    g2 = Glossary()
+    guest2 = g2.actor('Guest Two')
+    search2 = g2.verb('book')
+    room2 = g2.work_object('Suite')
+
+    s1 = story_fn('Coverage Story A', activities=(activity_fn(guest1, search1, room1),))
+    s2 = story_fn('Coverage Story B', activities=(activity_fn(guest2, search2, room2),))
+
+    fake_session = SimpleNamespace(
+        config=SimpleNamespace(pluginmanager=SimpleNamespace(get_plugins=lambda: []))
+    )
+    with pytest.raises(PytestGivenError, match='distinct Glossary'):
+        plugin._resolve_glossary([s1, s2], cast(pytest.Session, fake_session))

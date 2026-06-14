@@ -18,6 +18,8 @@ from ..model import (
     Scenario,
     SourceLocation,
     Step,
+    Story,
+    StoryId,
     TracebackFrame,
 )
 from .template import Template, narration_from
@@ -65,6 +67,9 @@ class Collector:
         self._active_fixture_descriptor: object | None = None
         self._recordings: dict[FixtureInstanceKey, FixtureRecording] = {}
         self.inside_unannotated_test: bool = False
+        self.active_scenario_story: Story | None = None
+        self.active_scenario_activity_ids: tuple[ActivityId, ...] = ()
+        self._discovered_stories: dict[StoryId, Story] = {}
 
     @property
     def state(self) -> RecordingState:
@@ -106,6 +111,9 @@ class Collector:
         module: str,
         tags: list[str],
         source: SourceLocation | None = None,
+        *,
+        story: Story | None = None,
+        activity_ids: tuple[ActivityId, ...] = (),
     ) -> None:
         self._current_scenario = Scenario(
             id=scenario_id,
@@ -113,10 +121,16 @@ class Collector:
             module=module,
             tags=tags,
             source=source,
+            story_id=story.id if story is not None else None,
+            activity_ids=activity_ids,
         )
         self._step_stack = []
         self._state = 'test'
         self.inside_unannotated_test = False
+        self.active_scenario_story = story
+        self.active_scenario_activity_ids = activity_ids
+        if story is not None:
+            self._discovered_stories[story.id] = story
 
     def finish_scenario(
         self,
@@ -133,6 +147,8 @@ class Collector:
         self._current_scenario = None
         self._step_stack = []
         self._state = 'idle'
+        self.active_scenario_story = None
+        self.active_scenario_activity_ids = ()
         return scenario
 
     def enter_fixture_setup(

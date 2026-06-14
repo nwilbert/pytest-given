@@ -1,10 +1,9 @@
 """ReportData ↔ JSON-shaped dict (de)serialization.
 
-`report_to_dict` is a thin wrapper around `dataclasses.asdict` — kept here
-so callers go through a single named entry point and we have somewhere to
-hang future serialization concerns (field filtering, format-version stamps,
-schema validation). `report_from_dict` is the inverse; the renderer reads
-the JSON, calls it once, and operates on typed dataclasses from there.
+`report_to_dict` serializes a `ReportData` to a JSON-shaped dict, filtering
+out underscore-prefixed fields (e.g. `_by_id` on `Story`/`Glossary`).
+`report_from_dict` is the inverse; the renderer reads the JSON, calls it
+once, and operates on typed dataclasses from there.
 
 The only non-trivial part is `Narration.parts`, whose three subtypes share
 the parent type but each carry a distinct key (`value` / `rendered` / `name`).
@@ -37,8 +36,25 @@ from .schema import (
 
 
 def report_to_dict(report: ReportData) -> dict[str, Any]:
-    """Serialize a `ReportData` to a JSON-shaped dict."""
-    return dataclasses.asdict(report)
+    """Serialize a `ReportData` to a JSON-shaped dict, skipping _ fields."""
+    result = _asdict_filtered(report)
+    assert isinstance(result, dict)
+    return result
+
+
+def _asdict_filtered(obj: Any) -> Any:
+    """Recursively convert dataclasses to dicts, skipping underscore fields."""
+    if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
+        return {
+            f.name: _asdict_filtered(getattr(obj, f.name))
+            for f in dataclasses.fields(obj)
+            if not f.name.startswith('_')
+        }
+    if isinstance(obj, (list, tuple)):
+        return [_asdict_filtered(x) for x in obj]
+    if isinstance(obj, dict):
+        return {k: _asdict_filtered(v) for k, v in obj.items()}
+    return obj
 
 
 def report_from_dict(d: dict[str, Any]) -> ReportData:

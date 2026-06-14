@@ -20,7 +20,7 @@ from ..model import (
     PytestGivenError,
     Story,
 )
-from .collector import get_active_collector
+from .collector import Collector, get_active_collector
 from .template import Template, narration_from
 
 _TEMPLATE_PARAM_KINDS = frozenset(
@@ -80,8 +80,33 @@ class StepDescriptor:
                 f"Cannot enter '{self.phase}: {self.narration.text}' — "
                 'no active scenario or fixture.'
             )
+        if self.activity_ids:
+            self._check_activity_scope(collector)
         collector.push_step(self.phase, self.narration, activity_ids=self.activity_ids)
         return self
+
+    def _check_activity_scope(self, collector: Collector) -> None:
+        """Validate step activity_ids against the active scenario's story scope."""
+        story = collector.active_scenario_story
+        if story is None:
+            raise PytestGivenError(
+                f'step activity= requires a story on the scenario '
+                f'(phase={self.phase!r}, ids={list(self.activity_ids)}).'
+            )
+        scope = collector.active_scenario_activity_ids
+        valid = scope if scope else tuple(a.id for a in story.activities)
+        valid_set = set(valid)
+        for aid in self.activity_ids:
+            if aid not in valid_set:
+                if scope:
+                    raise PytestGivenError(
+                        f'step activity={aid} outside scenario scope '
+                        f'(scenario activities={sorted(scope)}).'
+                    )
+                raise PytestGivenError(
+                    f'step activity={aid} not in story {story.title!r} '
+                    f'(valid: {sorted(valid_set)}).'
+                )
 
     def __exit__(
         self,
