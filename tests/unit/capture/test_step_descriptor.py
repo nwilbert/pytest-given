@@ -10,14 +10,32 @@ from pytest_given.capture.decorators import (
     then,
     when,
 )
+from pytest_given.capture.story import (
+    _clear_story_registry,
+)
+from pytest_given.capture.story import (
+    activity as activity_fn,
+)
+from pytest_given.capture.story import (
+    story as story_fn,
+)
 from pytest_given.model import (
+    ActivityId,
     FixtureRecording,
+    Glossary,
     Narration,
     NarrationLiteral,
     NarrationValue,
     PytestGivenError,
     Step,
 )
+
+
+@pytest.fixture(autouse=True)
+def _reset_story_registry():
+    _clear_story_registry()
+    yield
+    _clear_story_registry()
 
 
 def test_context_manager_basic() -> None:
@@ -509,3 +527,59 @@ def test_decorator_records_when_called_from_inside_fixture_body() -> None:
         collector.exit_fixture_setup(token)
         set_active_collector(None)
     assert [c.narration.text for c in root.children] == ['inserting money']
+
+
+def test_step_descriptor_accepts_activity_int():
+    step = given('a thing', activity=3)
+    assert step.activity_ids == (ActivityId(3),)
+
+
+def test_step_descriptor_accepts_activity_sequence():
+    step = when('an event', activity=[1, 2])
+    assert step.activity_ids == (ActivityId(1), ActivityId(2))
+
+
+def test_step_descriptor_activity_defaults_empty():
+    step = then('a result')
+    assert step.activity_ids == ()
+
+
+def test_step_descriptor_rejects_non_int_activity_id():
+    with pytest.raises(TypeError, match='activity'):
+        given('x', activity='one')  # type: ignore[arg-type]
+
+
+def test_step_descriptor_rejects_non_sequence_activity():
+    with pytest.raises(TypeError, match='activity'):
+        given('x', activity=1.5)  # type: ignore[arg-type]
+
+
+# --- Task 7.1: ScenarioDecorator story= / activities= ---
+
+
+def test_scenario_decorator_accepts_story_kwarg():
+    g = Glossary()
+    guest = g.actor('Guest')
+    search = g.verb('search')
+    room = g.work_object('Room')
+    s = story_fn(
+        'Book Scenario Decorator', activities=(activity_fn(guest, search, room),)
+    )
+    deco = scenario('test', story=s)
+    assert deco.story is s
+
+
+def test_scenario_decorator_accepts_activities_kwarg():
+    deco = scenario('test activities', activities=[1, 2, 3])
+    assert deco.activity_ids == (ActivityId(1), ActivityId(2), ActivityId(3))
+
+
+def test_scenario_decorator_defaults_story_none_and_activities_empty():
+    deco = scenario('test defaults')
+    assert deco.story is None
+    assert deco.activity_ids == ()
+
+
+def test_scenario_decorator_rejects_non_story_object():
+    with pytest.raises(PytestGivenError, match='Story instance'):
+        scenario('test', story='not-a-story')  # type: ignore[arg-type]

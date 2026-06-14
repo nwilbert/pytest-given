@@ -3,13 +3,14 @@ import inspect
 import json
 import types
 import warnings
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from string import Formatter, templatelib
 from typing import Any, Self
 
 import pytest
 
 from ..model import (
+    ActivityId,
     Narration,
     NarrationLiteral,
     NarrationPart,
@@ -17,6 +18,7 @@ from ..model import (
     NarrationValue,
     Phase,
     PytestGivenError,
+    Story,
 )
 from .collector import get_active_collector
 from .template import Template, narration_from
@@ -47,10 +49,13 @@ class StepDescriptor:
         self,
         phase: Phase,
         text: str | templatelib.Template | Template,
+        *,
+        activity_ids: tuple[ActivityId, ...] = (),
     ) -> None:
         self.phase = phase
         self._source: str | templatelib.Template | Template = text
         self.narration: Narration = narration_from(text)
+        self.activity_ids: tuple[ActivityId, ...] = activity_ids
 
     def __enter__(self) -> Self:
         if isinstance(self._source, Template):
@@ -75,7 +80,7 @@ class StepDescriptor:
                 f"Cannot enter '{self.phase}: {self.narration.text}' — "
                 'no active scenario or fixture.'
             )
-        collector.push_step(self.phase, self.narration)
+        collector.push_step(self.phase, self.narration, activity_ids=self.activity_ids)
         return self
 
     def __exit__(
@@ -136,7 +141,7 @@ class StepDescriptor:
                 if sig is not None
                 else self.narration
             )
-            collector.push_step(self.phase, narration)
+            collector.push_step(self.phase, narration, activity_ids=self.activity_ids)
             try:
                 return func(*args, **kwargs)
             finally:
@@ -181,9 +186,18 @@ class StepDescriptor:
 class ScenarioDecorator:
     """Decorator that marks a test for inclusion in the report."""
 
-    def __init__(self, name: str | Template, tags: list[str]) -> None:
+    def __init__(
+        self,
+        name: str | Template,
+        tags: list[str],
+        *,
+        story: Story | None = None,
+        activity_ids: tuple[ActivityId, ...] = (),
+    ) -> None:
         self.name: str | Template = name
         self.tags = tags
+        self.story = story
+        self.activity_ids = activity_ids
 
     def __call__(self, func: Any) -> Any:
         @functools.wraps(func)
@@ -194,19 +208,53 @@ class ScenarioDecorator:
         return wrapper
 
 
-def given(text: str | templatelib.Template | Template) -> StepDescriptor:
+def _normalize_activity(
+    activity: int | Sequence[int] | None,
+) -> tuple[ActivityId, ...]:
+    """Normalize the ``activity=`` kwarg to a tuple of ActivityId values."""
+    if activity is None:
+        return ()
+    if isinstance(activity, int):
+        return (ActivityId(activity),)
+    if isinstance(activity, Sequence):
+        result: list[ActivityId] = []
+        for item in activity:
+            if not isinstance(item, int):
+                raise TypeError(
+                    f'activity sequence must contain int values, got {type(item)!r}'
+                )
+            result.append(ActivityId(item))
+        return tuple(result)
+    raise TypeError(
+        f'activity must be an int or a Sequence[int], got {type(activity)!r}'
+    )
+
+
+def given(
+    text: str | templatelib.Template | Template,
+    *,
+    activity: int | Sequence[int] | None = None,
+) -> StepDescriptor:
     """Create a Given step (context manager or decorator)."""
-    return StepDescriptor('given', text)
+    return StepDescriptor('given', text, activity_ids=_normalize_activity(activity))
 
 
-def when(text: str | templatelib.Template | Template) -> StepDescriptor:
+def when(
+    text: str | templatelib.Template | Template,
+    *,
+    activity: int | Sequence[int] | None = None,
+) -> StepDescriptor:
     """Create a When step (context manager or decorator)."""
-    return StepDescriptor('when', text)
+    return StepDescriptor('when', text, activity_ids=_normalize_activity(activity))
 
 
-def then(text: str | templatelib.Template | Template) -> StepDescriptor:
+def then(
+    text: str | templatelib.Template | Template,
+    *,
+    activity: int | Sequence[int] | None = None,
+) -> StepDescriptor:
     """Create a Then step (context manager or decorator)."""
-    return StepDescriptor('then', text)
+    return StepDescriptor('then', text, activity_ids=_normalize_activity(activity))
 
 
 _FORMATTER = Formatter()
@@ -276,6 +324,9 @@ def attach(label: str | templatelib.Template, content: object) -> None:
 def scenario(
     name: str | Template,
     tags: list[str] | None = None,
+    *,
+    story: Story | None = None,
+    activities: Sequence[int] | None = None,
 ) -> ScenarioDecorator:
     """Mark a test for inclusion in the report."""
     if isinstance(name, templatelib.Template):
@@ -285,4 +336,12 @@ def scenario(
             'scope. Use pytest_given.Template(...) for parametrized scenario '
             'names, or a plain string for static names.'
         )
-    return ScenarioDecorator(name, tags or [])
+    if story is not None and not isinstance(story, Story):
+        raise PytestGivenError(
+            f'@scenario(story=...) must be a Story instance; '
+            f'got {type(story).__name__}: {story!r}'
+        )
+    activity_ids: tuple[ActivityId, ...] = (
+        tuple(ActivityId(i) for i in activities) if activities else ()
+    )
+    return ScenarioDecorator(name, tags or [], story=story, activity_ids=activity_ids)

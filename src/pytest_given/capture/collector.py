@@ -4,6 +4,7 @@ from contextvars import ContextVar
 from dataclasses import dataclass
 
 from ..model import (
+    ActivityId,
     Attachment,
     ContentType,
     ErrorInfo,
@@ -189,7 +190,13 @@ class Collector:
             return
         self._current_scenario.steps.append(copy.deepcopy(recording.root))
 
-    def push_step(self, phase: Phase, narration: Narration) -> Step:
+    def push_step(
+        self,
+        phase: Phase,
+        narration: Narration,
+        *,
+        activity_ids: tuple[ActivityId, ...] = (),
+    ) -> Step:
         if self._state == 'idle':
             raise PytestGivenError(
                 f"Cannot record '{phase}: {narration.text}' — "
@@ -206,7 +213,7 @@ class Collector:
                 f"Cannot nest '{phase}' inside '{stack[-1].phase}'"
                 ' — restructure your test or use a phase-neutral helper'
             )
-        step = Step(phase=phase, narration=narration)
+        step = Step(phase=phase, narration=narration, activity_ids=activity_ids)
         if stack:
             stack[-1].children.append(step)
         elif self._state == 'test' and self._current_scenario is not None:

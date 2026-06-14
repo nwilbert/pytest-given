@@ -1135,3 +1135,22 @@ def test_given_source_link_unknown_preset_raises(pytester, tmp_path):
         '--given-source-link=emacs',
     )
     assert 'emacs' in (result.stderr.str() + result.stdout.str())
+
+
+def test_step_activity_kwarg_propagates_to_report(pytester):
+    pytester.makepyfile("""
+        from pytest_given import given, scenario, when
+
+        @scenario('a scenario')
+        def test_x():
+            with given('setup', activity=1):
+                pass
+            with when('action', activity=[2, 3]):
+                pass
+    """)
+    result = pytester.runpytest('--given-json=report.json')
+    result.assert_outcomes(passed=1)
+    data = json.loads(pytester.path.joinpath('report.json').read_text())
+    steps = data['scenarios'][0]['steps']
+    assert steps[0]['activity_ids'] == [1]
+    assert steps[1]['activity_ids'] == [2, 3]
