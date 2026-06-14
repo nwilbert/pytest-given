@@ -13,5 +13,8 @@ __pycache__/
 .superpowers/
 docs/superpowers/plans/
 /given-report/
+/benchmarks/test_large_scenarios.py
+/benchmarks/large-scenarios-data.json
+/benchmarks/large-scenarios.html
 .claude/settings.local.json
 .playwright-mcp/

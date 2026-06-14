@@ -125,3 +125,26 @@ def examples(session: nox.Session) -> None:
     session.log(
         'Note: coffeeshop suite has 1 intentional failure for failure rendering.'
     )
+
+
+@nox.session
+def benchmark(session: nox.Session) -> None:
+    """Generate the large-scenarios suite and produce its JSON+HTML report.
+
+    Outputs land in `benchmarks/` and are gitignored. For size sweeps or
+    cProfile runs, invoke `benchmarks/bench.py` directly (see its docstring).
+    """
+    _sync(session, 'test', include_project=True)
+    session.run('python', 'benchmarks/gen_large_scenarios.py')
+    session.run(
+        'pytest',
+        'benchmarks/test_large_scenarios.py',
+        '--given-json=benchmarks/large-scenarios-data.json',
+        '--given-html',
+        '--given-html-output=benchmarks/large-scenarios.html',
+        '--given-source-link=github',
+        '--tb=no',
+        '--no-header',
+        '-q',
+        success_codes=[0, 1],
+    )
