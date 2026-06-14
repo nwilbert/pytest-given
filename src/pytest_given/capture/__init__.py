@@ -16,3 +16,5 @@ __all__ = [
     'then',
     'when',
 ]
+
+from . import glossary as _glossary_module  # noqa: F401 — registers methods on Glossary

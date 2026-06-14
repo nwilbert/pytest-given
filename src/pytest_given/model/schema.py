@@ -1,5 +1,10 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import Any, Literal, NamedTuple, NewType
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, NewType
+
+if TYPE_CHECKING:
+    from ..capture.glossary import Actor, Verb, WorkObject
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -166,6 +171,12 @@ class Glossary:
             raise ValueError(f'term id {term.id!r} already registered')
         self.terms.append(term)
         self._by_id[term.id] = term
+
+    if TYPE_CHECKING:
+
+        def actor(self, name: str, *, definition: str = '') -> Actor: ...
+        def work_object(self, name: str, *, definition: str = '') -> WorkObject: ...
+        def verb(self, name: str, *, definition: str = '') -> Verb: ...
 
 
 # Step phase
