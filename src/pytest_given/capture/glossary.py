@@ -7,16 +7,6 @@ from typing import Literal
 
 from ..model import Glossary, GlossaryTerm, PytestGivenError, TermId, id_derive
 
-__all__ = [
-    'Actor',
-    'ActorInstance',
-    'InflectedVerb',
-    'Verb',
-    'WorkObject',
-    'WorkObjectInstance',
-    'id_derive',
-]
-
 
 @dataclass(frozen=True)
 class _TermHandle:
