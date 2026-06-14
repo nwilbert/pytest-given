@@ -29,6 +29,7 @@ from .model import (
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
+    NarrationTermRef,
     NarrationValue,
     NodeId,
     ParameterCase,
@@ -497,4 +498,9 @@ def _templatize_narration(
                         f'{sorted(param_names)}).'
                     )
                 out.append(part)
+            case NarrationTermRef(expression=expression):
+                if expression in param_names:
+                    out.append(dataclasses.replace(part, param_column=expression))
+                else:
+                    out.append(part)
     return dataclasses.replace(narration, parts=out)

@@ -17,10 +17,12 @@ from pytest_given.capture.decorators import StepDescriptor
 from pytest_given.model import (
     Narration,
     NarrationPlaceholder,
+    NarrationTermRef,
     NodeId,
     ParamSpec,
     PytestGivenError,
     Scenario,
+    TermId,
 )
 
 
@@ -276,3 +278,36 @@ def test_group_parameterized_any_failed_merges_as_failed() -> None:
     }
     merged = plugin._group_parameterized(scenarios, param_info)
     assert merged[0].status == 'failed'
+
+
+def test_templatize_sets_param_column_when_term_ref_expression_matches() -> None:
+    narration = Narration(
+        text='Alice arrives',
+        parts=[
+            NarrationTermRef(
+                term_id=TermId('guest'),
+                display='Alice',
+                expression='guest',
+            ),
+        ],
+    )
+    out = plugin._templatize_narration(narration, param_names=['guest'])
+    ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
+    assert ref.param_column == 'guest'
+    assert ref.display == 'Alice'
+
+
+def test_templatize_term_ref_param_column_stays_none_when_no_column_match() -> None:
+    narration = Narration(
+        text='Alice arrives',
+        parts=[
+            NarrationTermRef(
+                term_id=TermId('guest'),
+                display='Alice',
+                expression='guest',
+            ),
+        ],
+    )
+    out = plugin._templatize_narration(narration, param_names=['euros'])
+    ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
+    assert ref.param_column is None

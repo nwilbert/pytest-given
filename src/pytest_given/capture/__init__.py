@@ -1,6 +1,7 @@
 from .collector import Collector, FixtureInstanceKey, set_active_collector
 from .decorators import attach, given, scenario, then, when
 from .draft import DraftActor, DraftVerb, DraftWorkObject, draft
+from .story import activity, path, story
 from .template import Template, narration_from
 from .traceback import parse_short_repr
 
@@ -11,13 +12,16 @@ __all__ = [
     'DraftWorkObject',
     'FixtureInstanceKey',
     'Template',
+    'activity',
     'attach',
     'draft',
     'given',
     'narration_from',
     'parse_short_repr',
+    'path',
     'scenario',
     'set_active_collector',
+    'story',
     'then',
     'when',
 ]

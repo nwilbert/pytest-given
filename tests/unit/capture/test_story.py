@@ -320,3 +320,37 @@ def test_story_id_collision_does_not_fire_after_registry_clear():
     story('Book', activities=())
     _clear_story_registry()
     story('Book', activities=())
+
+
+def test_path_carries_glossaries_attribute(guest, search, room):
+    """Phase 7 walks paths to find Glossary references; verify they're stashed."""
+    p = path(guest, search, room)
+    glossaries = getattr(p, '_glossaries', ())
+    assert len(glossaries) == 1
+    assert glossaries[0] is guest.glossary
+
+
+def test_activity_unions_glossaries_across_paths(g, guest, search, room):
+    # Two paths, same glossary — should not dedup down to zero or appear twice.
+    p1 = path(guest, search, room)
+    p2 = path(guest('Alice'), search, room)
+    a = activity(p1, p2)
+    glossaries = getattr(a, '_glossaries', ())
+    assert len(glossaries) == 1
+    assert glossaries[0] is g
+
+
+# --- Task 4.6: top-level re-exports ---
+
+
+def test_top_level_imports():
+    from pytest_given import Glossary, activity, draft, path, story
+
+    g = Glossary()
+    guest = g.actor('Guest')
+    search = g.verb('search')
+    room = g.work_object('Room')
+    p = path(guest, search, room)
+    a = activity(p, path(draft.actor('Concierge'), search, room))
+    s = story('Smoke', activities=(a,))
+    assert s.title == 'Smoke'

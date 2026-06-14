@@ -45,6 +45,7 @@ class NarrationTermRef:
 
     term_id: TermId
     display: str
+    expression: str = ''
     param_column: str | None = None
 
 

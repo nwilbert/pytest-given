@@ -7,8 +7,18 @@ from ..model import (
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
+    NarrationTermRef,
     NarrationValue,
     PytestGivenError,
+)
+from .draft import DraftActor, DraftVerb, DraftWorkObject
+from .glossary import (
+    Actor,
+    ActorInstance,
+    InflectedVerb,
+    Verb,
+    WorkObject,
+    WorkObjectInstance,
 )
 
 _FORMATTER = Formatter()
@@ -78,9 +88,11 @@ def parse_tstring(
     """Convert a t-string Template into (rendered text, structured parts).
 
     Iterates the t-string yielding str | Interpolation. Each interpolation
-    becomes a NarrationValue carrying the rendered string plus the source
-    expression and any conversion / format_spec — preserved so that the
-    templatize step can convert matching expressions to NarrationPlaceholder.
+    is inspected:
+    - Draft handles raise PytestGivenError immediately.
+    - Glossary handles (Actor, WorkObject, Verb, and their instances/inflections)
+      become NarrationTermRef carrying term_id, display, and the source expression.
+    - All other values become NarrationValue as before.
     """
     parts: list[NarrationPart] = []
     rendered_chunks: list[str] = []
@@ -96,6 +108,12 @@ def parse_tstring(
                 conversion=conversion,
                 format_spec=format_spec,
             ):
+                _reject_draft_in_narration(value)
+                term_ref = _try_term_ref(value, expression)
+                if term_ref is not None:
+                    parts.append(term_ref)
+                    rendered_chunks.append(term_ref.display)
+                    continue
                 rendered = format(
                     _FORMATTER.convert_field(value, conversion), format_spec
                 )
@@ -109,3 +127,55 @@ def parse_tstring(
                 )
                 rendered_chunks.append(rendered)
     return ''.join(rendered_chunks), parts
+
+
+def _reject_draft_in_narration(value: object) -> None:
+    """Raise PytestGivenError if `value` is a draft handle.
+
+    Drafts are story-side only; they must not appear in step narrations.
+    """
+    if not isinstance(value, (DraftActor, DraftWorkObject, DraftVerb)):
+        return
+    kind_to_method = {
+        'actor': 'g.actor',
+        'object': 'g.work_object',
+        'verb': 'g.verb',
+    }
+    method = kind_to_method[value.kind]
+    raise PytestGivenError(
+        f'draft {value.kind} {value.text!r} cannot appear in a step narration; '
+        f'drafts are story-side only. Either promote it to a glossary term '
+        f'({method}({value.text!r})) and use the typed handle in the t-string, '
+        f'or replace the interpolation with a plain string.'
+    )
+
+
+def _try_term_ref(value: object, expression: str = '') -> NarrationTermRef | None:
+    """Return a NarrationTermRef if `value` is a glossary handle, instance, or
+    inflection — else None (fall back to NarrationValue)."""
+    match value:
+        case Actor() | WorkObject() | Verb():
+            return NarrationTermRef(
+                term_id=value.id,
+                display=value.canonical,
+                expression=expression,
+            )
+        case ActorInstance(actor=h, display=display):
+            return NarrationTermRef(
+                term_id=h.id,
+                display=display,
+                expression=expression,
+            )
+        case WorkObjectInstance(work_object=h, display=display):
+            return NarrationTermRef(
+                term_id=h.id,
+                display=display,
+                expression=expression,
+            )
+        case InflectedVerb(verb=h, display=display):
+            return NarrationTermRef(
+                term_id=h.id,
+                display=display,
+                expression=expression,
+            )
+    return None

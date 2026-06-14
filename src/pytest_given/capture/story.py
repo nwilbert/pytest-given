@@ -13,6 +13,7 @@ from ..model import (
     ActivityPlaceholder,
     ActivityTerm,
     ActivityWord,
+    Glossary,
     PytestGivenError,
     Story,
     StoryId,
@@ -27,6 +28,9 @@ from .glossary import (
     WorkObjectInstance,
     id_derive,
 )
+
+# Capture the built-in id() before it can be shadowed by local parameters.
+_obj_id = id
 
 type _PathArg = (
     Actor
@@ -66,25 +70,33 @@ def path(*parts: _PathArg) -> ActivityPath:
     _check_position(parts[2], 2, 'noun', _NOUN_TYPES, parts)
     schema_parts = tuple(_to_part(p) for p in parts)
     # Collect the set of glossary object-identities referenced by this path.
-    glossary_ids: frozenset[int] = frozenset(
-        gid for p in parts if (gid := _glossary_id_of(p)) is not None
-    )
+    glossary_objects = _dedup_by_id(filter(None, (_glossary_of(p) for p in parts)))
+    glossary_ids: frozenset[int] = frozenset(_obj_id(g) for g in glossary_objects)
     p_obj = ActivityPath(parts=schema_parts)
     object.__setattr__(p_obj, '_glossary_ids', glossary_ids)
+    object.__setattr__(p_obj, '_glossaries', glossary_objects)
     return p_obj
 
 
-def _glossary_id_of(value: object) -> int | None:
+def _glossary_of(value: object) -> Glossary | None:
     match value:
         case Actor() | WorkObject() | Verb():
-            return id(value.glossary)
+            return value.glossary
         case ActorInstance(actor=h):
-            return id(h.glossary)
+            return h.glossary
         case WorkObjectInstance(work_object=h):
-            return id(h.glossary)
+            return h.glossary
         case InflectedVerb(verb=h):
-            return id(h.glossary)
+            return h.glossary
     return None
+
+
+def _dedup_by_id(glossaries: filter) -> tuple[Glossary, ...]:
+    """Deduplicate Glossary objects by id (since Glossary is not hashable)."""
+    seen: dict[int, Glossary] = {}
+    for g in glossaries:
+        seen.setdefault(_obj_id(g), g)
+    return tuple(seen.values())
 
 
 def activity(
@@ -112,8 +124,15 @@ def activity(
     glossary_ids: frozenset[int] = frozenset().union(
         *(getattr(p, '_glossary_ids', frozenset()) for p in paths)
     )
+    # Dedup glossary objects across paths (preserving order from first appearance).
+    seen: dict[int, Glossary] = {}
+    for p in paths:
+        for g in getattr(p, '_glossaries', ()):
+            seen.setdefault(_obj_id(g), g)
+    glossary_objects = tuple(seen.values())
     a = Activity(id=ActivityId(id if id is not None else 0), paths=paths)
     object.__setattr__(a, '_glossary_ids', glossary_ids)
+    object.__setattr__(a, '_glossaries', glossary_objects)
     return a
 
 
@@ -159,6 +178,7 @@ def _assign_sequence_numbers(
             object.__setattr__(
                 new, '_glossary_ids', getattr(a, '_glossary_ids', frozenset())
             )
+            object.__setattr__(new, '_glossaries', getattr(a, '_glossaries', ()))
             out.append(new)
             next_seq += 1
         else:
