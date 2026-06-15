@@ -2,11 +2,12 @@
 
 `Story` and `GlossaryTerm` are constructed at user-code import time, not
 inside a pytest hook, so their source-location must be reconstructed from
-the call stack. The plugin sets rootdir during `pytest_configure`; capture
-sites then call `capture_caller_source(skip=N)` from their user-facing
-wrappers. Returns None if rootdir is unset or the caller's file lies
-outside rootdir — the renderer treats that as "no link", same as a scenario
-whose `item.location` is absent.
+the call stack. The plugin sets rootdir during `pytest_load_initial_conftests`
+(before root conftest is imported); capture sites then call
+`capture_caller_source(skip=N)` from their user-facing wrappers. Returns
+None if rootdir is unset or the caller's file lies outside rootdir — the
+renderer treats that as "no link", same as a scenario whose `item.location`
+is absent.
 """
 
 from __future__ import annotations

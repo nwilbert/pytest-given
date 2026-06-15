@@ -1,3 +1,4 @@
+import functools
 import json
 from collections.abc import Callable
 from pathlib import Path
@@ -70,35 +71,21 @@ def render_html(
 
     param_color_map = _build_param_color_map(report.scenarios)
 
-    project = report.metadata.project
-    commit_sha = report.metadata.commit_sha
-
+    resolve_url = functools.partial(
+        _resolve_url,
+        template=source_link_template,
+        project=report.metadata.project,
+        commit_sha=report.metadata.commit_sha,
+    )
     source_urls: dict[int, str | None] = {
-        idx: _resolve_url(
-            scn.source,
-            template=source_link_template,
-            project=project,
-            commit_sha=commit_sha,
-        )
-        for idx, scn in enumerate(report.scenarios)
+        idx: resolve_url(scn.source) for idx, scn in enumerate(report.scenarios)
     }
     story_source_urls: dict[StoryId, str | None] = {
-        story.id: _resolve_url(
-            story.source,
-            template=source_link_template,
-            project=project,
-            commit_sha=commit_sha,
-        )
-        for story in report.stories
+        story.id: resolve_url(story.source) for story in report.stories
     }
+    glossary_terms = report.glossary.terms if report.glossary is not None else ()
     term_source_urls: dict[TermId, str | None] = {
-        term.id: _resolve_url(
-            term.source,
-            template=source_link_template,
-            project=project,
-            commit_sha=commit_sha,
-        )
-        for term in (report.glossary.terms if report.glossary is not None else ())
+        term.id: resolve_url(term.source) for term in glossary_terms
     }
 
     coverage_maps = build_coverage_maps(report)
