@@ -283,6 +283,7 @@ body {
 .scenario-body-inner {
   overflow: hidden;
   min-height: 0;
+  position: relative;
 }
 
 .scenario-name { font-size: var(--font-size-md); font-weight: 500; }
@@ -532,6 +533,16 @@ span.param-highlight {
   color: var(--text-primary);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+.scenario-body-inner > .scenario-source,
+.refs-content > .scenario-source {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.refs-content > .scenario-source {
+  bottom: var(--space-md);
+  padding-block: 0;
 }
 
 /* === Term-ref pills (actor / object / verb) and draft cue variants === */
@@ -804,6 +815,7 @@ span.param-highlight {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+  position: relative;
 }
 .refs-line {
   display: flex;

@@ -349,6 +349,16 @@
           </div>
           {% endfor %}
         </div>
+        {% if story.source %}
+        <div class="scenario-source">
+          {%- set story_url = story_source_urls.get(story.id) -%}
+          {%- if story_url -%}
+          <a href="{{ story_url }}">{{ story.source.relpath }}:{{ story.source.line }}</a>
+          {%- else -%}
+          <span>{{ story.source.relpath }}:{{ story.source.line }}</span>
+          {%- endif -%}
+        </div>
+        {% endif %}
       </div>
       {% endfor %}
     </div>
@@ -462,6 +472,16 @@
                   {% for form in agg.forms %}
                   <span class="use-chip">{{ form.display }}</span>
                   {% endfor %}
+                </div>
+                {% endif %}
+                {% if term.source %}
+                <div class="scenario-source">
+                  {%- set term_url = term_source_urls.get(term.id) -%}
+                  {%- if term_url -%}
+                  <a href="{{ term_url }}">{{ term.source.relpath }}:{{ term.source.line }}</a>
+                  {%- else -%}
+                  <span>{{ term.source.relpath }}:{{ term.source.line }}</span>
+                  {%- endif -%}
                 </div>
                 {% endif %}
               </div>
