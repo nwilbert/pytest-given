@@ -29,6 +29,7 @@ from .glossary import (
     WorkObjectInstance,
     id_derive,
 )
+from .source import capture_caller_source
 
 # Capture the built-in id() before it can be shadowed by local parameters.
 _obj_id = id
@@ -165,10 +166,11 @@ def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     and enforces v1's single-glossary invariant."""
     sid = StoryId(id_derive(title))
     _register_story(sid, title)
+    source = capture_caller_source(skip=2)
     numbered = _assign_sequence_numbers(tuple(activities))
     _check_unique_ids(numbered)
     _check_single_glossary(title, numbered)
-    return Story(id=sid, title=title, activities=numbered)
+    return Story(id=sid, title=title, activities=numbered, source=source)
 
 
 def _assign_sequence_numbers(

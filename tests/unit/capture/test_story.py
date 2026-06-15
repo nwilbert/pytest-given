@@ -1,6 +1,9 @@
+from pathlib import Path
+
 import pytest
 
 from pytest_given import PytestGivenError
+from pytest_given.capture import source as source_mod
 from pytest_given.capture.draft import draft
 from pytest_given.capture.story import (
     _clear_story_registry,
@@ -301,6 +304,23 @@ def test_story_with_only_drafts_has_empty_glossary_set():
 def test_story_empty_title_raises():
     with pytest.raises(PytestGivenError, match='derived id is empty'):
         story('---', [])
+
+
+def test_story_captures_source_from_call_site(g):
+    repo_root = Path(__file__).resolve().parents[3]
+    source_mod.set_rootdir(repo_root)
+    try:
+        guest = g.actor('Guest')
+        room = g.work_object('Room')
+        books = g.verb('books')
+
+        s = story('Checkout', [activity(guest, books, room)])
+
+        assert s.source is not None
+        assert s.source.relpath.endswith('test_story.py')
+        assert s.source.line > 0
+    finally:
+        source_mod._reset_rootdir()
 
 
 # --- Task 4.5: story-id duplicate detection ---

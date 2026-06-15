@@ -1,6 +1,9 @@
+from pathlib import Path
+
 import pytest
 
 from pytest_given import PytestGivenError
+from pytest_given.capture import source as source_mod
 from pytest_given.capture.glossary import (
     Actor,
     ActorInstance,
@@ -10,7 +13,7 @@ from pytest_given.capture.glossary import (
     WorkObjectInstance,
     id_derive,
 )
-from pytest_given.model import Glossary, GlossaryTerm, TermId
+from pytest_given.model import Glossary, GlossaryTerm, SourceLocation, TermId
 
 
 @pytest.mark.parametrize(
@@ -148,3 +151,76 @@ def test_glossary_actor_empty_name_raises():
     g = Glossary()
     with pytest.raises(PytestGivenError, match='derived id is empty'):
         g.actor('---')
+
+
+def test_glossary_actor_captures_source():
+    source_mod.set_rootdir(Path(__file__).resolve().parents[3])
+    try:
+        g = Glossary()
+        a = g.actor('Guest')
+        assert a.term.source is not None
+        assert a.term.source.relpath.endswith('test_glossary.py')
+        assert a.term.source.line > 0
+    finally:
+        source_mod._reset_rootdir()
+
+
+def test_glossary_work_object_captures_source():
+    source_mod.set_rootdir(Path(__file__).resolve().parents[3])
+    try:
+        g = Glossary()
+        w = g.work_object('Room')
+        assert w.term.source is not None
+        assert w.term.source.relpath.endswith('test_glossary.py')
+    finally:
+        source_mod._reset_rootdir()
+
+
+def test_glossary_verb_captures_source():
+    source_mod.set_rootdir(Path(__file__).resolve().parents[3])
+    try:
+        g = Glossary()
+        v = g.verb('confirm')
+        assert v.term.source is not None
+        assert v.term.source.relpath.endswith('test_glossary.py')
+    finally:
+        source_mod._reset_rootdir()
+
+
+def test_glossary_re_registration_preserves_first_source(monkeypatch):
+    source_mod.set_rootdir(Path(__file__).resolve().parents[3])
+    try:
+        g = Glossary()
+        a1 = g.actor('Guest', definition='d')
+        first_source = a1.term.source
+        assert first_source is not None
+
+        fake = SourceLocation(relpath='other/file.py', line=999)
+        monkeypatch.setattr(
+            'pytest_given.capture.glossary.capture_caller_source',
+            lambda skip=2: fake,
+        )
+        a2 = g.actor('Guest', definition='d')
+        assert a2.term is a1.term
+        assert a2.term.source == first_source
+    finally:
+        source_mod._reset_rootdir()
+
+
+def test_glossary_re_registration_with_matching_fields_succeeds_when_source_differs(monkeypatch):
+    """Conflict equality must ignore `source`; same kind/canonical/definition
+    from a different call site is not a conflict."""
+    import pytest_given.capture.glossary as gloss_mod
+
+    g = Glossary()
+
+    src1 = SourceLocation(relpath='a.py', line=1)
+    monkeypatch.setattr(gloss_mod, 'capture_caller_source', lambda skip=2: src1)
+    a1 = g.actor('Guest', definition='d')
+
+    src2 = SourceLocation(relpath='b.py', line=99)
+    monkeypatch.setattr(gloss_mod, 'capture_caller_source', lambda skip=2: src2)
+    a2 = g.actor('Guest', definition='d')
+
+    assert a1.term is a2.term
+    assert a1.term.source == src1  # first-registration wins

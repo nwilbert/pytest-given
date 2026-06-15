@@ -200,6 +200,28 @@ def test_scenario_source_defaults_to_none() -> None:
     assert s.source is None
 
 
+def test_story_source_defaults_to_none() -> None:
+    s = Story(id=StoryId('checkout'), title='Checkout', activities=())
+    assert s.source is None
+
+
+def test_story_carries_source_location() -> None:
+    src = SourceLocation(relpath='tests/conftest.py', line=12)
+    s = Story(id=StoryId('checkout'), title='Checkout', activities=(), source=src)
+    assert s.source == src
+
+
+def test_glossary_term_source_defaults_to_none() -> None:
+    t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
+    assert t.source is None
+
+
+def test_glossary_term_carries_source_location() -> None:
+    src = SourceLocation(relpath='tests/conftest.py', line=4)
+    t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest', source=src)
+    assert t.source == src
+
+
 def test_metadata_commit_sha_defaults_to_none() -> None:
     m = Metadata(project='p', timestamp='t', pytest_version='9', plugin_version='0.1')
     assert m.commit_sha is None

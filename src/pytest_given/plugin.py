@@ -22,6 +22,7 @@ from .capture import (
     set_active_collector,
 )
 from .capture.decorators import ScenarioDecorator
+from .capture.source import set_rootdir
 from .capture.story import _clear_story_registry
 from .model import (
     FixtureRecording,
@@ -83,6 +84,13 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         default='none',
         help='Source-link template or preset name (CLI flag overrides this).',
     )
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    """Publish pytest's rootdir to the capture module so `Story` and
+    `GlossaryTerm` constructed at user-code import time can compute
+    rootdir-relative source paths."""
+    set_rootdir(Path(config.rootpath))
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:

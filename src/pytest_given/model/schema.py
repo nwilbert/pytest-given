@@ -73,6 +73,7 @@ class GlossaryTerm:
     kind: Literal['actor', 'object', 'verb']
     canonical: str
     definition: str = ''
+    source: SourceLocation | None = None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -125,6 +126,7 @@ class Story:
     id: StoryId
     title: str
     activities: tuple[Activity, ...]
+    source: SourceLocation | None = None
     _by_id: dict[ActivityId, Activity] = field(
         init=False, repr=False, compare=False, default_factory=dict
     )

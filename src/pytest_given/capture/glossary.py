@@ -5,7 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from ..model import Glossary, GlossaryTerm, PytestGivenError, TermId, id_derive
+from ..model import Glossary, GlossaryTerm, PytestGivenError, SourceLocation, TermId, id_derive
+from .source import capture_caller_source
 
 
 @dataclass(frozen=True)
@@ -73,17 +74,29 @@ def _register_kind(
     kind: Literal['actor', 'object', 'verb'],
     name: str,
     definition: str,
+    source: SourceLocation | None = None,
 ) -> GlossaryTerm:
-    """Idempotent registration. Returns the canonical term (existing or new)."""
+    """Idempotent registration. Returns the canonical term (existing or new).
+
+    `source` is the call site of the user-facing wrapper (g.actor / g.work_object /
+    g.verb) — captured by those wrappers and threaded through. First-registration
+    wins: re-registration with matching (kind, canonical, definition) returns the
+    existing term unchanged, preserving its original `source`.
+    """
     new = GlossaryTerm(
         id=id_derive(name),
         kind=kind,
         canonical=name,
         definition=definition,
+        source=source,
     )
     existing = self.get(new.id)
     if existing is not None:
-        if existing == new:
+        if (
+            existing.kind == new.kind
+            and existing.canonical == new.canonical
+            and existing.definition == new.definition
+        ):
             return existing
         raise PytestGivenError(
             f'term {name!r} (id {new.id!r}) conflicts with prior registration '
@@ -96,19 +109,22 @@ def _register_kind(
 
 
 def _glossary_actor(self: Glossary, name: str, *, definition: str = '') -> Actor:
-    term = _register_kind(self, 'actor', name, definition)
+    source = capture_caller_source(skip=2)
+    term = _register_kind(self, 'actor', name, definition, source)
     return Actor(_term=term, _glossary=self)
 
 
 def _glossary_work_object(
     self: Glossary, name: str, *, definition: str = ''
 ) -> WorkObject:
-    term = _register_kind(self, 'object', name, definition)
+    source = capture_caller_source(skip=2)
+    term = _register_kind(self, 'object', name, definition, source)
     return WorkObject(_term=term, _glossary=self)
 
 
 def _glossary_verb(self: Glossary, name: str, *, definition: str = '') -> Verb:
-    term = _register_kind(self, 'verb', name, definition)
+    source = capture_caller_source(skip=2)
+    term = _register_kind(self, 'verb', name, definition, source)
     return Verb(_term=term, _glossary=self)
 
 
