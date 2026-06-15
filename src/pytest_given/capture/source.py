@@ -11,7 +11,7 @@ whose `item.location` is absent.
 
 from __future__ import annotations
 
-import inspect
+import sys
 from pathlib import Path
 
 from ..model import SourceLocation
@@ -20,7 +20,7 @@ _rootdir: Path | None = None
 
 
 def set_rootdir(path: Path) -> None:
-    """Called by the plugin in `pytest_configure`."""
+    """Called by the plugin in `pytest_load_initial_conftests`."""
     global _rootdir
     _rootdir = path.resolve()
 
@@ -44,10 +44,10 @@ def capture_caller_source(skip: int = 1) -> SourceLocation | None:
     """
     if _rootdir is None:
         return None
-    frame = inspect.stack()[skip]
-    abs_path = Path(frame.filename).resolve()
+    frame = sys._getframe(skip)
+    abs_path = Path(frame.f_code.co_filename).resolve()
     try:
         rel = abs_path.relative_to(_rootdir)
     except ValueError:
         return None
-    return SourceLocation(relpath=rel.as_posix(), line=frame.lineno)
+    return SourceLocation(relpath=rel.as_posix(), line=frame.f_lineno)

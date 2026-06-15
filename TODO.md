@@ -5,6 +5,7 @@
 - [ ] improve / add links in report, between scenarios, terms / glossary, and stories
 - [ ] use >> for activity paths?
 - [ ] add diagram to readme with Agent <-> Dev <-> Domain Expert
+- [ ] cache `format_source_link` template parse/validation in the renderer: it re-runs `string.Formatter().parse(template)` + field-name validation once per scenario, story, and term. Validate once per render, reuse the parsed template across all calls.
 
 ## Next
 

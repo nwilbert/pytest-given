@@ -86,11 +86,16 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
-def pytest_configure(config: pytest.Config) -> None:
+def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
     """Publish pytest's rootdir to the capture module so `Story` and
     `GlossaryTerm` constructed at user-code import time can compute
-    rootdir-relative source paths."""
-    set_rootdir(Path(config.rootpath))
+    rootdir-relative source paths.
+
+    Uses `pytest_load_initial_conftests` (not `pytest_configure`) so that
+    rootdir is set *before* root conftest.py is imported — users commonly
+    declare shared glossaries / stories at conftest module level, and that
+    code runs during conftest import."""
+    set_rootdir(Path(early_config.rootpath))
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:

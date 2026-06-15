@@ -207,7 +207,7 @@ def test_glossary_re_registration_preserves_first_source(monkeypatch):
         source_mod._reset_rootdir()
 
 
-def test_glossary_re_registration_with_matching_fields_succeeds_when_source_differs(monkeypatch):
+def test_glossary_re_registration_matching_fields_ok_when_source_differs(monkeypatch):
     """Conflict equality must ignore `source`; same kind/canonical/definition
     from a different call site is not a conflict."""
     import pytest_given.capture.glossary as gloss_mod

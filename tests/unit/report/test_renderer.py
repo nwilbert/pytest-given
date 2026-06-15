@@ -804,7 +804,9 @@ def test_render_includes_resolved_source_urls_when_template_set(tmp_path: Path) 
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path, source_link_template='vscode://file/{path}:{line}')
+    render_html(
+        json_path, html_path, source_link_template='vscode://file/{path}:{line}'
+    )
     content = html_path.read_text(encoding='utf-8')
     assert 'vscode://file/' in content
     assert 'tests/test_x.py:10' in content

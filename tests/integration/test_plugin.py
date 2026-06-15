@@ -1075,10 +1075,51 @@ def test_glossary_term_source_captured_in_json(pytester, tmp_path):
     assert terms, 'expected at least one glossary term'
     for term in terms:
         src = term['source']
-        assert src is not None, f"term {term['canonical']} missing source"
+        assert src is not None, f'term {term["canonical"]} missing source'
         assert src['relpath'].endswith('test_glossary_src.py')
         assert isinstance(src['line'], int)
         assert src['line'] >= 1
+
+
+def test_glossary_term_source_captured_when_declared_in_conftest(pytester, tmp_path):
+    """Glossary terms registered at the top level of conftest.py — a common
+    shared-fixture pattern — must capture source even though conftest is
+    imported before `pytest_configure`."""
+    pytester.makeconftest(
+        """
+        from pytest_given import Glossary, activity, story
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('ConftestStory', [activity(guest, search, room)])
+        """
+    )
+    pytester.makepyfile(
+        test_conf_src="""
+        from conftest import s
+        from pytest_given import scenario, when
+
+        @scenario('A', story=s, activities=[1])
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    terms = data['glossary']['terms']
+    assert terms, 'expected at least one glossary term'
+    for term in terms:
+        src = term['source']
+        assert src is not None, f'term {term["canonical"]} missing source'
+        assert src['relpath'].endswith('conftest.py')
+    assert data['stories']
+    story_src = data['stories'][0]['source']
+    assert story_src is not None
+    assert story_src['relpath'].endswith('conftest.py')
 
 
 def test_metadata_commit_sha_captured(pytester, tmp_path, monkeypatch):

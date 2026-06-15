@@ -5,7 +5,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from ..model import Glossary, GlossaryTerm, PytestGivenError, SourceLocation, TermId, id_derive
+from ..model import (
+    Glossary,
+    GlossaryTerm,
+    PytestGivenError,
+    SourceLocation,
+    TermId,
+    id_derive,
+)
 from .source import capture_caller_source
 
 
