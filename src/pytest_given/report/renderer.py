@@ -20,7 +20,9 @@ from ..model import (
     NarrationValue,
     NodeId,
     Scenario,
+    SourceLocation,
     StoryId,
+    TermId,
     report_from_dict,
 )
 from .aggregations import (
@@ -67,12 +69,37 @@ def render_html(
     env.globals['zip'] = zip
 
     param_color_map = _build_param_color_map(report.scenarios)
-    source_urls = _compute_source_urls(
-        report.scenarios,
-        project=report.metadata.project,
-        commit_sha=report.metadata.commit_sha,
-        source_link_template=source_link_template,
-    )
+
+    project = report.metadata.project
+    commit_sha = report.metadata.commit_sha
+
+    source_urls: dict[int, str | None] = {
+        idx: _resolve_url(
+            scn.source,
+            template=source_link_template,
+            project=project,
+            commit_sha=commit_sha,
+        )
+        for idx, scn in enumerate(report.scenarios)
+    }
+    story_source_urls: dict[StoryId, str | None] = {
+        story.id: _resolve_url(
+            story.source,
+            template=source_link_template,
+            project=project,
+            commit_sha=commit_sha,
+        )
+        for story in report.stories
+    }
+    term_source_urls: dict[TermId, str | None] = {
+        term.id: _resolve_url(
+            term.source,
+            template=source_link_template,
+            project=project,
+            commit_sha=commit_sha,
+        )
+        for term in (report.glossary.terms if report.glossary is not None else ())
+    }
 
     coverage_maps = build_coverage_maps(report)
     glossary_aggregations = build_glossary_aggregations(report)
@@ -151,6 +178,8 @@ def render_html(
         param_color_map=param_color_map,
         num_param_colors=_NUM_PARAM_COLORS,
         source_urls=source_urls,
+        story_source_urls=story_source_urls,
+        term_source_urls=term_source_urls,
     )
     html_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.write_text(html, encoding='utf-8')
@@ -169,30 +198,18 @@ def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
     return color_map
 
 
-def _compute_source_urls(
-    scenarios: list[Scenario],
+def _resolve_url(
+    source: SourceLocation | None,
     *,
+    template: str | None,
     project: str,
     commit_sha: str | None,
-    source_link_template: str | None,
-) -> dict[int, str | None]:
-    """Resolve per-scenario URLs once, keyed by scenario index.
-
-    Returns None for scenarios with no `source` data and for all scenarios
-    when `source_link_template` is None.
-    """
-    urls: dict[int, str | None] = {}
-    for idx, scenario in enumerate(scenarios):
-        if scenario.source is None or source_link_template is None:
-            urls[idx] = None
-            continue
-        urls[idx] = format_source_link(
-            source_link_template,
-            source=scenario.source,
-            project=project,
-            commit_sha=commit_sha,
-        )
-    return urls
+) -> str | None:
+    if source is None or template is None:
+        return None
+    return format_source_link(
+        template, source=source, project=project, commit_sha=commit_sha
+    )
 
 
 def _make_narration_filter(

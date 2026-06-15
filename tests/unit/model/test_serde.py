@@ -575,3 +575,47 @@ def test_narration_part_unknown_shape_raises():
 
     with pytest.raises(PytestGivenError, match='Unknown narration part shape'):
         _narration_part_from_dict({'mystery': 'x'})
+
+
+def test_story_source_roundtrips() -> None:
+    story = Story(
+        id=StoryId('checkout'),
+        title='Checkout',
+        activities=(
+            Activity(
+                id=ActivityId(1),
+                paths=(ActivityPath(parts=(ActivityWord(text='x'),)),),
+            ),
+        ),
+        source=SourceLocation(relpath='conftest.py', line=4),
+    )
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+        ),
+        stories=[story],
+    )
+    round_tripped = report_from_dict(report_to_dict(report))
+    assert round_tripped.stories[0].source == story.source
+
+
+def test_glossary_term_source_roundtrips() -> None:
+    g = Glossary(
+        terms=[
+            GlossaryTerm(
+                id=TermId('guest'),
+                kind='actor',
+                canonical='Guest',
+                source=SourceLocation(relpath='conftest.py', line=8),
+            ),
+        ],
+    )
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+        ),
+        glossary=g,
+    )
+    round_tripped = report_from_dict(report_to_dict(report))
+    assert round_tripped.glossary is not None
+    assert round_tripped.glossary.terms[0].source == g.terms[0].source

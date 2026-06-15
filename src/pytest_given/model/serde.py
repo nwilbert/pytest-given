@@ -100,19 +100,27 @@ def _glossary_from_dict(d: dict[str, Any] | None) -> Glossary | None:
 
 
 def _glossary_term_from_dict(d: dict[str, Any]) -> GlossaryTerm:
+    src = d.get('source')
     return GlossaryTerm(
         id=TermId(d['id']),
         kind=d['kind'],
         canonical=d['canonical'],
         definition=d.get('definition', ''),
+        source=SourceLocation(relpath=src['relpath'], line=src['line'])
+        if src is not None
+        else None,
     )
 
 
 def _story_from_dict(d: dict[str, Any]) -> Story:
+    src = d.get('source')
     return Story(
         id=StoryId(d['id']),
         title=d['title'],
         activities=tuple(_activity_from_dict(a) for a in d.get('activities', [])),
+        source=SourceLocation(relpath=src['relpath'], line=src['line'])
+        if src is not None
+        else None,
     )
 
 

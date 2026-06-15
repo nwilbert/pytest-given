@@ -768,6 +768,48 @@ def test_renderer_without_template_renders_plain_relpath(tmp_path: Path) -> None
     assert '<a href="vscode' not in content
 
 
+def test_render_includes_resolved_source_urls_when_template_set(tmp_path: Path) -> None:
+    """When source_link_template is set and a Story/GlossaryTerm has a source,
+    the resolved URL is computed by the renderer. We assert at the data-shape
+    level by injecting a single scenario whose URL we can confirm — confirming
+    the maps were populated. Story/term URL maps are exercised in later tasks
+    once the template emits their link blocks."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_x',
+                        'narration': _narration('My Scenario'),
+                        'module': 'test_mod',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                        'source': {'relpath': 'tests/test_x.py', 'line': 10},
+                    },
+                ],
+                'stories': [],
+                'glossary': None,
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path, source_link_template='vscode://file/{path}:{line}')
+    content = html_path.read_text(encoding='utf-8')
+    assert 'vscode://file/' in content
+    assert 'tests/test_x.py:10' in content
+
+
 def test_renderer_skips_link_block_when_scenario_has_no_source(
     tmp_path: Path,
 ) -> None:
