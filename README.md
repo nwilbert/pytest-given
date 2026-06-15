@@ -222,11 +222,11 @@ The JSON report is **always written** whenever the plugin is loaded — every `p
 | `--given-json=PATH` | `given-report/report-data.json` | JSON output path (always written) |
 | `--given-html` | off | Also generate the HTML report |
 | `--given-html-output=PATH` | `given-report/report.html` | HTML output path (used only with `--given-html`) |
-| `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card. See [Source links](#source-links). |
+| `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. See [Source links](#source-links). |
 
 ## Source links
 
-Add a clickable file:line anchor to each scenario card so devs can jump straight to the test source.
+Add a clickable file:line anchor to each scenario card, story panel, and expanded glossary term card so devs can jump straight to the source.
 
 ```toml
 # pyproject.toml — pytest 9+ canonical form

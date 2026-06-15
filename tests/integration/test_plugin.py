@@ -1019,6 +1019,68 @@ def test_parameterized_scenario_source_captured_in_json(pytester, tmp_path):
     assert src['line'] >= 1
 
 
+def test_story_source_captured_in_json(pytester, tmp_path):
+    """story() records the source location of its construction site."""
+    pytester.makepyfile(
+        test_story_src="""
+        from pytest_given import Glossary, activity, scenario, story, when
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Booking', [activity(guest, search, room)])
+
+        @scenario('A', story=s, activities=[1])
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    assert len(data['stories']) == 1
+    src = data['stories'][0]['source']
+    assert src is not None
+    assert src['relpath'].endswith('test_story_src.py')
+    assert isinstance(src['line'], int)
+    assert src['line'] >= 1
+
+
+def test_glossary_term_source_captured_in_json(pytester, tmp_path):
+    """Glossary terms record the source location of first registration."""
+    pytester.makepyfile(
+        test_glossary_src="""
+        from pytest_given import Glossary, activity, scenario, story, when
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Booking', [activity(guest, search, room)])
+
+        @scenario('A', story=s, activities=[1])
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    terms = data['glossary']['terms']
+    assert terms, 'expected at least one glossary term'
+    for term in terms:
+        src = term['source']
+        assert src is not None, f"term {term['canonical']} missing source"
+        assert src['relpath'].endswith('test_glossary_src.py')
+        assert isinstance(src['line'], int)
+        assert src['line'] >= 1
+
+
 def test_metadata_commit_sha_captured(pytester, tmp_path, monkeypatch):
     """metadata.commit_sha is populated from env vars."""
     monkeypatch.setenv('GITHUB_SHA', 'integration-sha')

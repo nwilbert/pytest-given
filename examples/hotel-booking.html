@@ -290,6 +290,7 @@ body {
 .scenario-body-inner {
   overflow: hidden;
   min-height: 0;
+  position: relative;
 }
 
 .scenario-name { font-size: var(--font-size-md); font-weight: 500; }
@@ -539,6 +540,16 @@ span.param-highlight {
   color: var(--text-primary);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+.scenario-body-inner > .scenario-source,
+.refs-content > .scenario-source {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.refs-content > .scenario-source {
+  bottom: var(--space-md);
+  padding-block: 0;
 }
 
 /* === Term-ref pills (actor / object / verb) and draft cue variants === */
@@ -811,6 +822,7 @@ span.param-highlight {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+  position: relative;
 }
 .refs-line {
   display: flex;
@@ -953,7 +965,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/44fe99045e1a91e22492c87bd5b8cda773f1f160/examples/test_hotel_booking.py#L127">examples/test_hotel_booking.py:127</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L127">examples/test_hotel_booking.py:127</a></div>
       
     </div>
     </div>
@@ -1002,7 +1014,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/44fe99045e1a91e22492c87bd5b8cda773f1f160/examples/test_hotel_booking.py#L141">examples/test_hotel_booking.py:141</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L141">examples/test_hotel_booking.py:141</a></div>
       
     </div>
     </div>
@@ -1195,7 +1207,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/44fe99045e1a91e22492c87bd5b8cda773f1f160/examples/test_hotel_booking.py#L177">examples/test_hotel_booking.py:177</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L177">examples/test_hotel_booking.py:177</a></div>
       
     </div>
     </div>
@@ -1565,6 +1577,9 @@ span.param-highlight {
           </div>
           
         </div>
+        
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L72">examples/test_hotel_booking.py:72</a></div>
+        
       </div>
       
     </div>
@@ -1673,6 +1688,9 @@ span.param-highlight {
                 </div>
                 
                 
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L46">examples/test_hotel_booking.py:46</a></div>
+                
               </div>
             </div>
           </div>
@@ -1720,6 +1738,9 @@ span.param-highlight {
                 </div>
                 
                 
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L49">examples/test_hotel_booking.py:49</a></div>
+                
               </div>
             </div>
           </div>
@@ -1757,6 +1778,9 @@ span.param-highlight {
                 </div>
                 
                 
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L50">examples/test_hotel_booking.py:50</a></div>
                 
               </div>
             </div>
@@ -1814,6 +1838,9 @@ span.param-highlight {
                 </div>
                 
                 
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L54">examples/test_hotel_booking.py:54</a></div>
+                
               </div>
             </div>
           </div>
@@ -1851,6 +1878,9 @@ span.param-highlight {
                 </div>
                 
                 
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L55">examples/test_hotel_booking.py:55</a></div>
                 
               </div>
             </div>
@@ -1890,6 +1920,9 @@ span.param-highlight {
                 
                 
                 
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L56">examples/test_hotel_booking.py:56</a></div>
+                
               </div>
             </div>
           </div>
@@ -1927,6 +1960,9 @@ span.param-highlight {
                 </div>
                 
                 
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L57">examples/test_hotel_booking.py:57</a></div>
                 
               </div>
             </div>
@@ -1984,6 +2020,9 @@ span.param-highlight {
                   
                 </div>
                 
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L61">examples/test_hotel_booking.py:61</a></div>
+                
               </div>
             </div>
           </div>
@@ -2028,6 +2067,9 @@ span.param-highlight {
                   <span class="use-chip">selects</span>
                   
                 </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L62">examples/test_hotel_booking.py:62</a></div>
                 
               </div>
             </div>
@@ -2074,6 +2116,9 @@ span.param-highlight {
                   
                 </div>
                 
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L63">examples/test_hotel_booking.py:63</a></div>
+                
               </div>
             </div>
           </div>
@@ -2118,6 +2163,9 @@ span.param-highlight {
                   <span class="use-chip">submits</span>
                   
                 </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L64">examples/test_hotel_booking.py:64</a></div>
                 
               </div>
             </div>
@@ -2164,6 +2212,9 @@ span.param-highlight {
                   
                 </div>
                 
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L65">examples/test_hotel_booking.py:65</a></div>
+                
               </div>
             </div>
           </div>
@@ -2209,6 +2260,9 @@ span.param-highlight {
                   
                 </div>
                 
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L66">examples/test_hotel_booking.py:66</a></div>
+                
               </div>
             </div>
           </div>
@@ -2236,6 +2290,9 @@ span.param-highlight {
                 
                 
                 
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6658cf61b964237ab8e349ab5ccff76a20e418cd/examples/test_hotel_booking.py#L69">examples/test_hotel_booking.py:69</a></div>
+                
               </div>
             </div>
           </div>
@@ -2255,10 +2312,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-14T17:13:41.551072+00:00",
+    "timestamp": "2026-06-15T05:32:15.543415+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "44fe99045e1a91e22492c87bd5b8cda773f1f160"
+    "commit_sha": "6658cf61b964237ab8e349ab5ccff76a20e418cd"
   },
   "scenarios": [
     {
@@ -3222,85 +3279,141 @@ window.__REPORT_DATA__ = {
         "id": "organizer",
         "kind": "actor",
         "canonical": "Organizer",
-        "definition": "Person booking accommodation on behalf of a group."
+        "definition": "Person booking accommodation on behalf of a group.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 46
+        }
       },
       {
         "id": "guest",
         "kind": "actor",
         "canonical": "Guest",
-        "definition": "Individual traveler in the group."
+        "definition": "Individual traveler in the group.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 49
+        }
       },
       {
         "id": "booking-system",
         "kind": "actor",
         "canonical": "Booking System",
-        "definition": "Automated reservation back-end."
+        "definition": "Automated reservation back-end.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 50
+        }
       },
       {
         "id": "room",
         "kind": "object",
         "canonical": "Room",
-        "definition": "A bookable hotel room."
+        "definition": "A bookable hotel room.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 54
+        }
       },
       {
         "id": "booking",
         "kind": "object",
         "canonical": "Booking",
-        "definition": "A reservation for one or more rooms."
+        "definition": "A reservation for one or more rooms.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 55
+        }
       },
       {
         "id": "payment",
         "kind": "object",
         "canonical": "Payment",
-        "definition": "Money transferred for a booking."
+        "definition": "Money transferred for a booking.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 56
+        }
       },
       {
         "id": "confirmation",
         "kind": "object",
         "canonical": "Confirmation",
-        "definition": "Notification of a successful booking."
+        "definition": "Notification of a successful booking.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 57
+        }
       },
       {
         "id": "search",
         "kind": "verb",
         "canonical": "search",
-        "definition": "Look up available options."
+        "definition": "Look up available options.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 61
+        }
       },
       {
         "id": "select",
         "kind": "verb",
         "canonical": "select",
-        "definition": "Choose one option from a set."
+        "definition": "Choose one option from a set.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 62
+        }
       },
       {
         "id": "add",
         "kind": "verb",
         "canonical": "add",
-        "definition": "Attach a member to a collection."
+        "definition": "Attach a member to a collection.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 63
+        }
       },
       {
         "id": "submit",
         "kind": "verb",
         "canonical": "submit",
-        "definition": "Send to the system for processing."
+        "definition": "Send to the system for processing.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 64
+        }
       },
       {
         "id": "confirm",
         "kind": "verb",
         "canonical": "confirm",
-        "definition": "Finalize and acknowledge."
+        "definition": "Finalize and acknowledge.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 65
+        }
       },
       {
         "id": "send",
         "kind": "verb",
         "canonical": "send",
-        "definition": "Deliver to a recipient."
+        "definition": "Deliver to a recipient.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 66
+        }
       },
       {
         "id": "reject",
         "kind": "verb",
         "canonical": "reject",
-        "definition": "Refuse to process or accept."
+        "definition": "Refuse to process or accept.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 69
+        }
       }
     ]
   },
@@ -3523,7 +3636,11 @@ window.__REPORT_DATA__ = {
             }
           ]
         }
-      ]
+      ],
+      "source": {
+        "relpath": "examples/test_hotel_booking.py",
+        "line": 72
+      }
     }
   ]
 };

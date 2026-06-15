@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-14T17:13:41.551072+00:00",
+    "timestamp": "2026-06-15T05:32:15.543415+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "44fe99045e1a91e22492c87bd5b8cda773f1f160"
+    "commit_sha": "6658cf61b964237ab8e349ab5ccff76a20e418cd"
   },
   "scenarios": [
     {
@@ -968,85 +968,141 @@
         "id": "organizer",
         "kind": "actor",
         "canonical": "Organizer",
-        "definition": "Person booking accommodation on behalf of a group."
+        "definition": "Person booking accommodation on behalf of a group.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 46
+        }
       },
       {
         "id": "guest",
         "kind": "actor",
         "canonical": "Guest",
-        "definition": "Individual traveler in the group."
+        "definition": "Individual traveler in the group.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 49
+        }
       },
       {
         "id": "booking-system",
         "kind": "actor",
         "canonical": "Booking System",
-        "definition": "Automated reservation back-end."
+        "definition": "Automated reservation back-end.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 50
+        }
       },
       {
         "id": "room",
         "kind": "object",
         "canonical": "Room",
-        "definition": "A bookable hotel room."
+        "definition": "A bookable hotel room.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 54
+        }
       },
       {
         "id": "booking",
         "kind": "object",
         "canonical": "Booking",
-        "definition": "A reservation for one or more rooms."
+        "definition": "A reservation for one or more rooms.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 55
+        }
       },
       {
         "id": "payment",
         "kind": "object",
         "canonical": "Payment",
-        "definition": "Money transferred for a booking."
+        "definition": "Money transferred for a booking.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 56
+        }
       },
       {
         "id": "confirmation",
         "kind": "object",
         "canonical": "Confirmation",
-        "definition": "Notification of a successful booking."
+        "definition": "Notification of a successful booking.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 57
+        }
       },
       {
         "id": "search",
         "kind": "verb",
         "canonical": "search",
-        "definition": "Look up available options."
+        "definition": "Look up available options.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 61
+        }
       },
       {
         "id": "select",
         "kind": "verb",
         "canonical": "select",
-        "definition": "Choose one option from a set."
+        "definition": "Choose one option from a set.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 62
+        }
       },
       {
         "id": "add",
         "kind": "verb",
         "canonical": "add",
-        "definition": "Attach a member to a collection."
+        "definition": "Attach a member to a collection.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 63
+        }
       },
       {
         "id": "submit",
         "kind": "verb",
         "canonical": "submit",
-        "definition": "Send to the system for processing."
+        "definition": "Send to the system for processing.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 64
+        }
       },
       {
         "id": "confirm",
         "kind": "verb",
         "canonical": "confirm",
-        "definition": "Finalize and acknowledge."
+        "definition": "Finalize and acknowledge.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 65
+        }
       },
       {
         "id": "send",
         "kind": "verb",
         "canonical": "send",
-        "definition": "Deliver to a recipient."
+        "definition": "Deliver to a recipient.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 66
+        }
       },
       {
         "id": "reject",
         "kind": "verb",
         "canonical": "reject",
-        "definition": "Refuse to process or accept."
+        "definition": "Refuse to process or accept.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 69
+        }
       }
     ]
   },
@@ -1269,7 +1325,11 @@
             }
           ]
         }
-      ]
+      ],
+      "source": {
+        "relpath": "examples/test_hotel_booking.py",
+        "line": 72
+      }
     }
   ]
 }

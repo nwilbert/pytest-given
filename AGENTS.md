@@ -26,6 +26,7 @@ Run all checks: `uv run nox`. List individual sessions with `uv run nox -l`.
 - `src/pytest_given/capture/decorators.py` — `StepDescriptor` + `ScenarioDecorator`: dual context-manager/decorator, cross-phase nesting detection, thread-local state
 - `src/pytest_given/capture/collector.py` — Step stack, collects scenario data during test execution
 - `src/pytest_given/capture/template.py` — `Template` (deferred brace substitution for `@scenario(...)`) + `narration_from(...)` (dispatches `str` / `Template` / t-string into a `Narration`) + `parse_tstring(...)`
+- `src/pytest_given/capture/source.py` — Rootdir-aware `capture_caller_source(skip=...)` helper using `inspect.stack`; used by `story()` and glossary registration to record their construction site as a `SourceLocation`
 - `src/pytest_given/model/schema.py` — Frozen / mutable dataclasses for the report tree (`ReportData`, `Metadata`, `Scenario`, `Step`, `Attachment`, `ErrorInfo`, `ParameterTable`, `ParameterCase`, `SourceLocation`); `Narration` + `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationPart` union; `NodeId` / `Phase` aliases
 - `src/pytest_given/model/serde.py` — `report_to_dict` / `report_from_dict` boundary between JSON and the dataclass model; discriminates the three `NarrationPart` variants by key
 - `src/pytest_given/model/errors.py` — `PytestGivenError`
