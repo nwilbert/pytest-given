@@ -1265,3 +1265,94 @@ def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
     content = html_path.read_text(encoding='utf-8')
     assert html_path.exists()
     assert 'Book a Room' in content
+
+
+def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
+    """The full pipeline — typed ReportData → report_to_dict → JSON → renderer
+    — must preserve the Glossary so term refs render as kind pills, not as
+    silent escape() fallbacks. Regression guard for the side-channel
+    `_glossaries` stash that previously didn't round-trip."""
+    from pytest_given.model import (
+        Activity,
+        ActivityEntity,
+        ActivityId,
+        ActivityPath,
+        ActivityTerm,
+        Glossary,
+        GlossaryTerm,
+        Metadata,
+        Narration,
+        NarrationLiteral,
+        NarrationTermRef,
+        NodeId,
+        ReportData,
+        Scenario,
+        Step,
+        Story,
+        StoryId,
+        TermId,
+        report_from_dict,
+        report_to_dict,
+    )
+
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    story = Story(
+        id=StoryId('book-a-room'),
+        title='Book a Room',
+        activities=(
+            Activity(
+                id=ActivityId(1),
+                paths=(
+                    ActivityPath(
+                        parts=(
+                            ActivityEntity(entity_id=TermId('guest'), display='Guest'),
+                            ActivityTerm(term_id=TermId('search'), display='searches'),
+                            ActivityEntity(entity_id=TermId('room'), display='Room'),
+                        )
+                    ),
+                ),
+            ),
+        ),
+    )
+    scenario = Scenario(
+        id=NodeId('test_book.py::test_x'),
+        narration=Narration(text='Book a room'),
+        module='m',
+        steps=[
+            Step(
+                phase='when',
+                narration=Narration(
+                    text='Guest searches',
+                    parts=[
+                        NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+                        NarrationLiteral(value=' '),
+                        NarrationTermRef(term_id=TermId('search'), display='searches'),
+                    ],
+                ),
+            )
+        ],
+        story_id=story.id,
+    )
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+        ),
+        scenarios=[scenario],
+        stories=[story],
+        glossary=g,
+    )
+
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(report_to_dict(report)))
+    rt = report_from_dict(json.loads(json_path.read_text()))
+    assert rt.glossary is not None
+    assert {t.id for t in rt.glossary.terms} == {'guest', 'search', 'room'}
+
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert 'term-ref-actor' in content
+    assert 'term-ref-verb' in content

@@ -114,32 +114,51 @@ def compute_coverage(
 
     Scope: if scenario.activity_ids is non-empty, only those activity ids
     can appear in the result. Otherwise every story activity is considered.
+
+    Matching uses an inverted index `identity → activity_ids` built once
+    per scenario: per step, the candidate set narrows to activities sharing
+    at least one identity with the step's `s_for_step`, replacing the prior
+    O(|activities|) inner scan with O(|s_cache| + |candidates|).
     """
     scope = (
         set(scenario.activity_ids)
         if scenario.activity_ids
         else {a.id for a in story.activities}
     )
-    activities_in_scope = [a for a in story.activities if a.id in scope]
-    refs_by_activity: dict[ActivityId, set[Identity] | None] = {
-        a.id: a_refs(glossary, a) for a in activities_in_scope
-    }
+    refs_by_activity: dict[ActivityId, set[Identity]] = {}
+    matches_any_step: set[ActivityId] = set()  # activity with empty a_refs
+    for activity in story.activities:
+        if activity.id not in scope:
+            continue
+        refs = a_refs(glossary, activity)
+        if refs is None:
+            continue
+        if not refs:
+            matches_any_step.add(activity.id)
+            continue
+        refs_by_activity[activity.id] = refs
+    identity_to_activities: dict[Identity, set[ActivityId]] = {}
+    for aid, refs in refs_by_activity.items():
+        for ident in refs:
+            identity_to_activities.setdefault(ident, set()).add(aid)
+
     result: dict[ActivityId, set[StepRef]] = {}
     for path_index, step in _walk_steps(scenario):
         ref: StepRef = (scenario.id, path_index)
-        s_cache: set[Identity] | None = None
-        for activity in activities_in_scope:
-            if step.activity_ids:
-                if activity.id in step.activity_ids:
-                    result.setdefault(activity.id, set()).add(ref)
-                continue
-            refs = refs_by_activity[activity.id]
-            if refs is None:
-                continue
-            if s_cache is None:
-                s_cache = s_for_step(glossary, step)
-            if refs.issubset(s_cache):
-                result.setdefault(activity.id, set()).add(ref)
+        if step.activity_ids:
+            for aid in step.activity_ids:
+                if aid in scope:
+                    result.setdefault(aid, set()).add(ref)
+            continue
+        s_cache = s_for_step(glossary, step)
+        for aid in matches_any_step:
+            result.setdefault(aid, set()).add(ref)
+        candidates: set[ActivityId] = set()
+        for ident in s_cache:
+            candidates |= identity_to_activities.get(ident, set())
+        for aid in candidates:
+            if refs_by_activity[aid].issubset(s_cache):
+                result.setdefault(aid, set()).add(ref)
     return result
 
 

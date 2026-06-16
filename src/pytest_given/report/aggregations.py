@@ -1,9 +1,11 @@
 """Precomputed aggregations for the HTML report renderer.
 
-Three helpers are exposed:
-  - `build_coverage_maps`       — per-scenario activity coverage dicts
+Helpers exposed:
+  - `build_coverage_maps`        — per-scenario activity coverage dicts
+  - `build_story_rollups`        — per-story scenarios + per-activity rollup
+  - `build_scenario_activity_index` — per-scenario sorted activity ids
   - `build_glossary_aggregations` — per-term instance/form/story aggregations
-  - `tab_visibility`            — which top-level tabs should be visible
+  - `tab_visibility`             — which top-level tabs should be visible
 """
 
 from __future__ import annotations
@@ -18,6 +20,7 @@ from ..model import (
     NarrationTermRef,
     NodeId,
     ReportData,
+    Scenario,
     Step,
     Story,
     StoryId,
@@ -52,6 +55,27 @@ class GlossaryAggregation:
     instances: list[TermInstance] = field(default_factory=list)
     forms: list[TermForm] = field(default_factory=list)
     stories: list[StoryId] = field(default_factory=list)
+
+
+@dataclass
+class ActivityCoverage:
+    """Per-activity coverage rollup: which scenarios cover it, pass count, total."""
+
+    scenario_ids: list[NodeId] = field(default_factory=list)
+    passed: int = 0
+
+    @property
+    def total(self) -> int:
+        return len(self.scenario_ids)
+
+
+@dataclass
+class StoryRollup:
+    """Per-story precomputed view data: scenarios bound to the story plus a
+    per-activity coverage breakdown. The Stories view consumes both."""
+
+    scenarios: list[Scenario] = field(default_factory=list)
+    per_activity: dict[ActivityId, ActivityCoverage] = field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------
@@ -95,6 +119,44 @@ def build_coverage_maps(
             continue
         result[scenario.id] = compute_coverage(glossary, scenario, story)
     return result
+
+
+def build_story_rollups(
+    report: ReportData,
+    coverage_maps: dict[NodeId, dict[ActivityId, set[StepRef]]],
+) -> dict[StoryId, StoryRollup]:
+    """Per-story view-data: bound scenarios + per-activity coverage rollup."""
+    scenarios_by_story: dict[StoryId, list[Scenario]] = {}
+    for scn in report.scenarios:
+        if scn.story_id is None:
+            continue
+        scenarios_by_story.setdefault(scn.story_id, []).append(scn)
+
+    rollups: dict[StoryId, StoryRollup] = {}
+    for story in report.stories:
+        scenarios = scenarios_by_story.get(story.id, [])
+        per_activity: dict[ActivityId, ActivityCoverage] = {}
+        for activity in story.activities:
+            covered_by: list[NodeId] = []
+            passed = 0
+            for scn in scenarios:
+                if activity.id not in coverage_maps[scn.id]:
+                    continue
+                covered_by.append(scn.id)
+                if scn.status == 'passed':
+                    passed += 1
+            per_activity[activity.id] = ActivityCoverage(
+                scenario_ids=covered_by, passed=passed
+            )
+        rollups[story.id] = StoryRollup(scenarios=scenarios, per_activity=per_activity)
+    return rollups
+
+
+def build_scenario_activity_index(
+    coverage_maps: dict[NodeId, dict[ActivityId, set[StepRef]]],
+) -> dict[NodeId, list[ActivityId]]:
+    """For each scenario, the sorted list of activity ids it covers."""
+    return {scn_id: sorted(amap.keys()) for scn_id, amap in coverage_maps.items()}
 
 
 # ---------------------------------------------------------------------------

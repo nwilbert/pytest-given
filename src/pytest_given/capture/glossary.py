@@ -115,24 +115,67 @@ def _register_kind(
     return new
 
 
+_HANDLE_BY_KIND: dict[Literal['actor', 'object', 'verb'], type[_TermHandle]] = {
+    'actor': Actor,
+    'object': WorkObject,
+    'verb': Verb,
+}
+
+
+# Insertion-ordered registry of Glossary instances ever used during the
+# session. Populated lazily by `_mint_handle` (i.e. the first time the
+# user mints any handle from a Glossary) so unused Glossaries don't show
+# up. plugin._resolve_glossary reads this to find "the" glossary without
+# needing a side-channel attribute on stories, which doesn't survive
+# JSON round-trip.
+_REGISTERED_GLOSSARIES: dict[int, Glossary] = {}
+
+
+def _register_glossary(glossary: Glossary) -> None:
+    _REGISTERED_GLOSSARIES.setdefault(id(glossary), glossary)
+
+
+def get_registered_glossaries() -> list[Glossary]:
+    """Return Glossary instances that minted at least one handle this session."""
+    return list(_REGISTERED_GLOSSARIES.values())
+
+
+def clear_glossary_registry() -> None:
+    """Reset the session-scoped Glossary registry. Called at pytest_sessionstart."""
+    _REGISTERED_GLOSSARIES.clear()
+
+
+def _mint_handle(
+    glossary: Glossary,
+    kind: Literal['actor', 'object', 'verb'],
+    name: str,
+    definition: str,
+) -> _TermHandle:
+    # skip=3: this function → kind wrapper (actor/work_object/verb) → user call site
+    source = capture_caller_source(skip=3)
+    term = _register_kind(glossary, kind, name, definition, source)
+    _register_glossary(glossary)
+    return _HANDLE_BY_KIND[kind](_term=term, _glossary=glossary)
+
+
 def _glossary_actor(self: Glossary, name: str, *, definition: str = '') -> Actor:
-    source = capture_caller_source(skip=2)
-    term = _register_kind(self, 'actor', name, definition, source)
-    return Actor(_term=term, _glossary=self)
+    handle = _mint_handle(self, 'actor', name, definition)
+    assert isinstance(handle, Actor)
+    return handle
 
 
 def _glossary_work_object(
     self: Glossary, name: str, *, definition: str = ''
 ) -> WorkObject:
-    source = capture_caller_source(skip=2)
-    term = _register_kind(self, 'object', name, definition, source)
-    return WorkObject(_term=term, _glossary=self)
+    handle = _mint_handle(self, 'object', name, definition)
+    assert isinstance(handle, WorkObject)
+    return handle
 
 
 def _glossary_verb(self: Glossary, name: str, *, definition: str = '') -> Verb:
-    source = capture_caller_source(skip=2)
-    term = _register_kind(self, 'verb', name, definition, source)
-    return Verb(_term=term, _glossary=self)
+    handle = _mint_handle(self, 'verb', name, definition)
+    assert isinstance(handle, Verb)
+    return handle
 
 
 Glossary.actor = _glossary_actor  # type: ignore[method-assign]

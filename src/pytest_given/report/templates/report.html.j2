@@ -12,6 +12,17 @@
 
 <div class="main">
 
+  {%- macro source_link(source) -%}
+    {%- if source -%}
+      {%- set url = source | source_url -%}
+      {%- if url -%}
+      <a href="{{ url }}">{{ source.relpath }}:{{ source.line }}</a>
+      {%- else -%}
+      <span>{{ source.relpath }}:{{ source.line }}</span>
+      {%- endif -%}
+    {%- endif -%}
+  {%- endmacro -%}
+
   {%- macro render_error(error) -%}
     {%- set internal_count = error.frames | selectattr('is_internal') | list | length -%}
     <div class="error-block"{% if internal_count %} x-data="{ showInternal: false }"{% endif %}>
@@ -244,14 +255,7 @@
       {% endif %}
 
       {% if scenario.source %}
-      <div class="scenario-source">
-        {%- set src_url = source_urls.get(loop.index0) -%}
-        {%- if src_url -%}
-        <a href="{{ src_url }}">{{ scenario.source.relpath }}:{{ scenario.source.line }}</a>
-        {%- else -%}
-        <span>{{ scenario.source.relpath }}:{{ scenario.source.line }}</span>
-        {%- endif -%}
-      </div>
+      <div class="scenario-source">{{ source_link(scenario.source) }}</div>
       {% endif %}
     </div>
     </div>
@@ -268,7 +272,7 @@
     <div class="sidebar">
       <div class="sidebar-label">Stories</div>
       {% for story in stories %}
-      {% set scns = scenarios_for_story.get(story.id, []) %}
+      {% set scns = story_rollups[story.id].scenarios %}
       <div class="story-sidebar-item" :class="{ active: selectedStory === '{{ story.id }}' }"
            @click="selectedStory = '{{ story.id }}'">
         <div class="story-sidebar-title">{{ story.title }}</div>
@@ -279,17 +283,18 @@
     <div class="view-main">
       {% for story in stories %}
       <div x-show="selectedStory === '{{ story.id }}'">
+        {% set rollup = story_rollups[story.id] %}
+        {% set story_scns = rollup.scenarios %}
+        {% set total_scns = story_scns | length %}
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
             <div class="header-title">{{ story.title }}</div>
-            {% set story_scns = scenarios_for_story.get(story.id, []) %}
-            <div class="header-context">{{ story.activities | length }} activities · {{ story_scns | length }} scenario{{ 's' if story_scns | length != 1 else '' }}</div>
+            <div class="header-context">{{ story.activities | length }} activities · {{ total_scns }} scenario{{ 's' if total_scns != 1 else '' }}</div>
           </div>
         </div>
         <div class="activity-timeline">
           {% for activity in story.activities %}
-          {% set cov = stories_coverage.get(story.id, {}).get(activity.id, {'scenario_ids': [], 'passed': 0, 'total': 0}) %}
-          {% set total_scns = total_scenarios_per_story.get(story.id, 0) %}
+          {% set cov = rollup.per_activity[activity.id] %}
           <div class="activity-row" id="activity-{{ story.id }}-{{ activity.id }}">
             <div class="activity-num">{{ activity.id }}</div>
             <div class="activity-body">
@@ -311,7 +316,7 @@
               {% endif %}
             </div>
             <div class="activity-badges">
-              {% for scn in scenarios_for_story.get(story.id, []) %}
+              {% for scn in story_scns %}
               {% if scn.id in cov.scenario_ids %}
               <a class="use-chip use-chip-{{ scn.status }}"
                  href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('{{ scn.id }}'))">
@@ -325,7 +330,7 @@
           {% endfor %}
         </div>
         <div class="scn-act-strip-section">
-          {% for scn in scenarios_for_story.get(story.id, []) %}
+          {% for scn in story_scns %}
           <div class="scenario {{ scn.status }}" style="margin-bottom: var(--space-sm);">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
@@ -350,14 +355,7 @@
           {% endfor %}
         </div>
         {% if story.source %}
-        <div class="scenario-source">
-          {%- set story_url = story_source_urls.get(story.id) -%}
-          {%- if story_url -%}
-          <a href="{{ story_url }}">{{ story.source.relpath }}:{{ story.source.line }}</a>
-          {%- else -%}
-          <span>{{ story.source.relpath }}:{{ story.source.line }}</span>
-          {%- endif -%}
-        </div>
+        <div class="scenario-source">{{ source_link(story.source) }}</div>
         {% endif %}
       </div>
       {% endfor %}
@@ -475,14 +473,7 @@
                 </div>
                 {% endif %}
                 {% if term.source %}
-                <div class="scenario-source">
-                  {%- set term_url = term_source_urls.get(term.id) -%}
-                  {%- if term_url -%}
-                  <a href="{{ term_url }}">{{ term.source.relpath }}:{{ term.source.line }}</a>
-                  {%- else -%}
-                  <span>{{ term.source.relpath }}:{{ term.source.line }}</span>
-                  {%- endif -%}
-                </div>
+                <div class="scenario-source">{{ source_link(term.source) }}</div>
                 {% endif %}
               </div>
             </div>

@@ -291,3 +291,21 @@ def test_tstring_with_term_ref_populates_expression(glossary: Glossary) -> None:
     _, parts = parse_tstring(t'a {guest} arrives')
     ref = next(p for p in parts if isinstance(p, NarrationTermRef))
     assert ref.expression == 'guest'
+
+
+def test_tstring_term_ref_with_format_spec_raises(glossary: Glossary) -> None:
+    guest = glossary.actor('Guest')
+    with pytest.raises(PytestGivenError, match='format spec or conversion'):
+        parse_tstring(t'hi {guest:>10}')
+
+
+def test_tstring_term_ref_with_conversion_raises(glossary: Glossary) -> None:
+    guest = glossary.actor('Guest')
+    with pytest.raises(PytestGivenError, match='format spec or conversion'):
+        parse_tstring(t'hi {guest!r}')
+
+
+def test_tstring_term_ref_instance_with_format_spec_raises(glossary: Glossary) -> None:
+    guest = glossary.actor('Guest')
+    with pytest.raises(PytestGivenError, match='format spec or conversion'):
+        parse_tstring(t'hi {guest("Alice"):>10}')

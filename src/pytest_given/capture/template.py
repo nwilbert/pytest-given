@@ -109,7 +109,9 @@ def parse_tstring(
                 format_spec=format_spec,
             ):
                 _reject_draft_in_narration(value)
-                term_ref = _try_term_ref(value, expression)
+                term_ref = _try_term_ref(
+                    value, expression, format_spec=format_spec, conversion=conversion
+                )
                 if term_ref is not None:
                     parts.append(term_ref)
                     rendered_chunks.append(term_ref.display)
@@ -150,32 +152,40 @@ def _reject_draft_in_narration(value: object) -> None:
     )
 
 
-def _try_term_ref(value: object, expression: str = '') -> NarrationTermRef | None:
+def _try_term_ref(
+    value: object,
+    expression: str = '',
+    *,
+    format_spec: str = '',
+    conversion: str | None = None,
+) -> NarrationTermRef | None:
     """Return a NarrationTermRef if `value` is a glossary handle, instance, or
-    inflection — else None (fall back to NarrationValue)."""
+    inflection — else None (fall back to NarrationValue).
+
+    Glossary handles render as kind-coloured pills carrying the term's
+    canonical or instance display; format_spec and conversion have no
+    meaningful target on a pill, so a non-empty value is rejected at
+    parse time rather than silently dropped.
+    """
     match value:
         case Actor() | WorkObject() | Verb():
-            return NarrationTermRef(
-                term_id=value.id,
-                display=value.canonical,
-                expression=expression,
-            )
+            display = value.canonical
+            term_id = value.id
         case ActorInstance(actor=h, display=display):
-            return NarrationTermRef(
-                term_id=h.id,
-                display=display,
-                expression=expression,
-            )
+            term_id = h.id
         case WorkObjectInstance(work_object=h, display=display):
-            return NarrationTermRef(
-                term_id=h.id,
-                display=display,
-                expression=expression,
-            )
+            term_id = h.id
         case InflectedVerb(verb=h, display=display):
-            return NarrationTermRef(
-                term_id=h.id,
-                display=display,
-                expression=expression,
-            )
-    return None
+            term_id = h.id
+        case _:
+            return None
+    if format_spec or conversion:
+        suffix = f':{format_spec}' if format_spec else ''
+        conv = f'!{conversion}' if conversion else ''
+        raise PytestGivenError(
+            f'glossary term interpolation {{{expression}{conv}{suffix}}} '
+            f'cannot carry a format spec or conversion — glossary handles '
+            f'render as kind pills with a fixed display ({display!r}). '
+            f'Drop the spec, or interpolate the underlying value separately.'
+        )
+    return NarrationTermRef(term_id=term_id, display=display, expression=expression)

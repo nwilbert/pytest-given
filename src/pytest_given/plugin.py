@@ -22,9 +22,12 @@ from .capture import (
     set_active_collector,
 )
 from .capture.decorators import ScenarioDecorator
+from .capture.glossary import clear_glossary_registry, get_registered_glossaries
 from .capture.source import set_rootdir
 from .capture.story import _clear_story_registry
 from .model import (
+    ActivityEntity,
+    ActivityTerm,
     FixtureRecording,
     Glossary,
     Metadata,
@@ -45,6 +48,7 @@ from .model import (
     SourceLocation,
     Step,
     Story,
+    TermId,
     report_to_dict,
 )
 from .report import detect_commit_sha, render_html, resolve_template
@@ -103,6 +107,7 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     global collector
     collector = Collector()
     _clear_story_registry()
+    clear_glossary_registry()
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
@@ -435,21 +440,44 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
 
 
 def _resolve_glossary(stories: list[Story], session: pytest.Session) -> Glossary | None:
-    """Collect Glossary instances reachable from stories; fall back to conftest scan."""
-    glossaries: dict[int, Glossary] = {}
+    """Pick the Glossary for the report.
+
+    1. If stories were collected, look at which Glossary instances actually
+       contain a term referenced by those stories — the rest are irrelevant
+       (test-local fixtures, unrelated Glossaries that happen to share the
+       process). This works without any side-channel on the Story tree, so
+       it round-trips through JSON correctly.
+    2. With no stories, fall back to a conftest scan — that catches the case
+       where the user declares a Glossary at conftest level but only uses
+       term refs in narrations (no stories yet).
+    """
+    if not stories:
+        return _scan_conftests_for_glossary(session)
+    used = _term_ids_referenced_by_stories(stories)
+    reaching = [
+        g for g in get_registered_glossaries() if any(t.id in used for t in g.terms)
+    ]
+    if len(reaching) > 1:
+        raise PytestGivenError(
+            f'stories reach {len(reaching)} distinct Glossary instances; '
+            f'v1 supports at most one.'
+        )
+    if reaching:
+        return reaching[0]
+    return _scan_conftests_for_glossary(session)
+
+
+def _term_ids_referenced_by_stories(stories: list[Story]) -> set[TermId]:
+    used: set[TermId] = set()
     for s in stories:
         for a in s.activities:
             for p in a.paths:
-                for g in getattr(p, '_glossaries', ()):
-                    glossaries.setdefault(id(g), g)
-    if len(glossaries) > 1:
-        raise PytestGivenError(
-            f'session reaches {len(glossaries)} distinct Glossary instances '
-            f'via stories; v1 supports at most one.'
-        )
-    if glossaries:
-        return next(iter(glossaries.values()))
-    return _scan_conftests_for_glossary(session)
+                for part in p.parts:
+                    if isinstance(part, ActivityEntity):
+                        used.add(part.entity_id)
+                    elif isinstance(part, ActivityTerm):
+                        used.add(part.term_id)
+    return used
 
 
 def _scan_conftests_for_glossary(session: pytest.Session) -> Glossary | None:

@@ -71,12 +71,14 @@ def path(*parts: _PathArg) -> ActivityPath:
     _check_position(parts[1], 1, 'verb', _VERB_TYPES, parts)
     _check_position(parts[2], 2, 'noun', _NOUN_TYPES, parts)
     schema_parts = tuple(_to_part(p) for p in parts)
-    # Collect the set of glossary object-identities referenced by this path.
-    glossary_objects = _dedup_by_id(filter(None, (_glossary_of(p) for p in parts)))
-    glossary_ids: frozenset[int] = frozenset(_obj_id(g) for g in glossary_objects)
+    # Stash the set of Glossary object-identities the path references — read
+    # by activity() and _check_single_glossary to enforce the v1 "one glossary
+    # per story" invariant at construction time. Not serialized.
+    glossary_ids: frozenset[int] = frozenset(
+        _obj_id(g) for g in (_glossary_of(p) for p in parts) if g is not None
+    )
     p_obj = ActivityPath(parts=schema_parts)
     object.__setattr__(p_obj, '_glossary_ids', glossary_ids)
-    object.__setattr__(p_obj, '_glossaries', glossary_objects)
     return p_obj
 
 
@@ -91,14 +93,6 @@ def _glossary_of(value: object) -> Glossary | None:
         case InflectedVerb(verb=h):
             return h.glossary
     return None
-
-
-def _dedup_by_id(glossaries: filter) -> tuple[Glossary, ...]:
-    """Deduplicate Glossary objects by id (since Glossary is not hashable)."""
-    seen: dict[int, Glossary] = {}
-    for g in glossaries:
-        seen.setdefault(_obj_id(g), g)
-    return tuple(seen.values())
 
 
 def activity(
@@ -126,12 +120,6 @@ def activity(
     glossary_ids: frozenset[int] = frozenset().union(
         *(getattr(p, '_glossary_ids', frozenset()) for p in paths)
     )
-    # Dedup glossary objects across paths (preserving order from first appearance).
-    seen: dict[int, Glossary] = {}
-    for p in paths:
-        for g in getattr(p, '_glossaries', ()):
-            seen.setdefault(_obj_id(g), g)
-    glossary_objects = tuple(seen.values())
     if id == 0:
         raise PytestGivenError(
             'activity(id=0) is reserved as the unset sentinel; '
@@ -139,7 +127,6 @@ def activity(
         )
     a = Activity(id=ActivityId(id if id is not None else 0), paths=paths)
     object.__setattr__(a, '_glossary_ids', glossary_ids)
-    object.__setattr__(a, '_glossaries', glossary_objects)
     return a
 
 
@@ -176,21 +163,24 @@ def story(title: str, activities: Sequence[Activity] = ()) -> Story:
 def _assign_sequence_numbers(
     activities: tuple[Activity, ...],
 ) -> tuple[Activity, ...]:
-    """Activities passed with id=0 (the unset sentinel) get 1..N from order;
-    activities with an explicit id keep theirs."""
+    """Activities passed with id=0 (the unset sentinel) get sequential ids
+    skipping any explicit ids already taken; activities with an explicit id
+    keep theirs."""
+    taken: set[ActivityId] = {a.id for a in activities if a.id != 0}
     out: list[Activity] = []
     next_seq = 1
     for a in activities:
-        if a.id == 0:
-            new = Activity(id=ActivityId(next_seq), paths=a.paths)
-            object.__setattr__(
-                new, '_glossary_ids', getattr(a, '_glossary_ids', frozenset())
-            )
-            object.__setattr__(new, '_glossaries', getattr(a, '_glossaries', ()))
-            out.append(new)
-            next_seq += 1
-        else:
+        if a.id != 0:
             out.append(a)
+            continue
+        while ActivityId(next_seq) in taken:
+            next_seq += 1
+        new = Activity(id=ActivityId(next_seq), paths=a.paths)
+        object.__setattr__(
+            new, '_glossary_ids', getattr(a, '_glossary_ids', frozenset())
+        )
+        out.append(new)
+        next_seq += 1
     return tuple(out)
 
 

@@ -20,7 +20,7 @@ from ..model import (
     PytestGivenError,
     Story,
 )
-from .collector import Collector, get_active_collector
+from .collector import get_active_collector
 from .template import Template, narration_from
 
 _TEMPLATE_PARAM_KINDS = frozenset(
@@ -80,33 +80,8 @@ class StepDescriptor:
                 f"Cannot enter '{self.phase}: {self.narration.text}' — "
                 'no active scenario or fixture.'
             )
-        if self.activity_ids:
-            self._check_activity_scope(collector)
         collector.push_step(self.phase, self.narration, activity_ids=self.activity_ids)
         return self
-
-    def _check_activity_scope(self, collector: Collector) -> None:
-        """Validate step activity_ids against the active scenario's story scope."""
-        story = collector.active_scenario_story
-        if story is None:
-            raise PytestGivenError(
-                f'step activity= requires a story on the scenario '
-                f'(phase={self.phase!r}, ids={list(self.activity_ids)}).'
-            )
-        scope = collector.active_scenario_activity_ids
-        valid = scope if scope else tuple(a.id for a in story.activities)
-        valid_set = set(valid)
-        for aid in self.activity_ids:
-            if aid not in valid_set:
-                if scope:
-                    raise PytestGivenError(
-                        f'step activity={aid} outside scenario scope '
-                        f'(scenario activities={sorted(scope)}).'
-                    )
-                raise PytestGivenError(
-                    f'step activity={aid} not in story {story.title!r} '
-                    f'(valid: {sorted(valid_set)}).'
-                )
 
     def __exit__(
         self,
@@ -130,6 +105,8 @@ class StepDescriptor:
                 'supported; use a plain string label, or move the step into a '
                 'helper function.'
             )
+        if isinstance(self._source, templatelib.Template):
+            self._check_tstring_decorator_safety()
         sig = (
             self._validate_template_against_signature(func)
             if isinstance(self._source, Template)
@@ -158,8 +135,6 @@ class StepDescriptor:
                 if sig is not None
                 else self.narration
             )
-            if self.activity_ids:
-                self._check_activity_scope(collector)
             collector.push_step(self.phase, narration, activity_ids=self.activity_ids)
             try:
                 return func(*args, **kwargs)
@@ -168,6 +143,30 @@ class StepDescriptor:
 
         wrapper._step_descriptor = self  # type: ignore[attr-defined]
         return wrapper
+
+    def _check_tstring_decorator_safety(self) -> None:
+        """A t-string passed to a decorator is evaluated once at module load;
+        any non-glossary interpolation captures its value frozen there.
+
+        Glossary handles render as `NarrationTermRef` and are safe to bake in
+        (they identify a concept, not a per-call datum). Anything else surfaces
+        as `NarrationValue`, which means the author probably expected per-call
+        substitution and won't get it — point them at the right form.
+        """
+        for part in self.narration.parts:
+            if not isinstance(part, NarrationValue):
+                continue
+            raise PytestGivenError(
+                f'@{self.phase}(t"...") interpolates non-glossary value '
+                f'{{{part.expression}}} (rendered as {part.rendered!r}); '
+                f't-strings on a decorator evaluate once at module load, '
+                f'so the value is baked into every recorded step. '
+                f'Use a glossary handle (g.actor/g.work_object/g.verb) for a '
+                f'term reference; pytest_given.Template('
+                f"'...{{{part.expression}}}...') for a helper arg bound "
+                f'per call; or move the step into the test body (with '
+                f'given/when/then(t"...")) where the value is in scope.'
+            )
 
     def _validate_template_against_signature(self, func: Any) -> inspect.Signature:
         assert isinstance(self._source, Template)

@@ -321,6 +321,24 @@ def test_compute_coverage_scenario_constrained_to_activity_ids(g):
     assert ActivityId(2) not in coverage
 
 
+def test_compute_coverage_empty_refs_activity_matches_every_step(g):
+    """An activity with no identity-bearing parts (only ActivityWord) has
+    `a_refs == set()`, which is a subset of every step. The matching code
+    preserves this degenerate-but-original semantics so deserialized data
+    keeps the same coverage shape it had in-memory."""
+    a = Activity(
+        id=ActivityId(1),
+        paths=(_path(ActivityWord(text='just'), ActivityWord(text='words')),),
+    )
+    story = Story(id=StoryId('s'), title='S', activities=(a,))
+    scenario = _scenario_with_steps(
+        _step('given', _term_ref('guest', 'Guest')),
+        _step('when'),
+    )
+    coverage = compute_coverage(g, scenario, story)
+    assert len(coverage[ActivityId(1)]) == 2
+
+
 def test_compute_coverage_nested_steps_are_walked(g):
     """Steps nested as children are also examined for coverage."""
     a = Activity(

@@ -34,9 +34,13 @@ from pytest_given.model import (
 
 @pytest.fixture(autouse=True)
 def _reset_story_registry():
+    from pytest_given.capture.glossary import clear_glossary_registry
+
     _clear_story_registry()
+    clear_glossary_registry()
     yield
     _clear_story_registry()
+    clear_glossary_registry()
 
 
 def test_context_manager_basic() -> None:
@@ -180,6 +184,33 @@ def test_step_descriptor_decorator_accepts_tstring() -> None:
     wrapped = desc(fixture_body)
     assert wrapped is not None  # didn't raise
     assert desc.narration.text == 'our guest Alice'
+
+
+def test_step_descriptor_decorator_rejects_tstring_with_non_glossary_value() -> None:
+    """A t-string on a decorator with a plain (non-glossary) interpolation
+    would silently bake the module-level value; raise with a guiding message."""
+    cup_size = 200
+    desc = StepDescriptor('given', t'a {cup_size} ml cup')
+
+    def helper() -> int:
+        return cup_size
+
+    with pytest.raises(PytestGivenError, match='cup_size'):
+        desc(helper)
+
+
+def test_step_descriptor_decorator_rejects_tstring_mixed_glossary_and_value() -> None:
+    """Even when the t-string also contains a valid glossary handle, any plain
+    value interpolation is rejected — partial safety isn't safety."""
+    g = Glossary()
+    guest = g.actor('Guest')
+    age = 30
+    desc = StepDescriptor('given', t'{guest("Alice")}, aged {age}')
+
+    def helper() -> None: ...
+
+    with pytest.raises(PytestGivenError, match='age'):
+        desc(helper)
 
 
 def test_scenario_with_plain_str_keeps_name() -> None:
@@ -604,10 +635,10 @@ def test_normalize_activity_rejects_non_int_in_sequence():
         _normalize_activity((1, 'x'))  # type: ignore[list-item]
 
 
-def test_step_check_activity_scope_raises_when_aid_not_in_story_no_scope() -> None:
-    """_check_activity_scope must raise when the scenario has no activity scope
-    restriction but the step references an id that is not in the story at all
-    (decorators.py line 106)."""
+def test_push_step_rejects_activity_id_not_in_story_no_scope() -> None:
+    """Collector.push_step rejects activity_ids that aren't in the story at
+    all when the scenario has no narrower scope. Validation lives on the
+    collector so every push_step entry point gets it."""
     collector = Collector()
     g = Glossary()
     guest = g.actor('Guest')
@@ -615,8 +646,41 @@ def test_step_check_activity_scope_raises_when_aid_not_in_story_no_scope() -> No
     room = g.work_object('Room')
     s = story_fn('Step Scope No Restriction', [activity_fn(guest, search, room)])
     collector.start_scenario('id', 'a', 'mod', [], story=s, activity_ids=())
-    set_active_collector(collector)
-    desc = StepDescriptor('given', 'a thing', activity_ids=(ActivityId(99),))
     with pytest.raises(PytestGivenError, match='not in story'):
-        desc._check_activity_scope(collector)
-    set_active_collector(None)
+        collector.push_step(
+            'given', Narration(text='a thing'), activity_ids=(ActivityId(99),)
+        )
+
+
+def test_push_step_rejects_activity_id_outside_scenario_scope() -> None:
+    """When the scenario narrows scope, ids outside that scope are rejected
+    by the collector regardless of story membership."""
+    collector = Collector()
+    g = Glossary()
+    guest = g.actor('Guest')
+    search = g.verb('search')
+    room = g.work_object('Room')
+    s = story_fn(
+        'Scoped',
+        [
+            activity_fn(guest, search, room, id=1),
+            activity_fn(guest('Alice'), search, room, id=2),
+        ],
+    )
+    collector.start_scenario(
+        'id', 'a', 'mod', [], story=s, activity_ids=(ActivityId(1),)
+    )
+    with pytest.raises(PytestGivenError, match='outside scenario scope'):
+        collector.push_step(
+            'given', Narration(text='a thing'), activity_ids=(ActivityId(2),)
+        )
+
+
+def test_push_step_requires_story_when_activity_ids_given() -> None:
+    """Step activity_ids without a story on the scenario is a user error."""
+    collector = Collector()
+    collector.start_scenario('id', 'a', 'mod', [])
+    with pytest.raises(PytestGivenError, match='requires a story'):
+        collector.push_step(
+            'given', Narration(text='a thing'), activity_ids=(ActivityId(1),)
+        )

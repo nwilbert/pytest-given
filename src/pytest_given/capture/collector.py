@@ -229,6 +229,8 @@ class Collector:
                 f"Cannot nest '{phase}' inside '{stack[-1].phase}'"
                 ' — restructure your test or use a phase-neutral helper'
             )
+        if activity_ids:
+            self._check_step_activity_scope(phase, activity_ids)
         step = Step(phase=phase, narration=narration, activity_ids=activity_ids)
         if stack:
             stack[-1].children.append(step)
@@ -236,6 +238,39 @@ class Collector:
             self._current_scenario.steps.append(step)
         stack.append(step)
         return step
+
+    def _check_step_activity_scope(
+        self,
+        phase: Phase,
+        activity_ids: tuple[ActivityId, ...],
+    ) -> None:
+        """Validate step activity_ids against the active scenario's story scope.
+
+        Lives on Collector (not on StepDescriptor) so every push_step entry
+        point — context manager, helper wrapper, future fixture grafting —
+        gets the check by construction.
+        """
+        story = self.active_scenario_story
+        if story is None:
+            raise PytestGivenError(
+                f'step activity= requires a story on the scenario '
+                f'(phase={phase!r}, ids={list(activity_ids)}).'
+            )
+        scope = self.active_scenario_activity_ids
+        valid = scope if scope else tuple(a.id for a in story.activities)
+        valid_set = set(valid)
+        for aid in activity_ids:
+            if aid in valid_set:
+                continue
+            if scope:
+                raise PytestGivenError(
+                    f'step activity={aid} outside scenario scope '
+                    f'(scenario activities={sorted(scope)}).'
+                )
+            raise PytestGivenError(
+                f'step activity={aid} not in story {story.title!r} '
+                f'(valid: {sorted(valid_set)}).'
+            )
 
     def pop_step(self) -> Step | None:
         stack = self._target_stack()

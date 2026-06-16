@@ -1,4 +1,3 @@
-import functools
 import json
 from collections.abc import Callable
 from pathlib import Path
@@ -8,7 +7,6 @@ from markupsafe import Markup, escape
 
 from ..model import (
     ActivityEntity,
-    ActivityId,
     ActivityPart,
     ActivityPlaceholder,
     ActivityTerm,
@@ -19,16 +17,15 @@ from ..model import (
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
-    NodeId,
     Scenario,
     SourceLocation,
-    StoryId,
-    TermId,
     report_from_dict,
 )
 from .aggregations import (
     build_coverage_maps,
     build_glossary_aggregations,
+    build_scenario_activity_index,
+    build_story_rollups,
     tab_visibility,
 )
 from .source_link import format_source_link
@@ -71,62 +68,17 @@ def render_html(
 
     param_color_map = _build_param_color_map(report.scenarios)
 
-    resolve_url = functools.partial(
-        _resolve_url,
+    env.filters['source_url'] = _make_source_url_filter(
         template=source_link_template,
         project=report.metadata.project,
         commit_sha=report.metadata.commit_sha,
     )
-    source_urls: dict[int, str | None] = {
-        idx: resolve_url(scn.source) for idx, scn in enumerate(report.scenarios)
-    }
-    story_source_urls: dict[StoryId, str | None] = {
-        story.id: resolve_url(story.source) for story in report.stories
-    }
-    glossary_terms = report.glossary.terms if report.glossary is not None else ()
-    term_source_urls: dict[TermId, str | None] = {
-        term.id: resolve_url(term.source) for term in glossary_terms
-    }
 
     coverage_maps = build_coverage_maps(report)
     glossary_aggregations = build_glossary_aggregations(report)
+    story_rollups = build_story_rollups(report, coverage_maps)
+    scn_covers = build_scenario_activity_index(coverage_maps)
     visibility = tab_visibility(report)
-
-    scenarios_by_story_id: dict[StoryId, list[Scenario]] = {}
-    for scn in report.scenarios:
-        if scn.story_id is None:
-            continue
-        scenarios_by_story_id.setdefault(scn.story_id, []).append(scn)
-
-    stories_coverage_rollup: dict[StoryId, dict[ActivityId, dict]] = {}
-    stories_coverage_by_scenario: dict[str, list[NodeId]] = {}
-    for story in report.stories:
-        per_activity: dict[ActivityId, dict] = {}
-        for activity in story.activities:
-            covered_by: list[NodeId] = []
-            passed = 0
-            total = 0
-            for scn in scenarios_by_story_id.get(story.id, []):
-                if activity.id in coverage_maps[scn.id]:
-                    covered_by.append(scn.id)
-                    total += 1
-                    if scn.status == 'passed':
-                        passed += 1
-            per_activity[activity.id] = {
-                'scenario_ids': covered_by,
-                'passed': passed,
-                'total': total,
-            }
-            stories_coverage_by_scenario[f'{story.id}:{activity.id}'] = covered_by
-        stories_coverage_rollup[story.id] = per_activity
-
-    scn_covers: dict[NodeId, list[ActivityId]] = {
-        scn.id: sorted(coverage_maps[scn.id].keys()) for scn in report.scenarios
-    }
-
-    total_scenarios_per_story = {
-        sid: len(scns) for sid, scns in scenarios_by_story_id.items()
-    }
 
     story_ids_json = Markup(json.dumps([story.id for story in report.stories]))
     term_ids_json = Markup(
@@ -151,11 +103,8 @@ def render_html(
         coverage_maps=coverage_maps,
         glossary_aggregations=glossary_aggregations,
         tab_visibility=visibility,
-        stories_coverage=stories_coverage_rollup,
-        stories_coverage_by_scenario=stories_coverage_by_scenario,
-        scenarios_for_story=scenarios_by_story_id,
+        story_rollups=story_rollups,
         scn_covers=scn_covers,
-        total_scenarios_per_story=total_scenarios_per_story,
         report_json=Markup(safe_report_json),
         story_ids_json=story_ids_json,
         term_ids_json=term_ids_json,
@@ -164,9 +113,6 @@ def render_html(
         alpine_js=Markup(alpine_js),
         param_color_map=param_color_map,
         num_param_colors=_NUM_PARAM_COLORS,
-        source_urls=source_urls,
-        story_source_urls=story_source_urls,
-        term_source_urls=term_source_urls,
     )
     html_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.write_text(html, encoding='utf-8')
@@ -185,18 +131,27 @@ def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
     return color_map
 
 
-def _resolve_url(
-    source: SourceLocation | None,
+def _make_source_url_filter(
     *,
     template: str | None,
     project: str,
     commit_sha: str | None,
-) -> str | None:
-    if source is None or template is None:
-        return None
-    return format_source_link(
-        template, source=source, project=project, commit_sha=commit_sha
-    )
+) -> Callable[[SourceLocation | None], str | None]:
+    """Build a Jinja filter that resolves a SourceLocation to a URL string.
+
+    Returns None when source linking is disabled or the source is absent —
+    the template uses that as the signal to render a plain `<span>` via the
+    `source_link` macro.
+    """
+
+    def _filter(source: SourceLocation | None) -> str | None:
+        if source is None or template is None:
+            return None
+        return format_source_link(
+            template, source=source, project=project, commit_sha=commit_sha
+        )
+
+    return _filter
 
 
 def _make_narration_filter(

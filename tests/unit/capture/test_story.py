@@ -25,9 +25,13 @@ from pytest_given.model import (
 
 @pytest.fixture(autouse=True)
 def _reset_story_registry():
+    from pytest_given.capture.glossary import clear_glossary_registry
+
     _clear_story_registry()
+    clear_glossary_registry()
     yield
     _clear_story_registry()
+    clear_glossary_registry()
 
 
 @pytest.fixture
@@ -261,6 +265,35 @@ def test_story_keeps_explicit_activity_ids(guest, search, room):
     assert s.activities[1].id == 1
 
 
+def test_story_auto_numbering_skips_taken_explicit_ids(guest, search, room):
+    """A mix of explicit and auto ids: auto picks must skip ids already used
+    explicitly elsewhere in the story."""
+    s = story(
+        'Book a Room',
+        [
+            activity(guest, search, room, id=1),
+            activity(guest('Alice'), search, room),
+            activity(guest('Bob'), search, room, id=3),
+            activity(guest('Cara'), search, room),
+        ],
+    )
+    assert [a.id for a in s.activities] == [1, 2, 3, 4]
+
+
+def test_story_auto_numbering_skips_taken_ids_even_when_earlier_auto(
+    guest, search, room
+):
+    """Explicit id=1 anywhere takes precedence over the auto counter."""
+    s = story(
+        'Book a Room',
+        [
+            activity(guest('Alice'), search, room),
+            activity(guest, search, room, id=1),
+        ],
+    )
+    assert [a.id for a in s.activities] == [2, 1]
+
+
 def test_story_rejects_duplicate_activity_ids(guest, search, room):
     with pytest.raises(PytestGivenError, match='duplicate activity id'):
         story(
@@ -338,22 +371,19 @@ def test_story_id_collision_does_not_fire_after_registry_clear():
     story('Book', [])
 
 
-def test_path_carries_glossaries_attribute(guest, search, room):
-    """Phase 7 walks paths to find Glossary references; verify they're stashed."""
+def test_path_records_single_glossary_id(guest, search, room):
+    """Glossary identity is stashed as a frozenset of object-ids on the path so
+    the single-glossary invariant can be enforced at story construction."""
     p = path(guest, search, room)
-    glossaries = getattr(p, '_glossaries', ())
-    assert len(glossaries) == 1
-    assert glossaries[0] is guest.glossary
+    assert getattr(p, '_glossary_ids', frozenset()) == frozenset({id(guest.glossary)})
 
 
-def test_activity_unions_glossaries_across_paths(g, guest, search, room):
-    # Two paths, same glossary — should not dedup down to zero or appear twice.
+def test_activity_unions_glossary_ids_across_paths(g, guest, search, room):
+    # Two paths, same glossary — id set must dedup, not double-count.
     p1 = path(guest, search, room)
     p2 = path(guest('Alice'), search, room)
     a = activity(p1, p2)
-    glossaries = getattr(a, '_glossaries', ())
-    assert len(glossaries) == 1
-    assert glossaries[0] is g
+    assert getattr(a, '_glossary_ids', frozenset()) == frozenset({id(g)})
 
 
 # --- Task 4.6: top-level re-exports ---
