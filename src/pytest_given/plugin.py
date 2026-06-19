@@ -22,7 +22,9 @@ from .capture import (
     set_active_collector,
 )
 from .capture.decorators import ScenarioDecorator
+from .capture.file_glossary import FileGlossary
 from .capture.glossary import clear_glossary_registry, get_registered_glossaries
+from .capture.kind_resolution import resolve_glossary_kinds
 from .capture.source import set_rootdir
 from .capture.story import _clear_story_registry
 from .model import (
@@ -415,6 +417,8 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     collector.param_info.clear()
     stories = list(collector._discovered_stories.values())
     glossary = _resolve_glossary(stories, session)
+    if glossary is not None:
+        glossary = resolve_glossary_kinds(glossary, stories)
     report = ReportData(
         metadata=Metadata(
             project=session.config.rootpath.name,
@@ -486,7 +490,9 @@ def _scan_conftests_for_glossary(session: pytest.Session) -> Glossary | None:
             continue
         for attr_name in dir(plugin_obj):
             attr = getattr(plugin_obj, attr_name, None)
-            if isinstance(attr, Glossary):
+            if isinstance(attr, FileGlossary):
+                found.append((plugin_file, attr.glossary))
+            elif isinstance(attr, Glossary):
                 found.append((plugin_file, attr))
     distinct: dict[int, tuple[str, Glossary]] = {}
     for fpath, g in found:
