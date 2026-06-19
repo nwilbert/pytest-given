@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-19T05:29:20.008415+00:00",
+    "timestamp": "2026-06-19T06:53:24.099718+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "7c038cbaa9e9795ad3b9b48573364bd13e63a0ca"
+    "commit_sha": "b392e99b5acd49f45bbba6ce2ab5c1624d223b06"
   },
   "scenarios": [
     {

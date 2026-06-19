@@ -104,11 +104,12 @@ def audit(session: nox.Session) -> None:
 
 @nox.session
 def examples(session: nox.Session) -> None:
-    """Regenerate coffeeshop and hotel-booking example reports."""
+    """Regenerate coffeeshop, hotel-booking, and file-glossary-booking reports."""
     _sync(session, 'test', include_project=True)
     for test_file, slug in [
         ('examples/test_coffeeshop.py', 'coffeeshop'),
         ('examples/test_hotel_booking.py', 'hotel-booking'),
+        ('examples/test_file_glossary_booking.py', 'file-glossary-booking'),
     ]:
         session.run(
             'pytest',
@@ -123,8 +124,9 @@ def examples(session: nox.Session) -> None:
             success_codes=[0, 1],
         )
     session.log(
-        'Note: each suite has 1 intentional failure for failure rendering '
-        '(coffeeshop: test_failing; hotel-booking: gift-card decline case).'
+        'Note: coffeeshop and hotel-booking have intentional failures for failure '
+        'rendering (coffeeshop: test_failing; hotel-booking: gift-card decline case). '
+        'file-glossary-booking has no intentional failures.'
     )
 
 

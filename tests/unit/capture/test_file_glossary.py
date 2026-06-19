@@ -94,3 +94,55 @@ def test_unrecognised_kind_value_raises(tmp_path):
 def test_missing_file_raises(tmp_path):
     with pytest.raises(PytestGivenError, match=r'not found|exist'):
         FileGlossary(tmp_path / 'nope.md')
+
+
+def test_glossary_property_returns_inner_glossary(glossary_file):
+    """FileGlossary.glossary property returns the inner Glossary with parsed terms."""
+    from pytest_given.model import TermId
+
+    fg = FileGlossary(glossary_file)
+    inner = fg.glossary
+    assert inner is not None
+    assert inner.get(TermId('guest')) is not None
+
+
+def test_empty_id_term_cell_raises(tmp_path):
+    """A term cell with no alphanumeric characters makes id_derive raise,
+    re-raised with file:line context."""
+    path = tmp_path / 'bad.md'
+    path.write_text(
+        '| Term | Meaning |\n|---|---|\n| @#$ | some definition |\n',
+        encoding='utf-8',
+    )
+    with pytest.raises(PytestGivenError, match=r'@#\$|id'):
+        FileGlossary(path)
+
+
+def test_conflicting_duplicate_rows_raise(tmp_path):
+    """Two rows with the same term but different definitions → PytestGivenError
+    matching 'conflicts'."""
+    path = tmp_path / 'dup.md'
+    path.write_text(
+        '| Term | Meaning |\n|---|---|\n'
+        '| Guest | First definition. |\n'
+        '| Guest | Second definition. |\n',
+        encoding='utf-8',
+    )
+    with pytest.raises(PytestGivenError, match='conflicts'):
+        FileGlossary(path)
+
+
+def test_idempotent_duplicate_rows_ok(tmp_path):
+    """Two identical rows (same term and definition) produce no error and one term."""
+    path = tmp_path / 'dup_ok.md'
+    path.write_text(
+        '| Term | Meaning |\n|---|---|\n'
+        '| Guest | A person booking. |\n'
+        '| Guest | A person booking. |\n',
+        encoding='utf-8',
+    )
+    from pytest_given.model import TermId
+
+    fg = FileGlossary(path)
+    assert len(fg.glossary.terms) == 1
+    assert fg.glossary.get(TermId('guest')) is not None

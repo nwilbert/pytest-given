@@ -366,3 +366,35 @@ def test_resolve_glossary_raises_with_two_distinct_glossaries_via_stories() -> N
     )
     with pytest.raises(PytestGivenError, match='distinct Glossary'):
         plugin._resolve_glossary([s1, s2], cast(pytest.Session, fake_session))
+
+
+@pytest.fixture
+def _reset_glossary_registry_plugin() -> Any:
+    from pytest_given.capture.glossary import clear_glossary_registry
+
+    clear_glossary_registry()
+    yield
+    clear_glossary_registry()
+
+
+@pytest.mark.usefixtures('_reset_glossary_registry_plugin')
+def test_scan_conftests_discovers_file_glossary(tmp_path: Any) -> None:
+    """_scan_conftests_for_glossary returns the inner Glossary from a FileGlossary
+    attribute on a conftest plugin object (plugin.py line 494)."""
+    from pytest_given.capture.file_glossary import FileGlossary
+
+    md_path = tmp_path / 'conftest_glossary.md'
+    md_path.write_text(
+        '| Term | Meaning |\n|---|---|\n| Guest | A person booking. |\n',
+        encoding='utf-8',
+    )
+    fg = FileGlossary(md_path)
+
+    fake_conftest = SimpleNamespace(__file__='/x/conftest.py', g=fg)
+    fake_session = SimpleNamespace(
+        config=SimpleNamespace(
+            pluginmanager=SimpleNamespace(get_plugins=lambda: [fake_conftest])
+        )
+    )
+    result = plugin._scan_conftests_for_glossary(cast(pytest.Session, fake_session))
+    assert result is fg.glossary

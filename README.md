@@ -204,6 +204,37 @@ Each step's term references are matched against the story's activities to comput
 
 See the [domain-storytelling design spec](docs/superpowers/specs/2026-06-07-domain-storytelling-design.md) for the full surface and the [hotel-booking example](examples/test_hotel_booking.py) for an end-to-end usage.
 
+**`FileGlossary` — load a Markdown glossary file** — if your project already keeps a `GLOSSARY.md`, point `FileGlossary` at it instead of declaring terms in code:
+
+```python
+from pathlib import Path
+from pytest_given import FileGlossary
+
+g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')
+```
+
+The file must contain at least one GFM pipe table. By default the first column is the term and the second is the description; override with `term_column`, `description_column`, and `kind_column` (each accepts a 0-based index or a header name, case-insensitive):
+
+```python
+g = FileGlossary('GLOSSARY.md', kind_column='Kind')   # explicit kinds from a "Kind" column
+g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning')
+```
+
+Access terms by name — `g['Guest']` (case-insensitive). The returned handle is usable inline everywhere a code-defined handle is:
+
+```python
+# In a story activity:
+activity(g['Guest'], g['book']('books'), g['Room'])
+
+# In a t-string step:
+with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
+    ...
+```
+
+When no `kind_column` is present, term kinds are **inferred from story activity-slot positions** at session finish: slot 0 → actor, slot 1 → verb, slot ≥ 2 → work object. A term used only in t-string steps (never in any story activity) stays kindless and renders with a neutral, uncoloured pill.
+
+See the [file-backed glossary design spec](docs/superpowers/specs/2026-06-18-file-backed-glossary-design.md) and the [file-glossary-booking example](examples/test_file_glossary_booking.py) for a worked end-to-end usage.
+
 ### `attach(label, content)`
 
 Attach data to the current step. Strings are stored verbatim; other types are JSON-serialized.
@@ -286,12 +317,13 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
 
 ## Examples
 
-Two example suites live under [`examples/`](examples/), each with pre-rendered JSON + HTML committed:
+Three example suites live under [`examples/`](examples/), each with pre-rendered JSON + HTML committed:
 
 - [`test_coffeeshop.py`](examples/test_coffeeshop.py) — a tour of the core feature surface: `when`/`then` blocks, generator fixtures with teardown, plain text and JSON attachments, parameterized tests rendered as tables, t-string interpolation, helper functions that record their own steps, top-level `given` blocks, deeply nested steps, failure rendering, and skipped scenarios. Output: [`coffeeshop.html`](examples/coffeeshop.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop.html)).
 - [`test_hotel_booking.py`](examples/test_hotel_booking.py) — Domain Storytelling features: a `Glossary` of actors / work objects / verbs, a `story(...)` with `activity(...)` rows, scenarios bound to a story with per-activity coverage, and `draft.*` placeholders for in-progress vocabulary. Output: [`hotel-booking.html`](examples/hotel-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking.html)).
+- [`test_file_glossary_booking.py`](examples/test_file_glossary_booking.py) — `FileGlossary` features: loading a Markdown glossary file, name-based term access, inferred kinds from story activity slots, and a deliberately kindless term (neutral pill). Output: [`file-glossary-booking.html`](examples/file-glossary-booking.html).
 
-Run `nox -s examples` to regenerate both.
+Run `nox -s examples` to regenerate all three.
 
 ## Working with LLMs
 

@@ -1,8 +1,10 @@
+from pathlib import Path
 from string import templatelib
 
 import pytest
 
 from pytest_given.capture.draft import draft
+from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.template import Template, parse_tstring
 from pytest_given.model import (
     Glossary,
@@ -309,3 +311,48 @@ def test_tstring_term_ref_instance_with_format_spec_raises(glossary: Glossary) -
     guest = glossary.actor('Guest')
     with pytest.raises(PytestGivenError, match='format spec or conversion'):
         parse_tstring(t'hi {guest("Alice"):>10}')
+
+
+# --- FileTermHandle / FileTermInstance in t-strings ---
+
+_FILE_GLOSSARY_MD = (
+    '| Term | Meaning |\n|---|---|\n| Guest | A person. |\n| Room | A room. |\n'
+)
+
+
+@pytest.fixture
+def _reset_glossary_registry():
+    from pytest_given.capture.glossary import clear_glossary_registry
+
+    clear_glossary_registry()
+    yield
+    clear_glossary_registry()
+
+
+@pytest.fixture
+def file_glossary(tmp_path: Path, _reset_glossary_registry) -> FileGlossary:
+    path = tmp_path / 'G.md'
+    path.write_text(_FILE_GLOSSARY_MD, encoding='utf-8')
+    return FileGlossary(path)
+
+
+def test_tstring_with_file_term_handle_emits_term_ref(
+    file_glossary: FileGlossary,
+) -> None:
+    guest = file_glossary['Guest']
+    _, parts = parse_tstring(t'a {guest} arrives')
+    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
+    assert len(term_refs) == 1
+    assert term_refs[0].term_id == 'guest'
+    assert term_refs[0].display == 'Guest'
+
+
+def test_tstring_with_file_term_instance_emits_term_ref_with_override_display(
+    file_glossary: FileGlossary,
+) -> None:
+    guest = file_glossary['Guest']
+    _, parts = parse_tstring(t'{guest("Alice")} books a room')
+    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
+    assert len(term_refs) == 1
+    assert term_refs[0].term_id == 'guest'
+    assert term_refs[0].display == 'Alice'

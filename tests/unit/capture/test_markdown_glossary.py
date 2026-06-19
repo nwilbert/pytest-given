@@ -98,3 +98,20 @@ def test_data_row_with_fewer_columns_raises():
             description_column=1,
             kind_column=2,
         )
+
+
+def test_pipe_line_without_separator_is_skipped():
+    """A line with a pipe that is NOT followed by a |---| separator row is
+    skipped. Only the real pipe table (with separator) produces rows."""
+    text = (
+        'This line has a | in it but no separator follows.\n'
+        'Next line is not a separator.\n'
+        '\n'
+        '| Term | Meaning |\n'
+        '|---|---|\n'
+        '| Real | yes |\n'
+    )
+    rows = parse_glossary_tables(
+        text, term_column=0, description_column=1, kind_column=None
+    )
+    assert [row.term for row in rows] == ['Real']

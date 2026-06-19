@@ -1,0 +1,407 @@
+{
+  "metadata": {
+    "project": "pytest-given",
+    "timestamp": "2026-06-19T06:53:24.467619+00:00",
+    "pytest_version": "9.0.3",
+    "plugin_version": "0.1.0",
+    "commit_sha": "b392e99b5acd49f45bbba6ce2ab5c1624d223b06"
+  },
+  "scenarios": [
+    {
+      "id": "examples/test_file_glossary_booking.py::test_book_available_room",
+      "narration": {
+        "text": "Guest books an available room",
+        "parts": []
+      },
+      "module": "test_file_glossary_booking",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "the Room is available",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "room",
+                "display": "Room",
+                "expression": "g[\"Room\"]",
+                "param_column": null
+              },
+              {
+                "value": " is available"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Guest books the Room",
+            "parts": [
+              {
+                "term_id": "guest",
+                "display": "Guest",
+                "expression": "g[\"Guest\"]",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "book",
+                "display": "books",
+                "expression": "g[\"Book\"](\"books\")",
+                "param_column": null
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "room",
+                "display": "Room",
+                "expression": "g[\"Room\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Guest receives a Confirmation",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "guest",
+                "display": "Guest",
+                "expression": "g[\"Guest\"]",
+                "param_column": null
+              },
+              {
+                "value": " receives a "
+              },
+              {
+                "term_id": "confirmation",
+                "display": "Confirmation",
+                "expression": "g[\"Confirmation\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Cancellation Policy applies to the Room",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "cancellation-policy",
+                "display": "Cancellation Policy",
+                "expression": "g[\"Cancellation Policy\"]",
+                "param_column": null
+              },
+              {
+                "value": " applies to the "
+              },
+              {
+                "term_id": "room",
+                "display": "Room",
+                "expression": "g[\"Room\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/test_file_glossary_booking.py",
+        "line": 43
+      },
+      "story_id": "book-a-room",
+      "activity_ids": []
+    },
+    {
+      "id": "examples/test_file_glossary_booking.py::test_book_unavailable_room",
+      "narration": {
+        "text": "Guest cannot book an unavailable room",
+        "parts": []
+      },
+      "module": "test_file_glossary_booking",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "no Room is available",
+            "parts": [
+              {
+                "value": "no "
+              },
+              {
+                "term_id": "room",
+                "display": "Room",
+                "expression": "g[\"Room\"]",
+                "param_column": null
+              },
+              {
+                "value": " is available"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Guest books a Room",
+            "parts": [
+              {
+                "term_id": "guest",
+                "display": "Guest",
+                "expression": "g[\"Guest\"]",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "book",
+                "display": "books",
+                "expression": "g[\"Book\"](\"books\")",
+                "param_column": null
+              },
+              {
+                "value": " a "
+              },
+              {
+                "term_id": "room",
+                "display": "Room",
+                "expression": "g[\"Room\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no Confirmation is issued",
+            "parts": [
+              {
+                "value": "no "
+              },
+              {
+                "term_id": "confirmation",
+                "display": "Confirmation",
+                "expression": "g[\"Confirmation\"]",
+                "param_column": null
+              },
+              {
+                "value": " is issued"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Cancellation Policy does not apply",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "cancellation-policy",
+                "display": "Cancellation Policy",
+                "expression": "g[\"Cancellation Policy\"]",
+                "param_column": null
+              },
+              {
+                "value": " does not apply"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/test_file_glossary_booking.py",
+        "line": 58
+      },
+      "story_id": "book-a-room",
+      "activity_ids": []
+    }
+  ],
+  "glossary": {
+    "terms": [
+      {
+        "id": "guest",
+        "kind": "actor",
+        "canonical": "Guest",
+        "definition": "A person making a room reservation.",
+        "source": {
+          "relpath": "examples/file-glossary-booking.md",
+          "line": 7
+        }
+      },
+      {
+        "id": "book",
+        "kind": "verb",
+        "canonical": "Book",
+        "definition": "Reserve a room for a given stay.",
+        "source": {
+          "relpath": "examples/file-glossary-booking.md",
+          "line": 8
+        }
+      },
+      {
+        "id": "room",
+        "kind": "object",
+        "canonical": "Room",
+        "definition": "A bookable hotel room.",
+        "source": {
+          "relpath": "examples/file-glossary-booking.md",
+          "line": 9
+        }
+      },
+      {
+        "id": "confirmation",
+        "kind": "object",
+        "canonical": "Confirmation",
+        "definition": "A notification acknowledging a successful reservation.",
+        "source": {
+          "relpath": "examples/file-glossary-booking.md",
+          "line": 10
+        }
+      },
+      {
+        "id": "cancellation-policy",
+        "kind": null,
+        "canonical": "Cancellation Policy",
+        "definition": "The rules governing how and when a booking may be cancelled.",
+        "source": {
+          "relpath": "examples/file-glossary-booking.md",
+          "line": 11
+        }
+      }
+    ]
+  },
+  "stories": [
+    {
+      "id": "book-a-room",
+      "title": "Book a Room",
+      "activities": [
+        {
+          "id": 1,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Guest"
+                },
+                {
+                  "term_id": "book",
+                  "display": "books"
+                },
+                {
+                  "term_id": "room",
+                  "display": "Room"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Guest"
+                },
+                {
+                  "term_id": "book",
+                  "display": "receives"
+                },
+                {
+                  "term_id": "confirmation",
+                  "display": "Confirmation"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "source": {
+        "relpath": "examples/test_file_glossary_booking.py",
+        "line": 34
+      }
+    }
+  ]
+}

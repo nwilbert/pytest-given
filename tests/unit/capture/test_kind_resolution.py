@@ -114,3 +114,19 @@ def test_declared_object_in_actor_slot_raises():
     glossary = Glossary(terms=[_term('room', 'object'), _term('x'), _term('y')])
     with pytest.raises(PytestGivenError, match=r'(?i)room'):
         resolve_glossary_kinds(glossary, [_story('S', ('room', 'x', 'y'))])
+
+
+def test_declared_actor_in_verb_slot_raises():
+    """A term declared kind 'actor' that appears at position 1 (verb slot) raises."""
+    glossary = Glossary(terms=[_term('subject'), _term('guest', 'actor'), _term('y')])
+    with pytest.raises(PytestGivenError, match=r'(?i)verb slot'):
+        resolve_glossary_kinds(glossary, [_story('S', ('subject', 'guest', 'y'))])
+
+
+def test_declared_verb_in_noun_slot_raises():
+    """A term declared kind 'verb' that appears at position ≥2 (noun slot) raises."""
+    glossary = Glossary(
+        terms=[_term('subject'), _term('action'), _term('search', 'verb')]
+    )
+    with pytest.raises(PytestGivenError, match=r'(?i)noun slot'):
+        resolve_glossary_kinds(glossary, [_story('S', ('subject', 'action', 'search'))])

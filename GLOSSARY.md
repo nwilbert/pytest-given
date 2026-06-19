@@ -63,6 +63,8 @@ The Domain-Driven Design layer atop the core surface. All terms here are optiona
 |---|---|
 | **glossary** (lowercase) | The Ubiquitous-Language concept: the shared vocabulary a domain speaks in. |
 | **Glossary** (capitalized) | The class that holds glossary terms — `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.verb(...)` registration methods. |
+| **FileGlossary** | A glossary loaded from a Markdown file. `FileGlossary(path)` parses all GFM pipe tables in the file into the same inner `Glossary` model; terms are accessed by name (`g['Guest']`, case-insensitive). Kind inference fills in term kinds post-collection from activity-slot positions when no explicit `kind_column` is configured. |
+| **FileTermHandle** | The deferred-kind handle a `FileGlossary` returns from `g[name]`. Carries the `GlossaryTerm` and a back-ref to the inner `Glossary`; callable to override display (`g['Room']('Deluxe Suite')`). Kind is `None` until the post-collection resolution pass runs. |
 | **Term** | A registered glossary entry: an Actor, Work Object, or Verb. Each carries an id (slug), a canonical name, a kind, and an optional definition. |
 | **Actor** | A glossary term for a participant in the domain (e.g., *Guest*). Renders with the actor pill style. |
 | **Work Object** | A glossary term for a thing acted on (e.g., *Room*, *Booking*). Renders with the work-object pill style. |

@@ -12,6 +12,7 @@ from ..model import (
     PytestGivenError,
 )
 from .draft import DraftActor, DraftVerb, DraftWorkObject
+from .file_glossary import FileTermHandle, FileTermInstance
 from .glossary import (
     Actor,
     ActorInstance,
@@ -177,6 +178,11 @@ def _try_term_ref(
             term_id = h.id
         case InflectedVerb(verb=h, display=display):
             term_id = h.id
+        case FileTermHandle():
+            display = value.canonical
+            term_id = value.id
+        case FileTermInstance(handle=handle, display=display):
+            term_id = handle.id
         case _:
             return None
     if format_spec or conversion:

@@ -55,3 +55,16 @@ def test_skip_argument_walks_up_call_stack():
     # We don't assert the exact line (would couple to formatting) — only that
     # it's reachable and inside the test function's body range.
     assert loc.line > 0
+
+
+def test_file_source_returns_location_inside_rootdir(tmp_path: Path):
+    """file_source returns a SourceLocation with posix relpath when the path
+    is inside the configured rootdir."""
+    from pytest_given.capture.source import file_source
+
+    set_rootdir(tmp_path)
+    target = tmp_path / 'glossary' / 'terms.md'
+    loc = file_source(target, 42)
+    assert loc is not None
+    assert loc.relpath == 'glossary/terms.md'
+    assert loc.line == 42
