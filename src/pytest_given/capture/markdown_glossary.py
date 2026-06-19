@@ -64,6 +64,19 @@ def parse_glossary_tables(
             and not _FENCE.match(lines[index])
         ):
             cells = _split_row(lines[index])
+            required_width = (
+                max(
+                    term_idx,
+                    desc_idx,
+                    kind_idx if kind_idx is not None else -1,
+                )
+                + 1
+            )
+            if len(cells) < required_width:
+                raise PytestGivenError(
+                    f'data row at line {index + 1} has {len(cells)} column(s), '
+                    f'but {required_width} column(s) required.'
+                )
             kind_value = cells[kind_idx].strip() if kind_idx is not None else ''
             rows.append(
                 GlossaryRow(

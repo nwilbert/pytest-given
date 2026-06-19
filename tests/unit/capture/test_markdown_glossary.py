@@ -81,3 +81,20 @@ def test_index_out_of_range_raises():
         parse_glossary_tables(
             SIMPLE, term_column=0, description_column=5, kind_column=None
         )
+
+
+SHORT_ROW_TABLE = """| Term | Meaning | Type |
+|---|---|---|
+| Guest | A person |
+| Room | A bookable room | place |
+"""
+
+
+def test_data_row_with_fewer_columns_raises():
+    with pytest.raises(PytestGivenError, match=r'(?i)column'):
+        parse_glossary_tables(
+            SHORT_ROW_TABLE,
+            term_column=0,
+            description_column=1,
+            kind_column=2,
+        )
