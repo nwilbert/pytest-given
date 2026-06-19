@@ -385,6 +385,28 @@ def test_build_glossary_aggregations_skips_unknown_term_ref_in_activity() -> Non
     assert TermId('unknown-term') not in aggs
 
 
+def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> None:
+    """A glossary term with kind=None in a story activity records the story ref
+    but does NOT produce an entity instance observation or a verb form entry."""
+    g = _g()
+    g._register(GlossaryTerm(id=TermId('widget'), kind=None, canonical='Widget'))
+    kindless_part = ActivityTermRef(term_id=TermId('widget'), display='My Widget')
+    a = Activity(
+        id=ActivityId(1),
+        paths=(ActivityPath(parts=(kindless_part,)),),
+    )
+    story = Story(id=StoryId('book'), title='Book', activities=(a,))
+    rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    assert TermId('widget') in aggs, 'kindless term should still appear in aggregations'
+    widget_agg = aggs[TermId('widget')]
+    assert widget_agg.stories == [StoryId('book')], 'story ref must be recorded'
+    assert widget_agg.instances == [], (
+        'kindless term must not produce an entity instance'
+    )
+    assert widget_agg.forms == [], 'kindless term must not produce a verb form'
+
+
 def test_glossary_aggregations_annotates_fixture_provenance() -> None:
     g = _g()
     fixture_step = Step(
