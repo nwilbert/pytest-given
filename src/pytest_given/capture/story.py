@@ -19,6 +19,7 @@ from ..model import (
     StoryId,
 )
 from .draft import DraftActor, DraftVerb, DraftWorkObject
+from .file_glossary import FileTermHandle, FileTermInstance
 from .glossary import (
     Actor,
     ActorInstance,
@@ -43,11 +44,13 @@ type _PathArg = (
     | DraftActor
     | DraftWorkObject
     | DraftVerb
+    | FileTermHandle
+    | FileTermInstance
     | str
 )
 
-_ACTOR_TYPES = (Actor, ActorInstance, DraftActor)
-_VERB_TYPES = (Verb, InflectedVerb, DraftVerb)
+_ACTOR_TYPES = (Actor, ActorInstance, DraftActor, FileTermHandle, FileTermInstance)
+_VERB_TYPES = (Verb, InflectedVerb, DraftVerb, FileTermHandle, FileTermInstance)
 _NOUN_TYPES = (
     Actor,
     ActorInstance,
@@ -55,6 +58,8 @@ _NOUN_TYPES = (
     WorkObjectInstance,
     DraftActor,
     DraftWorkObject,
+    FileTermHandle,
+    FileTermInstance,
 )
 
 
@@ -91,6 +96,10 @@ def _glossary_of(value: object) -> Glossary | None:
             return h.glossary
         case InflectedVerb(verb=h):
             return h.glossary
+        case FileTermHandle():
+            return value.glossary
+        case FileTermInstance(handle=handle):
+            return handle.glossary
     return None
 
 
@@ -247,6 +256,10 @@ def _to_part(value: _PathArg) -> ActivityPart:
             return ActivityTermRef(term_id=wo.id, display=display)
         case InflectedVerb(verb=verb, display=display):
             return ActivityTermRef(term_id=verb.id, display=display)
+        case FileTermHandle():
+            return ActivityTermRef(term_id=value.id, display=value.canonical)
+        case FileTermInstance(handle=handle, display=display):
+            return ActivityTermRef(term_id=handle.id, display=display)
         case DraftActor() | DraftWorkObject() | DraftVerb():
             return ActivityPlaceholder(kind=value.kind, text=value.text)
         case str():

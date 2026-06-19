@@ -52,3 +52,19 @@ def capture_caller_source(skip: int = 1) -> SourceLocation | None:
     except ValueError:
         return None
     return SourceLocation(relpath=rel.as_posix(), line=frame.f_lineno)
+
+
+def file_source(path: Path, line: int) -> SourceLocation | None:
+    """SourceLocation for a known file path + line (e.g. a glossary table row).
+
+    Mirrors `capture_caller_source` but for a path we already hold rather than
+    a stack frame. Returns None if rootdir is unset or the file is outside it.
+    """
+    if _rootdir is None:
+        return None
+    abs_path = path.resolve()
+    try:
+        rel = abs_path.relative_to(_rootdir)
+    except ValueError:
+        return None
+    return SourceLocation(relpath=rel.as_posix(), line=line)
