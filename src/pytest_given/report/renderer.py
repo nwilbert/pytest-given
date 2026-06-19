@@ -6,10 +6,9 @@ import jinja2
 from markupsafe import Markup, escape
 
 from ..model import (
-    ActivityEntity,
     ActivityPart,
     ActivityPlaceholder,
-    ActivityTerm,
+    ActivityTermRef,
     ActivityWord,
     Glossary,
     Narration,
@@ -209,6 +208,12 @@ _TERM_KIND_CLASSES = {
 }
 
 
+def _term_kind_class(kind: str | None) -> str:
+    return (
+        _TERM_KIND_CLASSES.get(kind, 'term-ref-unknown') if kind else 'term-ref-unknown'
+    )
+
+
 def _term_pill(
     *,
     classes: list[str],
@@ -232,7 +237,7 @@ def _render_term_ref(
     term = glossary.get(part.term_id) if glossary is not None else None
     if term is None:
         return str(escape(part.display))
-    classes = [_TERM_KIND_CLASSES[term.kind]]
+    classes = [_term_kind_class(term.kind)]
     if part.param_column is not None:
         color_idx = param_color_map.get(part.param_column, 0) % _NUM_PARAM_COLORS
         classes.append(f'param-color-{color_idx}')
@@ -265,27 +270,14 @@ def _make_activity_part_filter(
 
     def _render(part: ActivityPart) -> Markup:
         match part:
-            case ActivityEntity(entity_id=tid, display=display):
+            case ActivityTermRef(term_id=tid, display=display):
                 term = glossary.get(tid) if glossary else None
-                kind_class = (
-                    _TERM_KIND_CLASSES[term.kind]
-                    if term is not None
-                    else 'term-ref-unknown'
-                )
                 return Markup(
                     _term_pill(
-                        classes=[kind_class],
+                        classes=[_term_kind_class(term.kind if term else None)],
                         display=display,
                         term_id=tid,
                         title=term.definition if term else '',
-                    )
-                )
-            case ActivityTerm(term_id=tid, display=display):
-                return Markup(
-                    _term_pill(
-                        classes=[_TERM_KIND_CLASSES['verb']],
-                        display=display,
-                        term_id=tid,
                     )
                 )
             case ActivityWord(text=text):

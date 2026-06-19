@@ -1,9 +1,8 @@
 from pytest_given.model import (
     Activity,
-    ActivityEntity,
     ActivityId,
     ActivityPath,
-    ActivityTerm,
+    ActivityTermRef,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -24,12 +23,12 @@ from pytest_given.report.aggregations import (
 )
 
 
-def _ent(tid: str, display: str) -> ActivityEntity:
-    return ActivityEntity(entity_id=TermId(tid), display=display)
+def _ent(tid: str, display: str) -> ActivityTermRef:
+    return ActivityTermRef(term_id=TermId(tid), display=display)
 
 
-def _verb_part(tid: str) -> ActivityTerm:
-    return ActivityTerm(term_id=TermId(tid), display=tid)
+def _verb_part(tid: str) -> ActivityTermRef:
+    return ActivityTermRef(term_id=TermId(tid), display=tid)
 
 
 def _g() -> Glossary:
@@ -157,7 +156,7 @@ def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
             ActivityPath(
                 parts=(
                     _ent('guest', 'Alice'),
-                    ActivityTerm(term_id=TermId('search'), display='searches for'),
+                    ActivityTermRef(term_id=TermId('search'), display='searches for'),
                     _ent('room', 'Deluxe Suite'),
                 )
             ),
@@ -316,7 +315,7 @@ def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -
             ActivityPath(
                 parts=(
                     _ent('guest', 'Guest'),
-                    ActivityTerm(term_id=TermId('search'), display='searches for'),
+                    ActivityTermRef(term_id=TermId('search'), display='searches for'),
                     _ent('room', 'Room'),
                 )
             ),
@@ -367,17 +366,15 @@ def test_build_glossary_aggregations_skips_non_term_ref_narration_parts() -> Non
     assert aggs == {}
 
 
-def test_build_glossary_aggregations_skips_unknown_entity_in_activity() -> None:
-    """An ActivityEntity whose entity_id isn't in the glossary is silently skipped."""
+def test_build_glossary_aggregations_skips_unknown_term_ref_in_activity() -> None:
+    """An ActivityTermRef whose term_id isn't in the glossary is silently skipped."""
     g = _g()
     a = Activity(
         id=ActivityId(1),
         paths=(
             ActivityPath(
                 parts=(
-                    ActivityEntity(
-                        entity_id=TermId('unknown-entity'), display='Unknown'
-                    ),
+                    ActivityTermRef(term_id=TermId('unknown-term'), display='Unknown'),
                 )
             ),
         ),
@@ -385,24 +382,7 @@ def test_build_glossary_aggregations_skips_unknown_entity_in_activity() -> None:
     story = Story(id=StoryId('s'), title='S', activities=(a,))
     rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
     aggs = build_glossary_aggregations(rd)
-    assert TermId('unknown-entity') not in aggs
-
-
-def test_build_glossary_aggregations_skips_unknown_verb_in_activity() -> None:
-    """An ActivityTerm whose term_id isn't in the glossary is silently skipped."""
-    g = _g()
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            ActivityPath(
-                parts=(ActivityTerm(term_id=TermId('unknown-verb'), display='unknown'),)
-            ),
-        ),
-    )
-    story = Story(id=StoryId('s'), title='S', activities=(a,))
-    rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
-    aggs = build_glossary_aggregations(rd)
-    assert TermId('unknown-verb') not in aggs
+    assert TermId('unknown-term') not in aggs
 
 
 def test_glossary_aggregations_annotates_fixture_provenance() -> None:

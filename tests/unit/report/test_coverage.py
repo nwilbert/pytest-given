@@ -3,11 +3,10 @@ import pytest
 from pytest_given.capture.glossary import id_derive
 from pytest_given.model import (
     Activity,
-    ActivityEntity,
     ActivityId,
     ActivityPath,
     ActivityPlaceholder,
-    ActivityTerm,
+    ActivityTermRef,
     ActivityWord,
     Glossary,
     GlossaryTerm,
@@ -52,19 +51,19 @@ def test_instance_id_of_distinct_display_returns_derived_id(g):
     assert instance_id_of(g, TermId('guest'), 'Alice') == 'alice'
 
 
-def test_identity_of_activity_entity_canonical(g):
-    p = ActivityEntity(entity_id=TermId('guest'), display='Guest')
+def test_identity_of_activity_term_ref_actor_canonical(g):
+    p = ActivityTermRef(term_id=TermId('guest'), display='Guest')
     assert identity_of_part(g, p) == Identity(term_id='guest', instance_id=None)
 
 
-def test_identity_of_activity_entity_instance(g):
-    p = ActivityEntity(entity_id=TermId('guest'), display='Alice')
+def test_identity_of_activity_term_ref_actor_instance(g):
+    p = ActivityTermRef(term_id=TermId('guest'), display='Alice')
     assert identity_of_part(g, p) == Identity(term_id='guest', instance_id='alice')
 
 
-def test_identity_of_activity_term_ignores_display(g):
-    p1 = ActivityTerm(term_id=TermId('search'), display='search')
-    p2 = ActivityTerm(term_id=TermId('search'), display='searches for')
+def test_identity_of_activity_term_ref_verb_ignores_display(g):
+    p1 = ActivityTermRef(term_id=TermId('search'), display='search')
+    p2 = ActivityTermRef(term_id=TermId('search'), display='searches for')
     assert identity_of_part(g, p1) == identity_of_part(g, p2)
 
 
@@ -77,11 +76,11 @@ def test_identity_of_word_or_placeholder_is_none(g):
 
 
 def _entity(tid, display):
-    return ActivityEntity(entity_id=TermId(tid), display=display)
+    return ActivityTermRef(term_id=TermId(tid), display=display)
 
 
 def _term_part(tid):
-    return ActivityTerm(term_id=TermId(tid), display=tid)
+    return ActivityTermRef(term_id=TermId(tid), display=tid)
 
 
 def _path(*parts):

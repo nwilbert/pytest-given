@@ -13,10 +13,9 @@ from pytest_given.capture.story import (
 )
 from pytest_given.model import (
     Activity,
-    ActivityEntity,
     ActivityPath,
     ActivityPlaceholder,
-    ActivityTerm,
+    ActivityTermRef,
     ActivityWord,
     Glossary,
     StoryId,
@@ -54,51 +53,51 @@ def search(g):
     return g.verb('search')
 
 
-def test_path_dispatches_actor_to_activity_entity(guest, search, room):
+def test_path_dispatches_actor_to_activity_term_ref(guest, search, room):
     p = path(guest, search, room)
     assert isinstance(p, ActivityPath)
-    assert p.parts[0] == ActivityEntity(entity_id=guest.id, display='Guest')
+    assert p.parts[0] == ActivityTermRef(term_id=guest.id, display='Guest')
 
 
-def test_path_dispatches_actor_instance_to_activity_entity_with_instance_display(
+def test_path_dispatches_actor_instance_to_activity_term_ref_with_instance_display(
     guest,
     search,
     room,
 ):
     p = path(guest('Alice'), search, room)
-    assert p.parts[0] == ActivityEntity(entity_id=guest.id, display='Alice')
+    assert p.parts[0] == ActivityTermRef(term_id=guest.id, display='Alice')
 
 
-def test_path_dispatches_work_object_to_activity_entity(guest, search, room):
+def test_path_dispatches_work_object_to_activity_term_ref(guest, search, room):
     p = path(guest, search, room)
-    assert p.parts[2] == ActivityEntity(entity_id=room.id, display='Room')
+    assert p.parts[2] == ActivityTermRef(term_id=room.id, display='Room')
 
 
-def test_path_dispatches_work_object_instance_to_activity_entity_with_display(
+def test_path_dispatches_work_object_instance_to_activity_term_ref_with_display(
     guest,
     search,
     room,
 ):
     p = path(guest, search, room('Deluxe Suite'))
-    assert p.parts[2] == ActivityEntity(entity_id=room.id, display='Deluxe Suite')
+    assert p.parts[2] == ActivityTermRef(term_id=room.id, display='Deluxe Suite')
 
 
-def test_path_dispatches_verb_to_activity_term_with_canonical_display(
+def test_path_dispatches_verb_to_activity_term_ref_with_canonical_display(
     guest,
     search,
     room,
 ):
     p = path(guest, search, room)
-    assert p.parts[1] == ActivityTerm(term_id=search.id, display='search')
+    assert p.parts[1] == ActivityTermRef(term_id=search.id, display='search')
 
 
-def test_path_dispatches_inflected_verb_to_activity_term_with_inflected_display(
+def test_path_dispatches_inflected_verb_to_activity_term_ref_with_inflected_display(
     guest,
     search,
     room,
 ):
     p = path(guest, search('searches for'), room)
-    assert p.parts[1] == ActivityTerm(term_id=search.id, display='searches for')
+    assert p.parts[1] == ActivityTermRef(term_id=search.id, display='searches for')
 
 
 def test_path_dispatches_draft_actor_to_activity_placeholder(guest, search, room):
@@ -190,7 +189,7 @@ def test_path_rejects_verb_in_position_2(guest, search):
 
 def test_path_accepts_actor_in_position_2(guest, search):
     p = path(guest, search, guest('Bob'))
-    assert isinstance(p.parts[2], ActivityEntity)
+    assert isinstance(p.parts[2], ActivityTermRef)
 
 
 def test_path_accepts_free_form_parts_beyond_position_2(guest, search, room):

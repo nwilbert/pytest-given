@@ -5,11 +5,10 @@ from typing import NamedTuple
 
 from ..model import (
     Activity,
-    ActivityEntity,
     ActivityId,
     ActivityPart,
     ActivityPlaceholder,
-    ActivityTerm,
+    ActivityTermRef,
     ActivityWord,
     Glossary,
     NarrationTermRef,
@@ -47,15 +46,19 @@ def identity_of_part(
     glossary: Glossary,
     part: ActivityPart,
 ) -> Identity | None:
-    """Identity contributed by a single ActivityPart. Words/placeholders → None."""
+    """Identity contributed by a single ActivityPart. Words/placeholders → None.
+
+    Verbs contribute the canonical (term_id, None); actors/work objects (and
+    kindless terms) contribute an instance identity derived from display."""
     match part:
-        case ActivityEntity(entity_id=tid, display=display):
+        case ActivityTermRef(term_id=tid, display=display):
+            term = glossary.get(tid)
+            if term is not None and term.kind == 'verb':
+                return Identity(term_id=tid, instance_id=None)
             return Identity(
                 term_id=tid,
                 instance_id=instance_id_of(glossary, tid, display),
             )
-        case ActivityTerm(term_id=tid):
-            return Identity(term_id=tid, instance_id=None)
         case ActivityWord() | ActivityPlaceholder():
             return None
 

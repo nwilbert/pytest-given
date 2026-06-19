@@ -10,7 +10,7 @@
 ## Next
 
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
-- [ ] add a graphical view for stories
+- [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
 - [ ] Add option to not generate the JSON file on test run, rethink default behavior
 
 ## Later

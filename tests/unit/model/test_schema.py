@@ -4,12 +4,11 @@ import pytest
 
 from pytest_given.model import (
     Activity,
-    ActivityEntity,
     ActivityId,
     ActivityPart,
     ActivityPath,
     ActivityPlaceholder,
-    ActivityTerm,
+    ActivityTermRef,
     ActivityWord,
     Attachment,
     ErrorInfo,
@@ -253,16 +252,10 @@ def test_glossary_term_definition_defaults_empty() -> None:
 # --- Task 1.2: Activity-part variants + ActivityPart union ---
 
 
-def test_activity_entity_carries_term_id_and_display() -> None:
-    part = ActivityEntity(entity_id=TermId('guest'), display='Alice')
-    assert part.entity_id == 'guest'
+def test_activity_term_ref_carries_term_id_and_display() -> None:
+    part = ActivityTermRef(term_id=TermId('guest'), display='Alice')
+    assert part.term_id == 'guest'
     assert part.display == 'Alice'
-
-
-def test_activity_term_carries_term_id_and_display() -> None:
-    part = ActivityTerm(term_id=TermId('confirm'), display='confirms')
-    assert part.term_id == 'confirm'
-    assert part.display == 'confirms'
 
 
 def test_activity_word_carries_text() -> None:
@@ -284,14 +277,14 @@ def test_activity_parts_are_frozen() -> None:
 
 def test_activity_part_union_accepts_all_variants() -> None:
     parts: list[ActivityPart] = [
-        ActivityEntity(entity_id=TermId('g'), display='Guest'),
-        ActivityTerm(term_id=TermId('s'), display='searches'),
+        ActivityTermRef(term_id=TermId('g'), display='Guest'),
+        ActivityTermRef(term_id=TermId('s'), display='searches'),
         ActivityWord(text='for'),
         ActivityPlaceholder(kind='object', text='loyalty bonus'),
     ]
     assert [type(p).__name__ for p in parts] == [
-        'ActivityEntity',
-        'ActivityTerm',
+        'ActivityTermRef',
+        'ActivityTermRef',
         'ActivityWord',
         'ActivityPlaceholder',
     ]
@@ -303,9 +296,9 @@ def test_activity_part_union_accepts_all_variants() -> None:
 def test_activity_path_is_frozen_with_parts_tuple() -> None:
     path = ActivityPath(
         parts=(
-            ActivityEntity(entity_id=TermId('guest'), display='Guest'),
-            ActivityTerm(term_id=TermId('search'), display='searches for'),
-            ActivityEntity(entity_id=TermId('room'), display='Room'),
+            ActivityTermRef(term_id=TermId('guest'), display='Guest'),
+            ActivityTermRef(term_id=TermId('search'), display='searches for'),
+            ActivityTermRef(term_id=TermId('room'), display='Room'),
         )
     )
     assert len(path.parts) == 3
@@ -314,9 +307,9 @@ def test_activity_path_is_frozen_with_parts_tuple() -> None:
 def test_activity_holds_id_and_paths() -> None:
     p = ActivityPath(
         parts=(
-            ActivityEntity(entity_id=TermId('g'), display='G'),
-            ActivityTerm(term_id=TermId('s'), display='s'),
-            ActivityEntity(entity_id=TermId('o'), display='O'),
+            ActivityTermRef(term_id=TermId('g'), display='G'),
+            ActivityTermRef(term_id=TermId('s'), display='s'),
+            ActivityTermRef(term_id=TermId('o'), display='O'),
         )
     )
     act = Activity(id=ActivityId(1), paths=(p,))
@@ -327,9 +320,9 @@ def test_activity_holds_id_and_paths() -> None:
 def test_story_indexes_activities_by_id() -> None:
     p = ActivityPath(
         parts=(
-            ActivityEntity(entity_id=TermId('g'), display='G'),
-            ActivityTerm(term_id=TermId('s'), display='s'),
-            ActivityEntity(entity_id=TermId('o'), display='O'),
+            ActivityTermRef(term_id=TermId('g'), display='G'),
+            ActivityTermRef(term_id=TermId('s'), display='s'),
+            ActivityTermRef(term_id=TermId('o'), display='O'),
         )
     )
     a1 = Activity(id=ActivityId(1), paths=(p,))
@@ -343,9 +336,9 @@ def test_story_indexes_activities_by_id() -> None:
 def test_story_index_excluded_from_repr_and_equality() -> None:
     p = ActivityPath(
         parts=(
-            ActivityEntity(entity_id=TermId('g'), display='G'),
-            ActivityTerm(term_id=TermId('s'), display='s'),
-            ActivityEntity(entity_id=TermId('o'), display='O'),
+            ActivityTermRef(term_id=TermId('g'), display='G'),
+            ActivityTermRef(term_id=TermId('s'), display='s'),
+            ActivityTermRef(term_id=TermId('o'), display='O'),
         )
     )
     a = Activity(id=ActivityId(1), paths=(p,))

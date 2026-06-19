@@ -70,23 +70,18 @@ class Narration:
 @dataclass(frozen=True, kw_only=True)
 class GlossaryTerm:
     id: TermId
-    kind: Literal['actor', 'object', 'verb']
+    kind: Literal['actor', 'object', 'verb'] | None
     canonical: str
     definition: str = ''
     source: SourceLocation | None = None
 
 
 @dataclass(frozen=True, kw_only=True)
-class ActivityEntity:
-    """Part referencing a term whose kind is 'actor' or 'object'."""
-
-    entity_id: TermId
-    display: str
-
-
-@dataclass(frozen=True, kw_only=True)
-class ActivityTerm:
-    """Part referencing a term whose kind is 'verb'."""
+class ActivityTermRef:
+    """Reference to a glossary term in an activity path. Kind resolved via
+    glossary[term_id].kind — mirrors NarrationTermRef. Used for both
+    code-defined handles and file-glossary handles (whose kind may be
+    inferred post-collection)."""
 
     term_id: TermId
     display: str
@@ -107,7 +102,7 @@ class ActivityPlaceholder:
     text: str
 
 
-type ActivityPart = ActivityEntity | ActivityTerm | ActivityWord | ActivityPlaceholder
+type ActivityPart = ActivityTermRef | ActivityWord | ActivityPlaceholder
 
 
 @dataclass(frozen=True, kw_only=True)

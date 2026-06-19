@@ -2,12 +2,11 @@ from .errors import PytestGivenError
 from .ids import id_derive
 from .schema import (
     Activity,
-    ActivityEntity,
     ActivityId,
     ActivityPart,
     ActivityPath,
     ActivityPlaceholder,
-    ActivityTerm,
+    ActivityTermRef,
     ActivityWord,
     Attachment,
     ContentType,
@@ -43,12 +42,11 @@ from .serde import report_from_dict, report_to_dict
 
 __all__ = [
     'Activity',
-    'ActivityEntity',
     'ActivityId',
     'ActivityPart',
     'ActivityPath',
     'ActivityPlaceholder',
-    'ActivityTerm',
+    'ActivityTermRef',
     'ActivityWord',
     'Attachment',
     'ContentType',

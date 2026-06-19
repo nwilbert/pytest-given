@@ -7,12 +7,11 @@ from collections.abc import Sequence
 
 from ..model import (
     Activity,
-    ActivityEntity,
     ActivityId,
     ActivityPart,
     ActivityPath,
     ActivityPlaceholder,
-    ActivityTerm,
+    ActivityTermRef,
     ActivityWord,
     Glossary,
     PytestGivenError,
@@ -240,18 +239,14 @@ def _suggestion_for(pos: int, value: object) -> str:
 
 def _to_part(value: _PathArg) -> ActivityPart:
     match value:
-        case Actor():
-            return ActivityEntity(entity_id=value.id, display=value.canonical)
-        case WorkObject():
-            return ActivityEntity(entity_id=value.id, display=value.canonical)
-        case Verb():
-            return ActivityTerm(term_id=value.id, display=value.canonical)
+        case Actor() | WorkObject() | Verb():
+            return ActivityTermRef(term_id=value.id, display=value.canonical)
         case ActorInstance(actor=actor, display=display):
-            return ActivityEntity(entity_id=actor.id, display=display)
+            return ActivityTermRef(term_id=actor.id, display=display)
         case WorkObjectInstance(work_object=wo, display=display):
-            return ActivityEntity(entity_id=wo.id, display=display)
+            return ActivityTermRef(term_id=wo.id, display=display)
         case InflectedVerb(verb=verb, display=display):
-            return ActivityTerm(term_id=verb.id, display=display)
+            return ActivityTermRef(term_id=verb.id, display=display)
         case DraftActor() | DraftWorkObject() | DraftVerb():
             return ActivityPlaceholder(kind=value.kind, text=value.text)
         case str():

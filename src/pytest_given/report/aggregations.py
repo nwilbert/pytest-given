@@ -14,9 +14,8 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 from ..model import (
-    ActivityEntity,
     ActivityId,
-    ActivityTerm,
+    ActivityTermRef,
     NarrationTermRef,
     NodeId,
     ReportData,
@@ -220,26 +219,7 @@ def build_glossary_aggregations(
         for activity in story.activities:
             for path in activity.paths:
                 for apath_part in path.parts:
-                    if isinstance(apath_part, ActivityEntity):
-                        term = glossary.get(apath_part.entity_id)
-                        if term is None:
-                            continue
-                        agg = _ensure(apath_part.entity_id)
-                        _record_entity_observation(
-                            agg=agg,
-                            term_id=apath_part.entity_id,
-                            display=apath_part.display,
-                            canonical=term.canonical,
-                            fixture_name=None,
-                            seen_instances=seen_instances,
-                        )
-                        _record_story_ref(
-                            agg=agg,
-                            term_id=apath_part.entity_id,
-                            story_id=story.id,
-                            seen_story_refs=seen_story_refs,
-                        )
-                    elif isinstance(apath_part, ActivityTerm):
+                    if isinstance(apath_part, ActivityTermRef):
                         term = glossary.get(apath_part.term_id)
                         if term is None:
                             continue
@@ -250,12 +230,23 @@ def build_glossary_aggregations(
                             story_id=story.id,
                             seen_story_refs=seen_story_refs,
                         )
-                        # Collect verb surface form — only non-canonical forms
-                        form_key = (apath_part.term_id, apath_part.display)
-                        if form_key not in seen_forms:
-                            if apath_part.display != term.canonical:
-                                agg.forms.append(TermForm(display=apath_part.display))
-                            seen_forms.add(form_key)
+                        if term.kind in ('actor', 'object'):
+                            _record_entity_observation(
+                                agg=agg,
+                                term_id=apath_part.term_id,
+                                display=apath_part.display,
+                                canonical=term.canonical,
+                                fixture_name=None,
+                                seen_instances=seen_instances,
+                            )
+                        elif term.kind == 'verb':
+                            form_key = (apath_part.term_id, apath_part.display)
+                            if form_key not in seen_forms:
+                                if apath_part.display != term.canonical:
+                                    agg.forms.append(
+                                        TermForm(display=apath_part.display)
+                                    )
+                                seen_forms.add(form_key)
 
     return aggs
 

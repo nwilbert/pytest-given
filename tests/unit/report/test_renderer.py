@@ -1079,40 +1079,41 @@ def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
 # ---------------------------------------------------------------------------
 
 from pytest_given.model import (  # noqa: E402
-    ActivityEntity,
     ActivityPlaceholder,
-    ActivityTerm,
+    ActivityTermRef,
     ActivityWord,
 )
 from pytest_given.report.renderer import _make_activity_part_filter  # noqa: E402
 
 
-def test_activity_part_filter_actor_entity():
+def test_activity_part_filter_actor_term_ref():
     g = Glossary()
     g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
     f = _make_activity_part_filter(g)
-    out = str(f(ActivityEntity(entity_id=TermId('guest'), display='Alice')))
+    out = str(f(ActivityTermRef(term_id=TermId('guest'), display='Alice')))
     assert 'term-ref-actor' in out
     assert 'Alice' in out
 
 
-def test_activity_part_filter_object_entity():
+def test_activity_part_filter_object_term_ref():
     g = Glossary()
     g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
     f = _make_activity_part_filter(g)
-    out = str(f(ActivityEntity(entity_id=TermId('room'), display='Room')))
+    out = str(f(ActivityTermRef(term_id=TermId('room'), display='Room')))
     assert 'term-ref-object' in out
 
 
-def test_activity_part_filter_unknown_entity_falls_back():
+def test_activity_part_filter_unknown_term_ref_falls_back():
     f = _make_activity_part_filter(Glossary())  # empty glossary
-    out = str(f(ActivityEntity(entity_id=TermId('missing'), display='X')))
+    out = str(f(ActivityTermRef(term_id=TermId('missing'), display='X')))
     assert 'term-ref-unknown' in out
 
 
-def test_activity_part_filter_term_renders_verb_class():
-    f = _make_activity_part_filter(Glossary())
-    out = str(f(ActivityTerm(term_id=TermId('search'), display='searches')))
+def test_activity_part_filter_verb_term_ref_renders_verb_class():
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    f = _make_activity_part_filter(g)
+    out = str(f(ActivityTermRef(term_id=TermId('search'), display='searches')))
     assert 'term-ref-verb' in out
     assert 'searches' in out
 
@@ -1189,18 +1190,15 @@ def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
                                     {
                                         'parts': [
                                             {
-                                                'type': 'entity',
-                                                'entity_id': 'guest',
+                                                'term_id': 'guest',
                                                 'display': 'Guest',
                                             },
                                             {
-                                                'type': 'term',
                                                 'term_id': 'search',
                                                 'display': 'searches',
                                             },
                                             {
-                                                'type': 'entity',
-                                                'entity_id': 'room',
+                                                'term_id': 'room',
                                                 'display': 'Room',
                                             },
                                         ]
@@ -1274,10 +1272,9 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
     `_glossaries` stash that previously didn't round-trip."""
     from pytest_given.model import (
         Activity,
-        ActivityEntity,
         ActivityId,
         ActivityPath,
-        ActivityTerm,
+        ActivityTermRef,
         Glossary,
         GlossaryTerm,
         Metadata,
@@ -1308,9 +1305,11 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
                 paths=(
                     ActivityPath(
                         parts=(
-                            ActivityEntity(entity_id=TermId('guest'), display='Guest'),
-                            ActivityTerm(term_id=TermId('search'), display='searches'),
-                            ActivityEntity(entity_id=TermId('room'), display='Room'),
+                            ActivityTermRef(term_id=TermId('guest'), display='Guest'),
+                            ActivityTermRef(
+                                term_id=TermId('search'), display='searches'
+                            ),
+                            ActivityTermRef(term_id=TermId('room'), display='Room'),
                         )
                     ),
                 ),

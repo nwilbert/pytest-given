@@ -26,8 +26,7 @@ from .capture.glossary import clear_glossary_registry, get_registered_glossaries
 from .capture.source import set_rootdir
 from .capture.story import _clear_story_registry
 from .model import (
-    ActivityEntity,
-    ActivityTerm,
+    ActivityTermRef,
     FixtureRecording,
     Glossary,
     Metadata,
@@ -469,13 +468,11 @@ def _resolve_glossary(stories: list[Story], session: pytest.Session) -> Glossary
 
 def _term_ids_referenced_by_stories(stories: list[Story]) -> set[TermId]:
     used: set[TermId] = set()
-    for s in stories:
-        for a in s.activities:
-            for p in a.paths:
-                for part in p.parts:
-                    if isinstance(part, ActivityEntity):
-                        used.add(part.entity_id)
-                    elif isinstance(part, ActivityTerm):
+    for story in stories:
+        for activity in story.activities:
+            for activity_path in activity.paths:
+                for part in activity_path.parts:
+                    if isinstance(part, ActivityTermRef):
                         used.add(part.term_id)
     return used
 

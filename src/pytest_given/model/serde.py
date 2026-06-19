@@ -15,12 +15,11 @@ from typing import Any
 from .errors import PytestGivenError
 from .schema import (
     Activity,
-    ActivityEntity,
     ActivityId,
     ActivityPart,
     ActivityPath,
     ActivityPlaceholder,
-    ActivityTerm,
+    ActivityTermRef,
     ActivityWord,
     Attachment,
     ContentType,
@@ -138,23 +137,15 @@ def _activity_path_from_dict(d: dict[str, Any]) -> ActivityPath:
 
 
 def _activity_part_from_dict(d: dict[str, Any]) -> ActivityPart:
-    if 'entity_id' in d:
-        return ActivityEntity(
-            entity_id=TermId(d['entity_id']),
-            display=d['display'],
-        )
     if 'term_id' in d:
-        return ActivityTerm(
-            term_id=TermId(d['term_id']),
-            display=d['display'],
-        )
+        return ActivityTermRef(term_id=TermId(d['term_id']), display=d['display'])
     if 'kind' in d:
         return ActivityPlaceholder(kind=d['kind'], text=d['text'])
     if 'text' in d:
         return ActivityWord(text=d['text'])
     raise PytestGivenError(
         f'unknown ActivityPart shape (keys: {sorted(d)!r}). Expected one of '
-        '"entity_id", "term_id", "kind", "text".'
+        '"term_id", "kind", "text".'
     )
 
 

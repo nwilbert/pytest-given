@@ -2,11 +2,10 @@ import pytest
 
 from pytest_given.model import (
     Activity,
-    ActivityEntity,
     ActivityId,
     ActivityPath,
     ActivityPlaceholder,
-    ActivityTerm,
+    ActivityTermRef,
     ActivityWord,
     Attachment,
     ErrorInfo,
@@ -41,6 +40,53 @@ def _round_trip(report):
 
 def _meta():
     return Metadata(project='p', timestamp='t', pytest_version='8', plugin_version='0')
+
+
+def _dummy_metadata() -> Metadata:
+    return Metadata(
+        project='p',
+        timestamp='2026-06-18T00:00:00+00:00',
+        pytest_version='8.0',
+        plugin_version='0.1.0',
+        commit_sha=None,
+    )
+
+
+def test_activity_term_ref_round_trips():
+    story = Story(
+        id=StoryId('s'),
+        title='S',
+        activities=(
+            Activity(
+                id=ActivityId(1),
+                paths=(
+                    ActivityPath(
+                        parts=(
+                            ActivityTermRef(term_id=TermId('guest'), display='Guest'),
+                        )
+                    ),
+                ),
+            ),
+        ),
+    )
+    report = ReportData(
+        metadata=_dummy_metadata(), scenarios=[], stories=[story], glossary=None
+    )
+    round_tripped = report_from_dict(report_to_dict(report))
+    part = round_tripped.stories[0].activities[0].paths[0].parts[0]
+    assert part == ActivityTermRef(term_id=TermId('guest'), display='Guest')
+
+
+def test_glossary_term_kind_can_be_none():
+    glossary = Glossary(
+        terms=[GlossaryTerm(id=TermId('guest'), kind=None, canonical='Guest')]
+    )
+    report = ReportData(
+        metadata=_dummy_metadata(), scenarios=[], stories=[], glossary=glossary
+    )
+    round_tripped = report_from_dict(report_to_dict(report))
+    assert round_tripped.glossary is not None
+    assert round_tripped.glossary.terms[0].kind is None
 
 
 def _minimal_metadata_dict() -> dict:
@@ -479,8 +525,8 @@ def test_asdict_filtered_handles_dict_values() -> None:
 
 def test_activity_part_variants_round_trip():
     parts = (
-        ActivityEntity(entity_id=TermId('guest'), display='Guest'),
-        ActivityTerm(term_id=TermId('search'), display='searches'),
+        ActivityTermRef(term_id=TermId('guest'), display='Guest'),
+        ActivityTermRef(term_id=TermId('search'), display='searches'),
         ActivityWord(text='for'),
         ActivityPlaceholder(kind='object', text='loyalty bonus'),
     )
