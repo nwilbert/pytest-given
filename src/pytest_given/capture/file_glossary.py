@@ -14,7 +14,7 @@ from ..model import (
     TermId,
     id_derive,
 )
-from .glossary import _register_glossary
+from .glossary import TermHandle, register_glossary, terms_match
 from .markdown_glossary import ColumnSpec, GlossaryRow, parse_glossary_tables
 from .source import file_source
 
@@ -34,28 +34,10 @@ class FileTermInstance:
 
 
 @dataclass(frozen=True)
-class FileTermHandle:
-    """Deferred-kind handle for a file-glossary term. One type for all kinds;
-    kind is resolved post-collection. Callable to override display."""
-
-    _term: GlossaryTerm
-    _glossary: Glossary
-
-    @property
-    def term(self) -> GlossaryTerm:
-        return self._term
-
-    @property
-    def glossary(self) -> Glossary:
-        return self._glossary
-
-    @property
-    def id(self) -> TermId:
-        return self._term.id
-
-    @property
-    def canonical(self) -> str:
-        return self._term.canonical
+class FileTermHandle(TermHandle):
+    """Deferred-kind handle for a file-glossary term. One type for all kinds
+    (kind is resolved post-collection), unlike the code-defined Actor/WorkObject/
+    Verb handles. Callable to override display."""
 
     def __call__(self, display: str) -> FileTermInstance:
         return FileTermInstance(handle=self, display=display)
@@ -87,7 +69,7 @@ class FileGlossary:
         self._handles: dict[TermId, FileTermHandle] = {}
         for row in rows:
             self._add_row(row)
-        _register_glossary(self._glossary)
+        register_glossary(self._glossary)
 
     @property
     def glossary(self) -> Glossary:
@@ -108,11 +90,7 @@ class FileGlossary:
         )
         existing = self._glossary.get(term_id)
         if existing is not None:
-            if (existing.kind, existing.canonical, existing.definition) != (
-                term.kind,
-                term.canonical,
-                term.definition,
-            ):
+            if not terms_match(existing, term):
                 raise PytestGivenError(
                     f'{self._path}:{row.line}: term {row.term!r} (id {term_id!r}) '
                     f'conflicts with an earlier row.'

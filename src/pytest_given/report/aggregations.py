@@ -10,7 +10,6 @@ Helpers exposed:
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 from ..model import (
@@ -20,12 +19,11 @@ from ..model import (
     NodeId,
     ReportData,
     Scenario,
-    Step,
     Story,
     StoryId,
     TermId,
 )
-from .coverage import StepRef, compute_coverage
+from .coverage import StepRef, compute_coverage, walk_steps
 
 # ---------------------------------------------------------------------------
 # Public dataclasses
@@ -194,7 +192,7 @@ def build_glossary_aggregations(
 
     # --- Walk scenario steps ---
     for scenario in report.scenarios:
-        for step in _walk_steps_flat(scenario.steps):
+        for _, step in walk_steps(scenario.steps):
             for part in step.narration.parts:
                 if not isinstance(part, NarrationTermRef):
                     continue
@@ -210,9 +208,6 @@ def build_glossary_aggregations(
                         fixture_name=step.fixture_name,
                         seen_instances=seen_instances,
                     )
-                # Verbs in scenario steps: no form collection (forms come from
-                # story activities), but we still want them in aggs if needed.
-                # The spec only mentions forms from activity paths.
 
     # --- Walk story activities ---
     for story in report.stories:
@@ -287,11 +282,3 @@ def _record_story_ref(
     if ref_key not in seen_story_refs:
         seen_story_refs.add(ref_key)
         agg.stories.append(story_id)
-
-
-def _walk_steps_flat(steps: list[Step]) -> Iterable[Step]:
-    """Yield all steps and their descendants in depth-first order."""
-    for step in steps:
-        yield step
-        if step.children:
-            yield from _walk_steps_flat(step.children)

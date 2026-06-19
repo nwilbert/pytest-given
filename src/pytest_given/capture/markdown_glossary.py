@@ -58,20 +58,15 @@ def parse_glossary_tables(
             _resolve_column(kind_column, header) if kind_column is not None else None
         )
         index += 2  # consume header + separator
+        required_width = (
+            max(term_idx, desc_idx, kind_idx if kind_idx is not None else -1) + 1
+        )
         while (
             index < len(lines)
             and _is_table_row(lines[index])
             and not _FENCE.match(lines[index])
         ):
             cells = _split_row(lines[index])
-            required_width = (
-                max(
-                    term_idx,
-                    desc_idx,
-                    kind_idx if kind_idx is not None else -1,
-                )
-                + 1
-            )
             if len(cells) < required_width:
                 raise PytestGivenError(
                     f'data row at line {index + 1} has {len(cells)} column(s), '

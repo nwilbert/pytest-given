@@ -6,8 +6,8 @@ from pytest_given import PytestGivenError
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.draft import draft
 from pytest_given.capture.story import (
-    _clear_story_registry,
     activity,
+    clear_story_registry,
     path,
     story,
 )
@@ -26,10 +26,10 @@ from pytest_given.model import (
 def _reset_story_registry():
     from pytest_given.capture.glossary import clear_glossary_registry
 
-    _clear_story_registry()
+    clear_story_registry()
     clear_glossary_registry()
     yield
-    _clear_story_registry()
+    clear_story_registry()
     clear_glossary_registry()
 
 
@@ -366,7 +366,7 @@ def test_story_id_collision_raises_with_both_sites():
 
 def test_story_id_collision_does_not_fire_after_registry_clear():
     story('Book', [])
-    _clear_story_registry()
+    clear_story_registry()
     story('Book', [])
 
 

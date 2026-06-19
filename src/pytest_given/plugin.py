@@ -26,7 +26,7 @@ from .capture.file_glossary import FileGlossary
 from .capture.glossary import clear_glossary_registry, get_registered_glossaries
 from .capture.kind_resolution import resolve_glossary_kinds
 from .capture.source import set_rootdir
-from .capture.story import _clear_story_registry
+from .capture.story import clear_story_registry
 from .model import (
     ActivityTermRef,
     FixtureRecording,
@@ -107,7 +107,7 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     """Reset the collector at the start of each session."""
     global collector
     collector = Collector()
-    _clear_story_registry()
+    clear_story_registry()
     clear_glossary_registry()
 
 

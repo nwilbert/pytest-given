@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import inspect
+import sys
 from collections.abc import Sequence
 
 from ..model import (
@@ -17,6 +17,7 @@ from ..model import (
     PytestGivenError,
     Story,
     StoryId,
+    id_derive,
 )
 from .draft import DraftActor, DraftVerb, DraftWorkObject
 from .file_glossary import FileTermHandle, FileTermInstance
@@ -27,7 +28,6 @@ from .glossary import (
     Verb,
     WorkObject,
     WorkObjectInstance,
-    id_derive,
 )
 from .source import capture_caller_source
 
@@ -141,13 +141,13 @@ def activity(
 _STORY_REGISTRY: dict[StoryId, str] = {}
 
 
-def _clear_story_registry() -> None:
+def clear_story_registry() -> None:
     _STORY_REGISTRY.clear()
 
 
 def _register_story(sid: StoryId, title: str) -> None:
-    frame = inspect.stack()[2]
-    site = f'{frame.filename}:{frame.lineno}'
+    frame = sys._getframe(2)
+    site = f'{frame.f_code.co_filename}:{frame.f_lineno}'
     if sid in _STORY_REGISTRY:
         raise PytestGivenError(
             f'story {title!r} (id {sid!r}) already declared at '

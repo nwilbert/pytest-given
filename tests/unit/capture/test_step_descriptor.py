@@ -12,10 +12,10 @@ from pytest_given.capture.decorators import (
     when,
 )
 from pytest_given.capture.story import (
-    _clear_story_registry,
+    activity as activity_fn,
 )
 from pytest_given.capture.story import (
-    activity as activity_fn,
+    clear_story_registry,
 )
 from pytest_given.capture.story import (
     story as story_fn,
@@ -36,10 +36,10 @@ from pytest_given.model import (
 def _reset_story_registry():
     from pytest_given.capture.glossary import clear_glossary_registry
 
-    _clear_story_registry()
+    clear_story_registry()
     clear_glossary_registry()
     yield
-    _clear_story_registry()
+    clear_story_registry()
     clear_glossary_registry()
 
 

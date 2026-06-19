@@ -15,10 +15,10 @@ from pytest_given.capture.collector import (
 )
 from pytest_given.capture.decorators import ScenarioDecorator, StepDescriptor
 from pytest_given.capture.story import (
-    _clear_story_registry,
+    activity as activity_fn,
 )
 from pytest_given.capture.story import (
-    activity as activity_fn,
+    clear_story_registry,
 )
 from pytest_given.capture.story import (
     story as story_fn,
@@ -329,9 +329,9 @@ def test_templatize_term_ref_param_column_stays_none_when_no_column_match() -> N
 
 @pytest.fixture
 def _reset_story_registry_plugin() -> Any:
-    _clear_story_registry()
+    clear_story_registry()
     yield
-    _clear_story_registry()
+    clear_story_registry()
 
 
 @pytest.mark.usefixtures('_reset_story_registry_plugin')

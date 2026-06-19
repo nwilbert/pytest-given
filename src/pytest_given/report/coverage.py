@@ -146,7 +146,7 @@ def compute_coverage(
             identity_to_activities.setdefault(ident, set()).add(aid)
 
     result: dict[ActivityId, set[StepRef]] = {}
-    for path_index, step in _walk_steps(scenario):
+    for path_index, step in walk_steps(scenario.steps):
         ref: StepRef = (scenario.id, path_index)
         if step.activity_ids:
             for aid in step.activity_ids:
@@ -165,17 +165,11 @@ def compute_coverage(
     return result
 
 
-def _walk_steps(
-    scenario: Scenario,
+def walk_steps(
+    steps: list[Step], prefix: tuple[int, ...] = ()
 ) -> Iterable[tuple[tuple[int, ...], Step]]:
     """Depth-first walk yielding (index_path, step) for every step in the tree."""
-
-    def _walk(
-        steps: list[Step], prefix: tuple[int, ...]
-    ) -> Iterable[tuple[tuple[int, ...], Step]]:
-        for i, step in enumerate(steps):
-            yield (*prefix, i), step
-            if step.children:
-                yield from _walk(step.children, (*prefix, i))
-
-    return _walk(scenario.steps, ())
+    for index, step in enumerate(steps):
+        yield (*prefix, index), step
+        if step.children:
+            yield from walk_steps(step.children, (*prefix, index))

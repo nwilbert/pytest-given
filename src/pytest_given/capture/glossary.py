@@ -17,7 +17,7 @@ from .source import capture_caller_source
 
 
 @dataclass(frozen=True)
-class _TermHandle:
+class TermHandle:
     """Common base: a GlossaryTerm + back-ref to its owning Glossary."""
 
     _term: GlossaryTerm
@@ -41,21 +41,33 @@ class _TermHandle:
 
 
 @dataclass(frozen=True)
-class Actor(_TermHandle):
+class Actor(TermHandle):
     def __call__(self, display: str) -> ActorInstance:
         return ActorInstance(actor=self, display=display)
 
 
 @dataclass(frozen=True)
-class WorkObject(_TermHandle):
+class WorkObject(TermHandle):
     def __call__(self, display: str) -> WorkObjectInstance:
         return WorkObjectInstance(work_object=self, display=display)
 
 
 @dataclass(frozen=True)
-class Verb(_TermHandle):
+class Verb(TermHandle):
     def __call__(self, display: str) -> InflectedVerb:
         return InflectedVerb(verb=self, display=display)
+
+
+def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:
+    """Whether two terms are the same registration: kind, canonical, and
+    definition agree (`source` is intentionally excluded). Shared by the
+    code-defined (`_register_kind`) and file-backed (`FileGlossary._add_row`)
+    idempotency-and-conflict checks so the identity rule lives in one place."""
+    return (
+        existing.kind == candidate.kind
+        and existing.canonical == candidate.canonical
+        and existing.definition == candidate.definition
+    )
 
 
 @dataclass(frozen=True)
@@ -99,11 +111,7 @@ def _register_kind(
     )
     existing = self.get(new.id)
     if existing is not None:
-        if (
-            existing.kind == new.kind
-            and existing.canonical == new.canonical
-            and existing.definition == new.definition
-        ):
+        if terms_match(existing, new):
             return existing
         raise PytestGivenError(
             f'term {name!r} (id {new.id!r}) conflicts with prior registration '
@@ -115,7 +123,7 @@ def _register_kind(
     return new
 
 
-_HANDLE_BY_KIND: dict[Literal['actor', 'object', 'verb'], type[_TermHandle]] = {
+_HANDLE_BY_KIND: dict[Literal['actor', 'object', 'verb'], type[TermHandle]] = {
     'actor': Actor,
     'object': WorkObject,
     'verb': Verb,
@@ -131,7 +139,7 @@ _HANDLE_BY_KIND: dict[Literal['actor', 'object', 'verb'], type[_TermHandle]] = {
 _REGISTERED_GLOSSARIES: dict[int, Glossary] = {}
 
 
-def _register_glossary(glossary: Glossary) -> None:
+def register_glossary(glossary: Glossary) -> None:
     _REGISTERED_GLOSSARIES.setdefault(id(glossary), glossary)
 
 
@@ -150,11 +158,11 @@ def _mint_handle(
     kind: Literal['actor', 'object', 'verb'],
     name: str,
     definition: str,
-) -> _TermHandle:
+) -> TermHandle:
     # skip=3: this function → kind wrapper (actor/work_object/verb) → user call site
     source = capture_caller_source(skip=3)
     term = _register_kind(glossary, kind, name, definition, source)
-    _register_glossary(glossary)
+    register_glossary(glossary)
     return _HANDLE_BY_KIND[kind](_term=term, _glossary=glossary)
 
 
