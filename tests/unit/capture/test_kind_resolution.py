@@ -76,7 +76,7 @@ def test_verb_and_noun_conflict_raises():
         _story('S1', ('a', 'book', 'c')),  # book = verb slot
         _story('S2', ('a', 'd', 'book')),  # book = noun slot
     ]
-    with pytest.raises(PytestGivenError, match='book'):
+    with pytest.raises(PytestGivenError, match=r'(?i)book'):
         resolve_glossary_kinds(glossary, stories)
 
 
@@ -96,5 +96,21 @@ def test_declared_kind_verified_and_kept():
 
 def test_declared_verb_in_actor_slot_raises():
     glossary = Glossary(terms=[_term('search', 'verb'), _term('x'), _term('y')])
-    with pytest.raises(PytestGivenError, match='search'):
+    with pytest.raises(PytestGivenError, match=r'(?i)search'):
         resolve_glossary_kinds(glossary, [_story('S', ('search', 'x', 'y'))])
+
+
+def test_verb_and_actor_conflict_raises():
+    glossary = Glossary(terms=[_term('a'), _term('examine'), _term('b'), _term('c')])
+    stories = [
+        _story('S1', ('a', 'examine', 'b')),  # examine = verb slot
+        _story('S2', ('examine', 'c', 'a')),  # examine = actor slot
+    ]
+    with pytest.raises(PytestGivenError, match=r'(?i)examine'):
+        resolve_glossary_kinds(glossary, stories)
+
+
+def test_declared_object_in_actor_slot_raises():
+    glossary = Glossary(terms=[_term('room', 'object'), _term('x'), _term('y')])
+    with pytest.raises(PytestGivenError, match=r'(?i)room'):
+        resolve_glossary_kinds(glossary, [_story('S', ('room', 'x', 'y'))])

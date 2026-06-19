@@ -68,7 +68,7 @@ def _resolve_one(
         return term.kind
     if 'verb' in slots and ('actor' in slots or 'noun' in slots):
         raise PytestGivenError(
-            f'term {term.id!r} is used in incompatible positions{where}: '
+            f'term {term.canonical!r} is used in incompatible positions{where}: '
             f'a verb slot and an actor/noun slot. Add a kind column to disambiguate.'
         )
     if 'verb' in slots:
@@ -92,6 +92,6 @@ def _verify_declared(term: GlossaryTerm, slots: set[_Slot], where: str) -> None:
 
 def _raise_declared(term: GlossaryTerm, slot: str, where: str) -> None:
     raise PytestGivenError(
-        f'term {term.id!r} is declared kind {term.kind!r} but appears in '
+        f'term {term.canonical!r} is declared kind {term.kind!r} but appears in '
         f'a {slot}{where}, which is incompatible.'
     )
