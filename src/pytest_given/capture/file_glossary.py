@@ -141,7 +141,7 @@ class FileGlossary:
         term = self._glossary.get(term_id)
         if term is None:
             close = difflib.get_close_matches(
-                name, [term.canonical for term in self._glossary.terms], n=3
+                name, [candidate.canonical for candidate in self._glossary.terms], n=3
             )
             hint = f' Did you mean: {", ".join(close)}?' if close else ''
             raise PytestGivenError(f'no glossary term named {name!r}.{hint}')

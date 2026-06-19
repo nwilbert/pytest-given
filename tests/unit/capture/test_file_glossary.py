@@ -81,6 +81,28 @@ def test_explicit_kind_column(tmp_path):
     assert glossary['Room'].term.kind == 'object'
 
 
+def test_kind_column_by_integer_index(tmp_path):
+    path = tmp_path / 'g.md'
+    path.write_text(
+        '| Term | Meaning | Kind |\n|---|---|---|\n'
+        '| Guest | x | Actor |\n| Room | y | Work Object |\n',
+        encoding='utf-8',
+    )
+    glossary = FileGlossary(path, kind_column=2)
+    assert glossary['Guest'].term.kind == 'actor'
+    assert glossary['Room'].term.kind == 'object'
+
+
+def test_work_object_underscore_alias(tmp_path):
+    path = tmp_path / 'g.md'
+    path.write_text(
+        '| Term | Meaning | Kind |\n|---|---|---|\n| Room | y | work_object |\n',
+        encoding='utf-8',
+    )
+    glossary = FileGlossary(path, kind_column='Kind')
+    assert glossary['Room'].term.kind == 'object'
+
+
 def test_unrecognised_kind_value_raises(tmp_path):
     path = tmp_path / 'g.md'
     path.write_text(

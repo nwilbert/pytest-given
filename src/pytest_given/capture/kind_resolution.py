@@ -26,24 +26,18 @@ type _Slot = Literal['actor', 'verb', 'noun']
 
 def resolve_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary:
     """Return a new Glossary with each term's kind inferred/verified."""
-    slots_by_term: dict[TermId, set[_Slot]] = defaultdict(set)
-    stories_by_term: dict[TermId, set[str]] = defaultdict(set)
+    stories_by_slot: dict[TermId, dict[_Slot, set[str]]] = defaultdict(
+        lambda: defaultdict(set)
+    )
     for story in stories:
         for activity in story.activities:
             for activity_path in activity.paths:
                 for position, part in enumerate(activity_path.parts):
                     if isinstance(part, ActivityTermRef):
-                        slots_by_term[part.term_id].add(_slot_for(position))
-                        stories_by_term[part.term_id].add(story.title)
+                        slot = _slot_for(position)
+                        stories_by_slot[part.term_id][slot].add(story.title)
     resolved_terms = [
-        replace(
-            term,
-            kind=_resolve_one(
-                term,
-                slots_by_term.get(term.id, set()),
-                sorted(stories_by_term.get(term.id, set())),
-            ),
-        )
+        replace(term, kind=_resolve_one(term, stories_by_slot.get(term.id, {})))
         for term in glossary.terms
     ]
     return Glossary(terms=resolved_terms)
@@ -59,14 +53,15 @@ def _slot_for(position: int) -> _Slot:
 
 def _resolve_one(
     term: GlossaryTerm,
-    slots: set[_Slot],
-    story_titles: list[str],
+    stories_by_slot: dict[_Slot, set[str]],
 ) -> _Kind | None:
-    where = f' (in {", ".join(story_titles)})' if story_titles else ''
+    slots = set(stories_by_slot)
     if term.kind is not None:
-        _verify_declared(term, slots, where)
+        _verify_declared(term, stories_by_slot)
         return term.kind
     if 'verb' in slots and ('actor' in slots or 'noun' in slots):
+        other: _Slot = 'actor' if 'actor' in slots else 'noun'
+        where = _where(stories_by_slot, 'verb', other)
         raise PytestGivenError(
             f'term {term.canonical!r} is used in incompatible positions{where}: '
             f'a verb slot and an actor/noun slot. Add a kind column to disambiguate.'
@@ -80,14 +75,17 @@ def _resolve_one(
     return None
 
 
-def _verify_declared(term: GlossaryTerm, slots: set[_Slot], where: str) -> None:
+def _verify_declared(
+    term: GlossaryTerm, stories_by_slot: dict[_Slot, set[str]]
+) -> None:
     declared = term.kind
+    slots = set(stories_by_slot)
     if 'verb' in slots and declared != 'verb':
-        _raise_declared(term, 'verb slot', where)
+        _raise_declared(term, 'verb slot', _where(stories_by_slot, 'verb'))
     if 'actor' in slots and declared != 'actor':
-        _raise_declared(term, 'actor slot', where)
+        _raise_declared(term, 'actor slot', _where(stories_by_slot, 'actor'))
     if 'noun' in slots and declared == 'verb':
-        _raise_declared(term, 'noun slot', where)
+        _raise_declared(term, 'noun slot', _where(stories_by_slot, 'noun'))
 
 
 def _raise_declared(term: GlossaryTerm, slot: str, where: str) -> None:
@@ -95,3 +93,10 @@ def _raise_declared(term: GlossaryTerm, slot: str, where: str) -> None:
         f'term {term.canonical!r} is declared kind {term.kind!r} but appears in '
         f'a {slot}{where}, which is incompatible.'
     )
+
+
+def _where(stories_by_slot: dict[_Slot, set[str]], *slots: _Slot) -> str:
+    """Story titles for just the named slots, so a conflict names only the
+    stories that actually contributed the offending positions."""
+    titles = sorted({title for slot in slots for title in stories_by_slot[slot]})
+    return f' (in {", ".join(titles)})' if titles else ''

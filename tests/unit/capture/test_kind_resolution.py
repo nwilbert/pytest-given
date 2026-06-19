@@ -123,6 +123,38 @@ def test_declared_actor_in_verb_slot_raises():
         resolve_glossary_kinds(glossary, [_story('S', ('subject', 'guest', 'y'))])
 
 
+def test_conflict_where_names_only_offending_stories():
+    """The conflict message lists only the stories that contributed the
+    offending slots, not every story the term appears in."""
+    glossary = Glossary(terms=[_term('guest', 'actor'), _term('x'), _term('y')])
+    stories = [
+        _story('ActorStory', ('guest', 'x', 'y')),  # guest = actor slot (ok)
+        _story('VerbStory', ('x', 'guest', 'y')),  # guest = verb slot (violation)
+    ]
+    with pytest.raises(PytestGivenError) as excinfo:
+        resolve_glossary_kinds(glossary, stories)
+    message = str(excinfo.value)
+    assert 'VerbStory' in message
+    assert 'ActorStory' not in message
+
+
+def test_inferred_conflict_where_excludes_unrelated_slot_stories():
+    """An inferred (kindless) term used in verb, actor, and noun slots conflicts
+    on verb-vs-actor; the message names those stories but not the noun-only one."""
+    glossary = Glossary(terms=[_term('run'), _term('x'), _term('y'), _term('z')])
+    stories = [
+        _story('VerbStory', ('x', 'run', 'y')),  # run = verb slot
+        _story('ActorStory', ('run', 'x', 'y')),  # run = actor slot
+        _story('NounStory', ('x', 'y', 'run')),  # run = noun slot only
+    ]
+    with pytest.raises(PytestGivenError) as excinfo:
+        resolve_glossary_kinds(glossary, stories)
+    message = str(excinfo.value)
+    assert 'VerbStory' in message
+    assert 'ActorStory' in message
+    assert 'NounStory' not in message
+
+
 def test_declared_verb_in_noun_slot_raises():
     """A term declared kind 'verb' that appears at position ≥2 (noun slot) raises."""
     glossary = Glossary(
