@@ -4,6 +4,16 @@ from pytest_given.capture.file_glossary import FileGlossary, FileTermHandle
 from pytest_given.capture.story import activity
 from pytest_given.model import ActivityTermRef, PytestGivenError
 
+
+@pytest.fixture(autouse=True)
+def _reset_glossary_registry():
+    from pytest_given.capture.glossary import clear_glossary_registry
+
+    clear_glossary_registry()
+    yield
+    clear_glossary_registry()
+
+
 GLOSSARY_MD = """# Glossary
 
 | Term | Meaning |
