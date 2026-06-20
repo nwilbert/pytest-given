@@ -432,7 +432,7 @@
         {% for term in kind_terms %}
         {% set agg = glossary_aggregations.get(term.id) %}
         {% set q = 'glossarySearch' %}
-        <div class="entry"
+        <div class="entry" id="term-{{ term.id }}"
              x-show="!glossarySearch || '{{ (term.canonical + ' ' + term.definition) | lower }}'.includes(glossarySearch.toLowerCase())">
           <div class="entry-head" @click="expandedTerms['{{ term.id }}'] ? delete expandedTerms['{{ term.id }}'] : (expandedTerms['{{ term.id }}'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['{{ term.id }}'] }"></span>
@@ -475,6 +475,15 @@
                   {% for form in agg.forms %}
                   <span class="use-chip">{{ form.display }}</span>
                   {% endfor %}
+                </div>
+                {% endif %}
+                {% set scn_ids = term_scenario_index.get(term.id, []) %}
+                {% if scn_ids %}
+                <div class="refs-line">
+                  <a class="use-chip" href="#"
+                     @click.prevent="filterScenariosByTerm('{{ term.id }}')">
+                    Show {{ scn_ids | length }} scenario{{ 's' if scn_ids | length != 1 else '' }} using this term
+                  </a>
                 </div>
                 {% endif %}
                 {% if term.source %}

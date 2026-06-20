@@ -88,7 +88,8 @@ def render_html(
             else []
         )
     )
-    term_scenarios_json = Markup(json.dumps(build_term_scenario_index(report)))
+    term_scenario_index = build_term_scenario_index(report)
+    term_scenarios_json = Markup(json.dumps(term_scenario_index))
 
     env.filters['narration'] = _make_narration_filter(
         param_color_map,
@@ -110,6 +111,7 @@ def render_html(
         story_ids_json=story_ids_json,
         term_ids_json=term_ids_json,
         term_scenarios_json=term_scenarios_json,
+        term_scenario_index=term_scenario_index,
         css=Markup(css),
         app_js=Markup(app_js),
         alpine_js=Markup(alpine_js),
