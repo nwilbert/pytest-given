@@ -19,6 +19,7 @@ from pytest_given.model import (
 from pytest_given.report.aggregations import (
     build_coverage_maps,
     build_glossary_aggregations,
+    build_term_scenario_index,
     tab_visibility,
 )
 
@@ -452,3 +453,70 @@ def test_glossary_aggregations_annotates_fixture_provenance() -> None:
     aggs = build_glossary_aggregations(rd)
     alice = next(i for i in aggs[TermId('guest')].instances if i.display == 'Alice')
     assert alice.fixture_name == 'alice'
+
+
+def test_build_term_scenario_index_empty_when_no_glossary() -> None:
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[],
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn])
+    assert build_term_scenario_index(rd) == {}
+
+
+def test_build_term_scenario_index_maps_terms_to_scenarios() -> None:
+    g = _g()
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='x',
+            parts=[
+                NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+                NarrationTermRef(term_id=TermId('room'), display='Room'),
+            ],
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('test::a'),
+        narration=Narration(text='scn'),
+        module='m',
+        steps=[step],
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
+    index = build_term_scenario_index(rd)
+    assert index[TermId('guest')] == [NodeId('test::a')]
+    assert index[TermId('room')] == [NodeId('test::a')]
+    assert TermId('search') not in index
+
+
+def test_build_term_scenario_index_dedups_and_includes_scenario_narration() -> None:
+    g = _g()
+    step_one = Step(
+        phase='when',
+        narration=Narration(
+            text='x',
+            parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
+        ),
+    )
+    step_two = Step(
+        phase='then',
+        narration=Narration(
+            text='y',
+            parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('test::a'),
+        narration=Narration(
+            text='scn',
+            parts=[NarrationTermRef(term_id=TermId('room'), display='Room')],
+        ),
+        module='m',
+        steps=[step_one, step_two],
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
+    index = build_term_scenario_index(rd)
+    assert index[TermId('guest')] == [NodeId('test::a')]  # dedup across steps
+    assert index[TermId('room')] == [NodeId('test::a')]  # scenario narration counts

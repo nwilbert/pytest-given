@@ -5,6 +5,7 @@ Helpers exposed:
   - `build_story_rollups`        — per-story scenarios + per-activity rollup
   - `build_scenario_activity_index` — per-scenario sorted activity ids
   - `build_glossary_aggregations` — per-term instance/form/story aggregations
+  - `build_term_scenario_index`  — per-term scenario ids
   - `tab_visibility`             — which top-level tabs should be visible
 """
 
@@ -282,3 +283,31 @@ def _record_story_ref(
     if ref_key not in seen_story_refs:
         seen_story_refs.add(ref_key)
         agg.stories.append(story_id)
+
+
+# ---------------------------------------------------------------------------
+# Term-scenario index
+# ---------------------------------------------------------------------------
+
+
+def build_term_scenario_index(report: ReportData) -> dict[TermId, list[NodeId]]:
+    """For each glossary term, the scenarios whose narration or steps reference
+    it. Scenario render order is preserved; each scenario appears at most once
+    per term. Terms never referenced are absent; no glossary → empty."""
+    if report.glossary is None:
+        return {}
+    index: dict[TermId, list[NodeId]] = {}
+    for scenario in report.scenarios:
+        seen: set[TermId] = set()
+        narrations = [scenario.narration] + [
+            step.narration for _, step in walk_steps(scenario.steps)
+        ]
+        for narration in narrations:
+            for part in narration.parts:
+                if not isinstance(part, NarrationTermRef):
+                    continue
+                if part.term_id in seen:
+                    continue
+                seen.add(part.term_id)
+                index.setdefault(part.term_id, []).append(scenario.id)
+    return index
