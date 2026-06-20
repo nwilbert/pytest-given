@@ -295,13 +295,17 @@
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
             <div class="header-title">{{ story.title }}</div>
             <div class="header-context">{{ story.activities | length }} activities · {{ total_scns }} scenario{{ 's' if total_scns != 1 else '' }}</div>
+            <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
+                    @click="clearActivityHighlights()">Clear highlights ×</button>
           </div>
         </div>
         <div class="activity-timeline">
           {% for activity in story.activities %}
           {% set cov = rollup.per_activity[activity.id] %}
-          <div class="activity-row" id="activity-{{ story.id }}-{{ activity.id }}">
-            <div class="activity-num">{{ activity.id }}</div>
+          <div class="activity-row" id="activity-{{ story.id }}-{{ activity.id }}"
+               :class="{ 'activity-row-highlight': highlightedActivities['{{ activity.id }}'] }">
+            <div class="activity-num" data-activity-id="{{ activity.id }}"
+                 :class="{ 'activity-num-highlight': highlightedActivities['{{ activity.id }}'] }">{{ activity.id }}</div>
             <div class="activity-body">
               {% for path in activity.paths %}
               <div class="activity-path">
@@ -352,7 +356,8 @@
             <div class="scn-act-strip">
               <span class="scn-act-label">Covers:</span>
               {% for act_id in scn_covers.get(scn.id, []) %}
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-{{ story.id }}-{{ act_id }}').scrollIntoView({behavior:'smooth'})">{{ act_id }}</a>
+              <span class="use-chip" data-activity-id="{{ act_id }}"
+                    :class="{ 'use-chip-highlight': highlightedActivities['{{ act_id }}'] }">{{ act_id }}</span>
               {% endfor %}
             </div>
             {% endif %}

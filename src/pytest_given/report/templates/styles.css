@@ -859,3 +859,8 @@ span.param-highlight {
   opacity: 0.7;
 }
 .filter-chip-x:hover { opacity: 1; }
+
+/* === Activity highlighting (multi-select) === */
+.activity-row-highlight { background: var(--color-skip-bg); }
+.activity-num-highlight,
+.use-chip-highlight { outline: 2px solid var(--color-skipped); outline-offset: 1px; }

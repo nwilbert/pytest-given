@@ -43,6 +43,17 @@ function reportApp() {
     expandedScenarios: {},
     activeTag: null,
     termFilter: null,
+    highlightedActivities: {},
+    get anyActivitiesHighlighted() {
+      return Object.keys(this.highlightedActivities).length > 0;
+    },
+    toggleActivityHighlight(id) {
+      if (this.highlightedActivities[id]) delete this.highlightedActivities[id];
+      else this.highlightedActivities[id] = true;
+    },
+    clearActivityHighlights() {
+      this.highlightedActivities = {};
+    },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
     },
@@ -204,12 +215,18 @@ function reportApp() {
       });
       this.$watch('mainView', () => this._writeHash());
       this.$watch('selectedStory', () => this._writeHash());
+      this.$watch('selectedStory', () => { this.highlightedActivities = {}; });
       window.addEventListener('hashchange', () => this._readHash());
       document.addEventListener('click', (event) => {
         const pill = event.target.closest('[data-term-id]');
         if (!pill) return;
         if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
         this.goToTerm(pill.dataset.termId);
+      });
+      document.addEventListener('click', (event) => {
+        const chip = event.target.closest('[data-activity-id]');
+        if (!chip) return;
+        this.toggleActivityHighlight(chip.dataset.activityId);
       });
     },
     _readHash() {

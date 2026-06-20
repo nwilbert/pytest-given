@@ -867,6 +867,11 @@ span.param-highlight {
 }
 .filter-chip-x:hover { opacity: 1; }
 
+/* === Activity highlighting (multi-select) === */
+.activity-row-highlight { background: var(--color-skip-bg); }
+.activity-num-highlight,
+.use-chip-highlight { outline: 2px solid var(--color-skipped); outline-offset: 1px; }
+
 </style>
 </head>
 <body x-data="reportApp()">
@@ -999,7 +1004,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L127">examples/test_hotel_booking.py:127</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L127">examples/test_hotel_booking.py:127</a></div>
       
     </div>
     </div>
@@ -1049,7 +1054,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L141">examples/test_hotel_booking.py:141</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L141">examples/test_hotel_booking.py:141</a></div>
       
     </div>
     </div>
@@ -1069,7 +1074,7 @@ span.param-highlight {
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">92ms</span>
+        <span class="scenario-duration">91ms</span>
       </span>
     </div>
 
@@ -1243,7 +1248,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L177">examples/test_hotel_booking.py:177</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L177">examples/test_hotel_booking.py:177</a></div>
       
     </div>
     </div>
@@ -1278,13 +1283,17 @@ span.param-highlight {
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
             <div class="header-title">Book a Group Trip</div>
             <div class="header-context">7 activities · 3 scenarios</div>
+            <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
+                    @click="clearActivityHighlights()">Clear highlights ×</button>
           </div>
         </div>
         <div class="activity-timeline">
           
           
-          <div class="activity-row" id="activity-book-a-group-trip-1">
-            <div class="activity-num">1</div>
+          <div class="activity-row" id="activity-book-a-group-trip-1"
+               :class="{ 'activity-row-highlight': highlightedActivities['1'] }">
+            <div class="activity-num" data-activity-id="1"
+                 :class="{ 'activity-num-highlight': highlightedActivities['1'] }">1</div>
             <div class="activity-body">
               
               <div class="activity-path">
@@ -1315,8 +1324,10 @@ span.param-highlight {
           </div>
           
           
-          <div class="activity-row" id="activity-book-a-group-trip-2">
-            <div class="activity-num">2</div>
+          <div class="activity-row" id="activity-book-a-group-trip-2"
+               :class="{ 'activity-row-highlight': highlightedActivities['2'] }">
+            <div class="activity-num" data-activity-id="2"
+                 :class="{ 'activity-num-highlight': highlightedActivities['2'] }">2</div>
             <div class="activity-body">
               
               <div class="activity-path">
@@ -1353,8 +1364,10 @@ span.param-highlight {
           </div>
           
           
-          <div class="activity-row" id="activity-book-a-group-trip-3">
-            <div class="activity-num">3</div>
+          <div class="activity-row" id="activity-book-a-group-trip-3"
+               :class="{ 'activity-row-highlight': highlightedActivities['3'] }">
+            <div class="activity-num" data-activity-id="3"
+                 :class="{ 'activity-num-highlight': highlightedActivities['3'] }">3</div>
             <div class="activity-body">
               
               <div class="activity-path">
@@ -1395,8 +1408,10 @@ span.param-highlight {
           </div>
           
           
-          <div class="activity-row" id="activity-book-a-group-trip-4">
-            <div class="activity-num">4</div>
+          <div class="activity-row" id="activity-book-a-group-trip-4"
+               :class="{ 'activity-row-highlight': highlightedActivities['4'] }">
+            <div class="activity-num" data-activity-id="4"
+                 :class="{ 'activity-num-highlight': highlightedActivities['4'] }">4</div>
             <div class="activity-body">
               
               <div class="activity-path">
@@ -1433,8 +1448,10 @@ span.param-highlight {
           </div>
           
           
-          <div class="activity-row" id="activity-book-a-group-trip-5">
-            <div class="activity-num">5</div>
+          <div class="activity-row" id="activity-book-a-group-trip-5"
+               :class="{ 'activity-row-highlight': highlightedActivities['5'] }">
+            <div class="activity-num" data-activity-id="5"
+                 :class="{ 'activity-num-highlight': highlightedActivities['5'] }">5</div>
             <div class="activity-body">
               
               <div class="activity-path">
@@ -1465,8 +1482,10 @@ span.param-highlight {
           </div>
           
           
-          <div class="activity-row" id="activity-book-a-group-trip-6">
-            <div class="activity-num">6</div>
+          <div class="activity-row" id="activity-book-a-group-trip-6"
+               :class="{ 'activity-row-highlight': highlightedActivities['6'] }">
+            <div class="activity-num" data-activity-id="6"
+                 :class="{ 'activity-num-highlight': highlightedActivities['6'] }">6</div>
             <div class="activity-body">
               
               <div class="activity-path">
@@ -1501,8 +1520,10 @@ span.param-highlight {
           </div>
           
           
-          <div class="activity-row" id="activity-book-a-group-trip-7">
-            <div class="activity-num">7</div>
+          <div class="activity-row" id="activity-book-a-group-trip-7"
+               :class="{ 'activity-row-highlight': highlightedActivities['7'] }">
+            <div class="activity-num" data-activity-id="7"
+                 :class="{ 'activity-num-highlight': highlightedActivities['7'] }">7</div>
             <div class="activity-body">
               
               <div class="activity-path">
@@ -1545,9 +1566,11 @@ span.param-highlight {
             <div class="scn-act-strip">
               <span class="scn-act-label">Covers:</span>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-1').scrollIntoView({behavior:'smooth'})">1</a>
+              <span class="use-chip" data-activity-id="1"
+                    :class="{ 'use-chip-highlight': highlightedActivities['1'] }">1</span>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-2').scrollIntoView({behavior:'smooth'})">2</a>
+              <span class="use-chip" data-activity-id="2"
+                    :class="{ 'use-chip-highlight': highlightedActivities['2'] }">2</span>
               
             </div>
             
@@ -1569,15 +1592,20 @@ span.param-highlight {
             <div class="scn-act-strip">
               <span class="scn-act-label">Covers:</span>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-2').scrollIntoView({behavior:'smooth'})">2</a>
+              <span class="use-chip" data-activity-id="2"
+                    :class="{ 'use-chip-highlight': highlightedActivities['2'] }">2</span>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-3').scrollIntoView({behavior:'smooth'})">3</a>
+              <span class="use-chip" data-activity-id="3"
+                    :class="{ 'use-chip-highlight': highlightedActivities['3'] }">3</span>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-4').scrollIntoView({behavior:'smooth'})">4</a>
+              <span class="use-chip" data-activity-id="4"
+                    :class="{ 'use-chip-highlight': highlightedActivities['4'] }">4</span>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-5').scrollIntoView({behavior:'smooth'})">5</a>
+              <span class="use-chip" data-activity-id="5"
+                    :class="{ 'use-chip-highlight': highlightedActivities['5'] }">5</span>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-6').scrollIntoView({behavior:'smooth'})">6</a>
+              <span class="use-chip" data-activity-id="6"
+                    :class="{ 'use-chip-highlight': highlightedActivities['6'] }">6</span>
               
             </div>
             
@@ -1599,9 +1627,11 @@ span.param-highlight {
             <div class="scn-act-strip">
               <span class="scn-act-label">Covers:</span>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-3').scrollIntoView({behavior:'smooth'})">3</a>
+              <span class="use-chip" data-activity-id="3"
+                    :class="{ 'use-chip-highlight': highlightedActivities['3'] }">3</span>
               
-              <a class="use-chip" href="#" @click.prevent="$el.closest('#view-stories').querySelector('#activity-book-a-group-trip-4').scrollIntoView({behavior:'smooth'})">4</a>
+              <span class="use-chip" data-activity-id="4"
+                    :class="{ 'use-chip-highlight': highlightedActivities['4'] }">4</span>
               
             </div>
             
@@ -1609,7 +1639,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L72">examples/test_hotel_booking.py:72</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L72">examples/test_hotel_booking.py:72</a></div>
         
       </div>
       
@@ -1729,7 +1759,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L46">examples/test_hotel_booking.py:46</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L46">examples/test_hotel_booking.py:46</a></div>
                 
               </div>
             </div>
@@ -1788,7 +1818,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L49">examples/test_hotel_booking.py:49</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L49">examples/test_hotel_booking.py:49</a></div>
                 
               </div>
             </div>
@@ -1838,7 +1868,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L50">examples/test_hotel_booking.py:50</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L50">examples/test_hotel_booking.py:50</a></div>
                 
               </div>
             </div>
@@ -1906,7 +1936,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L54">examples/test_hotel_booking.py:54</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L54">examples/test_hotel_booking.py:54</a></div>
                 
               </div>
             </div>
@@ -1956,7 +1986,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L55">examples/test_hotel_booking.py:55</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L55">examples/test_hotel_booking.py:55</a></div>
                 
               </div>
             </div>
@@ -2006,7 +2036,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L56">examples/test_hotel_booking.py:56</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L56">examples/test_hotel_booking.py:56</a></div>
                 
               </div>
             </div>
@@ -2056,7 +2086,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L57">examples/test_hotel_booking.py:57</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L57">examples/test_hotel_booking.py:57</a></div>
                 
               </div>
             </div>
@@ -2124,7 +2154,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L61">examples/test_hotel_booking.py:61</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L61">examples/test_hotel_booking.py:61</a></div>
                 
               </div>
             </div>
@@ -2181,7 +2211,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L62">examples/test_hotel_booking.py:62</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L62">examples/test_hotel_booking.py:62</a></div>
                 
               </div>
             </div>
@@ -2238,7 +2268,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L63">examples/test_hotel_booking.py:63</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L63">examples/test_hotel_booking.py:63</a></div>
                 
               </div>
             </div>
@@ -2295,7 +2325,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L64">examples/test_hotel_booking.py:64</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L64">examples/test_hotel_booking.py:64</a></div>
                 
               </div>
             </div>
@@ -2352,7 +2382,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L65">examples/test_hotel_booking.py:65</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L65">examples/test_hotel_booking.py:65</a></div>
                 
               </div>
             </div>
@@ -2409,7 +2439,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L66">examples/test_hotel_booking.py:66</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L66">examples/test_hotel_booking.py:66</a></div>
                 
               </div>
             </div>
@@ -2448,7 +2478,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f207387a6273fd9cfab094d9b62f4c5eac2fffdc/examples/test_hotel_booking.py#L69">examples/test_hotel_booking.py:69</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_hotel_booking.py#L69">examples/test_hotel_booking.py:69</a></div>
                 
               </div>
             </div>
@@ -2469,10 +2499,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-20T09:54:15.285091+00:00",
+    "timestamp": "2026-06-20T10:03:00.063702+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "f207387a6273fd9cfab094d9b62f4c5eac2fffdc"
+    "commit_sha": "fc98e8c67210885ad23958b919b8f1ad179eb5b8"
   },
   "scenarios": [
     {
@@ -2995,7 +3025,7 @@ window.__REPORT_DATA__ = {
       "module": "test_hotel_booking",
       "tags": [],
       "status": "failed",
-      "duration_ms": 92,
+      "duration_ms": 91,
       "steps": [
         {
           "phase": "given",
@@ -3849,6 +3879,17 @@ function reportApp() {
     expandedScenarios: {},
     activeTag: null,
     termFilter: null,
+    highlightedActivities: {},
+    get anyActivitiesHighlighted() {
+      return Object.keys(this.highlightedActivities).length > 0;
+    },
+    toggleActivityHighlight(id) {
+      if (this.highlightedActivities[id]) delete this.highlightedActivities[id];
+      else this.highlightedActivities[id] = true;
+    },
+    clearActivityHighlights() {
+      this.highlightedActivities = {};
+    },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
     },
@@ -4010,12 +4051,18 @@ function reportApp() {
       });
       this.$watch('mainView', () => this._writeHash());
       this.$watch('selectedStory', () => this._writeHash());
+      this.$watch('selectedStory', () => { this.highlightedActivities = {}; });
       window.addEventListener('hashchange', () => this._readHash());
       document.addEventListener('click', (event) => {
         const pill = event.target.closest('[data-term-id]');
         if (!pill) return;
         if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
         this.goToTerm(pill.dataset.termId);
+      });
+      document.addEventListener('click', (event) => {
+        const chip = event.target.closest('[data-activity-id]');
+        if (!chip) return;
+        this.toggleActivityHighlight(chip.dataset.activityId);
       });
     },
     _readHash() {
