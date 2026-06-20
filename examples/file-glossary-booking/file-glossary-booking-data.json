@@ -1,14 +1,14 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-20T14:49:01.216975+00:00",
+    "timestamp": "2026-06-20T15:19:40.652353+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "febb86d6d31d7eff50c61dc28508e5acc4f0a743"
+    "commit_sha": "fa33a87528fd68a8f986160c5c8afce5ebbb3c76"
   },
   "scenarios": [
     {
-      "id": "examples/test_file_glossary_booking.py::test_book_available_room",
+      "id": "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room",
       "narration": {
         "text": "Guest books an available room",
         "parts": []
@@ -151,14 +151,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_file_glossary_booking.py",
+        "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
         "line": 46
       },
       "story_id": "book-a-room",
       "activity_ids": []
     },
     {
-      "id": "examples/test_file_glossary_booking.py::test_book_unavailable_room",
+      "id": "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room",
       "narration": {
         "text": "Guest cannot book an unavailable room",
         "parts": []
@@ -289,7 +289,7 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_file_glossary_booking.py",
+        "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
         "line": 61
       },
       "story_id": "book-a-room",
@@ -304,7 +304,7 @@
         "canonical": "Guest",
         "definition": "A person making a room reservation.",
         "source": {
-          "relpath": "examples/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
           "line": 7
         }
       },
@@ -314,7 +314,7 @@
         "canonical": "Book",
         "definition": "Reserve a room for a given stay.",
         "source": {
-          "relpath": "examples/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
           "line": 8
         }
       },
@@ -324,7 +324,7 @@
         "canonical": "Room",
         "definition": "A bookable hotel room.",
         "source": {
-          "relpath": "examples/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
           "line": 9
         }
       },
@@ -334,7 +334,7 @@
         "canonical": "Confirmation",
         "definition": "A notification acknowledging a successful reservation.",
         "source": {
-          "relpath": "examples/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
           "line": 10
         }
       },
@@ -344,7 +344,7 @@
         "canonical": "Cancellation Policy",
         "definition": "The rules governing how and when a booking may be cancelled.",
         "source": {
-          "relpath": "examples/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
           "line": 11
         }
       },
@@ -354,7 +354,7 @@
         "canonical": "Overbooking",
         "definition": "Accepting more reservations than there are rooms available.",
         "source": {
-          "relpath": "examples/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
           "line": 12
         }
       }
@@ -409,7 +409,7 @@
         }
       ],
       "source": {
-        "relpath": "examples/test_file_glossary_booking.py",
+        "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
         "line": 37
       }
     }

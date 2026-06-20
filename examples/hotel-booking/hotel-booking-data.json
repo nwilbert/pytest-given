@@ -1,14 +1,14 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-20T14:49:00.883220+00:00",
+    "timestamp": "2026-06-20T15:19:40.322335+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "febb86d6d31d7eff50c61dc28508e5acc4f0a743"
+    "commit_sha": "fa33a87528fd68a8f986160c5c8afce5ebbb3c76"
   },
   "scenarios": [
     {
-      "id": "examples/test_hotel_booking.py::test_pick_suite",
+      "id": "examples/hotel-booking/test_hotel_booking.py::test_pick_suite",
       "narration": {
         "text": "Carol picks a suite for the group",
         "parts": []
@@ -180,14 +180,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_hotel_booking.py",
+        "relpath": "examples/hotel-booking/test_hotel_booking.py",
         "line": 155
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
     },
     {
-      "id": "examples/test_hotel_booking.py::test_complete_booking",
+      "id": "examples/hotel-booking/test_hotel_booking.py::test_complete_booking",
       "narration": {
         "text": "Carol completes the booking for both guests",
         "parts": []
@@ -512,14 +512,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_hotel_booking.py",
+        "relpath": "examples/hotel-booking/test_hotel_booking.py",
         "line": 169
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
     },
     {
-      "id": "examples/test_hotel_booking.py::test_cancel_booking",
+      "id": "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking",
       "narration": {
         "text": "Alice cancels her booking and is refunded",
         "parts": []
@@ -727,14 +727,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_hotel_booking.py",
+        "relpath": "examples/hotel-booking/test_hotel_booking.py",
         "line": 249
       },
       "story_id": "cancel-a-booking",
       "activity_ids": []
     },
     {
-      "id": "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]",
+      "id": "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]",
       "narration": {
         "text": "Payment is declined \u2014 the booking is not finalized",
         "parts": []
@@ -1155,7 +1155,7 @@
                   "is_internal": true
                 },
                 {
-                  "path": "examples/test_hotel_booking.py",
+                  "path": "examples/hotel-booking/test_hotel_booking.py",
                   "lineno": 239,
                   "func": "test_payment_declined",
                   "code": "    assert payment_method in SUPPORTED_PAYMENT_METHODS",
@@ -1170,7 +1170,7 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_hotel_booking.py",
+        "relpath": "examples/hotel-booking/test_hotel_booking.py",
         "line": 205
       },
       "story_id": "book-a-group-trip",
@@ -1185,7 +1185,7 @@
         "canonical": "Organizer",
         "definition": "Person booking accommodation on behalf of a group.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 52
         }
       },
@@ -1195,7 +1195,7 @@
         "canonical": "Guest",
         "definition": "Individual traveler in the group.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 55
         }
       },
@@ -1205,7 +1205,7 @@
         "canonical": "Booking System",
         "definition": "Automated reservation back-end.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 56
         }
       },
@@ -1215,7 +1215,7 @@
         "canonical": "Room",
         "definition": "A bookable hotel room.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 60
         }
       },
@@ -1225,7 +1225,7 @@
         "canonical": "Booking",
         "definition": "A reservation for one or more rooms.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 61
         }
       },
@@ -1235,7 +1235,7 @@
         "canonical": "Payment",
         "definition": "Money transferred for a booking.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 62
         }
       },
@@ -1245,7 +1245,7 @@
         "canonical": "Confirmation",
         "definition": "Notification of a successful booking.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 63
         }
       },
@@ -1255,7 +1255,7 @@
         "canonical": "search",
         "definition": "Look up available options.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 67
         }
       },
@@ -1265,7 +1265,7 @@
         "canonical": "select",
         "definition": "Choose one option from a set.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 68
         }
       },
@@ -1275,7 +1275,7 @@
         "canonical": "add",
         "definition": "Attach a member to a collection.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 69
         }
       },
@@ -1285,7 +1285,7 @@
         "canonical": "submit",
         "definition": "Send to the system for processing.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 70
         }
       },
@@ -1295,7 +1295,7 @@
         "canonical": "confirm",
         "definition": "Finalize and acknowledge.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 71
         }
       },
@@ -1305,7 +1305,7 @@
         "canonical": "send",
         "definition": "Deliver to a recipient.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 72
         }
       },
@@ -1315,7 +1315,7 @@
         "canonical": "reject",
         "definition": "Refuse to process or accept.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 75
         }
       },
@@ -1325,7 +1325,7 @@
         "canonical": "cancel",
         "definition": "Withdraw a booking before arrival.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 77
         }
       },
@@ -1335,7 +1335,7 @@
         "canonical": "refund",
         "definition": "Return money for a cancelled booking.",
         "source": {
-          "relpath": "examples/test_hotel_booking.py",
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 78
         }
       }
@@ -1562,7 +1562,7 @@
         }
       ],
       "source": {
-        "relpath": "examples/test_hotel_booking.py",
+        "relpath": "examples/hotel-booking/test_hotel_booking.py",
         "line": 81
       }
     },
@@ -1649,7 +1649,7 @@
         }
       ],
       "source": {
-        "relpath": "examples/test_hotel_booking.py",
+        "relpath": "examples/hotel-booking/test_hotel_booking.py",
         "line": 121
       }
     }

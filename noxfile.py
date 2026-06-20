@@ -107,16 +107,16 @@ def examples(session: nox.Session) -> None:
     """Regenerate coffeeshop, hotel-booking, and file-glossary-booking reports."""
     _sync(session, 'test', include_project=True)
     for test_file, slug in [
-        ('examples/test_coffeeshop.py', 'coffeeshop'),
-        ('examples/test_hotel_booking.py', 'hotel-booking'),
-        ('examples/test_file_glossary_booking.py', 'file-glossary-booking'),
+        ('examples/coffeeshop/test_coffeeshop.py', 'coffeeshop'),
+        ('examples/hotel-booking/test_hotel_booking.py', 'hotel-booking'),
+        ('examples/file-glossary-booking/test_file_glossary_booking.py', 'file-glossary-booking'),
     ]:
         session.run(
             'pytest',
             test_file,
-            f'--given-json=examples/{slug}-data.json',
+            f'--given-json=examples/{slug}/{slug}-data.json',
             '--given-html',
-            f'--given-html-output=examples/{slug}.html',
+            f'--given-html-output=examples/{slug}/{slug}.html',
             '--given-source-link=github',
             '--tb=no',
             '--no-header',

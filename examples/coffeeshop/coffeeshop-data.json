@@ -1,14 +1,14 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-20T14:49:00.458531+00:00",
+    "timestamp": "2026-06-20T15:19:39.898317+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "febb86d6d31d7eff50c61dc28508e5acc4f0a743"
+    "commit_sha": "fa33a87528fd68a8f986160c5c8afce5ebbb3c76"
   },
   "scenarios": [
     {
-      "id": "examples/test_coffeeshop.py::test_buy_coffee",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_buy_coffee",
       "narration": {
         "text": "Basic scenario with when/then and a JSON attachment",
         "parts": []
@@ -71,14 +71,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_coffeeshop.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 20
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "examples/test_coffeeshop.py::test_text_attachment",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_text_attachment",
       "narration": {
         "text": "Plain text attachment",
         "parts": []
@@ -140,14 +140,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_coffeeshop.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 32
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "examples/test_coffeeshop.py::test_generator_fixture",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_generator_fixture",
       "narration": {
         "text": "Generator fixture with teardown",
         "parts": []
@@ -201,14 +201,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_coffeeshop.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 40
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "examples/test_coffeeshop.py::test_neutral_highlight",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight",
       "narration": {
         "text": "T-string with a non-parametrize value (neutral highlight)",
         "parts": []
@@ -298,14 +298,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_coffeeshop.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 61
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "examples/test_coffeeshop.py::test_buy_with_validation",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation",
       "narration": {
         "text": "Helper functions can record their own steps",
         "parts": []
@@ -435,14 +435,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_coffeeshop.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 100
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "examples/test_coffeeshop.py::test_complex_order",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_complex_order",
       "narration": {
         "text": "Top-level `given` block and deeply nested steps",
         "parts": []
@@ -631,14 +631,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_coffeeshop.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 113
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "examples/test_coffeeshop.py::test_failing",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_failing",
       "narration": {
         "text": "Failure rendering (intentionally failing)",
         "parts": []
@@ -646,7 +646,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 88,
+      "duration_ms": 86,
       "steps": [
         {
           "phase": "given",
@@ -771,7 +771,7 @@
             "is_internal": true
           },
           {
-            "path": "examples/test_coffeeshop.py",
+            "path": "examples/coffeeshop/test_coffeeshop.py",
             "lineno": 143,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
@@ -782,14 +782,14 @@
       },
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_coffeeshop.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 140
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "examples/test_coffeeshop.py::test_skipped",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_skipped",
       "narration": {
         "text": "Skipped scenario rendering",
         "parts": []
@@ -797,7 +797,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 27,
+      "duration_ms": 25,
       "steps": [],
       "parameters": null,
       "error": {
@@ -871,14 +871,14 @@
       },
       "skip_reason": "demonstrates skipped status",
       "source": {
-        "relpath": "examples/test_coffeeshop.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 146
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "examples/test_coffeeshop.py::test_pricing[1-False]",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]",
       "narration": {
         "text": "Parameterized test (renders as a parameter table)",
         "parts": []
@@ -983,14 +983,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_coffeeshop.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 49
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "examples/test_coffeeshop.py::test_brew[200]",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_brew[200]",
       "narration": {
         "text": "Brew {cup_size} ml (templated scenario name)",
         "parts": [
@@ -1090,14 +1090,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_coffeeshop.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 71
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "examples/test_coffeeshop.py::test_parametrized_all_skipped[1]",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]",
       "narration": {
         "text": "All cases skipped",
         "parts": []
@@ -1105,7 +1105,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 52,
+      "duration_ms": 51,
       "steps": [],
       "parameters": {
         "names": [
@@ -1267,7 +1267,7 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_coffeeshop.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 153
       },
       "story_id": null,
