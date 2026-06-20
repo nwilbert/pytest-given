@@ -42,6 +42,7 @@ function reportApp() {
     expandedAttachments: {},
     expandedScenarios: {},
     activeTag: null,
+    termFilter: null,
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
     },
@@ -57,6 +58,7 @@ function reportApp() {
     get filterSummary() {
       const parts = [];
       if (this.activeTag) parts.push('Tag: ' + this.activeTag);
+      if (this.termFilter) parts.push('Term: ' + this.termFilter);
       const hasStatus = (s) => data.scenarios.some(sc => sc.status === s);
       const allShown = (this.showPassed || !hasStatus('passed'))
         && (this.showFailed || !hasStatus('failed'))
@@ -106,6 +108,10 @@ function reportApp() {
       if (s.status === 'failed' && !this.showFailed) return false;
       if (s.status === 'skipped' && !this.showSkipped) return false;
       if (this.activeTag && !s.tags.includes(this.activeTag)) return false;
+      if (this.termFilter &&
+          !(window.__termScenarios[this.termFilter] || []).includes(s.id)) {
+        return false;
+      }
       if (this.search) {
         const q = this.search.toLowerCase();
         const text = (s.narration.text + ' ' + s.tags.join(' ')).toLowerCase();
@@ -151,6 +157,25 @@ function reportApp() {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     },
+    goToScenario(nodeId) {
+      this.mainView = 'scenarios';
+      this.$nextTick(() => this.scrollToAndExpand(nodeId));
+    },
+    goToTerm(id) {
+      this.mainView = 'glossary';
+      this.expandedTerms[id] = true;
+      this.$nextTick(() => {
+        const el = document.getElementById('term-' + id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    },
+    filterScenariosByTerm(id) {
+      this.termFilter = id;
+      this.mainView = 'scenarios';
+    },
+    clearTermFilter() {
+      this.termFilter = null;
+    },
     filterByTag(tag) {
       if (this.activeTag === tag) {
         this.activeTag = null;
@@ -174,7 +199,7 @@ function reportApp() {
     },
     init() {
       this._readHash();
-      ['search', 'activeTag', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+      ['search', 'activeTag', 'termFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
         this.$watch(key, () => this._writeHash());
       });
       this.$watch('mainView', () => this._writeHash());
@@ -185,6 +210,8 @@ function reportApp() {
       const params = parseHash();
       if (params.has('tag')) this.activeTag = params.get('tag');
       else this.activeTag = null;
+      if (params.has('term-filter')) this.termFilter = params.get('term-filter');
+      else this.termFilter = null;
       if (params.has('status')) {
         const shown = new Set(params.get('status').split(',').filter(Boolean));
         this.showPassed = shown.has('passed');
@@ -199,12 +226,23 @@ function reportApp() {
       else this.search = '';
       this.mainView = deserializeView(params);
       this.selectedStory = deserializeStory(params);
+      const targetScenario = params.get('scenario');
+      const targetTerm = params.get('term');
+      if (targetTerm) {
+        this.goToTerm(targetTerm);
+      } else if (targetScenario) {
+        this.goToScenario(targetScenario);
+      }
+      if (targetScenario || targetTerm) {
+        this.$nextTick(() => this._writeHash());  // _writeHash omits one-shot params
+      }
     },
     _writeHash() {
       const params = new URLSearchParams();
       if (this.mainView !== 'scenarios') params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
       if (this.activeTag) params.set('tag', this.activeTag);
+      if (this.termFilter) params.set('term-filter', this.termFilter);
 
       const present = new Set(data.scenarios.map(s => s.status));
       const shown = [];

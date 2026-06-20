@@ -830,3 +830,30 @@ span.param-highlight {
   white-space: nowrap;
 }
 .refs-fixture { font-size: var(--font-size-sm); color: var(--text-muted); }
+
+/* === Term filter chip (active term filter displayed in Scenarios header) === */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: var(--color-accent-bg);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  padding: 2px 8px 2px 10px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.filter-chip-x {
+  background: none;
+  border: none;
+  padding: 0 0 0 2px;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1;
+  color: var(--color-accent);
+  cursor: pointer;
+  opacity: 0.7;
+}
+.filter-chip-x:hover { opacity: 1; }

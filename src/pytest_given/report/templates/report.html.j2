@@ -166,6 +166,10 @@
     <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
       <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
       <div class="header-context" x-text="filterSummary"></div>
+      <span class="filter-chip" x-show="termFilter" x-cloak>
+        Term: <span x-text="termFilter"></span>
+        <button type="button" class="filter-chip-x" @click="clearTermFilter()" aria-label="Clear term filter">×</button>
+      </span>
       <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
     </div>
   </div>
