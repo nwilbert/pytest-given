@@ -175,6 +175,7 @@
   <div class="scenario {{ scenario.status }}"
        x-show="isVisible({{ loop.index0 }})"
        :id="'scenario-' + {{ loop.index0 }}"
+       data-scenario-id="{{ scenario.id }}"
        :class="{ 'scenario-expanded': expandedScenarios[{{ loop.index0 }}] }">
     <div class="scenario-header{% if not has_body %} scenario-header-empty{% endif %}"{% if has_body %} @click="toggleScenario({{ loop.index0 }})"{% endif %}>
       <div style="display:flex; align-items:center;">
@@ -494,6 +495,7 @@
 window.__REPORT_DATA__ = {{ report_json }};
 window.__storyIds = {{ story_ids_json }};
 window.__termIds = {{ term_ids_json }};
+window.__termScenarios = {{ term_scenarios_json }};
 {{ app_js }}
 </script>
 <script>{{ alpine_js }}</script>

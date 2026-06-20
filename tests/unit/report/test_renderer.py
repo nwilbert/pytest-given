@@ -1265,6 +1265,66 @@ def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
     assert 'Book a Room' in content
 
 
+def test_render_emits_term_scenario_index_global(tmp_path: Path) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'glossary': {
+                    'terms': [
+                        {
+                            'id': 'guest',
+                            'kind': 'actor',
+                            'canonical': 'Guest',
+                            'definition': '',
+                            'source': None,
+                        },
+                    ],
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_x',
+                        'narration': _narration('My Scenario'),
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 1,
+                        'steps': [
+                            {
+                                'phase': 'when',
+                                'narration': _narration(
+                                    'a',
+                                    [
+                                        {'term_id': 'guest', 'display': 'Guest'},
+                                    ],
+                                ),
+                                'status': 'passed',
+                                'children': [],
+                                'attachments': [],
+                                'error': None,
+                            }
+                        ],
+                        'parameters': None,
+                        'error': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert '__termScenarios' in content
+    assert 'test.py::test_x' in content
+    assert 'data-scenario-id="test.py::test_x"' in content
+
+
 def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
     """The full pipeline — typed ReportData → report_to_dict → JSON → renderer
     — must preserve the Glossary so term refs render as kind pills, not as

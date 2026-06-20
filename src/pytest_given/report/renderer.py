@@ -25,6 +25,7 @@ from .aggregations import (
     build_glossary_aggregations,
     build_scenario_activity_index,
     build_story_rollups,
+    build_term_scenario_index,
     tab_visibility,
 )
 from .source_link import format_source_link
@@ -87,6 +88,7 @@ def render_html(
             else []
         )
     )
+    term_scenarios_json = Markup(json.dumps(build_term_scenario_index(report)))
 
     env.filters['narration'] = _make_narration_filter(
         param_color_map,
@@ -107,6 +109,7 @@ def render_html(
         report_json=Markup(safe_report_json),
         story_ids_json=story_ids_json,
         term_ids_json=term_ids_json,
+        term_scenarios_json=term_scenarios_json,
         css=Markup(css),
         app_js=Markup(app_js),
         alpine_js=Markup(alpine_js),
