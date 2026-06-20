@@ -867,7 +867,7 @@ span.param-highlight {
 /* selected activity's timeline row: light-blue card (same tint as scenarios) */
 .activity-row-highlight { background: var(--color-accent-bg); }
 /* action bubbles: white when unselected, solid blue when selected */
-.scn-act-strip .use-chip { background: var(--bg-card); }
+.scn-act-strip .use-chip:not(.use-chip-highlight) { background: var(--bg-card); }
 .activity-num-highlight,
 .activity-num-highlight:hover,
 .use-chip-highlight,
