@@ -146,7 +146,7 @@
         <template x-for="group in groups" :key="group.name">
           <div>
             <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
-              <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
+              <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.name] }"></span>
               <span class="nav-group-name" x-text="group.name"></span>
               <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
               <span class="nav-group-count" x-text="group.scenarios.length"></span>
@@ -175,7 +175,10 @@
         Term: <span x-text="termFilter"></span>
         <button type="button" class="filter-chip-x" @click="clearTermFilter()" aria-label="Clear term filter">×</button>
       </span>
-      <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
+      <button class="collapse-all-btn" @click="toggleAllScenarios()">
+        <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
+        <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
+      </button>
     </div>
   </div>
 
@@ -438,8 +441,10 @@
             {{ verb_count }} verb{{ 's' if verb_count != 1 else '' }}{% if kindless_count %} ·
             {{ kindless_count }} other{% endif %}
           </div>
-          <button class="collapse-all-btn" @click="toggleAllTerms()"
-                  x-text="anyTermsExpanded ? 'Collapse all references ↑' : 'Expand all references ↓'"></button>
+          <button class="collapse-all-btn" @click="toggleAllTerms()">
+            <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
+            <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
+          </button>
         </div>
       </div>
 

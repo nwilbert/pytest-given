@@ -181,7 +181,19 @@ body {
   align-items: center;
   color: var(--text-primary);
 }
-.nav-group-toggle { color: var(--text-muted); width: 14px; display: inline-block; flex-shrink: 0; }
+.nav-group-toggle {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  color: var(--text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  margin-right: 6px;
+}
+.nav-group-toggle-open { transform: rotate(45deg); }
 .nav-group-name { font-weight: 500; }
 .nav-group-active { background: var(--color-accent); color: #fff; border-radius: var(--radius-sm); padding-left: var(--space-xs); padding-right: var(--space-xs); }
 .nav-group-active .nav-group-toggle,
@@ -238,8 +250,23 @@ body {
   color: var(--text-secondary);
   cursor: pointer;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .collapse-all-btn:hover { background: var(--bg-page); border-color: var(--color-accent); color: var(--color-accent); }
+.collapse-chevron {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+  margin-bottom: 1px;
+}
+.collapse-chevron-up { transform: rotate(-135deg); margin-bottom: -2px; }
 
 /* === Scenario Cards === */
 .scenario {
@@ -960,7 +987,7 @@ span.param-highlight {
         <template x-for="group in groups" :key="group.name">
           <div>
             <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
-              <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
+              <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.name] }"></span>
               <span class="nav-group-name" x-text="group.name"></span>
               <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
               <span class="nav-group-count" x-text="group.scenarios.length"></span>
@@ -989,7 +1016,10 @@ span.param-highlight {
         Term: <span x-text="termFilter"></span>
         <button type="button" class="filter-chip-x" @click="clearTermFilter()" aria-label="Clear term filter">×</button>
       </span>
-      <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
+      <button class="collapse-all-btn" @click="toggleAllScenarios()">
+        <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
+        <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
+      </button>
     </div>
   </div>
 
@@ -1032,7 +1062,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_file_glossary_booking.py#L46">examples/test_file_glossary_booking.py:46</a></div>
+      <div class="scenario-source"><span>examples/test_file_glossary_booking.py:46</span></div>
       
     </div>
     </div>
@@ -1076,7 +1106,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_file_glossary_booking.py#L61">examples/test_file_glossary_booking.py:61</a></div>
+      <div class="scenario-source"><span>examples/test_file_glossary_booking.py:61</span></div>
       
     </div>
     </div>
@@ -1235,7 +1265,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_file_glossary_booking.py#L37">examples/test_file_glossary_booking.py:37</a></div>
+        <div class="scenario-source"><span>examples/test_file_glossary_booking.py:37</span></div>
         
       </div>
       
@@ -1301,8 +1331,10 @@ span.param-highlight {
             1 verb ·
             2 other
           </div>
-          <button class="collapse-all-btn" @click="toggleAllTerms()"
-                  x-text="anyTermsExpanded ? 'Collapse all references ↑' : 'Expand all references ↓'"></button>
+          <button class="collapse-all-btn" @click="toggleAllTerms()">
+            <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
+            <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
+          </button>
         </div>
       </div>
 
@@ -1364,7 +1396,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L7">examples/file-glossary-booking.md:7</a></div>
+                <div class="scenario-source"><span>examples/file-glossary-booking.md:7</span></div>
                 
               </div>
             </div>
@@ -1431,7 +1463,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L9">examples/file-glossary-booking.md:9</a></div>
+                <div class="scenario-source"><span>examples/file-glossary-booking.md:9</span></div>
                 
               </div>
             </div>
@@ -1483,7 +1515,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L10">examples/file-glossary-booking.md:10</a></div>
+                <div class="scenario-source"><span>examples/file-glossary-booking.md:10</span></div>
                 
               </div>
             </div>
@@ -1559,7 +1591,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L8">examples/file-glossary-booking.md:8</a></div>
+                <div class="scenario-source"><span>examples/file-glossary-booking.md:8</span></div>
                 
               </div>
             </div>
@@ -1615,7 +1647,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L11">examples/file-glossary-booking.md:11</a></div>
+                <div class="scenario-source"><span>examples/file-glossary-booking.md:11</span></div>
                 
               </div>
             </div>
@@ -1649,7 +1681,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L12">examples/file-glossary-booking.md:12</a></div>
+                <div class="scenario-source"><span>examples/file-glossary-booking.md:12</span></div>
                 
               </div>
             </div>
