@@ -181,7 +181,19 @@ body {
   align-items: center;
   color: var(--text-primary);
 }
-.nav-group-toggle { color: var(--text-muted); width: 14px; display: inline-block; flex-shrink: 0; }
+.nav-group-toggle {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  color: var(--text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  margin-right: 6px;
+}
+.nav-group-toggle-open { transform: rotate(45deg); }
 .nav-group-name { font-weight: 500; }
 .nav-group-active { background: var(--color-accent); color: #fff; border-radius: var(--radius-sm); padding-left: var(--space-xs); padding-right: var(--space-xs); }
 .nav-group-active .nav-group-toggle,
@@ -238,8 +250,23 @@ body {
   color: var(--text-secondary);
   cursor: pointer;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .collapse-all-btn:hover { background: var(--bg-page); border-color: var(--color-accent); color: var(--color-accent); }
+.collapse-chevron {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+  margin-bottom: 1px;
+}
+.collapse-chevron-up { transform: rotate(-135deg); margin-bottom: -2px; }
 
 /* === Scenario Cards === */
 .scenario {
@@ -960,7 +987,7 @@ span.param-highlight {
         <template x-for="group in groups" :key="group.name">
           <div>
             <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
-              <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
+              <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.name] }"></span>
               <span class="nav-group-name" x-text="group.name"></span>
               <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
               <span class="nav-group-count" x-text="group.scenarios.length"></span>
@@ -989,7 +1016,10 @@ span.param-highlight {
         Term: <span x-text="termFilter"></span>
         <button type="button" class="filter-chip-x" @click="clearTermFilter()" aria-label="Clear term filter">×</button>
       </span>
-      <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
+      <button class="collapse-all-btn" @click="toggleAllScenarios()">
+        <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
+        <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
+      </button>
     </div>
   </div>
 
@@ -1003,7 +1033,7 @@ span.param-highlight {
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span>
         <span class="scenario-name">Carol picks a suite for the group</span>
         
-        <button type="button" class="anchor-link" title="Copy link to this"
+        <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=examples/test_hotel_booking.py::test_pick_suite', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
@@ -1034,7 +1064,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L155">examples/test_hotel_booking.py:155</a></div>
+      <div class="scenario-source"><span>examples/test_hotel_booking.py:155</span></div>
       
     </div>
     </div>
@@ -1049,7 +1079,7 @@ span.param-highlight {
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span>
         <span class="scenario-name">Carol completes the booking for both guests</span>
         
-        <button type="button" class="anchor-link" title="Copy link to this"
+        <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=examples/test_hotel_booking.py::test_complete_booking', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
@@ -1086,7 +1116,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L169">examples/test_hotel_booking.py:169</a></div>
+      <div class="scenario-source"><span>examples/test_hotel_booking.py:169</span></div>
       
     </div>
     </div>
@@ -1101,7 +1131,7 @@ span.param-highlight {
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span>
         <span class="scenario-name">Alice cancels her booking and is refunded</span>
         
-        <button type="button" class="anchor-link" title="Copy link to this"
+        <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=examples/test_hotel_booking.py::test_cancel_booking', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
@@ -1132,7 +1162,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L249">examples/test_hotel_booking.py:249</a></div>
+      <div class="scenario-source"><span>examples/test_hotel_booking.py:249</span></div>
       
     </div>
     </div>
@@ -1147,7 +1177,7 @@ span.param-highlight {
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span>
         <span class="scenario-name">Payment is declined — the booking is not finalized</span>
         
-        <button type="button" class="anchor-link" title="Copy link to this"
+        <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
@@ -1328,7 +1358,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L205">examples/test_hotel_booking.py:205</a></div>
+      <div class="scenario-source"><span>examples/test_hotel_booking.py:205</span></div>
       
     </div>
     </div>
@@ -1368,7 +1398,7 @@ span.param-highlight {
         
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-            <div class="header-title">Book a Group Trip<button type="button" class="anchor-link" title="Copy link to this"
+            <div class="header-title">Book a Group Trip<button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=stories&amp;story=book-a-group-trip', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></div>
             <div class="header-context">7 activities · 3 scenarios</div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
@@ -1730,7 +1760,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L81">examples/test_hotel_booking.py:81</a></div>
+        <div class="scenario-source"><span>examples/test_hotel_booking.py:81</span></div>
         
       </div>
       
@@ -1740,7 +1770,7 @@ span.param-highlight {
         
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-            <div class="header-title">Cancel a Booking<button type="button" class="anchor-link" title="Copy link to this"
+            <div class="header-title">Cancel a Booking<button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=stories&amp;story=cancel-a-booking', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></div>
             <div class="header-context">3 activities · 1 scenario</div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
@@ -1874,7 +1904,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L121">examples/test_hotel_booking.py:121</a></div>
+        <div class="scenario-source"><span>examples/test_hotel_booking.py:121</span></div>
         
       </div>
       
@@ -1932,8 +1962,10 @@ span.param-highlight {
             4 work objects ·
             9 verbs
           </div>
-          <button class="collapse-all-btn" @click="toggleAllTerms()"
-                  x-text="anyTermsExpanded ? 'Collapse all references ↑' : 'Expand all references ↓'"></button>
+          <button class="collapse-all-btn" @click="toggleAllTerms()">
+            <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
+            <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
+          </button>
         </div>
       </div>
 
@@ -1946,7 +1978,7 @@ span.param-highlight {
         <div class="kind-header">
           <span class="kind-title term-actor">Actors</span>
           <span class="kind-meta">3 terms</span>
-          <button type="button" class="anchor-link" title="Copy link to this"
+          <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
         </div>
         
@@ -1969,7 +2001,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=organizer', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['organizer'] }">
@@ -2002,7 +2034,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L52">examples/test_hotel_booking.py:52</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:52</span></div>
                 
               </div>
             </div>
@@ -2028,7 +2060,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=guest', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['guest'] }">
@@ -2065,7 +2097,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L55">examples/test_hotel_booking.py:55</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:55</span></div>
                 
               </div>
             </div>
@@ -2091,7 +2123,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=booking-system', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['booking-system'] }">
@@ -2119,7 +2151,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L56">examples/test_hotel_booking.py:56</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:56</span></div>
                 
               </div>
             </div>
@@ -2137,7 +2169,7 @@ span.param-highlight {
         <div class="kind-header">
           <span class="kind-title term-obj">Work Objects</span>
           <span class="kind-meta">4 terms</span>
-          <button type="button" class="anchor-link" title="Copy link to this"
+          <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
         </div>
         
@@ -2160,7 +2192,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=room', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['room'] }">
@@ -2193,7 +2225,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L60">examples/test_hotel_booking.py:60</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:60</span></div>
                 
               </div>
             </div>
@@ -2219,7 +2251,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=booking', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['booking'] }">
@@ -2247,7 +2279,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L61">examples/test_hotel_booking.py:61</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:61</span></div>
                 
               </div>
             </div>
@@ -2273,7 +2305,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=payment', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['payment'] }">
@@ -2301,7 +2333,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L62">examples/test_hotel_booking.py:62</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:62</span></div>
                 
               </div>
             </div>
@@ -2327,7 +2359,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=confirmation', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['confirmation'] }">
@@ -2355,7 +2387,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L63">examples/test_hotel_booking.py:63</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:63</span></div>
                 
               </div>
             </div>
@@ -2373,7 +2405,7 @@ span.param-highlight {
         <div class="kind-header">
           <span class="kind-title term-verb">Verbs</span>
           <span class="kind-meta">9 terms</span>
-          <button type="button" class="anchor-link" title="Copy link to this"
+          <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
         </div>
         
@@ -2396,7 +2428,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=search', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['search'] }">
@@ -2429,7 +2461,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L67">examples/test_hotel_booking.py:67</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:67</span></div>
                 
               </div>
             </div>
@@ -2455,7 +2487,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=select', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['select'] }">
@@ -2488,7 +2520,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L68">examples/test_hotel_booking.py:68</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:68</span></div>
                 
               </div>
             </div>
@@ -2514,7 +2546,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=add', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['add'] }">
@@ -2547,7 +2579,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L69">examples/test_hotel_booking.py:69</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:69</span></div>
                 
               </div>
             </div>
@@ -2573,7 +2605,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=submit', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['submit'] }">
@@ -2606,7 +2638,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L70">examples/test_hotel_booking.py:70</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:70</span></div>
                 
               </div>
             </div>
@@ -2632,7 +2664,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=confirm', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['confirm'] }">
@@ -2665,7 +2697,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L71">examples/test_hotel_booking.py:71</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:71</span></div>
                 
               </div>
             </div>
@@ -2691,7 +2723,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=send', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['send'] }">
@@ -2726,7 +2758,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L72">examples/test_hotel_booking.py:72</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:72</span></div>
                 
               </div>
             </div>
@@ -2748,7 +2780,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=reject', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['reject'] }">
@@ -2767,7 +2799,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L75">examples/test_hotel_booking.py:75</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:75</span></div>
                 
               </div>
             </div>
@@ -2793,7 +2825,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=cancel', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['cancel'] }">
@@ -2826,7 +2858,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L77">examples/test_hotel_booking.py:77</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:77</span></div>
                 
               </div>
             </div>
@@ -2852,7 +2884,7 @@ span.param-highlight {
                 
               </div>
             </div>
-            <button type="button" class="anchor-link" title="Copy link to this"
+            <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=glossary&amp;term=refund', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['refund'] }">
@@ -2885,7 +2917,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_hotel_booking.py#L78">examples/test_hotel_booking.py:78</a></div>
+                <div class="scenario-source"><span>examples/test_hotel_booking.py:78</span></div>
                 
               </div>
             </div>
