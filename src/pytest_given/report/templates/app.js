@@ -69,7 +69,6 @@ function reportApp() {
     get filterSummary() {
       const parts = [];
       if (this.activeTag) parts.push('Tag: ' + this.activeTag);
-      if (this.termFilter) parts.push('Term: ' + this.termFilter);
       const hasStatus = (s) => data.scenarios.some(sc => sc.status === s);
       const allShown = (this.showPassed || !hasStatus('passed'))
         && (this.showFailed || !hasStatus('failed'))
@@ -82,7 +81,10 @@ function reportApp() {
         if (shown.length) parts.push(shown.join(', '));
       }
       if (this.search) parts.push('"' + this.search + '"');
-      return parts.length ? parts.join(' · ') : 'All Scenarios';
+      // The term filter is shown as its own removable chip, so it isn't
+      // repeated here; suppress the "All Scenarios" fallback while it's active.
+      if (parts.length) return parts.join(' · ');
+      return this.termFilter ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
@@ -224,12 +226,16 @@ function reportApp() {
       this.$watch('selectedStory', () => this._writeHash());
       this.$watch('selectedStory', () => { this.highlightedActivities = {}; });
       window.addEventListener('hashchange', () => this._readHash());
+      // Capture phase + stopPropagation so a term pill inside a clickable
+      // container (e.g. a scenario header) navigates without also triggering
+      // that container's click (scenario expand/collapse).
       document.addEventListener('click', (event) => {
         const pill = event.target.closest('[data-term-id]');
         if (!pill) return;
         if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
+        event.stopPropagation();
         this.goToTerm(pill.dataset.termId);
-      });
+      }, true);
       document.addEventListener('click', (event) => {
         const chip = event.target.closest('[data-activity-id]');
         if (!chip) return;
