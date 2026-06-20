@@ -3,9 +3,15 @@ function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
 }
 
-function serializeHash(params) {
-  const s = params.toString();
-  history.replaceState(null, '', s ? '#' + s : window.location.pathname);
+function serializeHash(params, mode = 'push') {
+  const qs = params.toString();
+  const newHash = qs ? '#' + qs : '';
+  // No-op when the hash is unchanged: avoids spurious history entries and
+  // breaks the readHash -> watcher -> writeHash feedback loop.
+  if (newHash === window.location.hash) return;
+  const url = qs ? '#' + qs : window.location.pathname + window.location.search;
+  if (mode === 'replace') history.replaceState(null, '', url);
+  else history.pushState(null, '', url);
 }
 
 function deserializeView(params) {
@@ -43,6 +49,7 @@ function reportApp() {
     expandedScenarios: {},
     activeTag: null,
     termFilter: null,
+    _suppressHashWrite: false,
     highlightedActivities: {},
     get anyActivitiesHighlighted() {
       return Object.keys(this.highlightedActivities).length > 0;
@@ -225,13 +232,19 @@ function reportApp() {
     },
     init() {
       this._readHash();
-      ['search', 'activeTag', 'termFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
-        this.$watch(key, () => this._writeHash());
+      // Search typing replaces the current entry (no per-keystroke history
+      // spam); discrete navigations/filters push a back-able entry. All writes
+      // are suppressed while we're applying state FROM the hash (see _readHash).
+      this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
+      ['activeTag', 'termFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+        this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
-      this.$watch('mainView', () => this._writeHash());
-      this.$watch('selectedStory', () => this._writeHash());
+      this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      this.$watch('selectedStory', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       this.$watch('selectedStory', () => { this.highlightedActivities = {}; });
+      // hashchange: manual URL edits / pasted links. popstate: back/forward.
       window.addEventListener('hashchange', () => this._readHash());
+      window.addEventListener('popstate', () => this._readHash());
       // Capture phase + stopPropagation so a term pill inside a clickable
       // container (e.g. a scenario header) navigates without also triggering
       // that container's click (scenario expand/collapse).
@@ -249,6 +262,9 @@ function reportApp() {
       });
     },
     _readHash() {
+      // Applying state from the hash must not itself write the hash (which
+      // would create bogus history entries on back/forward).
+      this._suppressHashWrite = true;
       const params = parseHash();
       if (params.has('tag')) this.activeTag = params.get('tag');
       else this.activeTag = null;
@@ -275,11 +291,13 @@ function reportApp() {
       } else if (targetScenario) {
         this.goToScenario(targetScenario);
       }
-      if (targetScenario || targetTerm) {
-        this.$nextTick(() => this._writeHash());  // _writeHash omits one-shot params
-      }
+      this.$nextTick(() => {
+        this._suppressHashWrite = false;
+        // Drop one-shot target params (scenario=/term=) without adding history.
+        if (targetScenario || targetTerm) this._writeHash('replace');
+      });
     },
-    _writeHash() {
+    _writeHash(mode = 'push') {
       const params = new URLSearchParams();
       if (this.mainView !== 'scenarios') params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
@@ -298,7 +316,7 @@ function reportApp() {
       }
 
       if (this.search) params.set('q', this.search);
-      serializeHash(params);
+      serializeHash(params, mode);
     },
   };
 }
