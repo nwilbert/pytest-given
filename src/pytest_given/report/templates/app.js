@@ -199,6 +199,13 @@ function reportApp() {
       if (this.expandedAttachments[key]) delete this.expandedAttachments[key];
       else this.expandedAttachments[key] = true;
     },
+    copyAnchor(hashString, event) {
+      history.replaceState(null, '', '#' + hashString);
+      if (navigator.clipboard) navigator.clipboard.writeText(window.location.href);
+      const btn = event.currentTarget;
+      btn.classList.add('anchor-copied');
+      setTimeout(() => btn.classList.remove('anchor-copied'), 1200);
+    },
     setHoverParam(name, el) {
       const scope = el?.closest('.scenario') || document;
       scope.querySelectorAll('.param-highlight').forEach(e => e.classList.remove('param-highlight'));

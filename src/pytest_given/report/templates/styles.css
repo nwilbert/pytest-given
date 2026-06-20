@@ -644,6 +644,11 @@ span.param-highlight {
   color: var(--color-accent);
   border-bottom-color: var(--color-accent);
 }
+.nav-tab-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
 
 /* === Story layout === */
 .story-sidebar-item {
@@ -864,3 +869,17 @@ span.param-highlight {
 .activity-row-highlight { background: var(--color-skip-bg); }
 .activity-num-highlight,
 .use-chip-highlight { outline: 2px solid var(--color-skipped); outline-offset: 1px; }
+
+/* === Anchor link affordance === */
+.anchor-link {
+  opacity: 0; border: none; background: none; cursor: pointer;
+  color: var(--text-muted); padding: 0 var(--space-xs);
+  font-size: 0.9em;
+}
+.scenario-header:hover .anchor-link,
+.entry-head:hover .anchor-link,
+.kind-header:hover .anchor-link,
+.header:hover .anchor-link,
+.nav-tab-wrap:hover .anchor-link { opacity: 0.6; }
+.anchor-link:hover { opacity: 1 !important; }
+.anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-passed); }

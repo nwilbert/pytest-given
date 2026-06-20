@@ -23,6 +23,11 @@
     {%- endif -%}
   {%- endmacro -%}
 
+  {%- macro anchor_link(hash) -%}
+    <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('{{ hash }}', $event)" aria-label="Copy link">#</button>
+  {%- endmacro -%}
+
   {%- macro render_error(error) -%}
     {%- set internal_count = error.frames | selectattr('is_internal') | list | length -%}
     <div class="error-block"{% if internal_count %} x-data="{ showInternal: false }"{% endif %}>
@@ -94,18 +99,24 @@
   {% set visible_count = (tab_visibility.scenarios|int) + (tab_visibility.stories|int) + (tab_visibility.glossary|int) %}
   {% if visible_count > 1 %}
   <nav class="frame-nav" role="tablist">
-    <button class="nav-tab" role="tab"
-            :class="{ 'nav-tab-active': mainView === 'scenarios' }"
-            @click="mainView = 'scenarios'">Scenarios</button>
+    <span class="nav-tab-wrap">
+      <button class="nav-tab" role="tab"
+              :class="{ 'nav-tab-active': mainView === 'scenarios' }"
+              @click="mainView = 'scenarios'">Scenarios</button>{{ anchor_link('view=scenarios') }}
+    </span>
     {% if tab_visibility.stories %}
-    <button class="nav-tab" role="tab"
-            :class="{ 'nav-tab-active': mainView === 'stories' }"
-            @click="mainView = 'stories'">Stories</button>
+    <span class="nav-tab-wrap">
+      <button class="nav-tab" role="tab"
+              :class="{ 'nav-tab-active': mainView === 'stories' }"
+              @click="mainView = 'stories'">Stories</button>{{ anchor_link('view=stories') }}
+    </span>
     {% endif %}
     {% if tab_visibility.glossary %}
-    <button class="nav-tab" role="tab"
-            :class="{ 'nav-tab-active': mainView === 'glossary' }"
-            @click="mainView = 'glossary'">Glossary</button>
+    <span class="nav-tab-wrap">
+      <button class="nav-tab" role="tab"
+              :class="{ 'nav-tab-active': mainView === 'glossary' }"
+              @click="mainView = 'glossary'">Glossary</button>{{ anchor_link('view=glossary') }}
+    </span>
     {% endif %}
   </nav>
   {% endif %}
@@ -188,6 +199,7 @@
         {% for tag in scenario.tags %}
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
         {% endfor %}
+        {{ anchor_link('scenario=' ~ scenario.id) }}
       </div>
       <span class="scenario-meta">
         <span class="scenario-status {{ scenario.status }}">
@@ -293,7 +305,7 @@
         {% set total_scns = story_scns | length %}
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-            <div class="header-title">{{ story.title }}</div>
+            <div class="header-title">{{ story.title }}{{ anchor_link('view=stories&story=' ~ story.id) }}</div>
             <div class="header-context">{{ story.activities | length }} activities · {{ total_scns }} scenario{{ 's' if total_scns != 1 else '' }}</div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
                     @click="clearActivityHighlights()">Clear highlights ×</button>
@@ -433,6 +445,7 @@
         <div class="kind-header">
           <span class="kind-title {{ kind_cls }}">{{ kind_label }}</span>
           <span class="kind-meta">{{ kind_terms | length }} term{{ 's' if kind_terms | length != 1 else '' }}</span>
+          {{ anchor_link('view=glossary') }}
         </div>
         {% for term in kind_terms %}
         {% set agg = glossary_aggregations.get(term.id) %}
@@ -454,6 +467,7 @@
                 {% endif %}
               </div>
             </div>
+            {{ anchor_link('view=glossary&term=' ~ term.id) }}
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['{{ term.id }}'] }">
             <div class="refs-inner scenario-body-inner">

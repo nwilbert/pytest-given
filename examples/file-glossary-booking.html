@@ -651,6 +651,11 @@ span.param-highlight {
   color: var(--color-accent);
   border-bottom-color: var(--color-accent);
 }
+.nav-tab-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
 
 /* === Story layout === */
 .story-sidebar-item {
@@ -872,6 +877,20 @@ span.param-highlight {
 .activity-num-highlight,
 .use-chip-highlight { outline: 2px solid var(--color-skipped); outline-offset: 1px; }
 
+/* === Anchor link affordance === */
+.anchor-link {
+  opacity: 0; border: none; background: none; cursor: pointer;
+  color: var(--text-muted); padding: 0 var(--space-xs);
+  font-size: 0.9em;
+}
+.scenario-header:hover .anchor-link,
+.entry-head:hover .anchor-link,
+.kind-header:hover .anchor-link,
+.header:hover .anchor-link,
+.nav-tab-wrap:hover .anchor-link { opacity: 0.6; }
+.anchor-link:hover { opacity: 1 !important; }
+.anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-passed); }
+
 </style>
 </head>
 <body x-data="reportApp()">
@@ -885,18 +904,27 @@ span.param-highlight {
   
   
   <nav class="frame-nav" role="tablist">
-    <button class="nav-tab" role="tab"
-            :class="{ 'nav-tab-active': mainView === 'scenarios' }"
-            @click="mainView = 'scenarios'">Scenarios</button>
+    <span class="nav-tab-wrap">
+      <button class="nav-tab" role="tab"
+              :class="{ 'nav-tab-active': mainView === 'scenarios' }"
+              @click="mainView = 'scenarios'">Scenarios</button><button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=scenarios', $event)" aria-label="Copy link">#</button>
+    </span>
     
-    <button class="nav-tab" role="tab"
-            :class="{ 'nav-tab-active': mainView === 'stories' }"
-            @click="mainView = 'stories'">Stories</button>
+    <span class="nav-tab-wrap">
+      <button class="nav-tab" role="tab"
+              :class="{ 'nav-tab-active': mainView === 'stories' }"
+              @click="mainView = 'stories'">Stories</button><button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=stories', $event)" aria-label="Copy link">#</button>
+    </span>
     
     
-    <button class="nav-tab" role="tab"
-            :class="{ 'nav-tab-active': mainView === 'glossary' }"
-            @click="mainView = 'glossary'">Glossary</button>
+    <span class="nav-tab-wrap">
+      <button class="nav-tab" role="tab"
+              :class="{ 'nav-tab-active': mainView === 'glossary' }"
+              @click="mainView = 'glossary'">Glossary</button><button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary', $event)" aria-label="Copy link">#</button>
+    </span>
     
   </nav>
   
@@ -975,6 +1003,8 @@ span.param-highlight {
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span>
         <span class="scenario-name">Guest books an available room</span>
         
+        <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('scenario=examples/test_file_glossary_booking.py::test_book_available_room', $event)" aria-label="Copy link">#</button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
@@ -1002,7 +1032,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_file_glossary_booking.py#L43">examples/test_file_glossary_booking.py:43</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/38cb0ba79bf5f319bd5276e66f9c1137f9135318/examples/test_file_glossary_booking.py#L43">examples/test_file_glossary_booking.py:43</a></div>
       
     </div>
     </div>
@@ -1017,6 +1047,8 @@ span.param-highlight {
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span>
         <span class="scenario-name">Guest cannot book an unavailable room</span>
         
+        <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('scenario=examples/test_file_glossary_booking.py::test_book_unavailable_room', $event)" aria-label="Copy link">#</button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
@@ -1044,7 +1076,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_file_glossary_booking.py#L58">examples/test_file_glossary_booking.py:58</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/38cb0ba79bf5f319bd5276e66f9c1137f9135318/examples/test_file_glossary_booking.py#L58">examples/test_file_glossary_booking.py:58</a></div>
       
     </div>
     </div>
@@ -1077,7 +1109,8 @@ span.param-highlight {
         
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-            <div class="header-title">Book a Room</div>
+            <div class="header-title">Book a Room<button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=stories&amp;story=book-a-room', $event)" aria-label="Copy link">#</button></div>
             <div class="header-context">2 activities · 2 scenarios</div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
                     @click="clearActivityHighlights()">Clear highlights ×</button>
@@ -1200,7 +1233,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/test_file_glossary_booking.py#L34">examples/test_file_glossary_booking.py:34</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/38cb0ba79bf5f319bd5276e66f9c1137f9135318/examples/test_file_glossary_booking.py#L34">examples/test_file_glossary_booking.py:34</a></div>
         
       </div>
       
@@ -1268,6 +1301,8 @@ span.param-highlight {
         <div class="kind-header">
           <span class="kind-title term-actor">Actors</span>
           <span class="kind-meta">1 term</span>
+          <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary', $event)" aria-label="Copy link">#</button>
         </div>
         
         
@@ -1289,6 +1324,8 @@ span.param-highlight {
                 
               </div>
             </div>
+            <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary&amp;term=guest', $event)" aria-label="Copy link">#</button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['guest'] }">
             <div class="refs-inner scenario-body-inner">
@@ -1313,7 +1350,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/file-glossary-booking.md#L7">examples/file-glossary-booking.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/38cb0ba79bf5f319bd5276e66f9c1137f9135318/examples/file-glossary-booking.md#L7">examples/file-glossary-booking.md:7</a></div>
                 
               </div>
             </div>
@@ -1329,6 +1366,8 @@ span.param-highlight {
         <div class="kind-header">
           <span class="kind-title term-obj">Work Objects</span>
           <span class="kind-meta">2 terms</span>
+          <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary', $event)" aria-label="Copy link">#</button>
         </div>
         
         
@@ -1350,6 +1389,8 @@ span.param-highlight {
                 
               </div>
             </div>
+            <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary&amp;term=room', $event)" aria-label="Copy link">#</button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['room'] }">
             <div class="refs-inner scenario-body-inner">
@@ -1374,7 +1415,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/file-glossary-booking.md#L9">examples/file-glossary-booking.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/38cb0ba79bf5f319bd5276e66f9c1137f9135318/examples/file-glossary-booking.md#L9">examples/file-glossary-booking.md:9</a></div>
                 
               </div>
             </div>
@@ -1400,6 +1441,8 @@ span.param-highlight {
                 
               </div>
             </div>
+            <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary&amp;term=confirmation', $event)" aria-label="Copy link">#</button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['confirmation'] }">
             <div class="refs-inner scenario-body-inner">
@@ -1424,7 +1467,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/file-glossary-booking.md#L10">examples/file-glossary-booking.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/38cb0ba79bf5f319bd5276e66f9c1137f9135318/examples/file-glossary-booking.md#L10">examples/file-glossary-booking.md:10</a></div>
                 
               </div>
             </div>
@@ -1440,6 +1483,8 @@ span.param-highlight {
         <div class="kind-header">
           <span class="kind-title term-verb">Verbs</span>
           <span class="kind-meta">1 term</span>
+          <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary', $event)" aria-label="Copy link">#</button>
         </div>
         
         
@@ -1461,6 +1506,8 @@ span.param-highlight {
                 
               </div>
             </div>
+            <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary&amp;term=book', $event)" aria-label="Copy link">#</button>
           </div>
           <div class="refs scenario-body" :class="{ expanded: expandedTerms['book'] }">
             <div class="refs-inner scenario-body-inner">
@@ -1494,7 +1541,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fc98e8c67210885ad23958b919b8f1ad179eb5b8/examples/file-glossary-booking.md#L8">examples/file-glossary-booking.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/38cb0ba79bf5f319bd5276e66f9c1137f9135318/examples/file-glossary-booking.md#L8">examples/file-glossary-booking.md:8</a></div>
                 
               </div>
             </div>
@@ -1515,10 +1562,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-20T10:03:00.411495+00:00",
+    "timestamp": "2026-06-20T13:50:39.185189+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "fc98e8c67210885ad23958b919b8f1ad179eb5b8"
+    "commit_sha": "38cb0ba79bf5f319bd5276e66f9c1137f9135318"
   },
   "scenarios": [
     {
@@ -2122,6 +2169,13 @@ function reportApp() {
     toggleAttachment(key) {
       if (this.expandedAttachments[key]) delete this.expandedAttachments[key];
       else this.expandedAttachments[key] = true;
+    },
+    copyAnchor(hashString, event) {
+      history.replaceState(null, '', '#' + hashString);
+      if (navigator.clipboard) navigator.clipboard.writeText(window.location.href);
+      const btn = event.currentTarget;
+      btn.classList.add('anchor-copied');
+      setTimeout(() => btn.classList.remove('anchor-copied'), 1200);
     },
     setHoverParam(name, el) {
       const scope = el?.closest('.scenario') || document;
