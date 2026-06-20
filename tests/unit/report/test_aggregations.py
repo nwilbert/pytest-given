@@ -16,9 +16,12 @@ from pytest_given.model import (
     StoryId,
     TermId,
 )
+import pytest
+
 from pytest_given.report.aggregations import (
     build_coverage_maps,
     build_glossary_aggregations,
+    build_scenario_slug_index,
     build_term_scenario_index,
     tab_visibility,
 )
@@ -520,3 +523,52 @@ def test_build_term_scenario_index_dedups_and_includes_scenario_narration() -> N
     index = build_term_scenario_index(rd)
     assert index[TermId('guest')] == [NodeId('test::a')]  # dedup across steps
     assert index[TermId('room')] == [NodeId('test::a')]  # scenario narration counts
+
+
+def _scn(node_id: str) -> Scenario:
+    return Scenario(
+        id=NodeId(node_id),
+        narration=Narration(text='s'),
+        module='m',
+    )
+
+
+def test_scenario_slug_strips_test_prefix_and_py_and_dir() -> None:
+    rd = ReportData(
+        metadata=_meta(),
+        scenarios=[_scn('examples/hotel-booking/test_hotel_booking.py::test_complete_booking')],
+    )
+    index = build_scenario_slug_index(rd)
+    assert index == {
+        NodeId('examples/hotel-booking/test_hotel_booking.py::test_complete_booking'):
+            'hotel_booking/complete_booking',
+    }
+
+
+def test_scenario_slug_keeps_parametrization_tail() -> None:
+    rd = ReportData(metadata=_meta(), scenarios=[_scn('pkg/test_pour.py::test_pour[water]')])
+    index = build_scenario_slug_index(rd)
+    assert index[NodeId('pkg/test_pour.py::test_pour[water]')] == 'pour/pour[water]'
+
+
+def test_scenario_slug_file_without_test_prefix_kept_verbatim() -> None:
+    rd = ReportData(metadata=_meta(), scenarios=[_scn('checks.py::test_run')])
+    index = build_scenario_slug_index(rd)
+    assert index[NodeId('checks.py::test_run')] == 'checks/run'
+
+
+def test_scenario_slug_empty_report_is_empty() -> None:
+    rd = ReportData(metadata=_meta())
+    assert build_scenario_slug_index(rd) == {}
+
+
+def test_scenario_slug_duplicate_basename_raises() -> None:
+    rd = ReportData(
+        metadata=_meta(),
+        scenarios=[
+            _scn('a/test_booking.py::test_make'),
+            _scn('b/test_booking.py::test_make'),
+        ],
+    )
+    with pytest.raises(ValueError, match='Duplicate scenario slug'):
+        build_scenario_slug_index(rd)

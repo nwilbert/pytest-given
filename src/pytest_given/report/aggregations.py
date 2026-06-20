@@ -6,6 +6,7 @@ Helpers exposed:
   - `build_scenario_activity_index` — per-scenario sorted activity ids
   - `build_glossary_aggregations` — per-term instance/form/story aggregations
   - `build_term_scenario_index`  — per-term scenario ids
+  - `build_scenario_slug_index` — per-scenario short URL-fragment slug
   - `tab_visibility`             — which top-level tabs should be visible
 """
 
@@ -311,3 +312,42 @@ def build_term_scenario_index(report: ReportData) -> dict[TermId, list[NodeId]]:
                 seen.add(part.term_id)
                 index.setdefault(part.term_id, []).append(scenario.id)
     return index
+
+
+# ---------------------------------------------------------------------------
+# Scenario slug index
+# ---------------------------------------------------------------------------
+
+
+def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
+    """Map each scenario's node id to a short, stable, readable slug for the
+    URL fragment (`#scenario=<slug>`).
+
+    Slug is `<file>/<func>` where the file is the node id's basename with `.py`
+    and a leading `test_` removed, and the func is the part after `::` with a
+    leading `test_` removed (a parametrization tail like `[water]` is kept). It
+    is a pure function of the node id, so it is stable across re-runs.
+
+    Raises ValueError if two scenarios produce the same slug — two test files
+    sharing a basename across directories — naming the colliding node ids.
+    """
+    slugs: dict[NodeId, str] = {}
+    node_by_slug: dict[str, NodeId] = {}
+    for scenario in report.scenarios:
+        slug = _scenario_slug(scenario.id)
+        existing = node_by_slug.get(slug)
+        if existing is not None:
+            raise ValueError(
+                f'Duplicate scenario slug {slug!r} from node ids '
+                f'{existing!r} and {scenario.id!r}; rename one test file so '
+                f'their basenames differ.'
+            )
+        node_by_slug[slug] = scenario.id
+        slugs[scenario.id] = slug
+    return slugs
+
+
+def _scenario_slug(node_id: NodeId) -> str:
+    file_part, _, func_part = node_id.partition('::')
+    basename = file_part.rsplit('/', 1)[-1].removesuffix('.py')
+    return f'{basename.removeprefix("test_")}/{func_part.removeprefix("test_")}'
