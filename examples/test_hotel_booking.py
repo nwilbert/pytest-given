@@ -24,6 +24,12 @@ Given/When/Then form:
 
 Activity 7 stays uncovered (drafts are excluded from implicit coverage), making
 visible the vocabulary the team still has to commit.
+
+A second, shorter Story — `Cancel a Booking` — shares the same glossary to
+exercise the multi-story parts of the report (Stories tab, story filter) and to
+show vocabulary reused across stories (Guest, Booking, Payment, Confirmation,
+Booking System, send). Its single scenario `test_cancel_booking` covers all
+three of its activities.
 """
 
 import pytest
@@ -67,6 +73,9 @@ send = g.verb('send', definition='Deliver to a recipient.')
 # `reject` is in the ubiquitous language but no Story activity uses it yet —
 # it surfaces in the Glossary tab and powers the error-path scenario.
 reject = g.verb('reject', definition='Refuse to process or accept.')
+# Vocabulary for the second Story — reused alongside `send` from the first.
+cancel = g.verb('cancel', definition='Withdraw a booking before arrival.')
+refund = g.verb('refund', definition='Return money for a cancelled booking.')
 
 
 book_a_group_trip = story(
@@ -101,6 +110,25 @@ book_a_group_trip = story(
             organizer('Carol'),
             draft.verb('redeems'),
             draft.work_object('loyalty points'),
+        ),
+    ],
+)
+
+
+# A short second Story sharing the same glossary — exercises the multi-story
+# parts of the report (Stories tab, story filter) and shows vocabulary reused
+# across stories (Guest, Booking, Payment, Confirmation, Booking System, send).
+cancel_a_booking = story(
+    'Cancel a Booking',
+    [
+        # Guest instance withdraws a booking made on their behalf.
+        activity(guest('Alice'), cancel('cancels'), booking),
+        # Two work objects joined by a preposition — the refund settles the
+        # payment for that booking.
+        activity(booking_system, refund('refunds'), payment, 'for', booking),
+        # Reuses the send/confirmation vocabulary from the first story.
+        activity(
+            booking_system, send('sends'), confirmation, 'to', guest('Alice')
         ),
     ],
 )
@@ -216,3 +244,31 @@ def test_payment_declined(carol, alice, bob, payment_method, decline_reason):
         t'to {guest("Alice")} or {guest("Bob")}'
     ):
         assert not booking_state['confirmed']
+
+
+@scenario('Alice cancels her booking and is refunded', story=cancel_a_booking)
+def test_cancel_booking(alice):
+    with given(t'{guest("Alice")} has a confirmed {booking} she paid for'):
+        booking_state = {
+            'guest': alice['name'],
+            'paid': True,
+            'cancelled': False,
+            'refunded': False,
+            'notified': [],
+        }
+    with when(t'{guest("Alice")} {cancel("cancels")} the {booking}'):
+        booking_state['cancelled'] = True
+    with then(
+        t'the {booking_system} {refund("refunds")} the {payment} '
+        t'for the {booking}'
+    ):
+        booking_state['refunded'] = (
+            booking_state['cancelled'] and booking_state['paid']
+        )
+        assert booking_state['refunded']
+    with then(
+        t'the {booking_system} {send("sends")} a {confirmation} '
+        t'to {guest("Alice")}'
+    ):
+        booking_state['notified'] = [alice['name']]
+        assert booking_state['notified'] == ['Alice']

@@ -1031,7 +1031,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L127">examples/test_hotel_booking.py:127</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L155">examples/test_hotel_booking.py:155</a></div>
       
     </div>
     </div>
@@ -1083,19 +1083,65 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L141">examples/test_hotel_booking.py:141</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L169">examples/test_hotel_booking.py:169</a></div>
+      
+    </div>
+    </div>
+  </div>
+  <div class="scenario passed"
+       x-show="isVisible(2)"
+       :id="'scenario-' + 2"
+       data-scenario-id="examples/test_hotel_booking.py::test_cancel_booking"
+       :class="{ 'scenario-expanded': expandedScenarios[2] }">
+    <div class="scenario-header" @click="toggleScenario(2)">
+      <div style="display:flex; align-items:center;">
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span>
+        <span class="scenario-name">Alice cancels her booking and is refunded</span>
+        
+        <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('scenario=examples/test_hotel_booking.py::test_cancel_booking', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+      </div>
+      <span class="scenario-meta">
+        <span class="scenario-status passed">
+          ✓ passed
+        </span>
+        <span class="scenario-duration">0ms</span>
+      </span>
+    </div>
+
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[2] }">
+    <div class="scenario-body-inner">
+      
+      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
+            <div class="step-text">our guest <span class="term-ref-actor term-ref--link" data-term-id="guest" title="Individual traveler in the group.">Alice</span></div>
+          </div><div class="phase-steps">
+            <div class="step-text"><span class="term-ref-actor term-ref--link" data-term-id="guest" title="Individual traveler in the group.">Alice</span> has a confirmed <span class="term-ref-object term-ref--link" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span> she paid for</div>
+          </div><div class="phase-label">When</div><div class="phase-steps">
+            <div class="step-text"><span class="term-ref-actor term-ref--link" data-term-id="guest" title="Individual traveler in the group.">Alice</span> <span class="term-ref-verb term-ref--link" data-term-id="cancel" title="Withdraw a booking before arrival.">cancels</span> the <span class="term-ref-object term-ref--link" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span></div>
+          </div><div class="phase-label">Then</div><div class="phase-steps">
+            <div class="step-text">the <span class="term-ref-actor term-ref--link" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span> <span class="term-ref-verb term-ref--link" data-term-id="refund" title="Return money for a cancelled booking.">refunds</span> the <span class="term-ref-object term-ref--link" data-term-id="payment" title="Money transferred for a booking.">Payment</span> for the <span class="term-ref-object term-ref--link" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span></div>
+          </div><div class="phase-steps">
+            <div class="step-text">the <span class="term-ref-actor term-ref--link" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span> <span class="term-ref-verb term-ref--link" data-term-id="send" title="Deliver to a recipient.">sends</span> a <span class="term-ref-object term-ref--link" data-term-id="confirmation" title="Notification of a successful booking.">Confirmation</span> to <span class="term-ref-actor term-ref--link" data-term-id="guest" title="Individual traveler in the group.">Alice</span></div>
+          </div></div>
+
+      
+
+      
+
+      
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L249">examples/test_hotel_booking.py:249</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario failed"
-       x-show="isVisible(2)"
-       :id="'scenario-' + 2"
+       x-show="isVisible(3)"
+       :id="'scenario-' + 3"
        data-scenario-id="examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"
-       :class="{ 'scenario-expanded': expandedScenarios[2] }">
-    <div class="scenario-header" @click="toggleScenario(2)">
+       :class="{ 'scenario-expanded': expandedScenarios[3] }">
+    <div class="scenario-header" @click="toggleScenario(3)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span>
+        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span>
         <span class="scenario-name">Payment is declined — the booking is not finalized</span>
         
         <button type="button" class="anchor-link" title="Copy link to this"
@@ -1105,11 +1151,11 @@ span.param-highlight {
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">90ms</span>
+        <span class="scenario-duration">88ms</span>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[2] }">
+    <div class="scenario-body" :class="{ expanded: expandedScenarios[3] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -1265,7 +1311,7 @@ span.param-highlight {
               <pre class="error-frame-code">    return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame">
-              <div class="error-frame-loc">examples/test_hotel_booking.py:211: in test_payment_declined</div>
+              <div class="error-frame-loc">examples/test_hotel_booking.py:239: in test_payment_declined</div>
               <pre class="error-frame-code">    assert payment_method in SUPPORTED_PAYMENT_METHODS</pre>
             </div></div><pre class="error-tail">E   AssertionError: assert &#39;gift card&#39; in {&#39;bank transfer&#39;, &#39;credit card&#39;, &#39;debit card&#39;}</pre></div>
             </td>
@@ -1279,7 +1325,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L177">examples/test_hotel_booking.py:177</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L205">examples/test_hotel_booking.py:205</a></div>
       
     </div>
     </div>
@@ -1301,6 +1347,13 @@ span.param-highlight {
            @click="selectedStory = 'book-a-group-trip'">
         <div class="story-sidebar-title">Book a Group Trip</div>
         <div class="story-sidebar-meta">7 activities · 3 scenarios</div>
+      </div>
+      
+      
+      <div class="story-sidebar-item" :class="{ active: selectedStory === 'cancel-a-booking' }"
+           @click="selectedStory = 'cancel-a-booking'">
+        <div class="story-sidebar-title">Cancel a Booking</div>
+        <div class="story-sidebar-meta">3 activities · 1 scenario</div>
       </div>
       
     </div>
@@ -1674,7 +1727,151 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L72">examples/test_hotel_booking.py:72</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L81">examples/test_hotel_booking.py:81</a></div>
+        
+      </div>
+      
+      <div x-show="selectedStory === 'cancel-a-booking'">
+        
+        
+        
+        <div class="header">
+          <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+            <div class="header-title">Cancel a Booking<button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=stories&amp;story=cancel-a-booking', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></div>
+            <div class="header-context">3 activities · 1 scenario</div>
+            <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
+                    @click="clearActivityHighlights()">Deselect</button>
+          </div>
+        </div>
+        <div class="activity-timeline">
+          
+          
+          <div class="activity-row" id="activity-cancel-a-booking-1"
+               :class="{ 'activity-row-highlight': highlightedActivities['1'] }">
+            <div class="activity-num" data-activity-id="1"
+                 :class="{ 'activity-num-highlight': highlightedActivities['1'] }">1</div>
+            <div class="activity-body">
+              
+              <div class="activity-path">
+                <span class="term-ref-actor term-ref--link" data-term-id="guest" title="Individual traveler in the group.">Alice</span><span class="term-ref-verb term-ref--link" data-term-id="cancel" title="Withdraw a booking before arrival.">cancels</span><span class="term-ref-object term-ref--link" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span>
+              </div>
+              
+            </div>
+            <div class="activity-cov">
+              
+              <span class="cov-chip cov-passed">1/1</span>
+              
+            </div>
+            <div class="activity-badges">
+              
+              
+              <a class="use-chip use-chip-passed"
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_cancel_booking'))">
+                <span class="dot-passed">✓</span>
+                Alice cancels her booking...
+              </a>
+              
+              
+            </div>
+          </div>
+          
+          
+          <div class="activity-row" id="activity-cancel-a-booking-2"
+               :class="{ 'activity-row-highlight': highlightedActivities['2'] }">
+            <div class="activity-num" data-activity-id="2"
+                 :class="{ 'activity-num-highlight': highlightedActivities['2'] }">2</div>
+            <div class="activity-body">
+              
+              <div class="activity-path">
+                <span class="term-ref-actor term-ref--link" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span><span class="term-ref-verb term-ref--link" data-term-id="refund" title="Return money for a cancelled booking.">refunds</span><span class="term-ref-object term-ref--link" data-term-id="payment" title="Money transferred for a booking.">Payment</span><span class="activity-word">for</span><span class="term-ref-object term-ref--link" data-term-id="booking" title="A reservation for one or more rooms.">Booking</span>
+              </div>
+              
+            </div>
+            <div class="activity-cov">
+              
+              <span class="cov-chip cov-passed">1/1</span>
+              
+            </div>
+            <div class="activity-badges">
+              
+              
+              <a class="use-chip use-chip-passed"
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_cancel_booking'))">
+                <span class="dot-passed">✓</span>
+                Alice cancels her booking...
+              </a>
+              
+              
+            </div>
+          </div>
+          
+          
+          <div class="activity-row" id="activity-cancel-a-booking-3"
+               :class="{ 'activity-row-highlight': highlightedActivities['3'] }">
+            <div class="activity-num" data-activity-id="3"
+                 :class="{ 'activity-num-highlight': highlightedActivities['3'] }">3</div>
+            <div class="activity-body">
+              
+              <div class="activity-path">
+                <span class="term-ref-actor term-ref--link" data-term-id="booking-system" title="Automated reservation back-end.">Booking System</span><span class="term-ref-verb term-ref--link" data-term-id="send" title="Deliver to a recipient.">sends</span><span class="term-ref-object term-ref--link" data-term-id="confirmation" title="Notification of a successful booking.">Confirmation</span><span class="activity-word">to</span><span class="term-ref-actor term-ref--link" data-term-id="guest" title="Individual traveler in the group.">Alice</span>
+              </div>
+              
+            </div>
+            <div class="activity-cov">
+              
+              <span class="cov-chip cov-passed">1/1</span>
+              
+            </div>
+            <div class="activity-badges">
+              
+              
+              <a class="use-chip use-chip-passed"
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/test_hotel_booking.py::test_cancel_booking'))">
+                <span class="dot-passed">✓</span>
+                Alice cancels her booking...
+              </a>
+              
+              
+            </div>
+          </div>
+          
+        </div>
+        <div class="scn-act-strip-section">
+          
+          <div class="scenario passed" style="margin-bottom: var(--space-sm);"
+               x-show="activitySelectionMatches([1, 2, 3])">
+            <div class="scenario-header scenario-header-empty">
+              <div style="display:flex; align-items:center;">
+                <span class="scenario-chevron-placeholder"></span>
+                <span class="scenario-name">Alice cancels her booking and is refunded</span>
+              </div>
+              <span class="scenario-meta">
+                <span class="scenario-status passed">
+                  ✓ passed
+                </span>
+              </span>
+            </div>
+            
+            <div class="scn-act-strip">
+              <span class="scn-act-label">Covers:</span>
+              
+              <span class="use-chip" data-activity-id="1"
+                    :class="{ 'use-chip-highlight': highlightedActivities['1'] }">1</span>
+              
+              <span class="use-chip" data-activity-id="2"
+                    :class="{ 'use-chip-highlight': highlightedActivities['2'] }">2</span>
+              
+              <span class="use-chip" data-activity-id="3"
+                    :class="{ 'use-chip-highlight': highlightedActivities['3'] }">3</span>
+              
+            </div>
+            
+          </div>
+          
+        </div>
+        
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L121">examples/test_hotel_booking.py:121</a></div>
         
       </div>
       
@@ -1715,7 +1912,7 @@ span.param-highlight {
           <input type="checkbox" x-model="glossaryKindFilter.verb">
           <span class="kind-swatch kind-swatch-verb"></span>
           <span>Verbs</span>
-          <span class="nav-group-count">7</span>
+          <span class="nav-group-count">9</span>
         </label>
       </div>
     </div>
@@ -1725,10 +1922,10 @@ span.param-highlight {
         <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
           <div class="header-title">Glossary</div>
           <div class="header-context">
-            14 terms ·
+            16 terms ·
             3 actors ·
             4 work objects ·
-            7 verbs
+            9 verbs
           </div>
           <button class="collapse-all-btn" @click="toggleAllTerms()"
                   x-text="anyTermsExpanded ? 'Collapse all references ↑' : 'Expand all references ↓'"></button>
@@ -1798,7 +1995,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L46">examples/test_hotel_booking.py:46</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L52">examples/test_hotel_booking.py:52</a></div>
                 
               </div>
             </div>
@@ -1820,7 +2017,7 @@ span.param-highlight {
                 
                 
                 2 instances
-                 · used in 1 story
+                 · used in 2 stories
                 
               </div>
             </div>
@@ -1835,6 +2032,8 @@ span.param-highlight {
                   <span class="refs-label">Stories:</span>
                   
                   <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
+                  
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'cancel-a-booking'">cancel-a-booking</a>
                   
                 </div>
                 
@@ -1854,12 +2053,12 @@ span.param-highlight {
                 <div class="refs-line">
                   <a class="use-chip" href="#"
                      @click.prevent="filterScenariosByTerm('guest')">
-                    Show 2 scenarios using this term
+                    Show 3 scenarios using this term
                   </a>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L49">examples/test_hotel_booking.py:49</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L55">examples/test_hotel_booking.py:55</a></div>
                 
               </div>
             </div>
@@ -1881,7 +2080,7 @@ span.param-highlight {
                 
                 
                 
-                used in 1 story
+                used in 2 stories
                 
               </div>
             </div>
@@ -1897,6 +2096,8 @@ span.param-highlight {
                   
                   <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'cancel-a-booking'">cancel-a-booking</a>
+                  
                 </div>
                 
                 
@@ -1906,12 +2107,12 @@ span.param-highlight {
                 <div class="refs-line">
                   <a class="use-chip" href="#"
                      @click.prevent="filterScenariosByTerm('booking-system')">
-                    Show 2 scenarios using this term
+                    Show 3 scenarios using this term
                   </a>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L50">examples/test_hotel_booking.py:50</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L56">examples/test_hotel_booking.py:56</a></div>
                 
               </div>
             </div>
@@ -1983,7 +2184,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L54">examples/test_hotel_booking.py:54</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L60">examples/test_hotel_booking.py:60</a></div>
                 
               </div>
             </div>
@@ -2005,7 +2206,7 @@ span.param-highlight {
                 
                 
                 
-                used in 1 story
+                used in 2 stories
                 
               </div>
             </div>
@@ -2021,6 +2222,8 @@ span.param-highlight {
                   
                   <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'cancel-a-booking'">cancel-a-booking</a>
+                  
                 </div>
                 
                 
@@ -2030,12 +2233,12 @@ span.param-highlight {
                 <div class="refs-line">
                   <a class="use-chip" href="#"
                      @click.prevent="filterScenariosByTerm('booking')">
-                    Show 2 scenarios using this term
+                    Show 3 scenarios using this term
                   </a>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L55">examples/test_hotel_booking.py:55</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L61">examples/test_hotel_booking.py:61</a></div>
                 
               </div>
             </div>
@@ -2057,7 +2260,7 @@ span.param-highlight {
                 
                 
                 
-                used in 1 story
+                used in 2 stories
                 
               </div>
             </div>
@@ -2073,6 +2276,8 @@ span.param-highlight {
                   
                   <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'cancel-a-booking'">cancel-a-booking</a>
+                  
                 </div>
                 
                 
@@ -2082,12 +2287,12 @@ span.param-highlight {
                 <div class="refs-line">
                   <a class="use-chip" href="#"
                      @click.prevent="filterScenariosByTerm('payment')">
-                    Show 2 scenarios using this term
+                    Show 3 scenarios using this term
                   </a>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L56">examples/test_hotel_booking.py:56</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L62">examples/test_hotel_booking.py:62</a></div>
                 
               </div>
             </div>
@@ -2109,7 +2314,7 @@ span.param-highlight {
                 
                 
                 
-                used in 1 story
+                used in 2 stories
                 
               </div>
             </div>
@@ -2125,6 +2330,8 @@ span.param-highlight {
                   
                   <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
                   
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'cancel-a-booking'">cancel-a-booking</a>
+                  
                 </div>
                 
                 
@@ -2134,12 +2341,12 @@ span.param-highlight {
                 <div class="refs-line">
                   <a class="use-chip" href="#"
                      @click.prevent="filterScenariosByTerm('confirmation')">
-                    Show 2 scenarios using this term
+                    Show 3 scenarios using this term
                   </a>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L57">examples/test_hotel_booking.py:57</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L63">examples/test_hotel_booking.py:63</a></div>
                 
               </div>
             </div>
@@ -2154,7 +2361,7 @@ span.param-highlight {
       <div x-show="glossaryKindFilter.verb">
         <div class="kind-header">
           <span class="kind-title term-verb">Verbs</span>
-          <span class="kind-meta">7 terms</span>
+          <span class="kind-meta">9 terms</span>
           <button type="button" class="anchor-link" title="Copy link to this"
             @click.stop="copyAnchor('view=glossary', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
         </div>
@@ -2211,7 +2418,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L61">examples/test_hotel_booking.py:61</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L67">examples/test_hotel_booking.py:67</a></div>
                 
               </div>
             </div>
@@ -2270,7 +2477,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L62">examples/test_hotel_booking.py:62</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L68">examples/test_hotel_booking.py:68</a></div>
                 
               </div>
             </div>
@@ -2329,7 +2536,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L63">examples/test_hotel_booking.py:63</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L69">examples/test_hotel_booking.py:69</a></div>
                 
               </div>
             </div>
@@ -2388,7 +2595,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L64">examples/test_hotel_booking.py:64</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L70">examples/test_hotel_booking.py:70</a></div>
                 
               </div>
             </div>
@@ -2447,7 +2654,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L65">examples/test_hotel_booking.py:65</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L71">examples/test_hotel_booking.py:71</a></div>
                 
               </div>
             </div>
@@ -2469,7 +2676,7 @@ span.param-highlight {
                 
                 
                 
-                used in 1 story
+                used in 2 stories
                 
               </div>
             </div>
@@ -2484,6 +2691,8 @@ span.param-highlight {
                   <span class="refs-label">Stories:</span>
                   
                   <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-group-trip'">book-a-group-trip</a>
+                  
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'cancel-a-booking'">cancel-a-booking</a>
                   
                 </div>
                 
@@ -2501,12 +2710,12 @@ span.param-highlight {
                 <div class="refs-line">
                   <a class="use-chip" href="#"
                      @click.prevent="filterScenariosByTerm('send')">
-                    Show 1 scenario using this term
+                    Show 2 scenarios using this term
                   </a>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L66">examples/test_hotel_booking.py:66</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L72">examples/test_hotel_booking.py:72</a></div>
                 
               </div>
             </div>
@@ -2547,7 +2756,125 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_hotel_booking.py#L69">examples/test_hotel_booking.py:69</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L75">examples/test_hotel_booking.py:75</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
+        <div class="entry" id="term-cancel"
+             x-show="!glossarySearch || 'cancel withdraw a booking before arrival.'.includes(glossarySearch.toLowerCase())">
+          <div class="entry-head" @click="expandedTerms['cancel'] ? delete expandedTerms['cancel'] : (expandedTerms['cancel'] = true)">
+            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['cancel'] }"></span>
+            <span class="entry-name">
+              <span class="term-pill term-verb">cancel</span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Withdraw a booking before arrival.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-summary">
+                
+                
+                
+                used in 1 story
+                
+              </div>
+            </div>
+            <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary&amp;term=cancel', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+          </div>
+          <div class="refs scenario-body" :class="{ expanded: expandedTerms['cancel'] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'cancel-a-booking'">cancel-a-booking</a>
+                  
+                </div>
+                
+                
+                
+                <div class="refs-line">
+                  <span class="refs-label">Also used as:</span>
+                  
+                  <span class="use-chip">cancels</span>
+                  
+                </div>
+                
+                
+                
+                <div class="refs-line">
+                  <a class="use-chip" href="#"
+                     @click.prevent="filterScenariosByTerm('cancel')">
+                    Show 1 scenario using this term
+                  </a>
+                </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L77">examples/test_hotel_booking.py:77</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
+        <div class="entry" id="term-refund"
+             x-show="!glossarySearch || 'refund return money for a cancelled booking.'.includes(glossarySearch.toLowerCase())">
+          <div class="entry-head" @click="expandedTerms['refund'] ? delete expandedTerms['refund'] : (expandedTerms['refund'] = true)">
+            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['refund'] }"></span>
+            <span class="entry-name">
+              <span class="term-pill term-verb">refund</span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Return money for a cancelled booking.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-summary">
+                
+                
+                
+                used in 1 story
+                
+              </div>
+            </div>
+            <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary&amp;term=refund', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+          </div>
+          <div class="refs scenario-body" :class="{ expanded: expandedTerms['refund'] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'cancel-a-booking'">cancel-a-booking</a>
+                  
+                </div>
+                
+                
+                
+                <div class="refs-line">
+                  <span class="refs-label">Also used as:</span>
+                  
+                  <span class="use-chip">refunds</span>
+                  
+                </div>
+                
+                
+                
+                <div class="refs-line">
+                  <a class="use-chip" href="#"
+                     @click.prevent="filterScenariosByTerm('refund')">
+                    Show 1 scenario using this term
+                  </a>
+                </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dfe41424ba51dfa91d1d2de87a762662c92f1cac/examples/test_hotel_booking.py#L78">examples/test_hotel_booking.py:78</a></div>
                 
               </div>
             </div>
@@ -2568,10 +2895,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-20T14:23:06.014117+00:00",
+    "timestamp": "2026-06-20T14:34:53.709786+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "2d368f556abf73aba604eddde29b129304b02dd6"
+    "commit_sha": "dfe41424ba51dfa91d1d2de87a762662c92f1cac"
   },
   "scenarios": [
     {
@@ -2748,7 +3075,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_hotel_booking.py",
-        "line": 127
+        "line": 155
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
@@ -3080,9 +3407,224 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_hotel_booking.py",
-        "line": 141
+        "line": 169
       },
       "story_id": "book-a-group-trip",
+      "activity_ids": []
+    },
+    {
+      "id": "examples/test_hotel_booking.py::test_cancel_booking",
+      "narration": {
+        "text": "Alice cancels her booking and is refunded",
+        "parts": []
+      },
+      "module": "test_hotel_booking",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "our guest Alice",
+            "parts": [
+              {
+                "value": "our guest "
+              },
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "alice"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "Alice has a confirmed Booking she paid for",
+            "parts": [
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              },
+              {
+                "value": " has a confirmed "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking",
+                "param_column": null
+              },
+              {
+                "value": " she paid for"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Alice cancels the Booking",
+            "parts": [
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "cancel",
+                "display": "cancels",
+                "expression": "cancel(\"cancels\")",
+                "param_column": null
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Booking System refunds the Payment for the Booking",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "booking-system",
+                "display": "Booking System",
+                "expression": "booking_system",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "refund",
+                "display": "refunds",
+                "expression": "refund(\"refunds\")",
+                "param_column": null
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "payment",
+                "display": "Payment",
+                "expression": "payment",
+                "param_column": null
+              },
+              {
+                "value": " for the "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Booking System sends a Confirmation to Alice",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "booking-system",
+                "display": "Booking System",
+                "expression": "booking_system",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "send",
+                "display": "sends",
+                "expression": "send(\"sends\")",
+                "param_column": null
+              },
+              {
+                "value": " a "
+              },
+              {
+                "term_id": "confirmation",
+                "display": "Confirmation",
+                "expression": "confirmation",
+                "param_column": null
+              },
+              {
+                "value": " to "
+              },
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/test_hotel_booking.py",
+        "line": 249
+      },
+      "story_id": "cancel-a-booking",
       "activity_ids": []
     },
     {
@@ -3094,7 +3636,7 @@ window.__REPORT_DATA__ = {
       "module": "test_hotel_booking",
       "tags": [],
       "status": "failed",
-      "duration_ms": 90,
+      "duration_ms": 88,
       "steps": [
         {
           "phase": "given",
@@ -3508,7 +4050,7 @@ window.__REPORT_DATA__ = {
                 },
                 {
                   "path": "examples/test_hotel_booking.py",
-                  "lineno": 211,
+                  "lineno": 239,
                   "func": "test_payment_declined",
                   "code": "    assert payment_method in SUPPORTED_PAYMENT_METHODS",
                   "is_internal": false
@@ -3523,7 +4065,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_hotel_booking.py",
-        "line": 177
+        "line": 205
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
@@ -3538,7 +4080,7 @@ window.__REPORT_DATA__ = {
         "definition": "Person booking accommodation on behalf of a group.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 46
+          "line": 52
         }
       },
       {
@@ -3548,7 +4090,7 @@ window.__REPORT_DATA__ = {
         "definition": "Individual traveler in the group.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 49
+          "line": 55
         }
       },
       {
@@ -3558,7 +4100,7 @@ window.__REPORT_DATA__ = {
         "definition": "Automated reservation back-end.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 50
+          "line": 56
         }
       },
       {
@@ -3568,7 +4110,7 @@ window.__REPORT_DATA__ = {
         "definition": "A bookable hotel room.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 54
+          "line": 60
         }
       },
       {
@@ -3578,7 +4120,7 @@ window.__REPORT_DATA__ = {
         "definition": "A reservation for one or more rooms.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 55
+          "line": 61
         }
       },
       {
@@ -3588,7 +4130,7 @@ window.__REPORT_DATA__ = {
         "definition": "Money transferred for a booking.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 56
+          "line": 62
         }
       },
       {
@@ -3598,7 +4140,7 @@ window.__REPORT_DATA__ = {
         "definition": "Notification of a successful booking.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 57
+          "line": 63
         }
       },
       {
@@ -3608,7 +4150,7 @@ window.__REPORT_DATA__ = {
         "definition": "Look up available options.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 61
+          "line": 67
         }
       },
       {
@@ -3618,7 +4160,7 @@ window.__REPORT_DATA__ = {
         "definition": "Choose one option from a set.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 62
+          "line": 68
         }
       },
       {
@@ -3628,7 +4170,7 @@ window.__REPORT_DATA__ = {
         "definition": "Attach a member to a collection.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 63
+          "line": 69
         }
       },
       {
@@ -3638,7 +4180,7 @@ window.__REPORT_DATA__ = {
         "definition": "Send to the system for processing.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 64
+          "line": 70
         }
       },
       {
@@ -3648,7 +4190,7 @@ window.__REPORT_DATA__ = {
         "definition": "Finalize and acknowledge.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 65
+          "line": 71
         }
       },
       {
@@ -3658,7 +4200,7 @@ window.__REPORT_DATA__ = {
         "definition": "Deliver to a recipient.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 66
+          "line": 72
         }
       },
       {
@@ -3668,7 +4210,27 @@ window.__REPORT_DATA__ = {
         "definition": "Refuse to process or accept.",
         "source": {
           "relpath": "examples/test_hotel_booking.py",
-          "line": 69
+          "line": 75
+        }
+      },
+      {
+        "id": "cancel",
+        "kind": "verb",
+        "canonical": "cancel",
+        "definition": "Withdraw a booking before arrival.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 77
+        }
+      },
+      {
+        "id": "refund",
+        "kind": "verb",
+        "canonical": "refund",
+        "definition": "Return money for a cancelled booking.",
+        "source": {
+          "relpath": "examples/test_hotel_booking.py",
+          "line": 78
         }
       }
     ]
@@ -3895,14 +4457,101 @@ window.__REPORT_DATA__ = {
       ],
       "source": {
         "relpath": "examples/test_hotel_booking.py",
-        "line": 72
+        "line": 81
+      }
+    },
+    {
+      "id": "cancel-a-booking",
+      "title": "Cancel a Booking",
+      "activities": [
+        {
+          "id": 1,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice"
+                },
+                {
+                  "term_id": "cancel",
+                  "display": "cancels"
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "booking-system",
+                  "display": "Booking System"
+                },
+                {
+                  "term_id": "refund",
+                  "display": "refunds"
+                },
+                {
+                  "term_id": "payment",
+                  "display": "Payment"
+                },
+                {
+                  "text": "for"
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "booking-system",
+                  "display": "Booking System"
+                },
+                {
+                  "term_id": "send",
+                  "display": "sends"
+                },
+                {
+                  "term_id": "confirmation",
+                  "display": "Confirmation"
+                },
+                {
+                  "text": "to"
+                },
+                {
+                  "term_id": "guest",
+                  "display": "Alice"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "source": {
+        "relpath": "examples/test_hotel_booking.py",
+        "line": 121
       }
     }
   ]
 };
-window.__storyIds = ["book-a-group-trip"];
-window.__termIds = ["organizer", "guest", "booking-system", "room", "booking", "payment", "confirmation", "search", "select", "add", "submit", "confirm", "send", "reject"];
-window.__termScenarios = {"organizer": ["examples/test_hotel_booking.py::test_pick_suite", "examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "room": ["examples/test_hotel_booking.py::test_pick_suite", "examples/test_hotel_booking.py::test_complete_booking"], "search": ["examples/test_hotel_booking.py::test_pick_suite"], "select": ["examples/test_hotel_booking.py::test_pick_suite", "examples/test_hotel_booking.py::test_complete_booking"], "guest": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "add": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "booking": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "submit": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "payment": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "booking-system": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "confirm": ["examples/test_hotel_booking.py::test_complete_booking"], "send": ["examples/test_hotel_booking.py::test_complete_booking"], "confirmation": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "reject": ["examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"]};
+window.__storyIds = ["book-a-group-trip", "cancel-a-booking"];
+window.__termIds = ["organizer", "guest", "booking-system", "room", "booking", "payment", "confirmation", "search", "select", "add", "submit", "confirm", "send", "reject", "cancel", "refund"];
+window.__termScenarios = {"organizer": ["examples/test_hotel_booking.py::test_pick_suite", "examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "room": ["examples/test_hotel_booking.py::test_pick_suite", "examples/test_hotel_booking.py::test_complete_booking"], "search": ["examples/test_hotel_booking.py::test_pick_suite"], "select": ["examples/test_hotel_booking.py::test_pick_suite", "examples/test_hotel_booking.py::test_complete_booking"], "guest": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_cancel_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "add": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "booking": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_cancel_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "submit": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "payment": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_cancel_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "booking-system": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_cancel_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "confirm": ["examples/test_hotel_booking.py::test_complete_booking"], "send": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_cancel_booking"], "confirmation": ["examples/test_hotel_booking.py::test_complete_booking", "examples/test_hotel_booking.py::test_cancel_booking", "examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "cancel": ["examples/test_hotel_booking.py::test_cancel_booking"], "refund": ["examples/test_hotel_booking.py::test_cancel_booking"], "reject": ["examples/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"]};
 // --- Hash helpers ---
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
