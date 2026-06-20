@@ -54,6 +54,12 @@ function reportApp() {
     clearActivityHighlights() {
       this.highlightedActivities = {};
     },
+    // Story-view scenario cards filter on the selected activities: a card stays
+    // visible when nothing is selected, or when it covers ANY selected activity.
+    activitySelectionMatches(coveredIds) {
+      if (!this.anyActivitiesHighlighted) return true;
+      return coveredIds.some(id => this.highlightedActivities[id]);
+    },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
     },

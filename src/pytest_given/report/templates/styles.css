@@ -224,15 +224,15 @@ body {
 .header-title { font-size: var(--font-size-lg); font-weight: 600; }
 .collapse-all-btn {
   background: none;
-  border: none;
-  padding: 0;
-  font-size: var(--font-size-base);
-  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
   cursor: pointer;
   white-space: nowrap;
-  vertical-align: baseline;
 }
-.collapse-all-btn:hover { color: var(--color-accent); }
+.collapse-all-btn:hover { background: var(--bg-page); border-color: var(--color-accent); color: var(--color-accent); }
 
 /* === Scenario Cards === */
 .scenario {
@@ -644,11 +644,6 @@ span.param-highlight {
   color: var(--color-accent);
   border-bottom-color: var(--color-accent);
 }
-.nav-tab-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-}
 
 /* === Story layout === */
 .story-sidebar-item {
@@ -684,14 +679,16 @@ span.param-highlight {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-accent);
-  color: #fff;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
   border-radius: 50%;
   font-size: var(--font-size-sm);
   font-weight: 600;
   flex-shrink: 0;
   cursor: pointer;
 }
+.activity-num:hover { border-color: var(--color-accent); color: var(--color-accent); }
 .activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 
@@ -867,9 +864,18 @@ span.param-highlight {
 .filter-chip-x:hover { opacity: 1; }
 
 /* === Activity highlighting (multi-select) === */
-.activity-row-highlight { background: var(--color-skip-bg); }
+/* selected activity's timeline row: light-blue card (same tint as scenarios) */
+.activity-row-highlight { background: var(--color-accent-bg); }
+/* action bubbles: white when unselected, solid blue when selected */
+.scn-act-strip .use-chip { background: var(--bg-card); }
 .activity-num-highlight,
-.use-chip-highlight { outline: 2px solid var(--color-skipped); outline-offset: 1px; }
+.activity-num-highlight:hover,
+.use-chip-highlight,
+.use-chip-highlight:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
 
 /* === Anchor link affordance === */
 .anchor-link {
@@ -880,7 +886,6 @@ span.param-highlight {
 .scenario-header:hover .anchor-link,
 .entry-head:hover .anchor-link,
 .kind-header:hover .anchor-link,
-.header:hover .anchor-link,
-.nav-tab-wrap:hover .anchor-link { opacity: 0.6; }
+.header:hover .anchor-link { opacity: 0.6; }
 .anchor-link:hover { opacity: 1 !important; }
 .anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-passed); }

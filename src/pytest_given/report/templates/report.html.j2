@@ -25,7 +25,7 @@
 
   {%- macro anchor_link(hash) -%}
     <button type="button" class="anchor-link" title="Copy link to this"
-            @click.stop="copyAnchor('{{ hash }}', $event)" aria-label="Copy link">#</button>
+            @click.stop="copyAnchor('{{ hash }}', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
   {%- endmacro -%}
 
   {%- macro render_error(error) -%}
@@ -99,24 +99,18 @@
   {% set visible_count = (tab_visibility.scenarios|int) + (tab_visibility.stories|int) + (tab_visibility.glossary|int) %}
   {% if visible_count > 1 %}
   <nav class="frame-nav" role="tablist">
-    <span class="nav-tab-wrap">
-      <button class="nav-tab" role="tab"
-              :class="{ 'nav-tab-active': mainView === 'scenarios' }"
-              @click="mainView = 'scenarios'">Scenarios</button>{{ anchor_link('view=scenarios') }}
-    </span>
+    <button class="nav-tab" role="tab"
+            :class="{ 'nav-tab-active': mainView === 'scenarios' }"
+            @click="mainView = 'scenarios'">Scenarios</button>
     {% if tab_visibility.stories %}
-    <span class="nav-tab-wrap">
-      <button class="nav-tab" role="tab"
-              :class="{ 'nav-tab-active': mainView === 'stories' }"
-              @click="mainView = 'stories'">Stories</button>{{ anchor_link('view=stories') }}
-    </span>
+    <button class="nav-tab" role="tab"
+            :class="{ 'nav-tab-active': mainView === 'stories' }"
+            @click="mainView = 'stories'">Stories</button>
     {% endif %}
     {% if tab_visibility.glossary %}
-    <span class="nav-tab-wrap">
-      <button class="nav-tab" role="tab"
-              :class="{ 'nav-tab-active': mainView === 'glossary' }"
-              @click="mainView = 'glossary'">Glossary</button>{{ anchor_link('view=glossary') }}
-    </span>
+    <button class="nav-tab" role="tab"
+            :class="{ 'nav-tab-active': mainView === 'glossary' }"
+            @click="mainView = 'glossary'">Glossary</button>
     {% endif %}
   </nav>
   {% endif %}
@@ -308,7 +302,7 @@
             <div class="header-title">{{ story.title }}{{ anchor_link('view=stories&story=' ~ story.id) }}</div>
             <div class="header-context">{{ story.activities | length }} activities · {{ total_scns }} scenario{{ 's' if total_scns != 1 else '' }}</div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
-                    @click="clearActivityHighlights()">Clear highlights ×</button>
+                    @click="clearActivityHighlights()">Deselect</button>
           </div>
         </div>
         <div class="activity-timeline">
@@ -352,7 +346,8 @@
         </div>
         <div class="scn-act-strip-section">
           {% for scn in story_scns %}
-          <div class="scenario {{ scn.status }}" style="margin-bottom: var(--space-sm);">
+          <div class="scenario {{ scn.status }}" style="margin-bottom: var(--space-sm);"
+               x-show="activitySelectionMatches({{ scn_covers.get(scn.id, []) }})">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <span class="scenario-chevron-placeholder"></span>
