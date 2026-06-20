@@ -756,6 +756,7 @@ span.param-highlight {
 .kind-swatch-actor { background: #fcd34d; }
 .kind-swatch-object { background: #5eead4; }
 .kind-swatch-verb { background: #67e8f9; }
+.kind-swatch-kindless { background: #d1d5db; }
 
 /* === Kind section headers === */
 .kind-header {
@@ -777,6 +778,7 @@ span.param-highlight {
 .term-actor { color: #92400e; }
 .term-obj { color: #0f766e; }
 .term-verb { color: #0e7490; }
+.term-kindless { color: var(--text-secondary); }
 
 /* === Term pills === */
 .term-pill {
@@ -789,6 +791,7 @@ span.param-highlight {
 .term-pill.term-actor { background: #fef3c7; border: 1px solid #fcd34d; }
 .term-pill.term-obj { background: #ccfbf1; border: 1px solid #5eead4; }
 .term-pill.term-verb { background: #ecfeff; border: 1px solid #67e8f9; }
+.term-pill.term-kindless { background: #f3f4f6; border: 1px solid var(--border); }
 
 /* === Glossary entry layout === */
 .entry {

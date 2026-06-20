@@ -10,6 +10,9 @@ Key behaviours shown:
 - g['Room'] (slot 2 in the story activity) → kind inferred as object.
 - g['Cancellation Policy'] is used ONLY in a t-string step, never in any story
   activity, so its kind stays None (kindless) and it renders with a neutral pill.
+- 'Overbooking' is in the glossary file but referenced by no story and no step at
+  all. It still appears in the generated glossary — every file term is included
+  regardless of usage — under the neutral 'Other' section of the Glossary tab.
 """
 
 from pathlib import Path

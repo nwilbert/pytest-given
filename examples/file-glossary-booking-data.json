@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-20T14:23:06.351466+00:00",
+    "timestamp": "2026-06-20T14:49:01.216975+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "2d368f556abf73aba604eddde29b129304b02dd6"
+    "commit_sha": "febb86d6d31d7eff50c61dc28508e5acc4f0a743"
   },
   "scenarios": [
     {
@@ -152,7 +152,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_file_glossary_booking.py",
-        "line": 43
+        "line": 46
       },
       "story_id": "book-a-room",
       "activity_ids": []
@@ -290,7 +290,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_file_glossary_booking.py",
-        "line": 58
+        "line": 61
       },
       "story_id": "book-a-room",
       "activity_ids": []
@@ -347,6 +347,16 @@
           "relpath": "examples/file-glossary-booking.md",
           "line": 11
         }
+      },
+      {
+        "id": "overbooking",
+        "kind": null,
+        "canonical": "Overbooking",
+        "definition": "Accepting more reservations than there are rooms available.",
+        "source": {
+          "relpath": "examples/file-glossary-booking.md",
+          "line": 12
+        }
       }
     ]
   },
@@ -400,7 +410,7 @@
       ],
       "source": {
         "relpath": "examples/test_file_glossary_booking.py",
-        "line": 34
+        "line": 37
       }
     }
   ]

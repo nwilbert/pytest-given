@@ -763,6 +763,7 @@ span.param-highlight {
 .kind-swatch-actor { background: #fcd34d; }
 .kind-swatch-object { background: #5eead4; }
 .kind-swatch-verb { background: #67e8f9; }
+.kind-swatch-kindless { background: #d1d5db; }
 
 /* === Kind section headers === */
 .kind-header {
@@ -784,6 +785,7 @@ span.param-highlight {
 .term-actor { color: #92400e; }
 .term-obj { color: #0f766e; }
 .term-verb { color: #0e7490; }
+.term-kindless { color: var(--text-secondary); }
 
 /* === Term pills === */
 .term-pill {
@@ -796,6 +798,7 @@ span.param-highlight {
 .term-pill.term-actor { background: #fef3c7; border: 1px solid #fcd34d; }
 .term-pill.term-obj { background: #ccfbf1; border: 1px solid #5eead4; }
 .term-pill.term-verb { background: #ecfeff; border: 1px solid #67e8f9; }
+.term-pill.term-kindless { background: #f3f4f6; border: 1px solid var(--border); }
 
 /* === Glossary entry layout === */
 .entry {
@@ -1029,7 +1032,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_file_glossary_booking.py#L43">examples/test_file_glossary_booking.py:43</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_file_glossary_booking.py#L46">examples/test_file_glossary_booking.py:46</a></div>
       
     </div>
     </div>
@@ -1073,7 +1076,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_file_glossary_booking.py#L58">examples/test_file_glossary_booking.py:58</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_file_glossary_booking.py#L61">examples/test_file_glossary_booking.py:61</a></div>
       
     </div>
     </div>
@@ -1232,7 +1235,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/test_file_glossary_booking.py#L34">examples/test_file_glossary_booking.py:34</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/test_file_glossary_booking.py#L37">examples/test_file_glossary_booking.py:37</a></div>
         
       </div>
       
@@ -1257,6 +1260,7 @@ span.param-highlight {
         
         
         
+        
         <label class="kind-filter-row">
           <input type="checkbox" x-model="glossaryKindFilter.actor">
           <span class="kind-swatch kind-swatch-actor"></span>
@@ -1275,6 +1279,14 @@ span.param-highlight {
           <span>Verbs</span>
           <span class="nav-group-count">1</span>
         </label>
+        
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.kindless">
+          <span class="kind-swatch kind-swatch-kindless"></span>
+          <span>Other</span>
+          <span class="nav-group-count">2</span>
+        </label>
+        
       </div>
     </div>
 
@@ -1283,16 +1295,19 @@ span.param-highlight {
         <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
           <div class="header-title">Glossary</div>
           <div class="header-context">
-            5 terms ·
+            6 terms ·
             1 actor ·
             2 work objects ·
-            1 verb
+            1 verb ·
+            2 other
           </div>
           <button class="collapse-all-btn" @click="toggleAllTerms()"
                   x-text="anyTermsExpanded ? 'Collapse all references ↑' : 'Expand all references ↓'"></button>
         </div>
       </div>
 
+      
+      
       
       
       
@@ -1349,7 +1364,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/file-glossary-booking.md#L7">examples/file-glossary-booking.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L7">examples/file-glossary-booking.md:7</a></div>
                 
               </div>
             </div>
@@ -1357,6 +1372,8 @@ span.param-highlight {
         </div>
         
       </div>
+      
+      
       
       
       
@@ -1414,7 +1431,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/file-glossary-booking.md#L9">examples/file-glossary-booking.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L9">examples/file-glossary-booking.md:9</a></div>
                 
               </div>
             </div>
@@ -1466,7 +1483,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/file-glossary-booking.md#L10">examples/file-glossary-booking.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L10">examples/file-glossary-booking.md:10</a></div>
                 
               </div>
             </div>
@@ -1474,6 +1491,8 @@ span.param-highlight {
         </div>
         
       </div>
+      
+      
       
       
       
@@ -1540,7 +1559,97 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2d368f556abf73aba604eddde29b129304b02dd6/examples/file-glossary-booking.md#L8">examples/file-glossary-booking.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L8">examples/file-glossary-booking.md:8</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      
+      
+      
+      
+      
+      <div x-show="glossaryKindFilter.kindless">
+        <div class="kind-header">
+          <span class="kind-title term-kindless">Other</span>
+          <span class="kind-meta">2 terms</span>
+          <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+        </div>
+        
+        
+        
+        <div class="entry" id="term-cancellation-policy"
+             x-show="!glossarySearch || 'cancellation policy the rules governing how and when a booking may be cancelled.'.includes(glossarySearch.toLowerCase())">
+          <div class="entry-head" @click="expandedTerms['cancellation-policy'] ? delete expandedTerms['cancellation-policy'] : (expandedTerms['cancellation-policy'] = true)">
+            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['cancellation-policy'] }"></span>
+            <span class="entry-name">
+              <span class="term-pill term-kindless">Cancellation Policy</span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">The rules governing how and when a booking may be cancelled.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-summary">
+                
+              </div>
+            </div>
+            <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary&amp;term=cancellation-policy', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+          </div>
+          <div class="refs scenario-body" :class="{ expanded: expandedTerms['cancellation-policy'] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                
+                
+                
+                
+                <div class="refs-line">
+                  <a class="use-chip" href="#"
+                     @click.prevent="filterScenariosByTerm('cancellation-policy')">
+                    Show 2 scenarios using this term
+                  </a>
+                </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L11">examples/file-glossary-booking.md:11</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
+        <div class="entry" id="term-overbooking"
+             x-show="!glossarySearch || 'overbooking accepting more reservations than there are rooms available.'.includes(glossarySearch.toLowerCase())">
+          <div class="entry-head" @click="expandedTerms['overbooking'] ? delete expandedTerms['overbooking'] : (expandedTerms['overbooking'] = true)">
+            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['overbooking'] }"></span>
+            <span class="entry-name">
+              <span class="term-pill term-kindless">Overbooking</span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Accepting more reservations than there are rooms available.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-summary">
+                
+              </div>
+            </div>
+            <button type="button" class="anchor-link" title="Copy link to this"
+            @click.stop="copyAnchor('view=glossary&amp;term=overbooking', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+          </div>
+          <div class="refs scenario-body" :class="{ expanded: expandedTerms['overbooking'] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                
+                
+                
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/febb86d6d31d7eff50c61dc28508e5acc4f0a743/examples/file-glossary-booking.md#L12">examples/file-glossary-booking.md:12</a></div>
                 
               </div>
             </div>
@@ -1561,10 +1670,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-20T14:23:06.351466+00:00",
+    "timestamp": "2026-06-20T14:49:01.216975+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "2d368f556abf73aba604eddde29b129304b02dd6"
+    "commit_sha": "febb86d6d31d7eff50c61dc28508e5acc4f0a743"
   },
   "scenarios": [
     {
@@ -1712,7 +1821,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_file_glossary_booking.py",
-        "line": 43
+        "line": 46
       },
       "story_id": "book-a-room",
       "activity_ids": []
@@ -1850,7 +1959,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/test_file_glossary_booking.py",
-        "line": 58
+        "line": 61
       },
       "story_id": "book-a-room",
       "activity_ids": []
@@ -1907,6 +2016,16 @@ window.__REPORT_DATA__ = {
           "relpath": "examples/file-glossary-booking.md",
           "line": 11
         }
+      },
+      {
+        "id": "overbooking",
+        "kind": null,
+        "canonical": "Overbooking",
+        "definition": "Accepting more reservations than there are rooms available.",
+        "source": {
+          "relpath": "examples/file-glossary-booking.md",
+          "line": 12
+        }
       }
     ]
   },
@@ -1960,13 +2079,13 @@ window.__REPORT_DATA__ = {
       ],
       "source": {
         "relpath": "examples/test_file_glossary_booking.py",
-        "line": 34
+        "line": 37
       }
     }
   ]
 };
 window.__storyIds = ["book-a-room"];
-window.__termIds = ["guest", "book", "room", "confirmation", "cancellation-policy"];
+window.__termIds = ["guest", "book", "room", "confirmation", "cancellation-policy", "overbooking"];
 window.__termScenarios = {"room": ["examples/test_file_glossary_booking.py::test_book_available_room", "examples/test_file_glossary_booking.py::test_book_unavailable_room"], "guest": ["examples/test_file_glossary_booking.py::test_book_available_room", "examples/test_file_glossary_booking.py::test_book_unavailable_room"], "book": ["examples/test_file_glossary_booking.py::test_book_available_room", "examples/test_file_glossary_booking.py::test_book_unavailable_room"], "confirmation": ["examples/test_file_glossary_booking.py::test_book_available_room", "examples/test_file_glossary_booking.py::test_book_unavailable_room"], "cancellation-policy": ["examples/test_file_glossary_booking.py::test_book_available_room", "examples/test_file_glossary_booking.py::test_book_unavailable_room"]};
 // --- Hash helpers ---
 function parseHash() {
@@ -2006,7 +2125,7 @@ function reportApp() {
     mainView: 'scenarios',
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
-    glossaryKindFilter: { actor: true, object: true, verb: true },
+    glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
     expandedTerms: {},
     hoveredActivity: null,
     hoveredScenario: null,

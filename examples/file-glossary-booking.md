@@ -9,3 +9,4 @@ Terms for a minimal hotel booking domain.
 | Room | A bookable hotel room. |
 | Confirmation | A notification acknowledging a successful reservation. |
 | Cancellation Policy | The rules governing how and when a booking may be cancelled. |
+| Overbooking | Accepting more reservations than there are rooms available. |

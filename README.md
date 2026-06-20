@@ -233,6 +233,8 @@ with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
 
 When no `kind_column` is present, term kinds are **inferred from story activity-slot positions** at session finish: slot 0 → actor, slot 1 → verb, slot ≥ 2 → work object. A term used only in t-string steps (never in any story activity) stays kindless and renders with a neutral, uncoloured pill.
 
+**Every term in the glossary file is included in the report**, even one referenced by no story and no step. Terms whose kind could not be identified are listed under a neutral **Other** section in the Glossary tab (and filterable via its own "Other" toggle).
+
 See the [file-backed glossary design spec](docs/superpowers/specs/2026-06-18-file-backed-glossary-design.md) and the [file-glossary-booking example](examples/test_file_glossary_booking.py) for a worked end-to-end usage.
 
 ### `attach(label, content)`

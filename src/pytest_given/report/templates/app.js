@@ -36,7 +36,7 @@ function reportApp() {
     mainView: 'scenarios',
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
-    glossaryKindFilter: { actor: true, object: true, verb: true },
+    glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
     expandedTerms: {},
     hoveredActivity: null,
     hoveredScenario: null,
