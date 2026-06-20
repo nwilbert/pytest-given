@@ -576,6 +576,8 @@ span.param-highlight {
   border-radius: var(--radius-sm);
   padding: 1px 6px;
 }
+.term-ref--link { cursor: pointer; }
+.term-ref--link:hover { text-decoration: underline; }
 /* Draft cue: dashed border for actors/objects, dashed underline for verbs */
 .term-ref-actor.is-draft {
   border-style: dashed;

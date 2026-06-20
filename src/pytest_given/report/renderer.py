@@ -224,7 +224,10 @@ def _term_pill(
     term_id: str | None = None,
     title: str = '',
 ) -> str:
-    attrs = [f'class="{" ".join(classes)}"']
+    pill_classes = list(classes)
+    if term_id is not None:
+        pill_classes.append('term-ref--link')
+    attrs = [f'class="{" ".join(pill_classes)}"']
     if term_id is not None:
         attrs.append(f'data-term-id="{escape(term_id)}"')
     if title:

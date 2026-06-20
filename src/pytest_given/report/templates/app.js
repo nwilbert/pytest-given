@@ -205,6 +205,12 @@ function reportApp() {
       this.$watch('mainView', () => this._writeHash());
       this.$watch('selectedStory', () => this._writeHash());
       window.addEventListener('hashchange', () => this._readHash());
+      document.addEventListener('click', (event) => {
+        const pill = event.target.closest('[data-term-id]');
+        if (!pill) return;
+        if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
+        this.goToTerm(pill.dataset.termId);
+      });
     },
     _readHash() {
       const params = parseHash();
