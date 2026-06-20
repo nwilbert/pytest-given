@@ -284,7 +284,10 @@ function reportApp() {
       else this.search = '';
       this.mainView = deserializeView(params);
       this.selectedStory = deserializeStory(params);
-      const targetScenario = params.get('scenario');
+      const targetSlug = params.get('scenario');
+      const targetScenario = targetSlug
+        ? (window.__scenarioSlugs || {})[targetSlug]
+        : null;
       const targetTerm = params.get('term');
       if (targetTerm) {
         this.goToTerm(targetTerm);
@@ -294,7 +297,7 @@ function reportApp() {
       this.$nextTick(() => {
         this._suppressHashWrite = false;
         // Drop one-shot target params (scenario=/term=) without adding history.
-        if (targetScenario || targetTerm) this._writeHash('replace');
+        if (targetSlug || targetTerm) this._writeHash('replace');
       });
     },
     _writeHash(mode = 'push') {

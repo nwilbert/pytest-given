@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-20T15:19:39.898317+00:00",
+    "timestamp": "2026-06-20T15:59:13.179910+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "fa33a87528fd68a8f986160c5c8afce5ebbb3c76"
+    "commit_sha": "fd9aa94615b951792f12fc76ad9edc4c748df11a"
   },
   "scenarios": [
     {
@@ -646,7 +646,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 86,
+      "duration_ms": 85,
       "steps": [
         {
           "phase": "given",
@@ -797,7 +797,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 25,
+      "duration_ms": 26,
       "steps": [],
       "parameters": null,
       "error": {
@@ -1105,7 +1105,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 51,
+      "duration_ms": 53,
       "steps": [],
       "parameters": {
         "names": [

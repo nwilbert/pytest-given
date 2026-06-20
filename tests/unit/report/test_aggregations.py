@@ -1,3 +1,5 @@
+import pytest
+
 from pytest_given.model import (
     Activity,
     ActivityId,
@@ -16,8 +18,6 @@ from pytest_given.model import (
     StoryId,
     TermId,
 )
-import pytest
-
 from pytest_given.report.aggregations import (
     build_coverage_maps,
     build_glossary_aggregations,
@@ -536,17 +536,22 @@ def _scn(node_id: str) -> Scenario:
 def test_scenario_slug_strips_test_prefix_and_py_and_dir() -> None:
     rd = ReportData(
         metadata=_meta(),
-        scenarios=[_scn('examples/hotel-booking/test_hotel_booking.py::test_complete_booking')],
+        scenarios=[
+            _scn('examples/hotel-booking/test_hotel_booking.py::test_complete_booking')
+        ],
     )
     index = build_scenario_slug_index(rd)
     assert index == {
-        NodeId('examples/hotel-booking/test_hotel_booking.py::test_complete_booking'):
-            'hotel_booking/complete_booking',
+        NodeId(
+            'examples/hotel-booking/test_hotel_booking.py::test_complete_booking'
+        ): 'hotel_booking/complete_booking',
     }
 
 
 def test_scenario_slug_keeps_parametrization_tail() -> None:
-    rd = ReportData(metadata=_meta(), scenarios=[_scn('pkg/test_pour.py::test_pour[water]')])
+    rd = ReportData(
+        metadata=_meta(), scenarios=[_scn('pkg/test_pour.py::test_pour[water]')]
+    )
     index = build_scenario_slug_index(rd)
     assert index[NodeId('pkg/test_pour.py::test_pour[water]')] == 'pour/pour[water]'
 

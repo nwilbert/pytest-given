@@ -1423,16 +1423,22 @@ def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> N
         json.dumps(
             {
                 'metadata': {
-                    'project': 'p', 'timestamp': 't',
-                    'pytest_version': '9', 'plugin_version': '0.1',
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
                 },
                 'scenarios': [
                     {
                         'id': 'pkg/test_booking.py::test_make',
                         'narration': _narration('Make a booking'),
                         'module': 'test_booking',
-                        'tags': [], 'status': 'passed', 'duration_ms': 1,
-                        'steps': [], 'parameters': None, 'error': None,
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 1,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
                     }
                 ],
             }
@@ -1442,8 +1448,8 @@ def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> N
     render_html(json_path, html_path)
     content = html_path.read_text(encoding='utf-8')
     # Anchor carries the short slug, not the raw node id.
-    assert "scenario=booking/make" in content
-    assert "scenario=pkg/test_booking.py::test_make" not in content
+    assert 'scenario=booking/make' in content
+    assert 'scenario=pkg/test_booking.py::test_make' not in content
     # Reverse map global resolves slug -> node id.
     assert 'window.__scenarioSlugs = {' in content
     assert '"booking/make": "pkg/test_booking.py::test_make"' in content

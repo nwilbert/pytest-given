@@ -109,7 +109,10 @@ def examples(session: nox.Session) -> None:
     for test_file, slug in [
         ('examples/coffeeshop/test_coffeeshop.py', 'coffeeshop'),
         ('examples/hotel-booking/test_hotel_booking.py', 'hotel-booking'),
-        ('examples/file-glossary-booking/test_file_glossary_booking.py', 'file-glossary-booking'),
+        (
+            'examples/file-glossary-booking/test_file_glossary_booking.py',
+            'file-glossary-booking',
+        ),
     ]:
         session.run(
             'pytest',
