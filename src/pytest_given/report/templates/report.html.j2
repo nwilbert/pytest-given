@@ -196,7 +196,7 @@
         {% for tag in scenario.tags %}
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
         {% endfor %}
-        {{ anchor_link('scenario=' ~ scenario.id) }}
+        {{ anchor_link('scenario=' ~ scenario_slugs[scenario.id]) }}
       </div>
       <span class="scenario-meta">
         <span class="scenario-status {{ scenario.status }}">
@@ -542,6 +542,7 @@ window.__REPORT_DATA__ = {{ report_json }};
 window.__storyIds = {{ story_ids_json }};
 window.__termIds = {{ term_ids_json }};
 window.__termScenarios = {{ term_scenarios_json }};
+window.__scenarioSlugs = {{ scenario_slugs_json }};
 {{ app_js }}
 </script>
 <script>{{ alpine_js }}</script>

@@ -24,6 +24,7 @@ from .aggregations import (
     build_coverage_maps,
     build_glossary_aggregations,
     build_scenario_activity_index,
+    build_scenario_slug_index,
     build_story_rollups,
     build_term_scenario_index,
     tab_visibility,
@@ -90,6 +91,10 @@ def render_html(
     )
     term_scenario_index = build_term_scenario_index(report)
     term_scenarios_json = Markup(json.dumps(term_scenario_index))
+    scenario_slugs = build_scenario_slug_index(report)
+    scenario_slugs_json = Markup(
+        json.dumps({slug: node_id for node_id, slug in scenario_slugs.items()})
+    )
 
     env.filters['narration'] = _make_narration_filter(
         param_color_map,
@@ -112,6 +117,8 @@ def render_html(
         term_ids_json=term_ids_json,
         term_scenarios_json=term_scenarios_json,
         term_scenario_index=term_scenario_index,
+        scenario_slugs=scenario_slugs,
+        scenario_slugs_json=scenario_slugs_json,
         css=Markup(css),
         app_js=Markup(app_js),
         alpine_js=Markup(alpine_js),
