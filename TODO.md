@@ -2,6 +2,9 @@
 
 ## Now
 
+- [ ] Story scenario cards should be linked to the scenario view
+- [ ] Replace "Other" in glossary with something better
+- [ ] Example PDF attachment in report
 - [ ] cache `format_source_link` template parse/validation in the renderer: it re-runs `string.Formatter().parse(template)` + field-name validation once per scenario, story, and term. Validate once per render, reuse the parsed template across all calls.
 
 ## Next
@@ -10,7 +13,7 @@
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
 - [ ] Add option to not generate the JSON file on test run, rethink default behavior
-- - [ ] use >> for activity paths?
+- [ ] use >> for activity paths?
 
 ## Later
 
