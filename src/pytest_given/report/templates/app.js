@@ -260,6 +260,46 @@ function reportApp() {
         if (!chip) return;
         this.toggleActivityHighlight(chip.dataset.activityId);
       });
+      this._initTermTooltip();
+    },
+    // Single shared tooltip for every term-ref pill. We position it with
+    // `fixed` from the pill's bounding box (rather than a CSS-only tooltip)
+    // because pills live inside `overflow: hidden` collapsible bodies that
+    // would otherwise clip an absolutely positioned child.
+    _initTermTooltip() {
+      const tip = document.getElementById('term-tip');
+      if (!tip) return;
+      const nameEl = tip.querySelector('.term-tip-name');
+      const defEl = tip.querySelector('.term-tip-def');
+      const hide = () => { tip.hidden = true; };
+      document.addEventListener('pointerover', (event) => {
+        const pill = event.target.closest('[data-term-name]');
+        if (!pill) { return; }
+        nameEl.textContent = pill.dataset.termName;
+        const def = pill.dataset.termDef || '';
+        defEl.textContent = def;
+        defEl.hidden = !def;
+        tip.hidden = false;
+        const pillRect = pill.getBoundingClientRect();
+        const tipRect = tip.getBoundingClientRect();
+        const margin = 6;
+        let top = pillRect.top - tipRect.height - margin;
+        if (top < margin) top = pillRect.bottom + margin;  // flip below if clipped
+        let left = pillRect.left;
+        const maxLeft = window.innerWidth - tipRect.width - margin;
+        if (left > maxLeft) left = maxLeft;
+        if (left < margin) left = margin;
+        tip.style.top = top + 'px';
+        tip.style.left = left + 'px';
+      });
+      document.addEventListener('pointerout', (event) => {
+        const pill = event.target.closest('[data-term-name]');
+        if (!pill) return;
+        if (event.relatedTarget && pill.contains(event.relatedTarget)) return;
+        hide();
+      });
+      // Tooltip is positioned in viewport coords; any scroll invalidates it.
+      window.addEventListener('scroll', hide, true);
     },
     _readHash() {
       // Applying state from the hash must not itself write the hash (which

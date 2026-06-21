@@ -624,6 +624,25 @@ span.param-highlight {
 .activity-word {
   color: var(--text-secondary);
 }
+/* Custom hover tooltip for term-ref pills (replaces the native title): the
+   canonical term name as a heading above its definition. Shown/positioned by
+   app.js; a single shared node lives at body level to dodge overflow clipping. */
+#term-tip {
+  position: fixed;
+  z-index: 1000;
+  max-width: 280px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--text-primary);
+  color: var(--bg-card);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  pointer-events: none;
+}
+#term-tip[hidden] { display: none; }
+.term-tip-name { display: block; font-weight: 700; }
+.term-tip-def { display: block; margin-top: 2px; opacity: 0.82; }
 
 /* === Topbar === */
 .topbar {
@@ -747,6 +766,9 @@ span.param-highlight {
   cursor: pointer;
 }
 .use-chip:hover { border-color: var(--color-accent); color: var(--color-accent); }
+/* Non-interactive chips (term instances, verb forms): no link affordance. */
+.use-chip--static { cursor: default; }
+.use-chip--static:hover { border-color: var(--border); color: var(--text-secondary); }
 .use-chip-passed { border-color: var(--color-passed); }
 .use-chip-failed { border-color: var(--color-failed); }
 .use-chip-skipped { border-color: var(--color-skipped); }
@@ -864,7 +886,6 @@ span.param-highlight {
   font-weight: 500;
   white-space: nowrap;
 }
-.refs-fixture { font-size: var(--font-size-sm); color: var(--text-muted); }
 
 /* === Term filter chip (active term filter displayed in Scenarios header) === */
 .filter-chip {

@@ -498,7 +498,7 @@
                 <div class="refs-line">
                   <span class="refs-label">Instances:</span>
                   {% for inst in agg.instances %}
-                  <span class="use-chip">{{ inst.display }}{% if inst.fixture_name %} <span class="refs-fixture">(fixture: {{ inst.fixture_name }})</span>{% endif %}</span>
+                  <span class="use-chip use-chip--static">{{ inst.display }}</span>
                   {% endfor %}
                 </div>
                 {% endif %}
@@ -506,7 +506,7 @@
                 <div class="refs-line">
                   <span class="refs-label">Also used as:</span>
                   {% for form in agg.forms %}
-                  <span class="use-chip">{{ form.display }}</span>
+                  <span class="use-chip use-chip--static">{{ form.display }}</span>
                   {% endfor %}
                 </div>
                 {% endif %}
@@ -535,6 +535,13 @@
   {% endif %}
   </div>
 
+</div>
+
+<!-- Shared hover tooltip for term-ref pills; positioned by app.js. Lives at
+     body level so it is never clipped by collapsible scenario bodies. -->
+<div id="term-tip" role="tooltip" hidden>
+  <span class="term-tip-name"></span>
+  <span class="term-tip-def"></span>
 </div>
 
 <script>

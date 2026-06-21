@@ -232,13 +232,24 @@ def _term_pill(
     display: str,
     term_id: str | None = None,
     title: str = '',
+    tooltip_name: str = '',
+    tooltip_def: str = '',
 ) -> str:
     pill_classes = list(classes)
     if term_id is not None:
         pill_classes.append('term-ref--link')
+    if tooltip_name:
+        pill_classes.append('has-term-tip')
     attrs = [f'class="{" ".join(pill_classes)}"']
     if term_id is not None:
         attrs.append(f'data-term-id="{escape(term_id)}"')
+    # The custom hover tooltip (see app.js) reads the canonical name and
+    # definition off these attributes; it replaces the native `title` so the
+    # term name can show as a styled heading above its definition.
+    if tooltip_name:
+        attrs.append(f'data-term-name="{escape(tooltip_name)}"')
+        if tooltip_def:
+            attrs.append(f'data-term-def="{escape(tooltip_def)}"')
     if title:
         attrs.append(f'title="{escape(title)}"')
     return f'<span {" ".join(attrs)}>{escape(display)}</span>'
@@ -260,7 +271,8 @@ def _render_term_ref(
         classes=classes,
         display=part.display,
         term_id=part.term_id,
-        title=term.definition or '',
+        tooltip_name=term.canonical,
+        tooltip_def=term.definition,
     )
 
 
@@ -292,7 +304,8 @@ def _make_activity_part_filter(
                         classes=[_term_kind_class(term.kind if term else None)],
                         display=display,
                         term_id=tid,
-                        title=term.definition if term else '',
+                        tooltip_name=term.canonical if term else '',
+                        tooltip_def=term.definition if term else '',
                     )
                 )
             case ActivityWord(text=text):
