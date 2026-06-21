@@ -631,6 +631,25 @@ span.param-highlight {
 .activity-word {
   color: var(--text-secondary);
 }
+/* Custom hover tooltip for term-ref pills (replaces the native title): the
+   canonical term name as a heading above its definition. Shown/positioned by
+   app.js; a single shared node lives at body level to dodge overflow clipping. */
+#term-tip {
+  position: fixed;
+  z-index: 1000;
+  max-width: 280px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--text-primary);
+  color: var(--bg-card);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  pointer-events: none;
+}
+#term-tip[hidden] { display: none; }
+.term-tip-name { display: block; font-weight: 700; }
+.term-tip-def { display: block; margin-top: 2px; opacity: 0.82; }
 
 /* === Topbar === */
 .topbar {
@@ -754,6 +773,9 @@ span.param-highlight {
   cursor: pointer;
 }
 .use-chip:hover { border-color: var(--color-accent); color: var(--color-accent); }
+/* Non-interactive chips (term instances, verb forms): no link affordance. */
+.use-chip--static { cursor: default; }
+.use-chip--static:hover { border-color: var(--border); color: var(--text-secondary); }
 .use-chip-passed { border-color: var(--color-passed); }
 .use-chip-failed { border-color: var(--color-failed); }
 .use-chip-skipped { border-color: var(--color-skipped); }
@@ -871,7 +893,6 @@ span.param-highlight {
   font-weight: 500;
   white-space: nowrap;
 }
-.refs-fixture { font-size: var(--font-size-sm); color: var(--text-muted); }
 
 /* === Term filter chip (active term filter displayed in Scenarios header) === */
 .filter-chip {
@@ -1048,13 +1069,13 @@ span.param-highlight {
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-object term-ref--link" data-term-id="room" title="A bookable hotel room.">Room</span> is available</div>
+            <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span> is available</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link" data-term-id="guest" title="A person making a room reservation.">Guest</span> <span class="term-ref-verb term-ref--link" data-term-id="book" title="Reserve a room for a given stay.">books</span> the <span class="term-ref-object term-ref--link" data-term-id="room" title="A bookable hotel room.">Room</span></div>
+            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book" data-term-name="Book" data-term-def="Reserve a room for a given stay.">books</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor term-ref--link" data-term-id="guest" title="A person making a room reservation.">Guest</span> receives a <span class="term-ref-object term-ref--link" data-term-id="confirmation" title="A notification acknowledging a successful reservation.">Confirmation</span></div>
+            <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span> receives a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation" data-term-name="Confirmation" data-term-def="A notification acknowledging a successful reservation.">Confirmation</span></div>
           </div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-unknown term-ref--link" data-term-id="cancellation-policy" title="The rules governing how and when a booking may be cancelled.">Cancellation Policy</span> applies to the <span class="term-ref-object term-ref--link" data-term-id="room" title="A bookable hotel room.">Room</span></div>
+            <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="cancellation-policy" data-term-name="Cancellation Policy" data-term-def="The rules governing how and when a booking may be cancelled.">Cancellation Policy</span> applies to the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span></div>
           </div></div>
 
       
@@ -1062,7 +1083,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd9aa94615b951792f12fc76ad9edc4c748df11a/examples/file-glossary-booking/test_file_glossary_booking.py#L46">examples/file-glossary-booking/test_file_glossary_booking.py:46</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1ff7d727e7ac9309a7f9533ebedbf8e8d0cfebb9/examples/file-glossary-booking/test_file_glossary_booking.py#L46">examples/file-glossary-booking/test_file_glossary_booking.py:46</a></div>
       
     </div>
     </div>
@@ -1092,13 +1113,13 @@ span.param-highlight {
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">no <span class="term-ref-object term-ref--link" data-term-id="room" title="A bookable hotel room.">Room</span> is available</div>
+            <div class="step-text">no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span> is available</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link" data-term-id="guest" title="A person making a room reservation.">Guest</span> <span class="term-ref-verb term-ref--link" data-term-id="book" title="Reserve a room for a given stay.">books</span> a <span class="term-ref-object term-ref--link" data-term-id="room" title="A bookable hotel room.">Room</span></div>
+            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book" data-term-name="Book" data-term-def="Reserve a room for a given stay.">books</span> a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">no <span class="term-ref-object term-ref--link" data-term-id="confirmation" title="A notification acknowledging a successful reservation.">Confirmation</span> is issued</div>
+            <div class="step-text">no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation" data-term-name="Confirmation" data-term-def="A notification acknowledging a successful reservation.">Confirmation</span> is issued</div>
           </div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-unknown term-ref--link" data-term-id="cancellation-policy" title="The rules governing how and when a booking may be cancelled.">Cancellation Policy</span> does not apply</div>
+            <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="cancellation-policy" data-term-name="Cancellation Policy" data-term-def="The rules governing how and when a booking may be cancelled.">Cancellation Policy</span> does not apply</div>
           </div></div>
 
       
@@ -1106,7 +1127,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd9aa94615b951792f12fc76ad9edc4c748df11a/examples/file-glossary-booking/test_file_glossary_booking.py#L61">examples/file-glossary-booking/test_file_glossary_booking.py:61</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1ff7d727e7ac9309a7f9533ebedbf8e8d0cfebb9/examples/file-glossary-booking/test_file_glossary_booking.py#L61">examples/file-glossary-booking/test_file_glossary_booking.py:61</a></div>
       
     </div>
     </div>
@@ -1156,7 +1177,7 @@ span.param-highlight {
             <div class="activity-body">
               
               <div class="activity-path">
-                <span class="term-ref-actor term-ref--link" data-term-id="guest" title="A person making a room reservation.">Guest</span><span class="term-ref-verb term-ref--link" data-term-id="book" title="Reserve a room for a given stay.">books</span><span class="term-ref-object term-ref--link" data-term-id="room" title="A bookable hotel room.">Room</span>
+                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span><span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book" data-term-name="Book" data-term-def="Reserve a room for a given stay.">books</span><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span>
               </div>
               
             </div>
@@ -1194,7 +1215,7 @@ span.param-highlight {
             <div class="activity-body">
               
               <div class="activity-path">
-                <span class="term-ref-actor term-ref--link" data-term-id="guest" title="A person making a room reservation.">Guest</span><span class="term-ref-verb term-ref--link" data-term-id="book" title="Reserve a room for a given stay.">receives</span><span class="term-ref-object term-ref--link" data-term-id="confirmation" title="A notification acknowledging a successful reservation.">Confirmation</span>
+                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span><span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book" data-term-name="Book" data-term-def="Reserve a room for a given stay.">receives</span><span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation" data-term-name="Confirmation" data-term-def="A notification acknowledging a successful reservation.">Confirmation</span>
               </div>
               
             </div>
@@ -1265,7 +1286,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd9aa94615b951792f12fc76ad9edc4c748df11a/examples/file-glossary-booking/test_file_glossary_booking.py#L37">examples/file-glossary-booking/test_file_glossary_booking.py:37</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1ff7d727e7ac9309a7f9533ebedbf8e8d0cfebb9/examples/file-glossary-booking/test_file_glossary_booking.py#L37">examples/file-glossary-booking/test_file_glossary_booking.py:37</a></div>
         
       </div>
       
@@ -1396,7 +1417,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd9aa94615b951792f12fc76ad9edc4c748df11a/examples/file-glossary-booking/file-glossary-booking.md#L7">examples/file-glossary-booking/file-glossary-booking.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1ff7d727e7ac9309a7f9533ebedbf8e8d0cfebb9/examples/file-glossary-booking/file-glossary-booking.md#L7">examples/file-glossary-booking/file-glossary-booking.md:7</a></div>
                 
               </div>
             </div>
@@ -1463,7 +1484,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd9aa94615b951792f12fc76ad9edc4c748df11a/examples/file-glossary-booking/file-glossary-booking.md#L9">examples/file-glossary-booking/file-glossary-booking.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1ff7d727e7ac9309a7f9533ebedbf8e8d0cfebb9/examples/file-glossary-booking/file-glossary-booking.md#L9">examples/file-glossary-booking/file-glossary-booking.md:9</a></div>
                 
               </div>
             </div>
@@ -1515,7 +1536,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd9aa94615b951792f12fc76ad9edc4c748df11a/examples/file-glossary-booking/file-glossary-booking.md#L10">examples/file-glossary-booking/file-glossary-booking.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1ff7d727e7ac9309a7f9533ebedbf8e8d0cfebb9/examples/file-glossary-booking/file-glossary-booking.md#L10">examples/file-glossary-booking/file-glossary-booking.md:10</a></div>
                 
               </div>
             </div>
@@ -1575,9 +1596,9 @@ span.param-highlight {
                 <div class="refs-line">
                   <span class="refs-label">Also used as:</span>
                   
-                  <span class="use-chip">books</span>
+                  <span class="use-chip use-chip--static">books</span>
                   
-                  <span class="use-chip">receives</span>
+                  <span class="use-chip use-chip--static">receives</span>
                   
                 </div>
                 
@@ -1591,7 +1612,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd9aa94615b951792f12fc76ad9edc4c748df11a/examples/file-glossary-booking/file-glossary-booking.md#L8">examples/file-glossary-booking/file-glossary-booking.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1ff7d727e7ac9309a7f9533ebedbf8e8d0cfebb9/examples/file-glossary-booking/file-glossary-booking.md#L8">examples/file-glossary-booking/file-glossary-booking.md:8</a></div>
                 
               </div>
             </div>
@@ -1647,7 +1668,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd9aa94615b951792f12fc76ad9edc4c748df11a/examples/file-glossary-booking/file-glossary-booking.md#L11">examples/file-glossary-booking/file-glossary-booking.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1ff7d727e7ac9309a7f9533ebedbf8e8d0cfebb9/examples/file-glossary-booking/file-glossary-booking.md#L11">examples/file-glossary-booking/file-glossary-booking.md:11</a></div>
                 
               </div>
             </div>
@@ -1681,7 +1702,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fd9aa94615b951792f12fc76ad9edc4c748df11a/examples/file-glossary-booking/file-glossary-booking.md#L12">examples/file-glossary-booking/file-glossary-booking.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1ff7d727e7ac9309a7f9533ebedbf8e8d0cfebb9/examples/file-glossary-booking/file-glossary-booking.md#L12">examples/file-glossary-booking/file-glossary-booking.md:12</a></div>
                 
               </div>
             </div>
@@ -1698,14 +1719,21 @@ span.param-highlight {
 
 </div>
 
+<!-- Shared hover tooltip for term-ref pills; positioned by app.js. Lives at
+     body level so it is never clipped by collapsible scenario bodies. -->
+<div id="term-tip" role="tooltip" hidden>
+  <span class="term-tip-name"></span>
+  <span class="term-tip-def"></span>
+</div>
+
 <script>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-20T15:59:13.931978+00:00",
+    "timestamp": "2026-06-21T15:16:42.413327+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "fd9aa94615b951792f12fc76ad9edc4c748df11a"
+    "commit_sha": "1ff7d727e7ac9309a7f9533ebedbf8e8d0cfebb9"
   },
   "scenarios": [
     {
@@ -2382,6 +2410,46 @@ function reportApp() {
         if (!chip) return;
         this.toggleActivityHighlight(chip.dataset.activityId);
       });
+      this._initTermTooltip();
+    },
+    // Single shared tooltip for every term-ref pill. We position it with
+    // `fixed` from the pill's bounding box (rather than a CSS-only tooltip)
+    // because pills live inside `overflow: hidden` collapsible bodies that
+    // would otherwise clip an absolutely positioned child.
+    _initTermTooltip() {
+      const tip = document.getElementById('term-tip');
+      if (!tip) return;
+      const nameEl = tip.querySelector('.term-tip-name');
+      const defEl = tip.querySelector('.term-tip-def');
+      const hide = () => { tip.hidden = true; };
+      document.addEventListener('pointerover', (event) => {
+        const pill = event.target.closest('[data-term-name]');
+        if (!pill) { return; }
+        nameEl.textContent = pill.dataset.termName;
+        const def = pill.dataset.termDef || '';
+        defEl.textContent = def;
+        defEl.hidden = !def;
+        tip.hidden = false;
+        const pillRect = pill.getBoundingClientRect();
+        const tipRect = tip.getBoundingClientRect();
+        const margin = 6;
+        let top = pillRect.top - tipRect.height - margin;
+        if (top < margin) top = pillRect.bottom + margin;  // flip below if clipped
+        let left = pillRect.left;
+        const maxLeft = window.innerWidth - tipRect.width - margin;
+        if (left > maxLeft) left = maxLeft;
+        if (left < margin) left = margin;
+        tip.style.top = top + 'px';
+        tip.style.left = left + 'px';
+      });
+      document.addEventListener('pointerout', (event) => {
+        const pill = event.target.closest('[data-term-name]');
+        if (!pill) return;
+        if (event.relatedTarget && pill.contains(event.relatedTarget)) return;
+        hide();
+      });
+      // Tooltip is positioned in viewport coords; any scroll invalidates it.
+      window.addEventListener('scroll', hide, true);
     },
     _readHash() {
       // Applying state from the hash must not itself write the hash (which

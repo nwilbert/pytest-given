@@ -81,8 +81,9 @@ refund = g.verb('refund', definition='Return money for a cancelled booking.')
 book_a_group_trip = story(
     'Book a Group Trip',
     [
-        # 1. Canonical actor + canonical work object.
-        activity(organizer, search('searches for'), room),
+        # 1. Actor instance + canonical work object (the room category, before
+        #    any specific room is chosen).
+        activity(organizer('Carol'), search('searches for'), room),
         # 2. Actor instance + work-object instance.
         activity(organizer('Carol'), select('selects'), room('Deluxe Suite')),
         # 3. Multi-path: two parallel branches, each a two-actor sentence
