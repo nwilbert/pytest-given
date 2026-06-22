@@ -943,9 +943,13 @@ span.param-highlight {
 /* === Anchor link affordance === */
 .anchor-link {
   opacity: 0; border: none; background: none; cursor: pointer;
-  color: var(--text-muted); padding: 0 var(--space-xs);
-  font-size: 0.9em;
+  color: var(--text-muted); padding: var(--space-xs);
+  margin-left: var(--space-xs);
+  /* inline-flex + middle keeps the icon centered on the adjacent text rather
+     than sitting on its baseline (too high), especially at small font sizes. */
+  display: inline-flex; align-items: center; vertical-align: middle;
 }
+.anchor-link svg { display: block; }
 .scenario-header:hover .anchor-link,
 .entry-head:hover .anchor-link,
 .kind-header:hover .anchor-link,

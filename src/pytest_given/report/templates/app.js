@@ -216,10 +216,42 @@ function reportApp() {
     },
     copyAnchor(hashString, event) {
       history.replaceState(null, '', '#' + hashString);
-      if (navigator.clipboard) navigator.clipboard.writeText(window.location.href);
       const btn = event.currentTarget;
-      btn.classList.add('anchor-copied');
-      setTimeout(() => btn.classList.remove('anchor-copied'), 1200);
+      // Only flip to the "copied" state once the URL is actually on the
+      // clipboard — otherwise the icon would claim success even where the
+      // copy silently failed (e.g. a report served over http://).
+      this._copyText(window.location.href).then((ok) => {
+        if (!ok) return;
+        btn.classList.add('anchor-copied');
+        setTimeout(() => btn.classList.remove('anchor-copied'), 1200);
+      });
+    },
+    _copyText(text) {
+      // navigator.clipboard exists only in secure contexts (https, file://);
+      // a report opened over plain http:// has none, so fall back to the
+      // legacy execCommand path. Also fall back if writeText rejects.
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).then(
+          () => true,
+          () => this._execCopy(text),
+        );
+      }
+      return Promise.resolve(this._execCopy(text));
+    },
+    _execCopy(text) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (err) {
+        return false;
+      }
     },
     setHoverParam(name, el) {
       const scope = el?.closest('.scenario') || document;

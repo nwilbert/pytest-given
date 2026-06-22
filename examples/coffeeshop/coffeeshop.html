@@ -950,9 +950,13 @@ span.param-highlight {
 /* === Anchor link affordance === */
 .anchor-link {
   opacity: 0; border: none; background: none; cursor: pointer;
-  color: var(--text-muted); padding: 0 var(--space-xs);
-  font-size: 0.9em;
+  color: var(--text-muted); padding: var(--space-xs);
+  margin-left: var(--space-xs);
+  /* inline-flex + middle keeps the icon centered on the adjacent text rather
+     than sitting on its baseline (too high), especially at small font sizes. */
+  display: inline-flex; align-items: center; vertical-align: middle;
 }
+.anchor-link svg { display: block; }
 .scenario-header:hover .anchor-link,
 .entry-head:hover .anchor-link,
 .kind-header:hover .anchor-link,
@@ -1091,7 +1095,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9d67460f127af52293a7e10ff8b656742fb3617c/examples/coffeeshop/test_coffeeshop.py#L20">examples/coffeeshop/test_coffeeshop.py:20</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/42e35c745e11ceba0f033671e96918a475939c8c/examples/coffeeshop/test_coffeeshop.py#L20">examples/coffeeshop/test_coffeeshop.py:20</a></div>
       
     </div>
     </div>
@@ -1144,7 +1148,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9d67460f127af52293a7e10ff8b656742fb3617c/examples/coffeeshop/test_coffeeshop.py#L32">examples/coffeeshop/test_coffeeshop.py:32</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/42e35c745e11ceba0f033671e96918a475939c8c/examples/coffeeshop/test_coffeeshop.py#L32">examples/coffeeshop/test_coffeeshop.py:32</a></div>
       
     </div>
     </div>
@@ -1186,7 +1190,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9d67460f127af52293a7e10ff8b656742fb3617c/examples/coffeeshop/test_coffeeshop.py#L40">examples/coffeeshop/test_coffeeshop.py:40</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/42e35c745e11ceba0f033671e96918a475939c8c/examples/coffeeshop/test_coffeeshop.py#L40">examples/coffeeshop/test_coffeeshop.py:40</a></div>
       
     </div>
     </div>
@@ -1230,7 +1234,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9d67460f127af52293a7e10ff8b656742fb3617c/examples/coffeeshop/test_coffeeshop.py#L61">examples/coffeeshop/test_coffeeshop.py:61</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/42e35c745e11ceba0f033671e96918a475939c8c/examples/coffeeshop/test_coffeeshop.py#L61">examples/coffeeshop/test_coffeeshop.py:61</a></div>
       
     </div>
     </div>
@@ -1296,7 +1300,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9d67460f127af52293a7e10ff8b656742fb3617c/examples/coffeeshop/test_coffeeshop.py#L100">examples/coffeeshop/test_coffeeshop.py:100</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/42e35c745e11ceba0f033671e96918a475939c8c/examples/coffeeshop/test_coffeeshop.py#L100">examples/coffeeshop/test_coffeeshop.py:100</a></div>
       
     </div>
     </div>
@@ -1383,7 +1387,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9d67460f127af52293a7e10ff8b656742fb3617c/examples/coffeeshop/test_coffeeshop.py#L113">examples/coffeeshop/test_coffeeshop.py:113</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/42e35c745e11ceba0f033671e96918a475939c8c/examples/coffeeshop/test_coffeeshop.py#L113">examples/coffeeshop/test_coffeeshop.py:113</a></div>
       
     </div>
     </div>
@@ -1405,7 +1409,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">95ms</span>
+        <span class="scenario-duration">116ms</span>
       </span>
     </div>
 
@@ -1481,7 +1485,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9d67460f127af52293a7e10ff8b656742fb3617c/examples/coffeeshop/test_coffeeshop.py#L140">examples/coffeeshop/test_coffeeshop.py:140</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/42e35c745e11ceba0f033671e96918a475939c8c/examples/coffeeshop/test_coffeeshop.py#L140">examples/coffeeshop/test_coffeeshop.py:140</a></div>
       
     </div>
     </div>
@@ -1503,7 +1507,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status skipped">
           ○ skipped
         </span>
-        <span class="scenario-duration">26ms</span>
+        <span class="scenario-duration">33ms</span>
       </span>
     </div>
 
@@ -1562,7 +1566,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9d67460f127af52293a7e10ff8b656742fb3617c/examples/coffeeshop/test_coffeeshop.py#L146">examples/coffeeshop/test_coffeeshop.py:146</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/42e35c745e11ceba0f033671e96918a475939c8c/examples/coffeeshop/test_coffeeshop.py#L146">examples/coffeeshop/test_coffeeshop.py:146</a></div>
       
     </div>
     </div>
@@ -1674,7 +1678,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9d67460f127af52293a7e10ff8b656742fb3617c/examples/coffeeshop/test_coffeeshop.py#L49">examples/coffeeshop/test_coffeeshop.py:49</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/42e35c745e11ceba0f033671e96918a475939c8c/examples/coffeeshop/test_coffeeshop.py#L49">examples/coffeeshop/test_coffeeshop.py:49</a></div>
       
     </div>
     </div>
@@ -1758,7 +1762,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9d67460f127af52293a7e10ff8b656742fb3617c/examples/coffeeshop/test_coffeeshop.py#L71">examples/coffeeshop/test_coffeeshop.py:71</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/42e35c745e11ceba0f033671e96918a475939c8c/examples/coffeeshop/test_coffeeshop.py#L71">examples/coffeeshop/test_coffeeshop.py:71</a></div>
       
     </div>
     </div>
@@ -1780,7 +1784,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status skipped">
           ○ skipped
         </span>
-        <span class="scenario-duration">51ms</span>
+        <span class="scenario-duration">86ms</span>
       </span>
     </div>
 
@@ -1922,7 +1926,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9d67460f127af52293a7e10ff8b656742fb3617c/examples/coffeeshop/test_coffeeshop.py#L153">examples/coffeeshop/test_coffeeshop.py:153</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/42e35c745e11ceba0f033671e96918a475939c8c/examples/coffeeshop/test_coffeeshop.py#L153">examples/coffeeshop/test_coffeeshop.py:153</a></div>
       
     </div>
     </div>
@@ -1953,10 +1957,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-22T19:29:08.225372+00:00",
+    "timestamp": "2026-06-22T19:51:38.619545+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "9d67460f127af52293a7e10ff8b656742fb3617c"
+    "commit_sha": "42e35c745e11ceba0f033671e96918a475939c8c"
   },
   "scenarios": [
     {
@@ -2598,7 +2602,7 @@ window.__REPORT_DATA__ = {
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 95,
+      "duration_ms": 116,
       "steps": [
         {
           "phase": "given",
@@ -2749,7 +2753,7 @@ window.__REPORT_DATA__ = {
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 26,
+      "duration_ms": 33,
       "steps": [],
       "parameters": null,
       "error": {
@@ -3057,7 +3061,7 @@ window.__REPORT_DATA__ = {
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 51,
+      "duration_ms": 86,
       "steps": [],
       "parameters": {
         "names": [
@@ -3451,10 +3455,42 @@ function reportApp() {
     },
     copyAnchor(hashString, event) {
       history.replaceState(null, '', '#' + hashString);
-      if (navigator.clipboard) navigator.clipboard.writeText(window.location.href);
       const btn = event.currentTarget;
-      btn.classList.add('anchor-copied');
-      setTimeout(() => btn.classList.remove('anchor-copied'), 1200);
+      // Only flip to the "copied" state once the URL is actually on the
+      // clipboard — otherwise the icon would claim success even where the
+      // copy silently failed (e.g. a report served over http://).
+      this._copyText(window.location.href).then((ok) => {
+        if (!ok) return;
+        btn.classList.add('anchor-copied');
+        setTimeout(() => btn.classList.remove('anchor-copied'), 1200);
+      });
+    },
+    _copyText(text) {
+      // navigator.clipboard exists only in secure contexts (https, file://);
+      // a report opened over plain http:// has none, so fall back to the
+      // legacy execCommand path. Also fall back if writeText rejects.
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).then(
+          () => true,
+          () => this._execCopy(text),
+        );
+      }
+      return Promise.resolve(this._execCopy(text));
+    },
+    _execCopy(text) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (err) {
+        return false;
+      }
     },
     setHoverParam(name, el) {
       const scope = el?.closest('.scenario') || document;
