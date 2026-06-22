@@ -1,18 +1,5 @@
 # Report linking & deep links — design
 
-Date: 2026-06-20
-Status: accepted
-Branch target: `domain-storytelling`
-
-Implementation notes (deviations from this spec, both intentional):
-
-- The top-level tab anchors in §5 were dropped during implementation (commit
-  `b0fff3d`); the tabs already write `view=` to the hash, so the section stays
-  shareable without a per-tab copy icon.
-- The `scenario=` deep-link target (§2) now uses a short readable slug rather
-  than the raw node id, refined in
-  [2026-06-20-scenario-deep-link-slug-design.md](2026-06-20-scenario-deep-link-slug-design.md).
-
 ## Goal
 
 Improve navigation in the self-contained HTML report along three axes:
