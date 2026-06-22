@@ -1,9 +1,5 @@
 # Scenario deep-link slug — design
 
-Date: 2026-06-20
-Status: accepted
-Branch target: `domain-storytelling`
-
 ## Goal
 
 The report's URL fragment addresses a scenario by its raw pytest node id:
