@@ -141,27 +141,28 @@ body {
 .status-pill:not([class*="active-"]) { opacity: 0.5; text-decoration: line-through; }
 
 
-/* Browse-by toggle */
+/* Browse-by toggle — mirrors the status pills above (separate outlined pills,
+   light-blue active fill) so it reads as a lightweight control, not a slab. */
 .view-toggle {
   display: flex;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
+  gap: var(--space-xs);
 }
 .view-btn {
   flex: 1;
   text-align: center;
   font-size: var(--font-size-sm);
-  padding: var(--space-xs) 0;
+  padding: 2px 4px;
   cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
   background: var(--bg-card);
-  color: var(--text-secondary);
-  border: none;
+  color: var(--text-muted);
   user-select: none;
 }
 .view-btn.active {
-  background: var(--color-accent);
-  color: #fff;
+  background: var(--color-accent-bg);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
   font-weight: 500;
 }
 
