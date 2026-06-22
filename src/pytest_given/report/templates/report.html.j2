@@ -461,7 +461,6 @@
         <div class="kind-header">
           <span class="kind-title {{ kind_cls }}">{{ kind_label }}</span>
           <span class="kind-meta">{{ kind_terms | length }} term{{ 's' if kind_terms | length != 1 else '' }}</span>
-          {{ anchor_link('view=glossary') }}
         </div>
         {% for term in kind_terms %}
         {% set agg = glossary_aggregations.get(term.id) %}

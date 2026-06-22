@@ -199,14 +199,18 @@ Anchors appear on:
 
 - **Scenario headers** → `#scenario=<node-id>` (plus current filter state).
 - **Glossary term entry heads** → `#view=glossary&term=<id>`.
-- **Glossary kind headers** (Actors / Work Objects / Verbs) and the three
-  **top-level tabs** → `#view=<tab>` (section-level).
 - **Story title header** → `#view=stories&story=<id>`.
 
+Section-level anchors (the three **top-level tabs** and the **glossary kind
+headers** — Actors / Work Objects / Verbs) were dropped: they could only target
+`#view=<tab>`, which the tab buttons already write to the hash, so the icon was
+a redundant no-op affordance.
+
 One reusable mechanism in `app.js`: `copyAnchor(hashString, evt)` — sets the
-hash via `replaceState`, calls `navigator.clipboard.writeText(location.href)`,
-and briefly flips the icon to a "copied ✓" state. Handlers use `@click.stop`
-so clicking an anchor does not toggle the scenario/term it sits in.
+hash via `replaceState`, copies `location.href` to the clipboard (async
+Clipboard API with an `execCommand` fallback for insecure contexts, flipping the
+icon to "copied ✓" only on success), and uses `@click.stop` so clicking an
+anchor does not toggle the scenario/term it sits in.
 
 Template: a small Jinja macro `anchor_link(hash)` emitting the icon button,
 dropped into each heading. CSS: hidden by default, opacity up on heading-row

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-22T20:02:14.932424+00:00",
+    "timestamp": "2026-06-22T20:04:27.129455+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "6b51b239243784a40a5a39c42860c0bfdf963e67"
+    "commit_sha": "6eedfa0046db94b8cf25a6c8e150d625c46c4375"
   },
   "scenarios": [
     {
@@ -742,7 +742,7 @@
       "module": "test_hotel_booking",
       "tags": [],
       "status": "failed",
-      "duration_ms": 88,
+      "duration_ms": 90,
       "steps": [
         {
           "phase": "given",
