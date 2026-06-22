@@ -23,12 +23,13 @@ examples/hotel-booking/test_hotel_booking.py::test_complete_booking
   →  hotel_booking/complete_booking
 ```
 
-Derivation from the node id (a pure function of that single string):
+Derivation from the node id:
 
 1. Split on `::` → left is the file path (with `.py`), right is the function.
 2. File part → basename after the last `/`, drop `.py`, drop a leading `test_`.
-3. Function part → drop a leading `test_`. A parametrization tail is kept, so
-   `test_pour[water]` → `pour[water]` (needed to keep cases distinct).
+3. Function part → drop a leading `test_` **and drop the parametrization tail**,
+   so `test_pour[water]` → `pour`. Parametrized tests usually merge into one
+   scenario (see `_group_parameterized`), so the tail is just noise in the URL.
 4. Join with `/`: `hotel_booking/complete_booking`.
 
 The `/` separator stays literal and readable in the URL because the heading
@@ -38,17 +39,24 @@ not through `URLSearchParams` (which would percent-encode `/`). On read,
 
 ## Stability and uniqueness
 
-Because the slug is a pure function of the node id, it never depends on what
-else is in the report — re-runs with the same test produce the same slug, so
-shared links survive. (Chosen over conditional/“minimal” disambiguation
-precisely to avoid set-dependence.)
+The tail-less slug is normally a pure function of the node id, so re-runs
+produce the same slug and shared links survive.
 
-The only way two scenarios collide is **two test files with the same basename
-in different directories** — already a pytest anti-pattern (the default import
-mode rejects duplicate basenames without packaging). `build_scenario_slug_index`
-**asserts global slug uniqueness and raises a clear error** listing the
-offending node ids if it ever happens, rather than silently building
-set-dependent disambiguation.
+The exception is a parametrized test **whose narration varies per case**: it
+does not merge (the merge groups by narration text), so it yields several
+scenarios for the same function that would share a tail-less slug. Those — and
+only those — keep their parametrization tails to stay distinct
+(`pour/pour[water]`, `pour/pour[fire]`). This makes a *colliding* scenario's
+slug depend on the rest of the report; the common, non-colliding case stays
+short and stable. (Earlier this spec always kept the tail to avoid any
+set-dependence; that was reversed in favour of shorter fragments, accepting
+set-dependence for the narration-varying-parametrized case only.)
+
+If two scenarios still collide after that — **two test files with the same
+basename in different directories**, already a pytest anti-pattern (the default
+import mode rejects duplicate basenames without packaging) —
+`build_scenario_slug_index` **raises a clear error** listing the offending node
+ids rather than emitting an ambiguous slug.
 
 ## Where it lives
 
@@ -112,10 +120,11 @@ No change. `story` / `term` / `term-filter` are already short slugs;
 Per AGENTS.md: no Python tests pinning frontend markup, no frontend TDD.
 
 - **Python (TDD, data contract):** unit-test `build_scenario_slug_index` —
-  basic case, `test_`-stripping on both parts, `.py` drop, a parametrized
-  `[...]` case, and that a duplicate basename raises with a clear message. A
-  renderer test asserts the `__scenarioSlugs` global / `scenario_slugs` wiring
-  at the data-shaped level only.
+  basic case, `test_`-stripping on both parts, `.py` drop, parametrization tail
+  dropped when the base slug is unique, tail kept only for colliding scenarios,
+  and that a duplicate basename raises with a clear message. A renderer test
+  asserts the `__scenarioSlugs` global / `scenario_slugs` wiring at the
+  data-shaped level only.
 - **Playwright (the real verification):** regenerate `examples/` via
   `uv run nox -s examples`; open a report; confirm console is clean; click a
   scenario heading anchor and verify the copied hash is

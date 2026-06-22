@@ -12,6 +12,7 @@ Helpers exposed:
 
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass, field
 
 from ..model import (
@@ -320,21 +321,32 @@ def build_term_scenario_index(report: ReportData) -> dict[TermId, list[NodeId]]:
 
 
 def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
-    """Map each scenario's node id to a short, stable, readable slug for the
-    URL fragment (`#scenario=<slug>`).
+    """Map each scenario's node id to a short, readable slug for the URL
+    fragment (`#scenario=<slug>`).
 
     Slug is `<file>/<func>` where the file is the node id's basename with `.py`
     and a leading `test_` removed, and the func is the part after `::` with a
-    leading `test_` removed (a parametrization tail like `[water]` is kept). It
-    is a pure function of the node id, so it is stable across re-runs.
+    leading `test_` removed. The parametrization tail (`[water]`) is **dropped**
+    to keep the fragment short — a parametrized test usually merges into a
+    single scenario, so the tail is just noise.
 
-    Raises ValueError if two scenarios produce the same slug — two test files
+    The tail is kept only when it is needed to disambiguate: a parametrized test
+    whose narration varies per case yields several scenarios for the same
+    function, which would otherwise share a slug. Those (and only those) keep
+    their tails. This makes a colliding scenario's slug depend on the rest of
+    the report, but the common case stays short and stable across re-runs.
+
+    Raises ValueError if two scenarios still collide after that — two test files
     sharing a basename across directories — naming the colliding node ids.
     """
+    base_counts = Counter(
+        _scenario_slug(s.id, with_tail=False) for s in report.scenarios
+    )
     slugs: dict[NodeId, str] = {}
     node_by_slug: dict[str, NodeId] = {}
     for scenario in report.scenarios:
-        slug = _scenario_slug(scenario.id)
+        needs_tail = base_counts[_scenario_slug(scenario.id, with_tail=False)] > 1
+        slug = _scenario_slug(scenario.id, with_tail=needs_tail)
         existing = node_by_slug.get(slug)
         if existing is not None:
             raise ValueError(
@@ -347,7 +359,10 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
     return slugs
 
 
-def _scenario_slug(node_id: NodeId) -> str:
+def _scenario_slug(node_id: NodeId, *, with_tail: bool) -> str:
     file_part, _, func_part = node_id.partition('::')
     basename = file_part.rsplit('/', 1)[-1].removesuffix('.py')
-    return f'{basename.removeprefix("test_")}/{func_part.removeprefix("test_")}'
+    func = func_part.removeprefix('test_')
+    if not with_tail:
+        func = func.split('[', 1)[0]
+    return f'{basename.removeprefix("test_")}/{func}'

@@ -548,12 +548,29 @@ def test_scenario_slug_strips_test_prefix_and_py_and_dir() -> None:
     }
 
 
-def test_scenario_slug_keeps_parametrization_tail() -> None:
+def test_scenario_slug_drops_parametrization_tail_when_unique() -> None:
     rd = ReportData(
         metadata=_meta(), scenarios=[_scn('pkg/test_pour.py::test_pour[water]')]
     )
     index = build_scenario_slug_index(rd)
+    assert index[NodeId('pkg/test_pour.py::test_pour[water]')] == 'pour/pour'
+
+
+def test_scenario_slug_keeps_tail_only_for_colliding_scenarios() -> None:
+    # Two scenarios from the same parametrized function (narration varies per
+    # case, so they don't merge) would share a slug — both keep their tails.
+    rd = ReportData(
+        metadata=_meta(),
+        scenarios=[
+            _scn('pkg/test_pour.py::test_pour[water]'),
+            _scn('pkg/test_pour.py::test_pour[fire]'),
+            _scn('pkg/test_pour.py::test_drain[once]'),  # unique base → no tail
+        ],
+    )
+    index = build_scenario_slug_index(rd)
     assert index[NodeId('pkg/test_pour.py::test_pour[water]')] == 'pour/pour[water]'
+    assert index[NodeId('pkg/test_pour.py::test_pour[fire]')] == 'pour/pour[fire]'
+    assert index[NodeId('pkg/test_pour.py::test_drain[once]')] == 'pour/drain'
 
 
 def test_scenario_slug_file_without_test_prefix_kept_verbatim() -> None:
