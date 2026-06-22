@@ -260,6 +260,13 @@ function reportApp() {
         if (!chip) return;
         this.toggleActivityHighlight(chip.dataset.activityId);
       });
+      // Story-view scenario card titles jump to the scenario in the Scenarios view.
+      document.addEventListener('click', (event) => {
+        const link = event.target.closest('[data-goto-scenario]');
+        if (!link) return;
+        event.preventDefault();
+        this.goToScenario(link.dataset.gotoScenario);
+      });
       this._initTermTooltip();
     },
     // Single shared tooltip for every term-ref pill. We position it with

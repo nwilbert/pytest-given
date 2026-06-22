@@ -354,7 +354,9 @@
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <span class="scenario-chevron-placeholder"></span>
-                <span class="scenario-name">{{ scn.narration.text }}</span>
+                <a href="#" class="scenario-name scenario-name--link"
+                   data-goto-scenario="{{ scn.id }}"
+                   @click.prevent>{{ scn.narration.text }}</a>
               </div>
               <span class="scenario-meta">
                 <span class="scenario-status {{ scn.status }}">

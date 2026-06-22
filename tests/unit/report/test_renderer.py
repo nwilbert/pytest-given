@@ -1026,6 +1026,28 @@ def test_narration_filter_renders_verb_term_ref_with_verb_class() -> None:
     assert 'term-ref-verb' in str(f(n))
 
 
+def test_narration_filter_emits_tooltip_definition_when_term_has_one() -> None:
+    g = Glossary()
+    g._register(
+        GlossaryTerm(
+            id=TermId('guest'),
+            kind='actor',
+            canonical='Guest',
+            definition='A person staying at the hotel.',
+        )
+    )
+    f = _make_narration_filter(param_color_map={}, glossary=g)
+    n = Narration(
+        text='Guest',
+        parts=[
+            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+        ],
+    )
+    out = str(f(n))
+    assert 'data-term-name="Guest"' in out
+    assert 'data-term-def="A person staying at the hotel."' in out
+
+
 def test_narration_filter_includes_param_color_when_term_ref_has_param_column() -> None:
     g = _glossary()
     color_map = {'guest_name': 2}
