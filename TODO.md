@@ -2,8 +2,9 @@
 
 ## Now
 
-- [ ] Story scenario cards should be linked to the scenario view
 - [ ] Replace "Other" in glossary with something better
+- [ ] When a parameter row is hovered on, show the row values instead of the placeholders
+- [ ] integrate SVG diagram
 - [ ] Example PDF attachment in report
 - [ ] cache `format_source_link` template parse/validation in the renderer: it re-runs `string.Formatter().parse(template)` + field-name validation once per scenario, story, and term. Validate once per render, reuse the parsed template across all calls.
 
@@ -17,6 +18,7 @@
 
 ## Later
 
+- [ ] define a UI component library?
 - [ ] `GLOSSARY.md` export from a code-defined glossary (reverse direction of `FileGlossary`), plus sectioned/heading-scoped glossaries — one table per section on input, grouped sections in the HTML Glossary view. Both features pair naturally and were deferred from the file-backed glossary spec (see `docs/superpowers/specs/2026-06-18-file-backed-glossary-design.md` forward notes).
 - [ ] Create a proper documentation page, maybe using https://posit-dev.github.io/great-docs
 - [ ] Implement Annotated fixture/parametrize labels (`docs/superpowers/specs/proposed/2026-05-23-annotated-fixture-labels-design.md`)
