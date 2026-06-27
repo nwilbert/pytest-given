@@ -5,7 +5,7 @@ conference. The Story covers seven activities exercising every part of the
 domain-storytelling grammar: canonical entities, actor/work-object instances,
 two work objects joined by a preposition, two actors in the same path,
 multi-path activities for parallel branches, and an activity whose vocabulary
-is kindless and undefined, awaiting glossary classification.
+is undefined but classified by kind inference.
 
 Three scenarios implement the Story at varying detail, each in full
 Given/When/Then form:
@@ -22,11 +22,13 @@ Given/When/Then form:
   `test_complete_booking` to show how a scenario can probe a different aspect
   (the failure path) of the same activities.
 
-Activity 7 uses `redeems` and `loyalty points`, both registered as kindless
-(Uncategorized) terms with no definition yet (Undefined). It participates in
-coverage like any other activity, but no scenario currently references those
-terms, so it appears as an uncovered gap in the Stories view — signalling that
-the vocabulary still needs to be exercised by a test.
+Activity 7 uses `redeems` and `loyalty points`, both introduced with no kind
+and no definition. The post-collection kind-inference pass classifies them
+from their slot positions — `redeems` as a verb, `loyalty points` as a work
+object — but both remain without a definition, so each renders with a kind
+pill and an Undefined badge. No scenario currently references those terms,
+so activity 7 is an uncovered gap in the Stories view, signalling that the
+vocabulary still needs to be exercised by a test.
 
 A second, shorter Story — `Cancel a Booking` — shares the same glossary to
 exercise the multi-story parts of the report (Stories tab, story filter) and to
