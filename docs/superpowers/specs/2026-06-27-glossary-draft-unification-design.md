@@ -177,7 +177,7 @@ Storytelling graph:
   actor → verb → noun triple); later odd positions may be either.
 
 > **Superseded (2026-06-27):** these two rules are relaxed by
-> [Bare Strings in Activity Paths](bare-strings-in-activity-paths-design.md) — a
+> [Bare Strings in Activity Paths](2026-06-27-bare-strings-in-activity-paths-design.md) — a
 > bare `str` is now accepted at any position (including the verb slot and node
 > positions), and the two-term rule is a coverage-eligibility threshold rather
 > than a construction constraint.
