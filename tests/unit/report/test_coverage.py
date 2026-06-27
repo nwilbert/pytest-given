@@ -358,3 +358,39 @@ def test_compute_coverage_nested_steps_are_walked(g):
     coverage = compute_coverage(g, scenario, story)
     assert ActivityId(1) in coverage
     assert len(coverage[ActivityId(1)]) == 1
+
+
+def test_compute_coverage_explicit_step_binding_covers_eligible_activity(g):
+    """An explicit step activity_ids binding covers an eligible (>=2 distinct
+    term) activity directly, without identity matching."""
+    activity = Activity(
+        id=ActivityId(1),
+        paths=(
+            _path(
+                _entity('guest', 'Guest'), _term_part('search'), _entity('room', 'Room')
+            ),
+        ),
+    )
+    story = Story(id=StoryId('s'), title='S', activities=(activity,))
+    scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
+    coverage = compute_coverage(g, scenario, story)
+    assert ActivityId(1) in coverage
+
+
+def test_compute_coverage_explicit_binding_ignored_for_ineligible_activity(g):
+    """An explicit binding to an under-anchored (ineligible) activity is
+    ignored — eligibility gates explicit bindings too."""
+    activity = Activity(
+        id=ActivityId(1),
+        paths=(
+            _path(
+                _entity('guest', 'Guest'),
+                ActivityWord(text='browses'),
+                ActivityWord(text='listings'),
+            ),
+        ),
+    )
+    story = Story(id=StoryId('s'), title='S', activities=(activity,))
+    scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
+    coverage = compute_coverage(g, scenario, story)
+    assert ActivityId(1) not in coverage
