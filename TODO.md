@@ -2,9 +2,12 @@
 
 ## Now
 
-- [ ] Replace "Other" in glossary with something better
+- [ ] "Undefined only" filter should not be directly under "SHOW KINDS" header, turn into toggle / dropdown?
+- [ ] Glossary: Optionally hide kind? Group / filter by story?
+- [ ] move specs out of superpowers dir
 - [ ] When a parameter row is hovered on, show the row values instead of the placeholders
 - [ ] integrate SVG diagram
+- [ ] Create given tests for this project itself (e.g., behavior of different glossaries).
 - [ ] Example PDF attachment in report
 - [ ] cache `format_source_link` template parse/validation in the renderer: it re-runs `string.Formatter().parse(template)` + field-name validation once per scenario, story, and term. Validate once per render, reuse the parsed template across all calls.
 
@@ -15,6 +18,7 @@
 - [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
 - [ ] Add option to not generate the JSON file on test run, rethink default behavior
 - [ ] use >> for activity paths?
+- [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
 
 ## Later
 

@@ -12,6 +12,8 @@ uv sync --group dev
 
 **All Python invocations go through `uv run`** — `uv run pytest …`, `uv run python -m …`, `uv run nox …`. There is no system `python` on PATH; bare `python` / `pytest` calls will fail. This applies to one-off commands (running a single test file, REPL exploration) too, not just nox sessions.
 
+**Never prepend `cd <path> &&` to commands.** The working directory is already set to the project root; the `cd` is redundant and triggers a permission prompt.
+
 ## Quality gates
 
 Run all checks: `uv run nox`. List individual sessions with `uv run nox -l`.
