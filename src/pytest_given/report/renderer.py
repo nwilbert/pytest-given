@@ -230,7 +230,6 @@ def _term_pill(
     classes: list[str],
     display: str,
     term_id: str | None = None,
-    title: str = '',
     tooltip_name: str = '',
     tooltip_def: str = '',
 ) -> str:
@@ -249,8 +248,6 @@ def _term_pill(
         attrs.append(f'data-term-name="{escape(tooltip_name)}"')
         if tooltip_def:
             attrs.append(f'data-term-def="{escape(tooltip_def)}"')
-    if title:
-        attrs.append(f'title="{escape(title)}"')
     return f'<span {" ".join(attrs)}>{escape(display)}</span>'
 
 
