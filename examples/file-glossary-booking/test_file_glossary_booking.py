@@ -53,7 +53,7 @@ book_a_room = story(
 def test_book_available_room():
     with given(t'the {g["Room"]} is available'):
         catalog = {'Standard': True, 'Suite': False}
-    with when(t'{g["Guest"]} {g["Book"]("books")} the {g["Room"]}'):
+    with when(t'{g["Guest"]} {g["book"]("books")} the {g["Room"]}'):
         booked_room = next(name for name, avail in catalog.items() if avail)
     with then(t'the {g["Guest"]} receives a {g["Confirmation"]}'):
         assert booked_room == 'Standard'
@@ -68,7 +68,7 @@ def test_book_available_room():
 def test_book_unavailable_room():
     with given(t'no {g["Room"]} is available'):
         catalog = {'Suite': False}
-    with when(t'{g["Guest"]} {g["Book"]("books")} a {g["Room"]}'):
+    with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
         available_rooms = [name for name, avail in catalog.items() if avail]
     with then(t'no {g["Confirmation"]} is issued'):
         assert available_rooms == []
