@@ -50,32 +50,28 @@ from pytest_given import (
 g = Glossary()
 
 organizer = g.actor(
-    'Organizer', definition='Person booking accommodation on behalf of a group.'
+    'Organizer', 'Person booking accommodation on behalf of a group.'
 )
-guest = g.actor('Guest', definition='Individual traveler in the group.')
-booking_system = g.actor(
-    'Booking System', definition='Automated reservation back-end.'
-)
+guest = g.actor('Guest', 'Individual traveler in the group.')
+booking_system = g.actor('Booking System', 'Automated reservation back-end.')
 
-room = g.work_object('Room', definition='A bookable hotel room.')
-booking = g.work_object('Booking', definition='A reservation for one or more rooms.')
-payment = g.work_object('Payment', definition='Money transferred for a booking.')
-confirmation = g.work_object(
-    'Confirmation', definition='Notification of a successful booking.'
-)
+room = g.work_object('Room', 'A bookable hotel room.')
+booking = g.work_object('Booking', 'A reservation for one or more rooms.')
+payment = g.work_object('Payment', 'Money transferred for a booking.')
+confirmation = g.work_object('Confirmation', 'Notification of a successful booking.')
 
-search = g.verb('search', definition='Look up available options.')
-select = g.verb('select', definition='Choose one option from a set.')
-add = g.verb('add', definition='Attach a member to a collection.')
-submit = g.verb('submit', definition='Send to the system for processing.')
-confirm = g.verb('confirm', definition='Finalize and acknowledge.')
-send = g.verb('send', definition='Deliver to a recipient.')
+search = g.verb('search', 'Look up available options.')
+select = g.verb('select', 'Choose one option from a set.')
+add = g.verb('add', 'Attach a member to a collection.')
+submit = g.verb('submit', 'Send to the system for processing.')
+confirm = g.verb('confirm', 'Finalize and acknowledge.')
+send = g.verb('send', 'Deliver to a recipient.')
 # `reject` is in the ubiquitous language but no Story activity uses it yet —
 # it surfaces in the Glossary tab and powers the error-path scenario.
-reject = g.verb('reject', definition='Refuse to process or accept.')
+reject = g.verb('reject', 'Refuse to process or accept.')
 # Vocabulary for the second Story — reused alongside `send` from the first.
-cancel = g.verb('cancel', definition='Withdraw a booking before arrival.')
-refund = g.verb('refund', definition='Return money for a cancelled booking.')
+cancel = g.verb('cancel', 'Withdraw a booking before arrival.')
+refund = g.verb('refund', 'Return money for a cancelled booking.')
 
 
 book_a_group_trip = story(

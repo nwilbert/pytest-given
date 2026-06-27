@@ -206,8 +206,9 @@ still lacking a definition.
 the boundaries**: `_register_kind` and `FileGlossary._add_row` map an empty or
 whitespace-only definition to `None` (a blank description cell, which parses to
 `''` today, becomes `None`). The constructors flip their default —
-`g.actor/work_object/verb(..., definition: str | None = None)` and likewise
-`g(name, *, definition: str | None = None)`, all routed through the same
+`g.actor/work_object/verb(name, definition: str | None = None)` and likewise
+`g(name, definition: str | None = None)` — `definition` is an ordinary
+positional-or-keyword argument (not keyword-only) — all routed through the same
 boundary normalization.
 
 Touchpoints: `serde` read becomes `d.get('definition')` and write omits the key

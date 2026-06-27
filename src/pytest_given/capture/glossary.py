@@ -166,21 +166,21 @@ def _mint_handle(
     return _HANDLE_BY_KIND[kind](_term=term, _glossary=glossary)
 
 
-def _glossary_actor(self: Glossary, name: str, *, definition: str = '') -> Actor:
+def _glossary_actor(self: Glossary, name: str, definition: str = '') -> Actor:
     handle = _mint_handle(self, 'actor', name, definition)
     assert isinstance(handle, Actor)
     return handle
 
 
 def _glossary_work_object(
-    self: Glossary, name: str, *, definition: str = ''
+    self: Glossary, name: str, definition: str = ''
 ) -> WorkObject:
     handle = _mint_handle(self, 'object', name, definition)
     assert isinstance(handle, WorkObject)
     return handle
 
 
-def _glossary_verb(self: Glossary, name: str, *, definition: str = '') -> Verb:
+def _glossary_verb(self: Glossary, name: str, definition: str = '') -> Verb:
     handle = _mint_handle(self, 'verb', name, definition)
     assert isinstance(handle, Verb)
     return handle
