@@ -1,19 +1,20 @@
 from .collector import Collector, FixtureInstanceKey, set_active_collector
 from .decorators import attach, given, scenario, then, when
 from .draft import DraftActor, DraftVerb, DraftWorkObject, draft
-from .file_glossary import FileGlossary, FileTermHandle, FileTermInstance
+from .file_glossary import FileGlossary
+from .glossary import DeferredTermHandle, DeferredTermInstance
 from .story import activity, path, story
 from .template import Template, narration_from
 from .traceback import parse_short_repr
 
 __all__ = [
     'Collector',
+    'DeferredTermHandle',
+    'DeferredTermInstance',
     'DraftActor',
     'DraftVerb',
     'DraftWorkObject',
     'FileGlossary',
-    'FileTermHandle',
-    'FileTermInstance',
     'FixtureInstanceKey',
     'Template',
     'activity',

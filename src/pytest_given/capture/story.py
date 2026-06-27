@@ -20,10 +20,11 @@ from ..model import (
     id_derive,
 )
 from .draft import DraftActor, DraftVerb, DraftWorkObject
-from .file_glossary import FileTermHandle, FileTermInstance
 from .glossary import (
     Actor,
     ActorInstance,
+    DeferredTermHandle,
+    DeferredTermInstance,
     InflectedVerb,
     Verb,
     WorkObject,
@@ -44,13 +45,25 @@ type _PathArg = (
     | DraftActor
     | DraftWorkObject
     | DraftVerb
-    | FileTermHandle
-    | FileTermInstance
+    | DeferredTermHandle
+    | DeferredTermInstance
     | str
 )
 
-_ACTOR_TYPES = (Actor, ActorInstance, DraftActor, FileTermHandle, FileTermInstance)
-_VERB_TYPES = (Verb, InflectedVerb, DraftVerb, FileTermHandle, FileTermInstance)
+_ACTOR_TYPES = (
+    Actor,
+    ActorInstance,
+    DraftActor,
+    DeferredTermHandle,
+    DeferredTermInstance,
+)
+_VERB_TYPES = (
+    Verb,
+    InflectedVerb,
+    DraftVerb,
+    DeferredTermHandle,
+    DeferredTermInstance,
+)
 _NOUN_TYPES = (
     Actor,
     ActorInstance,
@@ -58,8 +71,8 @@ _NOUN_TYPES = (
     WorkObjectInstance,
     DraftActor,
     DraftWorkObject,
-    FileTermHandle,
-    FileTermInstance,
+    DeferredTermHandle,
+    DeferredTermInstance,
 )
 
 
@@ -96,9 +109,9 @@ def _glossary_of(value: object) -> Glossary | None:
             return h.glossary
         case InflectedVerb(verb=h):
             return h.glossary
-        case FileTermHandle():
+        case DeferredTermHandle():
             return value.glossary
-        case FileTermInstance(handle=handle):
+        case DeferredTermInstance(handle=handle):
             return handle.glossary
     return None
 
@@ -256,9 +269,9 @@ def _to_part(value: _PathArg) -> ActivityPart:
             return ActivityTermRef(term_id=wo.id, display=display)
         case InflectedVerb(verb=verb, display=display):
             return ActivityTermRef(term_id=verb.id, display=display)
-        case FileTermHandle():
+        case DeferredTermHandle():
             return ActivityTermRef(term_id=value.id, display=value.canonical)
-        case FileTermInstance(handle=handle, display=display):
+        case DeferredTermInstance(handle=handle, display=display):
             return ActivityTermRef(term_id=handle.id, display=display)
         case DraftActor() | DraftWorkObject() | DraftVerb():
             return ActivityPlaceholder(kind=value.kind, text=value.text)

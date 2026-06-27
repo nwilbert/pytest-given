@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import difflib
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
@@ -14,7 +13,12 @@ from ..model import (
     TermId,
     id_derive,
 )
-from .glossary import TermHandle, _normalize_definition, register_glossary, terms_match
+from .glossary import (
+    DeferredTermHandle,
+    _normalize_definition,
+    register_glossary,
+    terms_match,
+)
 from .markdown_glossary import ColumnSpec, GlossaryRow, parse_glossary_tables
 from .source import file_source
 
@@ -25,22 +29,6 @@ _KIND_ALIASES: dict[str, Literal['actor', 'object', 'verb']] = {
     'work_object': 'object',
     'verb': 'verb',
 }
-
-
-@dataclass(frozen=True)
-class FileTermInstance:
-    handle: FileTermHandle
-    display: str
-
-
-@dataclass(frozen=True)
-class FileTermHandle(TermHandle):
-    """Deferred-kind handle for a file-glossary term. One type for all kinds
-    (kind is resolved post-collection), unlike the code-defined Actor/WorkObject/
-    Verb handles. Callable to override display."""
-
-    def __call__(self, display: str) -> FileTermInstance:
-        return FileTermInstance(handle=self, display=display)
 
 
 class FileGlossary:
@@ -66,7 +54,7 @@ class FileGlossary:
             kind_column=kind_column,
         )
         self._glossary = Glossary()
-        self._handles: dict[TermId, FileTermHandle] = {}
+        self._handles: dict[TermId, DeferredTermHandle] = {}
         for row in rows:
             self._add_row(row)
         register_glossary(self._glossary)
@@ -111,7 +99,7 @@ class FileGlossary:
             )
         return mapped
 
-    def __getitem__(self, name: str) -> FileTermHandle:
+    def __getitem__(self, name: str) -> DeferredTermHandle:
         term_id = id_derive(name)
         handle = self._handles.get(term_id)
         if handle is not None:
@@ -123,6 +111,6 @@ class FileGlossary:
             )
             hint = f' Did you mean: {", ".join(close)}?' if close else ''
             raise PytestGivenError(f'no glossary term named {name!r}.{hint}')
-        handle = FileTermHandle(_term=term, _glossary=self._glossary)
+        handle = DeferredTermHandle(_term=term, _glossary=self._glossary)
         self._handles[term_id] = handle
         return handle

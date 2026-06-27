@@ -12,10 +12,11 @@ from ..model import (
     PytestGivenError,
 )
 from .draft import DraftActor, DraftVerb, DraftWorkObject
-from .file_glossary import FileTermHandle, FileTermInstance
 from .glossary import (
     Actor,
     ActorInstance,
+    DeferredTermHandle,
+    DeferredTermInstance,
     InflectedVerb,
     Verb,
     WorkObject,
@@ -178,10 +179,10 @@ def _try_term_ref(
             term_id = h.id
         case InflectedVerb(verb=h, display=display):
             term_id = h.id
-        case FileTermHandle():
+        case DeferredTermHandle():
             display = value.canonical
             term_id = value.id
-        case FileTermInstance(handle=handle, display=display):
+        case DeferredTermInstance(handle=handle, display=display):
             term_id = handle.id
         case _:
             return None

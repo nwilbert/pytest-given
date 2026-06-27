@@ -1,6 +1,7 @@
 import pytest
 
-from pytest_given.capture.file_glossary import FileGlossary, FileTermHandle
+from pytest_given.capture.file_glossary import FileGlossary
+from pytest_given.capture.glossary import DeferredTermHandle
 from pytest_given.capture.story import activity
 from pytest_given.model import ActivityTermRef, PytestGivenError
 
@@ -33,7 +34,7 @@ def glossary_file(tmp_path):
 
 def test_lookup_is_case_insensitive(glossary_file):
     glossary = FileGlossary(glossary_file)
-    assert isinstance(glossary['Guest'], FileTermHandle)
+    assert isinstance(glossary['Guest'], DeferredTermHandle)
     assert glossary['guest'].id == glossary['GUEST'].id == 'guest'
 
 

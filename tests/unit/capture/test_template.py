@@ -313,7 +313,7 @@ def test_tstring_term_ref_instance_with_format_spec_raises(glossary: Glossary) -
         parse_tstring(t'hi {guest("Alice"):>10}')
 
 
-# --- FileTermHandle / FileTermInstance in t-strings ---
+# --- DeferredTermHandle / DeferredTermInstance in t-strings ---
 
 _FILE_GLOSSARY_MD = (
     '| Term | Meaning |\n|---|---|\n| Guest | A person. |\n| Room | A room. |\n'

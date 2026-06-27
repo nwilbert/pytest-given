@@ -67,6 +67,23 @@ class Verb(TermHandle):
         return InflectedVerb(verb=self, display=display)
 
 
+@dataclass(frozen=True)
+class DeferredTermInstance:
+    handle: DeferredTermHandle
+    display: str
+
+
+@dataclass(frozen=True)
+class DeferredTermHandle(TermHandle):
+    """Deferred-kind handle for a term whose kind is resolved post-collection
+    (file-glossary terms and code-glossary g(...) / g[...] terms). One type for
+    all kinds, unlike the eager Actor/WorkObject/Verb handles. Callable to
+    override display."""
+
+    def __call__(self, display: str) -> DeferredTermInstance:
+        return DeferredTermInstance(handle=self, display=display)
+
+
 def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:
     """Whether two terms are the same registration: kind, canonical, and
     definition agree (`source` is intentionally excluded). Shared by the
