@@ -104,7 +104,7 @@ def _glossary_term_from_dict(d: dict[str, Any]) -> GlossaryTerm:
         id=TermId(d['id']),
         kind=d['kind'],
         canonical=d['canonical'],
-        definition=d.get('definition', ''),
+        definition=d.get('definition'),
         source=SourceLocation(relpath=src['relpath'], line=src['line'])
         if src is not None
         else None,

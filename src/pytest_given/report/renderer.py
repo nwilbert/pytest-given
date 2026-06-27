@@ -272,7 +272,7 @@ def _render_term_ref(
         display=part.display,
         term_id=part.term_id,
         tooltip_name=term.canonical,
-        tooltip_def=term.definition,
+        tooltip_def=term.definition or '',
     )
 
 
@@ -305,7 +305,7 @@ def _make_activity_part_filter(
                         display=display,
                         term_id=tid,
                         tooltip_name=term.canonical if term else '',
-                        tooltip_def=term.definition if term else '',
+                        tooltip_def=term.definition or '' if term else '',
                     )
                 )
             case ActivityWord(text=text):

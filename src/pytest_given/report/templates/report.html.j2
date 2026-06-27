@@ -466,7 +466,7 @@
         {% set agg = glossary_aggregations.get(term.id) %}
         {% set q = 'glossarySearch' %}
         <div class="entry" id="term-{{ term.id }}"
-             x-show="!glossarySearch || '{{ (term.canonical + ' ' + term.definition) | lower }}'.includes(glossarySearch.toLowerCase())">
+             x-show="!glossarySearch || '{{ (term.canonical + ' ' + (term.definition or '')) | lower }}'.includes(glossarySearch.toLowerCase())">
           <div class="entry-head" @click="expandedTerms['{{ term.id }}'] ? delete expandedTerms['{{ term.id }}'] : (expandedTerms['{{ term.id }}'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['{{ term.id }}'] }"></span>
             <span class="entry-name">

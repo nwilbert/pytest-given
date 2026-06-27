@@ -645,6 +645,16 @@ def test_story_source_roundtrips() -> None:
     assert round_tripped.stories[0].source == story.source
 
 
+def test_none_definition_round_trips():
+    term = GlossaryTerm(
+        id=TermId('guest'), kind='actor', canonical='Guest', definition=None
+    )
+    report = ReportData(metadata=_meta(), glossary=Glossary(terms=[term]))
+    restored = report_from_dict(report_to_dict(report))
+    assert restored.glossary is not None
+    assert restored.glossary.terms[0].definition is None
+
+
 def test_glossary_term_source_roundtrips() -> None:
     g = Glossary(
         terms=[

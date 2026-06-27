@@ -224,3 +224,15 @@ def test_glossary_re_registration_matching_fields_ok_when_source_differs(monkeyp
 
     assert a1.term is a2.term
     assert a1.term.source == src1  # first-registration wins
+
+
+def test_blank_definition_normalizes_to_none():
+    g = Glossary()
+    actor = g.actor('Guest', '   ')
+    assert actor.term.definition is None
+
+
+def test_real_definition_is_kept():
+    g = Glossary()
+    verb = g.verb('book', 'Reserve a room.')
+    assert verb.term.definition == 'Reserve a room.'

@@ -16,6 +16,15 @@ from ..model import (
 from .source import capture_caller_source
 
 
+def _normalize_definition(definition: str | None) -> str | None:
+    """Collapse an empty or whitespace-only definition to None so 'undefined'
+    has exactly one representation."""
+    if definition is None:
+        return None
+    stripped = definition.strip()
+    return stripped or None
+
+
 @dataclass(frozen=True)
 class TermHandle:
     """Common base: a GlossaryTerm + back-ref to its owning Glossary."""
@@ -90,9 +99,9 @@ class InflectedVerb:
 
 def _register_kind(
     self: Glossary,
-    kind: Literal['actor', 'object', 'verb'],
+    kind: Literal['actor', 'object', 'verb'] | None,
     name: str,
-    definition: str,
+    definition: str | None,
     source: SourceLocation | None = None,
 ) -> GlossaryTerm:
     """Idempotent registration. Returns the canonical term (existing or new).
@@ -106,7 +115,7 @@ def _register_kind(
         id=id_derive(name),
         kind=kind,
         canonical=name,
-        definition=definition,
+        definition=_normalize_definition(definition),
         source=source,
     )
     existing = self.get(new.id)
@@ -157,7 +166,7 @@ def _mint_handle(
     glossary: Glossary,
     kind: Literal['actor', 'object', 'verb'],
     name: str,
-    definition: str,
+    definition: str | None,
 ) -> TermHandle:
     # skip=3: this function → kind wrapper (actor/work_object/verb) → user call site
     source = capture_caller_source(skip=3)
@@ -166,21 +175,21 @@ def _mint_handle(
     return _HANDLE_BY_KIND[kind](_term=term, _glossary=glossary)
 
 
-def _glossary_actor(self: Glossary, name: str, definition: str = '') -> Actor:
+def _glossary_actor(self: Glossary, name: str, definition: str | None = None) -> Actor:
     handle = _mint_handle(self, 'actor', name, definition)
     assert isinstance(handle, Actor)
     return handle
 
 
 def _glossary_work_object(
-    self: Glossary, name: str, definition: str = ''
+    self: Glossary, name: str, definition: str | None = None
 ) -> WorkObject:
     handle = _mint_handle(self, 'object', name, definition)
     assert isinstance(handle, WorkObject)
     return handle
 
 
-def _glossary_verb(self: Glossary, name: str, definition: str = '') -> Verb:
+def _glossary_verb(self: Glossary, name: str, definition: str | None = None) -> Verb:
     handle = _mint_handle(self, 'verb', name, definition)
     assert isinstance(handle, Verb)
     return handle

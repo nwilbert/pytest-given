@@ -14,7 +14,7 @@ from ..model import (
     TermId,
     id_derive,
 )
-from .glossary import TermHandle, register_glossary, terms_match
+from .glossary import TermHandle, _normalize_definition, register_glossary, terms_match
 from .markdown_glossary import ColumnSpec, GlossaryRow, parse_glossary_tables
 from .source import file_source
 
@@ -85,7 +85,7 @@ class FileGlossary:
             id=term_id,
             kind=kind,
             canonical=row.term,
-            definition=row.definition,
+            definition=_normalize_definition(row.definition),
             source=file_source(self._path, row.line),
         )
         existing = self._glossary.get(term_id)

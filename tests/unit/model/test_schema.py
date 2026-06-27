@@ -244,9 +244,9 @@ def test_glossary_term_is_frozen_and_kw_only() -> None:
         term.kind = 'verb'  # type: ignore[misc]
 
 
-def test_glossary_term_definition_defaults_empty() -> None:
+def test_glossary_term_definition_defaults_none() -> None:
     term = GlossaryTerm(id=TermId('x'), kind='verb', canonical='x')
-    assert term.definition == ''
+    assert term.definition is None
 
 
 # --- Task 1.2: Activity-part variants + ActivityPart union ---

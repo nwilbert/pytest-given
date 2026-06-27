@@ -154,6 +154,20 @@ def test_conflicting_duplicate_rows_raise(tmp_path):
         FileGlossary(path)
 
 
+def test_blank_description_cell_normalizes_to_none(tmp_path):
+    """A row whose description cell is blank or whitespace-only should produce
+    a term whose definition is None, not an empty string."""
+    path = tmp_path / 'g.md'
+    path.write_text(
+        '| Term | Meaning |\n|---|---|\n| Guest |   |\n',
+        encoding='utf-8',
+    )
+    from pytest_given.model import TermId
+
+    fg = FileGlossary(path)
+    assert fg.glossary.get(TermId('guest')).definition is None
+
+
 def test_idempotent_duplicate_rows_ok(tmp_path):
     """Two identical rows (same term and definition) produce no error and one term."""
     path = tmp_path / 'dup_ok.md'

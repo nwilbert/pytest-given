@@ -72,7 +72,7 @@ class GlossaryTerm:
     id: TermId
     kind: Literal['actor', 'object', 'verb'] | None
     canonical: str
-    definition: str = ''
+    definition: str | None = None
     source: SourceLocation | None = None
 
 
@@ -172,9 +172,11 @@ class Glossary:
 
     if TYPE_CHECKING:
 
-        def actor(self, name: str, definition: str = '') -> Actor: ...
-        def work_object(self, name: str, definition: str = '') -> WorkObject: ...
-        def verb(self, name: str, definition: str = '') -> Verb: ...
+        def actor(self, name: str, definition: str | None = None) -> Actor: ...
+        def work_object(
+            self, name: str, definition: str | None = None
+        ) -> WorkObject: ...
+        def verb(self, name: str, definition: str | None = None) -> Verb: ...
 
 
 # Step phase
