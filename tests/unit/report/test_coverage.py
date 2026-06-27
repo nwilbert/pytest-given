@@ -25,6 +25,7 @@ from pytest_given.report.coverage import (
     compute_coverage,
     identity_of_part,
     instance_id_of,
+    is_coverage_eligible,
     s_for_step,
 )
 
@@ -280,11 +281,47 @@ def test_compute_coverage_scenario_constrained_to_activity_ids(g):
     assert ActivityId(2) not in coverage
 
 
-def test_compute_coverage_empty_refs_activity_matches_every_step(g):
-    """An activity with no identity-bearing parts (only ActivityWord) has
-    `a_refs == set()`, which is a subset of every step. The matching code
-    preserves this degenerate-but-original semantics so deserialized data
-    keeps the same coverage shape it had in-memory."""
+def test_is_coverage_eligible_true_for_two_distinct_terms(g):
+    a = Activity(
+        id=ActivityId(1),
+        paths=(
+            _path(
+                _entity('guest', 'Guest'),
+                ActivityWord(text='x'),
+                _entity('room', 'Room'),
+            ),
+        ),
+    )
+    assert is_coverage_eligible(a) is True
+
+
+def test_is_coverage_eligible_false_for_one_distinct_term(g):
+    # same term twice still counts as one distinct term id
+    a = Activity(
+        id=ActivityId(1),
+        paths=(
+            _path(
+                _entity('guest', 'Guest'),
+                ActivityWord(text='greets'),
+                _entity('guest', 'Alice'),
+            ),
+        ),
+    )
+    assert is_coverage_eligible(a) is False
+
+
+def test_is_coverage_eligible_false_for_all_bare_activity(g):
+    a = Activity(
+        id=ActivityId(1),
+        paths=(_path(ActivityWord(text='just'), ActivityWord(text='words')),),
+    )
+    assert is_coverage_eligible(a) is False
+
+
+def test_compute_coverage_excludes_under_anchored_activity(g):
+    """An activity with fewer than two distinct terms is excluded from
+    matching — it is never reported as covered (replaces the old
+    'empty refs matches every step' behaviour)."""
     a = Activity(
         id=ActivityId(1),
         paths=(_path(ActivityWord(text='just'), ActivityWord(text='words')),),
@@ -295,7 +332,7 @@ def test_compute_coverage_empty_refs_activity_matches_every_step(g):
         _step('when'),
     )
     coverage = compute_coverage(g, scenario, story)
-    assert len(coverage[ActivityId(1)]) == 2
+    assert ActivityId(1) not in coverage
 
 
 def test_compute_coverage_nested_steps_are_walked(g):

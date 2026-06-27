@@ -74,6 +74,19 @@ def a_refs(glossary: Glossary, activity: Activity) -> set[Identity]:
     return out
 
 
+def is_coverage_eligible(activity: Activity) -> bool:
+    """An activity participates in coverage matching only if it carries at
+    least two distinct glossary term refs. Under-anchored activities (0 or 1
+    distinct term) are excluded from matching and render 'not coverage-tracked'."""
+    term_ids = {
+        part.term_id
+        for activity_path in activity.paths
+        for part in activity_path.parts
+        if isinstance(part, ActivityTermRef)
+    }
+    return len(term_ids) >= 2
+
+
 def s_for_step(glossary: Glossary, step: Step) -> set[Identity]:
     """Identity set contributed by a step's narration term refs.
 
@@ -111,6 +124,8 @@ def compute_coverage(
 
     Scope: if scenario.activity_ids is non-empty, only those activity ids
     can appear in the result. Otherwise every story activity is considered.
+    Under-anchored activities (fewer than 2 distinct term refs) are excluded
+    from matching and never appear in the result.
 
     Matching uses an inverted index `identity → activity_ids` built once
     per scenario: per step, the candidate set narrows to activities sharing
@@ -123,15 +138,10 @@ def compute_coverage(
         else {a.id for a in story.activities}
     )
     refs_by_activity: dict[ActivityId, set[Identity]] = {}
-    matches_any_step: set[ActivityId] = set()  # activity with empty a_refs
     for activity in story.activities:
-        if activity.id not in scope:
+        if activity.id not in scope or not is_coverage_eligible(activity):
             continue
-        refs = a_refs(glossary, activity)
-        if not refs:
-            matches_any_step.add(activity.id)
-            continue
-        refs_by_activity[activity.id] = refs
+        refs_by_activity[activity.id] = a_refs(glossary, activity)
     identity_to_activities: dict[Identity, set[ActivityId]] = {}
     for aid, refs in refs_by_activity.items():
         for ident in refs:
@@ -142,12 +152,10 @@ def compute_coverage(
         ref: StepRef = (scenario.id, path_index)
         if step.activity_ids:
             for aid in step.activity_ids:
-                if aid in scope:
+                if aid in refs_by_activity:
                     result.setdefault(aid, set()).add(ref)
             continue
         s_cache = s_for_step(glossary, step)
-        for aid in matches_any_step:
-            result.setdefault(aid, set()).add(ref)
         candidates: set[ActivityId] = set()
         for ident in s_cache:
             candidates |= identity_to_activities.get(ident, set())
