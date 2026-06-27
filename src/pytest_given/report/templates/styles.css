@@ -872,7 +872,6 @@ span.param-highlight {
 .entry-summary { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 
 /* === Refs collapsible === */
-.refs { }
 .refs-inner { overflow: hidden; min-height: 0; }
 .refs-content {
   padding: 0 var(--space-lg) var(--space-md) calc(var(--space-lg) + 8px + var(--space-sm) + 160px + var(--space-sm));

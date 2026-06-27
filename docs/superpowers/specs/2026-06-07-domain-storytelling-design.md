@@ -176,6 +176,8 @@ These three are intermediate value classes consumed by `path(...)` and `narratio
 
 The renderer / coverage module looks up `glossary[term_id].kind` to choose the interpretation. No `instance_id` field on the parts — the canonical lookup is essentially free given the glossary is already in hand.
 
+> **Grammar superseded:** the "leading triple, free-form beyond position 2" rule below — and the `Draft*` argument types — are replaced by the strict node/edge alternation (even = node, odd = verb-or-connective, odd length ≥ 3) in [2026-06-27-glossary-draft-unification-design.md](2026-06-27-glossary-draft-unification-design.md).
+
 **Grammar.** Each `ActivityPath` enforces Domain Storytelling's canonical sentence shape — *subject → action → noun* — at its leading triple:
 
 1. **Position 0: an actor** — `Actor` (typed), `ActorInstance`, or `DraftActor`. The subject of the sentence.
@@ -475,6 +477,8 @@ For each step, the set of activities it "covers" is computed by the following pr
    | verb inflection (`confirm('confirms')`) | verb canonical (`confirm`) | ✓ — same direction, same identity |
 
 The subset rule handles verb and entity matching uniformly: every `ActivityEntity` and `ActivityTerm` in the path contributes to `A_refs`, and all of them must appear in `S`. For multi-path activities `A_refs` is the union across paths, so a step must reference every term across every path — strict v1 semantics; per-path partial coverage is a follow-up.
+
+> **Draft coverage exclusion superseded:** drafts and the `ActivityPlaceholder` node no longer exist (see [2026-06-27-glossary-draft-unification-design.md](2026-06-27-glossary-draft-unification-design.md)). Every activity now participates in implicit coverage; "unsettled" vocabulary is instead a kindless/undefined glossary term, surfaced in the report rather than excluded from coverage.
 
 **Drafts and bare strings in coverage.** `ActivityWord` (bare connective) contributes nothing to `A_refs`. `ActivityPlaceholder` (draft) is stronger: **an activity containing any draft is excluded from implicit (term-ref) coverage entirely** — the subset rule is not even evaluated. Only an explicit step `activity=N` binding can cover a draft-bearing activity. (Drafts can't appear in narrations at all — capture rejects them — so there's no step-side draft channel to reason about.) To bring a draft-bearing activity into implicit coverage, promote the draft to a glossary term; the activity's `A_refs` then includes the new term and matching resumes normally. The hard exclusion is the deliberate forcing function: missing vocabulary keeps the activity visibly uncovered until the team commits a name.
 

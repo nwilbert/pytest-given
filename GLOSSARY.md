@@ -69,12 +69,12 @@ The Domain-Driven Design layer atop the core surface. All terms here are optiona
 | **Actor** | A glossary term for a participant in the domain (e.g., *Guest*). Renders with the actor pill style. |
 | **Work Object** | A glossary term for a thing acted on (e.g., *Room*, *Booking*). Renders with the work-object pill style. |
 | **Verb** | A glossary term for an action (e.g., *book*, *confirm*). Verbs accept inflections — calling `book('books')` records *books* as a surface form of the canonical *book*. |
-| **Term ref** | An occurrence of a term inside narration. Modelled as `NarrationTermRef` in step text and as `ActivityEntity` / `ActivityTerm` inside activity prose. |
+| **Term ref** | An occurrence of a term inside narration. Modelled as `NarrationTermRef` in step text and as `ActivityTermRef` inside activity prose. |
 | **Instance** | A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). Instances aggregate in the Glossary tab's refs block. |
 | **Inflection** | A surface form of a Verb other than its canonical name (e.g., *searches for* as an inflection of *search*). Reported under "Also used as:" in the Glossary. |
 | **Story** | A named flow modelled as a sequence of activities. Constructed by `story('Title', [activity(...), ...])`. Stories are first-class report tabs and the unit of coverage. |
 | **Activity** | One row in a story — typically `actor + verb + work_object` plus optional connective words. Constructed by `activity(...)`. |
-| **ActivityPart** | The three-variant union making up an activity's prose: `ActivityEntity` (actor/object ref), `ActivityTerm` (verb ref), `ActivityWord` (plain word). |
+| **ActivityPart** | The two-variant union making up an activity's prose: `ActivityTermRef` (a reference to a glossary term — actor, work object, or verb; kind resolved via the glossary) and `ActivityWord` (a bare-string connective). |
 | **Path** | A branching segment inside a story — `path(...)` lets alternate activity sequences share a prefix. |
 | **Scenario↔activity binding** | The link between a scenario (or step) and one or more story activities. Carried by `@scenario(story=, activities=)` and the `activity=` kwarg on `given`/`when`/`then`. |
 | **Coverage** | The "did this scenario touch that activity" relation. Computed by the *A_refs ⊆ S* rule: an activity is covered when its set of term references (as identities, with a canonical fallback) is a subset of the union of term-reference identities across the scenario's steps. |

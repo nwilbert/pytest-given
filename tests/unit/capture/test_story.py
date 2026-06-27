@@ -173,7 +173,15 @@ def test_path_allows_node_edge_alternation_with_connective():
     booking = g.work_object('Booking')
     # actor verb object 'to' actor  (len 5, ends on a node)
     result = path(actor, verb, booking, 'to', guest)
-    assert len(result.parts) == 5
+    # even positions are term-ref nodes; the odd connective stays a bare word
+    assert [type(part) for part in result.parts] == [
+        ActivityTermRef,
+        ActivityTermRef,
+        ActivityTermRef,
+        ActivityWord,
+        ActivityTermRef,
+    ]
+    assert result.parts[3].text == 'to'
 
 
 def test_path_allows_second_verb_edge():
@@ -183,16 +191,16 @@ def test_path_allows_second_verb_edge():
     booking = g.work_object('Booking')
     send = g.verb('sends')
     note = g.work_object('Confirmation')
-    # actor verb object verb object  (len 5)
+    # actor verb object verb object  (len 5) — all five are term refs, no words
     result = path(actor, confirm, booking, send, note)
-    assert len(result.parts) == 5
+    assert [type(part) for part in result.parts] == [ActivityTermRef] * 5
 
 
 def test_path_rejects_bare_string_at_even_position():
     g = Glossary()
     actor = g.actor('Organizer')
     verb = g.verb('adds')
-    with pytest.raises(PytestGivenError, match='position 2'):
+    with pytest.raises(PytestGivenError, match=r'position 2.*noun'):
         path(actor, verb, 'booking')
 
 
