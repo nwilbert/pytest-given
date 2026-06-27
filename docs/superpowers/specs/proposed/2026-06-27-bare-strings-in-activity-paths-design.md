@@ -15,9 +15,12 @@ the team has *not* promoted to ubiquitous language onto an activity arrow
 (e.g. a one-off `'receives'`). Drafts used to fill it; bare words fill it now,
 without a second vocabulary model.
 
-Paired with a **floor**: an activity must carry at least **two distinct
-glossary terms**, so the entities anchoring it stay real vocabulary and
-coverage stays meaningful.
+Paired with a **coverage-eligibility threshold**: any activity is
+constructible, including an all-bare one, but an activity with fewer than **two
+distinct glossary terms** does not participate in scenario-coverage matching —
+it renders in a neutral "not coverage-tracked" state instead. The threshold
+governs *coverage matching*, not authoring: it does not gate what you may write,
+only where coverage carries enough signal to be meaningful.
 
 This **supersedes** two grammar rules in the
 [draft-unification spec](../2026-06-27-glossary-draft-unification-design.md):
@@ -37,14 +40,17 @@ This **supersedes** two grammar rules in the
   `None` for it (`coverage.py:61`); `aggregations` guards term collection with
   `isinstance(part, ActivityTermRef)` (`aggregations.py:220`); the renderer
   emits a muted `activity-word` span for any word (`renderer.py:310`). None of
-  them assume a word only appears on an edge. So the change is confined to
-  **validation** — the model, serde, coverage, aggregations and renderer need
-  no structural change.
+  them assume a word only appears on an edge. So allowing bare words is confined
+  to **grammar validation** — the model, serde, aggregations, and the
+  per-part renderer need no change. (Coverage matching and the per-activity
+  coverage chip do change, but for the eligibility threshold below, not because
+  of where words appear.)
 - **Coverage degenerate case.** `a_refs` builds an activity's identity set from
   its `ActivityTermRef` parts. An activity with an empty set falls into the
   `matches_any_step` branch (`coverage.py:126–132`) — "covered by every
   in-scope step," which is meaningless. Bare nodes make that case reachable in
-  practice; the floor below removes it.
+  practice; the eligibility threshold below removes it (such activities are
+  excluded from matching, not matched against everything).
 
 ## Design
 
@@ -91,41 +97,57 @@ A word never enters inference (it has no `term_id`), never appears in the
 Glossary view, and renders as muted `activity-word` text — visually
 distinguishable from a tracked term's pill.
 
-### Activity term floor
+### Coverage eligibility threshold
 
-- **Every activity must contain at least two distinct glossary term refs** —
-  i.e. ≥ 2 distinct `ActivityTermRef.term_id` values across all of the
-  activity's paths. Enforced in `activity()`, raising `PytestGivenError` that
-  names the activity's parts and the rule. ("distinct" guards the
-  same-term-twice loophole.)
-- Checkable **eagerly**: counting term refs needs no glossary and no kind
-  inference — just inspect the constructed parts.
-- **Rationale:** the entities anchoring an activity (the nodes of the DS graph)
-  must be real vocabulary; only the verb/connective tissue may be bare. For a
-  minimal `actor → verb → object`, that means actor and object are terms and the
-  verb may be a word — exactly the `g['Guest'], 'receives', g['Confirmation']`
-  case (2 terms). Threshold is **2**, not 3, because 3 would reject that very
-  case (only longer paths could then carry a bare verb).
+Authoring is **not** gated — any activity is constructible, including an
+all-bare one. The threshold governs *coverage matching only*:
 
-### Coverage consequence
+- **An activity is eligible for coverage only if it has ≥ 2 distinct glossary
+  term refs** — i.e. ≥ 2 distinct `ActivityTermRef.term_id` values across all of
+  its paths. ("distinct" guards the same-term-twice loophole.) An ineligible
+  activity (0 or 1 distinct term) is **excluded from matching**: it never
+  matches a step and never appears as covered.
+- Eligibility is computed **eagerly** from the constructed parts — no glossary
+  or kind inference needed (term refs carry their `term_id` already).
+- **Rationale:** coverage is a derived, best-effort signal; it should assert a
+  match only where there is enough vocabulary to make one meaningful. The
+  entities anchoring an activity (the DS-graph nodes) are what coverage matches
+  on, so two real anchors is the floor for a meaningful match. For a minimal
+  `actor → verb → object`, that means actor and object are terms and the verb may
+  be a word — exactly the `g['Guest'], 'receives', g['Confirmation']` case
+  (2 terms). Threshold is **2**, not 3, because 3 would exclude that very case
+  (only longer paths could then carry a bare verb). It is a *threshold*, not a
+  constructor `raise`, so it never gates expression — you can sketch a story in
+  bare words and watch coverage light up as you promote nodes to terms.
 
-- With ≥ 2 distinct term refs guaranteed per activity, `a_refs` is **never
-  empty** for a validly constructed story. The `matches_any_step` branch
-  (`coverage.py:126–132`) becomes unreachable; **replace it with an invariant
-  `assert`** that `a_refs` is non-empty (per the project's assert-over-pragma
-  rule), rather than leaving a dead branch.
-- A **partially** bare activity matches normally on its term identities; the
-  bare verb/connective simply does not participate in matching (as words never
-  have).
+### Coverage and rendering consequence
+
+- **`compute_coverage` skips ineligible activities** (those with < 2 distinct
+  identities): they are neither added to `refs_by_activity` nor matched. The
+  `matches_any_step` branch (`coverage.py:126–132`) — "empty refs → covered by
+  every step" — is **removed**; an empty/under-anchored ref set now means
+  *excluded*, not *matches everything*.
+- **Ineligible activities render in a neutral "not coverage-tracked" state**,
+  visually distinct from an uncovered (red `0/N`) chip — a muted dash (`—`) with
+  the tooltip *"insufficient number of glossary terms for matching"*, so the
+  reason is explicit. An eligible-but-uncovered activity keeps the existing
+  `0/N` styling. The rollup (`ActivityCoverage` / `per_activity`) carries an
+  eligibility flag so the template can branch; the template already reads
+  `rollup.per_activity[activity.id]`, so every activity keeps an entry. This is
+  template/CSS work and is **Playwright-verified** per the frontend rule.
+- A **partially** bare but eligible activity matches normally on its term
+  identities; the bare verb/connective simply does not participate (as words
+  never have).
 
 ## Error handling
 
 - **Wrong-kind handle at a slot** → `PytestGivenError` naming the position and
   the handle kind. Bare strings never raise on role.
-- **Activity with < 2 distinct term refs** → `PytestGivenError` naming the rule
-  and the activity's parts.
 - **Length / alternation violations** (even length, fewer than 3 parts) →
   unchanged `PytestGivenError`.
+- **An under-anchored activity (< 2 distinct terms) does *not* raise** — it is
+  constructible and simply ineligible for coverage (rendered "not
+  coverage-tracked"). There is no construction-time term floor.
 
 ## Testing
 
@@ -137,15 +159,20 @@ distinguishable from a tracked term's pill.
   position — all still raise. (These replace the former "rejects bare string at
   position 0/1/2/even" tests, which now assert acceptance.)
 - **Alternation:** even-length (dangling edge) and < 3 parts still raise.
-- **Floor:** an activity with 2 distinct terms is accepted; 1 distinct term
-  (including the same term twice) is rejected; a multi-path activity that
-  aggregates 2 distinct terms across its paths is accepted; a fully-bare
-  activity is rejected.
-- **Coverage:** a partially-bare activity matches on its terms; existing
-  coverage tests pass; the new `a_refs` non-empty assert never trips for a valid
-  story.
+- **Construction is never gated by term count:** an all-bare activity and a
+  1-term activity both construct without error.
+- **Coverage eligibility:** an activity with ≥ 2 distinct terms participates in
+  matching; an activity with 0 or 1 distinct term (including the same term twice)
+  is excluded — it never appears as covered and reports the ineligible state. A
+  multi-path activity aggregating 2 distinct terms across its paths is eligible.
+- **Coverage matching:** a partially-bare but eligible activity matches on its
+  terms; existing coverage tests pass; an all-bare activity is no longer
+  "covered by every step" (the `matches_any_step` behaviour is gone).
 - **Inference:** a verb *handle* at position 1 still infers `verb`; bare words
   never reach inference.
+- **Rendering (Playwright):** an ineligible activity shows the neutral "not
+  coverage-tracked" dash with the *"insufficient number of glossary terms for
+  matching"* tooltip, distinct from an uncovered `0/N` chip.
 
 ## Migration / docs
 
@@ -159,9 +186,9 @@ Pre-release: no compatibility shims.
   or an edge connective; carries no kind or id; never classified or listed in
   the glossary."* Updated in the same commit as the code (per its update rule).
 - **`README.md`:** the line *"An activity reads left-to-right: actor → verb →
-  work object (with optional connective words)"* gains a note that the verb and
-  connectives may be bare strings, while the entity nodes must be glossary
-  terms (≥ 2 per activity). Adjust any prose implying every path part is a term.
+  work object (with optional connective words)"* gains a note that any part may
+  be a bare string, but an activity needs ≥ 2 distinct glossary terms to be
+  tracked for coverage. Adjust any prose implying every path part must be a term.
 - **Supersede note:** add a pointer in the
   [draft-unification spec](../2026-06-27-glossary-draft-unification-design.md)
   marking its two grammar bullets as superseded by this spec, when this lands.
@@ -170,7 +197,7 @@ Pre-release: no compatibility shims.
 
 ## Forward notes
 
-- **Per-node-position floor.** The floor counts distinct term ids per activity.
+- **Finer eligibility rule.** Eligibility counts distinct term ids per activity.
   A future, finer rule (e.g. "position 0 and the final node must each be a
   term") could be considered, but the simple count suffices now.
 - **Anonymous node rendering.** A bare node renders with the same muted
@@ -178,6 +205,7 @@ Pre-release: no compatibility shims.
   indistinguishable despite occupying node vs edge positions. A future
   "anonymous node pill" rendering could distinguish them; deferred (it adds
   renderer position-awareness + CSS + Playwright work for marginal v1 value).
-- **`matches_any_step` removal.** If a future feature legitimately wants a
-  term-less activity, the floor and the `a_refs` assert would be revisited
-  together.
+- **`matches_any_step` removal.** Excluding under-anchored activities replaces
+  the old "empty refs → matches everything" behaviour. If a future feature wants
+  a term-less activity to participate in coverage, the eligibility threshold and
+  this exclusion would be revisited together.
