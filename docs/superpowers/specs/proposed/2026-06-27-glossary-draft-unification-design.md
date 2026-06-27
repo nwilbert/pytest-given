@@ -58,11 +58,17 @@ In:
 - **Report:** make definition-less terms visually flagged and filterable
   (the *"No definition yet."* state already renders) alongside the existing kind
   filters; kindless terms already render in the *Other* bucket.
-- **Tail-grammar tightening:** a single `path()` carries at most one verb (the
-  position-1 arrow); additional verbs in the tail are no longer accepted.
-  Multi-arrow activities use multiple `path()` calls, as today. This keeps
-  position-inference unambiguous and aligns with Domain Storytelling's
-  one-verb-per-arrow model.
+- **Story grammar formalized as a node/edge alternation:** even positions
+  (0, 2, 4, …) are entity **nodes** (actors / work objects); odd positions
+  (1, 3, 5, …) are **edges** — a verb handle or a bare-string connective. A path
+  alternates node / edge / node …, has an **odd length ≥ 3**, starts with an
+  actor, and ends on a node. This replaces the current "free-form beyond
+  position 2" rule and makes a path directly convertible to a Domain
+  Storytelling graph (nodes + labelled edges).
+- **`definition` becomes `str | None`** (default `None`): models "undocumented"
+  as a first-class state parallel to `kind: … | None`, with boundary
+  normalization (`''` / whitespace-only → `None`) so there is exactly one
+  representation.
 - **Migration** of the `hotel-booking` example and docs off `draft.*`.
 
 Out:
@@ -148,13 +154,32 @@ The user-facing `g` is the raw model `Glossary`, so two things change there:
 
 ### Story grammar
 
-`path()` keeps the leading-triple rule (actor → verb → noun). The tail tightens:
-nodes (actors / work objects) and bare-string connectives only — **no second
-verb** in a single path. A bare `str` in any position remains an `ActivityWord`
-connective (unchanged); it is never auto-promoted to a term (that would
-reintroduce the typo-safety hole and the draft-by-accident problem). Vocabulary
-in a path is always a handle (`g(...)`, `g[...]`, `g.actor(...)`, or an
-instance), never a bare string.
+A `path()` is a node/edge alternation so it maps directly onto a Domain
+Storytelling graph:
+
+- **Even positions (0, 2, 4, …) are entity nodes** — an actor or work-object
+  handle. Position 0 is specifically an actor (the "leads a path" rule). A bare
+  `str` is **not** allowed at an even position; vocabulary is always a handle
+  (`g(...)`, `g[...]`, `g.actor(...)`, or an instance), never a bare string —
+  auto-promoting bare strings would reintroduce the typo-safety hole and the
+  draft-by-accident problem.
+- **Odd positions (1, 3, 5, …) are edges** — either a verb handle (a labelled
+  arrow) or a bare-string connective (`'to'`, `'into'`), which stays an
+  `ActivityWord`. Position 1 specifically must be a verb (the leading
+  actor → verb → noun triple); later odd positions may be either.
+- A path **alternates** node / edge / node …, has an **odd length ≥ 3**, and
+  ends on a node. A path that ends on an edge (even length, dangling arrow) is
+  rejected. Multi-arrow activities continue to use multiple `path()` calls.
+
+This replaces today's "free-form beyond position 2" rule (spec line 185 of the
+Domain Storytelling design), which permitted additional verbs and nouns in any
+order and so could not be turned into a node/edge graph.
+
+**Kind-inference slot mapping updates to match.** `kind_resolution._slot_for`
+currently maps only position 1 → verb and everything ≥2 → noun; under the
+alternation it becomes: position 0 → actor, **odd → verb**, even ≥2 → noun.
+Connectives are `ActivityWord` (no `term_id`) and never reach inference, so any
+*term* at an odd position is a verb.
 
 ### Coverage
 
@@ -165,9 +190,26 @@ is eligible for matching. The former "stays visibly uncovered" demonstration
 the report flag below — a term/activity can now legitimately be covered while
 still lacking a definition.
 
+### Definition as `str | None`
+
+`GlossaryTerm.definition` becomes `str | None` (default `None`) so
+"undocumented" is a first-class state, parallel to `kind: … | None` for
+"unclassified". To keep exactly one representation, the value is **normalized at
+the boundaries**: `_register_kind` and `FileGlossary._add_row` map an empty or
+whitespace-only definition to `None` (a blank description cell, which parses to
+`''` today, becomes `None`). The typed constructors flip their default —
+`g.actor/work_object/verb(..., definition: str | None = None)`.
+
+Touchpoints: `serde` read becomes `d.get('definition')` and write omits the key
+(or emits `null`); `terms_match` (`None == None`) and the template's
+`{% if term.definition %}` keep working unchanged; the Glossary search filter
+(`report.html.j2:469`) concatenates `term.definition`, so it must guard with
+`(term.definition or '')` to avoid a `None`-concatenation error. The report's
+"undocumented" test is `definition is None`.
+
 ### Report
 
-- **Undocumented flag.** Terms with an empty `definition` get a visible marker
+- **Undocumented flag.** Terms whose `definition is None` get a visible marker
   in the Glossary view (the *"No definition yet."* placeholder already renders;
   promote it from a faint hint to a deliberate badge).
 - **Filter.** Add an "undocumented" toggle next to the existing kind filters so
@@ -198,8 +240,11 @@ still lacking a definition.
   observed position) → unchanged `resolve_glossary_kinds` errors.
 - **Registration conflict** (same name, conflicting kind/definition) →
   unchanged `_register_kind` / `terms_match` error.
-- **Second verb in a single `path()`** → `PytestGivenError` from the tightened
-  grammar check, suggesting a separate `path(...)` call.
+- **Grammar violations** → `PytestGivenError`: a bare string or verb at an even
+  (node) position; a non-verb-non-connective at an odd (edge) position; a path
+  ending on an edge (even length / dangling arrow). Messages name the offending
+  position and suggest the fix (wrap as a handle, or split into another
+  `path(...)`).
 
 ## Testing
 
@@ -211,10 +256,15 @@ still lacking a definition.
   existing `kind_resolution` tests.
 - **Coverage:** an activity built entirely from `g(...)` terms is now matchable;
   the former placeholder-exclusion test is removed/replaced.
-- **Grammar:** a two-verb single `path()` raises; a tail of nodes + connectives
-  validates.
-- **Report:** Playwright — undocumented badge shows for definition-less terms,
-  the undocumented filter isolates them, kindless terms appear in *Other*.
+- **Grammar:** node/edge alternation validates (`actor verb object 'to' actor`,
+  `actor verb object verb object`); a bare string or verb at an even position
+  raises; an even-length path (dangling edge) raises; `_slot_for` maps an
+  odd-position verb to the verb slot.
+- **Definition:** empty / whitespace-only definitions normalize to `None` from
+  both the typed constructors and a blank `FileGlossary` cell; serde round-trips
+  `None`.
+- **Report:** Playwright — undocumented badge shows when `definition is None`,
+  the undocumented filter isolates those terms, kindless terms appear in *Other*.
 
 ## Migration
 
