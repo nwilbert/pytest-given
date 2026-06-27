@@ -75,14 +75,15 @@ def path(*parts: _PathArg) -> ActivityPath:
             f'is not allowed — split multi-arrow activities into separate '
             f'path(...) calls.'
         )
-    _check_position(parts[0], 0, 'actor', _ACTOR_TYPES, parts)
-    _check_position(parts[1], 1, 'verb', _VERB_TYPES, parts)
-    for position in range(2, len(parts)):
-        part = parts[position]
-        if position % 2 == 0:
-            _check_position(part, position, 'noun', _NODE_TYPES, parts)
-        elif not isinstance(part, (*_VERB_TYPES, str)):
+    for position, part in enumerate(parts):
+        if isinstance(part, str):
+            continue  # a bare word carries no role; valid at any position
+        if position == 0:
+            _check_position(part, 0, 'actor', _ACTOR_TYPES, parts)
+        elif position % 2 == 1:
             _check_position(part, position, 'verb', _VERB_TYPES, parts)
+        else:
+            _check_position(part, position, 'noun', _NODE_TYPES, parts)
     schema_parts = tuple(_to_part(part) for part in parts)
     # Stash the set of Glossary object-identities the path references — read
     # by activity() and _check_single_glossary to enforce the v1 "one glossary
@@ -233,25 +234,28 @@ def _check_position(
 ) -> None:
     if isinstance(value, accepted):
         return
-    suggestion = _suggestion_for(pos, value)
     raise PytestGivenError(
-        f'activity path position {pos} must be an anchored {role}; '
-        f'got {type(value).__name__}: {value!r}. {suggestion} '
-        f'Full parts: {full_parts!r}'
+        f'activity path position {pos} must be a glossary {role} handle or a '
+        f'bare string; got {type(value).__name__}: {value!r}. '
+        f'{_suggestion_for(role)} Full parts: {full_parts!r}'
     )
 
 
-def _suggestion_for(pos: int, value: object) -> str:
-    if pos == 0:
-        return 'Rephrase in active voice — start with the actor doing the action.'
-    if pos == 1:
+def _suggestion_for(role: str) -> str:
+    if role == 'actor':
         return (
-            'Position 1 must be the verb; give the activity an action '
-            '(e.g., g.verb("submits") or g("submits")).'
+            'Position 0 is the actor node — pass an actor handle '
+            '(g.actor("…") / g("…")) or a bare string, not a work object or verb.'
         )
-    if isinstance(value, str):
-        return 'Wrap the noun as a glossary term: g.work_object("...") or g("...").'
-    return 'Position 2 must be a noun (actor or work object), not a verb.'
+    if role == 'verb':
+        return (
+            'An edge takes a verb handle (g.verb("…") / g("…")) or a bare '
+            'connective string, not an actor or work object.'
+        )
+    return (
+        'A node takes an actor or work-object handle (g.work_object("…") / '
+        'g("…")) or a bare string, not a verb.'
+    )
 
 
 def _to_part(value: _PathArg) -> ActivityPart:

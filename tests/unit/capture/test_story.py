@@ -121,9 +121,9 @@ def test_path_rejects_verb_in_position_0(guest, search, room):
         path(search, guest, room)
 
 
-def test_path_rejects_bare_string_in_position_0(search, room):
-    with pytest.raises(PytestGivenError, match=r'position 0.*actor'):
-        path('Guest', search, room)
+def test_path_allows_bare_string_in_position_0(search, room):
+    p = path('Guest', search, room)
+    assert p.parts[0] == ActivityWord(text='Guest')
 
 
 def test_path_rejects_actor_in_position_1(guest, room):
@@ -131,9 +131,9 @@ def test_path_rejects_actor_in_position_1(guest, room):
         path(guest, guest, room)
 
 
-def test_path_rejects_bare_string_in_position_1(guest, room):
-    with pytest.raises(PytestGivenError, match=r'position 1.*verb'):
-        path(guest, 'searches', room)
+def test_path_allows_bare_string_in_position_1(guest, room):
+    p = path(guest, 'searches', room)
+    assert p.parts[1] == ActivityWord(text='searches')
 
 
 def test_path_rejects_work_object_in_position_1(guest, room):
@@ -141,9 +141,9 @@ def test_path_rejects_work_object_in_position_1(guest, room):
         path(guest, room, room)
 
 
-def test_path_rejects_bare_string_in_position_2(guest, search):
-    with pytest.raises(PytestGivenError, match=r'position 2.*noun'):
-        path(guest, search, 'the room')
+def test_path_allows_bare_string_in_position_2(guest, search):
+    p = path(guest, search, 'the room')
+    assert p.parts[2] == ActivityWord(text='the room')
 
 
 def test_path_rejects_verb_in_position_2(guest, search):
@@ -160,6 +160,26 @@ def test_path_accepts_extended_alternation(guest, search, room):
     # actor verb node connective node — valid 5-part alternation ending on a node
     p = path(guest, search, room, 'into', room('Inbox'))
     assert len(p.parts) == 5
+
+
+def test_path_allows_fully_bare_path():
+    p = path('Guest', 'receives', 'Confirmation')
+    assert [type(part) for part in p.parts] == [
+        ActivityWord,
+        ActivityWord,
+        ActivityWord,
+    ]
+
+
+def test_path_allows_bare_verb_between_term_nodes(guest, room):
+    # the motivating case: bare verb, real entity nodes
+    p = path(guest, 'receives', room)
+    assert [type(part) for part in p.parts] == [
+        ActivityTermRef,
+        ActivityWord,
+        ActivityTermRef,
+    ]
+    assert p.parts[1] == ActivityWord(text='receives')
 
 
 # --- Task 5: node/edge alternation ---
@@ -196,12 +216,10 @@ def test_path_allows_second_verb_edge():
     assert [type(part) for part in result.parts] == [ActivityTermRef] * 5
 
 
-def test_path_rejects_bare_string_at_even_position():
-    g = Glossary()
-    actor = g.actor('Organizer')
-    verb = g.verb('adds')
-    with pytest.raises(PytestGivenError, match=r'position 2.*noun'):
-        path(actor, verb, 'booking')
+def test_path_allows_bare_string_at_later_even_position(guest, search, room):
+    # actor verb node connective bare-node — even index 4 is a bare word
+    p = path(guest, search, room, 'into', 'Inbox')
+    assert p.parts[4] == ActivityWord(text='Inbox')
 
 
 def test_path_rejects_dangling_edge():
