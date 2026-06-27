@@ -5,13 +5,16 @@ handles in story activities and t-string steps, and how term kinds are inferred
 from activity-slot positions at session finish.
 
 Key behaviours shown:
-- g['Guest'] (slot 0 in the story activity) → kind inferred as actor.
-- g['Book'] (slot 1 in the story activity) → kind inferred as verb.
-- g['Room'] (slot 2 in the story activity) → kind inferred as object.
+- g['Guest'] (slot 0 in a story activity) → kind inferred as actor.
+- g['book'] (slot 1 in the second activity) → kind inferred as verb.
+- g['Room'] (slot 2 in the second activity) → kind inferred as object.
+- The first activity (Guest → 'browses' → 'listings') has only one glossary
+  term, so it is excluded from coverage and renders "not coverage-tracked".
+- 'receives' in the third activity is a bare verb (no glossary identity).
 - g['Cancellation Policy'] is used ONLY in a t-string step, never in any story
   activity, so its kind stays None (kindless) and it renders with a neutral pill.
-- 'Overbooking' is in the glossary file but referenced by no story and no step at
-  all. It still appears in the generated glossary — every file term is included
+- 'Overbooking' is in the glossary file but referenced by no story and no step.
+  It still appears in the generated glossary — every file term is included
   regardless of usage — under the neutral 'Other' section of the Glossary tab.
 """
 
@@ -31,14 +34,17 @@ from pytest_given import (
 # Module-level declaration registers it with the plugin for kind inference.
 g = FileGlossary(Path(__file__).parent / 'file-glossary-booking.md')
 
-# Story: Guest → Book (slot 1, verb) → Room (slot 2, object).
-# 'Confirmation' appears at slot 2 in the second activity (object).
-# 'Cancellation Policy' is NEVER referenced in any activity (deliberately kindless).
+# Story: Guest → book (slot 1, verb) → Room (slot 2, object).
+# The first activity is deliberately under-anchored — only one glossary term
+# (Guest); 'browses' and 'listings' are bare words — so it is NOT coverage-tracked.
+# 'receives' in the third activity is a bare verb the team hasn't promoted to a
+# glossary term. 'Cancellation Policy' is never used in any activity (kindless).
 book_a_room = story(
     'Book a Room',
     [
-        activity(g['Guest'], g['Book']('books'), g['Room']),
-        activity(g['Guest'], g['Book']('receives'), g['Confirmation']),
+        activity(g['Guest'], 'browses', 'listings'),
+        activity(g['Guest'], g['book']('books'), g['Room']),
+        activity(g['Guest'], 'receives', g['Confirmation']),
     ],
 )
 

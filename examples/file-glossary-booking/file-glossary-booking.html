@@ -755,6 +755,12 @@ span.param-highlight {
 .cov-chip.cov-failed { background: #f8d7da; color: #721c24; }
 .cov-chip.cov-mixed { background: #fff3cd; color: #856404; }
 .cov-chip.cov-uncovered { background: #f3f4f6; color: var(--text-muted); }
+.cov-chip.cov-untracked {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-color, #d1d5db);
+  cursor: help;
+}
 
 /* === Scenario badge strip === */
 .activity-badges { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
@@ -1080,7 +1086,7 @@ span.param-highlight {
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span> is available</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book" data-term-name="Book" data-term-def="Reserve a room for a given stay.">books</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span></div>
+            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book" data-term-name="book" data-term-def="Reserve a room for a given stay.">books</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span> receives a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation" data-term-name="Confirmation" data-term-def="A notification acknowledging a successful reservation.">Confirmation</span></div>
           </div><div class="phase-steps">
@@ -1092,7 +1098,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1fde5587ece023672426400520005a377b1f8e0c/examples/file-glossary-booking/test_file_glossary_booking.py#L46">examples/file-glossary-booking/test_file_glossary_booking.py:46</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
       
     </div>
     </div>
@@ -1124,7 +1130,7 @@ span.param-highlight {
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span> is available</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book" data-term-name="Book" data-term-def="Reserve a room for a given stay.">books</span> a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span></div>
+            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book" data-term-name="book" data-term-def="Reserve a room for a given stay.">books</span> a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text">no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation" data-term-name="Confirmation" data-term-def="A notification acknowledging a successful reservation.">Confirmation</span> is issued</div>
           </div><div class="phase-steps">
@@ -1136,7 +1142,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1fde5587ece023672426400520005a377b1f8e0c/examples/file-glossary-booking/test_file_glossary_booking.py#L61">examples/file-glossary-booking/test_file_glossary_booking.py:61</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
       
     </div>
     </div>
@@ -1157,7 +1163,7 @@ span.param-highlight {
       <div class="story-sidebar-item" :class="{ active: selectedStory === 'book-a-room' }"
            @click="selectedStory = 'book-a-room'">
         <div class="story-sidebar-title">Book a Room</div>
-        <div class="story-sidebar-meta">2 activities · 2 scenarios</div>
+        <div class="story-sidebar-meta">3 activities · 2 scenarios</div>
       </div>
       
     </div>
@@ -1171,7 +1177,7 @@ span.param-highlight {
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
             <div class="header-title">Book a Room<button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('view=stories&amp;story=book-a-room', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></div>
-            <div class="header-context">2 activities · 2 scenarios</div>
+            <div class="header-context">3 activities · 2 scenarios</div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
                     @click="clearActivityHighlights()">Deselect</button>
           </div>
@@ -1186,7 +1192,33 @@ span.param-highlight {
             <div class="activity-body">
               
               <div class="activity-path">
-                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span><span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book" data-term-name="Book" data-term-def="Reserve a room for a given stay.">books</span><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span>
+                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span><span class="activity-word">browses</span><span class="activity-word">listings</span>
+              </div>
+              
+            </div>
+            <div class="activity-cov">
+              
+              <span class="cov-chip cov-untracked" title="insufficient number of glossary terms for matching">—</span>
+              
+            </div>
+            <div class="activity-badges">
+              
+              
+              
+              
+              
+            </div>
+          </div>
+          
+          
+          <div class="activity-row" id="activity-book-a-room-2"
+               :class="{ 'activity-row-highlight': highlightedActivities['2'] }">
+            <div class="activity-num" data-activity-id="2"
+                 :class="{ 'activity-num-highlight': highlightedActivities['2'] }">2</div>
+            <div class="activity-body">
+              
+              <div class="activity-path">
+                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span><span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book" data-term-name="book" data-term-def="Reserve a room for a given stay.">books</span><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-name="Room" data-term-def="A bookable hotel room.">Room</span>
               </div>
               
             </div>
@@ -1217,24 +1249,30 @@ span.param-highlight {
           </div>
           
           
-          <div class="activity-row" id="activity-book-a-room-2"
-               :class="{ 'activity-row-highlight': highlightedActivities['2'] }">
-            <div class="activity-num" data-activity-id="2"
-                 :class="{ 'activity-num-highlight': highlightedActivities['2'] }">2</div>
+          <div class="activity-row" id="activity-book-a-room-3"
+               :class="{ 'activity-row-highlight': highlightedActivities['3'] }">
+            <div class="activity-num" data-activity-id="3"
+                 :class="{ 'activity-num-highlight': highlightedActivities['3'] }">3</div>
             <div class="activity-body">
               
               <div class="activity-path">
-                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span><span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book" data-term-name="Book" data-term-def="Reserve a room for a given stay.">receives</span><span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation" data-term-name="Confirmation" data-term-def="A notification acknowledging a successful reservation.">Confirmation</span>
+                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="A person making a room reservation.">Guest</span><span class="activity-word">receives</span><span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation" data-term-name="Confirmation" data-term-def="A notification acknowledging a successful reservation.">Confirmation</span>
               </div>
               
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-uncovered">0/2</span>
+              <span class="cov-chip cov-passed">1/1</span>
               
             </div>
             <div class="activity-badges">
               
+              
+              <a class="use-chip use-chip-passed"
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room'))">
+                <span class="dot-passed">✓</span>
+                Guest books an available room
+              </a>
               
               
               
@@ -1246,7 +1284,7 @@ span.param-highlight {
         <div class="scn-act-strip-section">
           
           <div class="scenario passed" style="margin-bottom: var(--space-sm);"
-               x-show="activitySelectionMatches([1])">
+               x-show="activitySelectionMatches([2, 3])">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <span class="scenario-chevron-placeholder"></span>
@@ -1264,15 +1302,18 @@ span.param-highlight {
             <div class="scn-act-strip">
               <span class="scn-act-label">Covers:</span>
               
-              <span class="use-chip" data-activity-id="1"
-                    :class="{ 'use-chip-highlight': highlightedActivities['1'] }">1</span>
+              <span class="use-chip" data-activity-id="2"
+                    :class="{ 'use-chip-highlight': highlightedActivities['2'] }">2</span>
+              
+              <span class="use-chip" data-activity-id="3"
+                    :class="{ 'use-chip-highlight': highlightedActivities['3'] }">3</span>
               
             </div>
             
           </div>
           
           <div class="scenario passed" style="margin-bottom: var(--space-sm);"
-               x-show="activitySelectionMatches([1])">
+               x-show="activitySelectionMatches([2])">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <span class="scenario-chevron-placeholder"></span>
@@ -1290,8 +1331,8 @@ span.param-highlight {
             <div class="scn-act-strip">
               <span class="scn-act-label">Covers:</span>
               
-              <span class="use-chip" data-activity-id="1"
-                    :class="{ 'use-chip-highlight': highlightedActivities['1'] }">1</span>
+              <span class="use-chip" data-activity-id="2"
+                    :class="{ 'use-chip-highlight': highlightedActivities['2'] }">2</span>
               
             </div>
             
@@ -1299,7 +1340,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1fde5587ece023672426400520005a377b1f8e0c/examples/file-glossary-booking/test_file_glossary_booking.py#L37">examples/file-glossary-booking/test_file_glossary_booking.py:37</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -1432,7 +1473,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1fde5587ece023672426400520005a377b1f8e0c/examples/file-glossary-booking/file-glossary-booking.md#L7">examples/file-glossary-booking/file-glossary-booking.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L7">examples/file-glossary-booking/file-glossary-booking.md:7</a></div>
                 
               </div>
             </div>
@@ -1497,7 +1538,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1fde5587ece023672426400520005a377b1f8e0c/examples/file-glossary-booking/file-glossary-booking.md#L9">examples/file-glossary-booking/file-glossary-booking.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L9">examples/file-glossary-booking/file-glossary-booking.md:9</a></div>
                 
               </div>
             </div>
@@ -1549,7 +1590,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1fde5587ece023672426400520005a377b1f8e0c/examples/file-glossary-booking/file-glossary-booking.md#L10">examples/file-glossary-booking/file-glossary-booking.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L10">examples/file-glossary-booking/file-glossary-booking.md:10</a></div>
                 
               </div>
             </div>
@@ -1576,7 +1617,7 @@ span.param-highlight {
           <div class="entry-head" @click="expandedTerms['book'] ? delete expandedTerms['book'] : (expandedTerms['book'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['book'] }"></span>
             <span class="entry-name">
-              <span class="term-pill term-verb">Book</span>
+              <span class="term-pill term-verb">book</span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Reserve a room for a given stay.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -1609,8 +1650,6 @@ span.param-highlight {
                   
                   <span class="use-chip use-chip--static">books</span>
                   
-                  <span class="use-chip use-chip--static">receives</span>
-                  
                 </div>
                 
                 
@@ -1623,7 +1662,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1fde5587ece023672426400520005a377b1f8e0c/examples/file-glossary-booking/file-glossary-booking.md#L8">examples/file-glossary-booking/file-glossary-booking.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L8">examples/file-glossary-booking/file-glossary-booking.md:8</a></div>
                 
               </div>
             </div>
@@ -1677,7 +1716,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1fde5587ece023672426400520005a377b1f8e0c/examples/file-glossary-booking/file-glossary-booking.md#L11">examples/file-glossary-booking/file-glossary-booking.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L11">examples/file-glossary-booking/file-glossary-booking.md:11</a></div>
                 
               </div>
             </div>
@@ -1711,7 +1750,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1fde5587ece023672426400520005a377b1f8e0c/examples/file-glossary-booking/file-glossary-booking.md#L12">examples/file-glossary-booking/file-glossary-booking.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L12">examples/file-glossary-booking/file-glossary-booking.md:12</a></div>
                 
               </div>
             </div>
@@ -1739,10 +1778,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-27T12:01:17.121117+00:00",
+    "timestamp": "2026-06-27T17:13:43.772598+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "1fde5587ece023672426400520005a377b1f8e0c"
+    "commit_sha": "bba59e14f62416002fec7fdd77b4dc8920e28450"
   },
   "scenarios": [
     {
@@ -1890,7 +1929,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 46
+        "line": 52
       },
       "story_id": "book-a-room",
       "activity_ids": []
@@ -2028,7 +2067,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 61
+        "line": 67
       },
       "story_id": "book-a-room",
       "activity_ids": []
@@ -2049,7 +2088,7 @@ window.__REPORT_DATA__ = {
       {
         "id": "book",
         "kind": "verb",
-        "canonical": "Book",
+        "canonical": "book",
         "definition": "Reserve a room for a given stay.",
         "source": {
           "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
@@ -2113,12 +2152,10 @@ window.__REPORT_DATA__ = {
                   "display": "Guest"
                 },
                 {
-                  "term_id": "book",
-                  "display": "books"
+                  "text": "browses"
                 },
                 {
-                  "term_id": "room",
-                  "display": "Room"
+                  "text": "listings"
                 }
               ]
             }
@@ -2135,7 +2172,27 @@ window.__REPORT_DATA__ = {
                 },
                 {
                   "term_id": "book",
-                  "display": "receives"
+                  "display": "books"
+                },
+                {
+                  "term_id": "room",
+                  "display": "Room"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Guest"
+                },
+                {
+                  "text": "receives"
                 },
                 {
                   "term_id": "confirmation",
@@ -2148,7 +2205,7 @@ window.__REPORT_DATA__ = {
       ],
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 37
+        "line": 42
       }
     }
   ]

@@ -748,6 +748,12 @@ span.param-highlight {
 .cov-chip.cov-failed { background: #f8d7da; color: #721c24; }
 .cov-chip.cov-mixed { background: #fff3cd; color: #856404; }
 .cov-chip.cov-uncovered { background: #f3f4f6; color: var(--text-muted); }
+.cov-chip.cov-untracked {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-color, #d1d5db);
+  cursor: help;
+}
 
 /* === Scenario badge strip === */
 .activity-badges { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }

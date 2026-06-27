@@ -323,7 +323,9 @@
               {% endfor %}
             </div>
             <div class="activity-cov">
-              {% if cov.total == 0 %}
+              {% if not cov.eligible %}
+              <span class="cov-chip cov-untracked" title="insufficient number of glossary terms for matching">—</span>
+              {% elif cov.total == 0 %}
               <span class="cov-chip cov-uncovered">0/{{ total_scns }}</span>
               {% elif cov.passed == cov.total %}
               <span class="cov-chip cov-passed">{{ cov.passed }}/{{ cov.total }}</span>

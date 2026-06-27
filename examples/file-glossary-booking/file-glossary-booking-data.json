@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-27T12:01:17.121117+00:00",
+    "timestamp": "2026-06-27T17:13:43.772598+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "1fde5587ece023672426400520005a377b1f8e0c"
+    "commit_sha": "bba59e14f62416002fec7fdd77b4dc8920e28450"
   },
   "scenarios": [
     {
@@ -152,7 +152,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 46
+        "line": 52
       },
       "story_id": "book-a-room",
       "activity_ids": []
@@ -290,7 +290,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 61
+        "line": 67
       },
       "story_id": "book-a-room",
       "activity_ids": []
@@ -311,7 +311,7 @@
       {
         "id": "book",
         "kind": "verb",
-        "canonical": "Book",
+        "canonical": "book",
         "definition": "Reserve a room for a given stay.",
         "source": {
           "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
@@ -375,12 +375,10 @@
                   "display": "Guest"
                 },
                 {
-                  "term_id": "book",
-                  "display": "books"
+                  "text": "browses"
                 },
                 {
-                  "term_id": "room",
-                  "display": "Room"
+                  "text": "listings"
                 }
               ]
             }
@@ -397,7 +395,27 @@
                 },
                 {
                   "term_id": "book",
-                  "display": "receives"
+                  "display": "books"
+                },
+                {
+                  "term_id": "room",
+                  "display": "Room"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Guest"
+                },
+                {
+                  "text": "receives"
                 },
                 {
                   "term_id": "confirmation",
@@ -410,7 +428,7 @@
       ],
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 37
+        "line": 42
       }
     }
   ]
