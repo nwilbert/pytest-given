@@ -585,7 +585,7 @@ span.param-highlight {
   padding-block: 0;
 }
 
-/* === Term-ref pills (actor / object / verb) and draft cue variants === */
+/* === Term-ref pills (actor / object / verb) === */
 .term-ref-actor {
   background: #fef3c7;
   color: #92400e;
@@ -618,22 +618,6 @@ span.param-highlight {
 }
 .term-ref--link { cursor: pointer; }
 .term-ref--link:hover { text-decoration: underline; }
-/* Draft cue: dashed border for actors/objects, dashed underline for verbs */
-.term-ref-actor.is-draft {
-  border-style: dashed;
-  font-style: italic;
-  cursor: default;
-}
-.term-ref-object.is-draft {
-  border-style: dashed;
-  font-style: italic;
-  cursor: default;
-}
-.term-ref-verb.is-draft {
-  border-bottom-style: dashed;
-  font-style: italic;
-  cursor: default;
-}
 .activity-word {
   color: var(--text-secondary);
 }
@@ -874,7 +858,17 @@ span.param-highlight {
 .entry-name { flex-shrink: 0; min-width: 160px; }
 .entry-body { flex: 1; }
 .entry-def { font-size: var(--font-size-md); color: var(--text-primary); }
-.entry-def-placeholder { font-style: italic; color: var(--text-muted); }
+.entry-def-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
 .entry-summary { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 
 /* === Refs collapsible === */

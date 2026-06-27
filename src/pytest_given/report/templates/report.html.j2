@@ -425,10 +425,14 @@
         <label class="kind-filter-row">
           <input type="checkbox" x-model="glossaryKindFilter.kindless">
           <span class="kind-swatch kind-swatch-kindless"></span>
-          <span>Other</span>
+          <span>Uncategorized</span>
           <span class="nav-group-count">{{ kindless_count }}</span>
         </label>
         {% endif %}
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryUndefinedOnly">
+          <span>Undefined only</span>
+        </label>
       </div>
     </div>
 
@@ -441,7 +445,7 @@
             {{ actor_count }} actor{{ 's' if actor_count != 1 else '' }} ·
             {{ object_count }} work object{{ 's' if object_count != 1 else '' }} ·
             {{ verb_count }} verb{{ 's' if verb_count != 1 else '' }}{% if kindless_count %} ·
-            {{ kindless_count }} other{% endif %}
+            {{ kindless_count }} uncategorized{% endif %}
           </div>
           <button class="collapse-all-btn" @click="toggleAllTerms()">
             <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
@@ -450,7 +454,7 @@
         </div>
       </div>
 
-      {% for kind_label, kind_key, kind_cls in [('Actors', 'actor', 'term-actor'), ('Work Objects', 'object', 'term-obj'), ('Verbs', 'verb', 'term-verb'), ('Other', 'kindless', 'term-kindless')] %}
+      {% for kind_label, kind_key, kind_cls in [('Actors', 'actor', 'term-actor'), ('Work Objects', 'object', 'term-obj'), ('Verbs', 'verb', 'term-verb'), ('Uncategorized', 'kindless', 'term-kindless')] %}
       {% if kind_key == 'kindless' %}
       {% set kind_terms = glossary.terms | selectattr('kind', 'none') | list %}
       {% else %}
@@ -466,14 +470,14 @@
         {% set agg = glossary_aggregations.get(term.id) %}
         {% set q = 'glossarySearch' %}
         <div class="entry" id="term-{{ term.id }}"
-             x-show="!glossarySearch || '{{ (term.canonical + ' ' + (term.definition or '')) | lower }}'.includes(glossarySearch.toLowerCase())">
+             x-show="(!glossaryUndefinedOnly || {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || '{{ (term.canonical + ' ' + (term.definition or '')) | lower }}'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['{{ term.id }}'] ? delete expandedTerms['{{ term.id }}'] : (expandedTerms['{{ term.id }}'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['{{ term.id }}'] }"></span>
             <span class="entry-name">
               <span class="term-pill {{ kind_cls }}">{{ term.canonical }}</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">{{ term.definition if term.definition else '' }}<span class="entry-def-placeholder" {% if term.definition %}style="display:none"{% endif %}>No definition yet.</span></div>
+              <div class="entry-def">{{ term.definition if term.definition else '' }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
               <div class="entry-summary">
                 {% if agg %}
                 {% set show_instances = kind_key in ('actor', 'object') and agg.instances %}
