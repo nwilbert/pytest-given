@@ -7,7 +7,6 @@ from ..model import (
     Activity,
     ActivityId,
     ActivityPart,
-    ActivityPlaceholder,
     ActivityTermRef,
     ActivityWord,
     Glossary,
@@ -46,7 +45,7 @@ def identity_of_part(
     glossary: Glossary,
     part: ActivityPart,
 ) -> Identity | None:
-    """Identity contributed by a single ActivityPart. Words/placeholders → None.
+    """Identity contributed by a single ActivityPart. Words → None.
 
     Verbs contribute the canonical (term_id, None); actors/work objects (and
     kindless terms) contribute an instance identity derived from display."""
@@ -59,21 +58,16 @@ def identity_of_part(
                 term_id=tid,
                 instance_id=instance_id_of(glossary, tid, display),
             )
-        case ActivityWord() | ActivityPlaceholder():
+        case ActivityWord():
             return None
 
 
-def a_refs(glossary: Glossary, activity: Activity) -> set[Identity] | None:
-    """Identity set used for strict A_refs ⊆ S coverage matching.
-
-    Returns None if the activity contains any ActivityPlaceholder (draft),
-    signalling "hard-excluded from implicit coverage" per the spec.
-    """
+def a_refs(glossary: Glossary, activity: Activity) -> set[Identity]:
+    """Identity set used for strict A_refs ⊆ S coverage matching. Every
+    activity participates; words contribute nothing."""
     out: set[Identity] = set()
-    for p in activity.paths:
-        if any(isinstance(part, ActivityPlaceholder) for part in p.parts):
-            return None
-        for part in p.parts:
+    for activity_path in activity.paths:
+        for part in activity_path.parts:
             ident = identity_of_part(glossary, part)
             if ident is not None:
                 out.add(ident)
@@ -134,8 +128,6 @@ def compute_coverage(
         if activity.id not in scope:
             continue
         refs = a_refs(glossary, activity)
-        if refs is None:
-            continue
         if not refs:
             matches_any_step.add(activity.id)
             continue

@@ -1,6 +1,5 @@
 from .collector import Collector, FixtureInstanceKey, set_active_collector
 from .decorators import attach, given, scenario, then, when
-from .draft import DraftActor, DraftVerb, DraftWorkObject, draft
 from .file_glossary import FileGlossary
 from .glossary import DeferredTermHandle, DeferredTermInstance
 from .story import activity, path, story
@@ -11,15 +10,11 @@ __all__ = [
     'Collector',
     'DeferredTermHandle',
     'DeferredTermInstance',
-    'DraftActor',
-    'DraftVerb',
-    'DraftWorkObject',
     'FileGlossary',
     'FixtureInstanceKey',
     'Template',
     'activity',
     'attach',
-    'draft',
     'given',
     'narration_from',
     'parse_short_repr',

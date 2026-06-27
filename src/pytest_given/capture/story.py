@@ -10,7 +10,6 @@ from ..model import (
     ActivityId,
     ActivityPart,
     ActivityPath,
-    ActivityPlaceholder,
     ActivityTermRef,
     ActivityWord,
     Glossary,
@@ -19,7 +18,6 @@ from ..model import (
     StoryId,
     id_derive,
 )
-from .draft import DraftActor, DraftVerb, DraftWorkObject
 from .glossary import (
     Actor,
     ActorInstance,
@@ -42,9 +40,6 @@ type _PathArg = (
     | ActorInstance
     | WorkObjectInstance
     | InflectedVerb
-    | DraftActor
-    | DraftWorkObject
-    | DraftVerb
     | DeferredTermHandle
     | DeferredTermInstance
     | str
@@ -53,14 +48,12 @@ type _PathArg = (
 _ACTOR_TYPES = (
     Actor,
     ActorInstance,
-    DraftActor,
     DeferredTermHandle,
     DeferredTermInstance,
 )
 _VERB_TYPES = (
     Verb,
     InflectedVerb,
-    DraftVerb,
     DeferredTermHandle,
     DeferredTermInstance,
 )
@@ -69,8 +62,6 @@ _NOUN_TYPES = (
     ActorInstance,
     WorkObject,
     WorkObjectInstance,
-    DraftActor,
-    DraftWorkObject,
     DeferredTermHandle,
     DeferredTermInstance,
 )
@@ -249,13 +240,10 @@ def _suggestion_for(pos: int, value: object) -> str:
     if pos == 1:
         return (
             'Position 1 must be the verb; give the activity an action '
-            '(e.g., g.verb("submits") or draft.verb("submits")).'
+            '(e.g., g.verb("submits") or g("submits")).'
         )
     if isinstance(value, str):
-        return (
-            'Wrap the noun: use g.work_object("...") for committed '
-            'vocabulary, or draft.work_object("...") for an unsettled draft.'
-        )
+        return 'Wrap the noun as a glossary term: g.work_object("...") or g("...").'
     return 'Position 2 must be a noun (actor or work object), not a verb.'
 
 
@@ -273,7 +261,5 @@ def _to_part(value: _PathArg) -> ActivityPart:
             return ActivityTermRef(term_id=value.id, display=value.canonical)
         case DeferredTermInstance(handle=handle, display=display):
             return ActivityTermRef(term_id=handle.id, display=display)
-        case DraftActor() | DraftWorkObject() | DraftVerb():
-            return ActivityPlaceholder(kind=value.kind, text=value.text)
         case str():
             return ActivityWord(text=value)

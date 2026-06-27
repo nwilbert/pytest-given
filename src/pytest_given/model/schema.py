@@ -94,15 +94,7 @@ class ActivityWord:
     text: str
 
 
-@dataclass(frozen=True, kw_only=True)
-class ActivityPlaceholder:
-    """A draft (kind-tagged but not glossary-registered) entity or verb."""
-
-    kind: Literal['actor', 'object', 'verb']
-    text: str
-
-
-type ActivityPart = ActivityTermRef | ActivityWord | ActivityPlaceholder
+type ActivityPart = ActivityTermRef | ActivityWord
 
 
 @dataclass(frozen=True, kw_only=True)

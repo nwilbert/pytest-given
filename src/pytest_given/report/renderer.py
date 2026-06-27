@@ -7,7 +7,6 @@ from markupsafe import Markup, escape
 
 from ..model import (
     ActivityPart,
-    ActivityPlaceholder,
     ActivityTermRef,
     ActivityWord,
     Glossary,
@@ -310,13 +309,5 @@ def _make_activity_part_filter(
                 )
             case ActivityWord(text=text):
                 return Markup(f'<span class="activity-word">{escape(text)}</span>')
-            case ActivityPlaceholder(kind=kind, text=text):
-                return Markup(
-                    _term_pill(
-                        classes=[_TERM_KIND_CLASSES[kind], 'is-draft'],
-                        display=text,
-                        title='Draft — promote to glossary to lock in',
-                    )
-                )
 
     return _render

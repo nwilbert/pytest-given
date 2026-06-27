@@ -7,7 +7,6 @@ from pytest_given.model import (
     ActivityId,
     ActivityPart,
     ActivityPath,
-    ActivityPlaceholder,
     ActivityTermRef,
     ActivityWord,
     Attachment,
@@ -263,12 +262,6 @@ def test_activity_word_carries_text() -> None:
     assert part.text == 'for'
 
 
-def test_activity_placeholder_carries_kind_and_text() -> None:
-    part = ActivityPlaceholder(kind='verb', text='redeems')
-    assert part.kind == 'verb'
-    assert part.text == 'redeems'
-
-
 def test_activity_parts_are_frozen() -> None:
     part = ActivityWord(text='for')
     with pytest.raises(dataclasses.FrozenInstanceError):
@@ -280,13 +273,11 @@ def test_activity_part_union_accepts_all_variants() -> None:
         ActivityTermRef(term_id=TermId('g'), display='Guest'),
         ActivityTermRef(term_id=TermId('s'), display='searches'),
         ActivityWord(text='for'),
-        ActivityPlaceholder(kind='object', text='loyalty bonus'),
     ]
     assert [type(p).__name__ for p in parts] == [
         'ActivityTermRef',
         'ActivityTermRef',
         'ActivityWord',
-        'ActivityPlaceholder',
     ]
 
 

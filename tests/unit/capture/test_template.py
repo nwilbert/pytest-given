@@ -3,7 +3,6 @@ from string import templatelib
 
 import pytest
 
-from pytest_given.capture.draft import draft
 from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.template import Template, parse_tstring
 from pytest_given.model import (
@@ -253,36 +252,6 @@ def test_tstring_rendered_text_uses_display_for_term_refs(glossary: Glossary) ->
     guest = glossary.actor('Guest')
     text, _ = parse_tstring(t'the {guest("Alice")} arrives')
     assert text == 'the Alice arrives'
-
-
-# --- Task 5.2: draft interpolations raise PytestGivenError ---
-
-
-def test_tstring_with_draft_actor_raises() -> None:
-    d = draft.actor('Concierge')
-    with pytest.raises(PytestGivenError, match='draft'):
-        parse_tstring(t'the {d} greets')
-
-
-def test_tstring_with_draft_work_object_raises() -> None:
-    d = draft.work_object('loyalty bonus')
-    with pytest.raises(PytestGivenError, match='draft'):
-        parse_tstring(t'the {d} is applied')
-
-
-def test_tstring_with_draft_verb_raises() -> None:
-    d = draft.verb('redeems')
-    with pytest.raises(PytestGivenError, match='draft'):
-        parse_tstring(t'the guest {d} the bonus')
-
-
-def test_tstring_with_draft_error_message_suggests_promotion() -> None:
-    d = draft.actor('Concierge')
-    with pytest.raises(
-        PytestGivenError,
-        match=r'Concierge.*promote.*g\.actor',
-    ):
-        parse_tstring(t'the {d}')
 
 
 # --- Task 5.3: expression field populated; param_column via _templatize_narration ---

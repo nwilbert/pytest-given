@@ -5,7 +5,6 @@ from pytest_given.model import (
     Activity,
     ActivityId,
     ActivityPath,
-    ActivityPlaceholder,
     ActivityTermRef,
     ActivityWord,
     Glossary,
@@ -67,9 +66,8 @@ def test_identity_of_activity_term_ref_verb_ignores_display(g):
     assert identity_of_part(g, p1) == identity_of_part(g, p2)
 
 
-def test_identity_of_word_or_placeholder_is_none(g):
+def test_identity_of_word_is_none(g):
     assert identity_of_part(g, ActivityWord(text='for')) is None
-    assert identity_of_part(g, ActivityPlaceholder(kind='actor', text='x')) is None
 
 
 def test_identity_of_activity_term_ref_kindless_uses_instance_identity(g):
@@ -150,20 +148,6 @@ def test_a_refs_unions_across_multi_path_activity(g):
     )
     assert Identity('guest', 'alice') in a_refs(g, a)
     assert Identity('guest', 'bob') in a_refs(g, a)
-
-
-def test_a_refs_returns_none_sentinel_for_draft_bearing_activity(g):
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            _path(
-                _entity('guest', 'Alice'),
-                ActivityPlaceholder(kind='verb', text='redeems'),
-                _entity('room', 'Room'),
-            ),
-        ),
-    )
-    assert a_refs(g, a) is None
 
 
 # --- Task 8.3: s_for_step and compute_coverage ---
@@ -262,45 +246,6 @@ def test_compute_coverage_does_not_cover_instance_activity_with_canonical_step(g
     )
     coverage = compute_coverage(g, scenario, story)
     assert coverage.get(ActivityId(1), set()) == set()
-
-
-def test_compute_coverage_draft_bearing_activity_excluded_from_implicit(g):
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            _path(
-                _entity('guest', 'Guest'),
-                ActivityPlaceholder(kind='verb', text='redeems'),
-                _entity('room', 'Room'),
-            ),
-        ),
-    )
-    story = Story(id=StoryId('s'), title='S', activities=(a,))
-    scenario = _scenario_with_steps(
-        _step('when', _term_ref('guest', 'Guest'), _term_ref('room', 'Room')),
-    )
-    coverage = compute_coverage(g, scenario, story)
-    assert coverage.get(ActivityId(1), set()) == set()
-
-
-def test_compute_coverage_draft_bearing_activity_covered_by_explicit_binding(g):
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            _path(
-                _entity('guest', 'Guest'),
-                ActivityPlaceholder(kind='verb', text='redeems'),
-                _entity('room', 'Room'),
-            ),
-        ),
-    )
-    story = Story(id=StoryId('s'), title='S', activities=(a,))
-    scenario = _scenario_with_steps(
-        _step('when', activity_ids=[1]),
-    )
-    coverage = compute_coverage(g, scenario, story)
-    assert ActivityId(1) in coverage
-    assert len(coverage[ActivityId(1)]) == 1
 
 
 def test_compute_coverage_scenario_constrained_to_activity_ids(g):

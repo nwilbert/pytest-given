@@ -11,7 +11,6 @@ from ..model import (
     NarrationValue,
     PytestGivenError,
 )
-from .draft import DraftActor, DraftVerb, DraftWorkObject
 from .glossary import (
     Actor,
     ActorInstance,
@@ -91,7 +90,6 @@ def parse_tstring(
 
     Iterates the t-string yielding str | Interpolation. Each interpolation
     is inspected:
-    - Draft handles raise PytestGivenError immediately.
     - Glossary handles (Actor, WorkObject, Verb, and their instances/inflections)
       become NarrationTermRef carrying term_id, display, and the source expression.
     - All other values become NarrationValue as before.
@@ -110,7 +108,6 @@ def parse_tstring(
                 conversion=conversion,
                 format_spec=format_spec,
             ):
-                _reject_draft_in_narration(value)
                 term_ref = _try_term_ref(
                     value, expression, format_spec=format_spec, conversion=conversion
                 )
@@ -131,27 +128,6 @@ def parse_tstring(
                 )
                 rendered_chunks.append(rendered)
     return ''.join(rendered_chunks), parts
-
-
-def _reject_draft_in_narration(value: object) -> None:
-    """Raise PytestGivenError if `value` is a draft handle.
-
-    Drafts are story-side only; they must not appear in step narrations.
-    """
-    if not isinstance(value, (DraftActor, DraftWorkObject, DraftVerb)):
-        return
-    kind_to_method = {
-        'actor': 'g.actor',
-        'object': 'g.work_object',
-        'verb': 'g.verb',
-    }
-    method = kind_to_method[value.kind]
-    raise PytestGivenError(
-        f'draft {value.kind} {value.text!r} cannot appear in a step narration; '
-        f'drafts are story-side only. Either promote it to a glossary term '
-        f'({method}({value.text!r})) and use the typed handle in the t-string, '
-        f'or replace the interpolation with a plain string.'
-    )
 
 
 def _try_term_ref(

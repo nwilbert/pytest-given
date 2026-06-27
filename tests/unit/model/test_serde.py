@@ -4,7 +4,6 @@ from pytest_given.model import (
     Activity,
     ActivityId,
     ActivityPath,
-    ActivityPlaceholder,
     ActivityTermRef,
     ActivityWord,
     Attachment,
@@ -528,7 +527,6 @@ def test_activity_part_variants_round_trip():
         ActivityTermRef(term_id=TermId('guest'), display='Guest'),
         ActivityTermRef(term_id=TermId('search'), display='searches'),
         ActivityWord(text='for'),
-        ActivityPlaceholder(kind='object', text='loyalty bonus'),
     )
     path = ActivityPath(parts=parts)
     activity = Activity(id=ActivityId(1), paths=(path,))

@@ -4,7 +4,6 @@ import pytest
 
 from pytest_given import PytestGivenError
 from pytest_given.capture import source as source_mod
-from pytest_given.capture.draft import draft
 from pytest_given.capture.story import (
     activity,
     clear_story_registry,
@@ -14,7 +13,6 @@ from pytest_given.capture.story import (
 from pytest_given.model import (
     Activity,
     ActivityPath,
-    ActivityPlaceholder,
     ActivityTermRef,
     ActivityWord,
     Glossary,
@@ -100,25 +98,6 @@ def test_path_dispatches_inflected_verb_to_activity_term_ref_with_inflected_disp
     assert p.parts[1] == ActivityTermRef(term_id=search.id, display='searches for')
 
 
-def test_path_dispatches_draft_actor_to_activity_placeholder(guest, search, room):
-    p = path(draft.actor('Concierge'), search, room)
-    assert p.parts[0] == ActivityPlaceholder(kind='actor', text='Concierge')
-
-
-def test_path_dispatches_draft_work_object_to_activity_placeholder(
-    guest,
-    search,
-    room,
-):
-    p = path(guest, search, draft.work_object('loyalty bonus'))
-    assert p.parts[2] == ActivityPlaceholder(kind='object', text='loyalty bonus')
-
-
-def test_path_dispatches_draft_verb_to_activity_placeholder(guest, search, room):
-    p = path(guest, draft.verb('redeems'), room)
-    assert p.parts[1] == ActivityPlaceholder(kind='verb', text='redeems')
-
-
 def test_path_dispatches_bare_string_to_activity_word(guest, search, room):
     p = path(guest, search, room, 'for', guest('Alice'))
     assert p.parts[3] == ActivityWord(text='for')
@@ -147,16 +126,6 @@ def test_path_rejects_bare_string_in_position_0(search, room):
         path('Guest', search, room)
 
 
-def test_path_rejects_draft_work_object_in_position_0(search, room):
-    with pytest.raises(PytestGivenError, match=r'position 0.*actor'):
-        path(draft.work_object('foo'), search, room)
-
-
-def test_path_accepts_draft_actor_in_position_0(search, room):
-    p = path(draft.actor('Concierge'), search, room)
-    assert isinstance(p.parts[0], ActivityPlaceholder)
-
-
 def test_path_rejects_actor_in_position_1(guest, room):
     with pytest.raises(PytestGivenError, match=r'position 1.*verb'):
         path(guest, guest, room)
@@ -170,11 +139,6 @@ def test_path_rejects_bare_string_in_position_1(guest, room):
 def test_path_rejects_work_object_in_position_1(guest, room):
     with pytest.raises(PytestGivenError, match=r'position 1.*verb'):
         path(guest, room, room)
-
-
-def test_path_accepts_draft_verb_in_position_1(guest, room):
-    p = path(guest, draft.verb('redeems'), room)
-    assert isinstance(p.parts[1], ActivityPlaceholder)
 
 
 def test_path_rejects_bare_string_in_position_2(guest, search):
@@ -319,20 +283,6 @@ def test_story_rejects_two_glossaries(guest, search, room):
         )
 
 
-def test_story_with_only_drafts_has_empty_glossary_set():
-    s = story(
-        'Sketch',
-        [
-            activity(
-                draft.actor('Concierge'),
-                draft.verb('redeems'),
-                draft.work_object('loyalty bonus'),
-            )
-        ],
-    )
-    assert s.activities[0].paths[0].parts[0].kind == 'actor'
-
-
 def test_story_empty_title_raises():
     with pytest.raises(PytestGivenError, match='derived id is empty'):
         story('---', [])
@@ -389,13 +339,13 @@ def test_activity_unions_glossary_ids_across_paths(g, guest, search, room):
 
 
 def test_top_level_imports():
-    from pytest_given import Glossary, activity, draft, path, story
+    from pytest_given import Glossary, activity, path, story
 
     g = Glossary()
     guest = g.actor('Guest')
     search = g.verb('search')
     room = g.work_object('Room')
     p = path(guest, search, room)
-    a = activity(p, path(draft.actor('Concierge'), search, room))
+    a = activity(p)
     s = story('Smoke', [a])
     assert s.title == 'Smoke'

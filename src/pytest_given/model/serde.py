@@ -18,7 +18,6 @@ from .schema import (
     ActivityId,
     ActivityPart,
     ActivityPath,
-    ActivityPlaceholder,
     ActivityTermRef,
     ActivityWord,
     Attachment,
@@ -139,13 +138,11 @@ def _activity_path_from_dict(d: dict[str, Any]) -> ActivityPath:
 def _activity_part_from_dict(d: dict[str, Any]) -> ActivityPart:
     if 'term_id' in d:
         return ActivityTermRef(term_id=TermId(d['term_id']), display=d['display'])
-    if 'kind' in d:
-        return ActivityPlaceholder(kind=d['kind'], text=d['text'])
     if 'text' in d:
         return ActivityWord(text=d['text'])
     raise PytestGivenError(
         f'unknown ActivityPart shape (keys: {sorted(d)!r}). Expected one of '
-        '"term_id", "kind", "text".'
+        '"term_id", "text".'
     )
 
 

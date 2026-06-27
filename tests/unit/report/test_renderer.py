@@ -2,8 +2,6 @@ import json
 import re
 from pathlib import Path
 
-import pytest
-
 from pytest_given.report.renderer import render_html
 
 
@@ -1101,7 +1099,6 @@ def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
 # ---------------------------------------------------------------------------
 
 from pytest_given.model import (  # noqa: E402
-    ActivityPlaceholder,
     ActivityTermRef,
     ActivityWord,
 )
@@ -1145,20 +1142,6 @@ def test_activity_part_filter_word_renders_activity_word_class():
     out = str(f(ActivityWord(text='for')))
     assert 'activity-word' in out
     assert 'for' in out
-
-
-@pytest.mark.parametrize(
-    ('kind', 'expected'),
-    [
-        ('actor', 'term-ref-actor is-draft'),
-        ('object', 'term-ref-object is-draft'),
-        ('verb', 'term-ref-verb is-draft'),
-    ],
-)
-def test_activity_part_filter_placeholder_renders_draft_variant(kind, expected):
-    f = _make_activity_part_filter(None)
-    out = str(f(ActivityPlaceholder(kind=kind, text='x')))
-    assert expected in out
 
 
 # ---------------------------------------------------------------------------
