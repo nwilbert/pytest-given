@@ -23,7 +23,7 @@ governs *coverage matching*, not authoring: it does not gate what you may write,
 only where coverage carries enough signal to be meaningful.
 
 This **supersedes** two grammar rules in the
-[draft-unification spec](../2026-06-27-glossary-draft-unification-design.md):
+[draft-unification spec](2026-06-27-glossary-draft-unification-design.md):
 
 - *"Position 1 specifically must be a verb."*
 - *"A bare `str` is **not** allowed at an even position."*
@@ -190,7 +190,7 @@ Pre-release: no compatibility shims.
   be a bare string, but an activity needs ≥ 2 distinct glossary terms to be
   tracked for coverage. Adjust any prose implying every path part must be a term.
 - **Supersede note:** add a pointer in the
-  [draft-unification spec](../2026-06-27-glossary-draft-unification-design.md)
+  [draft-unification spec](2026-06-27-glossary-draft-unification-design.md)
   marking its two grammar bullets as superseded by this spec, when this lands.
 - Per the spec-lifecycle convention, `git mv` this file up to
   `docs/superpowers/specs/` in the commit that lands the implementation.

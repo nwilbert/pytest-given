@@ -66,7 +66,8 @@ def path(*parts: _PathArg) -> ActivityPath:
     onto a Domain Storytelling graph. Even positions (0, 2, ...) are entity
     nodes (actor / work object); odd positions (1, 3, ...) are edges — a verb
     handle or a bare-string connective. Position 0 is an actor, position 1 a
-    verb. The path has odd length >= 3 and ends on a node."""
+    verb — but any position also accepts a bare string (an ActivityWord that
+    carries no role). The path has odd length >= 3 and ends on a node."""
     if len(parts) < 3 or len(parts) % 2 == 0:
         raise PytestGivenError(
             f'activity path must alternate node / edge / node … with an odd '
