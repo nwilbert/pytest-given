@@ -103,7 +103,8 @@ Out:
 - **File glossary.** `capture/file_glossary.py` already provides the target
   shape: a single **deferred-kind** `FileTermHandle` (one type for all kinds),
   name-based `g['Guest']` access that raises on unknown with a did-you-mean
-  hint, and `kind=None` until resolved.
+  hint, and `kind=None` until resolved. Nothing in its body is file-specific —
+  it is just `TermHandle` + `__call__` — so it generalizes by renaming (below).
 - **Kind inference.** `capture/kind_resolution.py::resolve_glossary_kinds`
   already runs over the merged glossary for *every* registered glossary
   (`plugin.py:421`), inferring `None` kinds from activity slot-positions
@@ -133,8 +134,9 @@ coverage special-case all lose their reason to exist.
 | `g.actor/work_object/verb("foo", definition=…)` | explicit | creates | declared | optional |
 
 - Both `g("foo")` and `g["foo"]` return a **deferred-kind handle** — the same
-  handle type the file glossary already uses. The plan unifies on one deferred
-  handle rather than introducing a second.
+  handle type the file glossary already uses, generalized by renaming
+  `FileTermHandle` → `DeferredTermHandle` (see *Deletions and model changes*).
+  The plan unifies on one deferred handle rather than introducing a second.
 - `g("foo")` is idempotent: a later `g.verb("foo")` or `g("foo")` for the same
   name returns/refines the same term (subject to the existing `terms_match`
   conflict rule).
@@ -153,9 +155,10 @@ The user-facing `g` is the raw model `Glossary`, so two things change there:
   use). `__call__` is added for declare-or-get.
 - The deferred handle minted by `g("foo")` / `g["foo"]` must be **directly
   usable** in `path()` and t-strings. `_to_part` and `_try_term_ref` already
-  accept `FileTermHandle` / `FileTermInstance`; the unified handle slots into
-  the same match arms. The eager `Actor`/`WorkObject`/`Verb` handles minted by
-  the explicit `g.actor(...)` API remain valid.
+  accept `FileTermHandle` / `FileTermInstance` (renamed to `DeferredTermHandle` /
+  `DeferredTermInstance`); the unified handle slots into the same match arms. The
+  eager `Actor`/`WorkObject`/`Verb` handles minted by the explicit `g.actor(...)`
+  API remain valid.
 
 ### Story grammar
 
@@ -243,6 +246,13 @@ Touchpoints: `serde` read becomes `d.get('definition')` and write omits the key
   unrelated and stays.
 - Remove `_reject_draft_in_narration`. A vocabulary handle in a t-string is
   always a real term ref now.
+- **Rename the deferred handle to a kind-neutral name.** `FileTermHandle` →
+  `DeferredTermHandle` and `FileTermInstance` → `DeferredTermInstance`, moved to
+  `capture/glossary.py` next to `TermHandle` (the shared base) so neither code
+  nor file glossary owns it. `FileGlossary` imports and mints the renamed class
+  instead of defining its own; the code glossary's `__call__` / `__getitem__`
+  mint the same type. Nothing in the body changes — it is purely a name + home
+  move, plus updating `_to_part` / `_try_term_ref` match arms and any imports.
 
 ## Error handling
 
