@@ -21,7 +21,7 @@ Two accessors carry the new ergonomics on the existing code-defined glossary
    existing term if present (leaning on today's idempotent registration). This
    is the lightweight path that replaces `draft.*`: no kind. It takes an
    optional `definition` (`g("foo", definition=…)`) — kindless does not imply
-   undocumented.
+   undefined.
 2. **`g["foo"]` — get-only.** References a term named elsewhere; raises on an
    unknown name (with a did-you-mean hint), as a typo guard.
 
@@ -69,7 +69,7 @@ In:
   actor, and ends on a node. This replaces the current "free-form beyond
   position 2" rule and makes a path directly convertible to a Domain
   Storytelling graph (nodes + labelled edges).
-- **`definition` becomes `str | None`** (default `None`): models "undocumented"
+- **`definition` becomes `str | None`** (default `None`): models "undefined"
   as a first-class state parallel to `kind: … | None`, with boundary
   normalization (`''` / whitespace-only → `None`) so there is exactly one
   representation.
@@ -87,7 +87,7 @@ Out:
   is left to inference); use `g.actor/work_object/verb("foo", definition=…)`
   when you want to *state* a kind in code. A definition, by contrast, *is*
   accepted on `g("foo")`.
-- **A separate "promote me" / drafts worklist view.** Surfacing undocumented
+- **A separate "promote me" / drafts worklist view.** Surfacing undefined
   terms reuses the existing Glossary view + a filter; no new tab.
 
 ## Background
@@ -194,15 +194,15 @@ Connectives are `ActivityWord` (no `term_id`) and never reach inference, so any
 `a_refs` drops its placeholder check and the early `None` return; an activity's
 identity set is built from its `ActivityTermRef` parts as today. Every activity
 is eligible for matching. The former "stays visibly uncovered" demonstration
-(hotel-booking activity 7) is re-expressed as "stays visibly *undocumented*" via
+(hotel-booking activity 7) is re-expressed as "stays visibly *undefined*" via
 the report flag below — a term/activity can now legitimately be covered while
 still lacking a definition.
 
 ### Definition as `str | None`
 
 `GlossaryTerm.definition` becomes `str | None` (default `None`) so
-"undocumented" is a first-class state, parallel to `kind: … | None` for
-"unclassified". To keep exactly one representation, the value is **normalized at
+"undefined" is a first-class state, parallel to `kind: … | None` for
+"kindless". To keep exactly one representation, the value is **normalized at
 the boundaries**: `_register_kind` and `FileGlossary._add_row` map an empty or
 whitespace-only definition to `None` (a blank description cell, which parses to
 `''` today, becomes `None`). The constructors flip their default —
@@ -215,23 +215,23 @@ Touchpoints: `serde` read becomes `d.get('definition')` and write omits the key
 `{% if term.definition %}` keep working unchanged; the Glossary search filter
 (`report.html.j2:469`) concatenates `term.definition`, so it must guard with
 `(term.definition or '')` to avoid a `None`-concatenation error. The report's
-"undocumented" test is `definition is None`.
+"undefined" test is `definition is None`.
 
 ### Report
 
-- **Undocumented flag.** Terms whose `definition is None` get a visible marker
+- **Undefined flag.** Terms whose `definition is None` get a visible marker
   in the Glossary view (the *"No definition yet."* placeholder already renders;
   promote it from a faint hint to a deliberate badge).
-- **Filter.** Add an "undocumented" toggle next to the existing kind filters so
+- **Filter.** Add an "undefined" toggle next to the existing kind filters so
   a reader can isolate the terms that still need prose. Kindless terms continue
   to appear in the existing *Uncategorized* group; no new tab or view.
 - **Rename the kindless bucket label** from *Other* to *Uncategorized* (the
   visible group heading, the filter row, and the summary count at
   `report.html.j2:428/444/453`). The internal `kindless` filter key / CSS
   (`glossaryKindFilter.kindless`, `kind-swatch-kindless`) is unchanged.
-- **Orthogonal flags.** A term can be both kindless and undocumented, so the two
+- **Orthogonal flags.** A term can be both kindless and undefined, so the two
   read as independent signals: it sits in the *Uncategorized* group *and* carries
-  an undocumented badge — not one or the other.
+  an undefined badge — not one or the other.
 - All report changes are template/CSS/`app.js` and are verified with Playwright
   (the data-shaped contract — aggregations / kindless bucket — keeps its Python
   tests).
@@ -287,17 +287,43 @@ Touchpoints: `serde` read becomes `d.get('definition')` and write omits the key
 - **Definition:** empty / whitespace-only definitions normalize to `None` from
   both the typed constructors and a blank `FileGlossary` cell; serde round-trips
   `None`.
-- **Report:** Playwright — undocumented badge shows when `definition is None`,
-  the undocumented filter isolates those terms, kindless terms appear in *Uncategorized*.
+- **Report:** Playwright — undefined badge shows when `definition is None`,
+  the undefined filter isolates those terms, kindless terms appear in *Uncategorized*.
 
 ## Migration
 
 Pre-release: no compatibility shims (per project policy). Rewrite the
 `hotel-booking` example to drop `draft.*` — activity 7's `draft.verb('redeems')`
 / `draft.work_object('loyalty points')` become `g('redeems')` / `g('loyalty
-points')` (kindless until inferred), demonstrating the new undocumented state.
-Update `GLOSSARY.md`/`README` references and any prose in the two prior specs
-that describes drafts as current behavior.
+points')` (kindless until inferred), demonstrating the new undefined state.
+Update `README` references and any prose in the two prior specs that describes
+drafts as current behavior.
+
+### `GLOSSARY.md` updates
+
+The project glossary (`GLOSSARY.md`, *Domain Storytelling* section) is updated in
+the same commit as the code (per its update rule):
+
+- **Remove `Draft`.** The placeholder vocabulary concept is gone.
+- **Remove the `ActivityPlaceholder` variant from `ActivityPart`** — it becomes a
+  three-variant union (`ActivityEntity` / `ActivityTerm` / `ActivityWord`).
+- **Replace `FileTermHandle`** with **`DeferredTermHandle`**: the deferred-kind
+  handle returned by *both* the code glossary (`g('foo')` declare-or-get,
+  `g['foo']` get-only) and a `FileGlossary` (`g['Guest']`). Kind is `None` until
+  the post-collection resolution pass runs.
+- **Amend `Glossary` (capitalized)** to list the two accessor forms — `g('foo')`
+  (declare-or-get a kindless term, optional `definition=`) and `g['foo']`
+  (get-only, raises on an unknown name) — alongside the typed
+  `.actor/.work_object/.verb` methods.
+- **Amend `Term`** so the definition is "an optional definition (`str | None`,
+  `None` when undefined)".
+- **Add `Kindless`** — a term with `kind=None` (no actor/object/verb classification
+  yet); inferred from story slot positions, and shown in the report's
+  *Uncategorized* bucket when inference leaves it unset.
+- **Add `Undefined`** — a term with `definition is None` (no prose yet);
+  surfaced by a badge and a filter in the Glossary view. Orthogonal to *kindless*.
+- **Add `Uncategorized`** (report term) — the Glossary-view bucket for kindless
+  terms; renamed from the former *Other*.
 
 ## Forward notes
 
@@ -307,4 +333,4 @@ that describes drafts as current behavior.
   stays unambiguously "lightweight kindless".
 - **Promote-to-file workflow.** With drafts gone, "promote" becomes "add a
   definition (and let the kind infer)". A future export feature could surface
-  undocumented terms as a checklist for writing them into `GLOSSARY.md`.
+  undefined terms as a checklist for writing them into `GLOSSARY.md`.
