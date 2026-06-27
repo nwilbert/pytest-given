@@ -356,7 +356,7 @@ def test_glossary_register_appends_and_indexes() -> None:
     t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
     g._register(t)
     assert g.terms == [t]
-    assert g[TermId('guest')] is t
+    assert g.get(TermId('guest')) is t
     assert g.get(TermId('missing')) is None
 
 
@@ -380,8 +380,8 @@ def test_glossary_post_init_indexes_terms_passed_at_construction() -> None:
     t1 = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
     t2 = GlossaryTerm(id=TermId('room'), kind='object', canonical='Room')
     g = Glossary(terms=[t1, t2])
-    assert g[TermId('guest')] is t1
-    assert g[TermId('room')] is t2
+    assert g.get(TermId('guest')) is t1
+    assert g.get(TermId('room')) is t2
 
 
 # --- Task 1.5: NarrationTermRef + extended NarrationPart union ---

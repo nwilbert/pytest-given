@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, NewType
 
 if TYPE_CHECKING:
-    from ..capture.glossary import Actor, Verb, WorkObject
+    from ..capture.glossary import Actor, DeferredTermHandle, Verb, WorkObject
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -158,9 +158,6 @@ class Glossary:
         for term in self.terms:
             self._by_id[term.id] = term
 
-    def __getitem__(self, key: TermId) -> GlossaryTerm:
-        return self._by_id[key]
-
     def get(self, key: TermId) -> GlossaryTerm | None:
         return self._by_id.get(key)
 
@@ -172,6 +169,10 @@ class Glossary:
 
     if TYPE_CHECKING:
 
+        def __call__(
+            self, name: str, definition: str | None = None
+        ) -> DeferredTermHandle: ...
+        def __getitem__(self, name: str) -> DeferredTermHandle: ...
         def actor(self, name: str, definition: str | None = None) -> Actor: ...
         def work_object(
             self, name: str, definition: str | None = None

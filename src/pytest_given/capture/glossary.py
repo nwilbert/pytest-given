@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import difflib
 from dataclasses import dataclass
 from typing import Literal
 
@@ -212,6 +213,46 @@ def _glossary_verb(self: Glossary, name: str, definition: str | None = None) -> 
     return handle
 
 
+def deferred_handle_or_raise(
+    glossary: Glossary,
+    name: str,
+    handle_cache: dict[TermId, DeferredTermHandle] | None = None,
+) -> DeferredTermHandle:
+    """Name-based, case-insensitive get-only lookup returning a deferred handle.
+    Raises PytestGivenError with a did-you-mean hint on an unknown name. Shared
+    by the code glossary's g[...] / g(...) lookups and FileGlossary."""
+    term_id = id_derive(name)
+    if handle_cache is not None and term_id in handle_cache:
+        return handle_cache[term_id]
+    term = glossary.get(term_id)
+    if term is None:
+        close = difflib.get_close_matches(
+            name, [candidate.canonical for candidate in glossary.terms], n=3
+        )
+        hint = f' Did you mean: {", ".join(close)}?' if close else ''
+        raise PytestGivenError(f'no glossary term named {name!r}.{hint}')
+    handle = DeferredTermHandle(_term=term, _glossary=glossary)
+    if handle_cache is not None:
+        handle_cache[term_id] = handle
+    return handle
+
+
+def _glossary_call(
+    self: Glossary, name: str, definition: str | None = None
+) -> DeferredTermHandle:
+    # skip=2: this function → user call site
+    source = capture_caller_source(skip=2)
+    term = _register_kind(self, None, name, definition, source)
+    register_glossary(self)
+    return DeferredTermHandle(_term=term, _glossary=self)
+
+
+def _glossary_getitem(self: Glossary, name: str) -> DeferredTermHandle:
+    return deferred_handle_or_raise(self, name)
+
+
 Glossary.actor = _glossary_actor  # type: ignore[method-assign]
 Glossary.work_object = _glossary_work_object  # type: ignore[method-assign]
 Glossary.verb = _glossary_verb  # type: ignore[method-assign]
+Glossary.__call__ = _glossary_call  # type: ignore[method-assign]
+Glossary.__getitem__ = _glossary_getitem  # type: ignore[method-assign]

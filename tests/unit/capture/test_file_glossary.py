@@ -183,3 +183,22 @@ def test_idempotent_duplicate_rows_ok(tmp_path):
     fg = FileGlossary(path)
     assert len(fg.glossary.terms) == 1
     assert fg.glossary.get(TermId('guest')) is not None
+
+
+# --- Task 3: FileGlossary.__call__ (lookup-only, closed vocabulary) ---
+
+
+def test_file_glossary_call_known_name_returns_handle(glossary_file):
+    """FileGlossary is callable: g('Guest') returns a DeferredTermHandle."""
+    glossary = FileGlossary(glossary_file)
+    handle = glossary('Guest')
+    assert isinstance(handle, DeferredTermHandle)
+    assert handle.term.canonical == 'Guest'
+
+
+def test_file_glossary_call_unknown_name_raises(glossary_file):
+    """FileGlossary call form on an unknown name raises PytestGivenError (closed
+    vocabulary — it never creates terms)."""
+    glossary = FileGlossary(glossary_file)
+    with pytest.raises(PytestGivenError, match='no glossary term'):
+        glossary('Unknown Term')

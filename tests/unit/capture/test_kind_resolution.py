@@ -38,7 +38,7 @@ def _story(title, *triples):
 
 
 def _kind(glossary, term_id):
-    return glossary[TermId(term_id)].kind
+    return glossary.get(TermId(term_id)).kind
 
 
 def test_infers_actor_verb_object_by_position():

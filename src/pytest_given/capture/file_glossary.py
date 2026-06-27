@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import difflib
 from pathlib import Path
 from typing import Literal
 
@@ -16,6 +15,7 @@ from ..model import (
 from .glossary import (
     DeferredTermHandle,
     _normalize_definition,
+    deferred_handle_or_raise,
     register_glossary,
     terms_match,
 )
@@ -100,17 +100,9 @@ class FileGlossary:
         return mapped
 
     def __getitem__(self, name: str) -> DeferredTermHandle:
-        term_id = id_derive(name)
-        handle = self._handles.get(term_id)
-        if handle is not None:
-            return handle
-        term = self._glossary.get(term_id)
-        if term is None:
-            close = difflib.get_close_matches(
-                name, [candidate.canonical for candidate in self._glossary.terms], n=3
-            )
-            hint = f' Did you mean: {", ".join(close)}?' if close else ''
-            raise PytestGivenError(f'no glossary term named {name!r}.{hint}')
-        handle = DeferredTermHandle(_term=term, _glossary=self._glossary)
-        self._handles[term_id] = handle
-        return handle
+        return deferred_handle_or_raise(self._glossary, name, self._handles)
+
+    def __call__(self, name: str) -> DeferredTermHandle:
+        # A FileGlossary is a closed vocabulary: the call form looks up only,
+        # never creates. Unknown names raise (same as the subscript).
+        return self[name]

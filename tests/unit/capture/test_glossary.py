@@ -7,6 +7,7 @@ from pytest_given.capture import source as source_mod
 from pytest_given.capture.glossary import (
     Actor,
     ActorInstance,
+    DeferredTermHandle,
     InflectedVerb,
     Verb,
     WorkObject,
@@ -109,21 +110,21 @@ def test_glossary_actor_registers_and_returns_handle():
     assert a.id == 'guest'
     assert a.canonical == 'Guest'
     assert a.term.definition == 'Person booking accommodation.'
-    assert g[TermId('guest')].kind == 'actor'
+    assert g.get(TermId('guest')).kind == 'actor'
 
 
 def test_glossary_work_object_registers_and_returns_handle():
     g = Glossary()
     w = g.work_object('Room')
     assert isinstance(w, WorkObject)
-    assert g[TermId('room')].kind == 'object'
+    assert g.get(TermId('room')).kind == 'object'
 
 
 def test_glossary_verb_registers_and_returns_handle():
     g = Glossary()
     v = g.verb('confirm')
     assert isinstance(v, Verb)
-    assert g[TermId('confirm')].kind == 'verb'
+    assert g.get(TermId('confirm')).kind == 'verb'
 
 
 def test_glossary_re_registration_with_matching_fields_is_idempotent():
@@ -236,3 +237,45 @@ def test_real_definition_is_kept():
     g = Glossary()
     verb = g.verb('book', 'Reserve a room.')
     assert verb.term.definition == 'Reserve a room.'
+
+
+# --- Task 3: g(name) declare-or-get and g[name] get-only ---
+
+
+def test_call_declares_kindless_term():
+    g = Glossary()
+    handle = g('loyalty points')
+    assert handle.term.kind is None
+    assert handle.term.canonical == 'loyalty points'
+
+
+def test_call_is_idempotent():
+    g = Glossary()
+    first = g('redeems')
+    second = g('redeems')
+    assert first.term is second.term
+
+
+def test_call_accepts_definition():
+    g = Glossary()
+    handle = g('redeems', 'Exchange points for a benefit.')
+    assert handle.term.definition == 'Exchange points for a benefit.'
+
+
+def test_call_returns_deferred_handle():
+    g = Glossary()
+    handle = g('loyalty points')
+    assert isinstance(handle, DeferredTermHandle)
+
+
+def test_subscript_get_only_returns_handle():
+    g = Glossary()
+    g('redeems')
+    assert g['redeems'].term.canonical == 'redeems'
+
+
+def test_subscript_unknown_name_raises_with_hint():
+    g = Glossary()
+    g('redeems')
+    with pytest.raises(PytestGivenError, match='redeems'):
+        g['redeem']

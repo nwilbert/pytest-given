@@ -546,8 +546,8 @@ def test_glossary_round_trips_and_rebuilds_index():
     report = ReportData(metadata=_meta(), glossary=g)
     rt = _round_trip(report)
     assert rt.glossary is not None
-    assert rt.glossary[TermId('guest')].canonical == 'Guest'
-    assert rt.glossary[TermId('room')].kind == 'object'
+    assert rt.glossary.get(TermId('guest')).canonical == 'Guest'
+    assert rt.glossary.get(TermId('room')).kind == 'object'
 
 
 def test_narration_term_ref_round_trips():
