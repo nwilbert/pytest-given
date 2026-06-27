@@ -26,7 +26,7 @@ from ..model import (
     StoryId,
     TermId,
 )
-from .coverage import StepRef, compute_coverage, walk_steps
+from .coverage import StepRef, compute_coverage, is_coverage_eligible, walk_steps
 
 # ---------------------------------------------------------------------------
 # Public dataclasses
@@ -59,10 +59,12 @@ class GlossaryAggregation:
 
 @dataclass
 class ActivityCoverage:
-    """Per-activity coverage rollup: which scenarios cover it, pass count, total."""
+    """Per-activity coverage rollup: which scenarios cover it, pass count,
+    total, and whether it is eligible for coverage matching at all."""
 
     scenario_ids: list[NodeId] = field(default_factory=list)
     passed: int = 0
+    eligible: bool = True
 
     @property
     def total(self) -> int:
@@ -146,7 +148,9 @@ def build_story_rollups(
                 if scn.status == 'passed':
                     passed += 1
             per_activity[activity.id] = ActivityCoverage(
-                scenario_ids=covered_by, passed=passed
+                scenario_ids=covered_by,
+                passed=passed,
+                eligible=is_coverage_eligible(activity),
             )
         rollups[story.id] = StoryRollup(scenarios=scenarios, per_activity=per_activity)
     return rollups

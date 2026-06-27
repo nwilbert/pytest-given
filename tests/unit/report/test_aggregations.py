@@ -5,6 +5,7 @@ from pytest_given.model import (
     ActivityId,
     ActivityPath,
     ActivityTermRef,
+    ActivityWord,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -22,6 +23,7 @@ from pytest_given.report.aggregations import (
     build_coverage_maps,
     build_glossary_aggregations,
     build_scenario_slug_index,
+    build_story_rollups,
     build_term_scenario_index,
     tab_visibility,
 )
@@ -594,3 +596,39 @@ def test_scenario_slug_duplicate_basename_raises() -> None:
     )
     with pytest.raises(ValueError, match='Duplicate scenario slug'):
         build_scenario_slug_index(rd)
+
+
+def test_build_story_rollups_flags_under_anchored_activity_ineligible() -> None:
+    g = _g()
+    eligible = Activity(
+        id=ActivityId(1),
+        paths=(
+            ActivityPath(
+                parts=(
+                    _ent('guest', 'Guest'),
+                    _verb_part('search'),
+                    _ent('room', 'Room'),
+                )
+            ),
+        ),
+    )
+    under_anchored = Activity(
+        id=ActivityId(2),
+        paths=(
+            ActivityPath(
+                parts=(
+                    _ent('guest', 'Guest'),
+                    ActivityWord(text='browses'),
+                    ActivityWord(text='listings'),
+                )
+            ),
+        ),
+    )
+    story = Story(
+        id=StoryId('book'), title='Book', activities=(eligible, under_anchored)
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[], stories=[story], glossary=g)
+    rollups = build_story_rollups(rd, build_coverage_maps(rd))
+    per_activity = rollups[StoryId('book')].per_activity
+    assert per_activity[ActivityId(1)].eligible is True
+    assert per_activity[ActivityId(2)].eligible is False
