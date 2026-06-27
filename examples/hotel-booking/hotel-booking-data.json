@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-22T20:04:27.129455+00:00",
+    "timestamp": "2026-06-27T11:38:58.343334+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "6eedfa0046db94b8cf25a6c8e150d625c46c4375"
+    "commit_sha": "bb6465a6072a195b5f65a96f52077fe281077965"
   },
   "scenarios": [
     {
@@ -181,7 +181,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 156
+        "line": 146
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
@@ -513,7 +513,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 170
+        "line": 161
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
@@ -728,7 +728,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 250
+        "line": 238
       },
       "story_id": "cancel-a-booking",
       "activity_ids": []
@@ -1156,7 +1156,7 @@
                 },
                 {
                   "path": "examples/hotel-booking/test_hotel_booking.py",
-                  "lineno": 240,
+                  "lineno": 228,
                   "func": "test_payment_declined",
                   "code": "    assert payment_method in SUPPORTED_PAYMENT_METHODS",
                   "is_internal": false
@@ -1171,7 +1171,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 206
+        "line": 196
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
@@ -1186,7 +1186,7 @@
         "definition": "Person booking accommodation on behalf of a group.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 52
+          "line": 54
         }
       },
       {
@@ -1216,7 +1216,7 @@
         "definition": "A bookable hotel room.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 60
+          "line": 58
         }
       },
       {
@@ -1226,7 +1226,7 @@
         "definition": "A reservation for one or more rooms.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 61
+          "line": 59
         }
       },
       {
@@ -1236,7 +1236,7 @@
         "definition": "Money transferred for a booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 62
+          "line": 60
         }
       },
       {
@@ -1246,7 +1246,7 @@
         "definition": "Notification of a successful booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 63
+          "line": 61
         }
       },
       {
@@ -1256,7 +1256,7 @@
         "definition": "Look up available options.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 67
+          "line": 63
         }
       },
       {
@@ -1266,7 +1266,7 @@
         "definition": "Choose one option from a set.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 68
+          "line": 64
         }
       },
       {
@@ -1276,7 +1276,7 @@
         "definition": "Attach a member to a collection.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 69
+          "line": 65
         }
       },
       {
@@ -1286,7 +1286,7 @@
         "definition": "Send to the system for processing.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 70
+          "line": 66
         }
       },
       {
@@ -1296,7 +1296,7 @@
         "definition": "Finalize and acknowledge.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 71
+          "line": 67
         }
       },
       {
@@ -1306,7 +1306,7 @@
         "definition": "Deliver to a recipient.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 72
+          "line": 68
         }
       },
       {
@@ -1316,7 +1316,7 @@
         "definition": "Refuse to process or accept.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 75
+          "line": 71
         }
       },
       {
@@ -1326,7 +1326,7 @@
         "definition": "Withdraw a booking before arrival.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 77
+          "line": 73
         }
       },
       {
@@ -1336,7 +1336,27 @@
         "definition": "Return money for a cancelled booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 78
+          "line": 74
+        }
+      },
+      {
+        "id": "redeems",
+        "kind": "verb",
+        "canonical": "redeems",
+        "definition": null,
+        "source": {
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
+          "line": 104
+        }
+      },
+      {
+        "id": "loyalty-points",
+        "kind": "object",
+        "canonical": "loyalty points",
+        "definition": null,
+        "source": {
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
+          "line": 105
         }
       }
     ]
@@ -1549,12 +1569,12 @@
                   "display": "Carol"
                 },
                 {
-                  "kind": "verb",
-                  "text": "redeems"
+                  "term_id": "redeems",
+                  "display": "redeems"
                 },
                 {
-                  "kind": "object",
-                  "text": "loyalty points"
+                  "term_id": "loyalty-points",
+                  "display": "loyalty points"
                 }
               ]
             }
@@ -1563,7 +1583,7 @@
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 81
+        "line": 77
       }
     },
     {
@@ -1650,7 +1670,7 @@
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 122
+        "line": 114
       }
     }
   ]

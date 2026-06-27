@@ -62,21 +62,23 @@ The Domain-Driven Design layer atop the core surface. All terms here are optiona
 | Term | Meaning |
 |---|---|
 | **glossary** (lowercase) | The Ubiquitous-Language concept: the shared vocabulary a domain speaks in. |
-| **Glossary** (capitalized) | The class that holds glossary terms — `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.verb(...)` registration methods. |
+| **Glossary** (capitalized) | The class that holds glossary terms — `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.verb(...)` registration methods and `g('foo')` (declare-or-get a kindless term, optional `definition=`) / `g['foo']` (get-only, raises on unknown) accessor forms. |
 | **FileGlossary** | A glossary loaded from a Markdown file. `FileGlossary(path)` parses all GFM pipe tables in the file into the same inner `Glossary` model; terms are accessed by name (`g['Guest']`, case-insensitive). Kind inference fills in term kinds post-collection from activity-slot positions when no explicit `kind_column` is configured. |
-| **FileTermHandle** | The deferred-kind handle a `FileGlossary` returns from `g[name]`. Carries the `GlossaryTerm` and a back-ref to the inner `Glossary`; callable to override display (`g['Room']('Deluxe Suite')`). Kind is `None` until the post-collection resolution pass runs. |
-| **Term** | A registered glossary entry: an Actor, Work Object, or Verb. Each carries an id (slug), a canonical name, a kind, and an optional definition. |
+| **DeferredTermHandle** | The deferred-kind handle returned by both the code glossary (`g('foo')` declare-or-get, `g['foo']` get-only) and a `FileGlossary` (`g['Guest']`). Kind is `None` until the post-collection resolution pass runs. |
+| **Term** | A registered glossary entry: an Actor, Work Object, Verb, or kindless term. Each carries an id (slug), a canonical name, a kind (`None` when kindless), and an optional definition (`str | None`, `None` when undefined). |
 | **Actor** | A glossary term for a participant in the domain (e.g., *Guest*). Renders with the actor pill style. |
 | **Work Object** | A glossary term for a thing acted on (e.g., *Room*, *Booking*). Renders with the work-object pill style. |
 | **Verb** | A glossary term for an action (e.g., *book*, *confirm*). Verbs accept inflections — calling `book('books')` records *books* as a surface form of the canonical *book*. |
 | **Term ref** | An occurrence of a term inside narration. Modelled as `NarrationTermRef` in step text and as `ActivityEntity` / `ActivityTerm` inside activity prose. |
 | **Instance** | A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). Instances aggregate in the Glossary tab's refs block. |
 | **Inflection** | A surface form of a Verb other than its canonical name (e.g., *searches for* as an inflection of *search*). Reported under "Also used as:" in the Glossary. |
-| **Draft** | A placeholder vocabulary item authored via `draft.actor(...)`, `draft.work_object(...)`, `draft.verb(...)`. Not registered in the Glossary; rendered with an "is-draft" cue so reviewers see what still needs to land. |
 | **Story** | A named flow modelled as a sequence of activities. Constructed by `story('Title', [activity(...), ...])`. Stories are first-class report tabs and the unit of coverage. |
 | **Activity** | One row in a story — typically `actor + verb + work_object` plus optional connective words. Constructed by `activity(...)`. |
-| **ActivityPart** | The four-variant union making up an activity's prose: `ActivityEntity` (actor/object ref), `ActivityTerm` (verb ref), `ActivityWord` (plain word), `ActivityPlaceholder` (draft). |
+| **ActivityPart** | The three-variant union making up an activity's prose: `ActivityEntity` (actor/object ref), `ActivityTerm` (verb ref), `ActivityWord` (plain word). |
 | **Path** | A branching segment inside a story — `path(...)` lets alternate activity sequences share a prefix. |
 | **Scenario↔activity binding** | The link between a scenario (or step) and one or more story activities. Carried by `@scenario(story=, activities=)` and the `activity=` kwarg on `given`/`when`/`then`. |
 | **Coverage** | The "did this scenario touch that activity" relation. Computed by the *A_refs ⊆ S* rule: an activity is covered when its set of term references (as identities, with a canonical fallback) is a subset of the union of term-reference identities across the scenario's steps. |
+| **Kindless** | A term with `kind=None`; inferred from story slot positions, shown in the report's *Uncategorized* bucket when inference leaves it unset. |
+| **Undefined** | A term with `definition is None`; surfaced by a badge and filter in the Glossary view. Orthogonal to *kindless*. |
+| **Uncategorized** | The Glossary-view bucket for kindless terms (kind inference left `kind=None`). |
 | **Glossary-only mode** | A suite that declares a `Glossary` in `conftest.py` but no stories. Renders the Glossary tab alone; the Stories tab is suppressed when no stories exist. |

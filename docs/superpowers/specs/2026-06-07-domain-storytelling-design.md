@@ -238,6 +238,8 @@ JSON shape is unaffected: only the lists are serialized. External consumers read
 
 ### Authoring API (`src/pytest_given/__init__.py` exports; implementation in new modules)
 
+> **`draft.*` rows superseded:** the `draft.actor` / `draft.work_object` / `draft.verb` API and the `ActivityPlaceholder` schema variant are removed in [2026-06-27-glossary-draft-unification-design.md](2026-06-27-glossary-draft-unification-design.md).
+
 Public surface:
 
 | Name | Signature | Effect |

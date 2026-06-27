@@ -113,6 +113,8 @@ g = FileGlossary('GLOSSARY.md', kind_column='Kind')   # explicit kinds from a he
 
 ### `FileTermHandle`
 
+> **Superseded:** `FileTermHandle` is renamed `DeferredTermHandle` in [2026-06-27-glossary-draft-unification-design.md](2026-06-27-glossary-draft-unification-design.md).
+
 One handle type for all file terms, regardless of kind (kind is deferred).
 
 - Carries the `GlossaryTerm` and a back-ref to the inner `Glossary` (same shape

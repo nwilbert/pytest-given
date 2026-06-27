@@ -198,7 +198,7 @@ def test_select_suite(carol):
 
 Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it. A step can also bind explicitly with `given(text, activity=...)`.
 
-**Draft vocabulary** — `draft.actor('Some Name')`, `draft.work_object(...)`, `draft.verb(...)` mark in-progress terms that aren't yet ready to land in the glossary. Drafts render with a striped/italic cue in the report so reviewers see what still needs to be defined.
+**Kindless and undefined terms** — use `g('foo')` to declare a term that the team hasn't classified yet. It registers under the *Uncategorized* bucket in the Glossary view (no kind pill) and shows an *Undefined* badge until `definition=` is supplied. Use `g['foo']` to look up an already-declared term by name (raises if unknown). Both forms return a `DeferredTermHandle` usable in t-strings and story activities.
 
 **Glossary-only mode** — if you want the Glossary tab without writing stories yet, put `g = Glossary()` in a `conftest.py` so the plugin discovers it.
 
@@ -233,7 +233,7 @@ with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
 
 When no `kind_column` is present, term kinds are **inferred from story activity-slot positions** at session finish: slot 0 → actor, slot 1 → verb, slot ≥ 2 → work object. A term used only in t-string steps (never in any story activity) stays kindless and renders with a neutral, uncoloured pill.
 
-**Every term in the glossary file is included in the report**, even one referenced by no story and no step. Terms whose kind could not be identified are listed under a neutral **Other** section in the Glossary tab (and filterable via its own "Other" toggle).
+**Every term in the glossary file is included in the report**, even one referenced by no story and no step. Terms whose kind could not be identified are listed under the **Uncategorized** section in the Glossary tab (and filterable via its own toggle).
 
 See the [file-backed glossary design spec](docs/superpowers/specs/2026-06-18-file-backed-glossary-design.md) and the [file-glossary-booking example](examples/file-glossary-booking/test_file_glossary_booking.py) for a worked end-to-end usage.
 
@@ -322,7 +322,7 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
 Three example suites live under [`examples/`](examples/), each with pre-rendered JSON + HTML committed:
 
 - [`coffeeshop/test_coffeeshop.py`](examples/coffeeshop/test_coffeeshop.py) — a tour of the core feature surface: `when`/`then` blocks, generator fixtures with teardown, plain text and JSON attachments, parameterized tests rendered as tables, t-string interpolation, helper functions that record their own steps, top-level `given` blocks, deeply nested steps, failure rendering, and skipped scenarios. Output: [`coffeeshop.html`](examples/coffeeshop/coffeeshop.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop/coffeeshop.html)).
-- [`hotel-booking/test_hotel_booking.py`](examples/hotel-booking/test_hotel_booking.py) — Domain Storytelling features: a `Glossary` of actors / work objects / verbs, a `story(...)` with `activity(...)` rows, scenarios bound to a story with per-activity coverage, and `draft.*` placeholders for in-progress vocabulary. Output: [`hotel-booking.html`](examples/hotel-booking/hotel-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking/hotel-booking.html)).
+- [`hotel-booking/test_hotel_booking.py`](examples/hotel-booking/test_hotel_booking.py) — Domain Storytelling features: a `Glossary` of actors / work objects / verbs, a `story(...)` with `activity(...)` rows, scenarios bound to a story with per-activity coverage, and kindless + undefined terms (registered with `g('foo')`) awaiting classification. Output: [`hotel-booking.html`](examples/hotel-booking/hotel-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking/hotel-booking.html)).
 - [`file-glossary-booking/test_file_glossary_booking.py`](examples/file-glossary-booking/test_file_glossary_booking.py) — `FileGlossary` features: loading a Markdown glossary file, name-based term access, inferred kinds from story activity slots, and a deliberately kindless term (neutral pill). Output: [`file-glossary-booking.html`](examples/file-glossary-booking/file-glossary-booking.html).
 
 Run `nox -s examples` to regenerate all three.

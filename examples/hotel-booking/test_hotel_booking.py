@@ -4,8 +4,8 @@ An Organizer (Carol) reserves rooms for her colleagues Alice and Bob ahead of a
 conference. The Story covers seven activities exercising every part of the
 domain-storytelling grammar: canonical entities, actor/work-object instances,
 two work objects joined by a preposition, two actors in the same path,
-multi-path activities for parallel branches, and a draft activity for in-flight
-vocabulary.
+multi-path activities for parallel branches, and an activity whose vocabulary
+is kindless and undefined, awaiting glossary classification.
 
 Three scenarios implement the Story at varying detail, each in full
 Given/When/Then form:
@@ -22,8 +22,11 @@ Given/When/Then form:
   `test_complete_booking` to show how a scenario can probe a different aspect
   (the failure path) of the same activities.
 
-Activity 7 stays uncovered (drafts are excluded from implicit coverage), making
-visible the vocabulary the team still has to commit.
+Activity 7 uses `redeems` and `loyalty points`, both registered as kindless
+(Uncategorized) terms with no definition yet (Undefined). It participates in
+coverage like any other activity, but no scenario currently references those
+terms, so it appears as an uncovered gap in the Stories view — signalling that
+the vocabulary still needs to be exercised by a test.
 
 A second, shorter Story — `Cancel a Booking` — shares the same glossary to
 exercise the multi-story parts of the report (Stories tab, story filter) and to
@@ -37,7 +40,6 @@ import pytest
 from pytest_given import (
     Glossary,
     activity,
-    draft,
     given,
     path,
     scenario,
@@ -95,12 +97,12 @@ book_a_group_trip = story(
             path(booking_system, send('sends'), confirmation, 'to', guest('Alice')),
             path(booking_system, send('sends'), confirmation, 'to', guest('Bob')),
         ),
-        # 7. Draft verb + draft work object — vocabulary the team hasn't yet
-        #    committed; stays visibly uncovered until promoted to the glossary.
+        # 7. Vocabulary the team hasn't classified yet — kindless until kind
+        #    inference runs, and undefined until someone writes a definition.
         activity(
             organizer('Carol'),
-            draft.verb('redeems'),
-            draft.work_object('loyalty points'),
+            g('redeems'),
+            g('loyalty points'),
         ),
     ],
 )

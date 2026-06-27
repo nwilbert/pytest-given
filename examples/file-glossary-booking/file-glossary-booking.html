@@ -592,7 +592,7 @@ span.param-highlight {
   padding-block: 0;
 }
 
-/* === Term-ref pills (actor / object / verb) and draft cue variants === */
+/* === Term-ref pills (actor / object / verb) === */
 .term-ref-actor {
   background: #fef3c7;
   color: #92400e;
@@ -625,22 +625,6 @@ span.param-highlight {
 }
 .term-ref--link { cursor: pointer; }
 .term-ref--link:hover { text-decoration: underline; }
-/* Draft cue: dashed border for actors/objects, dashed underline for verbs */
-.term-ref-actor.is-draft {
-  border-style: dashed;
-  font-style: italic;
-  cursor: default;
-}
-.term-ref-object.is-draft {
-  border-style: dashed;
-  font-style: italic;
-  cursor: default;
-}
-.term-ref-verb.is-draft {
-  border-bottom-style: dashed;
-  font-style: italic;
-  cursor: default;
-}
 .activity-word {
   color: var(--text-secondary);
 }
@@ -881,7 +865,17 @@ span.param-highlight {
 .entry-name { flex-shrink: 0; min-width: 160px; }
 .entry-body { flex: 1; }
 .entry-def { font-size: var(--font-size-md); color: var(--text-primary); }
-.entry-def-placeholder { font-style: italic; color: var(--text-muted); }
+.entry-def-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
 .entry-summary { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 
 /* === Refs collapsible === */
@@ -1099,7 +1093,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6eedfa0046db94b8cf25a6c8e150d625c46c4375/examples/file-glossary-booking/test_file_glossary_booking.py#L46">examples/file-glossary-booking/test_file_glossary_booking.py:46</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bb6465a6072a195b5f65a96f52077fe281077965/examples/file-glossary-booking/test_file_glossary_booking.py#L46">examples/file-glossary-booking/test_file_glossary_booking.py:46</a></div>
       
     </div>
     </div>
@@ -1143,7 +1137,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6eedfa0046db94b8cf25a6c8e150d625c46c4375/examples/file-glossary-booking/test_file_glossary_booking.py#L61">examples/file-glossary-booking/test_file_glossary_booking.py:61</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bb6465a6072a195b5f65a96f52077fe281077965/examples/file-glossary-booking/test_file_glossary_booking.py#L61">examples/file-glossary-booking/test_file_glossary_booking.py:61</a></div>
       
     </div>
     </div>
@@ -1306,7 +1300,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6eedfa0046db94b8cf25a6c8e150d625c46c4375/examples/file-glossary-booking/test_file_glossary_booking.py#L37">examples/file-glossary-booking/test_file_glossary_booking.py:37</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bb6465a6072a195b5f65a96f52077fe281077965/examples/file-glossary-booking/test_file_glossary_booking.py#L37">examples/file-glossary-booking/test_file_glossary_booking.py:37</a></div>
         
       </div>
       
@@ -1354,10 +1348,14 @@ span.param-highlight {
         <label class="kind-filter-row">
           <input type="checkbox" x-model="glossaryKindFilter.kindless">
           <span class="kind-swatch kind-swatch-kindless"></span>
-          <span>Other</span>
+          <span>Uncategorized</span>
           <span class="nav-group-count">2</span>
         </label>
         
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryUndefinedOnly">
+          <span>Undefined only</span>
+        </label>
       </div>
     </div>
 
@@ -1370,7 +1368,7 @@ span.param-highlight {
             1 actor ·
             2 work objects ·
             1 verb ·
-            2 other
+            2 uncategorized
           </div>
           <button class="collapse-all-btn" @click="toggleAllTerms()">
             <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
@@ -1393,14 +1391,14 @@ span.param-highlight {
         
         
         <div class="entry" id="term-guest"
-             x-show="!glossarySearch || 'guest a person making a room reservation.'.includes(glossarySearch.toLowerCase())">
+             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'guest a person making a room reservation.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['guest'] ? delete expandedTerms['guest'] : (expandedTerms['guest'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['guest'] }"></span>
             <span class="entry-name">
               <span class="term-pill term-actor">Guest</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">A person making a room reservation.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-def">A person making a room reservation.<span class="entry-def-badge" style="display:none">Undefined</span></div>
               <div class="entry-summary">
                 
                 
@@ -1435,7 +1433,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6eedfa0046db94b8cf25a6c8e150d625c46c4375/examples/file-glossary-booking/file-glossary-booking.md#L7">examples/file-glossary-booking/file-glossary-booking.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bb6465a6072a195b5f65a96f52077fe281077965/examples/file-glossary-booking/file-glossary-booking.md#L7">examples/file-glossary-booking/file-glossary-booking.md:7</a></div>
                 
               </div>
             </div>
@@ -1458,14 +1456,14 @@ span.param-highlight {
         
         
         <div class="entry" id="term-room"
-             x-show="!glossarySearch || 'room a bookable hotel room.'.includes(glossarySearch.toLowerCase())">
+             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'room a bookable hotel room.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['room'] ? delete expandedTerms['room'] : (expandedTerms['room'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['room'] }"></span>
             <span class="entry-name">
               <span class="term-pill term-obj">Room</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">A bookable hotel room.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-def">A bookable hotel room.<span class="entry-def-badge" style="display:none">Undefined</span></div>
               <div class="entry-summary">
                 
                 
@@ -1500,7 +1498,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6eedfa0046db94b8cf25a6c8e150d625c46c4375/examples/file-glossary-booking/file-glossary-booking.md#L9">examples/file-glossary-booking/file-glossary-booking.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bb6465a6072a195b5f65a96f52077fe281077965/examples/file-glossary-booking/file-glossary-booking.md#L9">examples/file-glossary-booking/file-glossary-booking.md:9</a></div>
                 
               </div>
             </div>
@@ -1510,14 +1508,14 @@ span.param-highlight {
         
         
         <div class="entry" id="term-confirmation"
-             x-show="!glossarySearch || 'confirmation a notification acknowledging a successful reservation.'.includes(glossarySearch.toLowerCase())">
+             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'confirmation a notification acknowledging a successful reservation.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['confirmation'] ? delete expandedTerms['confirmation'] : (expandedTerms['confirmation'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['confirmation'] }"></span>
             <span class="entry-name">
               <span class="term-pill term-obj">Confirmation</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">A notification acknowledging a successful reservation.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-def">A notification acknowledging a successful reservation.<span class="entry-def-badge" style="display:none">Undefined</span></div>
               <div class="entry-summary">
                 
                 
@@ -1552,7 +1550,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6eedfa0046db94b8cf25a6c8e150d625c46c4375/examples/file-glossary-booking/file-glossary-booking.md#L10">examples/file-glossary-booking/file-glossary-booking.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bb6465a6072a195b5f65a96f52077fe281077965/examples/file-glossary-booking/file-glossary-booking.md#L10">examples/file-glossary-booking/file-glossary-booking.md:10</a></div>
                 
               </div>
             </div>
@@ -1575,14 +1573,14 @@ span.param-highlight {
         
         
         <div class="entry" id="term-book"
-             x-show="!glossarySearch || 'book reserve a room for a given stay.'.includes(glossarySearch.toLowerCase())">
+             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'book reserve a room for a given stay.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['book'] ? delete expandedTerms['book'] : (expandedTerms['book'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['book'] }"></span>
             <span class="entry-name">
               <span class="term-pill term-verb">Book</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">Reserve a room for a given stay.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-def">Reserve a room for a given stay.<span class="entry-def-badge" style="display:none">Undefined</span></div>
               <div class="entry-summary">
                 
                 
@@ -1626,7 +1624,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6eedfa0046db94b8cf25a6c8e150d625c46c4375/examples/file-glossary-booking/file-glossary-booking.md#L8">examples/file-glossary-booking/file-glossary-booking.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bb6465a6072a195b5f65a96f52077fe281077965/examples/file-glossary-booking/file-glossary-booking.md#L8">examples/file-glossary-booking/file-glossary-booking.md:8</a></div>
                 
               </div>
             </div>
@@ -1642,21 +1640,21 @@ span.param-highlight {
       
       <div x-show="glossaryKindFilter.kindless">
         <div class="kind-header">
-          <span class="kind-title term-kindless">Other</span>
+          <span class="kind-title term-kindless">Uncategorized</span>
           <span class="kind-meta">2 terms</span>
         </div>
         
         
         
         <div class="entry" id="term-cancellation-policy"
-             x-show="!glossarySearch || 'cancellation policy the rules governing how and when a booking may be cancelled.'.includes(glossarySearch.toLowerCase())">
+             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'cancellation policy the rules governing how and when a booking may be cancelled.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['cancellation-policy'] ? delete expandedTerms['cancellation-policy'] : (expandedTerms['cancellation-policy'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['cancellation-policy'] }"></span>
             <span class="entry-name">
               <span class="term-pill term-kindless">Cancellation Policy</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">The rules governing how and when a booking may be cancelled.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-def">The rules governing how and when a booking may be cancelled.<span class="entry-def-badge" style="display:none">Undefined</span></div>
               <div class="entry-summary">
                 
               </div>
@@ -1680,7 +1678,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6eedfa0046db94b8cf25a6c8e150d625c46c4375/examples/file-glossary-booking/file-glossary-booking.md#L11">examples/file-glossary-booking/file-glossary-booking.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bb6465a6072a195b5f65a96f52077fe281077965/examples/file-glossary-booking/file-glossary-booking.md#L11">examples/file-glossary-booking/file-glossary-booking.md:11</a></div>
                 
               </div>
             </div>
@@ -1690,14 +1688,14 @@ span.param-highlight {
         
         
         <div class="entry" id="term-overbooking"
-             x-show="!glossarySearch || 'overbooking accepting more reservations than there are rooms available.'.includes(glossarySearch.toLowerCase())">
+             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'overbooking accepting more reservations than there are rooms available.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['overbooking'] ? delete expandedTerms['overbooking'] : (expandedTerms['overbooking'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['overbooking'] }"></span>
             <span class="entry-name">
               <span class="term-pill term-kindless">Overbooking</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">Accepting more reservations than there are rooms available.<span class="entry-def-placeholder" style="display:none">No definition yet.</span></div>
+              <div class="entry-def">Accepting more reservations than there are rooms available.<span class="entry-def-badge" style="display:none">Undefined</span></div>
               <div class="entry-summary">
                 
               </div>
@@ -1714,7 +1712,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6eedfa0046db94b8cf25a6c8e150d625c46c4375/examples/file-glossary-booking/file-glossary-booking.md#L12">examples/file-glossary-booking/file-glossary-booking.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bb6465a6072a195b5f65a96f52077fe281077965/examples/file-glossary-booking/file-glossary-booking.md#L12">examples/file-glossary-booking/file-glossary-booking.md:12</a></div>
                 
               </div>
             </div>
@@ -1742,10 +1740,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-22T20:04:27.479906+00:00",
+    "timestamp": "2026-06-27T11:38:58.698348+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "6eedfa0046db94b8cf25a6c8e150d625c46c4375"
+    "commit_sha": "bb6465a6072a195b5f65a96f52077fe281077965"
   },
   "scenarios": [
     {
@@ -2199,6 +2197,7 @@ function reportApp() {
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
+    glossaryUndefinedOnly: false,
     expandedTerms: {},
     hoveredActivity: null,
     hoveredScenario: null,
