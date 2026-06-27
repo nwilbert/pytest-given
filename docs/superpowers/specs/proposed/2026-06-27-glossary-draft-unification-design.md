@@ -57,7 +57,7 @@ In:
   terms have ids.
 - **Report:** make definition-less terms visually flagged and filterable
   (the *"No definition yet."* state already renders) alongside the existing kind
-  filters; kindless terms already render in the *Other* bucket.
+  filters; kindless terms already render in the *Uncategorized* bucket.
 - **Story grammar formalized as a node/edge alternation:** even positions
   (0, 2, 4, …) are entity **nodes** (actors / work objects); odd positions
   (1, 3, 5, …) are **edges** — a verb handle or a bare-string connective. A path
@@ -104,7 +104,7 @@ Out:
   (`plugin.py:421`), inferring `None` kinds from activity slot-positions
   (0 → actor, 1 → verb, ≥2 → object; "leads a path at least once" wins → actor)
   and verifying declared kinds. Kindless terms (`kind=None`) are already a
-  first-class model state and already render in the report's *Other* bucket
+  first-class model state and already render in the report's *Uncategorized* bucket
   (`selectattr('kind', 'none')`).
 - **Drafts.** `capture/draft.py` mints `Draft*` placeholders → `_to_part`
   produces `ActivityPlaceholder(kind, text)` (no id). `coverage.py::a_refs`
@@ -134,7 +134,7 @@ coverage special-case all lose their reason to exist.
   name returns/refines the same term (subject to the existing `terms_match`
   conflict rule).
 - A term created via `g("foo")` and used only in scenario narration (never in a
-  story slot) is never reached by inference and stays **kindless → *Other***.
+  story slot) is never reached by inference and stays **kindless → *Uncategorized***.
   That is the intended replacement for "a draft verb referenced in a scenario".
 
 ### Handle and subscript integration
@@ -214,7 +214,14 @@ Touchpoints: `serde` read becomes `d.get('definition')` and write omits the key
   promote it from a faint hint to a deliberate badge).
 - **Filter.** Add an "undocumented" toggle next to the existing kind filters so
   a reader can isolate the terms that still need prose. Kindless terms continue
-  to appear in the existing *Other* group; no new tab or view.
+  to appear in the existing *Uncategorized* group; no new tab or view.
+- **Rename the kindless bucket label** from *Other* to *Uncategorized* (the
+  visible group heading, the filter row, and the summary count at
+  `report.html.j2:428/444/453`). The internal `kindless` filter key / CSS
+  (`glossaryKindFilter.kindless`, `kind-swatch-kindless`) is unchanged.
+- **Orthogonal flags.** A term can be both kindless and undocumented, so the two
+  read as independent signals: it sits in the *Uncategorized* group *and* carries
+  an undocumented badge — not one or the other.
 - All report changes are template/CSS/`app.js` and are verified with Playwright
   (the data-shaped contract — aggregations / kindless bucket — keeps its Python
   tests).
@@ -264,7 +271,7 @@ Touchpoints: `serde` read becomes `d.get('definition')` and write omits the key
   both the typed constructors and a blank `FileGlossary` cell; serde round-trips
   `None`.
 - **Report:** Playwright — undocumented badge shows when `definition is None`,
-  the undocumented filter isolates those terms, kindless terms appear in *Other*.
+  the undocumented filter isolates those terms, kindless terms appear in *Uncategorized*.
 
 ## Migration
 
