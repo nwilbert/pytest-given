@@ -107,7 +107,7 @@ def test_path_dispatches_bare_string_to_activity_word(guest, search, room):
 
 
 def test_path_rejects_path_with_fewer_than_three_parts(guest, search):
-    with pytest.raises(PytestGivenError, match='incomplete'):
+    with pytest.raises(PytestGivenError, match=r'odd|length.*3|alternate'):
         path(guest, search)
 
 
@@ -156,9 +156,54 @@ def test_path_accepts_actor_in_position_2(guest, search):
     assert isinstance(p.parts[2], ActivityTermRef)
 
 
-def test_path_accepts_free_form_parts_beyond_position_2(guest, search, room):
-    p = path(guest, search, room, 'into', room('Inbox'), search('searches'))
-    assert len(p.parts) == 6
+def test_path_accepts_extended_alternation(guest, search, room):
+    # actor verb node connective node — valid 5-part alternation ending on a node
+    p = path(guest, search, room, 'into', room('Inbox'))
+    assert len(p.parts) == 5
+
+
+# --- Task 5: node/edge alternation ---
+
+
+def test_path_allows_node_edge_alternation_with_connective():
+    g = Glossary()
+    actor = g.actor('Organizer')
+    verb = g.verb('adds')
+    guest = g.actor('Guest')
+    booking = g.work_object('Booking')
+    # actor verb object 'to' actor  (len 5, ends on a node)
+    result = path(actor, verb, booking, 'to', guest)
+    assert len(result.parts) == 5
+
+
+def test_path_allows_second_verb_edge():
+    g = Glossary()
+    actor = g.actor('System')
+    confirm = g.verb('confirms')
+    booking = g.work_object('Booking')
+    send = g.verb('sends')
+    note = g.work_object('Confirmation')
+    # actor verb object verb object  (len 5)
+    result = path(actor, confirm, booking, send, note)
+    assert len(result.parts) == 5
+
+
+def test_path_rejects_bare_string_at_even_position():
+    g = Glossary()
+    actor = g.actor('Organizer')
+    verb = g.verb('adds')
+    with pytest.raises(PytestGivenError, match='position 2'):
+        path(actor, verb, 'booking')
+
+
+def test_path_rejects_dangling_edge():
+    g = Glossary()
+    actor = g.actor('Organizer')
+    verb = g.verb('adds')
+    booking = g.work_object('Booking')
+    # len 4 — ends on an edge
+    with pytest.raises(PytestGivenError, match=r'odd|dangling|ends'):
+        path(actor, verb, booking, 'to')
 
 
 # --- Task 4.3: activity() constructor ---

@@ -1,9 +1,9 @@
 """Post-collection inference of file-glossary term kinds from story usage.
 
 A term referenced by an activity path gets a kind from the slot positions it
-appears in across all stories: position 0 → actor slot, 1 → verb slot, ≥2 →
-noun slot (actor or work object). Undeclared kinds are inferred; declared
-kinds are verified against observed positions. Conflicts raise."""
+appears in across all stories: 0 → actor, odd → verb, even ≥ 2 → noun
+(actor or work object). Undeclared kinds are inferred; declared kinds are
+verified against observed positions. Conflicts raise."""
 
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ def resolve_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary
 def _slot_for(position: int) -> _Slot:
     if position == 0:
         return 'actor'
-    if position == 1:
+    if position % 2 == 1:
         return 'verb'
     return 'noun'
 

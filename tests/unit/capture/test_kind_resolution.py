@@ -162,3 +162,16 @@ def test_declared_verb_in_noun_slot_raises():
     )
     with pytest.raises(PytestGivenError, match=r'(?i)noun slot'):
         resolve_glossary_kinds(glossary, [_story('S', ('subject', 'action', 'search'))])
+
+
+# --- Task 5: _slot_for alternation ---
+
+
+def test_slot_for_maps_odd_positions_to_verb():
+    from pytest_given.capture.kind_resolution import _slot_for
+
+    assert _slot_for(0) == 'actor'
+    assert _slot_for(1) == 'verb'
+    assert _slot_for(2) == 'noun'
+    assert _slot_for(3) == 'verb'
+    assert _slot_for(4) == 'noun'

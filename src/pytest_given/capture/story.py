@@ -45,19 +45,13 @@ type _PathArg = (
     | str
 )
 
-_ACTOR_TYPES = (
-    Actor,
-    ActorInstance,
-    DeferredTermHandle,
-    DeferredTermInstance,
-)
-_VERB_TYPES = (
-    Verb,
-    InflectedVerb,
-    DeferredTermHandle,
-    DeferredTermInstance,
-)
-_NOUN_TYPES = (
+# Even positions are graph nodes (entities); odd positions are edges (a verb
+# arrow or a bare-string connective). A DeferredTermHandle/Instance has no eager
+# kind, so it is structurally valid at either kind of position and resolved by
+# kind inference + _slot_for later.
+_ACTOR_TYPES = (Actor, ActorInstance, DeferredTermHandle, DeferredTermInstance)
+_VERB_TYPES = (Verb, InflectedVerb, DeferredTermHandle, DeferredTermInstance)
+_NODE_TYPES = (
     Actor,
     ActorInstance,
     WorkObject,
@@ -68,26 +62,39 @@ _NOUN_TYPES = (
 
 
 def path(*parts: _PathArg) -> ActivityPath:
-    """Build an ActivityPath. Enforces the DS sentence grammar on the leading
-    triple: actor → verb → noun. Beyond position 2, free-form."""
-    if len(parts) < 3:
+    """Build an ActivityPath as a node/edge alternation, so it maps directly
+    onto a Domain Storytelling graph. Even positions (0, 2, ...) are entity
+    nodes (actor / work object); odd positions (1, 3, ...) are edges — a verb
+    handle or a bare-string connective. Position 0 is an actor, position 1 a
+    verb. The path has odd length >= 3 and ends on a node."""
+    if len(parts) < 3 or len(parts) % 2 == 0:
         raise PytestGivenError(
-            f'activity path is incomplete: needs at least actor → verb → noun, '
-            f'got {len(parts)} part(s): {parts!r}.'
+            f'activity path must alternate node / edge / node … with an odd '
+            f'length >= 3 (it must start and end on an entity node); got '
+            f'{len(parts)} part(s): {parts!r}. A trailing arrow with no target '
+            f'is not allowed — split multi-arrow activities into separate '
+            f'path(...) calls.'
         )
     _check_position(parts[0], 0, 'actor', _ACTOR_TYPES, parts)
     _check_position(parts[1], 1, 'verb', _VERB_TYPES, parts)
-    _check_position(parts[2], 2, 'noun', _NOUN_TYPES, parts)
-    schema_parts = tuple(_to_part(p) for p in parts)
+    for position in range(2, len(parts)):
+        part = parts[position]
+        if position % 2 == 0:
+            _check_position(part, position, 'noun', _NODE_TYPES, parts)
+        elif not isinstance(part, (*_VERB_TYPES, str)):
+            _check_position(part, position, 'verb', _VERB_TYPES, parts)
+    schema_parts = tuple(_to_part(part) for part in parts)
     # Stash the set of Glossary object-identities the path references — read
     # by activity() and _check_single_glossary to enforce the v1 "one glossary
     # per story" invariant at construction time. Not serialized.
     glossary_ids: frozenset[int] = frozenset(
-        _obj_id(g) for g in (_glossary_of(p) for p in parts) if g is not None
+        _obj_id(owner)
+        for owner in (_glossary_of(part) for part in parts)
+        if owner is not None
     )
-    p_obj = ActivityPath(parts=schema_parts)
-    object.__setattr__(p_obj, '_glossary_ids', glossary_ids)
-    return p_obj
+    path_obj = ActivityPath(parts=schema_parts)
+    object.__setattr__(path_obj, '_glossary_ids', glossary_ids)
+    return path_obj
 
 
 def _glossary_of(value: object) -> Glossary | None:
