@@ -19,7 +19,9 @@ Two accessors carry the new ergonomics on the existing code-defined glossary
 
 1. **`g("foo")` — declare-or-get.** Mints a *kindless* term if new, returns the
    existing term if present (leaning on today's idempotent registration). This
-   is the lightweight path that replaces `draft.*`: no kind, no definition.
+   is the lightweight path that replaces `draft.*`: no kind. It takes an
+   optional `definition` (`g("foo", definition=…)`) — kindless does not imply
+   undocumented.
 2. **`g["foo"]` — get-only.** References a term named elsewhere; raises on an
    unknown name (with a did-you-mean hint), as a typo guard.
 
@@ -41,9 +43,11 @@ out-of-scope lines in the
 In:
 
 - **`g("foo")` declare-or-get** on the code-defined `Glossary` — mints a
-  kindless term (`kind=None`, `definition=''`) if new, else returns the existing
-  term (idempotent, per `terms_match`). Returns a deferred-kind handle usable
-  inline in stories and t-strings.
+  kindless term (`kind=None`) if new, else returns the existing term (idempotent,
+  per `terms_match`). Accepts an optional `definition` keyword
+  (`g("foo", definition=…)`, default `None`); the term is always kindless but
+  may carry prose. Returns a deferred-kind handle usable inline in stories and
+  t-strings.
 - **`g["foo"]` get-only** on the code-defined `Glossary` — name-based,
   case-insensitive lookup returning the same deferred-kind handle; raises
   `PytestGivenError` with a did-you-mean hint on an unknown name. Replaces the
@@ -79,9 +83,10 @@ Out:
 - **`g("foo")` creating on a file-backed glossary.** A `FileGlossary` is a
   closed vocabulary: both `g["foo"]` and `g("foo")` raise on an unknown name.
   In-code creation is code-glossary-only.
-- **Definitions supplied via `g("foo")`.** The call form is kindless and
-  definition-less by design; use `g.actor/work_object/verb("foo",
-  definition=…)` when you want to state a kind and/or prose in code.
+- **A kind supplied via `g("foo")`.** The call form is kindless by design (kind
+  is left to inference); use `g.actor/work_object/verb("foo", definition=…)`
+  when you want to *state* a kind in code. A definition, by contrast, *is*
+  accepted on `g("foo")`.
 - **A separate "promote me" / drafts worklist view.** Surfacing undocumented
   terms reuses the existing Glossary view + a filter; no new tab.
 
@@ -123,7 +128,7 @@ coverage special-case all lose their reason to exist.
 
 | Form | Meaning | Unknown name | Kind | Definition |
 | --- | --- | --- | --- | --- |
-| `g("foo")` | declare-or-get | *creates* (code glossary) | inferred | `''` |
+| `g("foo", definition=…)` | declare-or-get | *creates* (code glossary) | inferred | optional (default `None`) |
 | `g["foo"]` | get-only | *raises* (typo guard) | — | — |
 | `g.actor/work_object/verb("foo", definition=…)` | explicit | creates | declared | optional |
 
@@ -197,8 +202,10 @@ still lacking a definition.
 "unclassified". To keep exactly one representation, the value is **normalized at
 the boundaries**: `_register_kind` and `FileGlossary._add_row` map an empty or
 whitespace-only definition to `None` (a blank description cell, which parses to
-`''` today, becomes `None`). The typed constructors flip their default —
-`g.actor/work_object/verb(..., definition: str | None = None)`.
+`''` today, becomes `None`). The constructors flip their default —
+`g.actor/work_object/verb(..., definition: str | None = None)` and likewise
+`g(name, *, definition: str | None = None)`, all routed through the same
+boundary normalization.
 
 Touchpoints: `serde` read becomes `d.get('definition')` and write omits the key
 (or emits `null`); `terms_match` (`None == None`) and the template's
@@ -284,10 +291,10 @@ that describes drafts as current behavior.
 
 ## Forward notes
 
-- **`g("foo")` definitions / kinds.** If a future need arises to attach a
-  definition or kind at the call site without the typed methods, `g("foo",
-  definition=…, kind=…)` is a natural extension; left out of v1 to keep the call
-  form unambiguously "lightweight kindless".
+- **`g("foo")` kind at the call site.** `g("foo")` already takes `definition`;
+  if a future need arises to also state a kind without the typed methods,
+  `g("foo", kind=…)` is a natural extension, left out of v1 so the call form
+  stays unambiguously "lightweight kindless".
 - **Promote-to-file workflow.** With drafts gone, "promote" becomes "add a
   definition (and let the kind infer)". A future export feature could surface
   undocumented terms as a checklist for writing them into `GLOSSARY.md`.
