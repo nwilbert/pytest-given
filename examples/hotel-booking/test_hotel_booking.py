@@ -10,8 +10,8 @@ vocabulary.
 Three scenarios implement the Story at varying detail, each in full
 Given/When/Then form:
 
-* `test_pick_suite` — happy path, covers activities 1–2.
-* `test_complete_booking` — happy path through the rest, covers 2–6.
+* `test_pick_suite` — happy path, covers activities 1-2.
+* `test_complete_booking` — happy path through the rest, covers 2-6.
   Activity 2 is intentionally shared with `test_pick_suite` so the Stories tab
   shows two badges on that row.
 * `test_payment_declined` — parameterized error branch using a `reject` verb
@@ -49,9 +49,7 @@ from pytest_given import (
 # Ubiquitous language for group bookings.
 g = Glossary()
 
-organizer = g.actor(
-    'Organizer', 'Person booking accommodation on behalf of a group.'
-)
+organizer = g.actor('Organizer', 'Person booking accommodation on behalf of a group.')
 guest = g.actor('Guest', 'Individual traveler in the group.')
 booking_system = g.actor('Booking System', 'Automated reservation back-end.')
 
@@ -89,16 +87,12 @@ book_a_group_trip = story(
             path(organizer('Carol'), add('adds'), guest('Bob'), 'to', booking),
         ),
         # 4. Two work objects connected by a preposition.
-        activity(
-            organizer('Carol'), submit('submits'), payment, 'for', booking
-        ),
+        activity(organizer('Carol'), submit('submits'), payment, 'for', booking),
         # 5. System confirms the booking.
         activity(booking_system, confirm('confirms'), booking),
         # 6. Multi-path send — one confirmation per guest, in parallel.
         activity(
-            path(
-                booking_system, send('sends'), confirmation, 'to', guest('Alice')
-            ),
+            path(booking_system, send('sends'), confirmation, 'to', guest('Alice')),
             path(booking_system, send('sends'), confirmation, 'to', guest('Bob')),
         ),
         # 7. Draft verb + draft work object — vocabulary the team hasn't yet
@@ -124,9 +118,7 @@ cancel_a_booking = story(
         # payment for that booking.
         activity(booking_system, refund('refunds'), payment, 'for', booking),
         # Reuses the send/confirmation vocabulary from the first story.
-        activity(
-            booking_system, send('sends'), confirmation, 'to', guest('Alice')
-        ),
+        activity(booking_system, send('sends'), confirmation, 'to', guest('Alice')),
     ],
 )
 
@@ -152,12 +144,13 @@ def bob():
 @scenario('Carol picks a suite for the group', story=book_a_group_trip)
 def test_pick_suite(carol):
     with given(t'the {room("Deluxe Suite")} is listed as available'):
-        catalog = {'Deluxe Suite': {'available': True}, 'Standard': {'available': False}}
+        catalog = {
+            'Deluxe Suite': {'available': True},
+            'Standard': {'available': False},
+        }
     with when(t'{organizer("Carol")} {search("searches for")} a {room}'):
         offered = [name for name, r in catalog.items() if r['available']]
-    with when(
-        t'{organizer("Carol")} {select("selects")} the {room("Deluxe Suite")}'
-    ):
+    with when(t'{organizer("Carol")} {select("selects")} the {room("Deluxe Suite")}'):
         carol['selection'] = offered[0]
     with then(t'the {room("Deluxe Suite")} is held for {organizer("Carol")}'):
         assert carol['selection'] == 'Deluxe Suite'
@@ -181,8 +174,7 @@ def test_complete_booking(carol, alice, bob):
     ):
         booking_state['guests'] = [alice['name'], bob['name']]
     with when(
-        t'{organizer("Carol")} {submit("submits")} the {payment} '
-        t'for the {booking}'
+        t'{organizer("Carol")} {submit("submits")} the {payment} for the {booking}'
     ):
         booking_state['paid'] = True
     with then(t'the {booking_system} {confirm("confirms")} the {booking}'):
@@ -199,11 +191,9 @@ def test_complete_booking(carol, alice, bob):
 SUPPORTED_PAYMENT_METHODS = {'credit card', 'debit card', 'bank transfer'}
 
 
-@scenario(
-    'Payment is declined — the booking is not finalized', story=book_a_group_trip
-)
+@scenario('Payment is declined — the booking is not finalized', story=book_a_group_trip)
 @pytest.mark.parametrize(
-    'payment_method,decline_reason',
+    ('payment_method', 'decline_reason'),
     [
         ('credit card', 'insufficient funds'),
         ('debit card', 'expired card'),
@@ -256,16 +246,12 @@ def test_cancel_booking(alice):
     with when(t'{guest("Alice")} {cancel("cancels")} the {booking}'):
         booking_state['cancelled'] = True
     with then(
-        t'the {booking_system} {refund("refunds")} the {payment} '
-        t'for the {booking}'
+        t'the {booking_system} {refund("refunds")} the {payment} for the {booking}'
     ):
-        booking_state['refunded'] = (
-            booking_state['cancelled'] and booking_state['paid']
-        )
+        booking_state['refunded'] = booking_state['cancelled'] and booking_state['paid']
         assert booking_state['refunded']
     with then(
-        t'the {booking_system} {send("sends")} a {confirmation} '
-        t'to {guest("Alice")}'
+        t'the {booking_system} {send("sends")} a {confirmation} to {guest("Alice")}'
     ):
         booking_state['notified'] = [alice['name']]
         assert booking_state['notified'] == ['Alice']

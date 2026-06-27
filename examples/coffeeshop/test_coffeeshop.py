@@ -50,7 +50,7 @@ def test_generator_fixture(db):
     'Parameterized test (renders as a parameter table)',
     tags=['billing'],
 )
-@pytest.mark.parametrize('euros,expect', [(1, False), (2, True), (3, True)])
+@pytest.mark.parametrize(('euros', 'expect'), [(1, False), (2, True), (3, True)])
 def test_pricing(machine, euros, expect):
     with when(t'I insert ${euros}'):
         purchase_allowed = euros >= machine['price']

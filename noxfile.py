@@ -3,8 +3,10 @@ from pathlib import Path
 
 import nox
 
-src_path = 'src'
-code_paths = [src_path, 'tests', 'noxfile.py']
+# Linted and formatted everywhere; `tests` and `examples` are test code and are
+# deliberately not type-checked (heavy fixtures and loose dicts).
+code_paths = ['src', 'tests', 'examples', 'noxfile.py']
+mypy_paths = ['src', 'noxfile.py']
 
 nox.options.default_venv_backend = 'uv'
 nox.options.reuse_existing_virtualenvs = True
@@ -59,7 +61,7 @@ def lint(session: nox.Session) -> None:
 @nox.session
 def mypy(session: nox.Session) -> None:
     _sync(session, 'typecheck', include_project=True)
-    session.run('mypy', src_path)
+    session.run('mypy', *mypy_paths)
 
 
 @nox.session
