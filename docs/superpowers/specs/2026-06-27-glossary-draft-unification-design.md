@@ -175,6 +175,13 @@ Storytelling graph:
   arrow) or a bare-string connective (`'to'`, `'into'`), which stays an
   `ActivityWord`. Position 1 specifically must be a verb (the leading
   actor → verb → noun triple); later odd positions may be either.
+
+> **Superseded (2026-06-27):** these two rules are relaxed by
+> [Bare Strings in Activity Paths](bare-strings-in-activity-paths-design.md) — a
+> bare `str` is now accepted at any position (including the verb slot and node
+> positions), and the two-term rule is a coverage-eligibility threshold rather
+> than a construction constraint.
+
 - A path **alternates** node / edge / node …, has an **odd length ≥ 3**, and
   ends on a node. A path that ends on an edge (even length, dangling arrow) is
   rejected. Multi-arrow activities continue to use multiple `path()` calls.
