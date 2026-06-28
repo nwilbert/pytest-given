@@ -1,8 +1,11 @@
 import json
 import re
 from pathlib import Path
+from typing import Any, cast
 
-from pytest_given.report.renderer import render_html
+import pytest
+
+from pytest_given.report.renderer import _render_narration_part, render_html
 
 
 def _narration(text: str, parts: list | None = None) -> dict:
@@ -440,6 +443,51 @@ def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
     assert content.count('</script>') == 2
     # The escaped form must be present in the embedded JSON.
     assert '<\\/script>' in content
+
+
+def test_render_escapes_script_close_in_node_id_blobs(tmp_path: Path) -> None:
+    """A node id carrying `</script>` (via a parametrize id) flows into the
+    derived `__scenarioSlugs`/`__termScenarios` blobs, not just the report data;
+    every inline-script blob must neutralize `</` the same way."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'tests/test_x.py::test_y[</script><img src=x>]',
+                        'narration': _narration('XSS'),
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'parameters': None,
+                        'error': None,
+                        'steps': [],
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    # Two literal `</script>` tags only (data block + alpine block); an
+    # unescaped node id in any blob would add a third.
+    assert content.count('</script>') == 2
+
+
+def test_render_narration_part_rejects_unknown_variant() -> None:
+    # The exhaustive match guards against a NarrationPart variant being added
+    # without a render branch (silent drop). assert_never fires at runtime.
+    with pytest.raises(AssertionError):
+        _render_narration_part(cast(Any, object()), {}, None)
 
 
 def test_render_self_contained(tmp_path: Path) -> None:

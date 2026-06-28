@@ -1,6 +1,7 @@
 import json
 from collections.abc import Callable
 from pathlib import Path
+from typing import assert_never
 
 import jinja2
 from markupsafe import Markup, escape
@@ -12,6 +13,7 @@ from ..model import (
     Glossary,
     Narration,
     NarrationLiteral,
+    NarrationPart,
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
@@ -36,6 +38,21 @@ _NUM_PARAM_COLORS = 6
 type ParamColorMap = dict[str, int]
 
 
+def _neutralize_script_close(text: str) -> str:
+    """Replace `</` with `<\\/` so text embedded in an inline `<script>` can't
+    close the tag. `\\/` is a valid JS/JSON escape for `/`, so the parsed value
+    is unchanged while the HTML parser no longer sees a closing tag."""
+    return text.replace('</', '<\\/')
+
+
+def _script_json(value: object) -> Markup:
+    """Serialize `value` to JSON for embedding in an inline `<script>`, with
+    `</` neutralized. `json.dumps` does not escape `</` inside string literals,
+    and these blobs carry user-controlled node ids — so a parametrize id
+    containing `</script>` would otherwise break out of the tag (stored XSS)."""
+    return Markup(_neutralize_script_close(json.dumps(value)))
+
+
 def render_html(
     json_path: Path,
     html_path: Path,
@@ -53,7 +70,7 @@ def render_html(
     # inside an inline <script>; an attachment containing `</script>` would
     # close the tag and yield stored XSS. `\/` is a valid JSON/JS escape for
     # `/`, so this preserves the parsed value while neutering the HTML parser.
-    safe_report_json = raw_json.replace('</', '<\\/')
+    safe_report_json = _neutralize_script_close(raw_json)
 
     templates_dir = Path(__file__).parent / 'templates'
     css = (templates_dir / 'styles.css').read_text(encoding='utf-8')
@@ -80,19 +97,17 @@ def render_html(
     scn_covers = build_scenario_activity_index(coverage_maps)
     visibility = tab_visibility(report)
 
-    story_ids_json = Markup(json.dumps([story.id for story in report.stories]))
-    term_ids_json = Markup(
-        json.dumps(
-            [term.id for term in report.glossary.terms]
-            if report.glossary is not None
-            else []
-        )
+    story_ids_json = _script_json([story.id for story in report.stories])
+    term_ids_json = _script_json(
+        [term.id for term in report.glossary.terms]
+        if report.glossary is not None
+        else []
     )
     term_scenario_index = build_term_scenario_index(report)
-    term_scenarios_json = Markup(json.dumps(term_scenario_index))
+    term_scenarios_json = _script_json(term_scenario_index)
     scenario_slugs = build_scenario_slug_index(report)
-    scenario_slugs_json = Markup(
-        json.dumps({slug: node_id for node_id, slug in scenario_slugs.items()})
+    scenario_slugs_json = _script_json(
+        {slug: node_id for node_id, slug in scenario_slugs.items()}
     )
 
     env.filters['narration'] = _make_narration_filter(
@@ -189,33 +204,47 @@ def _make_narration_filter(
     def _render(narration: Narration) -> Markup:
         if not narration.parts:
             return Markup(str(escape(narration.text)))
-        out: list[str] = []
-        for part in narration.parts:
-            match part:
-                case NarrationLiteral(value=value):
-                    out.append(str(escape(value)))
-                case NarrationValue(rendered=rendered):
-                    out.append(f'<span class="param-value">{escape(rendered)}</span>')
-                case NarrationPlaceholder(name=name):
-                    color_idx = param_color_map.get(name, 0) % _NUM_PARAM_COLORS
-                    label = _placeholder_token(part)
-                    # Single-quote the JS arg because the HTML attribute is "..."
-                    # and parametrize names are Python identifiers (no `'`).
-                    safe_name = escape(name)
-                    enter = f"setHoverParam('{safe_name}', $event.currentTarget)"
-                    leave = 'setHoverParam(null, $event.currentTarget)'
-                    out.append(
-                        f'<span class="param-color-{color_idx}" '
-                        f'data-param="{safe_name}" '
-                        f'@mouseenter="{enter}" '
-                        f'@mouseleave="{leave}"'
-                        f'>{escape(label)}</span>'
-                    )
-                case NarrationTermRef():
-                    out.append(_render_term_ref(part, glossary, param_color_map))
+        out = [
+            _render_narration_part(part, param_color_map, glossary)
+            for part in narration.parts
+        ]
         return Markup(''.join(out))
 
     return _render
+
+
+def _render_narration_part(
+    part: NarrationPart,
+    param_color_map: ParamColorMap,
+    glossary: Glossary | None,
+) -> str:
+    """Render one `NarrationPart` to an HTML fragment. The `case _` guard makes
+    a future variant a type error here (via `assert_never`) rather than a part
+    silently dropped from the rendered narration."""
+    match part:
+        case NarrationLiteral(value=value):
+            return str(escape(value))
+        case NarrationValue(rendered=rendered):
+            return f'<span class="param-value">{escape(rendered)}</span>'
+        case NarrationPlaceholder(name=name):
+            color_idx = param_color_map.get(name, 0) % _NUM_PARAM_COLORS
+            label = _placeholder_token(part)
+            # Single-quote the JS arg because the HTML attribute is "..."
+            # and parametrize names are Python identifiers (no `'`).
+            safe_name = escape(name)
+            enter = f"setHoverParam('{safe_name}', $event.currentTarget)"
+            leave = 'setHoverParam(null, $event.currentTarget)'
+            return (
+                f'<span class="param-color-{color_idx}" '
+                f'data-param="{safe_name}" '
+                f'@mouseenter="{enter}" '
+                f'@mouseleave="{leave}"'
+                f'>{escape(label)}</span>'
+            )
+        case NarrationTermRef():
+            return _render_term_ref(part, glossary, param_color_map)
+        case _:
+            assert_never(part)
 
 
 _TERM_KIND_CLASSES = {
