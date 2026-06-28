@@ -1,8 +1,46 @@
+// --- Hash helpers ---
+function parseHash() {
+  return new URLSearchParams(window.location.hash.slice(1));
+}
+
+function serializeHash(params, mode = 'push') {
+  const qs = params.toString();
+  const newHash = qs ? '#' + qs : '';
+  // No-op when the hash is unchanged: avoids spurious history entries and
+  // breaks the readHash -> watcher -> writeHash feedback loop.
+  if (newHash === window.location.hash) return;
+  const url = qs ? '#' + qs : window.location.pathname + window.location.search;
+  if (mode === 'replace') history.replaceState(null, '', url);
+  else history.pushState(null, '', url);
+}
+
+function deserializeView(params) {
+  const v = params.get('view');
+  if (v === 'stories' || v === 'glossary') return v;
+  return 'scenarios';
+}
+
+function deserializeStory(params) {
+  const s = params.get('story');
+  const ids = window.__storyIds || [];
+  return (s && ids.includes(s)) ? s : (ids[0] || null);
+}
+
+// --- Alpine app ---
 function reportApp() {
   const data = window.__REPORT_DATA__;
+  const storyIds = window.__storyIds || [];
   return {
     search: '',
     view: 'tags',
+    mainView: 'scenarios',
+    selectedStory: storyIds[0] || null,
+    glossarySearch: '',
+    glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
+    glossaryDefinitionFilter: 'all',
+    expandedTerms: {},
+    hoveredActivity: null,
+    hoveredScenario: null,
     showPassed: true,
     showFailed: true,
     showSkipped: true,
@@ -11,6 +49,37 @@ function reportApp() {
     expandedAttachments: {},
     expandedScenarios: {},
     activeTag: null,
+    termFilter: null,
+    _suppressHashWrite: false,
+    highlightedActivities: {},
+    get anyActivitiesHighlighted() {
+      return Object.keys(this.highlightedActivities).length > 0;
+    },
+    toggleActivityHighlight(id) {
+      if (this.highlightedActivities[id]) delete this.highlightedActivities[id];
+      else this.highlightedActivities[id] = true;
+    },
+    clearActivityHighlights() {
+      this.highlightedActivities = {};
+    },
+    // Story-view scenario cards filter on the selected activities: a card stays
+    // visible when nothing is selected, or when it covers ANY selected activity.
+    activitySelectionMatches(coveredIds) {
+      if (!this.anyActivitiesHighlighted) return true;
+      return coveredIds.some(id => this.highlightedActivities[id]);
+    },
+    get anyTermsExpanded() {
+      return Object.keys(this.expandedTerms).length > 0;
+    },
+    toggleAllTerms() {
+      const expand = !this.anyTermsExpanded;
+      const ids = window.__termIds || [];
+      if (expand) {
+        ids.forEach(id => { this.expandedTerms[id] = true; });
+      } else {
+        this.expandedTerms = {};
+      }
+    },
     get filterSummary() {
       const parts = [];
       if (this.activeTag) parts.push('Tag: ' + this.activeTag);
@@ -26,7 +95,10 @@ function reportApp() {
         if (shown.length) parts.push(shown.join(', '));
       }
       if (this.search) parts.push('"' + this.search + '"');
-      return parts.length ? parts.join(' · ') : 'All Scenarios';
+      // The term filter is shown as its own removable chip, so it isn't
+      // repeated here; suppress the "All Scenarios" fallback while it's active.
+      if (parts.length) return parts.join(' · ');
+      return this.termFilter ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
@@ -63,6 +135,10 @@ function reportApp() {
       if (s.status === 'failed' && !this.showFailed) return false;
       if (s.status === 'skipped' && !this.showSkipped) return false;
       if (this.activeTag && !s.tags.includes(this.activeTag)) return false;
+      if (this.termFilter &&
+          !(window.__termScenarios[this.termFilter] || []).includes(s.id)) {
+        return false;
+      }
       if (this.search) {
         const q = this.search.toLowerCase();
         const text = (s.narration.text + ' ' + s.tags.join(' ')).toLowerCase();
@@ -108,6 +184,25 @@ function reportApp() {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     },
+    goToScenario(nodeId) {
+      this.mainView = 'scenarios';
+      this.$nextTick(() => this.scrollToAndExpand(nodeId));
+    },
+    goToTerm(id) {
+      this.mainView = 'glossary';
+      this.expandedTerms[id] = true;
+      this.$nextTick(() => {
+        const el = document.getElementById('term-' + id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    },
+    filterScenariosByTerm(id) {
+      this.termFilter = id;
+      this.mainView = 'scenarios';
+    },
+    clearTermFilter() {
+      this.termFilter = null;
+    },
     filterByTag(tag) {
       if (this.activeTag === tag) {
         this.activeTag = null;
@@ -120,6 +215,45 @@ function reportApp() {
       if (this.expandedAttachments[key]) delete this.expandedAttachments[key];
       else this.expandedAttachments[key] = true;
     },
+    copyAnchor(hashString, event) {
+      history.replaceState(null, '', '#' + hashString);
+      const btn = event.currentTarget;
+      // Only flip to the "copied" state once the URL is actually on the
+      // clipboard — otherwise the icon would claim success even where the
+      // copy silently failed (e.g. a report served over http://).
+      this._copyText(window.location.href).then((ok) => {
+        if (!ok) return;
+        btn.classList.add('anchor-copied');
+        setTimeout(() => btn.classList.remove('anchor-copied'), 1200);
+      });
+    },
+    _copyText(text) {
+      // navigator.clipboard exists only in secure contexts (https, file://);
+      // a report opened over plain http:// has none, so fall back to the
+      // legacy execCommand path. Also fall back if writeText rejects.
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).then(
+          () => true,
+          () => this._execCopy(text),
+        );
+      }
+      return Promise.resolve(this._execCopy(text));
+    },
+    _execCopy(text) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (err) {
+        return false;
+      }
+    },
     setHoverParam(name, el) {
       const scope = el?.closest('.scenario') || document;
       scope.querySelectorAll('.param-highlight').forEach(e => e.classList.remove('param-highlight'));
@@ -131,15 +265,91 @@ function reportApp() {
     },
     init() {
       this._readHash();
-      ['search', 'activeTag', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
-        this.$watch(key, () => this._writeHash());
+      // Search typing replaces the current entry (no per-keystroke history
+      // spam); discrete navigations/filters push a back-able entry. All writes
+      // are suppressed while we're applying state FROM the hash (see _readHash).
+      this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
+      ['activeTag', 'termFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+        this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
+      this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      this.$watch('selectedStory', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      this.$watch('selectedStory', () => { this.highlightedActivities = {}; });
+      // hashchange: manual URL edits / pasted links. popstate: back/forward.
       window.addEventListener('hashchange', () => this._readHash());
+      window.addEventListener('popstate', () => this._readHash());
+      // Capture phase + stopPropagation so a term pill inside a clickable
+      // container (e.g. a scenario header) navigates without also triggering
+      // that container's click (scenario expand/collapse).
+      document.addEventListener('click', (event) => {
+        const pill = event.target.closest('[data-term-id]');
+        if (!pill) return;
+        if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
+        event.stopPropagation();
+        this.goToTerm(pill.dataset.termId);
+      }, true);
+      document.addEventListener('click', (event) => {
+        const chip = event.target.closest('[data-activity-id]');
+        if (!chip) return;
+        this.toggleActivityHighlight(chip.dataset.activityId);
+      });
+      // Story-view scenario card titles jump to the scenario in the Scenarios view.
+      document.addEventListener('click', (event) => {
+        const link = event.target.closest('[data-goto-scenario]');
+        if (!link) return;
+        event.preventDefault();
+        this.goToScenario(link.dataset.gotoScenario);
+      });
+      this._initTermTooltip();
+    },
+    // Single shared tooltip for every term-ref pill. We position it with
+    // `fixed` from the pill's bounding box (rather than a CSS-only tooltip)
+    // because pills live inside `overflow: hidden` collapsible bodies that
+    // would otherwise clip an absolutely positioned child.
+    _initTermTooltip() {
+      const tip = document.getElementById('term-tip');
+      if (!tip) return;
+      const nameEl = tip.querySelector('.term-tip-name');
+      const defEl = tip.querySelector('.term-tip-def');
+      const hide = () => { tip.hidden = true; };
+      document.addEventListener('pointerover', (event) => {
+        const pill = event.target.closest('[data-term-name]');
+        if (!pill) { return; }
+        nameEl.textContent = pill.dataset.termName;
+        const def = pill.dataset.termDef || '';
+        defEl.textContent = def;
+        defEl.hidden = !def;
+        tip.hidden = false;
+        const pillRect = pill.getBoundingClientRect();
+        const tipRect = tip.getBoundingClientRect();
+        const margin = 6;
+        let top = pillRect.top - tipRect.height - margin;
+        if (top < margin) top = pillRect.bottom + margin;  // flip below if clipped
+        let left = pillRect.left;
+        const maxLeft = window.innerWidth - tipRect.width - margin;
+        if (left > maxLeft) left = maxLeft;
+        if (left < margin) left = margin;
+        tip.style.top = top + 'px';
+        tip.style.left = left + 'px';
+      });
+      document.addEventListener('pointerout', (event) => {
+        const pill = event.target.closest('[data-term-name]');
+        if (!pill) return;
+        if (event.relatedTarget && pill.contains(event.relatedTarget)) return;
+        hide();
+      });
+      // Tooltip is positioned in viewport coords; any scroll invalidates it.
+      window.addEventListener('scroll', hide, true);
     },
     _readHash() {
-      const params = new URLSearchParams(window.location.hash.slice(1));
+      // Applying state from the hash must not itself write the hash (which
+      // would create bogus history entries on back/forward).
+      this._suppressHashWrite = true;
+      const params = parseHash();
       if (params.has('tag')) this.activeTag = params.get('tag');
       else this.activeTag = null;
+      if (params.has('term-filter')) this.termFilter = params.get('term-filter');
+      else this.termFilter = null;
       if (params.has('status')) {
         const shown = new Set(params.get('status').split(',').filter(Boolean));
         this.showPassed = shown.has('passed');
@@ -152,10 +362,30 @@ function reportApp() {
       }
       if (params.has('q')) this.search = params.get('q');
       else this.search = '';
+      this.mainView = deserializeView(params);
+      this.selectedStory = deserializeStory(params);
+      const targetSlug = params.get('scenario');
+      const targetScenario = targetSlug
+        ? (window.__scenarioSlugs || {})[targetSlug]
+        : null;
+      const targetTerm = params.get('term');
+      if (targetTerm) {
+        this.goToTerm(targetTerm);
+      } else if (targetScenario) {
+        this.goToScenario(targetScenario);
+      }
+      this.$nextTick(() => {
+        this._suppressHashWrite = false;
+        // Drop one-shot target params (scenario=/term=) without adding history.
+        if (targetSlug || targetTerm) this._writeHash('replace');
+      });
     },
-    _writeHash() {
+    _writeHash(mode = 'push') {
       const params = new URLSearchParams();
+      if (this.mainView !== 'scenarios') params.set('view', this.mainView);
+      if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
       if (this.activeTag) params.set('tag', this.activeTag);
+      if (this.termFilter) params.set('term-filter', this.termFilter);
 
       const present = new Set(data.scenarios.map(s => s.status));
       const shown = [];
@@ -169,8 +399,7 @@ function reportApp() {
       }
 
       if (this.search) params.set('q', this.search);
-      const hash = params.toString();
-      history.replaceState(null, '', hash ? '#' + hash : window.location.pathname);
+      serializeHash(params, mode);
     },
   };
 }

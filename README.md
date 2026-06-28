@@ -2,7 +2,9 @@
 
 A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests. Inspired by [JGiven](https://jgiven.org/) (Java). The code is the single source of truth — no separate Gherkin DSL.
 
-**[See a live example report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/report.html)**
+Live examples:
+- **[Coffeeshop report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop/coffeeshop.html)** — tour of the core features.
+- **[Hotel-booking report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking/hotel-booking.html)** — Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
 
 ## Quick start
 
@@ -155,6 +157,86 @@ Three things worth knowing:
 
 3. **Parametrized scenarios use the first case's steps as the template.** All rows of the parameter table share the step structure recorded by case 1, with values substituted per row. That's the right behaviour when every case runs the same code with different values — and misleading when the steps themselves vary, e.g. a conditional `with given(t'...')` will only show case 1's branch. If steps diverge per case, split into separate `@scenario` tests.
 
+### Domain Storytelling
+
+Three optional pillars layer **Domain-Driven Design** on top of the core surface. Adopt any one independently — or all three for a full vocabulary-and-story workflow. The HTML report adds a tabbed view: **Scenarios** (always present), **Stories**, and **Glossary** (each only shown when populated).
+
+**1. Ubiquitous-language `Glossary`** — declare the actors, work objects, and verbs your tests speak about:
+
+```python
+from pytest_given import Glossary
+
+g = Glossary()
+guest = g.actor('Guest', definition='Person booking accommodation.')
+room = g.work_object('Room', definition='A bookable hotel room.')
+search = g.verb('search', definition='Look up available options.')
+```
+
+Use the captured handles directly in t-strings — `t'a {guest} {search("searches for")} a {room}'`. Each interpolation becomes a kind-coloured pill in the rendered step, with the term's definition as a tooltip. Glossary terms feed the Glossary tab.
+
+**2. Domain Stories** — model a flow as a sequence of `activity(...)` rows tied together by `story(...)`:
+
+```python
+from pytest_given import activity, story
+
+book_a_group_trip = story('Book a Group Trip', [
+    activity(organizer, search('searches for'), room),
+    activity(organizer('Carol'), select('selects'), room('Deluxe Suite')),
+])
+```
+
+An activity reads left-to-right: actor → verb → work object (with optional connective words). Any part may be a bare string instead of a glossary handle — but an activity needs at least two distinct glossary terms to be tracked for coverage; under-anchored activities render as "not coverage-tracked". `path(...)` lets a story branch where alternate activity sequences share a prefix.
+
+**3. Scenario ↔ activity binding** — link a scenario (and individual steps) to the story it implements:
+
+```python
+@scenario('Carol selects a suite', story=book_a_group_trip)
+def test_select_suite(carol):
+    with when(t'{organizer("Carol")} {search("searches for")} a {room}'):
+        ...
+```
+
+Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it. A step can also bind explicitly with `given(text, activity=...)`.
+
+**Kindless and undefined terms** — use `g('foo')` to declare a term that the team hasn't classified yet. It registers under the *Uncategorized* bucket in the Glossary view (no kind pill) and shows an *Undefined* badge until `definition=` is supplied. Use `g['foo']` to look up an already-declared term by name (raises if unknown). Both forms return a `DeferredTermHandle` usable in t-strings and story activities.
+
+**Glossary-only mode** — if you want the Glossary tab without writing stories yet, put `g = Glossary()` in a `conftest.py` so the plugin discovers it.
+
+See the [domain-storytelling design spec](docs/specs/2026-06-07-domain-storytelling-design.md) for the full surface and the [hotel-booking example](examples/hotel-booking/test_hotel_booking.py) for an end-to-end usage.
+
+**`FileGlossary` — load a Markdown glossary file** — if your project already keeps a `GLOSSARY.md`, point `FileGlossary` at it instead of declaring terms in code:
+
+```python
+from pathlib import Path
+from pytest_given import FileGlossary
+
+g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')
+```
+
+The file must contain at least one GFM pipe table. By default the first column is the term and the second is the description; override with `term_column`, `description_column`, and `kind_column` (each accepts a 0-based index or a header name, case-insensitive):
+
+```python
+g = FileGlossary('GLOSSARY.md', kind_column='Kind')   # explicit kinds from a "Kind" column
+g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning')
+```
+
+Access terms by name — `g['Guest']` (case-insensitive). The returned handle is usable inline everywhere a code-defined handle is:
+
+```python
+# In a story activity:
+activity(g['Guest'], g['book']('books'), g['Room'])
+
+# In a t-string step:
+with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
+    ...
+```
+
+When no `kind_column` is present, term kinds are **inferred from story activity-slot positions** at session finish: slot 0 → actor, slot 1 → verb, slot ≥ 2 → work object. A term used only in t-string steps (never in any story activity) stays kindless and renders with a neutral, uncoloured pill.
+
+**Every term in the glossary file is included in the report**, even one referenced by no story and no step. Terms whose kind could not be identified are listed under the **Uncategorized** section in the Glossary tab (and filterable via its own toggle).
+
+See the [file-backed glossary design spec](docs/specs/2026-06-18-file-backed-glossary-design.md) and the [file-glossary-booking example](examples/file-glossary-booking/test_file_glossary_booking.py) for a worked end-to-end usage.
+
 ### `attach(label, content)`
 
 Attach data to the current step. Strings are stored verbatim; other types are JSON-serialized.
@@ -173,11 +255,11 @@ The JSON report is **always written** whenever the plugin is loaded — every `p
 | `--given-json=PATH` | `given-report/report-data.json` | JSON output path (always written) |
 | `--given-html` | off | Also generate the HTML report |
 | `--given-html-output=PATH` | `given-report/report.html` | HTML output path (used only with `--given-html`) |
-| `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card. See [Source links](#source-links). |
+| `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. See [Source links](#source-links). |
 
 ## Source links
 
-Add a clickable file:line anchor to each scenario card so devs can jump straight to the test source.
+Add a clickable file:line anchor to each scenario card, story panel, and expanded glossary term card so devs can jump straight to the source.
 
 ```toml
 # pyproject.toml — pytest 9+ canonical form
@@ -237,19 +319,13 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
 
 ## Examples
 
-See [`examples/test_examples.py`](examples/test_examples.py) for a tour of every supported feature:
+Three example suites live under [`examples/`](examples/), each with pre-rendered JSON + HTML committed:
 
-- Basic `when`/`then` blocks
-- Generator fixtures with teardown
-- Plain text and JSON attachments
-- Parameterized tests rendered as parameter tables
-- T-string interpolation of non-parametrize values (neutral highlight)
-- Helper functions that record their own steps
-- Top-level `given` blocks and deeply nested steps
-- Failure rendering
-- Skipped scenarios with reason (including all-skipped parametrizes)
+- [`coffeeshop/test_coffeeshop.py`](examples/coffeeshop/test_coffeeshop.py) — a tour of the core feature surface: `when`/`then` blocks, generator fixtures with teardown, plain text and JSON attachments, parameterized tests rendered as tables, t-string interpolation, helper functions that record their own steps, top-level `given` blocks, deeply nested steps, failure rendering, and skipped scenarios. Output: [`coffeeshop.html`](examples/coffeeshop/coffeeshop.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop/coffeeshop.html)).
+- [`hotel-booking/test_hotel_booking.py`](examples/hotel-booking/test_hotel_booking.py) — Domain Storytelling features: a `Glossary` of actors / work objects / verbs, a `story(...)` with `activity(...)` rows, scenarios bound to a story with per-activity coverage, and kindless + undefined terms (registered with `g('foo')`) awaiting classification. Output: [`hotel-booking.html`](examples/hotel-booking/hotel-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking/hotel-booking.html)).
+- [`file-glossary-booking/test_file_glossary_booking.py`](examples/file-glossary-booking/test_file_glossary_booking.py) — `FileGlossary` features: loading a Markdown glossary file, name-based term access, inferred kinds from story activity slots, and a deliberately kindless term (neutral pill). Output: [`file-glossary-booking.html`](examples/file-glossary-booking/file-glossary-booking.html).
 
-A pre-rendered report is committed under [`examples/`](examples/): the JSON ([`report-data.json`](examples/report-data.json)) and the rendered HTML ([`report.html`](examples/report.html) — [live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/report.html)). Run `nox -s examples` to regenerate both.
+Run `nox -s examples` to regenerate all three.
 
 ## Working with LLMs
 

@@ -766,6 +766,50 @@ def test_renderer_without_template_renders_plain_relpath(tmp_path: Path) -> None
     assert '<a href="vscode' not in content
 
 
+def test_render_includes_resolved_source_urls_when_template_set(tmp_path: Path) -> None:
+    """When source_link_template is set and a Story/GlossaryTerm has a source,
+    the resolved URL is computed by the renderer. We assert at the data-shape
+    level by injecting a single scenario whose URL we can confirm — confirming
+    the maps were populated. Story/term URL maps are exercised in later tasks
+    once the template emits their link blocks."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_x',
+                        'narration': _narration('My Scenario'),
+                        'module': 'test_mod',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                        'source': {'relpath': 'tests/test_x.py', 'line': 10},
+                    },
+                ],
+                'stories': [],
+                'glossary': None,
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(
+        json_path, html_path, source_link_template='vscode://file/{path}:{line}'
+    )
+    content = html_path.read_text(encoding='utf-8')
+    assert 'vscode://file/' in content
+    assert 'tests/test_x.py:10' in content
+
+
 def test_renderer_skips_link_block_when_scenario_has_no_source(
     tmp_path: Path,
 ) -> None:
@@ -920,3 +964,497 @@ def test_render_param_table_cells_get_data_param(tmp_path: Path) -> None:
     assert re.search(r'<td[^>]*\bdata-param="expect"[^>]*>\s*False\s*</td>', content)
     assert re.search(r'<td[^>]*\bdata-param="euros"[^>]*>\s*2\s*</td>', content)
     assert re.search(r'<td[^>]*\bdata-param="expect"[^>]*>\s*True\s*</td>', content)
+
+
+# ---------------------------------------------------------------------------
+# Task 10.1 — NarrationTermRef rendering
+# ---------------------------------------------------------------------------
+
+from pytest_given.model import (  # noqa: E402
+    Glossary,
+    GlossaryTerm,
+    Narration,
+    NarrationTermRef,
+    TermId,
+)
+from pytest_given.report.renderer import _make_narration_filter  # noqa: E402
+
+
+def _glossary() -> Glossary:
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    return g
+
+
+def test_narration_filter_renders_actor_term_ref_with_actor_class() -> None:
+    g = _glossary()
+    f = _make_narration_filter(param_color_map={}, glossary=g)
+    n = Narration(
+        text='Guest',
+        parts=[
+            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+        ],
+    )
+    assert 'term-ref-actor' in str(f(n))
+
+
+def test_narration_filter_renders_object_term_ref_with_object_class() -> None:
+    g = _glossary()
+    f = _make_narration_filter(param_color_map={}, glossary=g)
+    n = Narration(
+        text='Room',
+        parts=[
+            NarrationTermRef(term_id=TermId('room'), display='Room'),
+        ],
+    )
+    assert 'term-ref-object' in str(f(n))
+
+
+def test_narration_filter_renders_verb_term_ref_with_verb_class() -> None:
+    g = _glossary()
+    f = _make_narration_filter(param_color_map={}, glossary=g)
+    n = Narration(
+        text='search',
+        parts=[
+            NarrationTermRef(term_id=TermId('search'), display='searches'),
+        ],
+    )
+    assert 'term-ref-verb' in str(f(n))
+
+
+def test_narration_filter_emits_tooltip_definition_when_term_has_one() -> None:
+    g = Glossary()
+    g._register(
+        GlossaryTerm(
+            id=TermId('guest'),
+            kind='actor',
+            canonical='Guest',
+            definition='A person staying at the hotel.',
+        )
+    )
+    f = _make_narration_filter(param_color_map={}, glossary=g)
+    n = Narration(
+        text='Guest',
+        parts=[
+            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+        ],
+    )
+    out = str(f(n))
+    assert 'data-term-name="Guest"' in out
+    assert 'data-term-def="A person staying at the hotel."' in out
+
+
+def test_narration_filter_includes_param_color_when_term_ref_has_param_column() -> None:
+    g = _glossary()
+    color_map = {'guest_name': 2}
+    f = _make_narration_filter(param_color_map=color_map, glossary=g)
+    n = Narration(
+        text='Alice',
+        parts=[
+            NarrationTermRef(
+                term_id=TermId('guest'),
+                display='Alice',
+                param_column='guest_name',
+            ),
+        ],
+    )
+    out = str(f(n))
+    assert 'term-ref-actor' in out
+    assert 'param-color-2' in out
+
+
+def test_narration_filter_handles_term_ref_with_no_glossary_match() -> None:
+    g = _glossary()
+    f = _make_narration_filter(param_color_map={}, glossary=g)
+    n = Narration(
+        text='X',
+        parts=[
+            NarrationTermRef(term_id=TermId('missing'), display='X'),
+        ],
+    )
+    out = str(f(n))
+    assert 'X' in out
+    assert 'term-ref' not in out
+
+
+def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
+    """When the renderer is invoked with glossary=None (e.g. no glossary
+    declared), NarrationTermRef still renders as escaped text."""
+    f = _make_narration_filter(param_color_map={})  # glossary defaults to None
+    n = Narration(
+        text='X',
+        parts=[
+            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+        ],
+    )
+    out = str(f(n))
+    assert 'Guest' in out
+    assert 'term-ref' not in out
+
+
+# ---------------------------------------------------------------------------
+# Task 11.2 — activity_part filter
+# ---------------------------------------------------------------------------
+
+from pytest_given.model import (  # noqa: E402
+    ActivityTermRef,
+    ActivityWord,
+)
+from pytest_given.report.renderer import _make_activity_part_filter  # noqa: E402
+
+
+def test_activity_part_filter_actor_term_ref():
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    f = _make_activity_part_filter(g)
+    out = str(f(ActivityTermRef(term_id=TermId('guest'), display='Alice')))
+    assert 'term-ref-actor' in out
+    assert 'Alice' in out
+
+
+def test_activity_part_filter_object_term_ref():
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    f = _make_activity_part_filter(g)
+    out = str(f(ActivityTermRef(term_id=TermId('room'), display='Room')))
+    assert 'term-ref-object' in out
+
+
+def test_activity_part_filter_unknown_term_ref_falls_back():
+    f = _make_activity_part_filter(Glossary())  # empty glossary
+    out = str(f(ActivityTermRef(term_id=TermId('missing'), display='X')))
+    assert 'term-ref-unknown' in out
+
+
+def test_activity_part_filter_verb_term_ref_renders_verb_class():
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    f = _make_activity_part_filter(g)
+    out = str(f(ActivityTermRef(term_id=TermId('search'), display='searches')))
+    assert 'term-ref-verb' in out
+    assert 'searches' in out
+
+
+def test_activity_part_filter_word_renders_activity_word_class():
+    f = _make_activity_part_filter(None)
+    out = str(f(ActivityWord(text='for')))
+    assert 'activity-word' in out
+    assert 'for' in out
+
+
+# ---------------------------------------------------------------------------
+# Task 11.2 — stories coverage rollup computed in render_html
+# ---------------------------------------------------------------------------
+
+
+def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
+    """render_html executes the stories-coverage rollup (lines 85, 90-107)
+    when at least one scenario has a story_id and the report has a story."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'glossary': {
+                    'terms': [
+                        {
+                            'id': 'guest',
+                            'kind': 'actor',
+                            'canonical': 'Guest',
+                            'definition': '',
+                        },
+                        {
+                            'id': 'search',
+                            'kind': 'verb',
+                            'canonical': 'search',
+                            'definition': '',
+                        },
+                        {
+                            'id': 'room',
+                            'kind': 'object',
+                            'canonical': 'Room',
+                            'definition': '',
+                        },
+                    ]
+                },
+                'stories': [
+                    {
+                        'id': 'book-a-room',
+                        'title': 'Book a Room',
+                        'activities': [
+                            {
+                                'id': 1,
+                                'paths': [
+                                    {
+                                        'parts': [
+                                            {
+                                                'term_id': 'guest',
+                                                'display': 'Guest',
+                                            },
+                                            {
+                                                'term_id': 'search',
+                                                'display': 'searches',
+                                            },
+                                            {
+                                                'term_id': 'room',
+                                                'display': 'Room',
+                                            },
+                                        ]
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ],
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_book',
+                        'narration': _narration('Book a room'),
+                        'module': 'mod',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 5,
+                        'steps': [
+                            {
+                                'phase': 'when',
+                                'narration': _narration(
+                                    'Guest searches Room',
+                                    [
+                                        {
+                                            'type': 'term_ref',
+                                            'term_id': 'guest',
+                                            'display': 'Guest',
+                                            'param_column': None,
+                                        },
+                                        {'value': ' '},
+                                        {
+                                            'type': 'term_ref',
+                                            'term_id': 'search',
+                                            'display': 'searches',
+                                            'param_column': None,
+                                        },
+                                        {'value': ' '},
+                                        {
+                                            'type': 'term_ref',
+                                            'term_id': 'room',
+                                            'display': 'Room',
+                                            'param_column': None,
+                                        },
+                                    ],
+                                ),
+                                'status': 'passed',
+                                'children': [],
+                                'attachments': [],
+                                'error': None,
+                            }
+                        ],
+                        'parameters': None,
+                        'error': None,
+                        'story_id': 'book-a-room',
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert html_path.exists()
+    assert 'Book a Room' in content
+
+
+def test_render_emits_term_scenario_index_global(tmp_path: Path) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'glossary': {
+                    'terms': [
+                        {
+                            'id': 'guest',
+                            'kind': 'actor',
+                            'canonical': 'Guest',
+                            'definition': '',
+                            'source': None,
+                        },
+                    ],
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_x',
+                        'narration': _narration('My Scenario'),
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 1,
+                        'steps': [
+                            {
+                                'phase': 'when',
+                                'narration': _narration(
+                                    'a',
+                                    [
+                                        {'term_id': 'guest', 'display': 'Guest'},
+                                    ],
+                                ),
+                                'status': 'passed',
+                                'children': [],
+                                'attachments': [],
+                                'error': None,
+                            }
+                        ],
+                        'parameters': None,
+                        'error': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert '__termScenarios' in content
+    assert 'test.py::test_x' in content
+    assert 'data-scenario-id="test.py::test_x"' in content
+
+
+def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
+    """The full pipeline — typed ReportData → report_to_dict → JSON → renderer
+    — must preserve the Glossary so term refs render as kind pills, not as
+    silent escape() fallbacks. Regression guard for the side-channel
+    `_glossaries` stash that previously didn't round-trip."""
+    from pytest_given.model import (
+        Activity,
+        ActivityId,
+        ActivityPath,
+        ActivityTermRef,
+        Glossary,
+        GlossaryTerm,
+        Metadata,
+        Narration,
+        NarrationLiteral,
+        NarrationTermRef,
+        NodeId,
+        ReportData,
+        Scenario,
+        Step,
+        Story,
+        StoryId,
+        TermId,
+        report_from_dict,
+        report_to_dict,
+    )
+
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    story = Story(
+        id=StoryId('book-a-room'),
+        title='Book a Room',
+        activities=(
+            Activity(
+                id=ActivityId(1),
+                paths=(
+                    ActivityPath(
+                        parts=(
+                            ActivityTermRef(term_id=TermId('guest'), display='Guest'),
+                            ActivityTermRef(
+                                term_id=TermId('search'), display='searches'
+                            ),
+                            ActivityTermRef(term_id=TermId('room'), display='Room'),
+                        )
+                    ),
+                ),
+            ),
+        ),
+    )
+    scenario = Scenario(
+        id=NodeId('test_book.py::test_x'),
+        narration=Narration(text='Book a room'),
+        module='m',
+        steps=[
+            Step(
+                phase='when',
+                narration=Narration(
+                    text='Guest searches',
+                    parts=[
+                        NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+                        NarrationLiteral(value=' '),
+                        NarrationTermRef(term_id=TermId('search'), display='searches'),
+                    ],
+                ),
+            )
+        ],
+        story_id=story.id,
+    )
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+        ),
+        scenarios=[scenario],
+        stories=[story],
+        glossary=g,
+    )
+
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(report_to_dict(report)))
+    rt = report_from_dict(json.loads(json_path.read_text()))
+    assert rt.glossary is not None
+    assert {t.id for t in rt.glossary.terms} == {'guest', 'search', 'room'}
+
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert 'term-ref-actor' in content
+    assert 'term-ref-verb' in content
+
+
+def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'pkg/test_booking.py::test_make',
+                        'narration': _narration('Make a booking'),
+                        'module': 'test_booking',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 1,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    # Anchor carries the short slug, not the raw node id.
+    assert 'scenario=booking/make' in content
+    assert 'scenario=pkg/test_booking.py::test_make' not in content
+    # Reverse map global resolves slug -> node id.
+    assert 'window.__scenarioSlugs = {' in content
+    assert '"booking/make": "pkg/test_booking.py::test_make"' in content

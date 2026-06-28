@@ -3,14 +3,23 @@ import dataclasses
 import pytest
 
 from pytest_given.model import (
+    Activity,
+    ActivityId,
+    ActivityPart,
+    ActivityPath,
+    ActivityTermRef,
+    ActivityWord,
     Attachment,
     ErrorInfo,
     FixtureRecording,
+    Glossary,
+    GlossaryTerm,
     Metadata,
     Narration,
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
+    NarrationTermRef,
     NodeId,
     ParameterCase,
     ParameterTable,
@@ -19,6 +28,9 @@ from pytest_given.model import (
     Scenario,
     SourceLocation,
     Step,
+    Story,
+    StoryId,
+    TermId,
     TracebackFrame,
 )
 
@@ -35,8 +47,13 @@ def test_step_defaults() -> None:
     assert step.status == 'passed'
     assert step.children == []
     assert step.attachments == []
-
     assert step.error is None
+    assert step.fixture_name is None
+
+
+def test_step_fixture_name_is_set_when_provided() -> None:
+    step = Step(phase='given', narration=_n('our guest'), fixture_name='alice')
+    assert step.fixture_name == 'alice'
 
 
 def test_step_with_children() -> None:
@@ -181,6 +198,255 @@ def test_scenario_source_defaults_to_none() -> None:
     assert s.source is None
 
 
+def test_story_source_defaults_to_none() -> None:
+    s = Story(id=StoryId('checkout'), title='Checkout', activities=())
+    assert s.source is None
+
+
+def test_story_carries_source_location() -> None:
+    src = SourceLocation(relpath='tests/conftest.py', line=12)
+    s = Story(id=StoryId('checkout'), title='Checkout', activities=(), source=src)
+    assert s.source == src
+
+
+def test_glossary_term_source_defaults_to_none() -> None:
+    t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
+    assert t.source is None
+
+
+def test_glossary_term_carries_source_location() -> None:
+    src = SourceLocation(relpath='tests/conftest.py', line=4)
+    t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest', source=src)
+    assert t.source == src
+
+
 def test_metadata_commit_sha_defaults_to_none() -> None:
     m = Metadata(project='p', timestamp='t', pytest_version='9', plugin_version='0.1')
     assert m.commit_sha is None
+
+
+# --- Task 1.1: Id aliases + GlossaryTerm ---
+
+
+def test_glossary_term_is_frozen_and_kw_only() -> None:
+    term = GlossaryTerm(
+        id=TermId('guest'),
+        kind='actor',
+        canonical='Guest',
+        definition='Person booking accommodation.',
+    )
+    assert term.id == 'guest'
+    assert term.kind == 'actor'
+    assert term.canonical == 'Guest'
+    assert term.definition == 'Person booking accommodation.'
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        term.kind = 'verb'  # type: ignore[misc]
+
+
+def test_glossary_term_definition_defaults_none() -> None:
+    term = GlossaryTerm(id=TermId('x'), kind='verb', canonical='x')
+    assert term.definition is None
+
+
+# --- Task 1.2: Activity-part variants + ActivityPart union ---
+
+
+def test_activity_term_ref_carries_term_id_and_display() -> None:
+    part = ActivityTermRef(term_id=TermId('guest'), display='Alice')
+    assert part.term_id == 'guest'
+    assert part.display == 'Alice'
+
+
+def test_activity_word_carries_text() -> None:
+    part = ActivityWord(text='for')
+    assert part.text == 'for'
+
+
+def test_activity_parts_are_frozen() -> None:
+    part = ActivityWord(text='for')
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        part.text = 'and'  # type: ignore[misc]
+
+
+def test_activity_part_union_accepts_all_variants() -> None:
+    parts: list[ActivityPart] = [
+        ActivityTermRef(term_id=TermId('g'), display='Guest'),
+        ActivityTermRef(term_id=TermId('s'), display='searches'),
+        ActivityWord(text='for'),
+    ]
+    assert [type(p).__name__ for p in parts] == [
+        'ActivityTermRef',
+        'ActivityTermRef',
+        'ActivityWord',
+    ]
+
+
+# --- Task 1.3: ActivityPath, Activity, Story with _by_id index ---
+
+
+def test_activity_path_is_frozen_with_parts_tuple() -> None:
+    path = ActivityPath(
+        parts=(
+            ActivityTermRef(term_id=TermId('guest'), display='Guest'),
+            ActivityTermRef(term_id=TermId('search'), display='searches for'),
+            ActivityTermRef(term_id=TermId('room'), display='Room'),
+        )
+    )
+    assert len(path.parts) == 3
+
+
+def test_activity_holds_id_and_paths() -> None:
+    p = ActivityPath(
+        parts=(
+            ActivityTermRef(term_id=TermId('g'), display='G'),
+            ActivityTermRef(term_id=TermId('s'), display='s'),
+            ActivityTermRef(term_id=TermId('o'), display='O'),
+        )
+    )
+    act = Activity(id=ActivityId(1), paths=(p,))
+    assert act.id == 1
+    assert act.paths == (p,)
+
+
+def test_story_indexes_activities_by_id() -> None:
+    p = ActivityPath(
+        parts=(
+            ActivityTermRef(term_id=TermId('g'), display='G'),
+            ActivityTermRef(term_id=TermId('s'), display='s'),
+            ActivityTermRef(term_id=TermId('o'), display='O'),
+        )
+    )
+    a1 = Activity(id=ActivityId(1), paths=(p,))
+    a2 = Activity(id=ActivityId(2), paths=(p,))
+    story = Story(id=StoryId('book'), title='Book', activities=(a1, a2))
+    assert story[ActivityId(1)] is a1
+    assert story[ActivityId(2)] is a2
+    assert story.get(ActivityId(99)) is None
+
+
+def test_story_index_excluded_from_repr_and_equality() -> None:
+    p = ActivityPath(
+        parts=(
+            ActivityTermRef(term_id=TermId('g'), display='G'),
+            ActivityTermRef(term_id=TermId('s'), display='s'),
+            ActivityTermRef(term_id=TermId('o'), display='O'),
+        )
+    )
+    a = Activity(id=ActivityId(1), paths=(p,))
+    s1 = Story(id=StoryId('x'), title='X', activities=(a,))
+    s2 = Story(id=StoryId('x'), title='X', activities=(a,))
+    assert s1 == s2
+    assert '_by_id' not in repr(s1)
+
+
+# --- Task 1.4: Glossary container with atomic write-through ---
+
+
+def test_glossary_register_appends_and_indexes() -> None:
+    g = Glossary()
+    t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
+    g._register(t)
+    assert g.terms == [t]
+    assert g.get(TermId('guest')) is t
+    assert g.get(TermId('missing')) is None
+
+
+def test_glossary_register_rejects_id_collision() -> None:
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
+    with pytest.raises(ValueError, match='already registered'):
+        g._register(GlossaryTerm(id=TermId('x'), kind='verb', canonical='X'))
+
+
+def test_glossary_index_excluded_from_repr_and_equality() -> None:
+    g1 = Glossary()
+    g1._register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
+    g2 = Glossary()
+    g2._register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
+    assert g1 == g2
+    assert '_by_id' not in repr(g1)
+
+
+def test_glossary_post_init_indexes_terms_passed_at_construction() -> None:
+    t1 = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
+    t2 = GlossaryTerm(id=TermId('room'), kind='object', canonical='Room')
+    g = Glossary(terms=[t1, t2])
+    assert g.get(TermId('guest')) is t1
+    assert g.get(TermId('room')) is t2
+
+
+# --- Task 1.5: NarrationTermRef + extended NarrationPart union ---
+
+
+def test_narration_term_ref_carries_term_id_display_and_optional_param_column() -> None:
+    part = NarrationTermRef(term_id=TermId('guest'), display='Alice')
+    assert part.term_id == 'guest'
+    assert part.display == 'Alice'
+    assert part.param_column is None
+
+    part2 = NarrationTermRef(
+        term_id=TermId('guest'), display='Alice', param_column='guest_name'
+    )
+    assert part2.param_column == 'guest_name'
+
+
+def test_narration_term_ref_is_assignable_to_narration_part() -> None:
+    part: NarrationPart = NarrationTermRef(term_id=TermId('guest'), display='Alice')
+    assert isinstance(part, NarrationTermRef)
+
+
+# --- Task 1.6: Extend ReportData, Scenario, Step with new fields ---
+
+
+def _meta() -> Metadata:
+    return Metadata(
+        project='proj',
+        timestamp='now',
+        pytest_version='8',
+        plugin_version='0.1.0',
+    )
+
+
+def test_report_data_defaults_glossary_none_and_stories_empty() -> None:
+    rd = ReportData(metadata=_meta())
+    assert rd.glossary is None
+    assert rd.stories == []
+
+
+def test_report_data_accepts_glossary_and_stories() -> None:
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
+    rd = ReportData(metadata=_meta(), glossary=g, stories=[])
+    assert rd.glossary is g
+
+
+def test_scenario_defaults_story_id_none_and_activity_ids_empty() -> None:
+    s = Scenario(id=NodeId('n'), narration=Narration(text='t'), module='m')
+    assert s.story_id is None
+    assert s.activity_ids == ()
+
+
+def test_scenario_accepts_story_id_and_activity_ids() -> None:
+    s = Scenario(
+        id=NodeId('n'),
+        narration=Narration(text='t'),
+        module='m',
+        story_id=StoryId('book'),
+        activity_ids=(ActivityId(1), ActivityId(2)),
+    )
+    assert s.story_id == 'book'
+    assert s.activity_ids == (1, 2)
+
+
+def test_step_defaults_activity_ids_empty() -> None:
+    step = Step(phase='given', narration=Narration(text='t'))
+    assert step.activity_ids == ()
+
+
+def test_step_accepts_activity_ids() -> None:
+    step = Step(
+        phase='given',
+        narration=Narration(text='t'),
+        activity_ids=(ActivityId(3),),
+    )
+    assert step.activity_ids == (3,)

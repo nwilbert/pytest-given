@@ -695,26 +695,30 @@ def test_scenario_with_template_name_merges_and_renders(pytester, tmp_path):
     assert [c['values'] for c in s['parameters']['cases']] == [[200], [300]]
 
 
-def test_given_with_template_on_fixture_raises(pytester, tmp_path):
+def test_given_with_tstring_on_fixture_works(pytester, tmp_path):
+    """T-strings on fixture @given decorators evaluate at module load time.
+    Module-level values (e.g. Glossary handles) are in scope and interpolate."""
     pytester.makepyfile(
         """
         import pytest
-        from pytest_given import scenario, given, then
+        from pytest_given import Glossary, scenario, given, then
+
+        g = Glossary()
+        guest = g.actor('Guest')
 
         @pytest.fixture
-        @given(t'value')   # t-string on a fixture is rejected
-        def value():
-            return 1
+        @given(t'our guest {guest("Alice")}')
+        def alice():
+            return 'Alice'
 
         @scenario('x')
-        def test_x(value):
+        def test_x(alice):
             with then('ok'):
                 pass
         """
     )
     result = pytester.runpytest('-v')
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*not allowed on a fixture*'])
+    assert result.ret == 0
 
 
 def test_attach_with_template_raises(pytester, tmp_path):
@@ -1015,6 +1019,109 @@ def test_parameterized_scenario_source_captured_in_json(pytester, tmp_path):
     assert src['line'] >= 1
 
 
+def test_story_source_captured_in_json(pytester, tmp_path):
+    """story() records the source location of its construction site."""
+    pytester.makepyfile(
+        test_story_src="""
+        from pytest_given import Glossary, activity, scenario, story, when
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Booking', [activity(guest, search, room)])
+
+        @scenario('A', story=s, activities=[1])
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    assert len(data['stories']) == 1
+    src = data['stories'][0]['source']
+    assert src is not None
+    assert src['relpath'].endswith('test_story_src.py')
+    assert isinstance(src['line'], int)
+    assert src['line'] >= 1
+
+
+def test_glossary_term_source_captured_in_json(pytester, tmp_path):
+    """Glossary terms record the source location of first registration."""
+    pytester.makepyfile(
+        test_glossary_src="""
+        from pytest_given import Glossary, activity, scenario, story, when
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Booking', [activity(guest, search, room)])
+
+        @scenario('A', story=s, activities=[1])
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    terms = data['glossary']['terms']
+    assert terms, 'expected at least one glossary term'
+    for term in terms:
+        src = term['source']
+        assert src is not None, f'term {term["canonical"]} missing source'
+        assert src['relpath'].endswith('test_glossary_src.py')
+        assert isinstance(src['line'], int)
+        assert src['line'] >= 1
+
+
+def test_glossary_term_source_captured_when_declared_in_conftest(pytester, tmp_path):
+    """Glossary terms registered at the top level of conftest.py — a common
+    shared-fixture pattern — must capture source even though conftest is
+    imported before `pytest_configure`."""
+    pytester.makeconftest(
+        """
+        from pytest_given import Glossary, activity, story
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('ConftestStory', [activity(guest, search, room)])
+        """
+    )
+    pytester.makepyfile(
+        test_conf_src="""
+        from conftest import s
+        from pytest_given import scenario, when
+
+        @scenario('A', story=s, activities=[1])
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    terms = data['glossary']['terms']
+    assert terms, 'expected at least one glossary term'
+    for term in terms:
+        src = term['source']
+        assert src is not None, f'term {term["canonical"]} missing source'
+        assert src['relpath'].endswith('conftest.py')
+    assert data['stories']
+    story_src = data['stories'][0]['source']
+    assert story_src is not None
+    assert story_src['relpath'].endswith('conftest.py')
+
+
 def test_metadata_commit_sha_captured(pytester, tmp_path, monkeypatch):
     """metadata.commit_sha is populated from env vars."""
     monkeypatch.setenv('GITHUB_SHA', 'integration-sha')
@@ -1135,3 +1242,259 @@ def test_given_source_link_unknown_preset_raises(pytester, tmp_path):
         '--given-source-link=emacs',
     )
     assert 'emacs' in (result.stderr.str() + result.stdout.str())
+
+
+def test_step_activity_kwarg_propagates_to_report(pytester):
+    pytester.makepyfile("""
+        from pytest_given import Glossary, activity, given, scenario, story, when
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Activity Propagation', [
+            activity(guest, search, room),
+            activity(guest('Alice'), search, room),
+            activity(guest, search, room('Suite'))])
+
+        @scenario('a scenario', story=s, activities=[1, 2, 3])
+        def test_x():
+            with given('setup', activity=1):
+                pass
+            with when('action', activity=[2, 3]):
+                pass
+    """)
+    result = pytester.runpytest('--given-json=report.json')
+    result.assert_outcomes(passed=1)
+    data = json.loads(pytester.path.joinpath('report.json').read_text())
+    steps = data['scenarios'][0]['steps']
+    assert steps[0]['activity_ids'] == [1]
+    assert steps[1]['activity_ids'] == [2, 3]
+
+
+# --- Task 7.3: Capture story_id and activity_ids at scenario start ---
+
+
+def test_scenario_story_id_appears_in_report(pytester):
+    pytester.makepyfile("""
+        from pytest_given import Glossary, activity, given, scenario, story
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Book', [activity(guest, search, room)])
+
+        @scenario('x', story=s, activities=[1])
+        def test_x():
+            with given('setup', activity=1):
+                pass
+    """)
+    pytester.runpytest('--given-json=report.json')
+    data = json.loads(pytester.path.joinpath('report.json').read_text())
+    scn = data['scenarios'][0]
+    assert scn['story_id'] == 'book'
+    assert scn['activity_ids'] == [1]
+
+
+# --- Task 7.2: Validate scenario binding at collection / runtime ---
+
+
+def test_scenario_activity_id_not_in_story_raises_at_collection(pytester):
+    pytester.makepyfile("""
+        from pytest_given import Glossary, activity, scenario, story
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Book', [activity(guest, search, room)])
+
+        @scenario('x', story=s, activities=[99])
+        def test_x():
+            pass
+    """)
+    result = pytester.runpytest('--collect-only')
+    result.stdout.fnmatch_lines(['*activity id*99*not in story*'])
+
+
+def test_step_activity_outside_scenario_scope_raises(pytester):
+    pytester.makepyfile("""
+        from pytest_given import Glossary, activity, given, scenario, story
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Book', [
+            activity(guest, search, room),
+            activity(guest('Alice'), search, room)])
+
+        @scenario('x', story=s, activities=[1])
+        def test_x():
+            with given('thing', activity=2):
+                pass
+    """)
+    result = pytester.runpytest()
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*step activity*2*outside scenario scope*'])
+
+
+def test_decorator_form_helper_step_with_activity_validates_scope(pytester):
+    pytester.makepyfile("""
+        from pytest_given import Glossary, activity, given, scenario, story
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Book', [activity(guest, search, room)])
+
+        @given('a setup', activity=99)
+        def helper():
+            return None
+
+        @scenario('x', story=s)
+        def test_x():
+            helper()
+    """)
+    result = pytester.runpytest()
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*step activity=99 not in story*'])
+
+
+def test_step_activity_without_scenario_story_raises(pytester):
+    pytester.makepyfile("""
+        from pytest_given import given, scenario
+
+        @scenario('x')
+        def test_x():
+            with given('thing', activity=1):
+                pass
+    """)
+    result = pytester.runpytest()
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*step activity= requires a story on the scenario*'])
+
+
+# --- Task 7.4: Session-finish discovery + serde underscore filter ---
+
+
+def test_session_finish_populates_report_stories_and_glossary(pytester):
+    pytester.makepyfile("""
+        from pytest_given import Glossary, activity, scenario, story
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Book', [activity(guest, search, room)])
+
+        @scenario('x', story=s)
+        def test_x():
+            pass
+    """)
+    pytester.runpytest('--given-json=report.json')
+    data = json.loads(pytester.path.joinpath('report.json').read_text())
+    assert len(data['stories']) == 1
+    assert data['stories'][0]['title'] == 'Book'
+    assert data['glossary'] is not None
+    assert {t['id'] for t in data['glossary']['terms']} == {'guest', 'search', 'room'}
+
+
+def test_session_finish_with_no_stories_leaves_glossary_none(pytester):
+    pytester.makepyfile("""
+        from pytest_given import scenario
+
+        @scenario('x')
+        def test_x():
+            pass
+    """)
+    pytester.runpytest('--given-json=report.json')
+    data = json.loads(pytester.path.joinpath('report.json').read_text())
+    assert data['stories'] == []
+    assert data['glossary'] is None
+
+
+def test_report_json_excludes_underscore_fields(pytester):
+    """_by_id on Story/Glossary must not appear in the JSON output."""
+    pytester.makepyfile("""
+        from pytest_given import Glossary, activity, scenario, story
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.verb('search')
+        room = g.work_object('Room')
+        s = story('Book JSON Filter', [activity(guest, search, room)])
+
+        @scenario('x', story=s)
+        def test_x():
+            pass
+    """)
+    pytester.runpytest('--given-json=report.json')
+    raw = pytester.path.joinpath('report.json').read_text()
+    assert '_by_id' not in raw
+
+
+# --- Task 7.5: Conftest-scan fallback ---
+
+
+def test_glossary_only_in_conftest_is_discovered(pytester):
+    pytester.makeconftest("""
+        from pytest_given import Glossary
+        g = Glossary()
+        g.actor('Guest')
+        g.verb('search')
+    """)
+    pytester.makepyfile("""
+        from pytest_given import scenario
+
+        @scenario('x')
+        def test_x():
+            pass
+    """)
+    pytester.runpytest('--given-json=report.json')
+    data = json.loads(pytester.path.joinpath('report.json').read_text())
+    assert data['glossary'] is not None
+    term_ids = {t['id'] for t in data['glossary']['terms']}
+    assert term_ids == {'guest', 'search'}
+
+
+def test_glossary_in_regular_module_not_discovered_without_story(pytester):
+    pytester.makepyfile(
+        domain="""
+        from pytest_given import Glossary
+        g = Glossary()
+        g.actor('Guest')
+    """
+    )
+    pytester.makepyfile("""
+        from pytest_given import scenario
+        import domain
+
+        @scenario('x')
+        def test_x():
+            assert domain.g is not None
+    """)
+    pytester.runpytest('--given-json=report.json')
+    data = json.loads(pytester.path.joinpath('report.json').read_text())
+    assert data['glossary'] is None
+
+
+def test_multiple_glossaries_in_conftests_raises(pytester):
+    pytester.makeconftest("""
+        from pytest_given import Glossary
+        g1 = Glossary()
+        g1.actor('Foo')
+        g2 = Glossary()
+        g2.actor('Bar')
+    """)
+    pytester.makepyfile("""
+        from pytest_given import scenario
+
+        @scenario('x')
+        def test_x():
+            pass
+    """)
+    result = pytester.runpytest('--given-json=report.json')
+    result.stderr.fnmatch_lines(['*multiple Glossary*'])

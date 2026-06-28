@@ -4,20 +4,43 @@ from pytest_given import Template
 from pytest_given.capture.collector import Collector, set_active_collector
 from pytest_given.capture.decorators import (
     StepDescriptor,
+    _normalize_activity,
     attach,
     given,
     scenario,
     then,
     when,
 )
+from pytest_given.capture.story import (
+    activity as activity_fn,
+)
+from pytest_given.capture.story import (
+    clear_story_registry,
+)
+from pytest_given.capture.story import (
+    story as story_fn,
+)
 from pytest_given.model import (
+    ActivityId,
     FixtureRecording,
+    Glossary,
     Narration,
     NarrationLiteral,
     NarrationValue,
     PytestGivenError,
     Step,
 )
+
+
+@pytest.fixture(autouse=True)
+def _reset_story_registry():
+    from pytest_given.capture.glossary import clear_glossary_registry
+
+    clear_story_registry()
+    clear_glossary_registry()
+    yield
+    clear_story_registry()
+    clear_glossary_registry()
 
 
 def test_context_manager_basic() -> None:
@@ -146,16 +169,48 @@ def test_step_descriptor_with_plain_str_has_empty_narration_parts() -> None:
     assert desc.narration.parts == []
 
 
-def test_step_descriptor_decorator_on_fixture_rejects_structured_text() -> None:
-    """@given(t'...') on a fixture raises — fixture args aren't in scope."""
+def test_step_descriptor_decorator_accepts_tstring() -> None:
+    """T-strings on decorators evaluate eagerly at module load; module-level
+    values (e.g. Glossary handles) interpolate, and the wrapped function
+    records the step on each call. For helpers needing bound-arg interpolation,
+    pytest_given.Template is the canonical form."""
+    g = Glossary()
+    guest = g.actor('Guest')
+    desc = StepDescriptor('given', t'our guest {guest("Alice")}')
+
+    def fixture_body() -> str:
+        return 'Alice'
+
+    wrapped = desc(fixture_body)
+    assert wrapped is not None  # didn't raise
+    assert desc.narration.text == 'our guest Alice'
+
+
+def test_step_descriptor_decorator_rejects_tstring_with_non_glossary_value() -> None:
+    """A t-string on a decorator with a plain (non-glossary) interpolation
+    would silently bake the module-level value; raise with a guiding message."""
     cup_size = 200
     desc = StepDescriptor('given', t'a {cup_size} ml cup')
 
-    def fixture_body() -> int:
+    def helper() -> int:
         return cup_size
 
-    with pytest.raises(PytestGivenError, match='not allowed on a fixture'):
-        desc(fixture_body)
+    with pytest.raises(PytestGivenError, match='cup_size'):
+        desc(helper)
+
+
+def test_step_descriptor_decorator_rejects_tstring_mixed_glossary_and_value() -> None:
+    """Even when the t-string also contains a valid glossary handle, any plain
+    value interpolation is rejected — partial safety isn't safety."""
+    g = Glossary()
+    guest = g.actor('Guest')
+    age = 30
+    desc = StepDescriptor('given', t'{guest("Alice")}, aged {age}')
+
+    def helper() -> None: ...
+
+    with pytest.raises(PytestGivenError, match='age'):
+        desc(helper)
 
 
 def test_scenario_with_plain_str_keeps_name() -> None:
@@ -509,3 +564,123 @@ def test_decorator_records_when_called_from_inside_fixture_body() -> None:
         collector.exit_fixture_setup(token)
         set_active_collector(None)
     assert [c.narration.text for c in root.children] == ['inserting money']
+
+
+def test_step_descriptor_accepts_activity_int():
+    step = given('a thing', activity=3)
+    assert step.activity_ids == (ActivityId(3),)
+
+
+def test_step_descriptor_accepts_activity_sequence():
+    step = when('an event', activity=[1, 2])
+    assert step.activity_ids == (ActivityId(1), ActivityId(2))
+
+
+def test_step_descriptor_activity_defaults_empty():
+    step = then('a result')
+    assert step.activity_ids == ()
+
+
+def test_step_descriptor_rejects_non_int_activity_id():
+    with pytest.raises(TypeError, match='activity'):
+        given('x', activity='one')  # type: ignore[arg-type]
+
+
+def test_step_descriptor_rejects_non_sequence_activity():
+    with pytest.raises(TypeError, match='activity'):
+        given('x', activity=1.5)  # type: ignore[arg-type]
+
+
+# --- Task 7.1: ScenarioDecorator story= / activities= ---
+
+
+def test_scenario_decorator_accepts_story_kwarg():
+    g = Glossary()
+    guest = g.actor('Guest')
+    search = g.verb('search')
+    room = g.work_object('Room')
+    s = story_fn('Book Scenario Decorator', [activity_fn(guest, search, room)])
+    deco = scenario('test', story=s)
+    assert deco.story is s
+
+
+def test_scenario_decorator_accepts_activities_kwarg():
+    deco = scenario('test activities', activities=[1, 2, 3])
+    assert deco.activity_ids == (ActivityId(1), ActivityId(2), ActivityId(3))
+
+
+def test_scenario_decorator_defaults_story_none_and_activities_empty():
+    deco = scenario('test defaults')
+    assert deco.story is None
+    assert deco.activity_ids == ()
+
+
+def test_scenario_decorator_rejects_non_story_object():
+    with pytest.raises(PytestGivenError, match='Story instance'):
+        scenario('test', story='not-a-story')  # type: ignore[arg-type]
+
+
+def test_normalize_activity_rejects_str():
+    with pytest.raises(TypeError, match='int or a Sequence'):
+        _normalize_activity('3')  # type: ignore[arg-type]
+
+
+def test_normalize_activity_rejects_bool():
+    with pytest.raises(TypeError, match='int or a Sequence'):
+        _normalize_activity(True)  # type: ignore[arg-type]
+
+
+def test_normalize_activity_rejects_non_int_in_sequence():
+    with pytest.raises(TypeError, match='must contain int values'):
+        _normalize_activity((1, 'x'))  # type: ignore[list-item]
+
+
+def test_push_step_rejects_activity_id_not_in_story_no_scope() -> None:
+    """Collector.push_step rejects activity_ids that aren't in the story at
+    all when the scenario has no narrower scope. Validation lives on the
+    collector so every push_step entry point gets it."""
+    collector = Collector()
+    g = Glossary()
+    guest = g.actor('Guest')
+    search = g.verb('search')
+    room = g.work_object('Room')
+    s = story_fn('Step Scope No Restriction', [activity_fn(guest, search, room)])
+    collector.start_scenario('id', 'a', 'mod', [], story=s, activity_ids=())
+    with pytest.raises(PytestGivenError, match='not in story'):
+        collector.push_step(
+            'given', Narration(text='a thing'), activity_ids=(ActivityId(99),)
+        )
+
+
+def test_push_step_rejects_activity_id_outside_scenario_scope() -> None:
+    """When the scenario narrows scope, ids outside that scope are rejected
+    by the collector regardless of story membership."""
+    collector = Collector()
+    g = Glossary()
+    guest = g.actor('Guest')
+    search = g.verb('search')
+    room = g.work_object('Room')
+    s = story_fn(
+        'Scoped',
+        [
+            activity_fn(guest, search, room, id=1),
+            activity_fn(guest('Alice'), search, room, id=2),
+        ],
+    )
+    collector.start_scenario(
+        'id', 'a', 'mod', [], story=s, activity_ids=(ActivityId(1),)
+    )
+    with pytest.raises(PytestGivenError, match='outside scenario scope'):
+        collector.push_step(
+            'given', Narration(text='a thing'), activity_ids=(ActivityId(2),)
+        )
+
+
+def test_push_step_requires_story_when_activity_ids_given() -> None:
+    """Step activity_ids without a story on the scenario is a user error."""
+    collector = Collector()
+    collector.start_scenario('id', 'a', 'mod', [])
+    with pytest.raises(PytestGivenError, match='requires a story'):
+        collector.push_step(
+            'given', Narration(text='a thing'), activity_ids=(ActivityId(1),)
+        )

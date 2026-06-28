@@ -4,6 +4,7 @@ from contextvars import ContextVar
 from dataclasses import dataclass
 
 from ..model import (
+    ActivityId,
     Attachment,
     ContentType,
     ErrorInfo,
@@ -17,6 +18,8 @@ from ..model import (
     Scenario,
     SourceLocation,
     Step,
+    Story,
+    StoryId,
     TracebackFrame,
 )
 from .template import Template, narration_from
@@ -64,6 +67,9 @@ class Collector:
         self._active_fixture_descriptor: object | None = None
         self._recordings: dict[FixtureInstanceKey, FixtureRecording] = {}
         self.inside_unannotated_test: bool = False
+        self.active_scenario_story: Story | None = None
+        self.active_scenario_activity_ids: tuple[ActivityId, ...] = ()
+        self._discovered_stories: dict[StoryId, Story] = {}
 
     @property
     def state(self) -> RecordingState:
@@ -105,6 +111,9 @@ class Collector:
         module: str,
         tags: list[str],
         source: SourceLocation | None = None,
+        *,
+        story: Story | None = None,
+        activity_ids: tuple[ActivityId, ...] = (),
     ) -> None:
         self._current_scenario = Scenario(
             id=scenario_id,
@@ -112,10 +121,16 @@ class Collector:
             module=module,
             tags=tags,
             source=source,
+            story_id=story.id if story is not None else None,
+            activity_ids=activity_ids,
         )
         self._step_stack = []
         self._state = 'test'
         self.inside_unannotated_test = False
+        self.active_scenario_story = story
+        self.active_scenario_activity_ids = activity_ids
+        if story is not None:
+            self._discovered_stories[story.id] = story
 
     def finish_scenario(
         self,
@@ -132,6 +147,8 @@ class Collector:
         self._current_scenario = None
         self._step_stack = []
         self._state = 'idle'
+        self.active_scenario_story = None
+        self.active_scenario_activity_ids = ()
         return scenario
 
     def enter_fixture_setup(
@@ -189,7 +206,13 @@ class Collector:
             return
         self._current_scenario.steps.append(copy.deepcopy(recording.root))
 
-    def push_step(self, phase: Phase, narration: Narration) -> Step:
+    def push_step(
+        self,
+        phase: Phase,
+        narration: Narration,
+        *,
+        activity_ids: tuple[ActivityId, ...] = (),
+    ) -> Step:
         if self._state == 'idle':
             raise PytestGivenError(
                 f"Cannot record '{phase}: {narration.text}' — "
@@ -206,13 +229,48 @@ class Collector:
                 f"Cannot nest '{phase}' inside '{stack[-1].phase}'"
                 ' — restructure your test or use a phase-neutral helper'
             )
-        step = Step(phase=phase, narration=narration)
+        if activity_ids:
+            self._check_step_activity_scope(phase, activity_ids)
+        step = Step(phase=phase, narration=narration, activity_ids=activity_ids)
         if stack:
             stack[-1].children.append(step)
         elif self._state == 'test' and self._current_scenario is not None:
             self._current_scenario.steps.append(step)
         stack.append(step)
         return step
+
+    def _check_step_activity_scope(
+        self,
+        phase: Phase,
+        activity_ids: tuple[ActivityId, ...],
+    ) -> None:
+        """Validate step activity_ids against the active scenario's story scope.
+
+        Lives on Collector (not on StepDescriptor) so every push_step entry
+        point — context manager, helper wrapper, future fixture grafting —
+        gets the check by construction.
+        """
+        story = self.active_scenario_story
+        if story is None:
+            raise PytestGivenError(
+                f'step activity= requires a story on the scenario '
+                f'(phase={phase!r}, ids={list(activity_ids)}).'
+            )
+        scope = self.active_scenario_activity_ids
+        valid = scope if scope else tuple(a.id for a in story.activities)
+        valid_set = set(valid)
+        for aid in activity_ids:
+            if aid in valid_set:
+                continue
+            if scope:
+                raise PytestGivenError(
+                    f'step activity={aid} outside scenario scope '
+                    f'(scenario activities={sorted(scope)}).'
+                )
+            raise PytestGivenError(
+                f'step activity={aid} not in story {story.title!r} '
+                f'(valid: {sorted(valid_set)}).'
+            )
 
     def pop_step(self) -> Step | None:
         stack = self._target_stack()

@@ -10,67 +10,23 @@
 </head>
 <body x-data="reportApp()">
 
-<div class="sidebar">
-  <div class="sidebar-title">{{ metadata.project }}</div>
-  <label class="search-box">
-    <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    <input type="text" placeholder="Search scenarios..." x-model="search">
-    <button type="button" class="search-box-clear" @click="search = ''" x-show="search" aria-label="Clear search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-    </button>
-  </label>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Status</div>
-    <div class="status-pills">
-      <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
-      <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
-      <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Browse by</div>
-    <div class="view-toggle">
-      <div class="view-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
-      <div class="view-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
-    </div>
-    <div class="nav-tree">
-      <template x-for="group in groups" :key="group.name">
-        <div>
-          <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
-            <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
-            <span class="nav-group-name" x-text="group.name"></span>
-            <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
-            <span class="nav-group-count" x-text="group.scenarios.length"></span>
-          </div>
-          <template x-if="expandedGroups[group.name]">
-            <div>
-              <template x-for="s in group.scenarios" :key="s.id">
-                <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
-                  <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
-                  <span x-text="s.narration.text"></span>
-                </div>
-              </template>
-            </div>
-          </template>
-        </div>
-      </template>
-    </div>
-  </div>
-</div>
-
 <div class="main">
-  <div class="header">
-    <div style="display:flex; justify-content:space-between; align-items:baseline;">
-      <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-        <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
-        <div class="header-context" x-text="filterSummary"></div>
-        <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
-      </div>
-      <div class="header-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · <span x-text="formattedTimestamp"></span></div>
-    </div>
-  </div>
+
+  {%- macro source_link(source) -%}
+    {%- if source -%}
+      {%- set url = source | source_url -%}
+      {%- if url -%}
+      <a href="{{ url }}">{{ source.relpath }}:{{ source.line }}</a>
+      {%- else -%}
+      <span>{{ source.relpath }}:{{ source.line }}</span>
+      {%- endif -%}
+    {%- endif -%}
+  {%- endmacro -%}
+
+  {%- macro anchor_link(hash) -%}
+    <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('{{ hash }}', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+  {%- endmacro -%}
 
   {%- macro render_error(error) -%}
     {%- set internal_count = error.frames | selectattr('is_internal') | list | length -%}
@@ -134,11 +90,104 @@
   {%- endif -%}
   {%- endmacro -%}
 
+  <header class="topbar">
+    <div class="topbar-title">{{ metadata.project }}</div>
+    <div class="topbar-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · <span x-text="formattedTimestamp"></span></div>
+  </header>
+
+  {% if tab_visibility.scenarios or tab_visibility.stories or tab_visibility.glossary %}
+  {% set visible_count = (tab_visibility.scenarios|int) + (tab_visibility.stories|int) + (tab_visibility.glossary|int) %}
+  {% if visible_count > 1 %}
+  <nav class="frame-nav" role="tablist">
+    <button class="nav-tab" role="tab"
+            :class="{ 'nav-tab-active': mainView === 'scenarios' }"
+            @click="mainView = 'scenarios'">Scenarios</button>
+    {% if tab_visibility.stories %}
+    <button class="nav-tab" role="tab"
+            :class="{ 'nav-tab-active': mainView === 'stories' }"
+            @click="mainView = 'stories'">Stories</button>
+    {% endif %}
+    {% if tab_visibility.glossary %}
+    <button class="nav-tab" role="tab"
+            :class="{ 'nav-tab-active': mainView === 'glossary' }"
+            @click="mainView = 'glossary'">Glossary</button>
+    {% endif %}
+  </nav>
+  {% endif %}
+  {% endif %}
+
+  <div id="view-scenarios" x-show="mainView === 'scenarios'">
+  <div class="view-layout">
+  <div class="sidebar">
+    <label class="search-box">
+      <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" placeholder="Search scenarios..." x-model="search">
+      <button type="button" class="search-box-clear" @click="search = ''" x-show="search" aria-label="Clear search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </label>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Status</div>
+      <div class="status-pills">
+        <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
+        <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
+        <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Browse by</div>
+      <div class="seg-toggle">
+        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
+        <div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+      </div>
+      <div class="nav-tree">
+        <template x-for="group in groups" :key="group.name">
+          <div>
+            <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
+              <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.name] }"></span>
+              <span class="nav-group-name" x-text="group.name"></span>
+              <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
+              <span class="nav-group-count" x-text="group.scenarios.length"></span>
+            </div>
+            <template x-if="expandedGroups[group.name]">
+              <div>
+                <template x-for="s in group.scenarios" :key="s.id">
+                  <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
+                    <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
+                    <span x-text="s.narration.text"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+  <div class="view-main">
+  <div class="header">
+    <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+      <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
+      <div class="header-context" x-text="filterSummary"></div>
+      <span class="filter-chip" x-show="termFilter" x-cloak>
+        Term: <span x-text="termFilter"></span>
+        <button type="button" class="filter-chip-x" @click="clearTermFilter()" aria-label="Clear term filter">×</button>
+      </span>
+      <button class="collapse-all-btn" @click="toggleAllScenarios()">
+        <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
+        <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
+      </button>
+    </div>
+  </div>
+
   {% for scenario in scenarios %}
   {%- set has_body = scenario.steps or scenario.parameters or scenario.error or scenario.skip_reason -%}
   <div class="scenario {{ scenario.status }}"
        x-show="isVisible({{ loop.index0 }})"
        :id="'scenario-' + {{ loop.index0 }}"
+       data-scenario-id="{{ scenario.id }}"
        :class="{ 'scenario-expanded': expandedScenarios[{{ loop.index0 }}] }">
     <div class="scenario-header{% if not has_body %} scenario-header-empty{% endif %}"{% if has_body %} @click="toggleScenario({{ loop.index0 }})"{% endif %}>
       <div style="display:flex; align-items:center;">
@@ -147,6 +196,7 @@
         {% for tag in scenario.tags %}
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
         {% endfor %}
+        {{ anchor_link('scenario=' ~ scenario_slugs[scenario.id]) }}
       </div>
       <span class="scenario-meta">
         <span class="scenario-status {{ scenario.status }}">
@@ -219,23 +269,299 @@
       {% endif %}
 
       {% if scenario.source %}
-      <div class="scenario-source">
-        {%- set src_url = source_urls.get(loop.index0) -%}
-        {%- if src_url -%}
-        <a href="{{ src_url }}">{{ scenario.source.relpath }}:{{ scenario.source.line }}</a>
-        {%- else -%}
-        <span>{{ scenario.source.relpath }}:{{ scenario.source.line }}</span>
-        {%- endif -%}
-      </div>
+      <div class="scenario-source">{{ source_link(scenario.source) }}</div>
       {% endif %}
     </div>
     </div>
   </div>
   {% endfor %}
+
+  </div>{# end .view-main #}
+  </div>{# end .view-layout #}
+  </div>{# end #view-scenarios #}
+
+  <div id="view-stories" x-show="mainView === 'stories'" x-cloak>
+  {% if stories %}
+  <div class="view-layout">
+    <div class="sidebar">
+      <div class="sidebar-label">Stories</div>
+      {% for story in stories %}
+      {% set scns = story_rollups[story.id].scenarios %}
+      <div class="story-sidebar-item" :class="{ active: selectedStory === '{{ story.id }}' }"
+           @click="selectedStory = '{{ story.id }}'">
+        <div class="story-sidebar-title">{{ story.title }}</div>
+        <div class="story-sidebar-meta">{{ story.activities | length }} activities · {{ scns | length }} scenario{{ 's' if scns | length != 1 else '' }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="view-main">
+      {% for story in stories %}
+      <div x-show="selectedStory === '{{ story.id }}'">
+        {% set rollup = story_rollups[story.id] %}
+        {% set story_scns = rollup.scenarios %}
+        {% set total_scns = story_scns | length %}
+        <div class="header">
+          <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+            <div class="header-title">{{ story.title }}{{ anchor_link('view=stories&story=' ~ story.id) }}</div>
+            <div class="header-context">{{ story.activities | length }} activities · {{ total_scns }} scenario{{ 's' if total_scns != 1 else '' }}</div>
+            <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
+                    @click="clearActivityHighlights()">Deselect</button>
+          </div>
+        </div>
+        <div class="activity-timeline">
+          {% for activity in story.activities %}
+          {% set cov = rollup.per_activity[activity.id] %}
+          <div class="activity-row" id="activity-{{ story.id }}-{{ activity.id }}"
+               :class="{ 'activity-row-highlight': highlightedActivities['{{ activity.id }}'] }">
+            <div class="activity-num" data-activity-id="{{ activity.id }}"
+                 :class="{ 'activity-num-highlight': highlightedActivities['{{ activity.id }}'] }">{{ activity.id }}</div>
+            <div class="activity-body">
+              {% for path in activity.paths %}
+              <div class="activity-path">
+                {% for part in path.parts %}{{ part | activity_part }}{% endfor %}
+              </div>
+              {% endfor %}
+            </div>
+            <div class="activity-cov">
+              {% if not cov.eligible %}
+              <span class="cov-chip cov-untracked" title="insufficient number of glossary terms for matching">—</span>
+              {% elif cov.total == 0 %}
+              <span class="cov-chip cov-uncovered">0/{{ total_scns }}</span>
+              {% elif cov.passed == cov.total %}
+              <span class="cov-chip cov-passed">{{ cov.passed }}/{{ cov.total }}</span>
+              {% elif cov.passed == 0 %}
+              <span class="cov-chip cov-failed">0/{{ cov.total }}</span>
+              {% else %}
+              <span class="cov-chip cov-mixed">{{ cov.passed }}/{{ cov.total }}</span>
+              {% endif %}
+            </div>
+            <div class="activity-badges">
+              {% for scn in story_scns %}
+              {% if scn.id in cov.scenario_ids %}
+              <a class="use-chip use-chip-{{ scn.status }}"
+                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('{{ scn.id }}'))">
+                <span class="dot-{{ scn.status }}">{{ '✓' if scn.status == 'passed' else ('✗' if scn.status == 'failed' else '○') }}</span>
+                {{ scn.narration.text | truncate(30) }}
+              </a>
+              {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="scn-act-strip-section">
+          {% for scn in story_scns %}
+          <div class="scenario {{ scn.status }}" style="margin-bottom: var(--space-sm);"
+               x-show="activitySelectionMatches({{ scn_covers.get(scn.id, []) }})">
+            <div class="scenario-header scenario-header-empty">
+              <div style="display:flex; align-items:center;">
+                <span class="scenario-chevron-placeholder"></span>
+                <a href="#" class="scenario-name scenario-name--link"
+                   data-goto-scenario="{{ scn.id }}"
+                   @click.prevent>{{ scn.narration.text }}</a>
+              </div>
+              <span class="scenario-meta">
+                <span class="scenario-status {{ scn.status }}">
+                  {{ '✓ passed' if scn.status == 'passed' else ('✗ failed' if scn.status == 'failed' else '○ skipped') }}
+                </span>
+              </span>
+            </div>
+            {% if scn_covers.get(scn.id) %}
+            <div class="scn-act-strip">
+              <span class="scn-act-label">Covers:</span>
+              {% for act_id in scn_covers.get(scn.id, []) %}
+              <span class="use-chip" data-activity-id="{{ act_id }}"
+                    :class="{ 'use-chip-highlight': highlightedActivities['{{ act_id }}'] }">{{ act_id }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% if story.source %}
+        <div class="scenario-source">{{ source_link(story.source) }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  </div>
+  <div id="view-glossary" x-show="mainView === 'glossary'" x-cloak>
+  {% if glossary %}
+  <div class="view-layout">
+    <div class="sidebar">
+      <label class="search-box">
+        <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="text" placeholder="Search terms..." x-model="glossarySearch">
+        <button type="button" class="search-box-clear" @click="glossarySearch = ''" x-show="glossarySearch" aria-label="Clear search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </label>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Show kinds</div>
+        {% set actor_count = glossary.terms | selectattr('kind', 'equalto', 'actor') | list | length %}
+        {% set object_count = glossary.terms | selectattr('kind', 'equalto', 'object') | list | length %}
+        {% set verb_count = glossary.terms | selectattr('kind', 'equalto', 'verb') | list | length %}
+        {% set kindless_count = glossary.terms | selectattr('kind', 'none') | list | length %}
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.actor">
+          <span class="kind-swatch kind-swatch-actor"></span>
+          <span>Actors</span>
+          <span class="nav-group-count">{{ actor_count }}</span>
+        </label>
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.object">
+          <span class="kind-swatch kind-swatch-object"></span>
+          <span>Work Objects</span>
+          <span class="nav-group-count">{{ object_count }}</span>
+        </label>
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.verb">
+          <span class="kind-swatch kind-swatch-verb"></span>
+          <span>Verbs</span>
+          <span class="nav-group-count">{{ verb_count }}</span>
+        </label>
+        {% if kindless_count %}
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.kindless">
+          <span class="kind-swatch kind-swatch-kindless"></span>
+          <span>Uncategorized</span>
+          <span class="nav-group-count">{{ kindless_count }}</span>
+        </label>
+        {% endif %}
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Definitions</div>
+        <div class="seg-toggle">
+          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'all' }" @click="glossaryDefinitionFilter = 'all'">All</div>
+          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'defined' }" @click="glossaryDefinitionFilter = 'defined'">Defined</div>
+          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'undefined' }" @click="glossaryDefinitionFilter = 'undefined'">Undefined</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-main">
+      <div class="header">
+        <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+          <div class="header-title">Glossary</div>
+          <div class="header-context">
+            {{ glossary.terms | length }} terms ·
+            {{ actor_count }} actor{{ 's' if actor_count != 1 else '' }} ·
+            {{ object_count }} work object{{ 's' if object_count != 1 else '' }} ·
+            {{ verb_count }} verb{{ 's' if verb_count != 1 else '' }}{% if kindless_count %} ·
+            {{ kindless_count }} uncategorized{% endif %}
+          </div>
+          <button class="collapse-all-btn" @click="toggleAllTerms()">
+            <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
+            <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
+          </button>
+        </div>
+      </div>
+
+      {% for kind_label, kind_key, kind_cls in [('Actors', 'actor', 'term-actor'), ('Work Objects', 'object', 'term-obj'), ('Verbs', 'verb', 'term-verb'), ('Uncategorized', 'kindless', 'term-kindless')] %}
+      {% if kind_key == 'kindless' %}
+      {% set kind_terms = glossary.terms | selectattr('kind', 'none') | list %}
+      {% else %}
+      {% set kind_terms = glossary.terms | selectattr('kind', 'equalto', kind_key) | list %}
+      {% endif %}
+      {% if kind_terms %}
+      <div x-show="glossaryKindFilter.{{ kind_key }}">
+        <div class="kind-header">
+          <span class="kind-title {{ kind_cls }}">{{ kind_label }}</span>
+          <span class="kind-meta">{{ kind_terms | length }} term{{ 's' if kind_terms | length != 1 else '' }}</span>
+        </div>
+        {% for term in kind_terms %}
+        {% set agg = glossary_aggregations.get(term.id) %}
+        {% set q = 'glossarySearch' %}
+        <div class="entry" id="term-{{ term.id }}"
+             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || '{{ (term.canonical + ' ' + (term.definition or '')) | lower }}'.includes(glossarySearch.toLowerCase()))">
+          <div class="entry-head" @click="expandedTerms['{{ term.id }}'] ? delete expandedTerms['{{ term.id }}'] : (expandedTerms['{{ term.id }}'] = true)">
+            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['{{ term.id }}'] }"></span>
+            <span class="entry-name">
+              <span class="term-pill {{ kind_cls }}">{{ term.canonical }}</span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">{{ term.definition if term.definition else '' }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
+              <div class="entry-summary">
+                {% if agg %}
+                {% set show_instances = kind_key in ('actor', 'object') and agg.instances %}
+                {% if show_instances %}{{ agg.instances | length }} instance{{ 's' if agg.instances | length != 1 else '' }}{% endif %}
+                {% if agg.stories %}{% if show_instances %} · {% endif %}used in {{ agg.stories | length }} stor{{ 'ies' if agg.stories | length != 1 else 'y' }}{% endif %}
+                {% endif %}
+              </div>
+            </div>
+            {{ anchor_link('view=glossary&term=' ~ term.id) }}
+          </div>
+          <div class="refs scenario-body" :class="{ expanded: expandedTerms['{{ term.id }}'] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                {% if agg and agg.stories %}
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  {% for sid in agg.stories %}
+                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = '{{ sid }}'">{{ sid }}</a>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% if agg and kind_key in ('actor', 'object') and agg.instances %}
+                <div class="refs-line">
+                  <span class="refs-label">Instances:</span>
+                  {% for inst in agg.instances %}
+                  <span class="use-chip use-chip--static">{{ inst.display }}</span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% if agg and kind_key == 'verb' and agg.forms %}
+                <div class="refs-line">
+                  <span class="refs-label">Also used as:</span>
+                  {% for form in agg.forms %}
+                  <span class="use-chip use-chip--static">{{ form.display }}</span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% set scn_ids = term_scenario_index.get(term.id, []) %}
+                {% if scn_ids %}
+                <div class="refs-line">
+                  <a class="use-chip" href="#"
+                     @click.prevent="filterScenariosByTerm('{{ term.id }}')">
+                    Show {{ scn_ids | length }} scenario{{ 's' if scn_ids | length != 1 else '' }} using this term
+                  </a>
+                </div>
+                {% endif %}
+                {% if term.source %}
+                <div class="scenario-source">{{ source_link(term.source) }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  </div>
+
+</div>
+
+<!-- Shared hover tooltip for term-ref pills; positioned by app.js. Lives at
+     body level so it is never clipped by collapsible scenario bodies. -->
+<div id="term-tip" role="tooltip" hidden>
+  <span class="term-tip-name"></span>
+  <span class="term-tip-def"></span>
 </div>
 
 <script>
 window.__REPORT_DATA__ = {{ report_json }};
+window.__storyIds = {{ story_ids_json }};
+window.__termIds = {{ term_ids_json }};
+window.__termScenarios = {{ term_scenarios_json }};
+window.__scenarioSlugs = {{ scenario_slugs_json }};
 {{ app_js }}
 </script>
 <script>{{ alpine_js }}</script>

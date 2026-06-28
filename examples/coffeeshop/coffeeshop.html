@@ -52,7 +52,8 @@ body {
   background: var(--bg-page);
   color: var(--text-primary);
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   font-size: var(--font-size-base);
   line-height: 1.5;
 }
@@ -61,19 +62,12 @@ body {
 .sidebar {
   width: 260px;
   background: var(--bg-sidebar);
-  border-right: 1px solid var(--border);
   padding: var(--space-lg);
   flex-shrink: 0;
   overflow-y: auto;
   max-height: 100vh;
   position: sticky;
   top: 0;
-}
-.sidebar-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: var(--space-lg);
 }
 /* Search box (wraps input + icons) */
 .search-box {
@@ -154,27 +148,31 @@ body {
 .status-pill:not([class*="active-"]) { opacity: 0.5; text-decoration: line-through; }
 
 
-/* Browse-by toggle */
-.view-toggle {
+/* Segmented toggle — a connected single-select control. Shared by the
+   "Browse by" (Tags/Modules) toggle and the glossary "Definitions" filter so
+   the two read as the same idiom. (The Status pills above are deliberately
+   separate: they are multi-select with per-status semantic colors.) */
+.seg-toggle {
   display: flex;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
-.view-btn {
+.seg-btn {
   flex: 1;
   text-align: center;
   font-size: var(--font-size-sm);
-  padding: var(--space-xs) 0;
+  padding: 4px;
   cursor: pointer;
+  border-left: 1px solid var(--border);
   background: var(--bg-card);
-  color: var(--text-secondary);
-  border: none;
+  color: var(--text-muted);
   user-select: none;
 }
-.view-btn.active {
-  background: var(--color-accent);
-  color: #fff;
+.seg-btn:first-child { border-left: none; }
+.seg-btn.active {
+  background: var(--color-accent-bg);
+  color: var(--color-accent);
   font-weight: 500;
 }
 
@@ -187,7 +185,19 @@ body {
   align-items: center;
   color: var(--text-primary);
 }
-.nav-group-toggle { color: var(--text-muted); width: 14px; display: inline-block; flex-shrink: 0; }
+.nav-group-toggle {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  color: var(--text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  margin-right: 6px;
+}
+.nav-group-toggle-open { transform: rotate(45deg); }
 .nav-group-name { font-weight: 500; }
 .nav-group-active { background: var(--color-accent); color: #fff; border-radius: var(--radius-sm); padding-left: var(--space-xs); padding-right: var(--space-xs); }
 .nav-group-active .nav-group-toggle,
@@ -209,7 +219,21 @@ body {
 .nav-status-icon { font-size: 0.625rem; }
 
 /* === Main === */
-.main { flex: 1; padding: var(--space-xl); overflow-y: auto; }
+.main {
+  flex: 1;
+  padding: var(--space-xl);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+/* View layout: sticky .sidebar (260px) + .view-main with consistent padding.
+   The layout grows to fill remaining vertical space so the sidebar stretches
+   to a consistent height across views regardless of content size. */
+#view-scenarios,
+#view-stories,
+#view-glossary { flex: 1; min-height: 0; display: flex; }
+.view-layout { display: flex; flex: 1; min-height: 0; }
+.view-main { flex: 1; min-width: 0; min-height: 0; padding: var(--space-xl); overflow-y: auto; }
 .header {
   margin-bottom: var(--space-xl);
   padding-bottom: var(--space-lg);
@@ -221,18 +245,32 @@ body {
   font-weight: 500;
 }
 .header-title { font-size: var(--font-size-lg); font-weight: 600; }
-.header-meta { color: var(--text-muted); font-size: var(--font-size-sm); }
 .collapse-all-btn {
   background: none;
-  border: none;
-  padding: 0;
-  font-size: var(--font-size-base);
-  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
   cursor: pointer;
   white-space: nowrap;
-  vertical-align: baseline;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
-.collapse-all-btn:hover { color: var(--color-accent); }
+.collapse-all-btn:hover { background: var(--bg-page); border-color: var(--color-accent); color: var(--color-accent); }
+.collapse-chevron {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+  margin-bottom: 1px;
+}
+.collapse-chevron-up { transform: rotate(-135deg); margin-bottom: -2px; }
 
 /* === Scenario Cards === */
 .scenario {
@@ -283,9 +321,22 @@ body {
 .scenario-body-inner {
   overflow: hidden;
   min-height: 0;
+  position: relative;
 }
 
 .scenario-name { font-size: var(--font-size-md); font-weight: 500; }
+.scenario-name--link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.scenario-name--link:hover { text-decoration: underline; }
+.scenario-name--link::after {
+  content: " →";
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+.scenario-header:hover .scenario-name--link::after { opacity: 0.6; }
 .scenario-tag {
   display: inline-block;
   background: var(--color-accent-bg);
@@ -533,74 +584,472 @@ span.param-highlight {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+.scenario-body-inner > .scenario-source,
+.refs-content > .scenario-source {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.refs-content > .scenario-source {
+  bottom: var(--space-md);
+  padding-block: 0;
+}
+
+/* === Term-ref pills (actor / object / verb) === */
+.term-ref-actor {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.term-ref-object {
+  background: #ccfbf1;
+  color: #0f766e;
+  border: 1px solid #5eead4;
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  cursor: pointer;
+}
+.term-ref-verb {
+  color: #0e7490;
+  border-bottom: 1px dotted #0e7490;
+  cursor: pointer;
+  font-weight: 500;
+}
+.term-ref-unknown {
+  background: #f3f4f6;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+}
+.term-ref--link { cursor: pointer; }
+.term-ref--link:hover { text-decoration: underline; }
+.activity-word {
+  color: var(--text-secondary);
+}
+/* Custom hover tooltip for term-ref pills (replaces the native title): the
+   canonical term name as a heading above its definition. Shown/positioned by
+   app.js; a single shared node lives at body level to dodge overflow clipping. */
+#term-tip {
+  position: fixed;
+  z-index: 1000;
+  max-width: 280px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--text-primary);
+  color: var(--bg-card);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  pointer-events: none;
+}
+#term-tip[hidden] { display: none; }
+.term-tip-name { display: block; font-weight: 700; }
+.term-tip-def { display: block; margin-top: 2px; opacity: 0.82; }
+
+/* === Topbar === */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+.topbar-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.topbar-meta {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* === Tab strip === */
+:root {
+  --color-mixed: #ca8a04;
+  --color-uncovered: #9ca3af;
+}
+.frame-nav {
+  display: flex;
+  gap: var(--space-xs);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0;
+}
+.nav-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.15s, border-color 0.15s;
+}
+.nav-tab:hover { color: var(--color-accent); }
+.nav-tab-active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* === Story layout === */
+.story-sidebar-item {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 1px solid transparent;
+  margin-bottom: var(--space-xs);
+}
+.story-sidebar-item:hover { background: var(--bg-card); border-color: var(--border); }
+.story-sidebar-item.active {
+  background: var(--color-accent-bg);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.story-sidebar-title { font-weight: 600; font-size: var(--font-size-md); }
+.story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
+
+/* === Activity timeline === */
+.activity-timeline { display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-xl); }
+.activity-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+}
+.activity-num {
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.activity-num:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+
+/* === Coverage chip === */
+.activity-cov { flex-shrink: 0; }
+.cov-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+.cov-chip.cov-passed { background: #d4edda; color: #155724; }
+.cov-chip.cov-failed { background: #f8d7da; color: #721c24; }
+.cov-chip.cov-mixed { background: #fff3cd; color: #856404; }
+.cov-chip.cov-uncovered { background: #f3f4f6; color: var(--text-muted); }
+.cov-chip.cov-untracked {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-color, #d1d5db);
+  cursor: help;
+}
+
+/* === Scenario badge strip === */
+.activity-badges { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+.use-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+}
+.use-chip:hover { border-color: var(--color-accent); color: var(--color-accent); }
+/* Non-interactive chips (term instances, verb forms): no link affordance. */
+.use-chip--static { cursor: default; }
+.use-chip--static:hover { border-color: var(--border); color: var(--text-secondary); }
+.use-chip-passed { border-color: var(--color-passed); }
+.use-chip-failed { border-color: var(--color-failed); }
+.use-chip-skipped { border-color: var(--color-skipped); }
+.scn-act-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+  border-top: 1px solid var(--border);
+  margin-top: var(--space-xs);
+  flex-wrap: wrap;
+}
+.scn-act-label { color: var(--text-muted); font-weight: 600; }
+.scn-act-strip-section { margin-top: var(--space-xl); }
+
+/* Kind filter rows in sidebar */
+.kind-filter-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 4px 0;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+.kind-filter-row input[type="checkbox"] { flex-shrink: 0; }
+.kind-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.kind-swatch-actor { background: #fcd34d; }
+.kind-swatch-object { background: #5eead4; }
+.kind-swatch-verb { background: #67e8f9; }
+.kind-swatch-kindless { background: #d1d5db; }
+
+/* === Kind section headers === */
+.kind-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--border);
+}
+.kind-title {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+}
+.kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
+
+/* Kind colour classes for kind headers and term pills */
+.term-actor { color: #92400e; }
+.term-obj { color: #0f766e; }
+.term-verb { color: #0e7490; }
+.term-kindless { color: var(--text-secondary); }
+
+/* === Term pills === */
+.term-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: var(--font-size-md);
+}
+.term-pill.term-actor { background: #fef3c7; border: 1px solid #fcd34d; }
+.term-pill.term-obj { background: #ccfbf1; border: 1px solid #5eead4; }
+.term-pill.term-verb { background: #ecfeff; border: 1px solid #67e8f9; }
+.term-pill.term-kindless { background: #f3f4f6; border: 1px solid var(--border); }
+
+/* === Glossary entry layout === */
+.entry {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+}
+.entry-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  user-select: none;
+}
+.entry-head .scenario-chevron { margin-top: 6px; flex-shrink: 0; }
+.entry-name { flex-shrink: 0; min-width: 160px; }
+.entry-body { flex: 1; }
+.entry-def { font-size: var(--font-size-md); color: var(--text-primary); }
+.entry-def-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.entry-summary { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
+
+/* === Refs collapsible === */
+.refs-inner { overflow: hidden; min-height: 0; }
+.refs-content {
+  padding: 0 var(--space-lg) var(--space-md) calc(var(--space-lg) + 8px + var(--space-sm) + 160px + var(--space-sm));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  position: relative;
+}
+.refs-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+.refs-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* === Term filter chip (active term filter displayed in Scenarios header) === */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: var(--color-accent-bg);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  padding: 2px 8px 2px 10px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.filter-chip-x {
+  background: none;
+  border: none;
+  padding: 0 0 0 2px;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1;
+  color: var(--color-accent);
+  cursor: pointer;
+  opacity: 0.7;
+}
+.filter-chip-x:hover { opacity: 1; }
+
+/* === Activity highlighting (multi-select) === */
+/* selected activity's timeline row: light-blue card (same tint as scenarios) */
+.activity-row-highlight { background: var(--color-accent-bg); }
+/* action bubbles: white when unselected, solid blue when selected */
+.scn-act-strip .use-chip:not(.use-chip-highlight) { background: var(--bg-card); }
+.activity-num-highlight,
+.activity-num-highlight:hover,
+.use-chip-highlight,
+.use-chip-highlight:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+/* === Anchor link affordance === */
+.anchor-link {
+  opacity: 0; border: none; background: none; cursor: pointer;
+  color: var(--text-muted); padding: var(--space-xs);
+  margin-left: var(--space-xs);
+  /* inline-flex + middle keeps the icon centered on the adjacent text rather
+     than sitting on its baseline (too high), especially at small font sizes. */
+  display: inline-flex; align-items: center; vertical-align: middle;
+}
+.anchor-link svg { display: block; }
+.scenario-header:hover .anchor-link,
+.entry-head:hover .anchor-link,
+.header:hover .anchor-link { opacity: 0.6; }
+.anchor-link:hover { opacity: 1 !important; }
+.anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-passed); }
 
 </style>
 </head>
 <body x-data="reportApp()">
 
-<div class="sidebar">
-  <div class="sidebar-title">pytest-given</div>
-  <label class="search-box">
-    <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    <input type="text" placeholder="Search scenarios..." x-model="search">
-    <button type="button" class="search-box-clear" @click="search = ''" x-show="search" aria-label="Clear search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-    </button>
-  </label>
+<div class="main"><header class="topbar">
+    <div class="topbar-title">pytest-given</div>
+    <div class="topbar-meta">pytest 9.0.3 · pytest-given 0.1.0 · <span x-text="formattedTimestamp"></span></div>
+  </header>
 
-  <div class="sidebar-section">
-    <div class="sidebar-label">Status</div>
-    <div class="status-pills">
-      <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
-      <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
-      <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
-    </div>
-  </div>
+  
+  
+  
+  
 
-  <div class="sidebar-section">
-    <div class="sidebar-label">Browse by</div>
-    <div class="view-toggle">
-      <div class="view-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
-      <div class="view-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
-    </div>
-    <div class="nav-tree">
-      <template x-for="group in groups" :key="group.name">
-        <div>
-          <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
-            <span class="nav-group-toggle" x-text="expandedGroups[group.name] ? '▾' : '▸'"></span>
-            <span class="nav-group-name" x-text="group.name"></span>
-            <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
-            <span class="nav-group-count" x-text="group.scenarios.length"></span>
-          </div>
-          <template x-if="expandedGroups[group.name]">
-            <div>
-              <template x-for="s in group.scenarios" :key="s.id">
-                <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
-                  <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
-                  <span x-text="s.narration.text"></span>
-                </div>
-              </template>
-            </div>
-          </template>
-        </div>
-      </template>
-    </div>
-  </div>
-</div>
+  <div id="view-scenarios" x-show="mainView === 'scenarios'">
+  <div class="view-layout">
+  <div class="sidebar">
+    <label class="search-box">
+      <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" placeholder="Search scenarios..." x-model="search">
+      <button type="button" class="search-box-clear" @click="search = ''" x-show="search" aria-label="Clear search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </label>
 
-<div class="main">
-  <div class="header">
-    <div style="display:flex; justify-content:space-between; align-items:baseline;">
-      <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-        <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
-        <div class="header-context" x-text="filterSummary"></div>
-        <button class="collapse-all-btn" @click="toggleAllScenarios()" x-text="anyScenariosExpanded ? 'Collapse all ↑' : 'Expand all ↓'"></button>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Status</div>
+      <div class="status-pills">
+        <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
+        <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
+        <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
       </div>
-      <div class="header-meta">pytest 9.0.3 · pytest-given 0.1.0 · <span x-text="formattedTimestamp"></span></div>
     </div>
-  </div><div class="scenario passed"
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Browse by</div>
+      <div class="seg-toggle">
+        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
+        <div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+      </div>
+      <div class="nav-tree">
+        <template x-for="group in groups" :key="group.name">
+          <div>
+            <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
+              <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.name] }"></span>
+              <span class="nav-group-name" x-text="group.name"></span>
+              <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
+              <span class="nav-group-count" x-text="group.scenarios.length"></span>
+            </div>
+            <template x-if="expandedGroups[group.name]">
+              <div>
+                <template x-for="s in group.scenarios" :key="s.id">
+                  <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
+                    <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
+                    <span x-text="s.narration.text"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+  <div class="view-main">
+  <div class="header">
+    <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+      <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
+      <div class="header-context" x-text="filterSummary"></div>
+      <span class="filter-chip" x-show="termFilter" x-cloak>
+        Term: <span x-text="termFilter"></span>
+        <button type="button" class="filter-chip-x" @click="clearTermFilter()" aria-label="Clear term filter">×</button>
+      </span>
+      <button class="collapse-all-btn" @click="toggleAllScenarios()">
+        <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
+        <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="scenario passed"
        x-show="isVisible(0)"
        :id="'scenario-' + 0"
+       data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_buy_coffee"
        :class="{ 'scenario-expanded': expandedScenarios[0] }">
     <div class="scenario-header" @click="toggleScenario(0)">
       <div style="display:flex; align-items:center;">
@@ -611,6 +1060,8 @@ span.param-highlight {
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'happy-path' }" @click.stop="filterByTag('happy-path')">happy-path</span>
         
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/buy_coffee', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
@@ -646,7 +1097,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L20">examples/test_examples.py:20</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/coffeeshop/test_coffeeshop.py#L20">examples/coffeeshop/test_coffeeshop.py:20</a></div>
       
     </div>
     </div>
@@ -654,6 +1105,7 @@ span.param-highlight {
   <div class="scenario passed"
        x-show="isVisible(1)"
        :id="'scenario-' + 1"
+       data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_text_attachment"
        :class="{ 'scenario-expanded': expandedScenarios[1] }">
     <div class="scenario-header" @click="toggleScenario(1)">
       <div style="display:flex; align-items:center;">
@@ -662,6 +1114,8 @@ span.param-highlight {
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/text_attachment', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
@@ -696,7 +1150,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L32">examples/test_examples.py:32</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/coffeeshop/test_coffeeshop.py#L32">examples/coffeeshop/test_coffeeshop.py:32</a></div>
       
     </div>
     </div>
@@ -704,12 +1158,15 @@ Total:        $2.00</pre></div>
   <div class="scenario passed"
        x-show="isVisible(2)"
        :id="'scenario-' + 2"
+       data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_generator_fixture"
        :class="{ 'scenario-expanded': expandedScenarios[2] }">
     <div class="scenario-header" @click="toggleScenario(2)">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span>
         <span class="scenario-name">Generator fixture with teardown</span>
         
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/generator_fixture', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
@@ -735,7 +1192,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L40">examples/test_examples.py:40</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/coffeeshop/test_coffeeshop.py#L40">examples/coffeeshop/test_coffeeshop.py:40</a></div>
       
     </div>
     </div>
@@ -743,12 +1200,15 @@ Total:        $2.00</pre></div>
   <div class="scenario passed"
        x-show="isVisible(3)"
        :id="'scenario-' + 3"
+       data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight"
        :class="{ 'scenario-expanded': expandedScenarios[3] }">
     <div class="scenario-header" @click="toggleScenario(3)">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span>
         <span class="scenario-name">T-string with a non-parametrize value (neutral highlight)</span>
         
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/neutral_highlight', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
@@ -776,7 +1236,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L61">examples/test_examples.py:61</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/coffeeshop/test_coffeeshop.py#L61">examples/coffeeshop/test_coffeeshop.py:61</a></div>
       
     </div>
     </div>
@@ -784,6 +1244,7 @@ Total:        $2.00</pre></div>
   <div class="scenario passed"
        x-show="isVisible(4)"
        :id="'scenario-' + 4"
+       data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation"
        :class="{ 'scenario-expanded': expandedScenarios[4] }">
     <div class="scenario-header" @click="toggleScenario(4)">
       <div style="display:flex; align-items:center;">
@@ -792,6 +1253,8 @@ Total:        $2.00</pre></div>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/buy_with_validation', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
@@ -839,7 +1302,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L100">examples/test_examples.py:100</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/coffeeshop/test_coffeeshop.py#L100">examples/coffeeshop/test_coffeeshop.py:100</a></div>
       
     </div>
     </div>
@@ -847,6 +1310,7 @@ Total:        $2.00</pre></div>
   <div class="scenario passed"
        x-show="isVisible(5)"
        :id="'scenario-' + 5"
+       data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_complex_order"
        :class="{ 'scenario-expanded': expandedScenarios[5] }">
     <div class="scenario-header" @click="toggleScenario(5)">
       <div style="display:flex; align-items:center;">
@@ -855,6 +1319,8 @@ Total:        $2.00</pre></div>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/complex_order', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
@@ -923,7 +1389,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L113">examples/test_examples.py:113</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/coffeeshop/test_coffeeshop.py#L113">examples/coffeeshop/test_coffeeshop.py:113</a></div>
       
     </div>
     </div>
@@ -931,18 +1397,21 @@ Total:        $2.00</pre></div>
   <div class="scenario failed"
        x-show="isVisible(6)"
        :id="'scenario-' + 6"
+       data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_failing"
        :class="{ 'scenario-expanded': expandedScenarios[6] }">
     <div class="scenario-header" @click="toggleScenario(6)">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[6] }"></span>
         <span class="scenario-name">Failure rendering (intentionally failing)</span>
         
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/failing', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">96ms</span>
+        <span class="scenario-duration">97ms</span>
       </span>
     </div>
 
@@ -963,62 +1432,62 @@ Total:        $2.00</pre></div>
           <span x-show="!showInternal">Show 13 internal frames</span>
           <span x-show="showInternal" x-cloak>Hide internal frames</span>
         </button><div class="error-frames"><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:353: in from_call</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/runner.py:353: in from_call</div>
               <pre class="error-frame-code">    result: TResult | None = func()
                              ^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:245: in &lt;lambda&gt;</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/runner.py:245: in &lt;lambda&gt;</div>
               <pre class="error-frame-code">    lambda: runtest_hook(item=item, **kwds),
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
               <pre class="error-frame-code">    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
               <pre class="error-frame-code">    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/logging.py:850: in pytest_runtest_call</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/logging.py:850: in pytest_runtest_call</div>
               <pre class="error-frame-code">    yield</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/capture.py:900: in pytest_runtest_call</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/capture.py:900: in pytest_runtest_call</div>
               <pre class="error-frame-code">    return (yield)
             ^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/skipping.py:268: in pytest_runtest_call</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/skipping.py:268: in pytest_runtest_call</div>
               <pre class="error-frame-code">    return (yield)
             ^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:179: in pytest_runtest_call</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/runner.py:179: in pytest_runtest_call</div>
               <pre class="error-frame-code">    item.runtest()</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/python.py:1720: in runtest</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/python.py:1720: in runtest</div>
               <pre class="error-frame-code">    self.ihook.pytest_pyfunc_call(pyfuncitem=self)</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
               <pre class="error-frame-code">    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
               <pre class="error-frame-code">    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/python.py:166: in pytest_pyfunc_call</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/python.py:166: in pytest_pyfunc_call</div>
               <pre class="error-frame-code">    result = testfunction(**testargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">src/pytest_given/capture/decorators.py:191: in wrapper</div>
+              <div class="error-frame-loc">src/pytest_given/capture/decorators.py:223: in wrapper</div>
               <pre class="error-frame-code">    return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame">
-              <div class="error-frame-loc">examples/test_examples.py:143: in test_failing</div>
+              <div class="error-frame-loc">examples/coffeeshop/test_coffeeshop.py:143: in test_failing</div>
               <pre class="error-frame-code">    assert machine[&#39;coffees&#39;] == 20</pre>
             </div></div><pre class="error-tail">E   assert 10 == 20</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L140">examples/test_examples.py:140</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/coffeeshop/test_coffeeshop.py#L140">examples/coffeeshop/test_coffeeshop.py:140</a></div>
       
     </div>
     </div>
@@ -1026,18 +1495,21 @@ Total:        $2.00</pre></div>
   <div class="scenario skipped"
        x-show="isVisible(7)"
        :id="'scenario-' + 7"
+       data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_skipped"
        :class="{ 'scenario-expanded': expandedScenarios[7] }">
     <div class="scenario-header" @click="toggleScenario(7)">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[7] }"></span>
         <span class="scenario-name">Skipped scenario rendering</span>
         
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/skipped', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status skipped">
           ○ skipped
         </span>
-        <span class="scenario-duration">27ms</span>
+        <span class="scenario-duration">28ms</span>
       </span>
     </div>
 
@@ -1059,44 +1531,44 @@ Total:        $2.00</pre></div>
           <span x-show="!showInternal">Show 9 internal frames</span>
           <span x-show="showInternal" x-cloak>Hide internal frames</span>
         </button><div class="error-frames"><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:353: in from_call</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/runner.py:353: in from_call</div>
               <pre class="error-frame-code">    result: TResult | None = func()
                              ^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:245: in &lt;lambda&gt;</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/runner.py:245: in &lt;lambda&gt;</div>
               <pre class="error-frame-code">    lambda: runtest_hook(item=item, **kwds),
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
               <pre class="error-frame-code">    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
               <pre class="error-frame-code">    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper</div>
               <pre class="error-frame-code">    return result.get_result()
            ^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper</div>
               <pre class="error-frame-code">    res = yield
           ^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/logging.py:843: in pytest_runtest_setup</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/logging.py:843: in pytest_runtest_setup</div>
               <pre class="error-frame-code">    yield</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/capture.py:895: in pytest_runtest_setup</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/capture.py:895: in pytest_runtest_setup</div>
               <pre class="error-frame-code">    return (yield)
             ^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/skipping.py:251: in pytest_runtest_setup</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/skipping.py:251: in pytest_runtest_setup</div>
               <pre class="error-frame-code">    raise skip.Exception(skipped.reason, _use_item_location=True)</pre>
             </div></div><pre class="error-tail">E   Skipped: demonstrates skipped status</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L146">examples/test_examples.py:146</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/coffeeshop/test_coffeeshop.py#L146">examples/coffeeshop/test_coffeeshop.py:146</a></div>
       
     </div>
     </div>
@@ -1104,6 +1576,7 @@ Total:        $2.00</pre></div>
   <div class="scenario passed"
        x-show="isVisible(8)"
        :id="'scenario-' + 8"
+       data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]"
        :class="{ 'scenario-expanded': expandedScenarios[8] }">
     <div class="scenario-header" @click="toggleScenario(8)">
       <div style="display:flex; align-items:center;">
@@ -1112,6 +1585,8 @@ Total:        $2.00</pre></div>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/pricing', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
@@ -1205,7 +1680,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L49">examples/test_examples.py:49</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/coffeeshop/test_coffeeshop.py#L49">examples/coffeeshop/test_coffeeshop.py:49</a></div>
       
     </div>
     </div>
@@ -1213,6 +1688,7 @@ Total:        $2.00</pre></div>
   <div class="scenario passed"
        x-show="isVisible(9)"
        :id="'scenario-' + 9"
+       data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_brew[200]"
        :class="{ 'scenario-expanded': expandedScenarios[9] }">
     <div class="scenario-header" @click="toggleScenario(9)">
       <div style="display:flex; align-items:center;">
@@ -1221,6 +1697,8 @@ Total:        $2.00</pre></div>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/brew', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status passed">
@@ -1286,7 +1764,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L71">examples/test_examples.py:71</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/coffeeshop/test_coffeeshop.py#L71">examples/coffeeshop/test_coffeeshop.py:71</a></div>
       
     </div>
     </div>
@@ -1294,18 +1772,21 @@ Total:        $2.00</pre></div>
   <div class="scenario skipped"
        x-show="isVisible(10)"
        :id="'scenario-' + 10"
+       data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]"
        :class="{ 'scenario-expanded': expandedScenarios[10] }">
     <div class="scenario-header" @click="toggleScenario(10)">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[10] }"></span>
         <span class="scenario-name">All cases skipped</span>
         
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/parametrized_all_skipped', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         <span class="scenario-status skipped">
           ○ skipped
         </span>
-        <span class="scenario-duration">56ms</span>
+        <span class="scenario-duration">54ms</span>
       </span>
     </div>
 
@@ -1346,38 +1827,38 @@ Total:        $2.00</pre></div>
           <span x-show="!showInternal">Show 9 internal frames</span>
           <span x-show="showInternal" x-cloak>Hide internal frames</span>
         </button><div class="error-frames"><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:353: in from_call</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/runner.py:353: in from_call</div>
               <pre class="error-frame-code">    result: TResult | None = func()
                              ^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:245: in &lt;lambda&gt;</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/runner.py:245: in &lt;lambda&gt;</div>
               <pre class="error-frame-code">    lambda: runtest_hook(item=item, **kwds),
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
               <pre class="error-frame-code">    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
               <pre class="error-frame-code">    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper</div>
               <pre class="error-frame-code">    return result.get_result()
            ^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper</div>
               <pre class="error-frame-code">    res = yield
           ^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/logging.py:843: in pytest_runtest_setup</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/logging.py:843: in pytest_runtest_setup</div>
               <pre class="error-frame-code">    yield</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/capture.py:895: in pytest_runtest_setup</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/capture.py:895: in pytest_runtest_setup</div>
               <pre class="error-frame-code">    return (yield)
             ^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/skipping.py:251: in pytest_runtest_setup</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/skipping.py:251: in pytest_runtest_setup</div>
               <pre class="error-frame-code">    raise skip.Exception(skipped.reason, _use_item_location=True)</pre>
             </div></div><pre class="error-tail">E   Skipped: awaiting fixture</pre></div>
             </td>
@@ -1402,38 +1883,38 @@ Total:        $2.00</pre></div>
           <span x-show="!showInternal">Show 9 internal frames</span>
           <span x-show="showInternal" x-cloak>Hide internal frames</span>
         </button><div class="error-frames"><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:353: in from_call</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/runner.py:353: in from_call</div>
               <pre class="error-frame-code">    result: TResult | None = func()
                              ^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/runner.py:245: in &lt;lambda&gt;</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/runner.py:245: in &lt;lambda&gt;</div>
               <pre class="error-frame-code">    lambda: runtest_hook(item=item, **kwds),
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_hooks.py:512: in __call__</div>
               <pre class="error-frame-code">    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_manager.py:120: in _hookexec</div>
               <pre class="error-frame-code">    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper</div>
               <pre class="error-frame-code">    return result.get_result()
            ^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper</div>
               <pre class="error-frame-code">    res = yield
           ^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/logging.py:843: in pytest_runtest_setup</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/logging.py:843: in pytest_runtest_setup</div>
               <pre class="error-frame-code">    yield</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/capture.py:895: in pytest_runtest_setup</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/capture.py:895: in pytest_runtest_setup</div>
               <pre class="error-frame-code">    return (yield)
             ^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">.nox/examples/Lib/site-packages/_pytest/skipping.py:251: in pytest_runtest_setup</div>
+              <div class="error-frame-loc">.venv/Lib/site-packages/_pytest/skipping.py:251: in pytest_runtest_setup</div>
               <pre class="error-frame-code">    raise skip.Exception(skipped.reason, _use_item_location=True)</pre>
             </div></div><pre class="error-tail">E   Skipped: awaiting fixture</pre></div>
             </td>
@@ -1447,31 +1928,50 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/cefdae8e1da6b9da70358f18b434949ebcac89f2/examples/test_examples.py#L153">examples/test_examples.py:153</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/coffeeshop/test_coffeeshop.py#L153">examples/coffeeshop/test_coffeeshop.py:153</a></div>
       
     </div>
     </div>
   </div>
   
+
+  </div>
+  </div>
+  </div>
+
+  <div id="view-stories" x-show="mainView === 'stories'" x-cloak>
+  
+  </div>
+  <div id="view-glossary" x-show="mainView === 'glossary'" x-cloak>
+  
+  </div>
+
+</div>
+
+<!-- Shared hover tooltip for term-ref pills; positioned by app.js. Lives at
+     body level so it is never clipped by collapsible scenario bodies. -->
+<div id="term-tip" role="tooltip" hidden>
+  <span class="term-tip-name"></span>
+  <span class="term-tip-def"></span>
 </div>
 
 <script>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-07T10:26:04.044527+00:00",
+    "timestamp": "2026-06-28T06:27:33.039161+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "cefdae8e1da6b9da70358f18b434949ebcac89f2"
+    "commit_sha": "6db8450fc811b021ae44c55522de6c1e5e82c964"
   },
   "scenarios": [
     {
-      "id": "examples/test_examples.py::test_buy_coffee",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_buy_coffee",
       "narration": {
         "text": "Basic scenario with when/then and a JSON attachment",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing",
         "happy-path"
@@ -1488,7 +1988,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -1499,7 +2001,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1516,24 +2020,28 @@ window.__REPORT_DATA__ = {
               "content_type": "json"
             }
           ],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 20
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_text_attachment",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_text_attachment",
       "narration": {
         "text": "Plain text attachment",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -1549,7 +2057,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -1560,7 +2070,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1577,24 +2089,28 @@ window.__REPORT_DATA__ = {
               "content_type": "text"
             }
           ],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 32
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_generator_fixture",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_generator_fixture",
       "narration": {
         "text": "Generator fixture with teardown",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "passed",
       "duration_ms": 0,
@@ -1608,7 +2124,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "db"
         },
         {
           "phase": "when",
@@ -1619,7 +2137,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1630,24 +2150,28 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 40
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_neutral_highlight",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight",
       "narration": {
         "text": "T-string with a non-parametrize value (neutral highlight)",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "passed",
       "duration_ms": 0,
@@ -1661,7 +2185,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "given",
@@ -1672,7 +2198,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "when",
@@ -1693,7 +2221,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1717,24 +2247,28 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 61
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_buy_with_validation",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation",
       "narration": {
         "text": "Helper functions can record their own steps",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -1750,7 +2284,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -1779,7 +2315,9 @@ window.__REPORT_DATA__ = {
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             },
             {
               "phase": "when",
@@ -1794,11 +2332,15 @@ window.__REPORT_DATA__ = {
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1809,7 +2351,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1834,28 +2378,34 @@ window.__REPORT_DATA__ = {
                   "content_type": "json"
                 }
               ],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 100
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_complex_order",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_complex_order",
       "narration": {
         "text": "Top-level `given` block and deeply nested steps",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -1871,7 +2421,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "given",
@@ -1882,7 +2434,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "when",
@@ -1901,7 +2455,9 @@ window.__REPORT_DATA__ = {
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             },
             {
               "phase": "when",
@@ -1920,7 +2476,9 @@ window.__REPORT_DATA__ = {
                   "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null
+                  "error": null,
+                  "activity_ids": [],
+                  "fixture_name": null
                 },
                 {
                   "phase": "when",
@@ -1931,15 +2489,21 @@ window.__REPORT_DATA__ = {
                   "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null
+                  "error": null,
+                  "activity_ids": [],
+                  "fixture_name": null
                 }
               ],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -1958,7 +2522,9 @@ window.__REPORT_DATA__ = {
               "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             },
             {
               "phase": "then",
@@ -1983,15 +2549,21 @@ window.__REPORT_DATA__ = {
                       "content_type": "json"
                     }
                   ],
-                  "error": null
+                  "error": null,
+                  "activity_ids": [],
+                  "fixture_name": null
                 }
               ],
               "attachments": [],
-              "error": null
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -2008,27 +2580,31 @@ window.__REPORT_DATA__ = {
               "content_type": "json"
             }
           ],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 113
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_failing",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_failing",
       "narration": {
         "text": "Failure rendering (intentionally failing)",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 96,
+      "duration_ms": 97,
       "steps": [
         {
           "phase": "given",
@@ -2039,7 +2615,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "then",
@@ -2050,7 +2628,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
@@ -2058,84 +2638,84 @@ window.__REPORT_DATA__ = {
         "message": "assert 10 == 20",
         "frames": [
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+            "path": ".venv/Lib/site-packages/_pytest/runner.py",
             "lineno": 353,
             "func": "from_call",
             "code": "    result: TResult | None = func()\n                             ^^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+            "path": ".venv/Lib/site-packages/_pytest/runner.py",
             "lineno": 245,
             "func": "<lambda>",
             "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/pluggy/_hooks.py",
+            "path": ".venv/Lib/site-packages/pluggy/_hooks.py",
             "lineno": 512,
             "func": "__call__",
             "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/pluggy/_manager.py",
+            "path": ".venv/Lib/site-packages/pluggy/_manager.py",
             "lineno": 120,
             "func": "_hookexec",
             "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/logging.py",
+            "path": ".venv/Lib/site-packages/_pytest/logging.py",
             "lineno": 850,
             "func": "pytest_runtest_call",
             "code": "    yield",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/capture.py",
+            "path": ".venv/Lib/site-packages/_pytest/capture.py",
             "lineno": 900,
             "func": "pytest_runtest_call",
             "code": "    return (yield)\n            ^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/skipping.py",
+            "path": ".venv/Lib/site-packages/_pytest/skipping.py",
             "lineno": 268,
             "func": "pytest_runtest_call",
             "code": "    return (yield)\n            ^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+            "path": ".venv/Lib/site-packages/_pytest/runner.py",
             "lineno": 179,
             "func": "pytest_runtest_call",
             "code": "    item.runtest()",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/python.py",
+            "path": ".venv/Lib/site-packages/_pytest/python.py",
             "lineno": 1720,
             "func": "runtest",
             "code": "    self.ihook.pytest_pyfunc_call(pyfuncitem=self)",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/pluggy/_hooks.py",
+            "path": ".venv/Lib/site-packages/pluggy/_hooks.py",
             "lineno": 512,
             "func": "__call__",
             "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/pluggy/_manager.py",
+            "path": ".venv/Lib/site-packages/pluggy/_manager.py",
             "lineno": 120,
             "func": "_hookexec",
             "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/python.py",
+            "path": ".venv/Lib/site-packages/_pytest/python.py",
             "lineno": 166,
             "func": "pytest_pyfunc_call",
             "code": "    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^",
@@ -2143,13 +2723,13 @@ window.__REPORT_DATA__ = {
           },
           {
             "path": "src/pytest_given/capture/decorators.py",
-            "lineno": 191,
+            "lineno": 223,
             "func": "wrapper",
             "code": "    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": "examples/test_examples.py",
+            "path": "examples/coffeeshop/test_coffeeshop.py",
             "lineno": 143,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
@@ -2160,83 +2740,85 @@ window.__REPORT_DATA__ = {
       },
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 140
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_skipped",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_skipped",
       "narration": {
         "text": "Skipped scenario rendering",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 27,
+      "duration_ms": 28,
       "steps": [],
       "parameters": null,
       "error": {
         "message": "demonstrates skipped status",
         "frames": [
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+            "path": ".venv/Lib/site-packages/_pytest/runner.py",
             "lineno": 353,
             "func": "from_call",
             "code": "    result: TResult | None = func()\n                             ^^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+            "path": ".venv/Lib/site-packages/_pytest/runner.py",
             "lineno": 245,
             "func": "<lambda>",
             "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/pluggy/_hooks.py",
+            "path": ".venv/Lib/site-packages/pluggy/_hooks.py",
             "lineno": 512,
             "func": "__call__",
             "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/pluggy/_manager.py",
+            "path": ".venv/Lib/site-packages/pluggy/_manager.py",
             "lineno": 120,
             "func": "_hookexec",
             "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/pluggy/_callers.py",
+            "path": ".venv/Lib/site-packages/pluggy/_callers.py",
             "lineno": 53,
             "func": "run_old_style_hookwrapper",
             "code": "    return result.get_result()\n           ^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/pluggy/_callers.py",
+            "path": ".venv/Lib/site-packages/pluggy/_callers.py",
             "lineno": 38,
             "func": "run_old_style_hookwrapper",
             "code": "    res = yield\n          ^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/logging.py",
+            "path": ".venv/Lib/site-packages/_pytest/logging.py",
             "lineno": 843,
             "func": "pytest_runtest_setup",
             "code": "    yield",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/capture.py",
+            "path": ".venv/Lib/site-packages/_pytest/capture.py",
             "lineno": 895,
             "func": "pytest_runtest_setup",
             "code": "    return (yield)\n            ^^^^^",
             "is_internal": true
           },
           {
-            "path": ".nox/examples/Lib/site-packages/_pytest/skipping.py",
+            "path": ".venv/Lib/site-packages/_pytest/skipping.py",
             "lineno": 251,
             "func": "pytest_runtest_setup",
             "code": "    raise skip.Exception(skipped.reason, _use_item_location=True)",
@@ -2247,17 +2829,19 @@ window.__REPORT_DATA__ = {
       },
       "skip_reason": "demonstrates skipped status",
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 146
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_pricing[1-False]",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]",
       "narration": {
         "text": "Parameterized test (renders as a parameter table)",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -2273,7 +2857,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -2293,7 +2879,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -2313,7 +2901,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": {
@@ -2351,12 +2941,14 @@ window.__REPORT_DATA__ = {
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 49
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_brew[200]",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_brew[200]",
       "narration": {
         "text": "Brew {cup_size} ml (templated scenario name)",
         "parts": [
@@ -2373,7 +2965,7 @@ window.__REPORT_DATA__ = {
           }
         ]
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [
         "billing"
       ],
@@ -2389,7 +2981,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
         },
         {
           "phase": "when",
@@ -2412,7 +3006,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         },
         {
           "phase": "then",
@@ -2423,7 +3019,9 @@ window.__REPORT_DATA__ = {
           "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": {
@@ -2450,20 +3048,22 @@ window.__REPORT_DATA__ = {
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 71
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     },
     {
-      "id": "examples/test_examples.py::test_parametrized_all_skipped[1]",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]",
       "narration": {
         "text": "All cases skipped",
         "parts": []
       },
-      "module": "test_examples",
+      "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 56,
+      "duration_ms": 54,
       "steps": [],
       "parameters": {
         "names": [
@@ -2479,63 +3079,63 @@ window.__REPORT_DATA__ = {
               "message": "awaiting fixture",
               "frames": [
                 {
-                  "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+                  "path": ".venv/Lib/site-packages/_pytest/runner.py",
                   "lineno": 353,
                   "func": "from_call",
                   "code": "    result: TResult | None = func()\n                             ^^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+                  "path": ".venv/Lib/site-packages/_pytest/runner.py",
                   "lineno": 245,
                   "func": "<lambda>",
                   "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/pluggy/_hooks.py",
+                  "path": ".venv/Lib/site-packages/pluggy/_hooks.py",
                   "lineno": 512,
                   "func": "__call__",
                   "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/pluggy/_manager.py",
+                  "path": ".venv/Lib/site-packages/pluggy/_manager.py",
                   "lineno": 120,
                   "func": "_hookexec",
                   "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/pluggy/_callers.py",
+                  "path": ".venv/Lib/site-packages/pluggy/_callers.py",
                   "lineno": 53,
                   "func": "run_old_style_hookwrapper",
                   "code": "    return result.get_result()\n           ^^^^^^^^^^^^^^^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/pluggy/_callers.py",
+                  "path": ".venv/Lib/site-packages/pluggy/_callers.py",
                   "lineno": 38,
                   "func": "run_old_style_hookwrapper",
                   "code": "    res = yield\n          ^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/_pytest/logging.py",
+                  "path": ".venv/Lib/site-packages/_pytest/logging.py",
                   "lineno": 843,
                   "func": "pytest_runtest_setup",
                   "code": "    yield",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/_pytest/capture.py",
+                  "path": ".venv/Lib/site-packages/_pytest/capture.py",
                   "lineno": 895,
                   "func": "pytest_runtest_setup",
                   "code": "    return (yield)\n            ^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/_pytest/skipping.py",
+                  "path": ".venv/Lib/site-packages/_pytest/skipping.py",
                   "lineno": 251,
                   "func": "pytest_runtest_setup",
                   "code": "    raise skip.Exception(skipped.reason, _use_item_location=True)",
@@ -2554,63 +3154,63 @@ window.__REPORT_DATA__ = {
               "message": "awaiting fixture",
               "frames": [
                 {
-                  "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+                  "path": ".venv/Lib/site-packages/_pytest/runner.py",
                   "lineno": 353,
                   "func": "from_call",
                   "code": "    result: TResult | None = func()\n                             ^^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/_pytest/runner.py",
+                  "path": ".venv/Lib/site-packages/_pytest/runner.py",
                   "lineno": 245,
                   "func": "<lambda>",
                   "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/pluggy/_hooks.py",
+                  "path": ".venv/Lib/site-packages/pluggy/_hooks.py",
                   "lineno": 512,
                   "func": "__call__",
                   "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/pluggy/_manager.py",
+                  "path": ".venv/Lib/site-packages/pluggy/_manager.py",
                   "lineno": 120,
                   "func": "_hookexec",
                   "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/pluggy/_callers.py",
+                  "path": ".venv/Lib/site-packages/pluggy/_callers.py",
                   "lineno": 53,
                   "func": "run_old_style_hookwrapper",
                   "code": "    return result.get_result()\n           ^^^^^^^^^^^^^^^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/pluggy/_callers.py",
+                  "path": ".venv/Lib/site-packages/pluggy/_callers.py",
                   "lineno": 38,
                   "func": "run_old_style_hookwrapper",
                   "code": "    res = yield\n          ^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/_pytest/logging.py",
+                  "path": ".venv/Lib/site-packages/_pytest/logging.py",
                   "lineno": 843,
                   "func": "pytest_runtest_setup",
                   "code": "    yield",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/_pytest/capture.py",
+                  "path": ".venv/Lib/site-packages/_pytest/capture.py",
                   "lineno": 895,
                   "func": "pytest_runtest_setup",
                   "code": "    return (yield)\n            ^^^^^",
                   "is_internal": true
                 },
                 {
-                  "path": ".nox/examples/Lib/site-packages/_pytest/skipping.py",
+                  "path": ".venv/Lib/site-packages/_pytest/skipping.py",
                   "lineno": 251,
                   "func": "pytest_runtest_setup",
                   "code": "    raise skip.Exception(skipped.reason, _use_item_location=True)",
@@ -2625,17 +3225,63 @@ window.__REPORT_DATA__ = {
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "examples/test_examples.py",
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 153
-      }
+      },
+      "story_id": null,
+      "activity_ids": []
     }
-  ]
+  ],
+  "glossary": null,
+  "stories": []
 };
+window.__storyIds = [];
+window.__termIds = [];
+window.__termScenarios = {};
+window.__scenarioSlugs = {"coffeeshop/buy_coffee": "examples/coffeeshop/test_coffeeshop.py::test_buy_coffee", "coffeeshop/text_attachment": "examples/coffeeshop/test_coffeeshop.py::test_text_attachment", "coffeeshop/generator_fixture": "examples/coffeeshop/test_coffeeshop.py::test_generator_fixture", "coffeeshop/neutral_highlight": "examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight", "coffeeshop/buy_with_validation": "examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation", "coffeeshop/complex_order": "examples/coffeeshop/test_coffeeshop.py::test_complex_order", "coffeeshop/failing": "examples/coffeeshop/test_coffeeshop.py::test_failing", "coffeeshop/skipped": "examples/coffeeshop/test_coffeeshop.py::test_skipped", "coffeeshop/pricing": "examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]", "coffeeshop/brew": "examples/coffeeshop/test_coffeeshop.py::test_brew[200]", "coffeeshop/parametrized_all_skipped": "examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]"};
+// --- Hash helpers ---
+function parseHash() {
+  return new URLSearchParams(window.location.hash.slice(1));
+}
+
+function serializeHash(params, mode = 'push') {
+  const qs = params.toString();
+  const newHash = qs ? '#' + qs : '';
+  // No-op when the hash is unchanged: avoids spurious history entries and
+  // breaks the readHash -> watcher -> writeHash feedback loop.
+  if (newHash === window.location.hash) return;
+  const url = qs ? '#' + qs : window.location.pathname + window.location.search;
+  if (mode === 'replace') history.replaceState(null, '', url);
+  else history.pushState(null, '', url);
+}
+
+function deserializeView(params) {
+  const v = params.get('view');
+  if (v === 'stories' || v === 'glossary') return v;
+  return 'scenarios';
+}
+
+function deserializeStory(params) {
+  const s = params.get('story');
+  const ids = window.__storyIds || [];
+  return (s && ids.includes(s)) ? s : (ids[0] || null);
+}
+
+// --- Alpine app ---
 function reportApp() {
   const data = window.__REPORT_DATA__;
+  const storyIds = window.__storyIds || [];
   return {
     search: '',
     view: 'tags',
+    mainView: 'scenarios',
+    selectedStory: storyIds[0] || null,
+    glossarySearch: '',
+    glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
+    glossaryDefinitionFilter: 'all',
+    expandedTerms: {},
+    hoveredActivity: null,
+    hoveredScenario: null,
     showPassed: true,
     showFailed: true,
     showSkipped: true,
@@ -2644,6 +3290,37 @@ function reportApp() {
     expandedAttachments: {},
     expandedScenarios: {},
     activeTag: null,
+    termFilter: null,
+    _suppressHashWrite: false,
+    highlightedActivities: {},
+    get anyActivitiesHighlighted() {
+      return Object.keys(this.highlightedActivities).length > 0;
+    },
+    toggleActivityHighlight(id) {
+      if (this.highlightedActivities[id]) delete this.highlightedActivities[id];
+      else this.highlightedActivities[id] = true;
+    },
+    clearActivityHighlights() {
+      this.highlightedActivities = {};
+    },
+    // Story-view scenario cards filter on the selected activities: a card stays
+    // visible when nothing is selected, or when it covers ANY selected activity.
+    activitySelectionMatches(coveredIds) {
+      if (!this.anyActivitiesHighlighted) return true;
+      return coveredIds.some(id => this.highlightedActivities[id]);
+    },
+    get anyTermsExpanded() {
+      return Object.keys(this.expandedTerms).length > 0;
+    },
+    toggleAllTerms() {
+      const expand = !this.anyTermsExpanded;
+      const ids = window.__termIds || [];
+      if (expand) {
+        ids.forEach(id => { this.expandedTerms[id] = true; });
+      } else {
+        this.expandedTerms = {};
+      }
+    },
     get filterSummary() {
       const parts = [];
       if (this.activeTag) parts.push('Tag: ' + this.activeTag);
@@ -2659,7 +3336,10 @@ function reportApp() {
         if (shown.length) parts.push(shown.join(', '));
       }
       if (this.search) parts.push('"' + this.search + '"');
-      return parts.length ? parts.join(' · ') : 'All Scenarios';
+      // The term filter is shown as its own removable chip, so it isn't
+      // repeated here; suppress the "All Scenarios" fallback while it's active.
+      if (parts.length) return parts.join(' · ');
+      return this.termFilter ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
@@ -2696,6 +3376,10 @@ function reportApp() {
       if (s.status === 'failed' && !this.showFailed) return false;
       if (s.status === 'skipped' && !this.showSkipped) return false;
       if (this.activeTag && !s.tags.includes(this.activeTag)) return false;
+      if (this.termFilter &&
+          !(window.__termScenarios[this.termFilter] || []).includes(s.id)) {
+        return false;
+      }
       if (this.search) {
         const q = this.search.toLowerCase();
         const text = (s.narration.text + ' ' + s.tags.join(' ')).toLowerCase();
@@ -2741,6 +3425,25 @@ function reportApp() {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     },
+    goToScenario(nodeId) {
+      this.mainView = 'scenarios';
+      this.$nextTick(() => this.scrollToAndExpand(nodeId));
+    },
+    goToTerm(id) {
+      this.mainView = 'glossary';
+      this.expandedTerms[id] = true;
+      this.$nextTick(() => {
+        const el = document.getElementById('term-' + id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    },
+    filterScenariosByTerm(id) {
+      this.termFilter = id;
+      this.mainView = 'scenarios';
+    },
+    clearTermFilter() {
+      this.termFilter = null;
+    },
     filterByTag(tag) {
       if (this.activeTag === tag) {
         this.activeTag = null;
@@ -2753,6 +3456,45 @@ function reportApp() {
       if (this.expandedAttachments[key]) delete this.expandedAttachments[key];
       else this.expandedAttachments[key] = true;
     },
+    copyAnchor(hashString, event) {
+      history.replaceState(null, '', '#' + hashString);
+      const btn = event.currentTarget;
+      // Only flip to the "copied" state once the URL is actually on the
+      // clipboard — otherwise the icon would claim success even where the
+      // copy silently failed (e.g. a report served over http://).
+      this._copyText(window.location.href).then((ok) => {
+        if (!ok) return;
+        btn.classList.add('anchor-copied');
+        setTimeout(() => btn.classList.remove('anchor-copied'), 1200);
+      });
+    },
+    _copyText(text) {
+      // navigator.clipboard exists only in secure contexts (https, file://);
+      // a report opened over plain http:// has none, so fall back to the
+      // legacy execCommand path. Also fall back if writeText rejects.
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).then(
+          () => true,
+          () => this._execCopy(text),
+        );
+      }
+      return Promise.resolve(this._execCopy(text));
+    },
+    _execCopy(text) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (err) {
+        return false;
+      }
+    },
     setHoverParam(name, el) {
       const scope = el?.closest('.scenario') || document;
       scope.querySelectorAll('.param-highlight').forEach(e => e.classList.remove('param-highlight'));
@@ -2764,15 +3506,91 @@ function reportApp() {
     },
     init() {
       this._readHash();
-      ['search', 'activeTag', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
-        this.$watch(key, () => this._writeHash());
+      // Search typing replaces the current entry (no per-keystroke history
+      // spam); discrete navigations/filters push a back-able entry. All writes
+      // are suppressed while we're applying state FROM the hash (see _readHash).
+      this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
+      ['activeTag', 'termFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+        this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
+      this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      this.$watch('selectedStory', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      this.$watch('selectedStory', () => { this.highlightedActivities = {}; });
+      // hashchange: manual URL edits / pasted links. popstate: back/forward.
       window.addEventListener('hashchange', () => this._readHash());
+      window.addEventListener('popstate', () => this._readHash());
+      // Capture phase + stopPropagation so a term pill inside a clickable
+      // container (e.g. a scenario header) navigates without also triggering
+      // that container's click (scenario expand/collapse).
+      document.addEventListener('click', (event) => {
+        const pill = event.target.closest('[data-term-id]');
+        if (!pill) return;
+        if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
+        event.stopPropagation();
+        this.goToTerm(pill.dataset.termId);
+      }, true);
+      document.addEventListener('click', (event) => {
+        const chip = event.target.closest('[data-activity-id]');
+        if (!chip) return;
+        this.toggleActivityHighlight(chip.dataset.activityId);
+      });
+      // Story-view scenario card titles jump to the scenario in the Scenarios view.
+      document.addEventListener('click', (event) => {
+        const link = event.target.closest('[data-goto-scenario]');
+        if (!link) return;
+        event.preventDefault();
+        this.goToScenario(link.dataset.gotoScenario);
+      });
+      this._initTermTooltip();
+    },
+    // Single shared tooltip for every term-ref pill. We position it with
+    // `fixed` from the pill's bounding box (rather than a CSS-only tooltip)
+    // because pills live inside `overflow: hidden` collapsible bodies that
+    // would otherwise clip an absolutely positioned child.
+    _initTermTooltip() {
+      const tip = document.getElementById('term-tip');
+      if (!tip) return;
+      const nameEl = tip.querySelector('.term-tip-name');
+      const defEl = tip.querySelector('.term-tip-def');
+      const hide = () => { tip.hidden = true; };
+      document.addEventListener('pointerover', (event) => {
+        const pill = event.target.closest('[data-term-name]');
+        if (!pill) { return; }
+        nameEl.textContent = pill.dataset.termName;
+        const def = pill.dataset.termDef || '';
+        defEl.textContent = def;
+        defEl.hidden = !def;
+        tip.hidden = false;
+        const pillRect = pill.getBoundingClientRect();
+        const tipRect = tip.getBoundingClientRect();
+        const margin = 6;
+        let top = pillRect.top - tipRect.height - margin;
+        if (top < margin) top = pillRect.bottom + margin;  // flip below if clipped
+        let left = pillRect.left;
+        const maxLeft = window.innerWidth - tipRect.width - margin;
+        if (left > maxLeft) left = maxLeft;
+        if (left < margin) left = margin;
+        tip.style.top = top + 'px';
+        tip.style.left = left + 'px';
+      });
+      document.addEventListener('pointerout', (event) => {
+        const pill = event.target.closest('[data-term-name]');
+        if (!pill) return;
+        if (event.relatedTarget && pill.contains(event.relatedTarget)) return;
+        hide();
+      });
+      // Tooltip is positioned in viewport coords; any scroll invalidates it.
+      window.addEventListener('scroll', hide, true);
     },
     _readHash() {
-      const params = new URLSearchParams(window.location.hash.slice(1));
+      // Applying state from the hash must not itself write the hash (which
+      // would create bogus history entries on back/forward).
+      this._suppressHashWrite = true;
+      const params = parseHash();
       if (params.has('tag')) this.activeTag = params.get('tag');
       else this.activeTag = null;
+      if (params.has('term-filter')) this.termFilter = params.get('term-filter');
+      else this.termFilter = null;
       if (params.has('status')) {
         const shown = new Set(params.get('status').split(',').filter(Boolean));
         this.showPassed = shown.has('passed');
@@ -2785,10 +3603,30 @@ function reportApp() {
       }
       if (params.has('q')) this.search = params.get('q');
       else this.search = '';
+      this.mainView = deserializeView(params);
+      this.selectedStory = deserializeStory(params);
+      const targetSlug = params.get('scenario');
+      const targetScenario = targetSlug
+        ? (window.__scenarioSlugs || {})[targetSlug]
+        : null;
+      const targetTerm = params.get('term');
+      if (targetTerm) {
+        this.goToTerm(targetTerm);
+      } else if (targetScenario) {
+        this.goToScenario(targetScenario);
+      }
+      this.$nextTick(() => {
+        this._suppressHashWrite = false;
+        // Drop one-shot target params (scenario=/term=) without adding history.
+        if (targetSlug || targetTerm) this._writeHash('replace');
+      });
     },
-    _writeHash() {
+    _writeHash(mode = 'push') {
       const params = new URLSearchParams();
+      if (this.mainView !== 'scenarios') params.set('view', this.mainView);
+      if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
       if (this.activeTag) params.set('tag', this.activeTag);
+      if (this.termFilter) params.set('term-filter', this.termFilter);
 
       const present = new Set(data.scenarios.map(s => s.status));
       const shown = [];
@@ -2802,8 +3640,7 @@ function reportApp() {
       }
 
       if (this.search) params.set('q', this.search);
-      const hash = params.toString();
-      history.replaceState(null, '', hash ? '#' + hash : window.location.pathname);
+      serializeHash(params, mode);
     },
   };
 }

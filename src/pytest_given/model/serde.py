@@ -1,10 +1,9 @@
 """ReportData ↔ JSON-shaped dict (de)serialization.
 
-`report_to_dict` is a thin wrapper around `dataclasses.asdict` — kept here
-so callers go through a single named entry point and we have somewhere to
-hang future serialization concerns (field filtering, format-version stamps,
-schema validation). `report_from_dict` is the inverse; the renderer reads
-the JSON, calls it once, and operates on typed dataclasses from there.
+`report_to_dict` serializes a `ReportData` to a JSON-shaped dict, filtering
+out underscore-prefixed fields (e.g. `_by_id` on `Story`/`Glossary`).
+`report_from_dict` is the inverse; the renderer reads the JSON, calls it
+once, and operates on typed dataclasses from there.
 
 The only non-trivial part is `Narration.parts`, whose three subtypes share
 the parent type but each carry a distinct key (`value` / `rendered` / `name`).
@@ -15,14 +14,23 @@ from typing import Any
 
 from .errors import PytestGivenError
 from .schema import (
+    Activity,
+    ActivityId,
+    ActivityPart,
+    ActivityPath,
+    ActivityTermRef,
+    ActivityWord,
     Attachment,
     ContentType,
     ErrorInfo,
+    Glossary,
+    GlossaryTerm,
     Metadata,
     Narration,
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
+    NarrationTermRef,
     NarrationValue,
     NodeId,
     ParameterCase,
@@ -32,13 +40,33 @@ from .schema import (
     Scenario,
     SourceLocation,
     Step,
+    Story,
+    StoryId,
+    TermId,
     TracebackFrame,
 )
 
 
 def report_to_dict(report: ReportData) -> dict[str, Any]:
-    """Serialize a `ReportData` to a JSON-shaped dict."""
-    return dataclasses.asdict(report)
+    """Serialize a `ReportData` to a JSON-shaped dict, skipping _ fields."""
+    result = _asdict_filtered(report)
+    assert isinstance(result, dict)
+    return result
+
+
+def _asdict_filtered(obj: Any) -> Any:
+    """Recursively convert dataclasses to dicts, skipping underscore fields."""
+    if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
+        return {
+            f.name: _asdict_filtered(getattr(obj, f.name))
+            for f in dataclasses.fields(obj)
+            if not f.name.startswith('_')
+        }
+    if isinstance(obj, (list, tuple)):
+        return [_asdict_filtered(x) for x in obj]
+    if isinstance(obj, dict):
+        return {k: _asdict_filtered(v) for k, v in obj.items()}
+    return obj
 
 
 def report_from_dict(d: dict[str, Any]) -> ReportData:
@@ -46,6 +74,8 @@ def report_from_dict(d: dict[str, Any]) -> ReportData:
     return ReportData(
         metadata=_metadata_from_dict(d['metadata']),
         scenarios=[_scenario_from_dict(s) for s in d['scenarios']],
+        stories=[_story_from_dict(s) for s in d.get('stories', [])],
+        glossary=_glossary_from_dict(d.get('glossary')),
     )
 
 
@@ -56,6 +86,63 @@ def _metadata_from_dict(d: dict[str, Any]) -> Metadata:
         pytest_version=d['pytest_version'],
         plugin_version=d['plugin_version'],
         commit_sha=d.get('commit_sha'),
+    )
+
+
+def _glossary_from_dict(d: dict[str, Any] | None) -> Glossary | None:
+    if d is None:
+        return None
+    return Glossary(
+        terms=[_glossary_term_from_dict(t) for t in d.get('terms', [])],
+    )
+
+
+def _glossary_term_from_dict(d: dict[str, Any]) -> GlossaryTerm:
+    src = d.get('source')
+    return GlossaryTerm(
+        id=TermId(d['id']),
+        kind=d['kind'],
+        canonical=d['canonical'],
+        definition=d.get('definition'),
+        source=SourceLocation(relpath=src['relpath'], line=src['line'])
+        if src is not None
+        else None,
+    )
+
+
+def _story_from_dict(d: dict[str, Any]) -> Story:
+    src = d.get('source')
+    return Story(
+        id=StoryId(d['id']),
+        title=d['title'],
+        activities=tuple(_activity_from_dict(a) for a in d.get('activities', [])),
+        source=SourceLocation(relpath=src['relpath'], line=src['line'])
+        if src is not None
+        else None,
+    )
+
+
+def _activity_from_dict(d: dict[str, Any]) -> Activity:
+    return Activity(
+        id=ActivityId(d['id']),
+        paths=tuple(_activity_path_from_dict(p) for p in d.get('paths', [])),
+    )
+
+
+def _activity_path_from_dict(d: dict[str, Any]) -> ActivityPath:
+    return ActivityPath(
+        parts=tuple(_activity_part_from_dict(p) for p in d.get('parts', [])),
+    )
+
+
+def _activity_part_from_dict(d: dict[str, Any]) -> ActivityPart:
+    if 'term_id' in d:
+        return ActivityTermRef(term_id=TermId(d['term_id']), display=d['display'])
+    if 'text' in d:
+        return ActivityWord(text=d['text'])
+    raise PytestGivenError(
+        f'unknown ActivityPart shape (keys: {sorted(d)!r}). Expected one of '
+        '"term_id", "text".'
     )
 
 
@@ -75,6 +162,8 @@ def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
         source=SourceLocation(relpath=src['relpath'], line=src['line'])
         if src is not None
         else None,
+        story_id=StoryId(d['story_id']) if d.get('story_id') else None,
+        activity_ids=tuple(ActivityId(i) for i in d.get('activity_ids') or ()),
     )
 
 
@@ -87,6 +176,8 @@ def _step_from_dict(d: dict[str, Any]) -> Step:
         children=[_step_from_dict(c) for c in d.get('children', [])],
         attachments=[_attachment_from_dict(a) for a in d.get('attachments', [])],
         error=_error_from_dict(d.get('error')),
+        activity_ids=tuple(ActivityId(i) for i in d.get('activity_ids') or ()),
+        fixture_name=d.get('fixture_name'),
     )
 
 
@@ -140,10 +231,18 @@ def _narration_from_dict(d: dict[str, Any]) -> Narration:
 
 
 def _narration_part_from_dict(d: dict[str, Any]) -> NarrationPart:
-    """Discriminate by unique key: `value` → Literal, `rendered` → Value,
-    `name` → Placeholder. Unknown shapes are a serialization bug; raise."""
+    """Discriminate by unique key: `value` → Literal, `term_id` → TermRef,
+    `rendered` → Value, `name` → Placeholder. Unknown shapes are a
+    serialization bug; raise."""
     if 'value' in d:
         return NarrationLiteral(value=d['value'])
+    if 'term_id' in d:
+        return NarrationTermRef(
+            term_id=TermId(d['term_id']),
+            display=d['display'],
+            expression=d.get('expression', ''),
+            param_column=d.get('param_column'),
+        )
     if 'rendered' in d:
         return NarrationValue(
             rendered=d['rendered'],
@@ -159,5 +258,5 @@ def _narration_part_from_dict(d: dict[str, Any]) -> NarrationPart:
         )
     raise PytestGivenError(
         f'Unknown narration part shape (keys: {sorted(d)!r}). Expected one of '
-        '"value", "rendered", or "name".'
+        '"value", "rendered", "name", or "term_id".'
     )

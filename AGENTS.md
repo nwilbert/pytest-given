@@ -10,11 +10,15 @@ See [README.md](README.md) for the user-facing overview, public API, and CLI fla
 uv sync --group dev
 ```
 
+**All Python invocations go through `uv run`** — `uv run pytest …`, `uv run python -m …`, `uv run nox …`. There is no system `python` on PATH; bare `python` / `pytest` calls will fail. This applies to one-off commands (running a single test file, REPL exploration) too, not just nox sessions.
+
+**Never prepend `cd <path> &&` to commands.** The working directory is already set to the project root; the `cd` is redundant and triggers a permission prompt.
+
 ## Quality gates
 
 Run all checks: `uv run nox`. List individual sessions with `uv run nox -l`.
 
-- `uv run nox -s examples` regenerates `examples/report-data.json` and `examples/report.html`. Run after changes to the renderer, templates, plugin output schema, or `examples/test_examples.py` itself, and commit the updated JSON.
+- `uv run nox -s examples` regenerates the JSON and HTML files under `examples/coffeeshop/`, `examples/hotel-booking/`, and `examples/file-glossary-booking/`. Run after changes to the renderer, templates, plugin output schema, or any example test file, and commit the updated outputs.
 - `uv run nox -s coverage` enforces a 100% coverage target.
 
 ## Architecture
@@ -24,6 +28,7 @@ Run all checks: `uv run nox`. List individual sessions with `uv run nox -l`.
 - `src/pytest_given/capture/decorators.py` — `StepDescriptor` + `ScenarioDecorator`: dual context-manager/decorator, cross-phase nesting detection, thread-local state
 - `src/pytest_given/capture/collector.py` — Step stack, collects scenario data during test execution
 - `src/pytest_given/capture/template.py` — `Template` (deferred brace substitution for `@scenario(...)`) + `narration_from(...)` (dispatches `str` / `Template` / t-string into a `Narration`) + `parse_tstring(...)`
+- `src/pytest_given/capture/source.py` — Rootdir-aware `capture_caller_source(skip=...)` helper using `inspect.stack`; used by `story()` and glossary registration to record their construction site as a `SourceLocation`
 - `src/pytest_given/model/schema.py` — Frozen / mutable dataclasses for the report tree (`ReportData`, `Metadata`, `Scenario`, `Step`, `Attachment`, `ErrorInfo`, `ParameterTable`, `ParameterCase`, `SourceLocation`); `Narration` + `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationPart` union; `NodeId` / `Phase` aliases
 - `src/pytest_given/model/serde.py` — `report_to_dict` / `report_from_dict` boundary between JSON and the dataclass model; discriminates the three `NarrationPart` variants by key
 - `src/pytest_given/model/errors.py` — `PytestGivenError`
@@ -34,7 +39,7 @@ Run all checks: `uv run nox`. List individual sessions with `uv run nox -l`.
 
 ### Step text & placeholders
 
-Three authoring forms (see [README](README.md#step-text--placeholders) for user-facing docs and the [design spec](docs/superpowers/specs/2026-05-23-structured-step-text-design.md)):
+Three authoring forms (see [README](README.md#step-text--placeholders) for user-facing docs and the [design spec](docs/specs/2026-05-23-structured-step-text-design.md)):
 
 | Context | Form |
 |---|---|
@@ -50,7 +55,7 @@ Lanes don't overlap: t-strings are rejected in `@scenario` and on any decorator 
 
 ## Report testing
 
-Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filter in `renderer.py` **must** be Playwright-verified before commit — Python-side regex tests on rendered HTML do not catch broken Alpine expressions, malformed `:class` bindings, or other runtime browser issues (the substring matches even when the attribute is unparseable). Open `examples/report.html` (regenerate via `uv run nox -s examples`) with the Playwright MCP server, check `browser_console_messages` for errors after init, then drive the changed surface (hover, click, URL hash). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
+Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filter in `renderer.py` **must** be Playwright-verified before commit — Python-side regex tests on rendered HTML do not catch broken Alpine expressions, malformed `:class` bindings, or other runtime browser issues (the substring matches even when the attribute is unparseable). Open e.g. `examples/coffeeshop/coffeeshop.html` (regenerate via `uv run nox -s examples`) with the Playwright MCP server, check `browser_console_messages` for errors after init, then drive the changed surface (hover, click, URL hash). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
 
 - **Don't write Python tests that pin frontend markup** (specific class names, wrapper structure, inline-handler shape, SVG strings). They check implementation details, not behavior, and rot the moment the renderer is refactored. The project has no JS-side UI tests; Playwright is the only verification for frontend concerns. Python tests stay on the renderer's data-shaped contract (what `data-param` value, which scenario IDs, which counts) — not on how the markup is assembled.
 - **Don't TDD frontend changes** for the same reason: a failing markup assertion isn't proving the bug exists in the browser, and a passing one isn't proving the fix works. Apply the change, regenerate `examples/`, drive it in Playwright, capture the result.
@@ -72,6 +77,6 @@ Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filt
 - TDD: write tests first
 - Commit messages: single line, no co-author trailers, no leading file/area labels like `TODO:` or `README:` — just describe the change ("note example cleanup as todo", not "TODO: note example cleanup"). Conventional-commit-style scope prefixes like `docs:` / `examples:` / `renderer:` are fine when they add information.
 - Keep commits coherent: each commit should represent one logical change. Don't split "do X", "tests for X", and "review-fixup for X" into separate commits — squash them before pushing. Don't bundle unrelated changes either.
-- Plan files under `docs/superpowers/plans/` are scratch artifacts — never commit them. Spec files under `docs/superpowers/specs/` are committed.
-- New specs land under `docs/superpowers/specs/proposed/`. When a spec's implementation lands, `git mv` it up one level into `docs/superpowers/specs/` in the same commit. `ls specs/proposed` is the canonical list of outstanding design work.
+- Plan files under `docs/superpowers/plans/` are scratch artifacts — never commit them. Spec files under `docs/specs/` are committed.
+- New specs land under `docs/specs/proposed/`. When a spec's implementation lands, `git mv` it up one level into `docs/specs/` in the same commit. `ls docs/specs/proposed` is the canonical list of outstanding design work.
 - Always run `uv run nox` (or at minimum `uv run nox -s format lint mypy test`) before committing

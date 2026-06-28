@@ -21,13 +21,22 @@ from .capture import (
     parse_short_repr,
     set_active_collector,
 )
+from .capture.decorators import ScenarioDecorator
+from .capture.file_glossary import FileGlossary
+from .capture.glossary import clear_glossary_registry, get_registered_glossaries
+from .capture.kind_resolution import resolve_glossary_kinds
+from .capture.source import set_rootdir
+from .capture.story import clear_story_registry
 from .model import (
+    ActivityTermRef,
     FixtureRecording,
+    Glossary,
     Metadata,
     Narration,
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
+    NarrationTermRef,
     NarrationValue,
     NodeId,
     ParameterCase,
@@ -39,6 +48,8 @@ from .model import (
     Scenario,
     SourceLocation,
     Step,
+    Story,
+    TermId,
     report_to_dict,
 )
 from .report import detect_commit_sha, render_html, resolve_template
@@ -80,21 +91,36 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
+def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
+    """Publish pytest's rootdir to the capture module so `Story` and
+    `GlossaryTerm` constructed at user-code import time can compute
+    rootdir-relative source paths.
+
+    Uses `pytest_load_initial_conftests` (not `pytest_configure`) so that
+    rootdir is set *before* root conftest.py is imported — users commonly
+    declare shared glossaries / stories at conftest module level, and that
+    code runs during conftest import."""
+    set_rootdir(Path(early_config.rootpath))
+
+
 def pytest_sessionstart(session: pytest.Session) -> None:
     """Reset the collector at the start of each session."""
     global collector
     collector = Collector()
+    clear_story_registry()
+    clear_glossary_registry()
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
-    """Validate Template-named scenarios eagerly at collection time.
+    """Validate Template-named scenarios and story bindings eagerly at collection.
 
-    Two checks:
+    Three checks:
     1. A Template-named scenario must be parametrized (its substitution source
        is `callspec.params`).
     2. Every Template placeholder must match a parametrize column name —
        catches typos at `pytest --collect-only` rather than at session-finish
        merge, where the error would escape `pytest_sessionfinish` opaquely.
+    3. Any activity_ids on the scenario must be valid ids within the story.
 
     Deferred to collection time (rather than decoration time) because
     @scenario and @pytest.mark.parametrize can appear in either order, and
@@ -105,6 +131,7 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
         marker = _get_scenario_marker(item)
         if marker is None:
             continue
+        _validate_scenario_story_binding(item, marker)
         if not isinstance(marker.name, Template):
             continue
         callspec = getattr(item, 'callspec', None)
@@ -123,6 +150,27 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
                     f'in @scenario(...) on {item.nodeid!r} does not match '
                     f'any parametrize column (have: {sorted(param_names)}).'
                 )
+
+
+def _validate_scenario_story_binding(
+    item: pytest.Item, marker: ScenarioDecorator
+) -> None:
+    """Check scenario.activity_ids against the story; runtime covers step scope."""
+    if marker.story is None and marker.activity_ids:
+        raise PytestGivenError(
+            f'@scenario(activities=...) on {item.nodeid!r} requires story=; '
+            f'activity ids are meaningless without a story to look them up in.'
+        )
+    if marker.story is None:
+        return
+    valid_ids = {a.id for a in marker.story.activities}
+    for aid in marker.activity_ids:
+        if aid not in valid_ids:
+            raise PytestGivenError(
+                f'@scenario(activities=...) on {item.nodeid!r}: activity id '
+                f'{aid} not in story {marker.story.title!r} '
+                f'(valid: {sorted(valid_ids)}).'
+            )
 
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
@@ -150,6 +198,8 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
         module=module,
         tags=scenario_marker.tags,
         source=source,
+        story=scenario_marker.story,
+        activity_ids=scenario_marker.activity_ids,
     )
     set_active_collector(collector)
     callspec = getattr(item, 'callspec', None)
@@ -190,7 +240,13 @@ def pytest_fixture_setup(
         yield
         return
     _ensure_teardown_wrapped(fixturedef)
-    recording = FixtureRecording(root=Step(phase=desc.phase, narration=desc.narration))
+    recording = FixtureRecording(
+        root=Step(
+            phase=desc.phase,
+            narration=desc.narration,
+            fixture_name=fixturedef.argname,
+        )
+    )
     token = collector.enter_fixture_setup(recording, descriptor=desc)
     try:
         yield
@@ -359,6 +415,10 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     json_path = Path(session.config.getoption('given_json'))
     scenarios = _group_parameterized(collector.scenarios, collector.param_info)
     collector.param_info.clear()
+    stories = list(collector._discovered_stories.values())
+    glossary = _resolve_glossary(stories, session)
+    if glossary is not None:
+        glossary = resolve_glossary_kinds(glossary, stories)
     report = ReportData(
         metadata=Metadata(
             project=session.config.rootpath.name,
@@ -368,6 +428,8 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             commit_sha=detect_commit_sha(),
         ),
         scenarios=scenarios,
+        stories=stories,
+        glossary=glossary,
     )
     json_path.parent.mkdir(parents=True, exist_ok=True)
     json_path.write_text(json.dumps(report_to_dict(report), indent=2), encoding='utf-8')
@@ -378,6 +440,74 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         template = resolve_template(raw_link)
         html_path = Path(session.config.getoption('given_html_output'))
         render_html(json_path, html_path, source_link_template=template)
+
+
+def _resolve_glossary(stories: list[Story], session: pytest.Session) -> Glossary | None:
+    """Pick the Glossary for the report.
+
+    1. If stories were collected, look at which Glossary instances actually
+       contain a term referenced by those stories — the rest are irrelevant
+       (test-local fixtures, unrelated Glossaries that happen to share the
+       process). This works without any side-channel on the Story tree, so
+       it round-trips through JSON correctly.
+    2. With no stories, fall back to a conftest scan — that catches the case
+       where the user declares a Glossary at conftest level but only uses
+       term refs in narrations (no stories yet).
+    """
+    if not stories:
+        return _scan_conftests_for_glossary(session)
+    used = _term_ids_referenced_by_stories(stories)
+    reaching = [
+        g for g in get_registered_glossaries() if any(t.id in used for t in g.terms)
+    ]
+    if len(reaching) > 1:
+        raise PytestGivenError(
+            f'stories reach {len(reaching)} distinct Glossary instances; '
+            f'v1 supports at most one.'
+        )
+    if reaching:
+        return reaching[0]
+    return _scan_conftests_for_glossary(session)
+
+
+def _term_ids_referenced_by_stories(stories: list[Story]) -> set[TermId]:
+    used: set[TermId] = set()
+    for story in stories:
+        for activity in story.activities:
+            for activity_path in activity.paths:
+                for part in activity_path.parts:
+                    if isinstance(part, ActivityTermRef):
+                        used.add(part.term_id)
+    return used
+
+
+def _scan_conftests_for_glossary(session: pytest.Session) -> Glossary | None:
+    """Scan registered conftest plugins for Glossary instances."""
+    found: list[tuple[str, Glossary]] = []
+    for plugin_obj in session.config.pluginmanager.get_plugins():
+        plugin_file = getattr(plugin_obj, '__file__', None)
+        if plugin_file is None or Path(plugin_file).name != 'conftest.py':
+            continue
+        for attr_name in dir(plugin_obj):
+            attr = getattr(plugin_obj, attr_name, None)
+            if isinstance(attr, FileGlossary):
+                found.append((plugin_file, attr.glossary))
+            elif isinstance(attr, Glossary):
+                found.append((plugin_file, attr))
+    distinct: dict[int, tuple[str, Glossary]] = {}
+    for fpath, g in found:
+        distinct.setdefault(id(g), (fpath, g))
+    if len(distinct) > 1:
+        details = ', '.join(
+            f'{fpath} ({len(g.terms)} term(s))' for fpath, g in distinct.values()
+        )
+        raise PytestGivenError(
+            f'multiple Glossary instances found in conftests ({len(distinct)}): '
+            f'{details}. v1 supports at most one glossary per suite.'
+        )
+    if distinct:
+        return next(iter(distinct.values()))[1]
+    return None
 
 
 def _group_parameterized(
@@ -437,6 +567,8 @@ def _group_parameterized(
             steps=template_steps,
             parameters=ParameterTable(names=param_names, cases=cases),
             source=first.source,
+            story_id=first.story_id,
+            activity_ids=first.activity_ids,
         )
         result.append(merged)
 
@@ -495,4 +627,9 @@ def _templatize_narration(
                         f'{sorted(param_names)}).'
                     )
                 out.append(part)
+            case NarrationTermRef(expression=expression):
+                if expression in param_names:
+                    out.append(dataclasses.replace(part, param_column=expression))
+                else:
+                    out.append(part)
     return dataclasses.replace(narration, parts=out)

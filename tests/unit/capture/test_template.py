@@ -1,11 +1,15 @@
+from pathlib import Path
 from string import templatelib
 
 import pytest
 
+from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.template import Template, parse_tstring
 from pytest_given.model import (
+    Glossary,
     NarrationLiteral,
     NarrationPlaceholder,
+    NarrationTermRef,
     NarrationValue,
     PytestGivenError,
 )
@@ -165,3 +169,159 @@ def test_parse_tstring_accepts_templatelib_template() -> None:
     assert isinstance(tpl, templatelib.Template)
     rendered, _ = parse_tstring(tpl)
     assert rendered == '200'
+
+
+# --- Task 5.1: glossary handles emit NarrationTermRef ---
+
+
+@pytest.fixture
+def glossary() -> Glossary:
+    g = Glossary()
+    g.actor('Guest', definition='')
+    g.work_object('Room', definition='')
+    g.verb('search', definition='')
+    return g
+
+
+def test_tstring_with_actor_emits_term_ref(glossary: Glossary) -> None:
+    guest = glossary.actor('Guest')  # idempotent re-fetch
+    _, parts = parse_tstring(t'a {guest} arrives')
+    assert any(
+        isinstance(p, NarrationTermRef)
+        and p.term_id == 'guest'
+        and p.display == 'Guest'
+        and p.param_column is None
+        for p in parts
+    )
+
+
+def test_tstring_with_actor_instance_emits_term_ref_with_instance_display(
+    glossary: Glossary,
+) -> None:
+    guest = glossary.actor('Guest')
+    _, parts = parse_tstring(t'{guest("Alice")} arrives')
+    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
+    assert len(term_refs) == 1
+    assert term_refs[0].term_id == 'guest'
+    assert term_refs[0].display == 'Alice'
+
+
+def test_tstring_with_work_object_emits_term_ref(glossary: Glossary) -> None:
+    room = glossary.work_object('Room')
+    _, parts = parse_tstring(t'the {room} is clean')
+    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
+    assert term_refs[0].term_id == 'room'
+    assert term_refs[0].display == 'Room'
+
+
+def test_tstring_with_work_object_instance_emits_term_ref(glossary: Glossary) -> None:
+    room = glossary.work_object('Room')
+    _, parts = parse_tstring(t'the {room("Deluxe Suite")} is clean')
+    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
+    assert term_refs[0].display == 'Deluxe Suite'
+
+
+def test_tstring_with_verb_emits_term_ref_with_canonical_display(
+    glossary: Glossary,
+) -> None:
+    search = glossary.verb('search')
+    _, parts = parse_tstring(t'they {search}')
+    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
+    assert term_refs[0].display == 'search'
+
+
+def test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display(
+    glossary: Glossary,
+) -> None:
+    search = glossary.verb('search')
+    _, parts = parse_tstring(t'they {search("searches for")} a room')
+    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
+    assert term_refs[0].display == 'searches for'
+    assert term_refs[0].term_id == 'search'
+
+
+def test_tstring_with_plain_value_still_emits_narration_value(
+    glossary: Glossary,
+) -> None:
+    name = 'Alice'
+    _, parts = parse_tstring(t'hi {name}')
+    assert any(isinstance(p, NarrationValue) for p in parts)
+
+
+def test_tstring_rendered_text_uses_display_for_term_refs(glossary: Glossary) -> None:
+    guest = glossary.actor('Guest')
+    text, _ = parse_tstring(t'the {guest("Alice")} arrives')
+    assert text == 'the Alice arrives'
+
+
+# --- Task 5.3: expression field populated; param_column via _templatize_narration ---
+
+
+def test_tstring_with_term_ref_populates_expression(glossary: Glossary) -> None:
+    guest = glossary.actor('Guest')
+    _, parts = parse_tstring(t'a {guest} arrives')
+    ref = next(p for p in parts if isinstance(p, NarrationTermRef))
+    assert ref.expression == 'guest'
+
+
+def test_tstring_term_ref_with_format_spec_raises(glossary: Glossary) -> None:
+    guest = glossary.actor('Guest')
+    with pytest.raises(PytestGivenError, match='format spec or conversion'):
+        parse_tstring(t'hi {guest:>10}')
+
+
+def test_tstring_term_ref_with_conversion_raises(glossary: Glossary) -> None:
+    guest = glossary.actor('Guest')
+    with pytest.raises(PytestGivenError, match='format spec or conversion'):
+        parse_tstring(t'hi {guest!r}')
+
+
+def test_tstring_term_ref_instance_with_format_spec_raises(glossary: Glossary) -> None:
+    guest = glossary.actor('Guest')
+    with pytest.raises(PytestGivenError, match='format spec or conversion'):
+        parse_tstring(t'hi {guest("Alice"):>10}')
+
+
+# --- DeferredTermHandle / DeferredTermInstance in t-strings ---
+
+_FILE_GLOSSARY_MD = (
+    '| Term | Meaning |\n|---|---|\n| Guest | A person. |\n| Room | A room. |\n'
+)
+
+
+@pytest.fixture
+def _reset_glossary_registry():
+    from pytest_given.capture.glossary import clear_glossary_registry
+
+    clear_glossary_registry()
+    yield
+    clear_glossary_registry()
+
+
+@pytest.fixture
+def file_glossary(tmp_path: Path, _reset_glossary_registry) -> FileGlossary:
+    path = tmp_path / 'G.md'
+    path.write_text(_FILE_GLOSSARY_MD, encoding='utf-8')
+    return FileGlossary(path)
+
+
+def test_tstring_with_file_term_handle_emits_term_ref(
+    file_glossary: FileGlossary,
+) -> None:
+    guest = file_glossary['Guest']
+    _, parts = parse_tstring(t'a {guest} arrives')
+    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
+    assert len(term_refs) == 1
+    assert term_refs[0].term_id == 'guest'
+    assert term_refs[0].display == 'Guest'
+
+
+def test_tstring_with_file_term_instance_emits_term_ref_with_override_display(
+    file_glossary: FileGlossary,
+) -> None:
+    guest = file_glossary['Guest']
+    _, parts = parse_tstring(t'{guest("Alice")} books a room')
+    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
+    assert len(term_refs) == 1
+    assert term_refs[0].term_id == 'guest'
+    assert term_refs[0].display == 'Alice'

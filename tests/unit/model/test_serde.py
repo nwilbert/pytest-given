@@ -1,14 +1,20 @@
-import dataclasses
-
 import pytest
 
 from pytest_given.model import (
+    Activity,
+    ActivityId,
+    ActivityPath,
+    ActivityTermRef,
+    ActivityWord,
     Attachment,
     ErrorInfo,
+    Glossary,
+    GlossaryTerm,
     Metadata,
     Narration,
     NarrationLiteral,
     NarrationPlaceholder,
+    NarrationTermRef,
     NarrationValue,
     NodeId,
     ParameterCase,
@@ -18,9 +24,68 @@ from pytest_given.model import (
     Scenario,
     SourceLocation,
     Step,
+    Story,
+    StoryId,
+    TermId,
     report_from_dict,
     report_to_dict,
 )
+from pytest_given.model.serde import _asdict_filtered
+
+
+def _round_trip(report):
+    return report_from_dict(report_to_dict(report))
+
+
+def _meta():
+    return Metadata(project='p', timestamp='t', pytest_version='8', plugin_version='0')
+
+
+def _dummy_metadata() -> Metadata:
+    return Metadata(
+        project='p',
+        timestamp='2026-06-18T00:00:00+00:00',
+        pytest_version='8.0',
+        plugin_version='0.1.0',
+        commit_sha=None,
+    )
+
+
+def test_activity_term_ref_round_trips():
+    story = Story(
+        id=StoryId('s'),
+        title='S',
+        activities=(
+            Activity(
+                id=ActivityId(1),
+                paths=(
+                    ActivityPath(
+                        parts=(
+                            ActivityTermRef(term_id=TermId('guest'), display='Guest'),
+                        )
+                    ),
+                ),
+            ),
+        ),
+    )
+    report = ReportData(
+        metadata=_dummy_metadata(), scenarios=[], stories=[story], glossary=None
+    )
+    round_tripped = report_from_dict(report_to_dict(report))
+    part = round_tripped.stories[0].activities[0].paths[0].parts[0]
+    assert part == ActivityTermRef(term_id=TermId('guest'), display='Guest')
+
+
+def test_glossary_term_kind_can_be_none():
+    glossary = Glossary(
+        terms=[GlossaryTerm(id=TermId('guest'), kind=None, canonical='Guest')]
+    )
+    report = ReportData(
+        metadata=_dummy_metadata(), scenarios=[], stories=[], glossary=glossary
+    )
+    round_tripped = report_from_dict(report_to_dict(report))
+    assert round_tripped.glossary is not None
+    assert round_tripped.glossary.terms[0].kind is None
 
 
 def _minimal_metadata_dict() -> dict:
@@ -390,8 +455,8 @@ def test_narration_unknown_part_shape_raises() -> None:
     assert 'narration' in str(exc.value).lower()
 
 
-def test_report_to_dict_matches_dataclasses_asdict() -> None:
-    """`report_to_dict` is a thin wrapper over `dataclasses.asdict`."""
+def test_report_to_dict_excludes_underscore_fields() -> None:
+    """report_to_dict skips fields whose names start with '_' (e.g. _by_id)."""
     report = ReportData(
         metadata=Metadata(
             project='p',
@@ -401,7 +466,13 @@ def test_report_to_dict_matches_dataclasses_asdict() -> None:
         ),
         scenarios=[],
     )
-    assert report_to_dict(report) == dataclasses.asdict(report)
+    result = report_to_dict(report)
+    # No underscore-prefixed keys anywhere in the output.
+    assert all(not k.startswith('_') for k in result)
+    assert result['metadata']['project'] == 'p'
+    assert result['scenarios'] == []
+    assert result['glossary'] is None
+    assert result['stories'] == []
 
 
 def test_round_trip_via_to_dict() -> None:
@@ -443,3 +514,162 @@ def test_round_trip_via_to_dict() -> None:
     )
     deserialized = report_from_dict(report_to_dict(original))
     assert deserialized == original
+
+
+def test_asdict_filtered_handles_dict_values() -> None:
+    """_asdict_filtered handles plain dict values (not just lists/dataclasses)."""
+    result = _asdict_filtered({'key': 'value', 'nested': {'a': 1}})
+    assert result == {'key': 'value', 'nested': {'a': 1}}
+
+
+def test_activity_part_variants_round_trip():
+    parts = (
+        ActivityTermRef(term_id=TermId('guest'), display='Guest'),
+        ActivityTermRef(term_id=TermId('search'), display='searches'),
+        ActivityWord(text='for'),
+    )
+    path = ActivityPath(parts=parts)
+    activity = Activity(id=ActivityId(1), paths=(path,))
+    story = Story(id=StoryId('s'), title='S', activities=(activity,))
+    report = ReportData(metadata=_meta(), stories=[story])
+    rt = _round_trip(report)
+    rt_parts = rt.stories[0].activities[0].paths[0].parts
+    assert rt_parts == parts
+
+
+def test_glossary_round_trips_and_rebuilds_index():
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    report = ReportData(metadata=_meta(), glossary=g)
+    rt = _round_trip(report)
+    assert rt.glossary is not None
+    assert rt.glossary.get(TermId('guest')).canonical == 'Guest'
+    assert rt.glossary.get(TermId('room')).kind == 'object'
+
+
+def test_narration_term_ref_round_trips():
+    narration = Narration(
+        text='Alice arrives',
+        parts=[
+            NarrationLiteral(value='Hello '),
+            NarrationTermRef(
+                term_id=TermId('guest'),
+                display='Alice',
+                expression='guest',
+                param_column='guest',
+            ),
+        ],
+    )
+    scn = Scenario(id=NodeId('n'), narration=narration, module='m')
+    report = ReportData(metadata=_meta(), scenarios=[scn])
+    rt = _round_trip(report)
+    assert rt.scenarios[0].narration.parts == narration.parts
+
+
+def test_report_data_with_no_glossary_or_stories_round_trips():
+    report = ReportData(metadata=_meta())
+    rt = _round_trip(report)
+    assert rt.glossary is None
+    assert rt.stories == []
+
+
+def test_scenario_story_id_and_activity_ids_round_trip():
+    scn = Scenario(
+        id=NodeId('n'),
+        narration=Narration(text='x'),
+        module='m',
+        story_id=StoryId('book'),
+        activity_ids=(ActivityId(1), ActivityId(2)),
+    )
+    report = ReportData(metadata=_meta(), scenarios=[scn])
+    rt = _round_trip(report)
+    assert rt.scenarios[0].story_id == 'book'
+    assert rt.scenarios[0].activity_ids == (1, 2)
+
+
+def test_step_activity_ids_round_trip():
+    scn = Scenario(
+        id=NodeId('n'),
+        narration=Narration(text='x'),
+        module='m',
+        steps=[
+            Step(
+                phase='given',
+                narration=Narration(text='s'),
+                activity_ids=(ActivityId(7),),
+            )
+        ],
+    )
+    report = ReportData(metadata=_meta(), scenarios=[scn])
+    rt = _round_trip(report)
+    assert rt.scenarios[0].steps[0].activity_ids == (7,)
+
+
+def test_activity_part_unknown_shape_raises():
+    from pytest_given.model.serde import _activity_part_from_dict
+
+    with pytest.raises(PytestGivenError, match='unknown ActivityPart shape'):
+        _activity_part_from_dict({'unknown_key': 'x'})
+
+
+def test_narration_part_unknown_shape_raises():
+    """Pre-existing behavior — covered to keep 100% after extending the branch."""
+    from pytest_given.model.serde import _narration_part_from_dict
+
+    with pytest.raises(PytestGivenError, match='Unknown narration part shape'):
+        _narration_part_from_dict({'mystery': 'x'})
+
+
+def test_story_source_roundtrips() -> None:
+    story = Story(
+        id=StoryId('checkout'),
+        title='Checkout',
+        activities=(
+            Activity(
+                id=ActivityId(1),
+                paths=(ActivityPath(parts=(ActivityWord(text='x'),)),),
+            ),
+        ),
+        source=SourceLocation(relpath='conftest.py', line=4),
+    )
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+        ),
+        stories=[story],
+    )
+    round_tripped = report_from_dict(report_to_dict(report))
+    assert round_tripped.stories[0].source == story.source
+
+
+def test_none_definition_round_trips():
+    term = GlossaryTerm(
+        id=TermId('guest'), kind='actor', canonical='Guest', definition=None
+    )
+    report = ReportData(metadata=_meta(), glossary=Glossary(terms=[term]))
+    restored = report_from_dict(report_to_dict(report))
+    assert restored.glossary is not None
+    assert restored.glossary.terms[0].definition is None
+
+
+def test_glossary_term_source_roundtrips() -> None:
+    g = Glossary(
+        terms=[
+            GlossaryTerm(
+                id=TermId('guest'),
+                kind='actor',
+                canonical='Guest',
+                source=SourceLocation(relpath='conftest.py', line=8),
+            ),
+        ],
+    )
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+        ),
+        glossary=g,
+    )
+    round_tripped = report_from_dict(report_to_dict(report))
+    assert round_tripped.glossary is not None
+    assert round_tripped.glossary.terms[0].source == g.terms[0].source

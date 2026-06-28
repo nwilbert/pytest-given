@@ -3,8 +3,10 @@ from pathlib import Path
 
 import nox
 
-src_path = 'src'
-code_paths = [src_path, 'tests', 'noxfile.py']
+# Linted and formatted everywhere; `tests` and `examples` are test code and are
+# deliberately not type-checked (heavy fixtures and loose dicts).
+code_paths = ['src', 'tests', 'examples', 'noxfile.py']
+mypy_paths = ['src', 'noxfile.py']
 
 nox.options.default_venv_backend = 'uv'
 nox.options.reuse_existing_virtualenvs = True
@@ -59,7 +61,7 @@ def lint(session: nox.Session) -> None:
 @nox.session
 def mypy(session: nox.Session) -> None:
     _sync(session, 'typecheck', include_project=True)
-    session.run('mypy', src_path)
+    session.run('mypy', *mypy_paths)
 
 
 @nox.session
@@ -104,20 +106,53 @@ def audit(session: nox.Session) -> None:
 
 @nox.session
 def examples(session: nox.Session) -> None:
-    """Regenerate examples/report-data.json and examples/report.html."""
+    """Regenerate coffeeshop, hotel-booking, and file-glossary-booking reports."""
     _sync(session, 'test', include_project=True)
+    for test_file, slug in [
+        ('examples/coffeeshop/test_coffeeshop.py', 'coffeeshop'),
+        ('examples/hotel-booking/test_hotel_booking.py', 'hotel-booking'),
+        (
+            'examples/file-glossary-booking/test_file_glossary_booking.py',
+            'file-glossary-booking',
+        ),
+    ]:
+        session.run(
+            'pytest',
+            test_file,
+            f'--given-json=examples/{slug}/{slug}-data.json',
+            '--given-html',
+            f'--given-html-output=examples/{slug}/{slug}.html',
+            '--given-source-link=github',
+            '--tb=no',
+            '--no-header',
+            '-q',
+            success_codes=[0, 1],
+        )
+    session.log(
+        'Note: coffeeshop and hotel-booking have intentional failures for failure '
+        'rendering (coffeeshop: test_failing; hotel-booking: gift-card decline case). '
+        'file-glossary-booking has no intentional failures.'
+    )
+
+
+@nox.session
+def benchmark(session: nox.Session) -> None:
+    """Generate the large-scenarios suite and produce its JSON+HTML report.
+
+    Outputs land in `benchmarks/` and are gitignored. For size sweeps or
+    cProfile runs, invoke `benchmarks/bench.py` directly (see its docstring).
+    """
+    _sync(session, 'test', include_project=True)
+    session.run('python', 'benchmarks/gen_large_scenarios.py')
     session.run(
         'pytest',
-        'examples/test_examples.py',
-        '--given-json=examples/report-data.json',
+        'benchmarks/test_large_scenarios.py',
+        '--given-json=benchmarks/large-scenarios-data.json',
         '--given-html',
-        '--given-html-output=examples/report.html',
+        '--given-html-output=benchmarks/large-scenarios.html',
         '--given-source-link=github',
         '--tb=no',
         '--no-header',
         '-q',
         success_codes=[0, 1],
-    )
-    session.log(
-        'Note: 1 intentional failure is expected (demonstrates failure rendering).'
     )
