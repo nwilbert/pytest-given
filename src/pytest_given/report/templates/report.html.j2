@@ -242,7 +242,9 @@
         </thead>
         <tbody>
           {% for case in scenario.parameters.cases %}
-          <tr class="{{ 'failed-row' if case.status == 'failed' else '' }}">
+          <tr class="{{ 'failed-row' if case.status == 'failed' else '' }}"
+              @mouseenter="setHoverRow($event.currentTarget)"
+              @mouseleave="clearHoverRow($event.currentTarget)">
             {% for name, val in zip(scenario.parameters.names, case.values) %}
             <td data-param="{{ name }}"
                 @mouseenter="setHoverParam('{{ name }}', $event.currentTarget)"

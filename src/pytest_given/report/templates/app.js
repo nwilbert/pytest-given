@@ -263,6 +263,33 @@ function reportApp() {
         `th[data-param="${safe}"], td[data-param="${safe}"], span[data-param="${safe}"]`,
       ).forEach(e => e.classList.add('param-highlight'));
     },
+    setHoverRow(rowEl) {
+      const scope = rowEl?.closest('.scenario');
+      if (!scope) return;
+      const values = {};
+      rowEl.querySelectorAll('td[data-param]').forEach(td => {
+        values[td.dataset.param] = td.textContent.trim();
+      });
+      scope.querySelectorAll('span[data-param]').forEach(span => {
+        const val = values[span.dataset.param];
+        if (val === undefined) return;
+        // Stash the original {token} once so re-entry stays idempotent.
+        if (span.dataset.token === undefined) span.dataset.token = span.textContent;
+        span.textContent = val;
+        span.classList.add('param-substituted');
+      });
+    },
+    clearHoverRow(rowEl) {
+      const scope = rowEl?.closest('.scenario');
+      if (!scope) return;
+      scope.querySelectorAll('span.param-substituted').forEach(span => {
+        if (span.dataset.token !== undefined) {
+          span.textContent = span.dataset.token;
+          delete span.dataset.token;
+        }
+        span.classList.remove('param-substituted');
+      });
+    },
     init() {
       this._readHash();
       // Search typing replaces the current entry (no per-keystroke history

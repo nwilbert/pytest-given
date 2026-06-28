@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-27T17:13:43.772598+00:00",
+    "timestamp": "2026-06-28T08:31:01.736194+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "bba59e14f62416002fec7fdd77b4dc8920e28450"
+    "commit_sha": "3e1fb08b787130b35526ec96c4802f3e4b9a5ecb"
   },
   "scenarios": [
     {
@@ -61,7 +61,7 @@
               {
                 "term_id": "book",
                 "display": "books",
-                "expression": "g[\"Book\"](\"books\")",
+                "expression": "g[\"book\"](\"books\")",
                 "param_column": null
               },
               {
@@ -211,7 +211,7 @@
               {
                 "term_id": "book",
                 "display": "books",
-                "expression": "g[\"Book\"](\"books\")",
+                "expression": "g[\"book\"](\"books\")",
                 "param_column": null
               },
               {

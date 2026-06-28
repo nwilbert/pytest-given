@@ -432,6 +432,12 @@ span.param-highlight {
   border-radius: 2px;
 }
 
+/* A placeholder showing a hovered row's concrete value (see app.js
+   setHoverRow). The class is a JS hook with no background of its own: the
+   value text in its retained param-color-N is the "filled-in" cue, and the
+   tint stays reserved for the cell crosshair (.param-highlight) so hovering a
+   single cell still visibly emphasizes that one column. */
+
 /* Error */
 .error-block {
   margin-top: var(--space-sm);
