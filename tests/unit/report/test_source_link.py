@@ -11,6 +11,18 @@ from pytest_given.report.source_link import (
 )
 
 
+def test_compile_source_link_rejects_positional_index_field() -> None:
+    # A positional field passes name validation but would raise IndexError at
+    # substitution; reject it up front so bad templates fail fast and uniformly.
+    with pytest.raises(PytestGivenError, match='positional field'):
+        compile_source_link('file://{0}:{line}', project='p', commit_sha=None)
+
+
+def test_compile_source_link_rejects_empty_positional_field() -> None:
+    with pytest.raises(PytestGivenError, match='positional field'):
+        compile_source_link('file://{}', project='p', commit_sha=None)
+
+
 def test_resolve_template_none_returns_none() -> None:
     assert resolve_template('none') is None
 

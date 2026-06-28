@@ -121,8 +121,14 @@ def _extract_field_names(template: str) -> list[str]:
                 f'or index access; only bare variable names are supported. '
                 f'Valid: {valid}.'
             )
-        if field_name and not field_name.isdigit():
-            fields.append(field_name)
+        if not field_name or field_name.isdigit():
+            valid = ', '.join(sorted(_VALID_VARS))
+            raise PytestGivenError(
+                f'Source-link template uses a positional field {{{field_name}}}; '
+                f'only named variables are supported (substitution passes '
+                f'keywords only). Valid: {valid}.'
+            )
+        fields.append(field_name)
     return fields
 
 
