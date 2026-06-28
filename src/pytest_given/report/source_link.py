@@ -10,6 +10,7 @@ import os
 import re
 import string
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
 from typing import Literal
 
@@ -57,16 +58,23 @@ def resolve_template(value: str | None) -> str | None:
     )
 
 
-def format_source_link(
+def compile_source_link(
     template: str,
     *,
-    source: SourceLocation,
     project: str,
     commit_sha: str | None,
-) -> str:
-    """Substitute `{path}`, `{relpath}`, `{line}`, `{project}`, `{sha}` in `template`.
+) -> Callable[[SourceLocation], str]:
+    """Validate `template` once and return a per-location substitution function.
 
-    `{path}` is resolved against the current working directory at call time.
+    The returned function substitutes `{path}`, `{relpath}`, `{line}`,
+    `{project}`, `{sha}` for a given `SourceLocation`. Validation (unknown
+    variables, attribute/index access, and the `{sha}` → `commit_sha`
+    requirement) depends only on the template, so it runs once here rather
+    than on every call — a render substitutes one template across every
+    scenario, story, and term. Template errors therefore surface eagerly, at
+    compile time, before any location is rendered.
+
+    `{path}` is resolved against the current working directory at call time;
     `{sha}` requires `commit_sha`; unknown variables raise.
     """
     used = set(_extract_field_names(template))
@@ -83,14 +91,18 @@ def format_source_link(
             'Set GITHUB_SHA / CI_COMMIT_SHA / BUILDKITE_COMMIT in CI, or run '
             'from a git working tree so `git rev-parse HEAD` can resolve.'
         )
-    abspath = (Path.cwd() / source.relpath).resolve().as_posix()
-    return template.format(
-        path=abspath,
-        relpath=source.relpath,
-        line=source.line,
-        project=project,
-        sha=commit_sha or '',
-    )
+
+    def substitute(source: SourceLocation) -> str:
+        abspath = (Path.cwd() / source.relpath).resolve().as_posix()
+        return template.format(
+            path=abspath,
+            relpath=source.relpath,
+            line=source.line,
+            project=project,
+            sha=commit_sha or '',
+        )
+
+    return substitute
 
 
 def _extract_field_names(template: str) -> list[str]:

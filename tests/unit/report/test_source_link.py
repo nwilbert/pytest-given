@@ -5,8 +5,8 @@ import pytest
 
 from pytest_given.model import PytestGivenError, SourceLocation
 from pytest_given.report.source_link import (
+    compile_source_link,
     detect_commit_sha,
-    format_source_link,
     resolve_template,
 )
 
@@ -162,12 +162,11 @@ def test_format_vscode_uses_absolute_path(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.chdir(tmp_path)
-    url = format_source_link(
+    url = compile_source_link(
         'vscode://file/{path}:{line}',
-        source=_src(),
         project='proj',
         commit_sha=None,
-    )
+    )(_src())
     expected = (tmp_path / 'tests/test_x.py').resolve().as_posix()
     assert url == f'vscode://file/{expected}:7'
 
@@ -176,31 +175,38 @@ def test_format_pycharm_uses_absolute_path(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.chdir(tmp_path)
-    url = format_source_link(
+    url = compile_source_link(
         'pycharm://open?file={path}&line={line}',
-        source=_src(),
         project='myproj',
         commit_sha=None,
-    )
+    )(_src())
     expected = (tmp_path / 'tests/test_x.py').resolve().as_posix()
     assert url == f'pycharm://open?file={expected}&line=7'
 
 
 def test_format_github_uses_sha_and_relpath() -> None:
-    url = format_source_link(
+    url = compile_source_link(
         'https://github.com/o/r/blob/{sha}/{relpath}#L{line}',
-        source=_src(),
         project='p',
         commit_sha='deadbeef',
-    )
+    )(_src())
     assert url == 'https://github.com/o/r/blob/deadbeef/tests/test_x.py#L7'
 
 
-def test_format_missing_sha_raises() -> None:
+def test_compile_reuses_validation_across_sources() -> None:
+    """A compiled template substitutes each SourceLocation independently."""
+    substitute = compile_source_link(
+        'foo://{relpath}#L{line}', project='p', commit_sha=None
+    )
+    assert substitute(_src('a.py', 1)) == 'foo://a.py#L1'
+    assert substitute(_src('b.py', 2)) == 'foo://b.py#L2'
+
+
+def test_compile_missing_sha_raises_eagerly() -> None:
+    """Validation happens at compile time — no SourceLocation required."""
     with pytest.raises(PytestGivenError) as exc:
-        format_source_link(
+        compile_source_link(
             'https://github.com/o/r/blob/{sha}/{relpath}#L{line}',
-            source=_src(),
             project='p',
             commit_sha=None,
         )
@@ -215,12 +221,11 @@ def test_format_with_trailing_literal_text(monkeypatch: pytest.MonkeyPatch) -> N
     `string.Formatter().parse` yields a final tuple with field_name=None for
     trailing literal text; the field-name extractor must skip those.
     """
-    url = format_source_link(
+    url = compile_source_link(
         '{relpath}/done',
-        source=_src('a.py', 1),
         project='p',
         commit_sha=None,
-    )
+    )(_src('a.py', 1))
     assert url == 'a.py/done'
 
 
@@ -228,9 +233,8 @@ def test_format_attribute_access_raises_clear_error() -> None:
     """`{path.parent}` passes head-only validation but explodes at format()
     time with a confusing AttributeError on str — reject it up front."""
     with pytest.raises(PytestGivenError) as exc:
-        format_source_link(
+        compile_source_link(
             'foo://x/{path.parent}',
-            source=_src(),
             project='p',
             commit_sha=None,
         )
@@ -240,9 +244,8 @@ def test_format_attribute_access_raises_clear_error() -> None:
 
 def test_format_index_access_raises_clear_error() -> None:
     with pytest.raises(PytestGivenError) as exc:
-        format_source_link(
+        compile_source_link(
             'foo://x/{relpath[0]}',
-            source=_src(),
             project='p',
             commit_sha=None,
         )
@@ -252,9 +255,8 @@ def test_format_index_access_raises_clear_error() -> None:
 
 def test_format_unknown_variable_raises() -> None:
     with pytest.raises(PytestGivenError) as exc:
-        format_source_link(
+        compile_source_link(
             'foo://x/{branch}',
-            source=_src(),
             project='p',
             commit_sha=None,
         )

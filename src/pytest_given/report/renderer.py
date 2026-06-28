@@ -28,7 +28,7 @@ from .aggregations import (
     build_term_scenario_index,
     tab_visibility,
 )
-from .source_link import format_source_link
+from .source_link import compile_source_link
 
 _NUM_PARAM_COLORS = 6
 
@@ -152,14 +152,20 @@ def _make_source_url_filter(
     Returns None when source linking is disabled or the source is absent —
     the template uses that as the signal to render a plain `<span>` via the
     `source_link` macro.
+
+    The template is validated and parsed once here (not per location); the
+    per-call closure only performs the substitution.
     """
+    substitute = (
+        None
+        if template is None
+        else compile_source_link(template, project=project, commit_sha=commit_sha)
+    )
 
     def _filter(source: SourceLocation | None) -> str | None:
-        if source is None or template is None:
+        if source is None or substitute is None:
             return None
-        return format_source_link(
-            template, source=source, project=project, commit_sha=commit_sha
-        )
+        return substitute(source)
 
     return _filter
 
