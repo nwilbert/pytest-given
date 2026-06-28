@@ -1,0 +1,5 @@
+# Normalize line endings: store LF in the repo and check out LF everywhere,
+# so a working tree edited from Windows (PyCharm) and WSL in parallel doesn't
+# churn every file between CRLF and LF. `text=auto` lets git auto-detect binary
+# files and leave them untouched.
+* text=auto eol=lf
