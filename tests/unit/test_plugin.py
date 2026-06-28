@@ -291,6 +291,27 @@ def test_group_parameterized_any_failed_merges_as_failed() -> None:
     assert merged[0].status == 'failed'
 
 
+def test_group_parameterized_distinct_functions_same_name_do_not_merge() -> None:
+    # Two different parametrized functions in one module that happen to share a
+    # scenario label must stay separate — grouping keys on the test function
+    # (node id without its parametrize tail), not on the rendered label.
+    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::y[1]')
+    scenarios = [
+        Scenario(id=nid1, narration=Narration(text='same label'), module='m'),
+        Scenario(id=nid2, narration=Narration(text='same label'), module='m'),
+    ]
+    param_info = {
+        nid1: ParamSpec(names=['n'], values=[1]),
+        nid2: ParamSpec(names=['k'], values=[1]),
+    }
+    merged = plugin._group_parameterized(scenarios, param_info)
+    assert {s.id for s in merged} == {nid1, nid2}
+    assert {tuple(s.parameters.names) for s in merged if s.parameters} == {
+        ('n',),
+        ('k',),
+    }
+
+
 def test_templatize_sets_param_column_when_term_ref_expression_matches() -> None:
     narration = Narration(
         text='Alice arrives',

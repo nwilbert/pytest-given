@@ -510,6 +510,14 @@ def _scan_conftests_for_glossary(session: pytest.Session) -> Glossary | None:
     return None
 
 
+def _function_base(node_id: NodeId) -> str:
+    """The node id without its parametrize tail, e.g.
+    'tests/t.py::test_x[1-2]' -> 'tests/t.py::test_x'. Two cases of one
+    parametrized function share this; two different functions never do, so it
+    keys grouping without merging same-named tests."""
+    return node_id.split('[', 1)[0]
+
+
 def _group_parameterized(
     scenarios: list[Scenario],
     param_info: ParamInfo,
@@ -521,7 +529,7 @@ def _group_parameterized(
 
     for scenario in scenarios:
         if scenario.id in param_info:
-            key = (scenario.narration.text, scenario.module)
+            key = (_function_base(scenario.id), scenario.narration.text)
             if key not in groups:
                 groups[key] = []
                 group_order.append(key)
