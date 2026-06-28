@@ -83,29 +83,43 @@ Running the same working tree from both Windows (PyCharm) and WSL has a second,
 subtler consequence: the **paths Python records for source frames are not always
 Linux paths**.
 
-`capture/source.py` reconstructs a source location for `Story` and
-`GlossaryTerm` objects from the call stack, turning each frame's
-`co_filename` into a path relative to rootdir so the HTML report can render a
-source link. On WSL, a frame for a file on the Windows mount can carry a
-*Windows-style* `co_filename` (e.g. `C:\Users\Niko\repos\...`) rather than the
-`/mnt/c/...` form. The trigger is the shared tree: a `.pyc` compiled by the
-Windows interpreter caches the absolute Windows path, and once that path is
-embedded in the code object the WSL interpreter sees it verbatim.
+`capture/source.py` reconstructs source locations (for `Story`/`GlossaryTerm`
+frames, scenario `item.location`s, and glossary files) into paths relative to
+rootdir so the HTML report can render source links. Running the same working
+tree from both Windows (PyCharm) and WSL means a single file can be recorded in
+**either** path convention, regardless of which interpreter is running:
 
-That breaks path handling, because `pathlib` on Linux treats `\` as an ordinary
-filename character, not a separator. So `Path(r'C:\Users\Niko\repos\foo.py')` is
-a *single-segment* relative path, `relative_to(rootdir)` raises `ValueError`,
-and `capture_caller_source` silently returns `None` — the source link just
-disappears from the report, with no error to explain why.
+- **Windows path under WSL.** A `.pyc` compiled by the Windows interpreter caches
+  the absolute Windows path (`C:\Users\Niko\repos\...`); once embedded in the
+  code object the WSL interpreter reads it verbatim. On Linux `pathlib` treats
+  `\` as an ordinary filename character, so `Path(r'C:\Users\...\foo.py')` is a
+  *single-segment* relative path and `relative_to(rootdir)` raises `ValueError`.
+- **WSL-mount path under native Windows.** The mirror case: a `.pyc` compiled
+  under WSL caches the `/mnt/c/...` form, and the Windows interpreter reuses it
+  for the shared checkout. Windows `pathlib` treats a leading `/mnt/c/...` as a
+  *drive-relative* path (`drive=''`), so `.resolve()` prepends the current drive
+  and produces a bogus `C:\mnt\c\...` that no longer shares a drive anchor with
+  the real `C:\Users\...` rootdir — again `relative_to` raises `ValueError`.
 
-The fix is a small normalisation step applied before any `Path` math:
-- Only a leading `<drive>:\` (matched by `_WINDOWS_PATH_RE`) is rewritten, and
-  only when we are actually under WSL (`_IS_WSL`) — so a real Windows run of
-  pytest, native Linux, and macOS are all left untouched.
-- The drive letter is lowercased and the rest of the path has its backslashes
-  flipped to forward slashes, producing the canonical `/mnt/c/...` mount path
-  that lines up with rootdir.
-- Plain Linux `co_filename`s fall straight through to `Path(filename)`, so this
-  is a no-op everywhere except the Windows-path-under-WSL case.
+In both cases `capture_caller_source` silently returns `None` and the source link
+just disappears from the report, with no error to explain why.
+
+The fix is a small **bidirectional** normalisation (`_co_filename_to_path`)
+applied to every path before any `Path` math — both to captured `co_filename`s
+and, via `set_rootdir`, to the rootdir itself, so the two sides always share an
+anchor:
+
+- Under WSL (`_IS_WSL`): a leading `<drive>:\` (or `<drive>:/`, matched by
+  `_WINDOWS_PATH_RE`) is rewritten to the canonical `/mnt/<drive>/...` mount
+  path — drive letter lowercased, backslashes flipped to forward slashes.
+- Under native Windows (`_IS_WINDOWS`): a leading `/mnt/<drive>/...` (matched by
+  `_MNT_PATH_RE`) is rewritten back to `<drive>:\...`.
+- On plain Linux and macOS neither branch fires — there `/mnt/<drive>` is a real
+  directory and a Windows-style `co_filename` should never occur — so paths fall
+  straight through to `Path(filename)` untouched.
+
+Because the WSL `/mnt`-absolute assumption is POSIX-only, tests that assert it
+must `skipif(sys.platform == 'win32', ...)`; every other test passes on all four
+targets (native Windows, macOS, Linux, WSL).
 
 

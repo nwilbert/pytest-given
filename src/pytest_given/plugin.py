@@ -8,7 +8,7 @@ import json
 import time
 from collections.abc import Generator
 from datetime import UTC, datetime
-from pathlib import Path, PurePath
+from pathlib import Path
 from typing import Any, cast
 
 import pytest
@@ -25,7 +25,7 @@ from .capture.decorators import ScenarioDecorator
 from .capture.file_glossary import FileGlossary
 from .capture.glossary import clear_glossary_registry, get_registered_glossaries
 from .capture.kind_resolution import resolve_glossary_kinds
-from .capture.source import set_rootdir
+from .capture.source import item_source, set_rootdir
 from .capture.story import clear_story_registry
 from .model import (
     ActivityTermRef,
@@ -46,7 +46,6 @@ from .model import (
     PytestGivenError,
     ReportData,
     Scenario,
-    SourceLocation,
     Step,
     Story,
     TermId,
@@ -188,10 +187,7 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     module = mod.__name__ if mod else item.nodeid.split('::')[0]
     node_id = NodeId(item.nodeid)
     relpath_raw, lineno0, _ = item.location
-    source = SourceLocation(
-        relpath=PurePath(relpath_raw).as_posix(),
-        line=(lineno0 or 0) + 1,
-    )
+    source = item_source(relpath_raw, (lineno0 or 0) + 1)
     collector.start_scenario(
         scenario_id=node_id,
         name=scenario_marker.name,

@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 import pytest
@@ -6,6 +7,7 @@ from pytest_given.capture.source import (
     _co_filename_to_path,
     _reset_rootdir,
     capture_caller_source,
+    item_source,
     set_rootdir,
 )
 from pytest_given.model import SourceLocation
@@ -73,6 +75,73 @@ def test_co_filename_to_path_leaves_posix_path_unchanged_on_wsl(monkeypatch):
     monkeypatch.setattr('pytest_given.capture.source._IS_WSL', True)
     result = _co_filename_to_path('/home/me/repo/tests/test_x.py')
     assert result.as_posix() == '/home/me/repo/tests/test_x.py'
+
+
+def test_co_filename_to_path_rewrites_mnt_path_on_windows(monkeypatch):
+    """On native Windows a co_filename can arrive in WSL-mount form (e.g. a
+    ``.pyc`` rewritten under WSL is reused on Windows for the same checkout);
+    ``/mnt/<drive>/...`` is folded back to ``<drive>:\\...`` so it shares a drive
+    anchor with the rootdir."""
+    monkeypatch.setattr('pytest_given.capture.source._IS_WSL', False)
+    monkeypatch.setattr('pytest_given.capture.source._IS_WINDOWS', True)
+    result = _co_filename_to_path('/mnt/c/Users/me/repo/tests/test_x.py')
+    assert result.as_posix() == 'C:/Users/me/repo/tests/test_x.py'
+    # Drive root with no trailing path still yields a drive-prefixed path
+    # (exact trailing-slash form is platform-dependent, so only check the drive).
+    assert _co_filename_to_path('/mnt/d').as_posix().startswith('D:')
+
+
+def test_co_filename_to_path_leaves_posix_path_unchanged_on_windows(monkeypatch):
+    """A non-/mnt POSIX path on native Windows is left alone — only the WSL
+    mount prefix is special-cased."""
+    monkeypatch.setattr('pytest_given.capture.source._IS_WSL', False)
+    monkeypatch.setattr('pytest_given.capture.source._IS_WINDOWS', True)
+    result = _co_filename_to_path('/usr/local/lib/test_x.py')
+    assert result.as_posix() == '/usr/local/lib/test_x.py'
+
+
+def test_item_source_passes_through_relative_location():
+    """The common (native) case: `item.location[0]` is already rootdir-relative,
+    so it is kept verbatim — no rootdir lookup needed."""
+    loc = item_source('examples/coffeeshop/test_coffeeshop.py', 100)
+    assert loc.relpath == 'examples/coffeeshop/test_coffeeshop.py'
+    assert loc.line == 100
+
+
+@pytest.mark.skipif(
+    sys.platform == 'win32',
+    reason='WSL /mnt rewriting is POSIX-only; native Windows pathlib treats '
+    '/mnt/<drive> as drive-relative, not absolute.',
+)
+def test_item_source_rerelativizes_windows_absolute_path_on_wsl(monkeypatch):
+    """Under WSL, pytest cannot relativize a Windows `co_filename` against the
+    POSIX /mnt rootdir and falls back to the absolute ``C:\\...`` path. It is
+    rewritten and re-relativized so the source link stays repo-relative."""
+    monkeypatch.setattr('pytest_given.capture.source._IS_WSL', True)
+    set_rootdir(Path('/mnt/c/Users/me/repo'))
+    loc = item_source(r'C:\Users\me\repo\examples\test_x.py', 7)
+    assert loc.relpath == 'examples/test_x.py'
+    assert loc.line == 7
+
+
+def test_item_source_relativizes_absolute_path_inside_rootdir(tmp_path: Path):
+    """An absolute path inside rootdir is re-relativized to a posix relpath.
+    Uses a real (platform-native) absolute path so it exercises the
+    is_absolute -> relativize branch on every OS, including Windows."""
+    set_rootdir(tmp_path)
+    target = tmp_path / 'examples' / 'test_x.py'
+    loc = item_source(str(target), 12)
+    assert loc.relpath == 'examples/test_x.py'
+    assert loc.line == 12
+
+
+def test_item_source_keeps_absolute_path_outside_rootdir():
+    """An absolute path that cannot be relativized degrades to the path as
+    given rather than to 'no link' — every scenario keeps a source."""
+    set_rootdir(Path('/some/root'))
+    loc = item_source('/elsewhere/test_x.py', 3)
+    assert loc.relpath == '/elsewhere/test_x.py'
+    assert loc.line == 3
 
 
 def test_file_source_returns_location_inside_rootdir(tmp_path: Path):
