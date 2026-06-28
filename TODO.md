@@ -2,19 +2,18 @@
 
 ## Now
 
-- [ ] Glossary: Optionally hide kind? Group / filter by story?
-- [ ] integrate SVG diagram
 - [ ] Create given tests for this project itself (e.g., behavior of different glossaries).
-- [ ] Example PDF attachment in report
-- [ ] cache `format_source_link` template parse/validation in the renderer: it re-runs `string.Formatter().parse(template)` + field-name validation once per scenario, story, and term. Validate once per render, reuse the parsed template across all calls.
+  - possibly combine this with the creation of an agent skill
 
 ## Next
 
-- [ ] add a diagram to the readme with Agent <-> Dev <-> Domain Expert
+- [ ] enable definition of a custom mapping for boolean values to strings in parameterized scenarios
+- [ ] Glossary: Optionally hide kind? Group / filter by story?
+- [ ] Example PDF attachment in report
+- [ ] add the prepared diagram to the readme with Agent <-> Dev <-> Domain Expert
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
 - [ ] Add option to not generate the JSON file on test run, rethink default behavior
-- [ ] use >> for activity paths?
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
 
 ## Later
