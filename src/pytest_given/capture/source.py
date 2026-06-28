@@ -97,6 +97,15 @@ def _relativize(abs_path: Path) -> str | None:
         return None
 
 
+def _optional_source(abs_path: Path, line: int) -> SourceLocation | None:
+    """SourceLocation for an absolute path, or None when it can't be made
+    rootdir-relative (rootdir unset or path outside it) — i.e. "no link". The
+    counterpart to `to_relpath`, which instead degrades to the path as given.
+    """
+    rel = _relativize(abs_path)
+    return None if rel is None else SourceLocation(relpath=rel, line=line)
+
+
 def capture_caller_source(skip: int = 1) -> SourceLocation | None:
     """Return a SourceLocation for the frame `skip` levels up the call stack.
 
@@ -109,10 +118,8 @@ def capture_caller_source(skip: int = 1) -> SourceLocation | None:
     path outside rootdir.
     """
     frame = sys._getframe(skip)
-    rel = _relativize(_co_filename_to_path(frame.f_code.co_filename))
-    if rel is None:
-        return None
-    return SourceLocation(relpath=rel, line=frame.f_lineno)
+    abs_path = _co_filename_to_path(frame.f_code.co_filename)
+    return _optional_source(abs_path, frame.f_lineno)
 
 
 def to_relpath(raw: str) -> str:
@@ -155,7 +162,4 @@ def file_source(path: Path, line: int) -> SourceLocation | None:
     Mirrors `capture_caller_source` but for a path we already hold rather than
     a stack frame. Returns None if rootdir is unset or the file is outside it.
     """
-    rel = _relativize(path)
-    if rel is None:
-        return None
-    return SourceLocation(relpath=rel, line=line)
+    return _optional_source(path, line)
