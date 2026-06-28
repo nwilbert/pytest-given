@@ -3,6 +3,17 @@ from pathlib import Path
 
 import nox
 
+# On WSL under /mnt, put virtualenvs on the Linux filesystem
+_proc_version = Path('/proc/version')
+if (
+    _proc_version.exists()
+    and 'microsoft' in _proc_version.read_text().lower()
+    and Path.cwd().is_relative_to('/mnt')
+):
+    nox.options.envdir = str(
+        Path.home() / '.local' / 'share' / 'nox-envs' / 'pytest-given'
+    )
+
 # Linted and formatted everywhere; `tests` and `examples` are test code and are
 # deliberately not type-checked (heavy fixtures and loose dicts).
 code_paths = ['src', 'tests', 'examples', 'noxfile.py']

@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from pytest_given.capture.source import (
+    _co_filename_to_path,
     _reset_rootdir,
     capture_caller_source,
     set_rootdir,
@@ -55,6 +56,23 @@ def test_skip_argument_walks_up_call_stack():
     # We don't assert the exact line (would couple to formatting) — only that
     # it's reachable and inside the test function's body range.
     assert loc.line > 0
+
+
+def test_co_filename_to_path_rewrites_windows_path_on_wsl(monkeypatch):
+    """Under WSL, co_filename for a Windows-filesystem file is a Windows path
+    (``C:\\...``); it is rewritten to the ``/mnt/c/...`` form so pathlib treats
+    the separators correctly."""
+    monkeypatch.setattr('pytest_given.capture.source._IS_WSL', True)
+    result = _co_filename_to_path(r'C:\Users\me\repo\tests\test_x.py')
+    assert result.as_posix() == '/mnt/c/Users/me/repo/tests/test_x.py'
+
+
+def test_co_filename_to_path_leaves_posix_path_unchanged_on_wsl(monkeypatch):
+    """A genuine POSIX co_filename has no Windows drive prefix, so it passes
+    through untouched even when running under WSL."""
+    monkeypatch.setattr('pytest_given.capture.source._IS_WSL', True)
+    result = _co_filename_to_path('/home/me/repo/tests/test_x.py')
+    assert result.as_posix() == '/home/me/repo/tests/test_x.py'
 
 
 def test_file_source_returns_location_inside_rootdir(tmp_path: Path):

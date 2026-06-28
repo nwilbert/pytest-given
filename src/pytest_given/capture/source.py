@@ -12,10 +12,37 @@ is absent.
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
 from ..model import SourceLocation
+
+_WINDOWS_PATH_RE = re.compile(r'^([A-Za-z]):\\')
+
+# Detecting WSL specifically (rather than "not Windows") keeps the /mnt/<drive>
+# rewrite below from ever firing on native Linux or macOS, where a Windows-style
+# co_filename should never occur in the first place.
+_IS_WSL = (
+    sys.platform == 'linux'
+    and Path('/proc/version').exists()
+    and 'microsoft' in Path('/proc/version').read_text().lower()
+)
+
+
+def _co_filename_to_path(filename: str) -> Path:
+    """Normalise a frame's `co_filename` to a Linux path if needed.
+
+    On WSL, co_filename for files on the Windows filesystem is a Windows path
+    (e.g. C:\\Users\\...). Path() on Linux treats backslashes as literal
+    filename characters, so we normalise to the /mnt/<drive>/... form first.
+    """
+    match = _WINDOWS_PATH_RE.match(filename)
+    if match and _IS_WSL:
+        rest = filename[2:].replace('\\', '/')
+        return Path(f'/mnt/{match.group(1).lower()}{rest}')
+    return Path(filename)
+
 
 _rootdir: Path | None = None
 
@@ -46,7 +73,7 @@ def capture_caller_source(skip: int = 1) -> SourceLocation | None:
     if _rootdir is None:
         return None
     frame = sys._getframe(skip)
-    abs_path = Path(frame.f_code.co_filename).resolve()
+    abs_path = _co_filename_to_path(frame.f_code.co_filename).resolve()
     try:
         rel = abs_path.relative_to(_rootdir)
     except ValueError:
