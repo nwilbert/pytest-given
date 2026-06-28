@@ -202,7 +202,7 @@ Each step's term references are matched against the story's activities to comput
 
 **Glossary-only mode** — if you want the Glossary tab without writing stories yet, put `g = Glossary()` in a `conftest.py` so the plugin discovers it.
 
-See the [domain-storytelling design spec](docs/superpowers/specs/2026-06-07-domain-storytelling-design.md) for the full surface and the [hotel-booking example](examples/hotel-booking/test_hotel_booking.py) for an end-to-end usage.
+See the [domain-storytelling design spec](docs/specs/2026-06-07-domain-storytelling-design.md) for the full surface and the [hotel-booking example](examples/hotel-booking/test_hotel_booking.py) for an end-to-end usage.
 
 **`FileGlossary` — load a Markdown glossary file** — if your project already keeps a `GLOSSARY.md`, point `FileGlossary` at it instead of declaring terms in code:
 
@@ -235,7 +235,7 @@ When no `kind_column` is present, term kinds are **inferred from story activity-
 
 **Every term in the glossary file is included in the report**, even one referenced by no story and no step. Terms whose kind could not be identified are listed under the **Uncategorized** section in the Glossary tab (and filterable via its own toggle).
 
-See the [file-backed glossary design spec](docs/superpowers/specs/2026-06-18-file-backed-glossary-design.md) and the [file-glossary-booking example](examples/file-glossary-booking/test_file_glossary_booking.py) for a worked end-to-end usage.
+See the [file-backed glossary design spec](docs/specs/2026-06-18-file-backed-glossary-design.md) and the [file-glossary-booking example](examples/file-glossary-booking/test_file_glossary_booking.py) for a worked end-to-end usage.
 
 ### `attach(label, content)`
 

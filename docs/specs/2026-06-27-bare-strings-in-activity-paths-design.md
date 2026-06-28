@@ -193,7 +193,7 @@ Pre-release: no compatibility shims.
   [draft-unification spec](2026-06-27-glossary-draft-unification-design.md)
   marking its two grammar bullets as superseded by this spec, when this lands.
 - Per the spec-lifecycle convention, `git mv` this file up to
-  `docs/superpowers/specs/` in the commit that lands the implementation.
+  `docs/specs/` in the commit that lands the implementation.
 
 ## Forward notes
 
