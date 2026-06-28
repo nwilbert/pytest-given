@@ -3,7 +3,6 @@
 ## Now
 
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
-- [ ] When a parameter row is hovered on, show the row values instead of the placeholders
 - [ ] integrate SVG diagram
 - [ ] Create given tests for this project itself (e.g., behavior of different glossaries).
 - [ ] Example PDF attachment in report
