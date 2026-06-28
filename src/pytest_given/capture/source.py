@@ -115,24 +115,38 @@ def capture_caller_source(skip: int = 1) -> SourceLocation | None:
     return SourceLocation(relpath=rel, line=frame.f_lineno)
 
 
+def to_relpath(raw: str) -> str:
+    """Normalise a path string and make it rootdir-relative when possible.
+
+    Folds the path into the native convention (see `_co_filename_to_path`) and,
+    if it is then an absolute path inside rootdir, returns it relative to rootdir;
+    otherwise returns it unchanged as posix. Used for both scenario
+    `item.location` paths and traceback frame paths so neither leaks an absolute,
+    machine-specific path — the same file can surface absolute (and in the wrong
+    convention) when a `.pyc` compiled by the other interpreter is reused across
+    a shared WSL+Windows checkout.
+    """
+    path = _co_filename_to_path(raw)
+    if path.is_absolute():
+        rel = _relativize(path)
+        if rel is not None:
+            return rel
+    return path.as_posix()
+
+
 def item_source(relpath_raw: str, line: int) -> SourceLocation:
     """Build a SourceLocation from a pytest `item.location` path + 1-based line.
 
     `item.location[0]` is normally already rootdir-relative, but under WSL pytest
     cannot relativize a Windows-style `co_filename` (e.g. ``C:\\Users\\...``)
     against the POSIX ``/mnt/<drive>`` rootdir and falls back to the absolute
-    Windows path. Detect that, rewrite it to the ``/mnt/<drive>`` form, and
-    re-relativize against rootdir. Unlike `capture_caller_source`, this always
+    Windows path. `to_relpath` rewrites it to the native convention and
+    re-relativizes against rootdir. Unlike `capture_caller_source`, this always
     returns a location: an absolute path outside rootdir (or unset rootdir)
     degrades to the path as given rather than to "no link", matching the prior
     behaviour where every scenario carried a source.
     """
-    path = _co_filename_to_path(relpath_raw)
-    if path.is_absolute():
-        rel = _relativize(path)
-        if rel is not None:
-            return SourceLocation(relpath=rel, line=line)
-    return SourceLocation(relpath=path.as_posix(), line=line)
+    return SourceLocation(relpath=to_relpath(relpath_raw), line=line)
 
 
 def file_source(path: Path, line: int) -> SourceLocation | None:

@@ -14,6 +14,7 @@ import re
 from dataclasses import dataclass, field
 
 from ..model import TracebackFrame
+from .source import to_relpath
 
 _FRAME_HEADER_RE = re.compile(r'^(?P<path>.+?):(?P<lineno>\d+): in (?P<func>.+)$')
 
@@ -99,20 +100,25 @@ def parse_short_repr(text: str) -> tuple[list[TracebackFrame], str | None]:
 
 
 def _portable_path(normalized_path: str) -> str:
-    """Collapse an external-dependency frame to a venv-independent path.
+    """Rewrite a frame path to a stable, machine-independent form.
 
-    A `site-packages` frame renders with a machine-specific prefix — the venv
-    lives in-repo on one machine (`.nox/.../Lib/site-packages/...`) and under
-    `$HOME` on another (`/home/me/.../site-packages/...`) — so reports (and the
-    committed examples) churn between environments. Truncate to the stable
-    `site-packages/...` tail. Project and user frames are already rootdir-relative
-    and pass through untouched. `is_internal` is still computed from the full
-    path, so classification is unaffected.
+    Two cases churn between environments (and can surface absolute when a `.pyc`
+    compiled by the other interpreter is reused across a shared WSL+Windows
+    checkout):
+
+    - A `site-packages` dependency frame carries a machine-specific venv prefix
+      (`.nox/.../Lib/site-packages/...` vs `/home/me/.../site-packages/...`);
+      truncate it to the stable `site-packages/...` tail.
+    - A project/user frame can arrive absolute and in the wrong path convention;
+      `to_relpath` folds it to the native convention and back to rootdir-relative.
+
+    `is_internal` is still computed from the full path, so classification is
+    unaffected.
     """
     idx = normalized_path.rfind(_SITE_PACKAGES_MARKER)
     if idx != -1:
         return normalized_path[idx + 1 :]
-    return normalized_path
+    return to_relpath(normalized_path)
 
 
 def _is_internal(normalized_path: str) -> bool:

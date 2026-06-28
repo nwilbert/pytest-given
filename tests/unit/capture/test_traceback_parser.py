@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from pytest_given.capture.source import _reset_rootdir, set_rootdir
 from pytest_given.capture.traceback import parse_short_repr
 
 
@@ -140,3 +143,19 @@ def test_user_test_file_not_internal() -> None:
     text = 'tests/test_billing.py:10: in test_buy\n    assert False\nE   assert False'
     frames, _ = parse_short_repr(text)
     assert frames[0].is_internal is False
+
+
+def test_absolute_user_frame_relativized_to_rootdir(tmp_path: Path) -> None:
+    """A project/user frame that arrives absolute (e.g. a stale cross-environment
+    `.pyc` makes pytest emit the file's absolute path) is folded back to a
+    rootdir-relative path so reports don't leak a machine-specific location."""
+    _reset_rootdir()
+    set_rootdir(tmp_path)
+    try:
+        target = tmp_path / 'tests' / 'test_x.py'
+        text = f'{target.as_posix()}:5: in test_x\n    assert False\nE   AssertionError'
+        frames, _ = parse_short_repr(text)
+        assert frames[0].path == 'tests/test_x.py'
+        assert frames[0].lineno == 5
+    finally:
+        _reset_rootdir()
