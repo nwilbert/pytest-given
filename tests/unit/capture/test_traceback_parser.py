@@ -12,7 +12,8 @@ def test_parses_multi_frame_short_repr() -> None:
     )
     frames, tail = parse_short_repr(text)
     assert len(frames) == 2
-    assert frames[0].path == '.venv/lib/site-packages/_pytest/runner.py'
+    # site-packages frames are collapsed to a venv-independent tail.
+    assert frames[0].path == 'site-packages/_pytest/runner.py'
     assert frames[0].lineno == 353
     assert frames[0].func == 'from_call'
     assert frames[0].is_internal is True
@@ -67,13 +68,33 @@ def test_empty_input() -> None:
 
 def test_windows_path_normalized_to_forward_slashes() -> None:
     text = (
-        '.nox\\examples\\Lib\\site-packages\\_pytest\\runner.py:353: in from_call\n'
-        '    result = func()\n'
+        'tests\\unit\\capture\\test_x.py:12: in test_thing\n'
+        '    assert False\n'
         'E   AssertionError'
     )
     frames, _ = parse_short_repr(text)
-    assert frames[0].path == '.nox/examples/Lib/site-packages/_pytest/runner.py'
-    assert frames[0].is_internal is True
+    assert frames[0].path == 'tests/unit/capture/test_x.py'
+    assert frames[0].is_internal is False
+
+
+def test_site_packages_frame_collapsed_to_venv_independent_tail() -> None:
+    """The same dependency frame renders with a machine-specific venv prefix on
+    different setups (`.nox/.../Lib/site-packages` on Windows, `$HOME/.../
+    site-packages` on WSL); both collapse to the stable `site-packages/...` tail
+    so reports don't churn between environments."""
+    windows, _ = parse_short_repr(
+        '.nox/examples/Lib/site-packages/_pytest/runner.py:1: in from_call\n'
+        '    func()\nE   AssertionError'
+    )
+    wsl, _ = parse_short_repr(
+        '/home/me/.local/share/nox-envs/proj/examples/lib/python3.14/'
+        'site-packages/_pytest/runner.py:1: in from_call\n'
+        '    func()\nE   AssertionError'
+    )
+    assert windows[0].path == 'site-packages/_pytest/runner.py'
+    assert wsl[0].path == 'site-packages/_pytest/runner.py'
+    assert windows[0].is_internal is True
+    assert wsl[0].is_internal is True
 
 
 def test_pluggy_frame_classified_internal() -> None:

@@ -27,6 +27,8 @@ _INTERNAL_SUBSTRINGS = (
 )
 _INTERNAL_SUFFIXES = ('/pytest_given/capture/decorators.py',)
 
+_SITE_PACKAGES_MARKER = '/site-packages/'
+
 
 @dataclass
 class _Pending:
@@ -54,7 +56,7 @@ def parse_short_repr(text: str) -> tuple[list[TracebackFrame], str | None]:
         normalized = p.path.replace('\\', '/')
         frames.append(
             TracebackFrame(
-                path=normalized,
+                path=_portable_path(normalized),
                 lineno=p.lineno,
                 func=p.func,
                 code='\n'.join(p.code),
@@ -94,6 +96,23 @@ def parse_short_repr(text: str) -> tuple[list[TracebackFrame], str | None]:
 
     tail = '\n'.join(tail_lines) if tail_lines else None
     return frames, tail
+
+
+def _portable_path(normalized_path: str) -> str:
+    """Collapse an external-dependency frame to a venv-independent path.
+
+    A `site-packages` frame renders with a machine-specific prefix — the venv
+    lives in-repo on one machine (`.nox/.../Lib/site-packages/...`) and under
+    `$HOME` on another (`/home/me/.../site-packages/...`) — so reports (and the
+    committed examples) churn between environments. Truncate to the stable
+    `site-packages/...` tail. Project and user frames are already rootdir-relative
+    and pass through untouched. `is_internal` is still computed from the full
+    path, so classification is unaffected.
+    """
+    idx = normalized_path.rfind(_SITE_PACKAGES_MARKER)
+    if idx != -1:
+        return normalized_path[idx + 1 :]
+    return normalized_path
 
 
 def _is_internal(normalized_path: str) -> bool:
