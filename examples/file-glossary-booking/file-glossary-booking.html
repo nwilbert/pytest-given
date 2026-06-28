@@ -148,28 +148,31 @@ body {
 .status-pill:not([class*="active-"]) { opacity: 0.5; text-decoration: line-through; }
 
 
-/* Browse-by toggle — mirrors the status pills above (separate outlined pills,
-   light-blue active fill) so it reads as a lightweight control, not a slab. */
-.view-toggle {
+/* Segmented toggle — a connected single-select control. Shared by the
+   "Browse by" (Tags/Modules) toggle and the glossary "Definitions" filter so
+   the two read as the same idiom. (The Status pills above are deliberately
+   separate: they are multi-select with per-status semantic colors.) */
+.seg-toggle {
   display: flex;
-  gap: var(--space-xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
 }
-.view-btn {
+.seg-btn {
   flex: 1;
   text-align: center;
   font-size: var(--font-size-sm);
-  padding: 2px 4px;
+  padding: 4px;
   cursor: pointer;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+  border-left: 1px solid var(--border);
   background: var(--bg-card);
   color: var(--text-muted);
   user-select: none;
 }
-.view-btn.active {
+.seg-btn:first-child { border-left: none; }
+.seg-btn.active {
   background: var(--color-accent-bg);
   color: var(--color-accent);
-  border-color: var(--color-accent);
   font-weight: 500;
 }
 
@@ -1015,9 +1018,9 @@ span.param-highlight {
 
     <div class="sidebar-section">
       <div class="sidebar-label">Browse by</div>
-      <div class="view-toggle">
-        <div class="view-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
-        <div class="view-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+      <div class="seg-toggle">
+        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
+        <div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
       </div>
       <div class="nav-tree">
         <template x-for="group in groups" :key="group.name">
@@ -1098,7 +1101,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
       
     </div>
     </div>
@@ -1142,7 +1145,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
       
     </div>
     </div>
@@ -1340,7 +1343,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -1392,10 +1395,15 @@ span.param-highlight {
           <span class="nav-group-count">2</span>
         </label>
         
-        <label class="kind-filter-row">
-          <input type="checkbox" x-model="glossaryUndefinedOnly">
-          <span>Undefined only</span>
-        </label>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Definitions</div>
+        <div class="seg-toggle">
+          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'all' }" @click="glossaryDefinitionFilter = 'all'">All</div>
+          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'defined' }" @click="glossaryDefinitionFilter = 'defined'">Defined</div>
+          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'undefined' }" @click="glossaryDefinitionFilter = 'undefined'">Undefined</div>
+        </div>
       </div>
     </div>
 
@@ -1431,7 +1439,7 @@ span.param-highlight {
         
         
         <div class="entry" id="term-guest"
-             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'guest a person making a room reservation.'.includes(glossarySearch.toLowerCase()))">
+             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || 'guest a person making a room reservation.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['guest'] ? delete expandedTerms['guest'] : (expandedTerms['guest'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['guest'] }"></span>
             <span class="entry-name">
@@ -1473,7 +1481,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L7">examples/file-glossary-booking/file-glossary-booking.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/file-glossary-booking/file-glossary-booking.md#L7">examples/file-glossary-booking/file-glossary-booking.md:7</a></div>
                 
               </div>
             </div>
@@ -1496,7 +1504,7 @@ span.param-highlight {
         
         
         <div class="entry" id="term-room"
-             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'room a bookable hotel room.'.includes(glossarySearch.toLowerCase()))">
+             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || 'room a bookable hotel room.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['room'] ? delete expandedTerms['room'] : (expandedTerms['room'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['room'] }"></span>
             <span class="entry-name">
@@ -1538,7 +1546,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L9">examples/file-glossary-booking/file-glossary-booking.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/file-glossary-booking/file-glossary-booking.md#L9">examples/file-glossary-booking/file-glossary-booking.md:9</a></div>
                 
               </div>
             </div>
@@ -1548,7 +1556,7 @@ span.param-highlight {
         
         
         <div class="entry" id="term-confirmation"
-             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'confirmation a notification acknowledging a successful reservation.'.includes(glossarySearch.toLowerCase()))">
+             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || 'confirmation a notification acknowledging a successful reservation.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['confirmation'] ? delete expandedTerms['confirmation'] : (expandedTerms['confirmation'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['confirmation'] }"></span>
             <span class="entry-name">
@@ -1590,7 +1598,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L10">examples/file-glossary-booking/file-glossary-booking.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/file-glossary-booking/file-glossary-booking.md#L10">examples/file-glossary-booking/file-glossary-booking.md:10</a></div>
                 
               </div>
             </div>
@@ -1613,7 +1621,7 @@ span.param-highlight {
         
         
         <div class="entry" id="term-book"
-             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'book reserve a room for a given stay.'.includes(glossarySearch.toLowerCase()))">
+             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || 'book reserve a room for a given stay.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['book'] ? delete expandedTerms['book'] : (expandedTerms['book'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['book'] }"></span>
             <span class="entry-name">
@@ -1662,7 +1670,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L8">examples/file-glossary-booking/file-glossary-booking.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/file-glossary-booking/file-glossary-booking.md#L8">examples/file-glossary-booking/file-glossary-booking.md:8</a></div>
                 
               </div>
             </div>
@@ -1685,7 +1693,7 @@ span.param-highlight {
         
         
         <div class="entry" id="term-cancellation-policy"
-             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'cancellation policy the rules governing how and when a booking may be cancelled.'.includes(glossarySearch.toLowerCase()))">
+             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || 'cancellation policy the rules governing how and when a booking may be cancelled.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['cancellation-policy'] ? delete expandedTerms['cancellation-policy'] : (expandedTerms['cancellation-policy'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['cancellation-policy'] }"></span>
             <span class="entry-name">
@@ -1716,7 +1724,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L11">examples/file-glossary-booking/file-glossary-booking.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/file-glossary-booking/file-glossary-booking.md#L11">examples/file-glossary-booking/file-glossary-booking.md:11</a></div>
                 
               </div>
             </div>
@@ -1726,7 +1734,7 @@ span.param-highlight {
         
         
         <div class="entry" id="term-overbooking"
-             x-show="(!glossaryUndefinedOnly || false) && (!glossarySearch || 'overbooking accepting more reservations than there are rooms available.'.includes(glossarySearch.toLowerCase()))">
+             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || 'overbooking accepting more reservations than there are rooms available.'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['overbooking'] ? delete expandedTerms['overbooking'] : (expandedTerms['overbooking'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['overbooking'] }"></span>
             <span class="entry-name">
@@ -1750,7 +1758,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bba59e14f62416002fec7fdd77b4dc8920e28450/examples/file-glossary-booking/file-glossary-booking.md#L12">examples/file-glossary-booking/file-glossary-booking.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6db8450fc811b021ae44c55522de6c1e5e82c964/examples/file-glossary-booking/file-glossary-booking.md#L12">examples/file-glossary-booking/file-glossary-booking.md:12</a></div>
                 
               </div>
             </div>
@@ -1778,10 +1786,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-06-27T17:13:43.772598+00:00",
+    "timestamp": "2026-06-28T06:26:01.402364+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "bba59e14f62416002fec7fdd77b4dc8920e28450"
+    "commit_sha": "6db8450fc811b021ae44c55522de6c1e5e82c964"
   },
   "scenarios": [
     {
@@ -1838,7 +1846,7 @@ window.__REPORT_DATA__ = {
               {
                 "term_id": "book",
                 "display": "books",
-                "expression": "g[\"Book\"](\"books\")",
+                "expression": "g[\"book\"](\"books\")",
                 "param_column": null
               },
               {
@@ -1988,7 +1996,7 @@ window.__REPORT_DATA__ = {
               {
                 "term_id": "book",
                 "display": "books",
-                "expression": "g[\"Book\"](\"books\")",
+                "expression": "g[\"book\"](\"books\")",
                 "param_column": null
               },
               {
@@ -2253,7 +2261,7 @@ function reportApp() {
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
-    glossaryUndefinedOnly: false,
+    glossaryDefinitionFilter: 'all',
     expandedTerms: {},
     hoveredActivity: null,
     hoveredScenario: null,

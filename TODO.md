@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] "Undefined only" filter should not be directly under "SHOW KINDS" header, turn into toggle / dropdown?
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
 - [ ] When a parameter row is hovered on, show the row values instead of the placeholders
 - [ ] integrate SVG diagram

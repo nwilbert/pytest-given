@@ -141,28 +141,31 @@ body {
 .status-pill:not([class*="active-"]) { opacity: 0.5; text-decoration: line-through; }
 
 
-/* Browse-by toggle — mirrors the status pills above (separate outlined pills,
-   light-blue active fill) so it reads as a lightweight control, not a slab. */
-.view-toggle {
+/* Segmented toggle — a connected single-select control. Shared by the
+   "Browse by" (Tags/Modules) toggle and the glossary "Definitions" filter so
+   the two read as the same idiom. (The Status pills above are deliberately
+   separate: they are multi-select with per-status semantic colors.) */
+.seg-toggle {
   display: flex;
-  gap: var(--space-xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
 }
-.view-btn {
+.seg-btn {
   flex: 1;
   text-align: center;
   font-size: var(--font-size-sm);
-  padding: 2px 4px;
+  padding: 4px;
   cursor: pointer;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+  border-left: 1px solid var(--border);
   background: var(--bg-card);
   color: var(--text-muted);
   user-select: none;
 }
-.view-btn.active {
+.seg-btn:first-child { border-left: none; }
+.seg-btn.active {
   background: var(--color-accent-bg);
   color: var(--color-accent);
-  border-color: var(--color-accent);
   font-weight: 500;
 }
 

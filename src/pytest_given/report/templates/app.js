@@ -37,7 +37,7 @@ function reportApp() {
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
-    glossaryUndefinedOnly: false,
+    glossaryDefinitionFilter: 'all',
     expandedTerms: {},
     hoveredActivity: null,
     hoveredScenario: null,

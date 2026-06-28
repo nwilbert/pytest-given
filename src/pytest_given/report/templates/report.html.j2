@@ -138,9 +138,9 @@
 
     <div class="sidebar-section">
       <div class="sidebar-label">Browse by</div>
-      <div class="view-toggle">
-        <div class="view-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
-        <div class="view-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+      <div class="seg-toggle">
+        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
+        <div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
       </div>
       <div class="nav-tree">
         <template x-for="group in groups" :key="group.name">
@@ -431,10 +431,15 @@
           <span class="nav-group-count">{{ kindless_count }}</span>
         </label>
         {% endif %}
-        <label class="kind-filter-row">
-          <input type="checkbox" x-model="glossaryUndefinedOnly">
-          <span>Undefined only</span>
-        </label>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Definitions</div>
+        <div class="seg-toggle">
+          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'all' }" @click="glossaryDefinitionFilter = 'all'">All</div>
+          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'defined' }" @click="glossaryDefinitionFilter = 'defined'">Defined</div>
+          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'undefined' }" @click="glossaryDefinitionFilter = 'undefined'">Undefined</div>
+        </div>
       </div>
     </div>
 
@@ -472,7 +477,7 @@
         {% set agg = glossary_aggregations.get(term.id) %}
         {% set q = 'glossarySearch' %}
         <div class="entry" id="term-{{ term.id }}"
-             x-show="(!glossaryUndefinedOnly || {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || '{{ (term.canonical + ' ' + (term.definition or '')) | lower }}'.includes(glossarySearch.toLowerCase()))">
+             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || '{{ (term.canonical + ' ' + (term.definition or '')) | lower }}'.includes(glossarySearch.toLowerCase()))">
           <div class="entry-head" @click="expandedTerms['{{ term.id }}'] ? delete expandedTerms['{{ term.id }}'] : (expandedTerms['{{ term.id }}'] = true)">
             <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['{{ term.id }}'] }"></span>
             <span class="entry-name">
