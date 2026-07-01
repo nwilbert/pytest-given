@@ -1,7 +1,7 @@
-import pytest
-
+from pytest_given import given, scenario, then, when
 from pytest_given.capture.markdown_glossary import GlossaryRow, parse_glossary_tables
 from pytest_given.model import PytestGivenError
+from tests._vocab import pg, then_raises
 
 SIMPLE = """# Glossary
 
@@ -12,55 +12,104 @@ SIMPLE = """# Glossary
 """
 
 
+@scenario(
+    'A pipe table parses into term and definition rows',
+    tags=['markdown', 'happy-path'],
+)
 def test_parses_default_columns():
-    rows = parse_glossary_tables(
-        SIMPLE, term_column=0, description_column=1, kind_column=None
-    )
-    assert rows == [
-        GlossaryRow(term='Guest', definition='A person booking.', kind=None, line=5),
-        GlossaryRow(term='Room', definition='A bookable room.', kind=None, line=6),
-    ]
+    with given('a Markdown document with one pipe table'):
+        text = SIMPLE
+    with when(t'the parser reads it into rows for a {pg["FileGlossary"]}'):
+        rows = parse_glossary_tables(
+            text, term_column=0, description_column=1, kind_column=None
+        )
+    with then(t'each row carries a {pg["Term"]}, definition and source line'):
+        assert rows == [
+            GlossaryRow(
+                term='Guest', definition='A person booking.', kind=None, line=5
+            ),
+            GlossaryRow(term='Room', definition='A bookable room.', kind=None, line=6),
+        ]
 
 
+@scenario(
+    'Multiple tables in one file are merged',
+    tags=['markdown', 'happy-path'],
+)
 def test_merges_multiple_tables():
-    text = (
-        SIMPLE + '\n## More\n\n| Term | Meaning |\n|---|---|\n| Search | Look up. |\n'
-    )
-    rows = parse_glossary_tables(
-        text, term_column=0, description_column=1, kind_column=None
-    )
-    assert [row.term for row in rows] == ['Guest', 'Room', 'Search']
+    with given('a document containing two separate pipe tables'):
+        text = (
+            SIMPLE
+            + '\n## More\n\n| Term | Meaning |\n|---|---|\n| Search | Look up. |\n'
+        )
+    with when('the parser reads the whole document'):
+        rows = parse_glossary_tables(
+            text, term_column=0, description_column=1, kind_column=None
+        )
+    with then(t'every table contributes its {pg["Term"]} rows'):
+        assert [row.term for row in rows] == ['Guest', 'Room', 'Search']
 
 
+@scenario(
+    'Columns can be selected by header name',
+    tags=['markdown', 'happy-path'],
+)
 def test_column_by_header_name_case_insensitive():
-    text = '| Word | Note | Role |\n|---|---|---|\n| Guest | x | Actor |\n'
-    rows = parse_glossary_tables(
-        text, term_column='word', description_column='note', kind_column='role'
-    )
-    assert rows == [GlossaryRow(term='Guest', definition='x', kind='Actor', line=3)]
+    with given('a table with custom, differently-cased header names'):
+        text = '| Word | Note | Role |\n|---|---|---|\n| Guest | x | Actor |\n'
+    with when('the parser selects columns by header name'):
+        rows = parse_glossary_tables(
+            text, term_column='word', description_column='note', kind_column='role'
+        )
+    with then('the named columns are matched case-insensitively'):
+        assert rows == [GlossaryRow(term='Guest', definition='x', kind='Actor', line=3)]
 
 
+@scenario(
+    'Escaped pipes are preserved in cells',
+    tags=['markdown', 'happy-path'],
+)
 def test_escaped_pipe_in_cell():
-    text = '| Term | Meaning |\n|---|---|\n| A\\|B | pipe\\|here |\n'
-    rows = parse_glossary_tables(
-        text, term_column=0, description_column=1, kind_column=None
-    )
-    assert rows == [GlossaryRow(term='A|B', definition='pipe|here', kind=None, line=3)]
+    with given(r'cells containing escaped pipe characters (\|)'):
+        text = '| Term | Meaning |\n|---|---|\n| A\\|B | pipe\\|here |\n'
+    with when('the parser splits the row'):
+        rows = parse_glossary_tables(
+            text, term_column=0, description_column=1, kind_column=None
+        )
+    with then('the escaped pipe survives as a literal pipe'):
+        assert rows == [
+            GlossaryRow(term='A|B', definition='pipe|here', kind=None, line=3)
+        ]
 
 
+@scenario(
+    'Tables inside fenced code blocks are skipped',
+    tags=['markdown', 'happy-path'],
+)
 def test_skips_tables_in_fenced_code_blocks():
-    text = (
-        '```\n| Term | Meaning |\n|---|---|\n| Fake | nope |\n```\n\n'
-        '| Term | Meaning |\n|---|---|\n| Real | yes |\n'
-    )
-    rows = parse_glossary_tables(
-        text, term_column=0, description_column=1, kind_column=None
-    )
-    assert [row.term for row in rows] == ['Real']
+    with given('a fenced code block that contains a look-alike table'):
+        text = (
+            '```\n| Term | Meaning |\n|---|---|\n| Fake | nope |\n```\n\n'
+            '| Term | Meaning |\n|---|---|\n| Real | yes |\n'
+        )
+    with when('the parser reads the document'):
+        rows = parse_glossary_tables(
+            text, term_column=0, description_column=1, kind_column=None
+        )
+    with then('only the real table outside the fence contributes rows'):
+        assert [row.term for row in rows] == ['Real']
 
 
+@scenario(
+    'A file with no pipe table is rejected',
+    tags=['markdown', 'validation'],
+)
 def test_no_table_raises():
-    with pytest.raises(PytestGivenError, match=r'no .*table'):
+    with then_raises(
+        t'parsing a table-less document for a {pg["FileGlossary"]} raises',
+        PytestGivenError,
+        match=r'no .*table',
+    ):
         parse_glossary_tables(
             '# Just a heading\n\nNo tables here.',
             term_column=0,
@@ -69,15 +118,31 @@ def test_no_table_raises():
         )
 
 
+@scenario(
+    'A missing named column is rejected',
+    tags=['markdown', 'validation'],
+)
 def test_missing_named_column_raises():
-    with pytest.raises(PytestGivenError, match='column'):
+    with then_raises(
+        'selecting a header name that is absent raises',
+        PytestGivenError,
+        match='column',
+    ):
         parse_glossary_tables(
             SIMPLE, term_column='Nope', description_column=1, kind_column=None
         )
 
 
+@scenario(
+    'A column index out of range is rejected',
+    tags=['markdown', 'validation'],
+)
 def test_index_out_of_range_raises():
-    with pytest.raises(PytestGivenError, match='column'):
+    with then_raises(
+        'selecting a column index past the table width raises',
+        PytestGivenError,
+        match='column',
+    ):
         parse_glossary_tables(
             SIMPLE, term_column=0, description_column=5, kind_column=None
         )
@@ -90,77 +155,120 @@ SHORT_ROW_TABLE = """| Term | Meaning | Type |
 """
 
 
+@scenario(
+    'A data row with too few columns is rejected',
+    tags=['markdown', 'validation'],
+)
 def test_data_row_with_fewer_columns_raises():
-    with pytest.raises(PytestGivenError, match=r'(?i)column'):
-        parse_glossary_tables(
-            SHORT_ROW_TABLE,
-            term_column=0,
-            description_column=1,
-            kind_column=2,
-        )
+    with given('a table with a data row narrower than its header'):
+        text = SHORT_ROW_TABLE
+    with then_raises(
+        'parsing raises pointing at the short row',
+        PytestGivenError,
+        match=r'(?i)column',
+    ):
+        parse_glossary_tables(text, term_column=0, description_column=1, kind_column=2)
 
 
+@scenario(
+    'Bold term cells render as clean terms',
+    tags=['markdown', 'happy-path'],
+)
 def test_strips_bold_from_term_cell():
-    text = '| Term | Meaning |\n|---|---|\n| **Scenario** | A decorated test. |\n'
-    rows = parse_glossary_tables(
-        text, term_column=0, description_column=1, kind_column=None
-    )
-    assert rows == [
-        GlossaryRow(term='Scenario', definition='A decorated test.', kind=None, line=3)
-    ]
+    with given(t'a {pg["Term"]} cell written with **bold** emphasis'):
+        text = '| Term | Meaning |\n|---|---|\n| **Scenario** | A decorated test. |\n'
+    with when('the parser reads the term cell'):
+        rows = parse_glossary_tables(
+            text, term_column=0, description_column=1, kind_column=None
+        )
+    with then('the emphasis is unwrapped to the plain canonical'):
+        assert rows == [
+            GlossaryRow(
+                term='Scenario', definition='A decorated test.', kind=None, line=3
+            )
+        ]
 
 
+@scenario(
+    'Italic and inline-code term cells are unwrapped',
+    tags=['markdown', 'happy-path'],
+)
 def test_strips_italic_and_inline_code_from_term_cell():
-    text = '| Term | Meaning |\n|---|---|\n| *Step* | one. |\n| `given` | two. |\n'
-    rows = parse_glossary_tables(
-        text, term_column=0, description_column=1, kind_column=None
-    )
-    assert [row.term for row in rows] == ['Step', 'given']
+    with given(t'{pg["Term"]} cells using *italic* and `code` emphasis'):
+        text = '| Term | Meaning |\n|---|---|\n| *Step* | one. |\n| `given` | two. |\n'
+    with when('the parser reads the term cells'):
+        rows = parse_glossary_tables(
+            text, term_column=0, description_column=1, kind_column=None
+        )
+    with then('each unwraps to its plain text'):
+        assert [row.term for row in rows] == ['Step', 'given']
 
 
+@scenario(
+    'Underscores inside an identifier survive',
+    tags=['markdown', 'happy-path'],
+)
 def test_preserves_underscores_inside_term_identifier():
-    """Single underscores inside an identifier are not emphasis and must survive
-    (e.g. a term literally named work_object)."""
-    text = '| Term | Meaning |\n|---|---|\n| work_object | a thing. |\n'
-    rows = parse_glossary_tables(
-        text, term_column=0, description_column=1, kind_column=None
-    )
-    assert rows[0].term == 'work_object'
+    with given(t'a {pg["Term"]} literally named work_object'):
+        text = '| Term | Meaning |\n|---|---|\n| work_object | a thing. |\n'
+    with when('the parser reads the term cell'):
+        rows = parse_glossary_tables(
+            text, term_column=0, description_column=1, kind_column=None
+        )
+    with then('the single underscores are not treated as emphasis'):
+        assert rows[0].term == 'work_object'
 
 
+@scenario(
+    'Emphasis is stripped from kind cells too',
+    tags=['markdown', 'happy-path'],
+)
 def test_strips_emphasis_from_kind_cell():
-    text = '| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | **Actor** |\n'
-    rows = parse_glossary_tables(
-        text, term_column=0, description_column=1, kind_column=2
-    )
-    assert rows[0].kind == 'Actor'
+    with given('a Kind cell written with bold emphasis'):
+        text = '| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | **Actor** |\n'
+    with when('the parser reads the kind cell'):
+        rows = parse_glossary_tables(
+            text, term_column=0, description_column=1, kind_column=2
+        )
+    with then('the kind is unwrapped to plain text'):
+        assert rows[0].kind == 'Actor'
 
 
+@scenario(
+    'Definition markdown is left intact',
+    tags=['markdown', 'happy-path'],
+)
 def test_leaves_description_markdown_intact():
-    """Emphasis is stripped only from term/kind cells; a definition keeps its
-    inline markup (backticks, bold) for the tooltip."""
-    text = (
-        '| Term | Meaning |\n|---|---|\n'
-        '| Scenario | A test decorated with `@scenario(...)`. |\n'
-    )
-    rows = parse_glossary_tables(
-        text, term_column=0, description_column=1, kind_column=None
-    )
-    assert rows[0].definition == 'A test decorated with `@scenario(...)`.'
+    with given('a definition cell rich with inline code'):
+        text = (
+            '| Term | Meaning |\n|---|---|\n'
+            '| Scenario | A test decorated with `@scenario(...)`. |\n'
+        )
+    with when('the parser reads the row'):
+        rows = parse_glossary_tables(
+            text, term_column=0, description_column=1, kind_column=None
+        )
+    with then('the definition keeps its markup for the tooltip'):
+        assert rows[0].definition == 'A test decorated with `@scenario(...)`.'
 
 
+@scenario(
+    'A pipe line without a separator is not a table',
+    tags=['markdown', 'happy-path'],
+)
 def test_pipe_line_without_separator_is_skipped():
-    """A line with a pipe that is NOT followed by a |---| separator row is
-    skipped. Only the real pipe table (with separator) produces rows."""
-    text = (
-        'This line has a | in it but no separator follows.\n'
-        'Next line is not a separator.\n'
-        '\n'
-        '| Term | Meaning |\n'
-        '|---|---|\n'
-        '| Real | yes |\n'
-    )
-    rows = parse_glossary_tables(
-        text, term_column=0, description_column=1, kind_column=None
-    )
-    assert [row.term for row in rows] == ['Real']
+    with given('prose containing a stray pipe, then a real table'):
+        text = (
+            'This line has a | in it but no separator follows.\n'
+            'Next line is not a separator.\n'
+            '\n'
+            '| Term | Meaning |\n'
+            '|---|---|\n'
+            '| Real | yes |\n'
+        )
+    with when('the parser reads the document'):
+        rows = parse_glossary_tables(
+            text, term_column=0, description_column=1, kind_column=None
+        )
+    with then('only the real pipe table produces rows'):
+        assert [row.term for row in rows] == ['Real']

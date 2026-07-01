@@ -147,6 +147,26 @@ def examples(session: nox.Session) -> None:
 
 
 @nox.session
+def self_report(session: nox.Session) -> None:
+    """Regenerate the self-documentation report from pytest-given's own backend
+    tests. The @scenario-decorated unit tests narrate the plugin's behaviour in
+    the vocabulary of GLOSSARY.md (loaded as a FileGlossary in tests/conftest.py).
+    """
+    _sync(session, 'test', include_project=True)
+    session.run(
+        'pytest',
+        'tests',
+        '--given-json=examples/self-report/self-report-data.json',
+        '--given-html',
+        '--given-html-output=examples/self-report/self-report.html',
+        '--given-source-link=github',
+        '--tb=no',
+        '--no-header',
+        '-q',
+    )
+
+
+@nox.session
 def benchmark(session: nox.Session) -> None:
     """Generate the large-scenarios suite and produce its JSON+HTML report.
 

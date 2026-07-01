@@ -19,6 +19,7 @@ uv sync --group dev
 Run all checks: `uv run nox`. List individual sessions with `uv run nox -l`.
 
 - `uv run nox -s examples` regenerates the JSON and HTML files under `examples/coffeeshop/`, `examples/hotel-booking/`, and `examples/file-glossary-booking/`. Run after changes to the renderer, templates, plugin output schema, or any example test file, and commit the updated outputs.
+- `uv run nox -s self_report` regenerates `examples/self-report/` — pytest-given applied to its own backend tests. Many unit tests are `@scenario`-decorated and narrate the plugin's behaviour in the vocabulary of [GLOSSARY.md](GLOSSARY.md), loaded as a `FileGlossary` in `tests/conftest.py` (via `tests/_vocab.py`, which also defines the `then_raises` / `when_raises` narration helpers). Scenarios are tagged by feature area (`kind-inference`, `file-glossary`, `markdown`, `story-grammar`, `coverage`, `step-text`, `glossary`) plus cross-cutting `happy-path` / `validation` / `inference` for report filtering. Run after decorating more tests, and commit the updated outputs.
 - `uv run nox -s coverage` enforces a 100% coverage target.
 
 ## Architecture

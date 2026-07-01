@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given import PytestGivenError
+from pytest_given import PytestGivenError, given, scenario, then, when
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.glossary import (
     Actor,
@@ -15,8 +15,13 @@ from pytest_given.capture.glossary import (
     id_derive,
 )
 from pytest_given.model import Glossary, GlossaryTerm, SourceLocation, TermId
+from tests._vocab import pg, then_raises
 
 
+@scenario(
+    'Term ids are derived as URL-safe slugs',
+    tags=['glossary', 'happy-path'],
+)
 @pytest.mark.parametrize(
     ('text', 'expected'),
     [
@@ -31,12 +36,23 @@ from pytest_given.model import Glossary, GlossaryTerm, SourceLocation, TermId
     ],
 )
 def test_id_derive_produces_expected_slug(text, expected):
-    assert id_derive(text) == expected
+    with when(t'a {pg["Term"]} name {text!r} is slugified into an id'):
+        derived = id_derive(text)
+    with then(t'the id is the expected slug {expected!r}'):
+        assert derived == expected
 
 
+@scenario(
+    'A name with no id-able characters is rejected',
+    tags=['glossary', 'validation'],
+)
 @pytest.mark.parametrize('text', ['---', '   ', '', '###'])
 def test_id_derive_raises_on_empty_result(text):
-    with pytest.raises(PytestGivenError, match='derived id is empty'):
+    with then_raises(
+        t'slugifying {text!r} into a {pg["Term"]} id raises',
+        PytestGivenError,
+        match='derived id is empty',
+    ):
         id_derive(text)
 
 
@@ -70,14 +86,21 @@ def test_verb_carries_term_and_glossary_back_ref():
     assert v.glossary is g
 
 
+@scenario(
+    'Calling an actor names a distinct instance',
+    tags=['glossary', 'happy-path'],
+)
 def test_actor_call_returns_instance_with_distinct_display():
-    g = Glossary()
-    t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
-    a = Actor(_term=t, _glossary=g)
-    inst = a('Alice')
-    assert isinstance(inst, ActorInstance)
-    assert inst.actor is a
-    assert inst.display == 'Alice'
+    with given(t'an {pg["Actor"]} handle for Guest'):
+        g = Glossary()
+        t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
+        a = Actor(_term=t, _glossary=g)
+    with when(t'the {pg["Actor"]} is called with a name'):
+        inst = a('Alice')
+    with then(t'an {pg["Instance"]} with a distinct display is returned'):
+        assert isinstance(inst, ActorInstance)
+        assert inst.actor is a
+        assert inst.display == 'Alice'
 
 
 def test_work_object_call_returns_instance_with_distinct_display():
@@ -90,27 +113,41 @@ def test_work_object_call_returns_instance_with_distinct_display():
     assert inst.display == 'Deluxe Suite'
 
 
+@scenario(
+    'Calling a verb records an inflection of the same term',
+    tags=['glossary', 'happy-path'],
+)
 def test_verb_call_returns_inflection_sharing_term_identity():
-    g = Glossary()
-    t = GlossaryTerm(id=TermId('confirm'), kind='verb', canonical='confirm')
-    v = Verb(_term=t, _glossary=g)
-    infl = v('confirms')
-    assert isinstance(infl, InflectedVerb)
-    assert infl.verb is v
-    assert infl.display == 'confirms'
+    with given(t'a {pg["Verb"]} handle for confirm'):
+        g = Glossary()
+        t = GlossaryTerm(id=TermId('confirm'), kind='verb', canonical='confirm')
+        v = Verb(_term=t, _glossary=g)
+    with when(t'the {pg["Verb"]} is called with a surface form'):
+        infl = v('confirms')
+    with then(t'an {pg["Inflection"]} sharing the verb identity is returned'):
+        assert isinstance(infl, InflectedVerb)
+        assert infl.verb is v
+        assert infl.display == 'confirms'
 
 
 # --- Task 2.4: Glossary.actor/work_object/verb registration methods ---
 
 
+@scenario(
+    'Registering an actor returns a typed handle',
+    tags=['glossary', 'happy-path'],
+)
 def test_glossary_actor_registers_and_returns_handle():
-    g = Glossary()
-    a = g.actor('Guest', definition='Person booking accommodation.')
-    assert isinstance(a, Actor)
-    assert a.id == 'guest'
-    assert a.canonical == 'Guest'
-    assert a.term.definition == 'Person booking accommodation.'
-    assert g.get(TermId('guest')).kind == 'actor'
+    with given('an empty glossary'):
+        g = Glossary()
+    with when(t'an {pg["Actor"]} is registered with a definition'):
+        a = g.actor('Guest', definition='Person booking accommodation.')
+    with then(t'a typed {pg["Actor"]} handle with the {pg["Actor"]} kind is returned'):
+        assert isinstance(a, Actor)
+        assert a.id == 'guest'
+        assert a.canonical == 'Guest'
+        assert a.term.definition == 'Person booking accommodation.'
+        assert g.get(TermId('guest')).kind == 'actor'
 
 
 def test_glossary_work_object_registers_and_returns_handle():
@@ -134,17 +171,35 @@ def test_glossary_re_registration_with_matching_fields_is_idempotent():
     assert a1.term == a2.term
 
 
+@scenario(
+    'Re-registering a term with a different definition is rejected',
+    tags=['glossary', 'validation'],
+)
 def test_glossary_re_registration_with_mismatched_definition_raises():
-    g = Glossary()
-    g.actor('Guest', definition='one')
-    with pytest.raises(PytestGivenError, match='conflicts with prior registration'):
+    with given(t'an {pg["Actor"]} already registered with one definition'):
+        g = Glossary()
+        g.actor('Guest', definition='one')
+    with then_raises(
+        'registering it again with a different definition raises',
+        PytestGivenError,
+        match='conflicts with prior registration',
+    ):
         g.actor('Guest', definition='two')
 
 
+@scenario(
+    'The same name cannot be two different kinds',
+    tags=['glossary', 'validation'],
+)
 def test_glossary_cross_kind_collision_raises():
-    g = Glossary()
-    g.actor('Foo')
-    with pytest.raises(PytestGivenError, match='conflicts with prior registration'):
+    with given(t'a name already registered as an {pg["Actor"]}'):
+        g = Glossary()
+        g.actor('Foo')
+    with then_raises(
+        t'registering the same name as a {pg["Verb"]} raises',
+        PytestGivenError,
+        match='conflicts with prior registration',
+    ):
         g.verb('foo')
 
 
@@ -242,11 +297,18 @@ def test_real_definition_is_kept():
 # --- Task 3: g(name) declare-or-get and g[name] get-only ---
 
 
+@scenario(
+    'Calling the glossary declares a kindless term',
+    tags=['glossary', 'inference'],
+)
 def test_call_declares_kindless_term():
-    g = Glossary()
-    handle = g('loyalty points')
-    assert handle.term.kind is None
-    assert handle.term.canonical == 'loyalty points'
+    with given('an empty glossary'):
+        g = Glossary()
+    with when(t'a {pg["Term"]} is declared by call, without a kind'):
+        handle = g('loyalty points')
+    with then(t'the {pg["Term"]} is registered as {pg["Kindless"]}'):
+        assert handle.term.kind is None
+        assert handle.term.canonical == 'loyalty points'
 
 
 def test_call_is_idempotent():
@@ -268,14 +330,29 @@ def test_call_returns_deferred_handle():
     assert isinstance(handle, DeferredTermHandle)
 
 
+@scenario(
+    'Subscript looks up an already-declared term',
+    tags=['glossary', 'happy-path'],
+)
 def test_subscript_get_only_returns_handle():
-    g = Glossary()
-    g('redeems')
-    assert g['redeems'].term.canonical == 'redeems'
+    with given(t'a glossary with one declared {pg["Term"]}'):
+        g = Glossary()
+        g('redeems')
+    with then(t'subscripting the name returns that {pg["Term"]}'):
+        assert g['redeems'].term.canonical == 'redeems'
 
 
+@scenario(
+    'Subscripting an unknown name raises with a hint',
+    tags=['glossary', 'validation'],
+)
 def test_subscript_unknown_name_raises_with_hint():
-    g = Glossary()
-    g('redeems')
-    with pytest.raises(PytestGivenError, match='redeems'):
+    with given(t'a glossary with one declared {pg["Term"]}'):
+        g = Glossary()
+        g('redeems')
+    with then_raises(
+        'subscripting a near-miss name raises with a hint',
+        PytestGivenError,
+        match='redeems',
+    ):
         g['redeem']
