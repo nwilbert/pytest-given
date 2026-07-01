@@ -19,6 +19,11 @@ _SEPARATOR_CELL = re.compile(r'^:?-+:?$')
 _FENCE = re.compile(r'^\s*(```|~~~)')
 _SPLIT_ON_UNESCAPED_PIPE = re.compile(r'(?<!\\)\|')
 
+# Unwrap inline emphasis so a term cell written as `**Scenario**` yields the
+# plain canonical `Scenario`. Only paired markers are unwrapped; a lone
+# underscore inside an identifier (e.g. work_object) is left untouched.
+_EMPHASIS = re.compile(r'\*\*(.+?)\*\*|__(.+?)__|\*(.+?)\*|`(.+?)`')
+
 
 @dataclass(frozen=True)
 class GlossaryRow:
@@ -72,10 +77,12 @@ def parse_glossary_tables(
                     f'data row at line {index + 1} has {len(cells)} column(s), '
                     f'but {required_width} column(s) required.'
                 )
-            kind_value = cells[kind_idx].strip() if kind_idx is not None else ''
+            kind_value = (
+                _strip_emphasis(cells[kind_idx].strip()) if kind_idx is not None else ''
+            )
             rows.append(
                 GlossaryRow(
-                    term=cells[term_idx],
+                    term=_strip_emphasis(cells[term_idx]),
                     definition=cells[desc_idx],
                     kind=kind_value or None,
                     line=index + 1,
@@ -88,6 +95,20 @@ def parse_glossary_tables(
             'header row followed by a |---|---| separator row).'
         )
     return rows
+
+
+def _strip_emphasis(cell: str) -> str:
+    """Unwrap inline Markdown emphasis (**bold**, *italic*, `code`, __bold__)
+    from a cell, leaving its text content. Applied to term and kind cells so a
+    glossary written with emphasised term names renders clean pills."""
+    prev = None
+    text = cell
+    while prev != text:
+        prev = text
+        text = _EMPHASIS.sub(
+            lambda m: next(g for g in m.groups() if g is not None), text
+        )
+    return text.strip()
 
 
 def _is_table_row(line: str) -> bool:

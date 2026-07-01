@@ -100,6 +100,55 @@ def test_data_row_with_fewer_columns_raises():
         )
 
 
+def test_strips_bold_from_term_cell():
+    text = '| Term | Meaning |\n|---|---|\n| **Scenario** | A decorated test. |\n'
+    rows = parse_glossary_tables(
+        text, term_column=0, description_column=1, kind_column=None
+    )
+    assert rows == [
+        GlossaryRow(term='Scenario', definition='A decorated test.', kind=None, line=3)
+    ]
+
+
+def test_strips_italic_and_inline_code_from_term_cell():
+    text = '| Term | Meaning |\n|---|---|\n| *Step* | one. |\n| `given` | two. |\n'
+    rows = parse_glossary_tables(
+        text, term_column=0, description_column=1, kind_column=None
+    )
+    assert [row.term for row in rows] == ['Step', 'given']
+
+
+def test_preserves_underscores_inside_term_identifier():
+    """Single underscores inside an identifier are not emphasis and must survive
+    (e.g. a term literally named work_object)."""
+    text = '| Term | Meaning |\n|---|---|\n| work_object | a thing. |\n'
+    rows = parse_glossary_tables(
+        text, term_column=0, description_column=1, kind_column=None
+    )
+    assert rows[0].term == 'work_object'
+
+
+def test_strips_emphasis_from_kind_cell():
+    text = '| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | **Actor** |\n'
+    rows = parse_glossary_tables(
+        text, term_column=0, description_column=1, kind_column=2
+    )
+    assert rows[0].kind == 'Actor'
+
+
+def test_leaves_description_markdown_intact():
+    """Emphasis is stripped only from term/kind cells; a definition keeps its
+    inline markup (backticks, bold) for the tooltip."""
+    text = (
+        '| Term | Meaning |\n|---|---|\n'
+        '| Scenario | A test decorated with `@scenario(...)`. |\n'
+    )
+    rows = parse_glossary_tables(
+        text, term_column=0, description_column=1, kind_column=None
+    )
+    assert rows[0].definition == 'A test decorated with `@scenario(...)`.'
+
+
 def test_pipe_line_without_separator_is_skipped():
     """A line with a pipe that is NOT followed by a |---| separator row is
     skipped. Only the real pipe table (with separator) produces rows."""
