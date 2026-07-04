@@ -405,6 +405,7 @@
       {% set object_count = glossary.terms | selectattr('kind', 'equalto', 'object') | list | length %}
       {% set verb_count = glossary.terms | selectattr('kind', 'equalto', 'verb') | list | length %}
       {% set kindless_count = glossary.terms | selectattr('kind', 'none') | list | length %}
+      {% set undefined_count = glossary.terms | selectattr('definition', 'none') | list | length %}
       {# When no term is categorized, the kind grouping is pure noise: drop the
          filter section and the 'Uncategorized' header, leaving a flat list. #}
       {% set all_uncategorized = kindless_count and not (actor_count or object_count or verb_count) %}
@@ -440,6 +441,9 @@
       </div>
       {% endif %}
 
+      {# When every term is defined, the Definitions filter can only ever be a
+         no-op: drop it, mirroring the kind grouping's all_uncategorized hide. #}
+      {% if undefined_count %}
       <div class="sidebar-section">
         <div class="sidebar-label">Definitions</div>
         <div class="seg-toggle">
@@ -448,6 +452,7 @@
           <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'undefined' }" @click="glossaryDefinitionFilter = 'undefined'">Undefined</div>
         </div>
       </div>
+      {% endif %}
     </div>
 
     <div class="view-main">
