@@ -63,10 +63,19 @@ def test_identity_of_activity_term_ref_actor_instance(g):
     assert identity_of_part(g, p) == Identity(term_id='guest', instance_id='alice')
 
 
+@scenario(
+    'A verb activity ref has one identity regardless of inflection',
+    tags=['happy-path'],
+)
 def test_identity_of_activity_term_ref_verb_ignores_display(g):
-    p1 = ActivityTermRef(term_id=TermId('search'), display='search')
-    p2 = ActivityTermRef(term_id=TermId('search'), display='searches for')
-    assert identity_of_part(g, p1) == identity_of_part(g, p2)
+    with given(t'a {pg["Verb"]} written canonically and as an {pg["Inflection"]}'):
+        p1 = ActivityTermRef(term_id=TermId('search'), display='search')
+        p2 = ActivityTermRef(term_id=TermId('search'), display='searches for')
+    with when(t'{pg["Coverage"]} derives each {pg["Term ref"]} identity'):
+        id1 = identity_of_part(g, p1)
+        id2 = identity_of_part(g, p2)
+    with then('both collapse to the one canonical verb identity'):
+        assert id1 == id2
 
 
 def test_identity_of_word_is_none(g):
@@ -137,20 +146,32 @@ def test_a_refs_for_instance_activity(g):
     }
 
 
+@scenario(
+    'A branching activity unions references across its paths',
+    tags=['happy-path'],
+)
 def test_a_refs_unions_across_multi_path_activity(g):
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            _path(
-                _entity('guest', 'Alice'), _term_part('search'), _entity('room', 'Room')
+    with given(t'an {pg["Activity"]} that branches into two {pg["Path"]} alternatives'):
+        a = Activity(
+            id=ActivityId(1),
+            paths=(
+                _path(
+                    _entity('guest', 'Alice'),
+                    _term_part('search'),
+                    _entity('room', 'Room'),
+                ),
+                _path(
+                    _entity('guest', 'Bob'),
+                    _term_part('search'),
+                    _entity('room', 'Room'),
+                ),
             ),
-            _path(
-                _entity('guest', 'Bob'), _term_part('search'), _entity('room', 'Room')
-            ),
-        ),
-    )
-    assert Identity('guest', 'alice') in a_refs(g, a)
-    assert Identity('guest', 'bob') in a_refs(g, a)
+        )
+    with when(t'{pg["Coverage"]} collects the {pg["Activity"]} references'):
+        refs = a_refs(g, a)
+    with then(t'both {pg["Instance"]} identities across the branches are present'):
+        assert Identity('guest', 'alice') in refs
+        assert Identity('guest', 'bob') in refs
 
 
 # --- Task 8.3: s_for_step and compute_coverage ---
@@ -178,13 +199,15 @@ def test_s_for_step_canonical_entity_ref(g):
 
 @scenario(
     'An instance step ref adds a canonical fallback',
-    tags=['coverage', 'inference'],
+    tags=['happy-path'],
 )
 def test_s_for_step_instance_entity_ref_adds_canonical_fallback(g):
     with given(t'a {pg["Step"]} referring to a named {pg["Instance"]}'):
         step = _step('when', _term_ref('guest', 'Alice'))
-    with then(t'its identity set includes the canonical {pg["Term ref"]} fallback'):
-        assert s_for_step(g, step) == {
+    with when(t'{pg["Coverage"]} computes the identity set for the {pg["Step"]}'):
+        identities = s_for_step(g, step)
+    with then(t'it includes the canonical {pg["Term ref"]} fallback'):
+        assert identities == {
             Identity('guest', 'alice'),
             Identity('guest', None),
         }
@@ -192,24 +215,28 @@ def test_s_for_step_instance_entity_ref_adds_canonical_fallback(g):
 
 @scenario(
     'A verb ref always resolves to its canonical identity',
-    tags=['coverage', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_s_for_step_verb_ref_always_canonical(g):
     with given(t'a {pg["Step"]} using an {pg["Inflection"]} of a {pg["Verb"]}'):
         step = _step('when', _term_ref('search', 'searches for'))
+    with when(t'{pg["Coverage"]} computes its identity set'):
+        identities = s_for_step(g, step)
     with then('the identity ignores the surface form and stays canonical'):
-        assert s_for_step(g, step) == {Identity('search', None)}
+        assert identities == {Identity('search', None)}
 
 
 @scenario(
     'An unknown term ref is skipped',
-    tags=['coverage', 'validation'],
+    tags=['validation'],
 )
 def test_s_for_step_unknown_term_ref_skipped(g):
     with given(t'a {pg["Step"]} referencing a {pg["Term"]} not in the glossary'):
         step = _step('when', _term_ref('unknown', 'something'))
-    with then('it contributes nothing to the identity set'):
-        assert s_for_step(g, step) == set()
+    with when(t'{pg["Coverage"]} computes its identity set'):
+        identities = s_for_step(g, step)
+    with then('the unknown ref contributes nothing to the identity set'):
+        assert identities == set()
 
 
 def _scenario_with_steps(*steps, activity_ids=()):
@@ -225,7 +252,7 @@ def _scenario_with_steps(*steps, activity_ids=()):
 
 @scenario(
     'An instance step covers a canonical activity',
-    tags=['coverage', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_compute_coverage_covers_canonical_activity_via_instance_step(g):
     with given(t'a {pg["Story"]} with a canonical {pg["Activity"]}'):
@@ -250,14 +277,14 @@ def test_compute_coverage_covers_canonical_activity_via_instance_step(g):
             ),
         )
         coverage = compute_coverage(g, scenario, story)
-    with then(t'the {pg["Activity"]} is reported as covered'):
+    with then(t'{pg["Coverage"]} reports the {pg["Activity"]} as covered'):
         assert ActivityId(1) in coverage
         assert len(coverage[ActivityId(1)]) == 1
 
 
 @scenario(
     'A canonical step does not cover an instance activity',
-    tags=['coverage', 'inference'],
+    tags=['happy-path'],
 )
 def test_compute_coverage_does_not_cover_instance_activity_with_canonical_step(g):
     with given(t'an {pg["Activity"]} anchored to a named {pg["Instance"]}'):
@@ -282,13 +309,13 @@ def test_compute_coverage_does_not_cover_instance_activity_with_canonical_step(g
             ),
         )
         coverage = compute_coverage(g, scenario, story)
-    with then('the more specific instance activity stays uncovered'):
+    with then(t'{pg["Coverage"]} leaves the more specific instance activity uncovered'):
         assert coverage.get(ActivityId(1), set()) == set()
 
 
 @scenario(
     'A scenario activity binding constrains coverage',
-    tags=['coverage', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_compute_coverage_scenario_constrained_to_activity_ids(g):
     with given(t'a {pg["Story"]} with two matching activities'):
@@ -324,14 +351,14 @@ def test_compute_coverage_scenario_constrained_to_activity_ids(g):
             activity_ids=[1],
         )
         coverage = compute_coverage(g, scenario, story)
-    with then('only the bound activity is considered for coverage'):
+    with then(t'{pg["Coverage"]} considers only the bound {pg["Activity"]}'):
         assert ActivityId(1) in coverage
         assert ActivityId(2) not in coverage
 
 
 @scenario(
     'An activity with two distinct terms is coverage-eligible',
-    tags=['coverage', 'inference'],
+    tags=['happy-path'],
 )
 def test_is_coverage_eligible_true_for_two_distinct_terms(g):
     with given(t'an {pg["Activity"]} anchored by two distinct {pg["Term"]} refs'):
@@ -345,13 +372,15 @@ def test_is_coverage_eligible_true_for_two_distinct_terms(g):
                 ),
             ),
         )
-    with then('it is eligible for coverage tracking'):
-        assert is_coverage_eligible(a) is True
+    with when(t'its {pg["Coverage"]} eligibility is checked'):
+        eligible = is_coverage_eligible(a)
+    with then(t'it is eligible for {pg["Coverage"]} tracking'):
+        assert eligible is True
 
 
 @scenario(
     'An under-anchored activity is not coverage-eligible',
-    tags=['coverage', 'inference'],
+    tags=['happy-path'],
 )
 def test_is_coverage_eligible_false_for_one_distinct_term(g):
     with given(t'an {pg["Activity"]} that mentions only one distinct {pg["Term"]}'):
@@ -366,8 +395,10 @@ def test_is_coverage_eligible_false_for_one_distinct_term(g):
                 ),
             ),
         )
-    with then('it is not eligible — coverage needs at least two anchors'):
-        assert is_coverage_eligible(a) is False
+    with when(t'its {pg["Coverage"]} eligibility is checked'):
+        eligible = is_coverage_eligible(a)
+    with then(t'it is ineligible — {pg["Coverage"]} needs at least two anchors'):
+        assert eligible is False
 
 
 def test_is_coverage_eligible_false_for_all_bare_activity(g):
@@ -380,7 +411,7 @@ def test_is_coverage_eligible_false_for_all_bare_activity(g):
 
 @scenario(
     'An under-anchored activity is never reported as covered',
-    tags=['coverage', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_compute_coverage_excludes_under_anchored_activity(g):
     """An activity with fewer than two distinct terms is excluded from
@@ -398,13 +429,13 @@ def test_compute_coverage_excludes_under_anchored_activity(g):
             _step('when'),
         )
         coverage = compute_coverage(g, scenario, story)
-    with then('the under-anchored activity is excluded from coverage'):
+    with then(t'{pg["Coverage"]} excludes the under-anchored {pg["Activity"]}'):
         assert ActivityId(1) not in coverage
 
 
 @scenario(
     'Nested steps are walked for coverage',
-    tags=['coverage', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_compute_coverage_nested_steps_are_walked(g):
     """Steps nested as children are also examined for coverage."""
@@ -440,7 +471,7 @@ def test_compute_coverage_nested_steps_are_walked(g):
 
 @scenario(
     'An explicit step binding covers an eligible activity',
-    tags=['coverage', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_compute_coverage_explicit_step_binding_covers_eligible_activity(g):
     """An explicit step activity_ids binding covers an eligible (>=2 distinct
@@ -460,13 +491,13 @@ def test_compute_coverage_explicit_step_binding_covers_eligible_activity(g):
     with when(t'a {pg["Step"]} binds to it explicitly by id'):
         scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
         coverage = compute_coverage(g, scenario, story)
-    with then('the binding covers it directly, without identity matching'):
+    with then(t'{pg["Coverage"]} counts it directly, without identity matching'):
         assert ActivityId(1) in coverage
 
 
 @scenario(
     'An explicit binding still requires eligibility',
-    tags=['coverage', 'validation'],
+    tags=['validation'],
 )
 def test_compute_coverage_explicit_binding_ignored_for_ineligible_activity(g):
     """An explicit binding to an under-anchored (ineligible) activity is
@@ -486,5 +517,5 @@ def test_compute_coverage_explicit_binding_ignored_for_ineligible_activity(g):
     with when(t'a {pg["Step"]} binds to it explicitly by id'):
         scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
         coverage = compute_coverage(g, scenario, story)
-    with then('eligibility gates the binding, so it stays uncovered'):
+    with then(t'eligibility gates the binding, so {pg["Coverage"]} stays empty'):
         assert ActivityId(1) not in coverage

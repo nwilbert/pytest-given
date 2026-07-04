@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given import PytestGivenError, given, scenario, then, when
+from pytest_given import PytestGivenError, given, scenario, then, when, when_then
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.story import (
     activity,
@@ -18,7 +18,7 @@ from pytest_given.model import (
     Glossary,
     StoryId,
 )
-from tests._vocab import pg, then_raises
+from tests._vocab import pg
 
 
 @pytest.fixture(autouse=True)
@@ -52,10 +52,16 @@ def search(g):
     return g.verb('search')
 
 
+@scenario(
+    'An actor handle in a path becomes a term ref',
+    tags=['story-grammar', 'happy-path'],
+)
 def test_path_dispatches_actor_to_activity_term_ref(guest, search, room):
-    p = path(guest, search, room)
-    assert isinstance(p, ActivityPath)
-    assert p.parts[0] == ActivityTermRef(term_id=guest.id, display='Guest')
+    with when(t'a {pg["Path"]} is built from three glossary handles'):
+        p = path(guest, search, room)
+    with then(t'the {pg["Actor"]} slot becomes a {pg["Term ref"]}'):
+        assert isinstance(p, ActivityPath)
+        assert p.parts[0] == ActivityTermRef(term_id=guest.id, display='Guest')
 
 
 def test_path_dispatches_actor_instance_to_activity_term_ref_with_instance_display(
@@ -112,9 +118,7 @@ def test_path_dispatches_inflected_verb_to_activity_term_ref_with_inflected_disp
     tags=['story-grammar', 'happy-path'],
 )
 def test_path_dispatches_bare_string_to_activity_word(guest, search, room):
-    with given(t'a {pg["Path"]} that includes a plain connective string'):
-        pass
-    with when(t'the {pg["Path"]} is built with a bare word between term nodes'):
+    with when(t'a {pg["Path"]} is built with a bare word between term nodes'):
         p = path(guest, search, room, 'for', guest('Alice'))
     with then(
         t'the bare word becomes an {pg["ActivityPart"]} word, not a {pg["Term ref"]}'
@@ -130,10 +134,12 @@ def test_path_dispatches_bare_string_to_activity_word(guest, search, room):
     tags=['story-grammar', 'validation'],
 )
 def test_path_rejects_path_with_fewer_than_three_parts(guest, search):
-    with then_raises(
-        t'a {pg["Path"]} shorter than three parts is rejected',
-        PytestGivenError,
-        match=r'odd|length.*3|alternate',
+    with (
+        when_then(
+            t'a {pg["Path"]} of only two parts is built',
+            'a PytestGivenError rejects it as too short',
+        ),
+        pytest.raises(PytestGivenError, match=r'odd|length.*3|alternate'),
     ):
         path(guest, search)
 
@@ -143,10 +149,12 @@ def test_path_rejects_path_with_fewer_than_three_parts(guest, search):
     tags=['story-grammar', 'validation'],
 )
 def test_path_rejects_work_object_in_position_0(search, room):
-    with then_raises(
-        t'a {pg["Work Object"]} is rejected in the {pg["Actor"]} slot',
-        PytestGivenError,
-        match=r'position 0.*actor',
+    with (
+        when_then(
+            t'a {pg["Path"]} is built with a {pg["Work Object"]} in position 0',
+            t'a PytestGivenError says position 0 is the {pg["Actor"]} slot',
+        ),
+        pytest.raises(PytestGivenError, match=r'position 0.*actor'),
     ):
         path(room, search, room)
 
@@ -156,10 +164,12 @@ def test_path_rejects_work_object_in_position_0(search, room):
     tags=['story-grammar', 'validation'],
 )
 def test_path_rejects_verb_in_position_0(guest, search, room):
-    with then_raises(
-        t'a {pg["Verb"]} may not open a path — position 0 is the {pg["Actor"]} slot',
-        PytestGivenError,
-        match=r'position 0.*actor',
+    with (
+        when_then(
+            t'a {pg["Verb"]} is placed in position 0 of a {pg["Path"]}',
+            t'a PytestGivenError says position 0 is the {pg["Actor"]} slot',
+        ),
+        pytest.raises(PytestGivenError, match=r'position 0.*actor'),
     ):
         path(search, guest, room)
 
@@ -180,10 +190,12 @@ def test_path_allows_bare_string_in_position_0(search, room):
     tags=['story-grammar', 'validation'],
 )
 def test_path_rejects_actor_in_position_1(guest, room):
-    with then_raises(
-        t'an {pg["Actor"]} may not fill position 1 — that is the {pg["Verb"]} slot',
-        PytestGivenError,
-        match=r'position 1.*verb',
+    with (
+        when_then(
+            t'an {pg["Actor"]} is placed in position 1 of a {pg["Path"]}',
+            t'a PytestGivenError says position 1 is the {pg["Verb"]} slot',
+        ),
+        pytest.raises(PytestGivenError, match=r'position 1.*verb'),
     ):
         path(guest, guest, room)
 
@@ -193,10 +205,12 @@ def test_path_rejects_actor_in_position_1(guest, room):
     tags=['story-grammar', 'validation'],
 )
 def test_path_rejects_work_object_in_position_1(guest, room):
-    with then_raises(
-        t'a {pg["Work Object"]} in position 1 is rejected',
-        PytestGivenError,
-        match=r'position 1.*verb',
+    with (
+        when_then(
+            t'a {pg["Work Object"]} is placed in position 1 of a {pg["Path"]}',
+            t'a PytestGivenError says position 1 is the {pg["Verb"]} slot',
+        ),
+        pytest.raises(PytestGivenError, match=r'position 1.*verb'),
     ):
         path(guest, room, room)
 
@@ -206,10 +220,12 @@ def test_path_rejects_work_object_in_position_1(guest, room):
     tags=['story-grammar', 'validation'],
 )
 def test_path_rejects_verb_in_position_2(guest, search):
-    with then_raises(
-        t'a {pg["Verb"]} in the noun slot is rejected',
-        PytestGivenError,
-        match=r'position 2.*noun',
+    with (
+        when_then(
+            t'a {pg["Verb"]} is placed in position 2 of a {pg["Path"]}',
+            'a PytestGivenError says position 2 is the noun slot',
+        ),
+        pytest.raises(PytestGivenError, match=r'position 2.*noun'),
     ):
         path(guest, search, search)
 
@@ -286,10 +302,12 @@ def test_path_rejects_dangling_edge():
         actor = g.actor('Organizer')
         verb = g.verb('adds')
         booking = g.work_object('Booking')
-    with then_raises(
-        'a path ending on an edge (even length) is rejected',
-        PytestGivenError,
-        match=r'odd|dangling|ends',
+    with (
+        when_then(
+            'a path ending on a connective edge is built',
+            'a PytestGivenError rejects the dangling edge',
+        ),
+        pytest.raises(PytestGivenError, match=r'odd|dangling|ends'),
     ):
         path(actor, verb, booking, 'to')
 
@@ -331,10 +349,12 @@ def test_activity_multi_path_accepts_multiple_paths(guest, search, room):
 def test_activity_mixing_parts_and_paths_raises(guest, search, room):
     with given(t'a prebuilt {pg["Path"]}'):
         p = path(guest, search, room)
-    with then_raises(
-        'mixing it with loose handles in one activity raises',
-        PytestGivenError,
-        match='mix',
+    with (
+        when_then(
+            t'it is combined with loose handles in one {pg["Activity"]}',
+            'a PytestGivenError rejects the mix',
+        ),
+        pytest.raises(PytestGivenError, match='mix'),
     ):
         activity(p, guest, search, room)
 
@@ -344,10 +364,12 @@ def test_activity_mixing_parts_and_paths_raises(guest, search, room):
     tags=['story-grammar', 'validation'],
 )
 def test_activity_explicit_id_zero_raises(guest, search, room):
-    with then_raises(
-        t'building an {pg["Activity"]} with explicit id=0 is rejected',
-        PytestGivenError,
-        match=r'id=0.*reserved',
+    with (
+        when_then(
+            t'an {pg["Activity"]} is built with explicit id=0',
+            'a PytestGivenError says id=0 is reserved',
+        ),
+        pytest.raises(PytestGivenError, match=r'id=0.*reserved'),
     ):
         activity(guest, search, room, id=0)
 
@@ -393,18 +415,19 @@ def test_story_auto_numbering_skips_taken_explicit_ids(guest, search, room):
     tags=['story-grammar', 'validation'],
 )
 def test_story_rejects_duplicate_activity_ids(guest, search, room):
-    with then_raises(
-        t'two {pg["Activity"]} rows sharing an explicit id are rejected',
-        PytestGivenError,
-        match='duplicate activity id',
+    with given(t'two {pg["Activity"]} rows sharing an explicit id'):
+        rows = [
+            activity(guest, search, room, id=1),
+            activity(guest('Alice'), search, room, id=1),
+        ]
+    with (
+        when_then(
+            t'they are assembled into a {pg["Story"]}',
+            'a PytestGivenError reports the duplicate activity id',
+        ),
+        pytest.raises(PytestGivenError, match='duplicate activity id'),
     ):
-        story(
-            'Book',
-            [
-                activity(guest, search, room, id=1),
-                activity(guest('Alice'), search, room, id=1),
-            ],
-        )
+        story('Book', rows)
 
 
 @scenario(
@@ -426,10 +449,12 @@ def test_story_rejects_two_glossaries(guest, search, room):
     with given('two activities that reach two different glossaries'):
         other = Glossary()
         other_search = other.verb('search')
-    with then_raises(
-        t'the {pg["Story"]} spanning both glossaries is rejected',
-        PytestGivenError,
-        match='spans multiple glossaries',
+    with (
+        when_then(
+            t'a {pg["Story"]} is built spanning both glossaries',
+            'a PytestGivenError says a story spans multiple glossaries',
+        ),
+        pytest.raises(PytestGivenError, match='spans multiple glossaries'),
     ):
         story(
             'Book',
@@ -469,10 +494,12 @@ def test_story_captures_source_from_call_site(g):
 def test_story_id_collision_raises_with_both_sites():
     with given(t'a {pg["Story"]} already declared under an id'):
         story('Book a Room', [])
-    with then_raises(
-        'declaring a second story with the same slug raises',
-        PytestGivenError,
-        match='already declared',
+    with (
+        when_then(
+            'a second story is declared with the same slug',
+            'a PytestGivenError reports the id was already declared',
+        ),
+        pytest.raises(PytestGivenError, match='already declared'),
     ):
         story('book-a-room', [])
 
@@ -522,16 +549,24 @@ def test_path_accepts_extended_alternation(guest, search, room):
     assert len(p.parts) == 5
 
 
+@scenario(
+    'A path may chain a second verb-object pair',
+    tags=['story-grammar', 'happy-path'],
+)
 def test_path_allows_second_verb_edge():
-    g = Glossary()
-    actor = g.actor('System')
-    confirm = g.verb('confirms')
-    booking = g.work_object('Booking')
-    send = g.verb('sends')
-    note = g.work_object('Confirmation')
-    # actor verb object verb object  (len 5) — all five are term refs, no words
-    result = path(actor, confirm, booking, send, note)
-    assert [type(part) for part in result.parts] == [ActivityTermRef] * 5
+    with given(
+        t'an {pg["Actor"]}, two {pg["Verb"]} and two {pg["Work Object"]} handles'
+    ):
+        g = Glossary()
+        actor = g.actor('System')
+        confirm = g.verb('confirms')
+        booking = g.work_object('Booking')
+        send = g.verb('sends')
+        note = g.work_object('Confirmation')
+    with when(t'they form a five-node {pg["Path"]} (actor verb object verb object)'):
+        result = path(actor, confirm, booking, send, note)
+    with then(t'every slot is a {pg["Term ref"]}, with no bare words'):
+        assert [type(part) for part in result.parts] == [ActivityTermRef] * 5
 
 
 def test_path_allows_bare_string_at_later_even_position(guest, search, room):

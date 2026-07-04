@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given import PytestGivenError, given, scenario, then, when
+from pytest_given import PytestGivenError, given, scenario, then, when, when_then
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.glossary import (
     Actor,
@@ -15,12 +15,12 @@ from pytest_given.capture.glossary import (
     id_derive,
 )
 from pytest_given.model import Glossary, GlossaryTerm, SourceLocation, TermId
-from tests._vocab import pg, then_raises
+from tests._vocab import pg
 
 
 @scenario(
     'Term ids are derived as URL-safe slugs',
-    tags=['glossary', 'happy-path'],
+    tags=['happy-path'],
 )
 @pytest.mark.parametrize(
     ('text', 'expected'),
@@ -44,14 +44,16 @@ def test_id_derive_produces_expected_slug(text, expected):
 
 @scenario(
     'A name with no id-able characters is rejected',
-    tags=['glossary', 'validation'],
+    tags=['validation'],
 )
 @pytest.mark.parametrize('text', ['---', '   ', '', '###'])
 def test_id_derive_raises_on_empty_result(text):
-    with then_raises(
-        t'slugifying {text!r} into a {pg["Term"]} id raises',
-        PytestGivenError,
-        match='derived id is empty',
+    with (
+        when_then(
+            t'{text!r} is slugified into a {pg["Term"]} id',
+            'a PytestGivenError reports the derived id is empty',
+        ),
+        pytest.raises(PytestGivenError, match='derived id is empty'),
     ):
         id_derive(text)
 
@@ -88,7 +90,7 @@ def test_verb_carries_term_and_glossary_back_ref():
 
 @scenario(
     'Calling an actor names a distinct instance',
-    tags=['glossary', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_actor_call_returns_instance_with_distinct_display():
     with given(t'an {pg["Actor"]} handle for Guest'):
@@ -115,7 +117,7 @@ def test_work_object_call_returns_instance_with_distinct_display():
 
 @scenario(
     'Calling a verb records an inflection of the same term',
-    tags=['glossary', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_verb_call_returns_inflection_sharing_term_identity():
     with given(t'a {pg["Verb"]} handle for confirm'):
@@ -135,7 +137,7 @@ def test_verb_call_returns_inflection_sharing_term_identity():
 
 @scenario(
     'Registering an actor returns a typed handle',
-    tags=['glossary', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_glossary_actor_registers_and_returns_handle():
     with given('an empty glossary'):
@@ -164,41 +166,52 @@ def test_glossary_verb_registers_and_returns_handle():
     assert g.get(TermId('confirm')).kind == 'verb'
 
 
+@scenario(
+    'Re-registering a term with matching fields is idempotent',
+    tags=['happy-path'],
+)
 def test_glossary_re_registration_with_matching_fields_is_idempotent():
-    g = Glossary()
-    a1 = g.actor('Guest', definition='d')
-    a2 = g.actor('Guest', definition='d')
-    assert a1.term == a2.term
+    with given(t'an {pg["Actor"]} already registered with a definition'):
+        g = Glossary()
+        a1 = g.actor('Guest', definition='d')
+    with when('the same name and definition are registered again'):
+        a2 = g.actor('Guest', definition='d')
+    with then(t'both handles share the one {pg["Term"]}'):
+        assert a1.term == a2.term
 
 
 @scenario(
     'Re-registering a term with a different definition is rejected',
-    tags=['glossary', 'validation'],
+    tags=['validation'],
 )
 def test_glossary_re_registration_with_mismatched_definition_raises():
     with given(t'an {pg["Actor"]} already registered with one definition'):
         g = Glossary()
         g.actor('Guest', definition='one')
-    with then_raises(
-        'registering it again with a different definition raises',
-        PytestGivenError,
-        match='conflicts with prior registration',
+    with (
+        when_then(
+            'the name is registered again with a different definition',
+            'a PytestGivenError reports the conflict with the prior registration',
+        ),
+        pytest.raises(PytestGivenError, match='conflicts with prior registration'),
     ):
         g.actor('Guest', definition='two')
 
 
 @scenario(
     'The same name cannot be two different kinds',
-    tags=['glossary', 'validation'],
+    tags=['validation'],
 )
 def test_glossary_cross_kind_collision_raises():
     with given(t'a name already registered as an {pg["Actor"]}'):
         g = Glossary()
         g.actor('Foo')
-    with then_raises(
-        t'registering the same name as a {pg["Verb"]} raises',
-        PytestGivenError,
-        match='conflicts with prior registration',
+    with (
+        when_then(
+            t'the same name is registered as a {pg["Verb"]}',
+            'a PytestGivenError reports the conflict with the prior registration',
+        ),
+        pytest.raises(PytestGivenError, match='conflicts with prior registration'),
     ):
         g.verb('foo')
 
@@ -209,14 +222,21 @@ def test_glossary_actor_empty_name_raises():
         g.actor('---')
 
 
+@scenario(
+    'Registering an actor captures its definition site',
+    tags=['happy-path'],
+)
 def test_glossary_actor_captures_source():
     source_mod.set_rootdir(Path(__file__).resolve().parents[3])
     try:
-        g = Glossary()
-        a = g.actor('Guest')
-        assert a.term.source is not None
-        assert a.term.source.relpath.endswith('test_glossary.py')
-        assert a.term.source.line > 0
+        with given('a rootdir-aware glossary'):
+            g = Glossary()
+        with when(t'an {pg["Actor"]} is registered'):
+            a = g.actor('Guest')
+        with then(t'the {pg["Term"]} records a {pg["Source link"]} to this file'):
+            assert a.term.source is not None
+            assert a.term.source.relpath.endswith('test_glossary.py')
+            assert a.term.source.line > 0
     finally:
         source_mod._reset_rootdir()
 
@@ -299,7 +319,7 @@ def test_real_definition_is_kept():
 
 @scenario(
     'Calling the glossary declares a kindless term',
-    tags=['glossary', 'inference'],
+    tags=['kind-inference', 'happy-path'],
 )
 def test_call_declares_kindless_term():
     with given('an empty glossary'):
@@ -332,7 +352,7 @@ def test_call_returns_deferred_handle():
 
 @scenario(
     'Subscript looks up an already-declared term',
-    tags=['glossary', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_subscript_get_only_returns_handle():
     with given(t'a glossary with one declared {pg["Term"]}'):
@@ -344,15 +364,17 @@ def test_subscript_get_only_returns_handle():
 
 @scenario(
     'Subscripting an unknown name raises with a hint',
-    tags=['glossary', 'validation'],
+    tags=['validation'],
 )
 def test_subscript_unknown_name_raises_with_hint():
     with given(t'a glossary with one declared {pg["Term"]}'):
         g = Glossary()
         g('redeems')
-    with then_raises(
-        'subscripting a near-miss name raises with a hint',
-        PytestGivenError,
-        match='redeems',
+    with (
+        when_then(
+            'a near-miss name is subscripted',
+            'a PytestGivenError is raised with a spelling hint',
+        ),
+        pytest.raises(PytestGivenError, match='redeems'),
     ):
         g['redeem']

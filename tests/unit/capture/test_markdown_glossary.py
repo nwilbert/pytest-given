@@ -1,7 +1,9 @@
-from pytest_given import given, scenario, then, when
+import pytest
+
+from pytest_given import given, scenario, then, when, when_then
 from pytest_given.capture.markdown_glossary import GlossaryRow, parse_glossary_tables
 from pytest_given.model import PytestGivenError
-from tests._vocab import pg, then_raises
+from tests._vocab import pg
 
 SIMPLE = """# Glossary
 
@@ -12,16 +14,20 @@ SIMPLE = """# Glossary
 """
 
 
+@pytest.fixture
+@given('a Markdown document with one pipe table')
+def simple_doc():
+    return SIMPLE
+
+
 @scenario(
     'A pipe table parses into term and definition rows',
     tags=['markdown', 'happy-path'],
 )
-def test_parses_default_columns():
-    with given('a Markdown document with one pipe table'):
-        text = SIMPLE
+def test_parses_default_columns(simple_doc):
     with when(t'the parser reads it into rows for a {pg["FileGlossary"]}'):
         rows = parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=None
+            simple_doc, term_column=0, description_column=1, kind_column=None
         )
     with then(t'each row carries a {pg["Term"]}, definition and source line'):
         assert rows == [
@@ -105,16 +111,17 @@ def test_skips_tables_in_fenced_code_blocks():
     tags=['markdown', 'validation'],
 )
 def test_no_table_raises():
-    with then_raises(
-        t'parsing a table-less document for a {pg["FileGlossary"]} raises',
-        PytestGivenError,
-        match=r'no .*table',
+    with given('a document with no pipe table'):
+        text = '# Just a heading\n\nNo tables here.'
+    with (
+        when_then(
+            t'the parser reads it for a {pg["FileGlossary"]}',
+            'no pipe table is reported',
+        ),
+        pytest.raises(PytestGivenError, match=r'no .*table'),
     ):
         parse_glossary_tables(
-            '# Just a heading\n\nNo tables here.',
-            term_column=0,
-            description_column=1,
-            kind_column=None,
+            text, term_column=0, description_column=1, kind_column=None
         )
 
 
@@ -122,14 +129,16 @@ def test_no_table_raises():
     'A missing named column is rejected',
     tags=['markdown', 'validation'],
 )
-def test_missing_named_column_raises():
-    with then_raises(
-        'selecting a header name that is absent raises',
-        PytestGivenError,
-        match='column',
+def test_missing_named_column_raises(simple_doc):
+    with (
+        when_then(
+            'the parser selects a header name that is absent',
+            'a PytestGivenError names the missing column',
+        ),
+        pytest.raises(PytestGivenError, match='column'),
     ):
         parse_glossary_tables(
-            SIMPLE, term_column='Nope', description_column=1, kind_column=None
+            simple_doc, term_column='Nope', description_column=1, kind_column=None
         )
 
 
@@ -137,14 +146,16 @@ def test_missing_named_column_raises():
     'A column index out of range is rejected',
     tags=['markdown', 'validation'],
 )
-def test_index_out_of_range_raises():
-    with then_raises(
-        'selecting a column index past the table width raises',
-        PytestGivenError,
-        match='column',
+def test_index_out_of_range_raises(simple_doc):
+    with (
+        when_then(
+            'the parser selects a column index past the table width',
+            'a PytestGivenError names the out-of-range column',
+        ),
+        pytest.raises(PytestGivenError, match='column'),
     ):
         parse_glossary_tables(
-            SIMPLE, term_column=0, description_column=5, kind_column=None
+            simple_doc, term_column=0, description_column=5, kind_column=None
         )
 
 
@@ -162,10 +173,12 @@ SHORT_ROW_TABLE = """| Term | Meaning | Type |
 def test_data_row_with_fewer_columns_raises():
     with given('a table with a data row narrower than its header'):
         text = SHORT_ROW_TABLE
-    with then_raises(
-        'parsing raises pointing at the short row',
-        PytestGivenError,
-        match=r'(?i)column',
+    with (
+        when_then(
+            'the parser reads the short row',
+            'a PytestGivenError points at the short row',
+        ),
+        pytest.raises(PytestGivenError, match=r'(?i)column'),
     ):
         parse_glossary_tables(text, term_column=0, description_column=1, kind_column=2)
 

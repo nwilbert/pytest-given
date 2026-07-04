@@ -117,6 +117,27 @@ with when('I place a large order'):
         ...
 ```
 
+### `when_then(when_text, then_text)`
+
+When a single call is both the action under test and the thing you assert about — most often an expected raise — pair it with `pytest.raises` and let `when_then` narrate both an action and its outcome from one `with`:
+
+```python
+from pytest_given import when_then
+
+@scenario('Sold out is rejected')
+def test_sold_out(machine):
+    with given('a machine that has sold its last coffee'):
+        machine['coffees'] = 0
+    with (
+        when_then('a customer tries to buy a coffee',
+                  'the machine reports it is sold out'),
+        pytest.raises(ValueError, match='sold out'),
+    ):
+        buy_coffee(machine)
+```
+
+The body runs inside the `when`; the sibling `then` is emitted once the body exits cleanly (e.g. after the inner `pytest.raises` catches the error). If the body raises uncaught, the `when` is recorded, the `then` is skipped, and the exception propagates.
+
 Parameterized tests are automatically grouped into a single scenario with a parameter table. Use **t-strings** (`t'...'`) to interpolate parameter values into step text — the plugin recognizes parameter names in t-string interpolations and color-codes them in the report:
 
 ```python

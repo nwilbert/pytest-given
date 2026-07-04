@@ -11,6 +11,7 @@ from .capture import (
     story,
     then,
     when,
+    when_then,
 )
 from .model import Glossary, PytestGivenError
 
@@ -27,4 +28,5 @@ __all__ = [
     'story',
     'then',
     'when',
+    'when_then',
 ]

@@ -1,5 +1,5 @@
 from .collector import Collector, FixtureInstanceKey, set_active_collector
-from .decorators import attach, given, scenario, then, when
+from .decorators import attach, given, scenario, then, when, when_then
 from .file_glossary import FileGlossary
 from .glossary import DeferredTermHandle, DeferredTermInstance
 from .story import activity, path, story
@@ -24,6 +24,7 @@ __all__ = [
     'story',
     'then',
     'when',
+    'when_then',
 ]
 
 from . import glossary as _glossary_module  # noqa: F401 — registers methods on Glossary

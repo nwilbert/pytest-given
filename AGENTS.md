@@ -19,7 +19,7 @@ uv sync --group dev
 Run all checks: `uv run nox`. List individual sessions with `uv run nox -l`.
 
 - `uv run nox -s examples` regenerates the JSON and HTML files under `examples/coffeeshop/`, `examples/hotel-booking/`, and `examples/file-glossary-booking/`. Run after changes to the renderer, templates, plugin output schema, or any example test file, and commit the updated outputs.
-- `uv run nox -s self_report` regenerates `examples/self-report/` — pytest-given applied to its own backend tests. Many unit tests are `@scenario`-decorated and narrate the plugin's behaviour in the vocabulary of [GLOSSARY.md](GLOSSARY.md), loaded as a `FileGlossary` in `tests/conftest.py` (via `tests/_vocab.py`, which also defines the `then_raises` / `when_raises` narration helpers). Scenarios are tagged by feature area (`kind-inference`, `file-glossary`, `markdown`, `story-grammar`, `coverage`, `step-text`, `glossary`) plus cross-cutting `happy-path` / `validation` / `inference` for report filtering. Run after decorating more tests, and commit the updated outputs.
+- `uv run nox -s self_report` regenerates `examples/self-report/` — pytest-given applied to its own backend tests. Many unit tests are `@scenario`-decorated and narrate the plugin's behaviour in the vocabulary of [GLOSSARY.md](GLOSSARY.md), loaded as a `FileGlossary` in `tests/conftest.py` (via `tests/_vocab.py`). Run after decorating more tests, and commit the updated outputs. See [Writing self-report scenarios](#writing-self-report-scenarios) for the tagging and narration conventions.
 - `uv run nox -s coverage` enforces a 100% coverage target.
 
 ## Architecture
@@ -65,6 +65,21 @@ Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filt
 - Traceback display and header metadata formatting are known limitations, not current priorities.
 - Never save Playwright screenshots into the project directory. Use `/tmp/` or omit the `filename` parameter.
 - If the Playwright MCP browser install hangs after the download reaches 100% (microsoft/playwright#40998 in alpha builds), switch `.mcp.json` from `--browser chromium` to `--browser chrome` to use system Chrome.
+
+## Writing self-report scenarios
+
+When decorating a backend test with `@scenario`, the goal is a report that reads as a truthful behavioural spec. Keep these rules:
+
+- **Narrate in glossary vocabulary.** Reference terms as `pg['Term']` inside t-string step text (e.g. `t'a {pg["FileGlossary"]} loaded from a file'`). Term refs are what power the Glossary tab's per-term filter, and they render as pills.
+- **Every step maps to load-bearing code.** `given` arranges, `when` performs the one call under test, `then` asserts its result. Never write a placeholder step like `with given(...): pass` — a step with no code is a lie in the report. Delete it.
+- **Put the system-under-test call in `when`, not folded into the `then` assertion.** Prefer `with when(...): result = sut(x)` then `with then(...): assert result == …` over `with then(...): assert sut(x) == …`. The report should show the action, not hide it inside a check.
+- **Two phases is fine when honest.** If the assertion inspects a *static property of the arranged state* (not a return value of an action), `given` + `then` is truthful — don't invent a `when`. Likewise a pure "constructing X raises" check needs no `given`.
+- **Surface the arrangement as a `given`, don't hide it in the assertion.** If a scenario feeds the action a module constant or a value it builds on the fly (a document string, a path, a list of rows), bind that input in a `given` step rather than passing the literal straight into the `when`/`then`/`pytest.raises` call. For a constant reused across scenarios, promote it to a `@given(...)` step fixture (a `@pytest.fixture` wrapped with `@given`); for a one-off, construct it in an explicit `with given(...)` block. Inputs that come from `@pytest.mark.parametrize` already show in the parameter table, and inputs that come from fixtures are already arranged — neither needs a hand-written `given`.
+- **Keep pytest-given narration and real assertions separate.** Nest the vanilla `pytest.raises` inside the narration — never fold it into a narration-named helper. The report step and the actual assertion stay visibly distinct constructs. (Tests are exempt from ruff `SIM117` so this nesting is allowed.)
+- **Narrate an expected raise as `when_then` — the action and the raise are two steps.** The raise *is* an outcome, so keep it distinct from the action that triggered it: `with when_then('the action', 'a `PytestGivenError` is raised'), pytest.raises(Exc, match=…): sut(x)` emits a `when` (wrapping the call) and a sibling `then` (the outcome). Write the `then` as a real outcome, not the bare mechanism: name the exception type (`'a `PytestGivenError` is raised'`) and, when the `match=` pins a specific message, reflect that finding in domain terms (`'no pipe table is reported'`, `'the misspelt term is flagged with a hint'`). Avoid a contentless `'it raises'`. The `when` runs the body; the `then` is emitted once the inner `pytest.raises` swallows the error.
+- **Tag orthogonally to the glossary — never duplicate a term.** A tag that restates a glossary term (there is no `coverage` / `file-glossary` / `glossary` tag) is redundant: filter those feature areas via the term instead, and make sure the scenarios reference that term. Tags carry only what the glossary can't: behaviour (`happy-path`, `validation`), mechanism (`parametrization`), and feature areas with no matching term (`markdown`, `step-text`, `story-grammar`, `kind-inference`).
+- **Convert behaviour, not plumbing.** Decorate tests that assert a rule (inference, grammar, dispatch, coverage). Leave trivial getters, constructors, and dataclass round-trips as plain tests — they add report noise, not behaviour.
+- **Keep step text short.** A t-string with two or three pills reaches the 88-column limit fast; move detail into the node structure rather than one long sentence.
 
 ## Conventions
 

@@ -1,33 +1,12 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-01T20:16:54.603681+00:00",
+    "timestamp": "2026-07-04T06:07:30.080500+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "0de3fd66effb1ab1ec4a6cd5df24f9a006971310"
+    "commit_sha": "a27fc0b2c26957dc31b1944131c9ad1aa9d8d247"
   },
   "scenarios": [
-    {
-      "id": "test_multiple_glossaries_in_conftests_raises.py::test_x",
-      "narration": {
-        "text": "x",
-        "parts": []
-      },
-      "module": "test_multiple_glossaries_in_conftests_raises",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "test_multiple_glossaries_in_conftests_raises.py",
-        "line": 3
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
     {
       "id": "tests/unit/capture/test_file_glossary.py::test_lookup_is_case_insensitive",
       "narration": {
@@ -36,7 +15,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "happy-path"
       ],
       "status": "passed",
@@ -69,12 +47,12 @@
           "fixture_name": null
         },
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "a Term resolves regardless of case, to the same id",
+            "text": "the same Term is looked up in three different cases",
             "parts": [
               {
-                "value": "a "
+                "value": "the same "
               },
               {
                 "term_id": "term",
@@ -83,9 +61,22 @@
                 "param_column": null
               },
               {
-                "value": " resolves regardless of case, to the same id"
+                "value": " is looked up in three different cases"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "every lookup resolves to one handle type and the same id",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -113,7 +104,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "happy-path"
       ],
       "status": "passed",
@@ -146,12 +136,12 @@
           "fixture_name": null
         },
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "looking up the same Term twice returns one handle",
+            "text": "the same Term is looked up twice",
             "parts": [
               {
-                "value": "looking up the same "
+                "value": "the same "
               },
               {
                 "term_id": "term",
@@ -160,9 +150,22 @@
                 "param_column": null
               },
               {
-                "value": " twice returns one handle"
+                "value": " is looked up twice"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "both lookups return the one memoized handle",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -177,7 +180,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 49
+        "line": 51
       },
       "story_id": null,
       "activity_ids": []
@@ -190,8 +193,8 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
-        "inference"
+        "kind-inference",
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -263,7 +266,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 60
+        "line": 64
       },
       "story_id": null,
       "activity_ids": []
@@ -276,7 +279,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "validation"
       ],
       "status": "passed",
@@ -309,12 +311,12 @@
           "fixture_name": null
         },
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "looking up a misspelt Term raises with a hint",
+            "text": "a misspelt Term is looked up",
             "parts": [
               {
-                "value": "looking up a misspelt "
+                "value": "a misspelt "
               },
               {
                 "term_id": "term",
@@ -323,9 +325,22 @@
                 "param_column": null
               },
               {
-                "value": " raises with a hint"
+                "value": " is looked up"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError is raised with a spelling hint",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -340,7 +355,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 71
+        "line": 75
       },
       "story_id": null,
       "activity_ids": []
@@ -353,7 +368,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "story-grammar"
       ],
       "status": "passed",
@@ -437,7 +451,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 86
+        "line": 92
       },
       "story_id": null,
       "activity_ids": []
@@ -450,7 +464,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "story-grammar"
       ],
       "status": "passed",
@@ -537,7 +550,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 101
+        "line": 107
       },
       "story_id": null,
       "activity_ids": []
@@ -550,8 +563,7 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
-        "inference"
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -631,7 +643,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 120
+        "line": 126
       },
       "story_id": null,
       "activity_ids": []
@@ -644,8 +656,7 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
-        "inference"
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -708,7 +719,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 139
+        "line": 145
       },
       "story_id": null,
       "activity_ids": []
@@ -721,8 +732,7 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
-        "inference"
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -802,7 +812,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 158
+        "line": 164
       },
       "story_id": null,
       "activity_ids": []
@@ -815,7 +825,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "validation"
       ],
       "status": "passed",
@@ -835,12 +844,12 @@
           "fixture_name": null
         },
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "loading the FileGlossary raises",
+            "text": "the FileGlossary loads the file",
             "parts": [
               {
-                "value": "loading the "
+                "value": "the "
               },
               {
                 "term_id": "fileglossary",
@@ -849,9 +858,22 @@
                 "param_column": null
               },
               {
-                "value": " raises"
+                "value": " loads the file"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError names the unrecognised kind",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -866,7 +888,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 175
+        "line": 181
       },
       "story_id": null,
       "activity_ids": []
@@ -879,19 +901,31 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "validation"
       ],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "then",
+          "phase": "given",
           "narration": {
-            "text": "pointing a FileGlossary at a missing file raises",
+            "text": "a path to a file that does not exist",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a FileGlossary is opened on that path",
             "parts": [
               {
-                "value": "pointing a "
+                "value": "a "
               },
               {
                 "term_id": "fileglossary",
@@ -900,9 +934,22 @@
                 "param_column": null
               },
               {
-                "value": " at a missing file raises"
+                "value": " is opened on that path"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError reports the file is not found",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -917,7 +964,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 192
+        "line": 202
       },
       "story_id": null,
       "activity_ids": []
@@ -930,7 +977,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "validation"
       ],
       "status": "passed",
@@ -963,9 +1009,35 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "the FileGlossary loads the file",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "fileglossary",
+                "display": "FileGlossary",
+                "expression": "pg[\"FileGlossary\"]",
+                "param_column": null
+              },
+              {
+                "value": " loads the file"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "loading raises with file:line context",
+            "text": "a PytestGivenError is raised with file:line context",
             "parts": []
           },
           "status": "passed",
@@ -981,7 +1053,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 215
+        "line": 229
       },
       "story_id": null,
       "activity_ids": []
@@ -994,7 +1066,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "validation"
       ],
       "status": "passed",
@@ -1027,9 +1098,35 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "the FileGlossary loads the file",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "fileglossary",
+                "display": "FileGlossary",
+                "expression": "pg[\"FileGlossary\"]",
+                "param_column": null
+              },
+              {
+                "value": " loads the file"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "loading raises a conflict error",
+            "text": "a PytestGivenError reports the conflicting rows",
             "parts": []
           },
           "status": "passed",
@@ -1045,7 +1142,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 232
+        "line": 250
       },
       "story_id": null,
       "activity_ids": []
@@ -1058,7 +1155,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "happy-path"
       ],
       "status": "passed",
@@ -1145,7 +1241,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 251
+        "line": 273
       },
       "story_id": null,
       "activity_ids": []
@@ -1158,7 +1254,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "happy-path"
       ],
       "status": "passed",
@@ -1242,7 +1337,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 270
+        "line": 292
       },
       "story_id": null,
       "activity_ids": []
@@ -1255,7 +1350,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "happy-path"
       ],
       "status": "passed",
@@ -1345,7 +1439,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 295
+        "line": 317
       },
       "story_id": null,
       "activity_ids": []
@@ -1358,7 +1452,6 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
-        "file-glossary",
         "validation"
       ],
       "status": "passed",
@@ -1391,12 +1484,25 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "an unknown name is called",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "calling an unknown name raises \u2014 it never creates a Term",
+            "text": "a PytestGivenError is raised \u2014 it never creates a Term",
             "parts": [
               {
-                "value": "calling an unknown name raises \u2014 it never creates a "
+                "value": "a PytestGivenError is raised \u2014 it never creates a "
               },
               {
                 "term_id": "term",
@@ -1419,7 +1525,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 309
+        "line": 331
       },
       "story_id": null,
       "activity_ids": []
@@ -1432,7 +1538,6 @@
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
-        "glossary",
         "happy-path"
       ],
       "status": "passed",
@@ -1522,7 +1627,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 89
+        "line": 91
       },
       "story_id": null,
       "activity_ids": []
@@ -1535,7 +1640,6 @@
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
-        "glossary",
         "happy-path"
       ],
       "status": "passed",
@@ -1625,7 +1729,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 116
+        "line": 118
       },
       "story_id": null,
       "activity_ids": []
@@ -1638,7 +1742,6 @@
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
-        "glossary",
         "happy-path"
       ],
       "status": "passed",
@@ -1724,7 +1827,93 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 136
+        "line": 138
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_glossary.py::test_glossary_re_registration_with_matching_fields_is_idempotent",
+      "narration": {
+        "text": "Re-registering a term with matching fields is idempotent",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_glossary",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 11,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Actor already registered with a definition",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "actor",
+                "display": "Actor",
+                "expression": "pg[\"Actor\"]",
+                "param_column": null
+              },
+              {
+                "value": " already registered with a definition"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the same name and definition are registered again",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "both handles share the one Term",
+            "parts": [
+              {
+                "value": "both handles share the one "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_glossary.py",
+        "line": 169
       },
       "story_id": null,
       "activity_ids": []
@@ -1737,7 +1926,6 @@
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
-        "glossary",
         "validation"
       ],
       "status": "passed",
@@ -1770,9 +1958,22 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "the name is registered again with a different definition",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "registering it again with a different definition raises",
+            "text": "a PytestGivenError reports the conflict with the prior registration",
             "parts": []
           },
           "status": "passed",
@@ -1788,7 +1989,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 174
+        "line": 183
       },
       "story_id": null,
       "activity_ids": []
@@ -1801,11 +2002,10 @@
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
-        "glossary",
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -1831,21 +2031,129 @@
           "fixture_name": null
         },
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "registering the same name as a Verb raises",
+            "text": "the same name is registered as a Verb",
             "parts": [
               {
-                "value": "registering the same name as a "
+                "value": "the same name is registered as a "
               },
               {
                 "term_id": "verb",
                 "display": "Verb",
                 "expression": "pg[\"Verb\"]",
                 "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError reports the conflict with the prior registration",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_glossary.py",
+        "line": 201
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_glossary.py::test_glossary_actor_captures_source",
+      "narration": {
+        "text": "Registering an actor captures its definition site",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_glossary",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 11,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a rootdir-aware glossary",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "an Actor is registered",
+            "parts": [
+              {
+                "value": "an "
               },
               {
-                "value": " raises"
+                "term_id": "actor",
+                "display": "Actor",
+                "expression": "pg[\"Actor\"]",
+                "param_column": null
+              },
+              {
+                "value": " is registered"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Term records a Source link to this file",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]",
+                "param_column": null
+              },
+              {
+                "value": " records a "
+              },
+              {
+                "term_id": "source-link",
+                "display": "Source link",
+                "expression": "pg[\"Source link\"]",
+                "param_column": null
+              },
+              {
+                "value": " to this file"
               }
             ]
           },
@@ -1862,7 +2170,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 190
+        "line": 225
       },
       "story_id": null,
       "activity_ids": []
@@ -1875,8 +2183,8 @@
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
-        "glossary",
-        "inference"
+        "kind-inference",
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -1958,7 +2266,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 300
+        "line": 320
       },
       "story_id": null,
       "activity_ids": []
@@ -1971,7 +2279,6 @@
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
-        "glossary",
         "happy-path"
       ],
       "status": "passed",
@@ -2029,7 +2336,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 333
+        "line": 353
       },
       "story_id": null,
       "activity_ids": []
@@ -2042,7 +2349,6 @@
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
-        "glossary",
         "validation"
       ],
       "status": "passed",
@@ -2072,9 +2378,22 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "a near-miss name is subscripted",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "subscripting a near-miss name raises with a hint",
+            "text": "a PytestGivenError is raised with a spelling hint",
             "parts": []
           },
           "status": "passed",
@@ -2090,7 +2409,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 345
+        "line": 365
       },
       "story_id": null,
       "activity_ids": []
@@ -2217,7 +2536,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 44
+        "line": 46
       },
       "story_id": null,
       "activity_ids": []
@@ -2231,7 +2550,7 @@
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
         "kind-inference",
-        "inference"
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -2332,7 +2651,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 63
+        "line": 65
       },
       "story_id": null,
       "activity_ids": []
@@ -2346,7 +2665,7 @@
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
         "kind-inference",
-        "inference"
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -2434,7 +2753,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 83
+        "line": 85
       },
       "story_id": null,
       "activity_ids": []
@@ -2489,9 +2808,22 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "kind resolution runs over both stories",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "kind resolution raises a conflict naming the term",
+            "text": "a PytestGivenError names the conflicting term",
             "parts": []
           },
           "status": "passed",
@@ -2507,7 +2839,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 96
+        "line": 98
       },
       "story_id": null,
       "activity_ids": []
@@ -2594,7 +2926,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 115
+        "line": 119
       },
       "story_id": null,
       "activity_ids": []
@@ -2646,12 +2978,12 @@
           "fixture_name": null
         },
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "placing it in the Actor slot raises",
+            "text": "kind resolution places it in the Actor slot",
             "parts": [
               {
-                "value": "placing it in the "
+                "value": "kind resolution places it in the "
               },
               {
                 "term_id": "actor",
@@ -2660,9 +2992,22 @@
                 "param_column": null
               },
               {
-                "value": " slot raises"
+                "value": " slot"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError names the misplaced term",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -2677,7 +3022,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 136
+        "line": 140
       },
       "story_id": null,
       "activity_ids": []
@@ -2732,9 +3077,22 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "kind resolution runs over both stories",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "kind resolution raises a conflict naming the term",
+            "text": "a PytestGivenError names the conflicting term",
             "parts": []
           },
           "status": "passed",
@@ -2750,7 +3108,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 151
+        "line": 157
       },
       "story_id": null,
       "activity_ids": []
@@ -2802,12 +3160,12 @@
           "fixture_name": null
         },
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "placing it in the Actor slot raises",
+            "text": "kind resolution places it in the Actor slot",
             "parts": [
               {
-                "value": "placing it in the "
+                "value": "kind resolution places it in the "
               },
               {
                 "term_id": "actor",
@@ -2816,9 +3174,22 @@
                 "param_column": null
               },
               {
-                "value": " slot raises"
+                "value": " slot"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError names the misplaced term",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -2833,7 +3204,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 174
+        "line": 182
       },
       "story_id": null,
       "activity_ids": []
@@ -2885,9 +3256,22 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "kind resolution places it at position 1 (the verb slot)",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "placing it at position 1 (verb slot) raises",
+            "text": "a PytestGivenError says an actor cannot fill the verb slot",
             "parts": []
           },
           "status": "passed",
@@ -2903,7 +3287,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 189
+        "line": 199
       },
       "story_id": null,
       "activity_ids": []
@@ -2989,7 +3373,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 206
+        "line": 218
       },
       "story_id": null,
       "activity_ids": []
@@ -3075,7 +3459,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 225
+        "line": 238
       },
       "story_id": null,
       "activity_ids": []
@@ -3127,9 +3511,22 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "kind resolution places it at position \u22652 (a noun slot)",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "placing it at position \u22652 (noun slot) raises",
+            "text": "a PytestGivenError says a verb cannot fill the noun slot",
             "parts": []
           },
           "status": "passed",
@@ -3145,7 +3542,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 248
+        "line": 260
       },
       "story_id": null,
       "activity_ids": []
@@ -3159,15 +3556,15 @@
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
         "kind-inference",
-        "inference"
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "given",
+          "phase": "when",
           "narration": {
-            "text": "the slot-inference rule for an activity path",
+            "text": "the slot rule is applied to successive path positions",
             "parts": []
           },
           "status": "passed",
@@ -3196,7 +3593,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 265
+        "line": 279
       },
       "story_id": null,
       "activity_ids": []
@@ -3226,7 +3623,7 @@
           "attachments": [],
           "error": null,
           "activity_ids": [],
-          "fixture_name": null
+          "fixture_name": "simple_doc"
         },
         {
           "phase": "when",
@@ -3283,7 +3680,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 15
+        "line": 23
       },
       "story_id": null,
       "activity_ids": []
@@ -3360,7 +3757,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 35
+        "line": 41
       },
       "story_id": null,
       "activity_ids": []
@@ -3424,7 +3821,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 53
+        "line": 59
       },
       "story_id": null,
       "activity_ids": []
@@ -3488,7 +3885,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 68
+        "line": 74
       },
       "story_id": null,
       "activity_ids": []
@@ -3552,7 +3949,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 85
+        "line": 91
       },
       "story_id": null,
       "activity_ids": []
@@ -3572,23 +3969,46 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "then",
+          "phase": "given",
           "narration": {
-            "text": "parsing a table-less document for a FileGlossary raises",
+            "text": "a document with no pipe table",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the parser reads it for a FileGlossary",
             "parts": [
               {
-                "value": "parsing a table-less document for a "
+                "value": "the parser reads it for a "
               },
               {
                 "term_id": "fileglossary",
                 "display": "FileGlossary",
                 "expression": "pg[\"FileGlossary\"]",
                 "param_column": null
-              },
-              {
-                "value": " raises"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no pipe table is reported",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -3603,7 +4023,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 103
+        "line": 109
       },
       "story_id": null,
       "activity_ids": []
@@ -3623,9 +4043,35 @@
       "duration_ms": 0,
       "steps": [
         {
+          "phase": "given",
+          "narration": {
+            "text": "a Markdown document with one pipe table",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "simple_doc"
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the parser selects a header name that is absent",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "selecting a header name that is absent raises",
+            "text": "a PytestGivenError names the missing column",
             "parts": []
           },
           "status": "passed",
@@ -3641,7 +4087,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 121
+        "line": 128
       },
       "story_id": null,
       "activity_ids": []
@@ -3661,9 +4107,35 @@
       "duration_ms": 0,
       "steps": [
         {
+          "phase": "given",
+          "narration": {
+            "text": "a Markdown document with one pipe table",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "simple_doc"
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the parser selects a column index past the table width",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "selecting a column index past the table width raises",
+            "text": "a PytestGivenError names the out-of-range column",
             "parts": []
           },
           "status": "passed",
@@ -3679,7 +4151,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 136
+        "line": 145
       },
       "story_id": null,
       "activity_ids": []
@@ -3712,9 +4184,22 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "the parser reads the short row",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "parsing raises pointing at the short row",
+            "text": "a PytestGivenError points at the short row",
             "parts": []
           },
           "status": "passed",
@@ -3730,7 +4215,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 158
+        "line": 169
       },
       "story_id": null,
       "activity_ids": []
@@ -3807,7 +4292,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 173
+        "line": 186
       },
       "story_id": null,
       "activity_ids": []
@@ -3881,7 +4366,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 192
+        "line": 205
       },
       "story_id": null,
       "activity_ids": []
@@ -3958,7 +4443,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 207
+        "line": 220
       },
       "story_id": null,
       "activity_ids": []
@@ -4022,7 +4507,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 222
+        "line": 235
       },
       "story_id": null,
       "activity_ids": []
@@ -4086,7 +4571,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 237
+        "line": 250
       },
       "story_id": null,
       "activity_ids": []
@@ -4150,7 +4635,90 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 255
+        "line": 268
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_story.py::test_path_dispatches_actor_to_activity_term_ref",
+      "narration": {
+        "text": "An actor handle in a path becomes a term ref",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_story",
+      "tags": [
+        "story-grammar",
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a Path is built from three glossary handles",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "path",
+                "display": "Path",
+                "expression": "pg[\"Path\"]",
+                "param_column": null
+              },
+              {
+                "value": " is built from three glossary handles"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Actor slot becomes a Term ref",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "actor",
+                "display": "Actor",
+                "expression": "pg[\"Actor\"]",
+                "param_column": null
+              },
+              {
+                "value": " slot becomes a "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "Term ref",
+                "expression": "pg[\"Term ref\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_story.py",
+        "line": 55
       },
       "story_id": null,
       "activity_ids": []
@@ -4262,7 +4830,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 93
+        "line": 99
       },
       "story_id": null,
       "activity_ids": []
@@ -4282,38 +4850,12 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "given",
+          "phase": "when",
           "narration": {
-            "text": "a Path that includes a plain connective string",
+            "text": "a Path is built with a bare word between term nodes",
             "parts": [
               {
                 "value": "a "
-              },
-              {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]",
-                "param_column": null
-              },
-              {
-                "value": " that includes a plain connective string"
-              }
-            ]
-          },
-          "status": "passed",
-          "children": [],
-          "attachments": [],
-          "error": null,
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the Path is built with a bare word between term nodes",
-            "parts": [
-              {
-                "value": "the "
               },
               {
                 "term_id": "path",
@@ -4371,7 +4913,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 110
+        "line": 116
       },
       "story_id": null,
       "activity_ids": []
@@ -4391,9 +4933,9 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "a Path shorter than three parts is rejected",
+            "text": "a Path of only two parts is built",
             "parts": [
               {
                 "value": "a "
@@ -4405,9 +4947,22 @@
                 "param_column": null
               },
               {
-                "value": " shorter than three parts is rejected"
+                "value": " of only two parts is built"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError rejects it as too short",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -4422,7 +4977,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 128
+        "line": 132
       },
       "story_id": null,
       "activity_ids": []
@@ -4442,12 +4997,21 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "a Work Object is rejected in the Actor slot",
+            "text": "a Path is built with a Work Object in position 0",
             "parts": [
               {
                 "value": "a "
+              },
+              {
+                "term_id": "path",
+                "display": "Path",
+                "expression": "pg[\"Path\"]",
+                "param_column": null
+              },
+              {
+                "value": " is built with a "
               },
               {
                 "term_id": "work-object",
@@ -4456,7 +5020,24 @@
                 "param_column": null
               },
               {
-                "value": " is rejected in the "
+                "value": " in position 0"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError says position 0 is the Actor slot",
+            "parts": [
+              {
+                "value": "a PytestGivenError says position 0 is the "
               },
               {
                 "term_id": "actor",
@@ -4482,7 +5063,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 141
+        "line": 147
       },
       "story_id": null,
       "activity_ids": []
@@ -4502,9 +5083,9 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "a Verb may not open a path \u2014 position 0 is the Actor slot",
+            "text": "a Verb is placed in position 0 of a Path",
             "parts": [
               {
                 "value": "a "
@@ -4516,7 +5097,30 @@
                 "param_column": null
               },
               {
-                "value": " may not open a path \u2014 position 0 is the "
+                "value": " is placed in position 0 of a "
+              },
+              {
+                "term_id": "path",
+                "display": "Path",
+                "expression": "pg[\"Path\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError says position 0 is the Actor slot",
+            "parts": [
+              {
+                "value": "a PytestGivenError says position 0 is the "
               },
               {
                 "term_id": "actor",
@@ -4542,7 +5146,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 154
+        "line": 162
       },
       "story_id": null,
       "activity_ids": []
@@ -4616,7 +5220,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 167
+        "line": 177
       },
       "story_id": null,
       "activity_ids": []
@@ -4636,9 +5240,9 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "an Actor may not fill position 1 \u2014 that is the Verb slot",
+            "text": "an Actor is placed in position 1 of a Path",
             "parts": [
               {
                 "value": "an "
@@ -4650,7 +5254,30 @@
                 "param_column": null
               },
               {
-                "value": " may not fill position 1 \u2014 that is the "
+                "value": " is placed in position 1 of a "
+              },
+              {
+                "term_id": "path",
+                "display": "Path",
+                "expression": "pg[\"Path\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError says position 1 is the Verb slot",
+            "parts": [
+              {
+                "value": "a PytestGivenError says position 1 is the "
               },
               {
                 "term_id": "verb",
@@ -4676,7 +5303,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 178
+        "line": 188
       },
       "story_id": null,
       "activity_ids": []
@@ -4696,9 +5323,9 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "a Work Object in position 1 is rejected",
+            "text": "a Work Object is placed in position 1 of a Path",
             "parts": [
               {
                 "value": "a "
@@ -4710,7 +5337,39 @@
                 "param_column": null
               },
               {
-                "value": " in position 1 is rejected"
+                "value": " is placed in position 1 of a "
+              },
+              {
+                "term_id": "path",
+                "display": "Path",
+                "expression": "pg[\"Path\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError says position 1 is the Verb slot",
+            "parts": [
+              {
+                "value": "a PytestGivenError says position 1 is the "
+              },
+              {
+                "term_id": "verb",
+                "display": "Verb",
+                "expression": "pg[\"Verb\"]",
+                "param_column": null
+              },
+              {
+                "value": " slot"
               }
             ]
           },
@@ -4727,7 +5386,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 191
+        "line": 203
       },
       "story_id": null,
       "activity_ids": []
@@ -4747,9 +5406,9 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "a Verb in the noun slot is rejected",
+            "text": "a Verb is placed in position 2 of a Path",
             "parts": [
               {
                 "value": "a "
@@ -4761,9 +5420,28 @@
                 "param_column": null
               },
               {
-                "value": " in the noun slot is rejected"
+                "value": " is placed in position 2 of a "
+              },
+              {
+                "term_id": "path",
+                "display": "Path",
+                "expression": "pg[\"Path\"]",
+                "param_column": null
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError says position 2 is the noun slot",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -4778,7 +5456,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 204
+        "line": 218
       },
       "story_id": null,
       "activity_ids": []
@@ -4848,7 +5526,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 217
+        "line": 233
       },
       "story_id": null,
       "activity_ids": []
@@ -4925,7 +5603,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 233
+        "line": 249
       },
       "story_id": null,
       "activity_ids": []
@@ -5033,7 +5711,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 251
+        "line": 267
       },
       "story_id": null,
       "activity_ids": []
@@ -5097,9 +5775,22 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "a path ending on a connective edge is built",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "a path ending on an edge (even length) is rejected",
+            "text": "a PytestGivenError rejects the dangling edge",
             "parts": []
           },
           "status": "passed",
@@ -5115,7 +5806,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 277
+        "line": 293
       },
       "story_id": null,
       "activity_ids": []
@@ -5189,7 +5880,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 300
+        "line": 318
       },
       "story_id": null,
       "activity_ids": []
@@ -5276,7 +5967,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 313
+        "line": 331
       },
       "story_id": null,
       "activity_ids": []
@@ -5319,9 +6010,32 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "it is combined with loose handles in one Activity",
+            "parts": [
+              {
+                "value": "it is combined with loose handles in one "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "mixing it with loose handles in one activity raises",
+            "text": "a PytestGivenError rejects the mix",
             "parts": []
           },
           "status": "passed",
@@ -5337,7 +6051,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 327
+        "line": 345
       },
       "story_id": null,
       "activity_ids": []
@@ -5357,12 +6071,12 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "building an Activity with explicit id=0 is rejected",
+            "text": "an Activity is built with explicit id=0",
             "parts": [
               {
-                "value": "building an "
+                "value": "an "
               },
               {
                 "term_id": "activity",
@@ -5371,9 +6085,22 @@
                 "param_column": null
               },
               {
-                "value": " with explicit id=0 is rejected"
+                "value": " is built with explicit id=0"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError says id=0 is reserved",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -5388,7 +6115,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 342
+        "line": 362
       },
       "story_id": null,
       "activity_ids": []
@@ -5461,7 +6188,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 358
+        "line": 380
       },
       "story_id": null,
       "activity_ids": []
@@ -5548,7 +6275,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 373
+        "line": 395
       },
       "story_id": null,
       "activity_ids": []
@@ -5568,9 +6295,9 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "then",
+          "phase": "given",
           "narration": {
-            "text": "two Activity rows sharing an explicit id are rejected",
+            "text": "two Activity rows sharing an explicit id",
             "parts": [
               {
                 "value": "two "
@@ -5582,9 +6309,45 @@
                 "param_column": null
               },
               {
-                "value": " rows sharing an explicit id are rejected"
+                "value": " rows sharing an explicit id"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "they are assembled into a Story",
+            "parts": [
+              {
+                "value": "they are assembled into a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError reports the duplicate activity id",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -5599,7 +6362,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 391
+        "line": 413
       },
       "story_id": null,
       "activity_ids": []
@@ -5663,7 +6426,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 410
+        "line": 433
       },
       "story_id": null,
       "activity_ids": []
@@ -5696,12 +6459,12 @@
           "fixture_name": null
         },
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "the Story spanning both glossaries is rejected",
+            "text": "a Story is built spanning both glossaries",
             "parts": [
               {
-                "value": "the "
+                "value": "a "
               },
               {
                 "term_id": "story",
@@ -5710,9 +6473,22 @@
                 "param_column": null
               },
               {
-                "value": " spanning both glossaries is rejected"
+                "value": " is built spanning both glossaries"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError says a story spans multiple glossaries",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -5727,7 +6503,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 421
+        "line": 444
       },
       "story_id": null,
       "activity_ids": []
@@ -5773,9 +6549,22 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "a second story is declared with the same slug",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "declaring a second story with the same slug raises",
+            "text": "a PytestGivenError reports the id was already declared",
             "parts": []
           },
           "status": "passed",
@@ -5791,7 +6580,128 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 465
+        "line": 490
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_story.py::test_path_allows_second_verb_edge",
+      "narration": {
+        "text": "A path may chain a second verb-object pair",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_story",
+      "tags": [
+        "story-grammar",
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Actor, two Verb and two Work Object handles",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "actor",
+                "display": "Actor",
+                "expression": "pg[\"Actor\"]",
+                "param_column": null
+              },
+              {
+                "value": ", two "
+              },
+              {
+                "term_id": "verb",
+                "display": "Verb",
+                "expression": "pg[\"Verb\"]",
+                "param_column": null
+              },
+              {
+                "value": " and two "
+              },
+              {
+                "term_id": "work-object",
+                "display": "Work Object",
+                "expression": "pg[\"Work Object\"]",
+                "param_column": null
+              },
+              {
+                "value": " handles"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "they form a five-node Path (actor verb object verb object)",
+            "parts": [
+              {
+                "value": "they form a five-node "
+              },
+              {
+                "term_id": "path",
+                "display": "Path",
+                "expression": "pg[\"Path\"]",
+                "param_column": null
+              },
+              {
+                "value": " (actor verb object verb object)"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "every slot is a Term ref, with no bare words",
+            "parts": [
+              {
+                "value": "every slot is a "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "Term ref",
+                "expression": "pg[\"Term ref\"]",
+                "param_column": null
+              },
+              {
+                "value": ", with no bare words"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_story.py",
+        "line": 552
       },
       "story_id": null,
       "activity_ids": []
@@ -5828,6 +6738,19 @@
                 "value": " template with one placeholder"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the template is parsed",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -5923,12 +6846,12 @@
           "fixture_name": null
         },
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "substituting a Parameter table value fills the placeholder",
+            "text": "a Parameter table value is substituted in",
             "parts": [
               {
-                "value": "substituting a "
+                "value": "a "
               },
               {
                 "term_id": "parameter-table",
@@ -5937,9 +6860,22 @@
                 "param_column": null
               },
               {
-                "value": " value fills the placeholder"
+                "value": " value is substituted in"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the placeholder is filled with that value",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -5954,7 +6890,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 56
+        "line": 58
       },
       "story_id": null,
       "activity_ids": []
@@ -6031,7 +6967,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 120
+        "line": 124
       },
       "story_id": null,
       "activity_ids": []
@@ -6108,7 +7044,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 184
+        "line": 188
       },
       "story_id": null,
       "activity_ids": []
@@ -6121,8 +7057,7 @@
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
-        "step-text",
-        "glossary"
+        "step-text"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -6204,7 +7139,197 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 224
+        "line": 228
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_template.py::test_tstring_with_work_object_emits_term_ref",
+      "narration": {
+        "text": "A work object handle in a t-string emits a term ref",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_template",
+      "tags": [
+        "step-text"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Work Object handle from the glossary",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "work-object",
+                "display": "Work Object",
+                "expression": "pg[\"Work Object\"]",
+                "param_column": null
+              },
+              {
+                "value": " handle from the glossary"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "it is interpolated into a t-string step",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the step carries a Term ref for that Work Object",
+            "parts": [
+              {
+                "value": "the step carries a "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "Term ref",
+                "expression": "pg[\"Term ref\"]",
+                "param_column": null
+              },
+              {
+                "value": " for that "
+              },
+              {
+                "term_id": "work-object",
+                "display": "Work Object",
+                "expression": "pg[\"Work Object\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_template.py",
+        "line": 258
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_template.py::test_tstring_with_verb_emits_term_ref_with_canonical_display",
+      "narration": {
+        "text": "A bare verb handle keeps its canonical display",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_template",
+      "tags": [
+        "step-text"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Verb handle used without an Inflection",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "verb",
+                "display": "Verb",
+                "expression": "pg[\"Verb\"]",
+                "param_column": null
+              },
+              {
+                "value": " handle used without an "
+              },
+              {
+                "term_id": "inflection",
+                "display": "Inflection",
+                "expression": "pg[\"Inflection\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "it is interpolated into a t-string step",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Term ref shows the canonical verb",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "Term ref",
+                "expression": "pg[\"Term ref\"]",
+                "param_column": null
+              },
+              {
+                "value": " shows the canonical verb"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_template.py",
+        "line": 280
       },
       "story_id": null,
       "activity_ids": []
@@ -6217,8 +7342,7 @@
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
-        "step-text",
-        "glossary"
+        "step-text"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -6300,7 +7424,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 278
+        "line": 296
       },
       "story_id": null,
       "activity_ids": []
@@ -6346,12 +7470,25 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "the t-string is parsed",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "parsing the t-string raises \u2014 a Term ref takes no format spec",
+            "text": "a PytestGivenError says a Term ref takes no format spec",
             "parts": [
               {
-                "value": "parsing the t-string raises \u2014 a "
+                "value": "a PytestGivenError says a "
               },
               {
                 "term_id": "term-ref",
@@ -6377,7 +7514,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 319
+        "line": 337
       },
       "story_id": null,
       "activity_ids": []
@@ -6390,8 +7527,7 @@
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
-        "step-text",
-        "file-glossary"
+        "step-text"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -6473,7 +7609,225 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 369
+        "line": 389
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_coverage.py::test_identity_of_activity_term_ref_verb_ignores_display",
+      "narration": {
+        "text": "A verb activity ref has one identity regardless of inflection",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_coverage",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Verb written canonically and as an Inflection",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "verb",
+                "display": "Verb",
+                "expression": "pg[\"Verb\"]",
+                "param_column": null
+              },
+              {
+                "value": " written canonically and as an "
+              },
+              {
+                "term_id": "inflection",
+                "display": "Inflection",
+                "expression": "pg[\"Inflection\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage derives each Term ref identity",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " derives each "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "Term ref",
+                "expression": "pg[\"Term ref\"]",
+                "param_column": null
+              },
+              {
+                "value": " identity"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "both collapse to the one canonical verb identity",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_coverage.py",
+        "line": 66
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_coverage.py::test_a_refs_unions_across_multi_path_activity",
+      "narration": {
+        "text": "A branching activity unions references across its paths",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_coverage",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Activity that branches into two Path alternatives",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]",
+                "param_column": null
+              },
+              {
+                "value": " that branches into two "
+              },
+              {
+                "term_id": "path",
+                "display": "Path",
+                "expression": "pg[\"Path\"]",
+                "param_column": null
+              },
+              {
+                "value": " alternatives"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage collects the Activity references",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " collects the "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]",
+                "param_column": null
+              },
+              {
+                "value": " references"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "both Instance identities across the branches are present",
+            "parts": [
+              {
+                "value": "both "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]",
+                "param_column": null
+              },
+              {
+                "value": " identities across the branches are present"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_coverage.py",
+        "line": 149
       },
       "story_id": null,
       "activity_ids": []
@@ -6486,8 +7840,7 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
-        "inference"
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -6525,12 +7878,41 @@
           "fixture_name": null
         },
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "its identity set includes the canonical Term ref fallback",
+            "text": "Coverage computes the identity set for the Step",
             "parts": [
               {
-                "value": "its identity set includes the canonical "
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " computes the identity set for the "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it includes the canonical Term ref fallback",
+            "parts": [
+              {
+                "value": "it includes the canonical "
               },
               {
                 "term_id": "term-ref",
@@ -6556,7 +7938,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 179
+        "line": 200
       },
       "story_id": null,
       "activity_ids": []
@@ -6569,7 +7951,6 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
         "happy-path"
       ],
       "status": "passed",
@@ -6617,6 +7998,29 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage computes its identity set",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " computes its identity set"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
             "text": "the identity ignores the surface form and stays canonical",
@@ -6635,7 +8039,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 193
+        "line": 216
       },
       "story_id": null,
       "activity_ids": []
@@ -6648,7 +8052,6 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
         "validation"
       ],
       "status": "passed",
@@ -6690,9 +8093,32 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage computes its identity set",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " computes its identity set"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "it contributes nothing to the identity set",
+            "text": "the unknown ref contributes nothing to the identity set",
             "parts": []
           },
           "status": "passed",
@@ -6708,7 +8134,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 204
+        "line": 229
       },
       "story_id": null,
       "activity_ids": []
@@ -6721,7 +8147,6 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
         "happy-path"
       ],
       "status": "passed",
@@ -6794,10 +8219,16 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the Activity is reported as covered",
+            "text": "Coverage reports the Activity as covered",
             "parts": [
               {
-                "value": "the "
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " reports the "
               },
               {
                 "term_id": "activity",
@@ -6806,7 +8237,7 @@
                 "param_column": null
               },
               {
-                "value": " is reported as covered"
+                "value": " as covered"
               }
             ]
           },
@@ -6823,7 +8254,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 226
+        "line": 253
       },
       "story_id": null,
       "activity_ids": []
@@ -6836,8 +8267,7 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
-        "inference"
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -6909,8 +8339,18 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the more specific instance activity stays uncovered",
-            "parts": []
+            "text": "Coverage leaves the more specific instance activity uncovered",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " leaves the more specific instance activity uncovered"
+              }
+            ]
           },
           "status": "passed",
           "children": [],
@@ -6925,7 +8365,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 258
+        "line": 285
       },
       "story_id": null,
       "activity_ids": []
@@ -6938,7 +8378,6 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
         "happy-path"
       ],
       "status": "passed",
@@ -6999,8 +8438,24 @@
         {
           "phase": "then",
           "narration": {
-            "text": "only the bound activity is considered for coverage",
-            "parts": []
+            "text": "Coverage considers only the bound Activity",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " considers only the bound "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]",
+                "param_column": null
+              }
+            ]
           },
           "status": "passed",
           "children": [],
@@ -7015,7 +8470,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 289
+        "line": 316
       },
       "story_id": null,
       "activity_ids": []
@@ -7028,8 +8483,7 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
-        "inference"
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -7070,10 +8524,49 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "its Coverage eligibility is checked",
+            "parts": [
+              {
+                "value": "its "
+              },
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " eligibility is checked"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "it is eligible for coverage tracking",
-            "parts": []
+            "text": "it is eligible for Coverage tracking",
+            "parts": [
+              {
+                "value": "it is eligible for "
+              },
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " tracking"
+              }
+            ]
           },
           "status": "passed",
           "children": [],
@@ -7088,7 +8581,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 332
+        "line": 359
       },
       "story_id": null,
       "activity_ids": []
@@ -7101,8 +8594,7 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
-        "inference"
+        "happy-path"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -7140,10 +8632,49 @@
           "fixture_name": null
         },
         {
+          "phase": "when",
+          "narration": {
+            "text": "its Coverage eligibility is checked",
+            "parts": [
+              {
+                "value": "its "
+              },
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " eligibility is checked"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "then",
           "narration": {
-            "text": "it is not eligible \u2014 coverage needs at least two anchors",
-            "parts": []
+            "text": "it is ineligible \u2014 Coverage needs at least two anchors",
+            "parts": [
+              {
+                "value": "it is ineligible \u2014 "
+              },
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " needs at least two anchors"
+              }
+            ]
           },
           "status": "passed",
           "children": [],
@@ -7158,7 +8689,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 352
+        "line": 381
       },
       "story_id": null,
       "activity_ids": []
@@ -7171,7 +8702,6 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
         "happy-path"
       ],
       "status": "passed",
@@ -7228,8 +8758,24 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the under-anchored activity is excluded from coverage",
-            "parts": []
+            "text": "Coverage excludes the under-anchored Activity",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " excludes the under-anchored "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]",
+                "param_column": null
+              }
+            ]
           },
           "status": "passed",
           "children": [],
@@ -7244,7 +8790,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 381
+        "line": 412
       },
       "story_id": null,
       "activity_ids": []
@@ -7257,7 +8803,6 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
         "happy-path"
       ],
       "status": "passed",
@@ -7368,7 +8913,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 405
+        "line": 436
       },
       "story_id": null,
       "activity_ids": []
@@ -7381,7 +8926,6 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
         "happy-path"
       ],
       "status": "passed",
@@ -7448,8 +8992,18 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the binding covers it directly, without identity matching",
-            "parts": []
+            "text": "Coverage counts it directly, without identity matching",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " counts it directly, without identity matching"
+              }
+            ]
           },
           "status": "passed",
           "children": [],
@@ -7464,7 +9018,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 441
+        "line": 472
       },
       "story_id": null,
       "activity_ids": []
@@ -7477,7 +9031,6 @@
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
-        "coverage",
         "validation"
       ],
       "status": "passed",
@@ -7547,8 +9100,21 @@
         {
           "phase": "then",
           "narration": {
-            "text": "eligibility gates the binding, so it stays uncovered",
-            "parts": []
+            "text": "eligibility gates the binding, so Coverage stays empty",
+            "parts": [
+              {
+                "value": "eligibility gates the binding, so "
+              },
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " stays empty"
+              }
+            ]
           },
           "status": "passed",
           "children": [],
@@ -7563,7 +9129,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 467
+        "line": 498
       },
       "story_id": null,
       "activity_ids": []
@@ -7576,7 +9142,6 @@
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
-        "glossary",
         "happy-path"
       ],
       "status": "passed",
@@ -7728,27 +9293,23 @@
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
-        "glossary",
         "validation"
       ],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "slugifying '---' into a Term id raises",
+            "text": "'---' is slugified into a Term id",
             "parts": [
-              {
-                "value": "slugifying "
-              },
               {
                 "name": "text",
                 "format_spec": "",
                 "conversion": "r"
               },
               {
-                "value": " into a "
+                "value": " is slugified into a "
               },
               {
                 "term_id": "term",
@@ -7757,9 +9318,22 @@
                 "param_column": null
               },
               {
-                "value": " id raises"
+                "value": " id"
               }
             ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError reports the derived id is empty",
+            "parts": []
           },
           "status": "passed",
           "children": [],
@@ -7828,9 +9402,9 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "given",
+          "phase": "when",
           "narration": {
-            "text": "a Templatize template placeholder 'count={obj.attr}'",
+            "text": "a Templatize template is built from placeholder 'count={obj.attr}'",
             "parts": [
               {
                 "value": "a "
@@ -7842,7 +9416,7 @@
                 "param_column": null
               },
               {
-                "value": " template placeholder "
+                "value": " template is built from placeholder "
               },
               {
                 "name": "text",
@@ -7861,7 +9435,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "constructing it raises \u2014 only bare identifiers are allowed",
+            "text": "a PytestGivenError says bare identifiers only",
             "parts": []
           },
           "status": "passed",
@@ -7904,7 +9478,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 93
+        "line": 97
       },
       "story_id": null,
       "activity_ids": []

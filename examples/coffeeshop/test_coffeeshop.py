@@ -1,6 +1,6 @@
 import pytest
 
-from pytest_given import Template, attach, given, scenario, then, when
+from pytest_given import Template, attach, given, scenario, then, when, when_then
 
 
 @pytest.fixture
@@ -135,6 +135,29 @@ def test_complex_order(machine):
     with then('the machine state is consistent'):
         assert machine['price'] == 2
         attach('Final machine state', machine)
+
+
+def buy_coffee(machine):
+    if machine['coffees'] <= 0:
+        raise ValueError('the machine is sold out')
+    machine['coffees'] -= 1
+
+
+@scenario(
+    'An expected error, narrated as when + then (when_then)',
+    tags=['billing', 'validation'],
+)
+def test_sold_out_is_rejected(machine):
+    with given('a machine that has sold its last coffee'):
+        machine['coffees'] = 0
+    with (
+        when_then(
+            'a customer tries to buy a coffee',
+            'the machine reports it is sold out',
+        ),
+        pytest.raises(ValueError, match='sold out'),
+    ):
+        buy_coffee(machine)
 
 
 @scenario('Failure rendering (intentionally failing)')

@@ -213,6 +213,99 @@ def test_step_descriptor_decorator_rejects_tstring_mixed_glossary_and_value() ->
         desc(helper)
 
 
+def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
+    """when_then('W', 'T') wraps the body as a `when` and emits a sibling
+    `then` once the body exits cleanly."""
+    from pytest_given.capture.decorators import when_then
+
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with when_then('the action runs', 'the outcome holds'):
+            pass
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert [(s.phase, s.narration.text) for s in scenario.steps] == [
+        ('when', 'the action runs'),
+        ('then', 'the outcome holds'),
+    ]
+    assert all(s.status == 'passed' for s in scenario.steps)
+    assert all(s.children == [] for s in scenario.steps)
+
+
+def test_when_then_pairs_with_inner_pytest_raises() -> None:
+    """The canonical raise pattern: an inner pytest.raises swallows the error
+    the body throws, so when_then still emits both sibling steps."""
+    from pytest_given.capture.decorators import when_then
+
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with (
+            when_then('the parser reads a bad document', 'it is rejected'),
+            pytest.raises(ValueError, match='boom'),
+        ):
+            raise ValueError('boom')
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert [(s.phase, s.narration.text) for s in scenario.steps] == [
+        ('when', 'the parser reads a bad document'),
+        ('then', 'it is rejected'),
+    ]
+
+
+def test_when_then_omits_then_when_body_raises_uncaught() -> None:
+    """If the body raises and nothing catches it, the outcome never held —
+    the `when` is recorded but no `then` sibling is emitted, and the
+    exception propagates."""
+    from pytest_given.capture.decorators import when_then
+
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with pytest.raises(RuntimeError, match='nope'), when_then('act', 'result'):
+            raise RuntimeError('nope')
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert [(s.phase, s.narration.text) for s in scenario.steps] == [
+        ('when', 'act'),
+    ]
+
+
+def test_when_then_accepts_tstrings_for_glossary_refs() -> None:
+    """Both narrations accept t-strings so glossary handles can render."""
+    from pytest_given.capture.decorators import when_then
+
+    g = Glossary()
+    room = g.work_object('Room')
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with when_then(t'booking a {room}', t'the {room} is held'):
+            pass
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert [s.narration.text for s in scenario.steps] == [
+        'booking a Room',
+        'the Room is held',
+    ]
+
+
+def test_when_then_exported_from_package() -> None:
+    """when_then is part of the public API."""
+    import pytest_given
+
+    assert pytest_given.when_then is not None
+
+
 def test_scenario_with_plain_str_keeps_name() -> None:
     deco = scenario('Brew coffee')
     assert deco.name == 'Brew coffee'

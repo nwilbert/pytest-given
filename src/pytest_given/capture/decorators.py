@@ -279,6 +279,61 @@ def then(
     return StepDescriptor('then', text, activity_ids=_normalize_activity(activity))
 
 
+class WhenThen:
+    """Narrate an action and its outcome as two sibling steps in one ``with``.
+
+    Reach for it when a single expression is both the action under test and
+    the thing you assert about — most often an expected raise, where forcing
+    one ``then`` step to carry both reads awkwardly. The body runs inside the
+    ``when``; the ``then`` sibling is emitted once the body exits cleanly, so
+    pair it with a vanilla ``pytest.raises`` *inside* the same ``with`` (the
+    inner context manager swallows the error before this one's ``__exit__``
+    runs)::
+
+        with when_then('the parser reads a table-less document',
+                       'no pipe table is reported'), \\
+             pytest.raises(PytestGivenError, match=r'no .*table'):
+            parse_glossary_tables(text, term_column=0, ...)
+
+    If the body raises and nothing catches it, the outcome never held: the
+    ``when`` is recorded, the ``then`` is skipped, and the exception
+    propagates. It composes two `StepDescriptor` instances, so every guard
+    (Template rejection, idle/unannotated handling, t-string narration) is
+    inherited by construction.
+    """
+
+    def __init__(
+        self,
+        when_text: str | templatelib.Template | Template,
+        then_text: str | templatelib.Template | Template,
+    ) -> None:
+        self._when = StepDescriptor('when', when_text)
+        self._then = StepDescriptor('then', then_text)
+
+    def __enter__(self) -> Self:
+        self._when.__enter__()
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: types.TracebackType | None,
+    ) -> None:
+        self._when.__exit__(exc_type, exc_val, exc_tb)
+        if exc_type is None:
+            self._then.__enter__()
+            self._then.__exit__(None, None, None)
+
+
+def when_then(
+    when_text: str | templatelib.Template | Template,
+    then_text: str | templatelib.Template | Template,
+) -> WhenThen:
+    """Pair a When action with its Then outcome as two sibling steps."""
+    return WhenThen(when_text, then_text)
+
+
 _FORMATTER = Formatter()
 
 

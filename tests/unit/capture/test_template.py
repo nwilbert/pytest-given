@@ -3,7 +3,7 @@ from string import templatelib
 
 import pytest
 
-from pytest_given import given, scenario, then, when
+from pytest_given import given, scenario, then, when, when_then
 from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.template import Template, parse_tstring
 from pytest_given.model import (
@@ -14,7 +14,7 @@ from pytest_given.model import (
     NarrationValue,
     PytestGivenError,
 )
-from tests._vocab import pg, then_raises
+from tests._vocab import pg
 
 
 def test_template_parses_literal_only() -> None:
@@ -29,7 +29,9 @@ def test_template_parses_literal_only() -> None:
 )
 def test_template_parses_single_placeholder() -> None:
     with given(t'a deferred {pg["Templatize"]} template with one placeholder'):
-        t = Template('Brew {cup_size} ml')
+        source = 'Brew {cup_size} ml'
+    with when('the template is parsed'):
+        t = Template(source)
     with then(t'it splits into literal and placeholder {pg["Narration"]} parts'):
         assert t.parts == [
             NarrationLiteral(value='Brew '),
@@ -60,8 +62,10 @@ def test_template_get_identifiers() -> None:
 def test_template_substitute_basic() -> None:
     with given(t'a {pg["Templatize"]} template referencing a {pg["Case"]} column'):
         t = Template('Brew {cup_size} ml')
-    with then(t'substituting a {pg["Parameter table"]} value fills the placeholder'):
-        assert t.substitute({'cup_size': 200}) == 'Brew 200 ml'
+    with when(t'a {pg["Parameter table"]} value is substituted in'):
+        rendered = t.substitute({'cup_size': 200})
+    with then('the placeholder is filled with that value'):
+        assert rendered == 'Brew 200 ml'
 
 
 def test_template_substitute_with_format_spec() -> None:
@@ -100,12 +104,12 @@ def test_template_unclosed_brace_raises_value_error() -> None:
     ids=['attribute', 'indexing', 'expression'],
 )
 def test_template_non_identifier_raises_pytest_given_error(text: str) -> None:
-    with given(t'a {pg["Templatize"]} template placeholder {text!r}'):
-        pass
-    with then_raises(
-        'constructing it raises — only bare identifiers are allowed',
-        PytestGivenError,
-        match='bare identifiers',
+    with (
+        when_then(
+            t'a {pg["Templatize"]} template is built from placeholder {text!r}',
+            'a PytestGivenError says bare identifiers only',
+        ),
+        pytest.raises(PytestGivenError, match='bare identifiers'),
     ):
         Template(text)
 
@@ -223,7 +227,7 @@ def glossary() -> Glossary:
 
 @scenario(
     'A glossary handle in a t-string emits a term ref',
-    tags=['step-text', 'glossary'],
+    tags=['step-text'],
 )
 def test_tstring_with_actor_emits_term_ref(glossary: Glossary) -> None:
     with given(t'an {pg["Actor"]} handle from the glossary'):
@@ -251,12 +255,19 @@ def test_tstring_with_actor_instance_emits_term_ref_with_instance_display(
     assert term_refs[0].display == 'Alice'
 
 
+@scenario(
+    'A work object handle in a t-string emits a term ref',
+    tags=['step-text'],
+)
 def test_tstring_with_work_object_emits_term_ref(glossary: Glossary) -> None:
-    room = glossary.work_object('Room')
-    _, parts = parse_tstring(t'the {room} is clean')
-    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
-    assert term_refs[0].term_id == 'room'
-    assert term_refs[0].display == 'Room'
+    with given(t'a {pg["Work Object"]} handle from the glossary'):
+        room = glossary.work_object('Room')
+    with when('it is interpolated into a t-string step'):
+        _, parts = parse_tstring(t'the {room} is clean')
+    with then(t'the step carries a {pg["Term ref"]} for that {pg["Work Object"]}'):
+        term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
+        assert term_refs[0].term_id == 'room'
+        assert term_refs[0].display == 'Room'
 
 
 def test_tstring_with_work_object_instance_emits_term_ref(glossary: Glossary) -> None:
@@ -266,18 +277,25 @@ def test_tstring_with_work_object_instance_emits_term_ref(glossary: Glossary) ->
     assert term_refs[0].display == 'Deluxe Suite'
 
 
+@scenario(
+    'A bare verb handle keeps its canonical display',
+    tags=['step-text'],
+)
 def test_tstring_with_verb_emits_term_ref_with_canonical_display(
     glossary: Glossary,
 ) -> None:
-    search = glossary.verb('search')
-    _, parts = parse_tstring(t'they {search}')
-    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
-    assert term_refs[0].display == 'search'
+    with given(t'a {pg["Verb"]} handle used without an {pg["Inflection"]}'):
+        search = glossary.verb('search')
+    with when('it is interpolated into a t-string step'):
+        _, parts = parse_tstring(t'they {search}')
+    with then(t'the {pg["Term ref"]} shows the canonical verb'):
+        term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
+        assert term_refs[0].display == 'search'
 
 
 @scenario(
     'An inflected verb in a t-string shows the inflection',
-    tags=['step-text', 'glossary'],
+    tags=['step-text'],
 )
 def test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display(
     glossary: Glossary,
@@ -323,10 +341,12 @@ def test_tstring_with_term_ref_populates_expression(glossary: Glossary) -> None:
 def test_tstring_term_ref_with_format_spec_raises(glossary: Glossary) -> None:
     with given(t'an {pg["Actor"]} handle interpolated with a format spec'):
         guest = glossary.actor('Guest')
-    with then_raises(
-        t'parsing the t-string raises — a {pg["Term ref"]} takes no format spec',
-        PytestGivenError,
-        match='format spec or conversion',
+    with (
+        when_then(
+            'the t-string is parsed',
+            t'a PytestGivenError says a {pg["Term ref"]} takes no format spec',
+        ),
+        pytest.raises(PytestGivenError, match='format spec or conversion'),
     ):
         parse_tstring(t'hi {guest:>10}')
 
@@ -368,7 +388,7 @@ def file_glossary(tmp_path: Path, _reset_glossary_registry) -> FileGlossary:
 
 @scenario(
     'A FileGlossary handle works in a t-string step',
-    tags=['step-text', 'file-glossary'],
+    tags=['step-text'],
 )
 def test_tstring_with_file_term_handle_emits_term_ref(
     file_glossary: FileGlossary,
