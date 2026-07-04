@@ -2,8 +2,7 @@
 
 ## Now
 
-- [ ] Give some indication / filter in Glossary for number of corresponding scenarios
-- [ ] render markdown in FileGlossary descriptions and normal glossary as well
+- [ ] Give some indication / filter in Glossary for number of corresponding scenarios, maybe add sort option
 
 ## Next
 

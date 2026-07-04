@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-04T12:04:35.805466+00:00",
+    "timestamp": "2026-07-04T12:50:11.290848+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "d54fb19d646901cf3d3c8af6892f30160fda107e"
+    "commit_sha": "591306a32f50cc05080050029343690b374de246"
   },
   "scenarios": [
     {
@@ -342,7 +342,7 @@
         "id": "cancellation-policy",
         "kind": null,
         "canonical": "Cancellation Policy",
-        "definition": "The rules governing how and when a booking may be cancelled.",
+        "definition": "The rules governing **how** and **when** a booking may be cancelled.<br>Enforced by the `CancellationPolicy` type.",
         "source": {
           "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
           "line": 11

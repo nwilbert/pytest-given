@@ -344,7 +344,9 @@ function reportApp() {
         if (!pill) { return; }
         nameEl.textContent = pill.dataset.termName;
         const def = pill.dataset.termDef || '';
-        defEl.textContent = def;
+        // def is markdown-rendered HTML (from data-term-def), generated from
+        // trusted test source, so innerHTML is safe here.
+        defEl.innerHTML = def;
         defEl.hidden = !def;
         tip.hidden = false;
         const pillRect = pill.getBoundingClientRect();

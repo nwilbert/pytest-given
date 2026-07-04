@@ -30,6 +30,7 @@ from .aggregations import (
     build_term_scenario_index,
     tab_visibility,
 )
+from .inline_markdown import render_inline_markdown
 from .source_link import compile_source_link
 
 _NUM_PARAM_COLORS = 6
@@ -51,6 +52,16 @@ def _script_json(value: object) -> Markup:
     and these blobs carry user-controlled node ids — so a parametrize id
     containing `</script>` would otherwise break out of the tag (stored XSS)."""
     return Markup(_neutralize_script_close(json.dumps(value)))
+
+
+def _inline_md(text: str | None) -> Markup:
+    """Jinja filter: render a term description's inline Markdown to safe HTML.
+
+    The `not text` guard matters: `markupsafe.escape(None)` renders the literal
+    string 'None', and `term.definition` is None for undefined terms."""
+    if not text:
+        return Markup('')
+    return Markup(render_inline_markdown(text))
 
 
 def render_html(
@@ -115,6 +126,7 @@ def render_html(
         glossary=report.glossary,
     )
     env.filters['activity_part'] = _make_activity_part_filter(report.glossary)
+    env.filters['inline_md'] = _inline_md
     template = env.get_template('report.html.j2')
     html = template.render(
         metadata=report.metadata,
@@ -282,7 +294,8 @@ def _term_pill(
     if tooltip_name:
         attrs.append(f'data-term-name="{escape(tooltip_name)}"')
         if tooltip_def:
-            attrs.append(f'data-term-def="{escape(tooltip_def)}"')
+            rendered_def = render_inline_markdown(tooltip_def)
+            attrs.append(f'data-term-def="{escape(rendered_def)}"')
     return f'<span {" ".join(attrs)}>{escape(display)}</span>'
 
 

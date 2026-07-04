@@ -650,6 +650,16 @@ span.param-highlight {
 .term-tip-name { display: block; font-weight: 700; }
 .term-tip-def { display: block; margin-top: 2px; opacity: 0.82; }
 
+/* Inline code in rendered term descriptions (entry body + hover tooltip). */
+.entry-def code,
+.term-tip-def code {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.1em 0.3em;
+  border-radius: var(--radius-sm);
+}
+
 /* === Topbar === */
 .topbar {
   display: flex;

@@ -5,11 +5,24 @@ from typing import Any, cast
 
 import pytest
 
-from pytest_given.report.renderer import _render_narration_part, render_html
+from pytest_given.report.renderer import (
+    _inline_md,
+    _render_narration_part,
+    render_html,
+)
 
 
 def _narration(text: str, parts: list | None = None) -> dict:
     return {'text': text, 'parts': parts or []}
+
+
+def test_inline_md_filter_blank_is_empty() -> None:
+    assert _inline_md(None) == ''
+    assert _inline_md('') == ''
+
+
+def test_inline_md_filter_renders_markdown() -> None:
+    assert _inline_md('**x** and `y`') == '<strong>x</strong> and <code>y</code>'
 
 
 def test_render_produces_html_file(tmp_path: Path) -> None:

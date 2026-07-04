@@ -493,7 +493,7 @@
               <span class="term-pill {{ kind_cls }}">{{ term.canonical }}</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">{{ term.definition if term.definition else '' }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
+              <div class="entry-def">{{ term.definition | inline_md }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
               <div class="entry-summary">
                 {% if agg %}
                 {% set show_instances = kind_key in ('actor', 'object') and agg.instances %}
