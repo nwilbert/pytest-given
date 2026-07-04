@@ -372,13 +372,20 @@ def _annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
 
 
 def _graft_fixture_recordings(item: pytest.Item) -> None:
-    """Graft this item's step-fixture recordings in setup order.
+    """Graft this item's fixture step-recordings and Annotated `given` labels.
 
-    `collector._recordings` is insertion-ordered by setup time, so iterating it
-    preserves narrative order even when `item.fixturenames` lists dependents
-    before their dependencies.
+    Phase 1: fixture recordings in `collector.recordings()` setup order
+    (`_recordings` is insertion-ordered by setup time, so this stays correct
+    even though `item.fixturenames` can list a dependent before its
+    dependency). Each recording may take an Annotated override narration,
+    matched to the recording by its parameter name. Phase 2: Annotated-only
+    leaves (parametrize values, built-in / undecorated fixtures) in
+    test-signature order.
     """
     assert hasattr(item, 'fixturenames'), f'expected fixturenames on {item!r}'
+    func = getattr(item, 'function', None)
+    descriptors = _annotated_given_descriptors(func) if func is not None else {}
+
     fm = item.session._fixturemanager
     expected: dict[FixtureInstanceKey, str] = {}
     for name in item.fixturenames:
@@ -392,16 +399,40 @@ def _graft_fixture_recordings(item: pytest.Item) -> None:
             continue
         key: FixtureInstanceKey = (id(fixturedef), fixturedef.cached_result[1])
         expected[key] = fixturedef.scope
+
+    # Phase 1: fixture recordings in setup order, with optional override.
     # Function-scoped recordings won't be re-consumed; drop after grafting so
     # the recordings dict doesn't grow unboundedly across the session.
+    grafted_names: set[str | None] = set()
     to_drop: list[FixtureInstanceKey] = []
     for key, recording in collector.recordings():
-        if key in expected:
-            collector.graft_recording(recording)
-            if expected[key] == 'function':
-                to_drop.append(key)
+        if key not in expected:
+            continue
+        name = recording.root.fixture_name
+        descriptor = descriptors.get(name) if name is not None else None
+        override = descriptor.narration if descriptor is not None else None
+        collector.graft_recording(recording, override_narration=override)
+        grafted_names.add(name)
+        if expected[key] == 'function':
+            to_drop.append(key)
     for key in to_drop:
         collector.drop_recording(key)
+
+    # Phase 2: Annotated-only leaves (parametrize values, built-in /
+    # undecorated fixtures) in test-signature order.
+    for name, descriptor in descriptors.items():
+        if name in grafted_names:
+            continue
+        defs = fm.getfixturedefs(name, item)
+        fdef = defs[-1] if defs else None
+        # A decorated fixture is phase-1 territory; skip it here so its
+        # recorded body is never replaced by a bodyless leaf.
+        if (
+            fdef is not None
+            and getattr(fdef.func, '_step_descriptor', None) is not None
+        ):
+            continue
+        collector.graft_leaf_given(descriptor.narration)
 
 
 @pytest.hookimpl(trylast=True)

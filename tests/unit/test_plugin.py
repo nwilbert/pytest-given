@@ -25,6 +25,7 @@ from pytest_given.capture.story import (
 )
 from pytest_given.model import (
     ActivityId,
+    FixtureRecording,
     Glossary,
     Narration,
     NarrationPlaceholder,
@@ -33,6 +34,7 @@ from pytest_given.model import (
     ParamSpec,
     PytestGivenError,
     Scenario,
+    Step,
     TermId,
 )
 
@@ -471,3 +473,44 @@ def test_extract_returns_empty_on_unresolvable_annotations() -> None:
 
     # Best-effort: an unresolvable sibling annotation must not raise.
     assert plugin._annotated_given_descriptors(f) == {}
+
+
+def test_graft_skips_recording_not_belonging_to_item(
+    fresh_collector: Collector,
+) -> None:
+    """A recording left in the collector by another item (its key isn't in
+    this item's `expected` set) is skipped, not grafted."""
+    fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
+    stale = FixtureRecording(
+        root=Step(phase='given', narration=Narration(text='stale'), fixture_name='o')
+    )
+    fresh_collector.store_recording((object(), None), stale)
+    item = _fake_item({})
+    plugin._graft_fixture_recordings(item)
+    assert fresh_collector._current_scenario is not None
+    assert fresh_collector._current_scenario.steps == []
+
+
+def test_graft_phase2_skips_decorated_fixture_without_recording(
+    fresh_collector: Collector,
+) -> None:
+    """An Annotated given() on a decorated fixture that recorded nothing (no
+    cached_result) is phase-1 territory — phase 2 must not synthesize a leaf
+    for it and drop the body."""
+
+    def testfn(machine: Annotated[object, given('override')]) -> None: ...
+
+    deco = _fake_func(StepDescriptor('given', 'a machine'))
+    fixturedef = SimpleNamespace(func=deco, cached_result=None, scope='function')
+    fm = SimpleNamespace(
+        getfixturedefs=lambda name, _i: {'machine': [fixturedef]}.get(name)
+    )
+    session = SimpleNamespace(_fixturemanager=fm)
+    item = cast(
+        pytest.Item,
+        SimpleNamespace(fixturenames=['machine'], session=session, function=testfn),
+    )
+    fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
+    plugin._graft_fixture_recordings(item)
+    assert fresh_collector._current_scenario is not None
+    assert fresh_collector._current_scenario.steps == []

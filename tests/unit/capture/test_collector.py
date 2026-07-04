@@ -434,6 +434,12 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
     assert recording.root.narration.text == 'original label'
 
 
+def test_graft_leaf_given_without_scenario_is_noop() -> None:
+    collector = Collector()
+    collector.graft_leaf_given(_n('orphan'))
+    assert collector.scenarios == []
+
+
 def test_graft_recording_without_override_is_unchanged() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])

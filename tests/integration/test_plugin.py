@@ -1498,3 +1498,254 @@ def test_multiple_glossaries_in_conftests_raises(pytester):
     """)
     result = pytester.runpytest('--given-json=report.json')
     result.stderr.fnmatch_lines(['*multiple Glossary*'])
+
+
+def test_annotated_given_on_parametrize_value_synthesizes_leaf(pytester, tmp_path):
+    """A parametrize column annotated with given(Template(...)) grows a leaf
+    given step; merged view carries a placeholder for the column."""
+    pytester.makepyfile(
+        """
+        from typing import Annotated
+        import pytest
+        from pytest_given import scenario, given, when, Template
+
+        @scenario('slug rejects empties')
+        @pytest.mark.parametrize('text', ['---', ''])
+        def test_it(text: Annotated[str, given(Template('the name {text}'))]):
+            with when('it is slugified'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'out.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    (merged,) = data['scenarios']
+    given_step = merged['steps'][0]
+    assert given_step['phase'] == 'given'
+    names = [p.get('name') for p in given_step['narration']['parts']]
+    assert 'text' in names
+    assert merged['parameters']['names'] == ['text']
+
+
+def test_annotated_given_on_multiple_param_columns(pytester, tmp_path):
+    """Each annotated column of a multi-name parametrize gets its own leaf."""
+    pytester.makepyfile(
+        """
+        from typing import Annotated
+        import pytest
+        from pytest_given import scenario, given, when, Template
+
+        @scenario('two inputs')
+        @pytest.mark.parametrize('a,b', [(1, 2)])
+        def test_it(
+            a: Annotated[int, given(Template('a is {a}'))],
+            b: Annotated[int, given(Template('b is {b}'))],
+        ):
+            with when('added'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'out.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    (merged,) = data['scenarios']
+    given_texts = [
+        s['narration']['text'] for s in merged['steps'] if s['phase'] == 'given'
+    ]
+    assert given_texts == ['a is {a}', 'b is {b}']
+
+
+def test_annotated_given_plain_string_on_param_renders_verbatim(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from typing import Annotated
+        import pytest
+        from pytest_given import scenario, given, when
+
+        @scenario('verbatim')
+        @pytest.mark.parametrize('cup', [200])
+        def test_it(cup: Annotated[int, given('a {cup} ml cup')]):
+            with when('brewed'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'out.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    (merged,) = data['scenarios']
+    assert merged['steps'][0]['narration']['text'] == 'a {cup} ml cup'
+
+
+def test_annotated_given_on_builtin_fixture_synthesizes_leaf(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from pathlib import Path
+        from typing import Annotated
+        from pytest_given import scenario, given, when
+
+        @scenario('uses a temp dir')
+        def test_it(tmp_path: Annotated[Path, given('a temporary directory')]):
+            with when('something happens'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'out.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    (s,) = data['scenarios']
+    assert s['steps'][0]['phase'] == 'given'
+    assert s['steps'][0]['narration']['text'] == 'a temporary directory'
+
+
+def test_annotated_given_overrides_decorated_fixture_label_keeps_body(
+    pytester, tmp_path
+):
+    pytester.makepyfile(
+        """
+        from typing import Annotated
+        import pytest
+        from pytest_given import scenario, given, when
+
+        @pytest.fixture
+        @given('the default label')
+        def machine():
+            with given('a recorded child'):
+                pass
+            return object()
+
+        @scenario('override')
+        def test_it(machine: Annotated[object, given('a fancy machine')]):
+            with when('used'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'out.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    (s,) = data['scenarios']
+    root = s['steps'][0]
+    assert root['narration']['text'] == 'a fancy machine'
+    assert [c['narration']['text'] for c in root['children']] == ['a recorded child']
+
+
+def test_annotated_given_indirect_parametrize_override_keeps_body(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from typing import Annotated
+        import pytest
+        from pytest_given import scenario, given, when
+
+        @pytest.fixture
+        @given('the default label')
+        def machine(request):
+            with given('a recorded child'):
+                pass
+            return request.param
+
+        @scenario('indirect override')
+        @pytest.mark.parametrize('machine', ['m1'], indirect=True)
+        def test_it(machine: Annotated[object, given('an overridden machine')]):
+            with when('used'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'out.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    (s,) = data['scenarios']
+    root = s['steps'][0]
+    assert root['narration']['text'] == 'an overridden machine'
+    assert [c['narration']['text'] for c in root['children']] == ['a recorded child']
+
+
+def test_annotated_when_on_param_fails_scenario(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from typing import Annotated
+        import pytest
+        from pytest_given import scenario, when
+
+        @scenario('bad')
+        @pytest.mark.parametrize('x', [1])
+        def test_it(x: Annotated[int, when('nope')]):
+            pass
+        """
+    )
+    result = pytester.runpytest()
+    result.assert_outcomes(errors=1)
+    result.stdout.fnmatch_lines(['*only given*'])
+
+
+def test_annotated_given_tstring_on_param_fails_scenario(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from typing import Annotated
+        import pytest
+        from pytest_given import scenario, given
+
+        NAME = 'frozen'
+
+        @scenario('bad')
+        @pytest.mark.parametrize('x', [1])
+        def test_it(x: Annotated[int, given(t'a {NAME} label')]):
+            pass
+        """
+    )
+    result = pytester.runpytest()
+    result.assert_outcomes(errors=1)
+    result.stdout.fnmatch_lines(['*t-string*'])
+
+
+def test_param_without_annotated_stays_table_only(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, when
+
+        @scenario('plain param')
+        @pytest.mark.parametrize('n', [1, 2])
+        def test_it(n):
+            with when('acted'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'out.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    (merged,) = data['scenarios']
+    assert [s['phase'] for s in merged['steps']] == ['when']
+
+
+def test_mixed_fixture_and_param_annotated_order(pytester, tmp_path):
+    """Fixture graft (setup order) precedes the parametrize leaf (signature
+    order): given steps read [a machine, the name {text}]."""
+    pytester.makepyfile(
+        """
+        from typing import Annotated
+        import pytest
+        from pytest_given import scenario, given, when, Template
+
+        @pytest.fixture
+        @given('a machine')
+        def machine():
+            return object()
+
+        @scenario('mixed')
+        @pytest.mark.parametrize('text', ['x'])
+        def test_it(
+            machine,
+            text: Annotated[str, given(Template('the name {text}'))],
+        ):
+            with when('run'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'out.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    (merged,) = data['scenarios']
+    given_texts = [
+        s['narration']['text'] for s in merged['steps'] if s['phase'] == 'given'
+    ]
+    assert given_texts == ['a machine', 'the name {text}']
