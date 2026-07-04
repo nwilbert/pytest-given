@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-04T09:46:25.080911+00:00",
+    "timestamp": "2026-07-04T11:09:31.025286+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "d7d547026cefe8cc8f755d366212434986b3c6de"
+    "commit_sha": "7961a0b47b3532bb4c42aee7a7ed0849818afc89"
   },
   "scenarios": [
     {
@@ -1723,7 +1723,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 91
+        "line": 105
       },
       "story_id": null,
       "activity_ids": []
@@ -1825,7 +1825,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 118
+        "line": 132
       },
       "story_id": null,
       "activity_ids": []
@@ -1923,7 +1923,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 138
+        "line": 152
       },
       "story_id": null,
       "activity_ids": []
@@ -1939,7 +1939,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -2009,7 +2009,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 169
+        "line": 183
       },
       "story_id": null,
       "activity_ids": []
@@ -2085,7 +2085,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 183
+        "line": 197
       },
       "story_id": null,
       "activity_ids": []
@@ -2168,7 +2168,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 201
+        "line": 215
       },
       "story_id": null,
       "activity_ids": []
@@ -2266,7 +2266,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 225
+        "line": 239
       },
       "story_id": null,
       "activity_ids": []
@@ -2362,7 +2362,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 320
+        "line": 334
       },
       "story_id": null,
       "activity_ids": []
@@ -2432,7 +2432,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 353
+        "line": 367
       },
       "story_id": null,
       "activity_ids": []
@@ -2505,7 +2505,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 365
+        "line": 379
       },
       "story_id": null,
       "activity_ids": []
@@ -9334,12 +9334,34 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "when",
+          "phase": "given",
           "narration": {
-            "text": "a Term name 'Guest' is slugified into an id",
+            "text": "the name {text}",
             "parts": [
               {
-                "value": "a "
+                "value": "the name "
+              },
+              {
+                "name": "text",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "it is slugified into a Term id",
+            "parts": [
+              {
+                "value": "it is slugified into a "
               },
               {
                 "term_id": "term",
@@ -9348,15 +9370,7 @@
                 "param_column": null
               },
               {
-                "value": " name "
-              },
-              {
-                "name": "text",
-                "format_spec": "",
-                "conversion": "r"
-              },
-              {
-                "value": " is slugified into an id"
+                "value": " id"
               }
             ]
           },
@@ -9466,7 +9480,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 21
+        "line": 30
       },
       "story_id": null,
       "activity_ids": []
@@ -9485,17 +9499,34 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "when",
+          "phase": "given",
           "narration": {
-            "text": "'---' is slugified into a Term id",
+            "text": "the name {text}",
             "parts": [
+              {
+                "value": "the name "
+              },
               {
                 "name": "text",
                 "format_spec": "",
-                "conversion": "r"
-              },
+                "conversion": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "it is slugified into a Term id",
+            "parts": [
               {
-                "value": " is slugified into a "
+                "value": "it is slugified into a "
               },
               {
                 "term_id": "term",
@@ -9568,7 +9599,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 45
+        "line": 57
       },
       "story_id": null,
       "activity_ids": []

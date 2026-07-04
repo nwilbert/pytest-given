@@ -1,8 +1,17 @@
 from pathlib import Path
+from typing import Annotated
 
 import pytest
 
-from pytest_given import PytestGivenError, given, scenario, then, when, when_then
+from pytest_given import (
+    PytestGivenError,
+    Template,
+    given,
+    scenario,
+    then,
+    when,
+    when_then,
+)
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.glossary import (
     Actor,
@@ -35,8 +44,11 @@ from tests._vocab import pg
         ('booking system', 'booking-system'),
     ],
 )
-def test_id_derive_produces_expected_slug(text, expected):
-    with when(t'a {pg["Term"]} name {text!r} is slugified into an id'):
+def test_id_derive_produces_expected_slug(
+    text: Annotated[str, given(Template('the name {text}'))],
+    expected,
+):
+    with when(t'it is slugified into a {pg["Term"]} id'):
         derived = id_derive(text)
     with then(t'the id is the expected slug {expected!r}'):
         assert derived == expected
@@ -47,10 +59,12 @@ def test_id_derive_produces_expected_slug(text, expected):
     tags=['validation'],
 )
 @pytest.mark.parametrize('text', ['---', '   ', '', '###'])
-def test_id_derive_raises_on_empty_result(text):
+def test_id_derive_raises_on_empty_result(
+    text: Annotated[str, given(Template('the name {text}'))],
+):
     with (
         when_then(
-            t'{text!r} is slugified into a {pg["Term"]} id',
+            t'it is slugified into a {pg["Term"]} id',
             'a PytestGivenError reports the derived id is empty',
         ),
         pytest.raises(PytestGivenError, match='derived id is empty'),
