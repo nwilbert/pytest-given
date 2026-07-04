@@ -589,6 +589,14 @@ span.param-highlight {
   right: 0;
   bottom: 0;
 }
+/* When the scenario has an error box, this link overlaps its reddish
+   background; a card-colored chip keeps it legible and looks intentional.
+   Over the plain card background (no error) the chip is the same color, so
+   it stays invisible. */
+.scenario-body-inner > .scenario-source {
+  background: var(--bg-card);
+  border-top-left-radius: var(--radius-md);
+}
 .refs-content > .scenario-source {
   bottom: var(--space-md);
   padding-block: 0;
