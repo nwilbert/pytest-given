@@ -3,8 +3,10 @@
 A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests. Inspired by [JGiven](https://jgiven.org/) (Java). The code is the single source of truth — no separate Gherkin DSL.
 
 Live examples:
-- **[Coffeeshop report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop/coffeeshop.html)** — tour of the core features.
+- **[Coffeeshop report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop/coffeeshop.html)** — tour of the core features, including `Annotated` `given` labels.
 - **[Hotel-booking report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking/hotel-booking.html)** — Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
+- **[File-glossary report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/file-glossary-booking/file-glossary-booking.html)** — Domain Storytelling with a Markdown `FileGlossary` and kinds inferred from story activities.
+- **[Self-report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/self-report/self-report.html)** — pytest-given run against its own test suite (dogfooding).
 
 ## Quick start
 
@@ -356,13 +358,14 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
 
 ## Examples
 
-Three example suites live under [`examples/`](examples/), each with pre-rendered JSON + HTML committed:
+Four example suites live under [`examples/`](examples/), each with pre-rendered JSON + HTML committed:
 
-- [`coffeeshop/test_coffeeshop.py`](examples/coffeeshop/test_coffeeshop.py) — a tour of the core feature surface: `when`/`then` blocks, generator fixtures with teardown, plain text and JSON attachments, parameterized tests rendered as tables, t-string interpolation, helper functions that record their own steps, top-level `given` blocks, deeply nested steps, failure rendering, and skipped scenarios. Output: [`coffeeshop.html`](examples/coffeeshop/coffeeshop.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop/coffeeshop.html)).
+- [`coffeeshop/test_coffeeshop.py`](examples/coffeeshop/test_coffeeshop.py) — a tour of the core feature surface: `when`/`then` blocks, generator fixtures with teardown, plain text and JSON attachments, parameterized tests rendered as tables, t-string interpolation, `Annotated[..., given(...)]` labels on a parametrize value, helper functions that record their own steps, top-level `given` blocks, deeply nested steps, failure rendering, and skipped scenarios. Output: [`coffeeshop.html`](examples/coffeeshop/coffeeshop.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop/coffeeshop.html)).
 - [`hotel-booking/test_hotel_booking.py`](examples/hotel-booking/test_hotel_booking.py) — Domain Storytelling features: a `Glossary` of actors / work objects / verbs, a `story(...)` with `activity(...)` rows, scenarios bound to a story with per-activity coverage, and kindless + undefined terms (registered with `g('foo')`) awaiting classification. Output: [`hotel-booking.html`](examples/hotel-booking/hotel-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking/hotel-booking.html)).
-- [`file-glossary-booking/test_file_glossary_booking.py`](examples/file-glossary-booking/test_file_glossary_booking.py) — `FileGlossary` features: loading a Markdown glossary file, name-based term access, inferred kinds from story activity slots, and a deliberately kindless term (neutral pill). Output: [`file-glossary-booking.html`](examples/file-glossary-booking/file-glossary-booking.html).
+- [`file-glossary-booking/test_file_glossary_booking.py`](examples/file-glossary-booking/test_file_glossary_booking.py) — `FileGlossary` features: loading a Markdown glossary file, name-based term access, inferred kinds from story activity slots, and a deliberately kindless term (neutral pill). Output: [`file-glossary-booking.html`](examples/file-glossary-booking/file-glossary-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/file-glossary-booking/file-glossary-booking.html)).
+- [`self-report/`](examples/self-report/) — pytest-given applied to its own backend test suite: many unit tests are `@scenario`-decorated and narrated in the vocabulary of [`GLOSSARY.md`](GLOSSARY.md) (loaded as a `FileGlossary`). No hand-written test file — it's generated from the whole suite. Output: [`self-report.html`](examples/self-report/self-report.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/self-report/self-report.html)).
 
-Run `nox -s examples` to regenerate all three.
+Run `nox -s examples` to regenerate the first three, and `nox -s self_report` for the self-report.
 
 ## Working with LLMs
 
