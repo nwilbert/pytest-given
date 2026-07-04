@@ -4,7 +4,7 @@ from .file_glossary import FileGlossary
 from .glossary import DeferredTermHandle, DeferredTermInstance
 from .story import activity, path, story
 from .template import Template, narration_from
-from .traceback import parse_short_repr
+from .traceback import filter_internal_frames, parse_short_repr
 
 __all__ = [
     'Collector',
@@ -15,6 +15,7 @@ __all__ = [
     'Template',
     'activity',
     'attach',
+    'filter_internal_frames',
     'given',
     'narration_from',
     'parse_short_repr',

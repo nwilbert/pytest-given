@@ -119,12 +119,20 @@ def audit(session: nox.Session) -> None:
 def examples(session: nox.Session) -> None:
     """Regenerate coffeeshop, hotel-booking, and file-glossary-booking reports."""
     _sync(session, 'test', include_project=True)
-    for test_file, slug in [
-        ('examples/coffeeshop/test_coffeeshop.py', 'coffeeshop'),
-        ('examples/hotel-booking/test_hotel_booking.py', 'hotel-booking'),
+    # coffeeshop runs with --given-all-frames so it demonstrates the "show
+    # internal frames" toggle on a real failure; the others use the default
+    # filter so they show the clean user-only frames most users see.
+    for test_file, slug, extra in [
+        (
+            'examples/coffeeshop/test_coffeeshop.py',
+            'coffeeshop',
+            ['--given-all-frames'],
+        ),
+        ('examples/hotel-booking/test_hotel_booking.py', 'hotel-booking', []),
         (
             'examples/file-glossary-booking/test_file_glossary_booking.py',
             'file-glossary-booking',
+            [],
         ),
     ]:
         session.run(
@@ -137,11 +145,14 @@ def examples(session: nox.Session) -> None:
             '--tb=no',
             '--no-header',
             '-q',
+            *extra,
             success_codes=[0, 1],
         )
     session.log(
         'Note: coffeeshop and hotel-booking have intentional failures for failure '
         'rendering (coffeeshop: test_failing; hotel-booking: gift-card decline case). '
+        'coffeeshop uses --given-all-frames to demonstrate the internal-frames '
+        'toggle; hotel-booking uses the default filter. '
         'file-glossary-booking has no intentional failures.'
     )
 

@@ -86,6 +86,44 @@ def test_failed_scenario(pytester, tmp_path):
     assert 'assert 1 == 2' in error['error_tail']
 
 
+def _failing_scenario_error(pytester, tmp_path, *extra):
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, then
+
+        @scenario("Failing test")
+        def test_fail():
+            with then("this fails"):
+                assert 1 == 2
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}', *extra)
+    result.assert_outcomes(failed=1)
+    return json.loads(json_path.read_text())['scenarios'][0]['error']
+
+
+def test_internal_frames_dropped_by_default(pytester, tmp_path):
+    """The pluggy/_pytest/decorator frames are filtered before getrepr, so they
+    never reach the JSON — only user frames survive."""
+    error = _failing_scenario_error(pytester, tmp_path)
+    assert error['frames'], 'expected the user frame to survive'
+    assert all(not f['is_internal'] for f in error['frames']), (
+        f'expected only user frames, got {error["frames"]!r}'
+    )
+    assert any(f['func'] == 'test_fail' for f in error['frames'])
+
+
+def test_given_all_frames_retains_internal_frames(pytester, tmp_path):
+    """--given-all-frames skips the pre-filter, so internal frames ride in the
+    JSON classified as is_internal=True for the renderer's toggle."""
+    error = _failing_scenario_error(pytester, tmp_path, '--given-all-frames')
+    assert any(f['is_internal'] for f in error['frames']), (
+        f'expected internal frames to be retained, got {error["frames"]!r}'
+    )
+    assert any(f['func'] == 'test_fail' for f in error['frames'])
+
+
 def test_unannotated_test_not_in_report(pytester, tmp_path):
     """Tests without @scenario don't appear in the report."""
     pytester.makepyfile(
@@ -812,6 +850,9 @@ def test_skipped_scenario_captures_mark_reason(pytester, tmp_path):
     data = json.loads(json_path.read_text())
     assert data['scenarios'][0]['status'] == 'skipped'
     assert data['scenarios'][0]['skip_reason'] == 'awaiting fixture'
+    # A skip carries a structured reason, never a traceback — makereport
+    # short-circuits before getrepr so no error/frames are captured.
+    assert data['scenarios'][0]['error'] is None
 
 
 def test_skipped_scenario_without_reason_has_none(pytester, tmp_path):

@@ -19,6 +19,7 @@ from .capture import (
     Collector,
     FixtureInstanceKey,
     Template,
+    filter_internal_frames,
     parse_short_repr,
     set_active_collector,
 )
@@ -71,6 +72,16 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         '--given-html-output',
         default='given-report/report.html',
         help='Output path for HTML report (default: given-report/report.html)',
+    )
+    group.addoption(
+        '--given-all-frames',
+        action='store_true',
+        default=False,
+        help=(
+            'Store internal pluggy/_pytest/pytest-given frames in the JSON '
+            'report. Slower on large failing suites — only set when debugging '
+            'the plugin or pytest itself.'
+        ),
     )
     group.addoption(
         '--given-source-link',
@@ -454,6 +465,16 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
     # failure). Without the setup branch, fixture failures would silently
     # bypass fail_scenario and the scenario would carry no error info.
     if call.when in ('setup', 'call') and call.excinfo is not None:
+        # A skip raises Skipped (at setup for mark.skip/skipif, at call for an
+        # in-body pytest.skip()). Its traceback is pure skip machinery — the
+        # scenario carries a structured skip_reason instead (set in logreport).
+        # Short-circuit before getrepr, whose per-frame AST scan would otherwise
+        # run for every skipped scenario. Not gated on --given-all-frames: a skip
+        # never wants a traceback regardless.
+        if call.excinfo.errisinstance(pytest.skip.Exception):
+            return
+        if not item.config.getoption('given_all_frames'):
+            filter_internal_frames(call.excinfo)
         error_repr = call.excinfo.getrepr(style='short')
         message = str(call.excinfo.value)
         frames, error_tail = parse_short_repr(str(error_repr))

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-04T12:04:34.008523+00:00",
+    "timestamp": "2026-07-04T17:17:18.607093+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "d54fb19d646901cf3d3c8af6892f30160fda107e"
+    "commit_sha": "47b7c55eedbed3c84d48104f3d07ad30b15c42a8"
   },
   "scenarios": [
     {
@@ -723,7 +723,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 253,
+      "duration_ms": 264,
       "steps": [
         {
           "phase": "given",
@@ -874,78 +874,10 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 22,
+      "duration_ms": 1,
       "steps": [],
       "parameters": null,
-      "error": {
-        "message": "demonstrates skipped status",
-        "frames": [
-          {
-            "path": "site-packages/_pytest/runner.py",
-            "lineno": 353,
-            "func": "from_call",
-            "code": "    result: TResult | None = func()\n                             ^^^^^^",
-            "is_internal": true
-          },
-          {
-            "path": "site-packages/_pytest/runner.py",
-            "lineno": 245,
-            "func": "<lambda>",
-            "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-            "is_internal": true
-          },
-          {
-            "path": "site-packages/pluggy/_hooks.py",
-            "lineno": 512,
-            "func": "__call__",
-            "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-            "is_internal": true
-          },
-          {
-            "path": "site-packages/pluggy/_manager.py",
-            "lineno": 120,
-            "func": "_hookexec",
-            "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-            "is_internal": true
-          },
-          {
-            "path": "site-packages/pluggy/_callers.py",
-            "lineno": 53,
-            "func": "run_old_style_hookwrapper",
-            "code": "    return result.get_result()\n           ^^^^^^^^^^^^^^^^^^^",
-            "is_internal": true
-          },
-          {
-            "path": "site-packages/pluggy/_callers.py",
-            "lineno": 38,
-            "func": "run_old_style_hookwrapper",
-            "code": "    res = yield\n          ^^^^^",
-            "is_internal": true
-          },
-          {
-            "path": "site-packages/_pytest/logging.py",
-            "lineno": 843,
-            "func": "pytest_runtest_setup",
-            "code": "    yield",
-            "is_internal": true
-          },
-          {
-            "path": "site-packages/_pytest/capture.py",
-            "lineno": 895,
-            "func": "pytest_runtest_setup",
-            "code": "    return (yield)\n            ^^^^^",
-            "is_internal": true
-          },
-          {
-            "path": "site-packages/_pytest/skipping.py",
-            "lineno": 251,
-            "func": "pytest_runtest_setup",
-            "code": "    raise skip.Exception(skipped.reason, _use_item_location=True)",
-            "is_internal": true
-          }
-        ],
-        "error_tail": "E   Skipped: demonstrates skipped status"
-      },
+      "error": null,
       "skip_reason": "demonstrates skipped status",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
@@ -1290,7 +1222,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 44,
+      "duration_ms": 2,
       "steps": [],
       "parameters": {
         "names": [
@@ -1302,150 +1234,14 @@
               1
             ],
             "status": "skipped",
-            "error": {
-              "message": "awaiting fixture",
-              "frames": [
-                {
-                  "path": "site-packages/_pytest/runner.py",
-                  "lineno": 353,
-                  "func": "from_call",
-                  "code": "    result: TResult | None = func()\n                             ^^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/_pytest/runner.py",
-                  "lineno": 245,
-                  "func": "<lambda>",
-                  "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/pluggy/_hooks.py",
-                  "lineno": 512,
-                  "func": "__call__",
-                  "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/pluggy/_manager.py",
-                  "lineno": 120,
-                  "func": "_hookexec",
-                  "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/pluggy/_callers.py",
-                  "lineno": 53,
-                  "func": "run_old_style_hookwrapper",
-                  "code": "    return result.get_result()\n           ^^^^^^^^^^^^^^^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/pluggy/_callers.py",
-                  "lineno": 38,
-                  "func": "run_old_style_hookwrapper",
-                  "code": "    res = yield\n          ^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/_pytest/logging.py",
-                  "lineno": 843,
-                  "func": "pytest_runtest_setup",
-                  "code": "    yield",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/_pytest/capture.py",
-                  "lineno": 895,
-                  "func": "pytest_runtest_setup",
-                  "code": "    return (yield)\n            ^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/_pytest/skipping.py",
-                  "lineno": 251,
-                  "func": "pytest_runtest_setup",
-                  "code": "    raise skip.Exception(skipped.reason, _use_item_location=True)",
-                  "is_internal": true
-                }
-              ],
-              "error_tail": "E   Skipped: awaiting fixture"
-            }
+            "error": null
           },
           {
             "values": [
               2
             ],
             "status": "skipped",
-            "error": {
-              "message": "awaiting fixture",
-              "frames": [
-                {
-                  "path": "site-packages/_pytest/runner.py",
-                  "lineno": 353,
-                  "func": "from_call",
-                  "code": "    result: TResult | None = func()\n                             ^^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/_pytest/runner.py",
-                  "lineno": 245,
-                  "func": "<lambda>",
-                  "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/pluggy/_hooks.py",
-                  "lineno": 512,
-                  "func": "__call__",
-                  "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/pluggy/_manager.py",
-                  "lineno": 120,
-                  "func": "_hookexec",
-                  "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/pluggy/_callers.py",
-                  "lineno": 53,
-                  "func": "run_old_style_hookwrapper",
-                  "code": "    return result.get_result()\n           ^^^^^^^^^^^^^^^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/pluggy/_callers.py",
-                  "lineno": 38,
-                  "func": "run_old_style_hookwrapper",
-                  "code": "    res = yield\n          ^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/_pytest/logging.py",
-                  "lineno": 843,
-                  "func": "pytest_runtest_setup",
-                  "code": "    yield",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/_pytest/capture.py",
-                  "lineno": 895,
-                  "func": "pytest_runtest_setup",
-                  "code": "    return (yield)\n            ^^^^^",
-                  "is_internal": true
-                },
-                {
-                  "path": "site-packages/_pytest/skipping.py",
-                  "lineno": 251,
-                  "func": "pytest_runtest_setup",
-                  "code": "    raise skip.Exception(skipped.reason, _use_item_location=True)",
-                  "is_internal": true
-                }
-              ],
-              "error_tail": "E   Skipped: awaiting fixture"
-            }
+            "error": null
           }
         ]
       },

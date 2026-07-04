@@ -59,7 +59,7 @@ def filter_internal_frames(excinfo: ExceptionInfo) -> None:
     )
 ```
 
-`_is_internal` (already in `capture/traceback.py`) gets exported as the single source of truth for both pre-filtering and post-parsing classification.
+`_is_internal` (already in `capture/traceback.py`) is the single source of truth for both pre-filtering and post-parsing classification. `filter_internal_frames` lives in the same module, so `_is_internal` stays module-private — only `filter_internal_frames` is imported by `plugin.py`. Both callers pass a full normalized path: `_flush` already classifies on the pre-`_portable_path` path, and the pre-filter classifies on `entry.path`, so the two views agree.
 
 Call from `pytest_runtest_makereport` before `getrepr`:
 
@@ -72,6 +72,8 @@ if call.when in ('setup', 'call') and call.excinfo is not None:
 ```
 
 This cuts AST work proportional to the share of internal frames in each failure's stack — in the benchmark suite, ~5 of 7 frames per failure are internal (pluggy + `_pytest/runner.py` + `_pytest/python.py` + pytest-given's `decorators.py`), so the AST cost drops by roughly 70%.
+
+The pre-filter inherits `_is_internal`'s classification rule: it matches `_pytest`/`pluggy` frames by their `/site-packages/` prefix (plus the `capture/decorators.py` suffix). This holds for the uv-managed benchmark venv where those dependencies live under `site-packages`; a source/editable checkout of pytest itself would not be classified internal, but that is not the target environment and the same limitation already governs post-parse classification today.
 
 Pytest's own filtering (`tbfilter=True`) is not enough because pytest's heuristic does not match pluggy dispatchers or our `@scenario` wrapper. The plugin already classifies these correctly via `_is_internal`; we just need to apply that classification *earlier*.
 
@@ -99,6 +101,12 @@ When on:
 
 This is the smallest surface that preserves the existing debugging affordance (frames are *available* in the report when asked for) without paying for it by default.
 
+### C. Short-circuit skips before `getrepr`
+
+The Scope line "skips already structured, no traceback" was aspirational, not actual: a skip raises `Skipped` (at setup for `mark.skip`/`skipif`, at call for an in-body `pytest.skip()`), which arrives at `pytest_runtest_makereport` as `call.excinfo` and was formatted like any failure. Its traceback is entirely skip machinery (`pluggy` → `_pytest/skipping.py`), so A's pre-filter reduced it to empty and the keep-original guard restored *all* of it — the scenario ended up `skipped` yet carried a full internal traceback, and every skip paid the `getrepr` AST cost (measured: ~112s of `getrepr` for 2000 skips, 18k `getstatementrange_ast` calls).
+
+Fix: detect the skip in `makereport` (`call.excinfo.errisinstance(pytest.skip.Exception)`) and return before `getrepr`. Not gated on `--given-all-frames` — a skip never wants a traceback. The scenario's structured `skip_reason` (set in `logreport`) is unaffected; `error` is now `None`. This makes the Scope line true and removes the skip-path collapse (`getrepr` for skips drops to zero).
+
 ### Schema impact
 
 `TracebackFrame.is_internal` becomes vestigial in the default-storage shape (always `False`). Two options:
@@ -118,6 +126,20 @@ Recommend option 1 — the field costs nothing on the wire (one bool per frame) 
 - With `--given-all-frames`, the JSON for those failures contains internal frames classified as `is_internal=True` and the renderer's "Show internal frames" toggle reveals them.
 
 Playwright verification on `benchmarks/large-scenarios.html` after regenerating: open one of the `test_fixed_failure_*` scenarios in each rendering site (step error, parametrize-case error, scenario error) and confirm the user-frame display unchanged.
+
+### Measured outcome
+
+Change A landed. Measured on a suite of **5000 failing `@scenario` tests spread across 200 normal-sized files** (the realistic shape — failures across many small modules, not one giant file):
+
+| run | wall |
+|---|---|
+| vanilla pytest, `--tb=no`, no plugin | 20.5s |
+| pytest-given, `--given-all-frames` (pre-filter off) | **278.5s** |
+| pytest-given, default (pre-filter on) | **19.9s** |
+
+The plugin's failure-path overhead drops from **~14× vanilla to parity with vanilla** — the collapse is gone. Per-failure the pre-filter removes ~5 of every ~7 formatted frames; at N=2000 in the project benchmark, `repr_traceback_entry` calls fall 132→41 and `getstatementrange_ast` calls 125→34.
+
+The one case where change A alone leaves a residual is the *benchmark's own* single-giant-file shape: with all failing frames pointing into one ~1 MB module, the retained user frames still cost one whole-file AST parse each (O(failures), 407s→242s = 1.68×). That residual is precisely what the "build our own frame list" alternative below would remove; it does not appear in realistically-structured suites, where the retained per-failure user frame is a cheap small-file parse.
 
 ## Alternatives considered
 

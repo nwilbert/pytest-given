@@ -12,9 +12,15 @@ implementation noise the reader almost never needs.
 
 import re
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
+import pytest
 
 from ..model import TracebackFrame
 from .source import to_relpath
+
+if TYPE_CHECKING:
+    from _pytest._code.code import TracebackEntry
 
 _FRAME_HEADER_RE = re.compile(r'^(?P<path>.+?):(?P<lineno>\d+): in (?P<func>.+)$')
 
@@ -29,6 +35,30 @@ _INTERNAL_SUBSTRINGS = (
 _INTERNAL_SUFFIXES = ('/pytest_given/capture/decorators.py',)
 
 _SITE_PACKAGES_MARKER = '/site-packages/'
+
+
+def filter_internal_frames(excinfo: pytest.ExceptionInfo[BaseException]) -> None:
+    """Drop internal frames from ``excinfo.traceback`` before ``getrepr`` runs.
+
+    ``getrepr(style='short')`` runs pytest's per-frame AST statement-range scan
+    once per surviving entry, so pruning the pluggy/``_pytest``/decorator frames
+    here — rather than after parsing — is what removes the O(N²) traceback cost
+    on large failing suites. Only pytest's view of the traceback is rewritten;
+    the exception's native ``__traceback__`` is left intact.
+
+    Reuses ``_is_internal`` (the classifier ``parse_short_repr`` applies to the
+    formatted output) so the pre-filter and post-parse classification agree. If
+    every entry classifies as internal — e.g. a failure raised entirely within
+    plugin/library code — the original traceback is kept so ``getrepr`` still has
+    a crash frame to format.
+    """
+    filtered = excinfo.traceback.filter(lambda entry: not _is_internal_entry(entry))
+    if len(filtered) > 0:
+        excinfo.traceback = filtered
+
+
+def _is_internal_entry(entry: TracebackEntry) -> bool:
+    return _is_internal(str(entry.path).replace('\\', '/'))
 
 
 @dataclass
