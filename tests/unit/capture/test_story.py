@@ -34,16 +34,19 @@ def g():
 
 
 @pytest.fixture
+@given('a Guest actor')
 def guest(g):
     return g.actor('Guest')
 
 
 @pytest.fixture
+@given('a Room work object')
 def room(g):
     return g.work_object('Room')
 
 
 @pytest.fixture
+@given('a search verb')
 def search(g):
     return g.verb('search')
 

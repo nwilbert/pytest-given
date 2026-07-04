@@ -1,5 +1,6 @@
 from pathlib import Path
 from string import templatelib
+from typing import Annotated
 
 import pytest
 
@@ -103,10 +104,12 @@ def test_template_unclosed_brace_raises_value_error() -> None:
     ['count={obj.attr}', '{d[key]}', '{x + 1}'],
     ids=['attribute', 'indexing', 'expression'],
 )
-def test_template_non_identifier_raises_pytest_given_error(text: str) -> None:
+def test_template_non_identifier_raises_pytest_given_error(
+    text: Annotated[str, given(Template('the placeholder {text}'))],
+) -> None:
     with (
         when_then(
-            t'a {pg["Templatize"]} template is built from placeholder {text!r}',
+            t'a {pg["Templatize"]} template is built from it',
             'a PytestGivenError says bare identifiers only',
         ),
         pytest.raises(PytestGivenError, match='bare identifiers'),

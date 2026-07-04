@@ -2,9 +2,6 @@
 
 ## Now
 
-- [ ] Create given tests for this project itself (e.g., behavior of different glossaries).
-  - add glossary categories
-  - use attachments (e.g., for the given markdown glossary)
 - [ ] File Glossary with no stories -> don't show "Uncategorized" header
 - [ ] Give some indication / filter in Glossary for number of corresponding scenarios
 - [ ] render markdown in FileGlossary descriptions and normal glossary as well
@@ -20,14 +17,12 @@
 - [ ] Add option to not generate the JSON file on test run, rethink default behavior
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
 - [ ] Provide an agent skill for work with pytest-given, and document how LLM agents can benefit from pytest-given
-  - make sure that there is always given-when-then
 
 ## Later
 
 - [ ] define a UI component library?
 - [ ] `GLOSSARY.md` export from a code-defined glossary (reverse direction of `FileGlossary`), plus sectioned/heading-scoped glossaries — one table per section on input, grouped sections in the HTML Glossary view. Both features pair naturally and were deferred from the file-backed glossary spec (see `docs/specs/2026-06-18-file-backed-glossary-design.md` forward notes).
 - [ ] Create a proper documentation page, maybe using https://posit-dev.github.io/great-docs
-- [ ] Implement Annotated fixture/parametrize labels (`docs/specs/proposed/2026-05-23-annotated-fixture-labels-design.md`)
 - [ ] Maybe: implement flat-step-display — opt-in body hiding on `given`/`when`/`then` (see `docs/specs/proposed/2026-06-06-flat-step-display-design.md`)
 - [ ] Add `@scenario(group_parametrized=False)` option to opt out of parametrize merging 
   - emit each case as its own scenario (named per case via Template substitution, or by appending the parametrize id to a `str` name).
