@@ -95,6 +95,21 @@ def db():
     conn.close()
 ```
 
+As a call-site label with `Annotated` (**only `given` is allowed**) — attach a `given` step to a fixture or a `@pytest.mark.parametrize` value from the test signature. This is the way to surface a parametrized input as a `given` (a direct parametrize value otherwise appears only in the parameter table), and it can label an undecorated or built-in fixture, or override a decorated fixture's label for one scenario:
+
+```python
+from typing import Annotated
+
+@scenario('A name with no id-able characters is rejected')
+@pytest.mark.parametrize('text', ['---', '', '###'])
+def test_rejects_empty(text: Annotated[str, given(Template('the name {text}'))]):
+    with when_then('it is slugified', 'a PytestGivenError is raised'), \
+            pytest.raises(PytestGivenError):
+        id_derive(text)
+```
+
+Use `Template('… {col} …')` for a per-case placeholder (substituted against the parametrize column, rendered `{col}` in the merged view and the concrete value per row) or a plain string for a static label. A t-string is rejected here — the parameter value isn't in scope at definition time. `when`/`then` inside `Annotated` are rejected too; the action and outcome live in the test body.
+
 As a helper-function decorator (any phase). The helper records its own step on each call; for dynamic narration, use `pytest_given.Template` and reference the helper's parameters:
 
 ```python
@@ -169,6 +184,7 @@ def test_brew(cup_size):
 | T-string | `with given(t'a {cup_size} cup')` | pytest-given interpolates at runtime. Values are color-coded when the interpolation expression matches a parametrize column; otherwise highlighted neutrally. |
 | `Template` in `@scenario(...)` | `@scenario(Template('Brew {cup_size} ml'))` | Deferred substitution against parametrize columns at report time. Unmatched placeholders raise `PytestGivenError` at collection. |
 | `Template` on a helper-function decorator | `@when(Template('I insert {amount}'))` | Deferred substitution against the function's bound arguments at each call. Placeholders must name a positional-or-keyword parameter of the helper. Unmatched placeholders raise `PytestGivenError` at decoration time. |
+| `Annotated[..., given(...)]` on a test parameter | `def test(text: Annotated[str, given(Template('a {text} cup'))])` | Synthesizes a `given` step for a fixture or parametrize value at the call site. Plain string renders verbatim; `Template` does deferred substitution against parametrize columns. Only `given` is allowed; a t-string is rejected. |
 
 Three things worth knowing:
 
