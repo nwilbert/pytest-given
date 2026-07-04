@@ -220,11 +220,13 @@ def test_render_parameterized_step_with_structured_narration(tmp_path: Path) -> 
     assert re.search(r'<th[^>]*\bparam-color-1\b[^>]*\bdata-param="expect"', content)
 
 
-def test_render_merged_placeholder_preserves_format_spec_and_conversion(
+def test_render_merged_placeholder_drops_format_spec_and_conversion(
     tmp_path: Path,
 ) -> None:
-    """Merged-template view shows {name!conv:spec} so the author's format
-    intent stays visible to the reader."""
+    """Merged-template view shows a bare {name}: the schematic slot marks which
+    column varies, not how a value prints. Conversion and format spec are
+    per-value details applied in the concrete per-case rows, so they are
+    dropped from the collapsed slot."""
     json_path = tmp_path / 'data.json'
     json_path.write_text(
         json.dumps(
@@ -287,8 +289,10 @@ def test_render_merged_placeholder_preserves_format_spec_and_conversion(
     html_path = tmp_path / 'report.html'
     render_html(json_path, html_path)
     content = html_path.read_text(encoding='utf-8')
-    assert '{n:03d}' in content
-    assert '{obj!r}' in content
+    assert '{n}' in content
+    assert '{obj}' in content
+    assert '{n:03d}' not in content
+    assert '{obj!r}' not in content
 
 
 def test_render_plain_str_step_with_empty_parts_escapes_braces(

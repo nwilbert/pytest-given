@@ -196,7 +196,7 @@ def _make_narration_filter(
     of typed `NarrationPart` variants:
       - `NarrationLiteral` → escape `value`
       - `NarrationValue`   → `.param-value` highlight around `rendered`
-      - `NarrationPlaceholder` → color-coded `{name!conv:spec}` token
+      - `NarrationPlaceholder` → color-coded `{name}` token
       - `NarrationTermRef` → kind-coloured pill resolved via glossary
     Empty parts → escape `text` and emit verbatim.
     """
@@ -308,14 +308,14 @@ def _render_term_ref(
 
 
 def _placeholder_token(part: NarrationPlaceholder) -> str:
-    """Reconstruct the source-side `{name!conv:spec}` token, so the merged
-    template view preserves the author's format intent."""
-    inner = part.name
-    if part.conversion:
-        inner += '!' + part.conversion
-    if part.format_spec:
-        inner += ':' + part.format_spec
-    return '{' + inner + '}'
+    """Render the merged-template slot as a bare `{name}`.
+
+    The merged view is schematic — it marks *which* column varies, not how any
+    one value prints. Conversion (`!r`) and format spec (`:03d`) are per-value
+    rendering details, already applied in the concrete per-case rows, so they
+    are noise in the collapsed slot and are dropped here (still stored on the
+    placeholder for the concrete-value and deferred-`Template` paths)."""
+    return '{' + part.name + '}'
 
 
 def _make_activity_part_filter(
