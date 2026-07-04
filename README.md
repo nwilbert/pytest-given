@@ -295,6 +295,15 @@ The JSON report is **always written** whenever the plugin is loaded — every `p
 | `--given-html` | off | Also generate the HTML report |
 | `--given-html-output=PATH` | `given-report/report.html` | HTML output path (used only with `--given-html`) |
 | `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. See [Source links](#source-links). |
+| `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
+
+## Traceback frames
+
+When a scenario fails, its traceback is captured into the report. By default only your own frames are kept — the `pluggy` dispatcher, `_pytest` runner, and pytest-given's own `@scenario` wrapper frames are dropped, since they're implementation noise you rarely need. This also keeps failing suites fast: pytest's per-frame source analysis is the dominant cost on a run with many failures, so filtering those frames out before they're formatted is what stops a suite with thousands of failing scenarios from slowing to a crawl.
+
+Pass `--given-all-frames` to retain every frame (each stored with an `is_internal` flag; the HTML report then shows a **"Show internal frames"** toggle on each failure). It's a debugging escape hatch for when you're troubleshooting the plugin or pytest itself — it re-introduces the per-frame cost, so leave it off for normal runs on large failing suites.
+
+Skipped scenarios never capture a traceback at all — they carry their skip reason instead.
 
 ## Source links
 

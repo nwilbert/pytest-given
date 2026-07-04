@@ -2,6 +2,8 @@
 
 ## Now
 
+- [ ] Cleanup glossary
+
 ## Next
 
 - [ ] Add sort option in GLossary, to sort by number of scenarios, instances, or stories
