@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] File Glossary with no stories -> don't show "Uncategorized" header
 - [ ] Give some indication / filter in Glossary for number of corresponding scenarios
 - [ ] render markdown in FileGlossary descriptions and normal glossary as well
 

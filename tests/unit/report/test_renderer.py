@@ -1474,6 +1474,112 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
     assert 'term-ref-verb' in content
 
 
+def test_render_glossary_all_uncategorized_hides_kind_ui(tmp_path: Path) -> None:
+    """When every term is uncategorized, the kind machinery is pure noise:
+    no 'Show kinds' sidebar section and no 'Uncategorized' kind header. The
+    terms themselves still render as a flat list."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'glossary': {
+                    'terms': [
+                        {'id': 'widget', 'kind': None, 'canonical': 'Widget'},
+                        {'id': 'gadget', 'kind': None, 'canonical': 'Gadget'},
+                    ],
+                },
+                'scenarios': [],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    # Kind filter section is gone.
+    assert 'Show kinds' not in content
+    # The 'Uncategorized' kind header is gone.
+    assert 'kind-title term-kindless' not in content
+    # But the terms still render.
+    assert 'Widget' in content
+    assert 'Gadget' in content
+
+
+def test_render_glossary_with_categorized_terms_keeps_kind_ui(tmp_path: Path) -> None:
+    """When at least one term is categorized, the kind machinery stays: the
+    'Show kinds' sidebar section and the 'Uncategorized' header for the
+    remaining kindless terms both render."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'glossary': {
+                    'terms': [
+                        {'id': 'guest', 'kind': 'actor', 'canonical': 'Guest'},
+                        {'id': 'widget', 'kind': None, 'canonical': 'Widget'},
+                    ],
+                },
+                'scenarios': [],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert 'Show kinds' in content
+    assert 'kind-title term-kindless' in content
+    # The header breakdown still names the kinds.
+    assert '1 actor' in content
+    assert '1 uncategorized' in content
+
+
+def test_render_glossary_all_uncategorized_header_omits_kind_breakdown(
+    tmp_path: Path,
+) -> None:
+    """With every term uncategorized, the header context collapses to just the
+    term count — the '0 actors · 0 work objects · 0 verbs · N uncategorized'
+    breakdown is noise and is dropped."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'glossary': {
+                    'terms': [
+                        {'id': 'widget', 'kind': None, 'canonical': 'Widget'},
+                        {'id': 'gadget', 'kind': None, 'canonical': 'Gadget'},
+                    ],
+                },
+                'scenarios': [],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(json_path, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert '2 terms' in content
+    # These phrases only ever appear in the header breakdown.
+    assert '0 actor' not in content
+    assert 'work object' not in content
+    assert 'uncategorized' not in content
+
+
 def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> None:
     json_path = tmp_path / 'data.json'
     json_path.write_text(
