@@ -200,11 +200,34 @@ class Collector:
     def drop_recording(self, key: FixtureInstanceKey) -> None:
         self._recordings.pop(key, None)
 
-    def graft_recording(self, recording: FixtureRecording) -> None:
-        """Deep-copy the recording's root into the active scenario's steps."""
+    def graft_recording(
+        self,
+        recording: FixtureRecording,
+        *,
+        override_narration: Narration | None = None,
+    ) -> None:
+        """Deep-copy the recording's root into the active scenario's steps.
+
+        When *override_narration* is given (an Annotated label on the fixture
+        parameter), it replaces the grafted root's narration; the recorded
+        children and attachments are preserved.
+        """
         if self._current_scenario is None:
             return
-        self._current_scenario.steps.append(copy.deepcopy(recording.root))
+        root = copy.deepcopy(recording.root)
+        if override_narration is not None:
+            root.narration = override_narration
+        self._current_scenario.steps.append(root)
+
+    def graft_leaf_given(self, narration: Narration) -> None:
+        """Append a childless `given` step to the active scenario.
+
+        Used for Annotated labels on parametrize values and undecorated /
+        built-in fixtures — arrangements with no recorded body.
+        """
+        if self._current_scenario is None:
+            return
+        self._current_scenario.steps.append(Step(phase='given', narration=narration))
 
     def push_step(
         self,

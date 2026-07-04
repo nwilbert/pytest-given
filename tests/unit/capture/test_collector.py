@@ -403,3 +403,41 @@ def test_start_scenario_source_defaults_to_none() -> None:
     )
     scenario = collector.finish_scenario(status='passed', duration_ms=0)
     assert scenario.source is None
+
+
+def test_graft_leaf_given_appends_childless_given_step() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    collector.graft_leaf_given(_n('the name {text}'))
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    assert len(scenario.steps) == 1
+    leaf = scenario.steps[0]
+    assert leaf.phase == 'given'
+    assert leaf.narration.text == 'the name {text}'
+    assert leaf.children == []
+
+
+def test_graft_recording_override_replaces_root_narration_keeps_children() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    root = Step(phase='given', narration=_n('original label'), fixture_name='machine')
+    root.children.append(Step(phase='given', narration=_n('a recorded child')))
+    recording = FixtureRecording(root=root)
+
+    collector.graft_recording(recording, override_narration=_n('a fancy machine'))
+
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    grafted = scenario.steps[0]
+    assert grafted.narration.text == 'a fancy machine'
+    assert [c.narration.text for c in grafted.children] == ['a recorded child']
+    # The stored recording's root is untouched (deep copy on graft).
+    assert recording.root.narration.text == 'original label'
+
+
+def test_graft_recording_without_override_is_unchanged() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    recording = FixtureRecording(root=Step(phase='given', narration=_n('kept label')))
+    collector.graft_recording(recording)
+    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    assert scenario.steps[0].narration.text == 'kept label'
