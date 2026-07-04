@@ -1,6 +1,6 @@
 import pytest
 
-from pytest_given import given, scenario, then, when, when_then
+from pytest_given import attach, given, scenario, then, when, when_then
 from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.glossary import DeferredTermHandle
 from pytest_given.capture.story import activity
@@ -30,6 +30,7 @@ def glossary_file(tmp_path):
 )
 def test_lookup_is_case_insensitive(glossary_file):
     with given(t'a {pg["FileGlossary"]} loaded from a Markdown file'):
+        attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
     with when(t'the same {pg["Term"]} is looked up in three different cases'):
         handles = [glossary['Guest'], glossary['guest'], glossary['GUEST']]
@@ -44,6 +45,7 @@ def test_lookup_is_case_insensitive(glossary_file):
 )
 def test_handles_are_memoized(glossary_file):
     with given(t'a {pg["FileGlossary"]} loaded from a Markdown file'):
+        attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
     with when(t'the same {pg["Term"]} is looked up twice'):
         first, second = glossary['Room'], glossary['room']
@@ -57,6 +59,7 @@ def test_handles_are_memoized(glossary_file):
 )
 def test_terms_start_kindless(glossary_file):
     with given(t'a {pg["FileGlossary"]} with no kind column'):
+        attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
     with then(t'each {pg["Term"]} is {pg["Kindless"]} until inference runs'):
         assert glossary['Guest'].term.kind is None
@@ -68,6 +71,7 @@ def test_terms_start_kindless(glossary_file):
 )
 def test_unknown_name_raises_with_suggestion(glossary_file):
     with given(t'a {pg["FileGlossary"]} loaded from a Markdown file'):
+        attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
     with (
         when_then(
@@ -85,6 +89,7 @@ def test_unknown_name_raises_with_suggestion(glossary_file):
 )
 def test_usable_inline_in_activity(glossary_file):
     with given(t'a {pg["FileGlossary"]} loaded from a Markdown file'):
+        attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
     with when(t'its handles build an {pg["Activity"]}'):
         built = activity(glossary['Guest'], glossary['search'], glossary['Room'])
@@ -100,6 +105,7 @@ def test_usable_inline_in_activity(glossary_file):
 )
 def test_call_overrides_display(glossary_file):
     with given(t'a {pg["FileGlossary"]} loaded from a Markdown file'):
+        attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
     with when(t'a handle is called to name an {pg["Instance"]}'):
         built = activity(
@@ -119,12 +125,13 @@ def test_call_overrides_display(glossary_file):
 )
 def test_explicit_kind_column(tmp_path):
     with given(t'a Markdown glossary with an explicit Kind column'):
-        path = tmp_path / 'g.md'
-        path.write_text(
+        doc = (
             '| Term | Meaning | Kind |\n|---|---|---|\n'
-            '| Guest | x | Actor |\n| Room | y | Work Object |\n',
-            encoding='utf-8',
+            '| Guest | x | Actor |\n| Room | y | Work Object |\n'
         )
+        attach('Glossary file', doc)
+        path = tmp_path / 'g.md'
+        path.write_text(doc, encoding='utf-8')
     with when(t'the {pg["FileGlossary"]} reads the Kind column'):
         glossary = FileGlossary(path, kind_column='Kind')
     with then(t'kinds come straight from the file, not {pg["Kindless"]} inference'):
@@ -138,12 +145,13 @@ def test_explicit_kind_column(tmp_path):
 )
 def test_kind_column_by_integer_index(tmp_path):
     with given('a Markdown glossary with the kind in the third column'):
-        path = tmp_path / 'g.md'
-        path.write_text(
+        doc = (
             '| Term | Meaning | Kind |\n|---|---|---|\n'
-            '| Guest | x | Actor |\n| Room | y | Work Object |\n',
-            encoding='utf-8',
+            '| Guest | x | Actor |\n| Room | y | Work Object |\n'
         )
+        attach('Glossary file', doc)
+        path = tmp_path / 'g.md'
+        path.write_text(doc, encoding='utf-8')
     with when(t'the {pg["FileGlossary"]} selects the kind column by index'):
         glossary = FileGlossary(path, kind_column=2)
     with then('the kinds are read from that column'):
@@ -157,11 +165,10 @@ def test_kind_column_by_integer_index(tmp_path):
 )
 def test_work_object_underscore_alias(tmp_path):
     with given(t'a glossary whose Kind cell says work_object'):
+        doc = '| Term | Meaning | Kind |\n|---|---|---|\n| Room | y | work_object |\n'
+        attach('Glossary file', doc)
         path = tmp_path / 'g.md'
-        path.write_text(
-            '| Term | Meaning | Kind |\n|---|---|---|\n| Room | y | work_object |\n',
-            encoding='utf-8',
-        )
+        path.write_text(doc, encoding='utf-8')
     with when(t'the {pg["FileGlossary"]} parses the kind'):
         glossary = FileGlossary(path, kind_column='Kind')
     with then(t'it normalizes to the {pg["Work Object"]} kind'):
@@ -174,11 +181,10 @@ def test_work_object_underscore_alias(tmp_path):
 )
 def test_unrecognised_kind_value_raises(tmp_path):
     with given('a glossary whose Kind cell holds an unknown value'):
+        doc = '| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | Wizard |\n'
+        attach('Glossary file', doc)
         path = tmp_path / 'g.md'
-        path.write_text(
-            '| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | Wizard |\n',
-            encoding='utf-8',
-        )
+        path.write_text(doc, encoding='utf-8')
     with (
         when_then(
             t'the {pg["FileGlossary"]} loads the file',
@@ -222,11 +228,10 @@ def test_glossary_property_returns_inner_glossary(glossary_file):
 )
 def test_empty_id_term_cell_raises(tmp_path):
     with given(t'a row whose {pg["Term"]} cell has no id-able characters'):
+        doc = '| Term | Meaning |\n|---|---|\n| @#$ | some definition |\n'
+        attach('Glossary file', doc)
         path = tmp_path / 'bad.md'
-        path.write_text(
-            '| Term | Meaning |\n|---|---|\n| @#$ | some definition |\n',
-            encoding='utf-8',
-        )
+        path.write_text(doc, encoding='utf-8')
     with (
         when_then(
             t'the {pg["FileGlossary"]} loads the file',
@@ -243,13 +248,14 @@ def test_empty_id_term_cell_raises(tmp_path):
 )
 def test_conflicting_duplicate_rows_raise(tmp_path):
     with given(t'two rows for one {pg["Term"]} with different definitions'):
-        path = tmp_path / 'dup.md'
-        path.write_text(
+        doc = (
             '| Term | Meaning |\n|---|---|\n'
             '| Guest | First definition. |\n'
-            '| Guest | Second definition. |\n',
-            encoding='utf-8',
+            '| Guest | Second definition. |\n'
         )
+        attach('Glossary file', doc)
+        path = tmp_path / 'dup.md'
+        path.write_text(doc, encoding='utf-8')
     with (
         when_then(
             t'the {pg["FileGlossary"]} loads the file',
@@ -268,11 +274,10 @@ def test_blank_description_cell_normalizes_to_none(tmp_path):
     from pytest_given.model import TermId
 
     with given(t'a row whose description cell is blank'):
+        doc = '| Term | Meaning |\n|---|---|\n| Guest |   |\n'
+        attach('Glossary file', doc)
         path = tmp_path / 'g.md'
-        path.write_text(
-            '| Term | Meaning |\n|---|---|\n| Guest |   |\n',
-            encoding='utf-8',
-        )
+        path.write_text(doc, encoding='utf-8')
     with when(t'the {pg["FileGlossary"]} parses it'):
         fg = FileGlossary(path)
     with then(t'the {pg["Term"]} definition is None, i.e. {pg["Undefined"]}'):
@@ -287,13 +292,14 @@ def test_idempotent_duplicate_rows_ok(tmp_path):
     from pytest_given.model import TermId
 
     with given(t'two identical rows for the same {pg["Term"]}'):
-        path = tmp_path / 'dup_ok.md'
-        path.write_text(
+        doc = (
             '| Term | Meaning |\n|---|---|\n'
             '| Guest | A person booking. |\n'
-            '| Guest | A person booking. |\n',
-            encoding='utf-8',
+            '| Guest | A person booking. |\n'
         )
+        attach('Glossary file', doc)
+        path = tmp_path / 'dup_ok.md'
+        path.write_text(doc, encoding='utf-8')
     with when(t'the {pg["FileGlossary"]} parses them'):
         fg = FileGlossary(path)
     with then(t'they collapse to a single {pg["Term"]}'):
@@ -310,6 +316,7 @@ def test_idempotent_duplicate_rows_ok(tmp_path):
 )
 def test_file_glossary_call_known_name_returns_handle(glossary_file):
     with given(t'a {pg["FileGlossary"]} loaded from a Markdown file'):
+        attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
     with when(t'a known {pg["Term"]} is looked up by call'):
         handle = glossary('Guest')
@@ -324,6 +331,7 @@ def test_file_glossary_call_known_name_returns_handle(glossary_file):
 )
 def test_file_glossary_call_unknown_name_raises(glossary_file):
     with given(t'a {pg["FileGlossary"]} loaded from a Markdown file'):
+        attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
     with (
         when_then(

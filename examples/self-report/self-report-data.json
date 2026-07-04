@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-04T08:04:51.714084+00:00",
+    "timestamp": "2026-07-04T08:30:16.808778+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "b6e9991ef09a85a357e67e6ef5c4a3e844c05c3d"
+    "commit_sha": "9d8e60264a219098c8fb3d4c7d8804e9042bfe25"
   },
   "scenarios": [
     {
@@ -41,7 +41,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest  | A person booking. |\n| Room   | A bookable room. |\n| search | Look up options. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -130,7 +136,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest  | A person booking. |\n| Room   | A bookable room. |\n| search | Look up options. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -180,7 +192,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 41
+        "line": 42
       },
       "story_id": null,
       "activity_ids": []
@@ -220,7 +232,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest  | A person booking. |\n| Room   | A bookable room. |\n| search | Look up options. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -266,7 +284,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 54
+        "line": 56
       },
       "story_id": null,
       "activity_ids": []
@@ -305,7 +323,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest  | A person booking. |\n| Room   | A bookable room. |\n| search | Look up options. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -355,7 +379,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 65
+        "line": 68
       },
       "story_id": null,
       "activity_ids": []
@@ -394,7 +418,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest  | A person booking. |\n| Room   | A bookable room. |\n| search | Look up options. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -451,7 +481,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 82
+        "line": 86
       },
       "story_id": null,
       "activity_ids": []
@@ -490,7 +520,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest  | A person booking. |\n| Room   | A bookable room. |\n| search | Look up options. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -550,7 +586,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 97
+        "line": 102
       },
       "story_id": null,
       "activity_ids": []
@@ -580,7 +616,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | Actor |\n| Room | y | Work Object |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -643,7 +685,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 116
+        "line": 122
       },
       "story_id": null,
       "activity_ids": []
@@ -669,7 +711,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | Actor |\n| Room | y | Work Object |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -719,7 +767,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 135
+        "line": 142
       },
       "story_id": null,
       "activity_ids": []
@@ -749,7 +797,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "| Term | Meaning | Kind |\n|---|---|---|\n| Room | y | work_object |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -812,7 +866,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 154
+        "line": 162
       },
       "story_id": null,
       "activity_ids": []
@@ -838,7 +892,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | Wizard |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -888,7 +948,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 171
+        "line": 178
       },
       "story_id": null,
       "activity_ids": []
@@ -964,7 +1024,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 192
+        "line": 198
       },
       "story_id": null,
       "activity_ids": []
@@ -1003,7 +1063,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "| Term | Meaning |\n|---|---|\n| @#$ | some definition |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -1053,7 +1119,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 219
+        "line": 225
       },
       "story_id": null,
       "activity_ids": []
@@ -1092,7 +1158,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "| Term | Meaning |\n|---|---|\n| Guest | First definition. |\n| Guest | Second definition. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -1142,7 +1214,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 240
+        "line": 245
       },
       "story_id": null,
       "activity_ids": []
@@ -1172,7 +1244,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "| Term | Meaning |\n|---|---|\n| Guest |   |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -1241,7 +1319,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 263
+        "line": 269
       },
       "story_id": null,
       "activity_ids": []
@@ -1277,7 +1355,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "| Term | Meaning |\n|---|---|\n| Guest | A person booking. |\n| Guest | A person booking. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -1337,7 +1421,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 282
+        "line": 287
       },
       "story_id": null,
       "activity_ids": []
@@ -1376,7 +1460,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest  | A person booking. |\n| Room   | A bookable room. |\n| search | Look up options. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -1439,7 +1529,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 307
+        "line": 313
       },
       "story_id": null,
       "activity_ids": []
@@ -1478,7 +1568,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest  | A person booking. |\n| Room   | A bookable room. |\n| search | Look up options. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -1525,7 +1621,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 321
+        "line": 328
       },
       "story_id": null,
       "activity_ids": []
@@ -2088,7 +2184,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -3620,7 +3716,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest | A person booking. |\n| Room  | A bookable room. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": "simple_doc"
@@ -3680,7 +3782,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 23
+        "line": 24
       },
       "story_id": null,
       "activity_ids": []
@@ -3707,7 +3809,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest | A person booking. |\n| Room  | A bookable room. |\n\n## More\n\n| Term | Meaning |\n|---|---|\n| Search | Look up. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -3757,7 +3865,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 41
+        "line": 42
       },
       "story_id": null,
       "activity_ids": []
@@ -3784,7 +3892,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "| Word | Note | Role |\n|---|---|---|\n| Guest | x | Actor |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -3821,7 +3935,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 59
+        "line": 61
       },
       "story_id": null,
       "activity_ids": []
@@ -3848,7 +3962,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "| Term | Meaning |\n|---|---|\n| A\\|B | pipe\\|here |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -3885,7 +4005,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 74
+        "line": 77
       },
       "story_id": null,
       "activity_ids": []
@@ -3912,7 +4032,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "```\n| Term | Meaning |\n|---|---|\n| Fake | nope |\n```\n\n| Term | Meaning |\n|---|---|\n| Real | yes |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -3949,7 +4075,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 91
+        "line": 95
       },
       "story_id": null,
       "activity_ids": []
@@ -3976,7 +4102,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "# Just a heading\n\nNo tables here.",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -4023,7 +4155,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 109
+        "line": 114
       },
       "story_id": null,
       "activity_ids": []
@@ -4050,7 +4182,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest | A person booking. |\n| Room  | A bookable room. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": "simple_doc"
@@ -4087,7 +4225,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 128
+        "line": 134
       },
       "story_id": null,
       "activity_ids": []
@@ -4114,7 +4252,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest | A person booking. |\n| Room  | A bookable room. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": "simple_doc"
@@ -4151,7 +4295,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 145
+        "line": 151
       },
       "story_id": null,
       "activity_ids": []
@@ -4178,7 +4322,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "| Term | Meaning | Type |\n|---|---|---|\n| Guest | A person |\n| Room | A bookable room | place |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -4215,7 +4365,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 169
+        "line": 175
       },
       "story_id": null,
       "activity_ids": []
@@ -4255,7 +4405,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "| Term | Meaning |\n|---|---|\n| **Scenario** | A decorated test. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -4292,7 +4448,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 186
+        "line": 193
       },
       "story_id": null,
       "activity_ids": []
@@ -4329,7 +4485,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "| Term | Meaning |\n|---|---|\n| *Step* | one. |\n| `given` | two. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -4366,7 +4528,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 205
+        "line": 213
       },
       "story_id": null,
       "activity_ids": []
@@ -4406,7 +4568,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "| Term | Meaning |\n|---|---|\n| work_object | a thing. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -4443,7 +4611,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 220
+        "line": 229
       },
       "story_id": null,
       "activity_ids": []
@@ -4470,7 +4638,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | **Actor** |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -4507,7 +4681,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 235
+        "line": 245
       },
       "story_id": null,
       "activity_ids": []
@@ -4534,7 +4708,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "| Term | Meaning |\n|---|---|\n| Scenario | A test decorated with `@scenario(...)`. |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -4571,7 +4751,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 250
+        "line": 261
       },
       "story_id": null,
       "activity_ids": []
@@ -4598,7 +4778,13 @@
           },
           "status": "passed",
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "This line has a | in it but no separator follows.\nNext line is not a separator.\n\n| Term | Meaning |\n|---|---|\n| Real | yes |\n",
+              "content_type": "text"
+            }
+          ],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -4635,7 +4821,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 268
+        "line": 280
       },
       "story_id": null,
       "activity_ids": []
@@ -5620,7 +5806,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",

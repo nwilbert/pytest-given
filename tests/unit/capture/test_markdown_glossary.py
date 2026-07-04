@@ -1,6 +1,6 @@
 import pytest
 
-from pytest_given import given, scenario, then, when, when_then
+from pytest_given import attach, given, scenario, then, when, when_then
 from pytest_given.capture.markdown_glossary import GlossaryRow, parse_glossary_tables
 from pytest_given.model import PytestGivenError
 from tests._vocab import pg
@@ -17,6 +17,7 @@ SIMPLE = """# Glossary
 @pytest.fixture
 @given('a Markdown document with one pipe table')
 def simple_doc():
+    attach('Markdown document', SIMPLE)
     return SIMPLE
 
 
@@ -48,6 +49,7 @@ def test_merges_multiple_tables():
             SIMPLE
             + '\n## More\n\n| Term | Meaning |\n|---|---|\n| Search | Look up. |\n'
         )
+        attach('Markdown document', text)
     with when('the parser reads the whole document'):
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
@@ -63,6 +65,7 @@ def test_merges_multiple_tables():
 def test_column_by_header_name_case_insensitive():
     with given('a table with custom, differently-cased header names'):
         text = '| Word | Note | Role |\n|---|---|---|\n| Guest | x | Actor |\n'
+        attach('Markdown document', text)
     with when('the parser selects columns by header name'):
         rows = parse_glossary_tables(
             text, term_column='word', description_column='note', kind_column='role'
@@ -78,6 +81,7 @@ def test_column_by_header_name_case_insensitive():
 def test_escaped_pipe_in_cell():
     with given(r'cells containing escaped pipe characters (\|)'):
         text = '| Term | Meaning |\n|---|---|\n| A\\|B | pipe\\|here |\n'
+        attach('Markdown document', text)
     with when('the parser splits the row'):
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
@@ -98,6 +102,7 @@ def test_skips_tables_in_fenced_code_blocks():
             '```\n| Term | Meaning |\n|---|---|\n| Fake | nope |\n```\n\n'
             '| Term | Meaning |\n|---|---|\n| Real | yes |\n'
         )
+        attach('Markdown document', text)
     with when('the parser reads the document'):
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
@@ -113,6 +118,7 @@ def test_skips_tables_in_fenced_code_blocks():
 def test_no_table_raises():
     with given('a document with no pipe table'):
         text = '# Just a heading\n\nNo tables here.'
+        attach('Markdown document', text)
     with (
         when_then(
             t'the parser reads it for a {pg["FileGlossary"]}',
@@ -173,6 +179,7 @@ SHORT_ROW_TABLE = """| Term | Meaning | Type |
 def test_data_row_with_fewer_columns_raises():
     with given('a table with a data row narrower than its header'):
         text = SHORT_ROW_TABLE
+        attach('Markdown document', text)
     with (
         when_then(
             'the parser reads the short row',
@@ -190,6 +197,7 @@ def test_data_row_with_fewer_columns_raises():
 def test_strips_bold_from_term_cell():
     with given(t'a {pg["Term"]} cell written with **bold** emphasis'):
         text = '| Term | Meaning |\n|---|---|\n| **Scenario** | A decorated test. |\n'
+        attach('Markdown document', text)
     with when('the parser reads the term cell'):
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
@@ -209,6 +217,7 @@ def test_strips_bold_from_term_cell():
 def test_strips_italic_and_inline_code_from_term_cell():
     with given(t'{pg["Term"]} cells using *italic* and `code` emphasis'):
         text = '| Term | Meaning |\n|---|---|\n| *Step* | one. |\n| `given` | two. |\n'
+        attach('Markdown document', text)
     with when('the parser reads the term cells'):
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
@@ -224,6 +233,7 @@ def test_strips_italic_and_inline_code_from_term_cell():
 def test_preserves_underscores_inside_term_identifier():
     with given(t'a {pg["Term"]} literally named work_object'):
         text = '| Term | Meaning |\n|---|---|\n| work_object | a thing. |\n'
+        attach('Markdown document', text)
     with when('the parser reads the term cell'):
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
@@ -239,6 +249,7 @@ def test_preserves_underscores_inside_term_identifier():
 def test_strips_emphasis_from_kind_cell():
     with given('a Kind cell written with bold emphasis'):
         text = '| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | **Actor** |\n'
+        attach('Markdown document', text)
     with when('the parser reads the kind cell'):
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=2
@@ -257,6 +268,7 @@ def test_leaves_description_markdown_intact():
             '| Term | Meaning |\n|---|---|\n'
             '| Scenario | A test decorated with `@scenario(...)`. |\n'
         )
+        attach('Markdown document', text)
     with when('the parser reads the row'):
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
@@ -279,6 +291,7 @@ def test_pipe_line_without_separator_is_skipped():
             '|---|---|\n'
             '| Real | yes |\n'
         )
+        attach('Markdown document', text)
     with when('the parser reads the document'):
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
