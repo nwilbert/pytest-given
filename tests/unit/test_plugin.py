@@ -3,11 +3,11 @@ in integration tests; tested here directly so coverage hits 100%."""
 
 import inspect
 from types import SimpleNamespace
-from typing import Any, cast
+from typing import Annotated, Any, cast
 
 import pytest
 
-from pytest_given import plugin
+from pytest_given import Template, given, plugin, then, when
 from pytest_given.capture.collector import (
     Collector,
     get_active_collector,
@@ -409,3 +409,65 @@ def test_scan_conftests_discovers_file_glossary(tmp_path: Any) -> None:
     )
     result = plugin._scan_conftests_for_glossary(cast(pytest.Session, fake_session))
     assert result is fg.glossary
+
+
+def test_extract_given_descriptor_from_parametrize_param() -> None:
+    def f(text: Annotated[str, given(Template('the name {text}'))]) -> None: ...
+
+    descs = plugin._annotated_given_descriptors(f)
+    assert set(descs) == {'text'}
+    assert descs['text'].phase == 'given'
+
+
+def test_extract_ignores_unannotated_and_plain_annotated_params() -> None:
+    def f(a: int, b: Annotated[str, 'just a string'], c: str) -> None: ...
+
+    assert plugin._annotated_given_descriptors(f) == {}
+
+
+def test_extract_skips_self() -> None:
+    class T:
+        def m(self, text: Annotated[str, given('a name')]) -> None: ...
+
+    descs = plugin._annotated_given_descriptors(T.m)
+    assert set(descs) == {'text'}
+
+
+def test_extract_rejects_when_in_annotated() -> None:
+    def f(x: Annotated[int, when('an action')]) -> None: ...
+
+    with pytest.raises(PytestGivenError, match='only given'):
+        plugin._annotated_given_descriptors(f)
+
+
+def test_extract_rejects_then_in_annotated() -> None:
+    def f(x: Annotated[int, then('an outcome')]) -> None: ...
+
+    with pytest.raises(PytestGivenError, match='only given'):
+        plugin._annotated_given_descriptors(f)
+
+
+def test_extract_rejects_tstring_label() -> None:
+    name = 'frozen'
+
+    def f(x: Annotated[int, given(t'a {name} label')]) -> None: ...
+
+    with pytest.raises(PytestGivenError, match='t-string'):
+        plugin._annotated_given_descriptors(f)
+
+
+def test_extract_rejects_multiple_descriptors_on_one_param() -> None:
+    def f(x: Annotated[int, given('one'), given('two')]) -> None: ...
+
+    with pytest.raises(PytestGivenError, match='multiple'):
+        plugin._annotated_given_descriptors(f)
+
+
+def test_extract_returns_empty_on_unresolvable_annotations() -> None:
+    def f(
+        x: 'DefinitelyNotAType',  # noqa: UP037, F821
+        y: Annotated[str, given('a name')],
+    ) -> None: ...
+
+    # Best-effort: an unresolvable sibling annotation must not raise.
+    assert plugin._annotated_given_descriptors(f) == {}

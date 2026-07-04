@@ -9,7 +9,8 @@ import time
 from collections.abc import Generator
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, cast
+from string import templatelib
+from typing import Any, cast, get_type_hints
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -21,7 +22,7 @@ from .capture import (
     parse_short_repr,
     set_active_collector,
 )
-from .capture.decorators import ScenarioDecorator
+from .capture.decorators import ScenarioDecorator, StepDescriptor
 from .capture.file_glossary import FileGlossary
 from .capture.kind_resolution import resolve_glossary_kinds
 from .capture.source import item_source, set_rootdir
@@ -319,6 +320,55 @@ def _extract_skip_reason(longrepr: object) -> str | None:
     if not message or message in ('<Skipped instance>', 'unconditional skip'):
         return None
     return message
+
+
+def _annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
+    """Map each parameter carrying ``Annotated[..., given(...)]`` to its
+    descriptor.
+
+    Reads type hints off the unwrapped function (past the ``@scenario``
+    wrapper). Best-effort: if the annotations cannot be resolved, returns an
+    empty mapping rather than failing the test. Rejects the forbidden forms —
+    ``when(...)`` / ``then(...)``, a t-string label, or more than one
+    descriptor on a single parameter.
+    """
+    target = inspect.unwrap(cast(Any, func))
+    try:
+        hints = get_type_hints(target, include_extras=True)
+    except Exception:
+        return {}
+    out: dict[str, StepDescriptor] = {}
+    for name, hint in hints.items():
+        if name in ('self', 'cls', 'return'):
+            continue
+        metadata = getattr(hint, '__metadata__', None)
+        if metadata is None:
+            continue
+        descriptors = [m for m in metadata if isinstance(m, StepDescriptor)]
+        if not descriptors:
+            continue
+        if len(descriptors) > 1:
+            raise PytestGivenError(
+                f'multiple given()/when()/then() in Annotated metadata for '
+                f'parameter {name!r} — use exactly one.'
+            )
+        desc = descriptors[0]
+        if desc.phase != 'given':
+            raise PytestGivenError(
+                f'only given() is supported inside Annotated; parameter '
+                f"{name!r} carries {desc.phase}(). Use 'with when(...)' / "
+                f"'with then(...)' in the test body for the action and outcome."
+            )
+        if isinstance(desc._source, templatelib.Template):
+            raise PytestGivenError(
+                f'Annotated given(t"...") on parameter {name!r} is not '
+                f'supported: a t-string evaluates at function-definition time, '
+                f'where the parameter value is not in scope. Use '
+                f'given(Template("... {{{name}}} ...")) for a per-case '
+                f'placeholder, or a plain string label.'
+            )
+        out[name] = desc
+    return out
 
 
 def _graft_fixture_recordings(item: pytest.Item) -> None:
