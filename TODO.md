@@ -8,7 +8,6 @@
 - [ ] File Glossary with no stories -> don't show "Uncategorized" header
 - [ ] Give some indication / filter in Glossary for number of corresponding scenarios
 - [ ] render markdown in FileGlossary descriptions and normal glossary as well
-- [ ] Make story→glossary resolution deterministic by resolving from the collected stories' own glossary reference rather than the mutable module-global _REGISTERED_GLOSSARIES, so the primary path no longer depends on a session-global that the test suite clears per-test and is only saved by the conftest-scan fallback.****
 
 ## Next
 

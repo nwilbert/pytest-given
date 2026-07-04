@@ -368,7 +368,7 @@ def test_validate_scenario_story_binding_activities_without_story_raises() -> No
 @pytest.mark.usefixtures('_reset_story_registry_plugin')
 def test_resolve_glossary_raises_with_two_distinct_glossaries_via_stories() -> None:
     """_resolve_glossary must raise when two stories reach different Glossary
-    instances via their activity paths (plugin.py line 427)."""
+    instances via their activity paths — read straight off the story tree."""
     g1 = Glossary()
     guest1 = g1.actor('Guest One')
     search1 = g1.verb('search')
@@ -389,16 +389,6 @@ def test_resolve_glossary_raises_with_two_distinct_glossaries_via_stories() -> N
         plugin._resolve_glossary([s1, s2], cast(pytest.Session, fake_session))
 
 
-@pytest.fixture
-def _reset_glossary_registry_plugin() -> Any:
-    from pytest_given.capture.glossary import clear_glossary_registry
-
-    clear_glossary_registry()
-    yield
-    clear_glossary_registry()
-
-
-@pytest.mark.usefixtures('_reset_glossary_registry_plugin')
 def test_scan_conftests_discovers_file_glossary(tmp_path: Any) -> None:
     """_scan_conftests_for_glossary returns the inner Glossary from a FileGlossary
     attribute on a conftest plugin object (plugin.py line 494)."""

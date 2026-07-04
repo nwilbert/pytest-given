@@ -34,13 +34,9 @@ from pytest_given.model import (
 
 @pytest.fixture(autouse=True)
 def _reset_story_registry():
-    from pytest_given.capture.glossary import clear_glossary_registry
-
     clear_story_registry()
-    clear_glossary_registry()
     yield
     clear_story_registry()
-    clear_glossary_registry()
 
 
 def test_context_manager_basic() -> None:

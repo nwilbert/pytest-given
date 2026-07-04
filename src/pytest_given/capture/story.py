@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 
 from ..model import (
     Activity,
@@ -86,16 +86,20 @@ def path(*parts: _PathArg) -> ActivityPath:
         else:
             _check_position(part, position, 'noun', _NODE_TYPES, parts)
     schema_parts = tuple(_to_part(part) for part in parts)
-    # Stash the set of Glossary object-identities the path references — read
-    # by activity() and _check_single_glossary to enforce the v1 "one glossary
-    # per story" invariant at construction time. Not serialized.
-    glossary_ids: frozenset[int] = frozenset(
-        _obj_id(owner)
+    # Stash the live Glossary objects the path references, keyed by object id —
+    # read by activity() and _check_single_glossary to enforce the v1 "one
+    # glossary per story" invariant at construction time, and by story() so the
+    # owning Glossary travels on the Story tree itself. plugin._resolve_glossary
+    # reads that stash to pick the report's glossary deterministically, without
+    # consulting any session-global. Keying by id() dedups by identity (Glossary
+    # is unhashable) while keeping the object. Not serialized.
+    glossaries: dict[int, Glossary] = {
+        _obj_id(owner): owner
         for owner in (_glossary_of(part) for part in parts)
         if owner is not None
-    )
+    }
     path_obj = ActivityPath(parts=schema_parts)
-    object.__setattr__(path_obj, '_glossary_ids', glossary_ids)
+    object.__setattr__(path_obj, '_glossaries', glossaries)
     return path_obj
 
 
@@ -138,17 +142,26 @@ def activity(
         paths = tuple(p for p in parts_or_paths if isinstance(p, ActivityPath))
     else:
         paths = (path(*parts_or_paths),)  # type: ignore[arg-type]
-    glossary_ids: frozenset[int] = frozenset().union(
-        *(getattr(p, '_glossary_ids', frozenset()) for p in paths)
-    )
+    glossaries = _merge_glossaries(getattr(p, '_glossaries', {}) for p in paths)
     if id == 0:
         raise PytestGivenError(
             'activity(id=0) is reserved as the unset sentinel; '
             'use id=1.. or omit to take the auto-assigned sequence number.'
         )
     a = Activity(id=ActivityId(id if id is not None else 0), paths=paths)
-    object.__setattr__(a, '_glossary_ids', glossary_ids)
+    object.__setattr__(a, '_glossaries', glossaries)
     return a
+
+
+def _merge_glossaries(
+    stashes: Iterable[dict[int, Glossary]],
+) -> dict[int, Glossary]:
+    """Union the id→Glossary stashes of several paths/activities, deduping by
+    object identity."""
+    merged: dict[int, Glossary] = {}
+    for stash in stashes:
+        merged.update(stash)
+    return merged
 
 
 _STORY_REGISTRY: dict[StoryId, str] = {}
@@ -177,8 +190,13 @@ def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     source = capture_caller_source(skip=2)
     numbered = _assign_sequence_numbers(tuple(activities))
     _check_unique_ids(numbered)
-    _check_single_glossary(title, numbered)
-    return Story(id=sid, title=title, activities=numbered, source=source)
+    glossaries = _merge_glossaries(getattr(a, '_glossaries', {}) for a in numbered)
+    _check_single_glossary(title, glossaries)
+    result = Story(id=sid, title=title, activities=numbered, source=source)
+    # Carry the story's glossary on the tree so plugin._resolve_glossary can
+    # pick it deterministically from the collected stories themselves.
+    object.__setattr__(result, '_glossaries', glossaries)
+    return result
 
 
 def _assign_sequence_numbers(
@@ -197,9 +215,7 @@ def _assign_sequence_numbers(
         while ActivityId(next_seq) in taken:
             next_seq += 1
         new = Activity(id=ActivityId(next_seq), paths=a.paths)
-        object.__setattr__(
-            new, '_glossary_ids', getattr(a, '_glossary_ids', frozenset())
-        )
+        object.__setattr__(new, '_glossaries', getattr(a, '_glossaries', {}))
         out.append(new)
         next_seq += 1
     return tuple(out)
@@ -215,13 +231,10 @@ def _check_unique_ids(activities: tuple[Activity, ...]) -> None:
         seen.add(a.id)
 
 
-def _check_single_glossary(title: str, activities: tuple[Activity, ...]) -> None:
-    glossary_ids: frozenset[int] = frozenset().union(
-        *(getattr(a, '_glossary_ids', frozenset()) for a in activities)
-    )
-    if len(glossary_ids) > 1:
+def _check_single_glossary(title: str, glossaries: dict[int, Glossary]) -> None:
+    if len(glossaries) > 1:
         raise PytestGivenError(
-            f'story {title!r} spans multiple glossaries ({len(glossary_ids)}); '
+            f'story {title!r} spans multiple glossaries ({len(glossaries)}); '
             f'v1 supports at most one glossary per story.'
         )
 

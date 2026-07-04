@@ -23,12 +23,10 @@ from .capture import (
 )
 from .capture.decorators import ScenarioDecorator
 from .capture.file_glossary import FileGlossary
-from .capture.glossary import clear_glossary_registry, get_registered_glossaries
 from .capture.kind_resolution import resolve_glossary_kinds
 from .capture.source import item_source, set_rootdir
 from .capture.story import clear_story_registry
 from .model import (
-    ActivityTermRef,
     FixtureRecording,
     Glossary,
     Metadata,
@@ -48,7 +46,6 @@ from .model import (
     Scenario,
     Step,
     Story,
-    TermId,
     report_to_dict,
 )
 from .report import detect_commit_sha, render_html, resolve_template
@@ -107,7 +104,6 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     global collector
     collector = Collector()
     clear_story_registry()
-    clear_glossary_registry()
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
@@ -441,40 +437,29 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
 def _resolve_glossary(stories: list[Story], session: pytest.Session) -> Glossary | None:
     """Pick the Glossary for the report.
 
-    1. If stories were collected, look at which Glossary instances actually
-       contain a term referenced by those stories — the rest are irrelevant
-       (test-local fixtures, unrelated Glossaries that happen to share the
-       process). This works without any side-channel on the Story tree, so
-       it round-trips through JSON correctly.
-    2. With no stories, fall back to a conftest scan — that catches the case
-       where the user declares a Glossary at conftest level but only uses
-       term refs in narrations (no stories yet).
+    1. If any collected story references a Glossary, read it straight off the
+       story tree — `story()` stashes the owning Glossary object(s) there at
+       construction time. This is deterministic: it depends only on the live
+       Story objects we were handed, not on any mutable session-global that
+       could be cleared per-test or shared across the process. (The stash is a
+       side-channel that does not survive JSON, but resolution runs on the live
+       in-memory stories, never on deserialized ones — the renderer reads the
+       serialized `glossary` field instead.)
+    2. With no stories (or stories that reference no glossary), fall back to a
+       conftest scan — that catches the case where the user declares a Glossary
+       at conftest level but only uses term refs in narrations (no stories yet).
     """
-    if not stories:
-        return _scan_conftests_for_glossary(session)
-    used = _term_ids_referenced_by_stories(stories)
-    reaching = [
-        g for g in get_registered_glossaries() if any(t.id in used for t in g.terms)
-    ]
+    reaching: dict[int, Glossary] = {}
+    for story in stories:
+        reaching.update(getattr(story, '_glossaries', {}))
     if len(reaching) > 1:
         raise PytestGivenError(
             f'stories reach {len(reaching)} distinct Glossary instances; '
             f'v1 supports at most one.'
         )
     if reaching:
-        return reaching[0]
+        return next(iter(reaching.values()))
     return _scan_conftests_for_glossary(session)
-
-
-def _term_ids_referenced_by_stories(stories: list[Story]) -> set[TermId]:
-    used: set[TermId] = set()
-    for story in stories:
-        for activity in story.activities:
-            for activity_path in activity.paths:
-                for part in activity_path.parts:
-                    if isinstance(part, ActivityTermRef):
-                        used.add(part.term_id)
-    return used
 
 
 def _scan_conftests_for_glossary(session: pytest.Session) -> Glossary | None:

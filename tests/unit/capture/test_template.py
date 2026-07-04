@@ -371,16 +371,7 @@ _FILE_GLOSSARY_MD = (
 
 
 @pytest.fixture
-def _reset_glossary_registry():
-    from pytest_given.capture.glossary import clear_glossary_registry
-
-    clear_glossary_registry()
-    yield
-    clear_glossary_registry()
-
-
-@pytest.fixture
-def file_glossary(tmp_path: Path, _reset_glossary_registry) -> FileGlossary:
+def file_glossary(tmp_path: Path) -> FileGlossary:
     path = tmp_path / 'G.md'
     path.write_text(_FILE_GLOSSARY_MD, encoding='utf-8')
     return FileGlossary(path)

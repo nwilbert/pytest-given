@@ -16,7 +16,6 @@ from .glossary import (
     DeferredTermHandle,
     _normalize_definition,
     deferred_handle_or_raise,
-    register_glossary,
     terms_match,
 )
 from .markdown_glossary import ColumnSpec, GlossaryRow, parse_glossary_tables
@@ -57,7 +56,6 @@ class FileGlossary:
         self._handles: dict[TermId, DeferredTermHandle] = {}
         for row in rows:
             self._add_row(row)
-        register_glossary(self._glossary)
 
     @property
     def glossary(self) -> Glossary:

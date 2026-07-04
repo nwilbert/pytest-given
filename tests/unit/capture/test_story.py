@@ -23,13 +23,9 @@ from tests._vocab import pg
 
 @pytest.fixture(autouse=True)
 def _reset_story_registry():
-    from pytest_given.capture.glossary import clear_glossary_registry
-
     clear_story_registry()
-    clear_glossary_registry()
     yield
     clear_story_registry()
-    clear_glossary_registry()
 
 
 @pytest.fixture
@@ -510,19 +506,27 @@ def test_story_id_collision_does_not_fire_after_registry_clear():
     story('Book', [])
 
 
-def test_path_records_single_glossary_id(guest, search, room):
-    """Glossary identity is stashed as a frozenset of object-ids on the path so
-    the single-glossary invariant can be enforced at story construction."""
+def test_path_records_single_glossary(guest, search, room):
+    """The live Glossary the path references is stashed (keyed by object id) so
+    the single-glossary invariant can be enforced at story construction and the
+    plugin can resolve the report glossary from the story tree."""
     p = path(guest, search, room)
-    assert getattr(p, '_glossary_ids', frozenset()) == frozenset({id(guest.glossary)})
+    assert getattr(p, '_glossaries', {}) == {id(guest.glossary): guest.glossary}
 
 
-def test_activity_unions_glossary_ids_across_paths(g, guest, search, room):
-    # Two paths, same glossary — id set must dedup, not double-count.
+def test_activity_unions_glossaries_across_paths(g, guest, search, room):
+    # Two paths, same glossary — the stash must dedup by identity, not double-count.
     p1 = path(guest, search, room)
     p2 = path(guest('Alice'), search, room)
     a = activity(p1, p2)
-    assert getattr(a, '_glossary_ids', frozenset()) == frozenset({id(g)})
+    assert getattr(a, '_glossaries', {}) == {id(g): g}
+
+
+def test_story_stashes_its_glossary(guest, search, room):
+    """story() carries the referenced Glossary on the Story tree so
+    plugin._resolve_glossary can pick it without any session-global."""
+    s = story('Book', [activity(guest, search, room)])
+    assert getattr(s, '_glossaries', {}) == {id(guest.glossary): guest.glossary}
 
 
 # --- Additional grammar/constructor cases (kept as plain unit checks) ---

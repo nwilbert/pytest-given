@@ -157,29 +157,6 @@ _HANDLE_BY_KIND: dict[Literal['actor', 'object', 'verb'], type[TermHandle]] = {
 }
 
 
-# Insertion-ordered registry of Glossary instances ever used during the
-# session. Populated lazily by `_mint_handle` (i.e. the first time the
-# user mints any handle from a Glossary) so unused Glossaries don't show
-# up. plugin._resolve_glossary reads this to find "the" glossary without
-# needing a side-channel attribute on stories, which doesn't survive
-# JSON round-trip.
-_REGISTERED_GLOSSARIES: dict[int, Glossary] = {}
-
-
-def register_glossary(glossary: Glossary) -> None:
-    _REGISTERED_GLOSSARIES.setdefault(id(glossary), glossary)
-
-
-def get_registered_glossaries() -> list[Glossary]:
-    """Return Glossary instances that minted at least one handle this session."""
-    return list(_REGISTERED_GLOSSARIES.values())
-
-
-def clear_glossary_registry() -> None:
-    """Reset the session-scoped Glossary registry. Called at pytest_sessionstart."""
-    _REGISTERED_GLOSSARIES.clear()
-
-
 def _mint_handle(
     glossary: Glossary,
     kind: Literal['actor', 'object', 'verb'],
@@ -189,7 +166,6 @@ def _mint_handle(
     # skip=3: this function → kind wrapper (actor/work_object/verb) → user call site
     source = capture_caller_source(skip=3)
     term = _register_kind(glossary, kind, name, definition, source)
-    register_glossary(glossary)
     return _HANDLE_BY_KIND[kind](_term=term, _glossary=glossary)
 
 
@@ -243,7 +219,6 @@ def _glossary_call(
     # skip=2: this function → user call site
     source = capture_caller_source(skip=2)
     term = _register_kind(self, None, name, definition, source)
-    register_glossary(self)
     return DeferredTermHandle(_term=term, _glossary=self)
 
 
