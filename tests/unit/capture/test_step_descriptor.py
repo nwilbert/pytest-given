@@ -299,6 +299,49 @@ def test_when_then_accepts_tstrings_for_glossary_refs() -> None:
     ]
 
 
+@pytest.mark.parametrize('phase_factory', [given, then])
+def test_when_then_rejects_cross_phase_nested_step(phase_factory) -> None:
+    """A `given` or `then` opened inside a when_then body hits the collector's
+    cross-phase guard (it would nest under the active `when`), and the step
+    stack is left balanced so the scenario can still finish."""
+    from pytest_given.capture.decorators import when_then
+
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with pytest.raises(PytestGivenError, match=r"Cannot nest .* inside 'when'"):
+            with when_then('act', 'result'), phase_factory('sneaky'):
+                pass
+        assert collector._step_stack == []
+    finally:
+        set_active_collector(None)
+
+
+def test_when_then_allows_nested_when_as_child_sub_step() -> None:
+    """A nested `when` is the same phase, so it becomes a child sub-step of the
+    action — the `then` sibling is still emitted after the body exits."""
+    from pytest_given.capture.decorators import when_then
+
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with when_then('the action runs', 'the outcome holds'):
+            with when('a sub-action runs'):
+                pass
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert [(s.phase, s.narration.text) for s in scenario.steps] == [
+        ('when', 'the action runs'),
+        ('then', 'the outcome holds'),
+    ]
+    assert [(c.phase, c.narration.text) for c in scenario.steps[0].children] == [
+        ('when', 'a sub-action runs'),
+    ]
+
+
 def test_when_then_exported_from_package() -> None:
     """when_then is part of the public API."""
     import pytest_given
