@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-04T06:07:30.080500+00:00",
+    "timestamp": "2026-07-04T06:35:20.478335+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "a27fc0b2c26957dc31b1944131c9ad1aa9d8d247"
+    "commit_sha": "fd4b0e18f50365681a4eba2da97d4ef3af8ef13c"
   },
   "scenarios": [
     {
@@ -1843,7 +1843,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -1929,7 +1929,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -2005,7 +2005,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
