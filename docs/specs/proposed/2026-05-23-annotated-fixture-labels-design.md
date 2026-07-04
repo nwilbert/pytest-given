@@ -72,6 +72,8 @@ For dynamic per-case narration on parametrize parameters, use `pytest_given.Temp
 
 A plain string `given('a {cup_size} ml cup')` is not interpreted as a template — `narration_from(str)` produces a `Narration` with empty `parts`, so the renderer emits the literal text `a {cup_size} ml cup` (braces and all). If the test author wanted a placeholder, they need `Template(...)`. Mistakes here are loud, not silent.
 
+The **merged (collapsed) parametrized view** shows the placeholder as a bare `{cup_size}` — the schematic slot marks *which* column varies, not how any value prints, so conversion/format spec are dropped from it (they still apply to the concrete per-case value). This is the behavior established by `renderer.py:_placeholder_token`; an Annotated `given(Template('the name {text}'))` therefore reads `the name {text}` in the merged row and `the name '---'` per case.
+
 Multi-name parametrize is handled per parameter — each name is its own entry in `callspec.params` and `item.fixturenames`, and the resolution rules in the next section fire independently per parameter:
 
 ```python
@@ -91,11 +93,11 @@ For each parameter in the test function signature, excluding `self` and `cls`:
 1. **Extract Annotated metadata.** Call `typing.get_type_hints(func, include_extras=True)` once per test function. For each parameter, scan the metadata tuple of any `Annotated[...]` annotation for `StepDescriptor` instances.
 2. **Validate the descriptor.** If two or more `StepDescriptor`s appear on a single parameter, raise `PytestGivenError('multiple given()/when()/then() on parameter <name>')`. If the descriptor's phase is not `given`, raise `PytestGivenError("only given() is supported inside Annotated; use 'with when(...)' / 'with then(...)' in the test body for <name>")`.
 3. **Classify the parameter.** Using `item`:
-   - If `item.callspec` exists and `name in item.callspec.params` **and** the session fixture manager does not return a user-defined `FixtureDef` for the name → **parametrize parameter** (a direct parametrize value with no fixture body).
-   - Else if the fixture manager returns a `FixtureDef` whose `func` is a user-defined callable for the name → **fixture parameter**. This branch covers both ordinary fixtures and indirect-parametrize fixtures (where the name is *both* in `callspec.params` and has a real fixture).
-   - Otherwise → raise `PytestGivenError('Annotated given() on <name> is neither a fixture nor a parametrize parameter')`.
+   - If `item.callspec` exists and `name in item.callspec.params` **and** the fixture manager has no *non-synthetic* `FixtureDef` for the name → **parametrize parameter** (a direct parametrize value; pytest wraps it in a synthetic `FixtureDef`, which does not count).
+   - Else if the fixture manager returns a real (non-synthetic) `FixtureDef` for the name → **fixture parameter**. This branch covers ordinary user fixtures, indirect-parametrize fixtures (the name is *both* in `callspec.params` and has a real fixture), **and built-in / plugin fixtures** (`tmp_path`, `request`, `capsys`, `monkeypatch`, …) — a fixture is a fixture regardless of who defined it; a built-in simply records no body, so it lands in the "fixture, no decorator" row of the table below and gets a leaf `given`.
+   - Otherwise → **unreachable**. Every parameter reaching `pytest_runtest_setup` is one of the above — pytest fails genuinely unresolvable names at setup, before this hook — so guard the fall-through with an `assert`, not a user-facing error (project convention: assert over pragma for invariant guards).
 
-   "User-defined `FixtureDef`" is distinguished from pytest's synthetic parametrize defs by inspecting the def — concrete approach is a plan-time decision (`fixturedef.baseid` non-empty, or `fixturedef.func` not being a pytest internal). The classification is what matters for the spec; the discriminator is implementation detail.
+   The only discrimination that matters is **synthetic-parametrize-`FixtureDef` vs. real `FixtureDef`** — *not* user-defined vs. built-in. Pytest represents a direct parametrize value as a synthetic def; that synthetic def is the sole thing the parametrize branch must exclude. The concrete probe (e.g. `fixturedef.func` being pytest's synthesized direct-param wrapper, or an equivalent `_pytest` signal) is a plan-time decision; the classification is what matters for the spec.
 4. **Apply per category.**
 
 | Annotated `given(...)` on param | Fixture has `@given` decorator | Behavior |
@@ -108,7 +110,11 @@ For each parameter in the test function signature, excluding `self` and `cls`:
 
    (`@when` / `@then` on fixtures are already rejected at fixture-setup time, so only `@given` is reachable here.)
 
-5. **Ordering.** Grafted steps interleave fixture-recording grafts with Annotated leaves following `item.fixturenames` order — pytest's metafunc machinery puts direct parametrize parameters in the same list that drives fixture resolution, so iterating it gives a natural top-of-scenario layout before test-body steps. This replaces today's setup-order iteration over `collector.recordings()` (which works for fixture-only grafts but can't position Annotated leaves on parametrize params, since those have no recording to be ordered by setup time). In practice setup order and `fixturenames` order coincide for pure fixture grafts (dependencies set up before dependents); the change is necessary for the parametrize case and a no-op for the existing fixture case. Integration test 9 below pins the observed order.
+5. **Ordering.** Two phases, appended to the scenario's step list before any test-body steps:
+   1. **Fixture grafts** in `collector.recordings()` setup order — unchanged from today. This order is dependency-first (a fixture is set up before the fixture that requests it), which reads correctly for nested fixtures. An Annotated *override* on a decorated fixture happens in this phase: the recording is matched back to its parameter name via `recording.root.fixture_name`, and the override narration replaces the grafted root.
+   2. **Annotated-only leaves** — for each test parameter (in test-signature order) that carries an `Annotated[..., given(...)]` **and** is not a decorated fixture (i.e. a direct parametrize value or a built-in/undecorated fixture, neither of which recorded a subtree), synthesize a leaf `given`.
+
+   > **Why not `item.fixturenames` order?** `item.fixturenames` is *not* setup order — it can list a dependent before its dependency (verified: `['derived', 'other', 'request', 'base']` for a `derived(base)` chain whose setup order is `['base', 'derived', 'other']`). Setup order is required to keep nested-fixture grafts correct, so it is retained for phase 1; phase-2 leaves have no recording and thus no setup-order position, so they follow the stable, author-visible test-signature order. Integration tests 9–10 pin the observed order.
 
 ### Forbidden usage
 
@@ -117,7 +123,8 @@ Hard errors (raise `PytestGivenError` during `pytest_runtest_setup`, failing the
 - `Annotated[..., when('...')]` or `Annotated[..., then('...')]` on any parameter.
 - `Annotated[..., given(t'...')]` on any parameter (t-strings are nonsensical in Annotated metadata; see the API table).
 - Multiple `StepDescriptor`s on a single parameter.
-- `Annotated[..., given('...')]` on a parameter that is neither a fixture nor a parametrize value.
+
+(There is no "neither a fixture nor a parametrize value" error: built-in/plugin fixtures classify as fixtures per Resolution Rule 3, and pytest rejects genuinely unresolvable parameter names at setup before this hook — the fall-through is an internal `assert`, not a user-facing case.)
 
 (A fixture decorated with `@when` or `@then` is independently rejected by `pytest_fixture_setup` regardless of Annotated usage — see the fixture-step-recording spec.)
 
@@ -127,7 +134,7 @@ Hard errors (raise `PytestGivenError` during `pytest_runtest_setup`, failing the
 
 | File | Change |
 |---|---|
-| `src/pytest_given/plugin.py` | In `pytest_runtest_setup`, replace `_graft_fixture_recordings(item)` with a new function that walks `item.fixturenames` in order, resolves Annotated metadata per parameter via `typing.get_type_hints(item.function, include_extras=True)`, and either grafts a fixture recording (optionally overriding the root narration) or synthesizes a leaf step. Reject t-strings on extracted descriptors here (the Annotated resolution path is the natural choke point). The recording lookup logic (`fm.getfixturedefs`, `_step_descriptor`, `cached_result`) is reused. |
+| `src/pytest_given/plugin.py` | Rework `_graft_fixture_recordings(item)`. It **already** walks `item.fixturenames` to *detect* decorated fixtures, but then grafts in `collector.recordings()` (setup) order; the change is to make the grafting itself fixturenames-ordered and to interleave Annotated leaves at their parameter's position. Resolve Annotated metadata via `typing.get_type_hints(inspect.unwrap(item.function), include_extras=True)` — `@scenario` sets `__wrapped__`, so unwrap first; resolving on the wrapper would use the decorator module's globals. Wrap the call defensively: if a test's annotations can't be resolved (an exotic forward ref on some unrelated param), treat the function as having no Annotated steps rather than failing the test. From each parameter's resolved `Annotated`, scan `__metadata__` for `StepDescriptor` instances. Then either graft a fixture recording (optionally overriding the root narration) or synthesize a leaf step. Reject t-strings on extracted descriptors here (the Annotated resolution path is the natural choke point). The recording lookup logic (`fm.getfixturedefs`, `_step_descriptor`, `cached_result`) is reused. |
 | `src/pytest_given/capture/collector.py` | Add `graft_leaf_given(narration: Narration)` that appends a leaf `Step(phase='given', narration=narration)` to the current scenario. Extend `graft_recording(recording, *, override_narration: Narration \| None = None)` so the existing call site (no overrides) is unaffected while the Annotated path can override the root narration. |
 | `src/pytest_given/capture/decorators.py` | No change. `given/when/then` signatures stay as-is. |
 | `src/pytest_given/model/errors.py` | No change. Reuse `PytestGivenError`. |
@@ -147,16 +154,25 @@ Integration tests in `tests/integration/test_plugin.py`:
 4. **Parametrize param + Annotated (plain string)** → the literal text (including any `{name}` braces) renders verbatim in every case — no substitution, no highlight. Confirms `Template(...)` is the only path to per-case dynamic narration.
 5. **Annotated `when(...)` / `then(...)`** → `PytestGivenError`.
 6. **Annotated `given(t'...')`** → `PytestGivenError` (t-strings are forbidden in Annotated metadata).
-7. **Annotated `given(...)` on a non-fixture / non-parametrize parameter** → `PytestGivenError`.
+7. **Annotated `given(...)` on a built-in / plugin fixture** (e.g. `tmp_path`) → a leaf `given` step is synthesized just like an undecorated user fixture; no error. Confirms built-ins classify as fixtures, not as a rejected "neither" case.
 8. **Multiple `StepDescriptor`s on one parameter** → `PytestGivenError`.
 9. **Indirect parametrize fixture**: a fixture parametrized via `@pytest.mark.parametrize('name', [...], indirect=True)` with Annotated override behaves like the fixture case — narration is overridden, body preserved.
-10. **Mixed usage in the same scenario** — one decorator-only fixture, one Annotated-override fixture, one parametrize Annotated — all appear in `item.fixturenames` order at the top of the scenario.
+10. **Mixed usage in the same scenario** — one decorator-only fixture, one Annotated-override fixture, one parametrize Annotated — all appear at the top of the scenario in the two-phase order of Resolution Rule 5 (fixture grafts in setup order, then the parametrize leaf in signature order). Pins the observed order.
 11. **Class-based test method** — `self` is skipped without error; Annotated on other params behaves as elsewhere.
+
+## Dogfooding & Docs
+
+This spec predates the self-report (`examples/self-report/`, pytest-given narrating its own backend tests) and the current authoring conventions in [AGENTS.md](../../AGENTS.md). Landing it must also:
+
+- **Narrate the motivating tests.** `test_id_derive_raises_on_empty_result` and `test_id_derive_produces_expected_slug` (`tests/unit/capture/test_glossary.py`) take their input straight from `@pytest.mark.parametrize('text', …)` and today read the value inside the `when`. Annotate the `text` parameter with `given(Template('the name {text}'))` so each grows a leading `given` step (`the name {text}` merged, `the name '---'` per case). This is the exemplar the feature exists for; regenerate `examples/self-report/` and commit the content change.
+- **Update the parametrize convention.** [AGENTS.md](../../AGENTS.md) currently says parametrize inputs "already show in the parameter table … [and] don't need a hand-written `given`." Amend it to note the new opt-in: surface a parametrized input as a `given` via `Annotated[..., given(Template(...))]` when the value reads as an *arrangement* the reader should see named up front, rather than as the subject of the action (for a one-arg pure function like `id_derive`, either reading can be honest — it's a judgment call, not a mandate).
+- **README.** Document `Annotated[..., given(...)]` in the step-text / fixtures section alongside the existing `@given` fixture decorator and the authoring-form table.
 
 ## Out of Scope
 
 - `Annotated` carrying `when(...)` or `then(...)` — explicitly forbidden. The narrative for actions and assertions lives in the test body via `with when(...)` / `with then(...)`.
 - T-strings inside `Annotated` metadata — forbidden, see the API table.
 - Auto-templatization of Annotated narration against fixture-resolved values that are not parametric (e.g., interpolating a constant from a session-scoped fixture into the label). Annotated metadata is evaluated at function-definition time and cannot reference runtime values; users use the existing `with given(t'... {value}')` pattern inside the test body for that.
-- Reordering grafted steps by phase. All grafts follow `item.fixturenames` order; phase is not used to reorder.
+- Reordering grafted steps by phase. Grafts follow the two-phase order of Resolution Rule 5 (fixture grafts in setup order, then Annotated-only leaves in signature order); phase is not used to reorder.
 - Hiding a decorated fixture's recorded body when overriding its label from `Annotated`. The override always preserves the body.
+- Recovering Annotated labels when a test function's annotations cannot be resolved by `get_type_hints` (e.g. an unrelated parameter carries an unresolvable forward reference). Resolution is best-effort per function: on failure the function's Annotated labels are silently skipped rather than failing the test.
