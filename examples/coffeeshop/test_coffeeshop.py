@@ -1,3 +1,5 @@
+from typing import Annotated
+
 import pytest
 
 from pytest_given import Template, attach, given, scenario, then, when, when_then
@@ -56,6 +58,21 @@ def test_pricing(machine, euros, expect):
         purchase_allowed = euros >= machine['price']
     with then(t'the purchase is allowed: {expect}'):
         assert purchase_allowed == expect
+
+
+@scenario(
+    'Parametrize value surfaced as a given (Annotated)',
+    tags=['billing'],
+)
+@pytest.mark.parametrize('cup_size', [200, 350])
+def test_annotated_given_label(
+    machine,
+    cup_size: Annotated[int, given(Template('an order for a {cup_size} ml cup'))],
+):
+    with when('I brew the cup'):
+        machine['coffees'] -= 1
+    with then('the machine has one fewer coffee'):
+        assert machine['coffees'] == 9
 
 
 @scenario('T-string with a non-parametrize value (neutral highlight)')

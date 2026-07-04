@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-04T06:35:22.227412+00:00",
+    "timestamp": "2026-07-04T11:21:26.727826+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "fd4b0e18f50365681a4eba2da97d4ef3af8ef13c"
+    "commit_sha": "cbb76a0c52a011db1a02c03106496bb345a93315"
   },
   "scenarios": [
     {
@@ -72,7 +72,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 20
+        "line": 22
       },
       "story_id": null,
       "activity_ids": []
@@ -141,7 +141,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 32
+        "line": 34
       },
       "story_id": null,
       "activity_ids": []
@@ -202,7 +202,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 40
+        "line": 42
       },
       "story_id": null,
       "activity_ids": []
@@ -299,7 +299,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 61
+        "line": 78
       },
       "story_id": null,
       "activity_ids": []
@@ -436,7 +436,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 100
+        "line": 117
       },
       "story_id": null,
       "activity_ids": []
@@ -632,7 +632,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 113
+        "line": 130
       },
       "story_id": null,
       "activity_ids": []
@@ -709,7 +709,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 146
+        "line": 163
       },
       "story_id": null,
       "activity_ids": []
@@ -723,7 +723,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 251,
+      "duration_ms": 256,
       "steps": [
         {
           "phase": "given",
@@ -849,7 +849,7 @@
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 166,
+            "lineno": 183,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
             "is_internal": false
@@ -860,7 +860,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 163
+        "line": 180
       },
       "story_id": null,
       "activity_ids": []
@@ -949,7 +949,7 @@
       "skip_reason": "demonstrates skipped status",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 169
+        "line": 186
       },
       "story_id": null,
       "activity_ids": []
@@ -1061,7 +1061,115 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 49
+        "line": 51
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]",
+      "narration": {
+        "text": "Parametrize value surfaced as a given (Annotated)",
+        "parts": []
+      },
+      "module": "test_coffeeshop",
+      "tags": [
+        "billing"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an order for a {cup_size} ml cup",
+            "parts": [
+              {
+                "value": "an order for a "
+              },
+              {
+                "name": "cup_size",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " ml cup"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I brew the cup",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the machine has one fewer coffee",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "names": [
+          "cup_size"
+        ],
+        "cases": [
+          {
+            "values": [
+              200
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              350
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
+        "line": 63
       },
       "story_id": null,
       "activity_ids": []
@@ -1168,7 +1276,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 71
+        "line": 88
       },
       "story_id": null,
       "activity_ids": []
@@ -1182,7 +1290,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 43,
+      "duration_ms": 44,
       "steps": [],
       "parameters": {
         "names": [
@@ -1345,7 +1453,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 176
+        "line": 193
       },
       "story_id": null,
       "activity_ids": []
