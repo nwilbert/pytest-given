@@ -40,7 +40,7 @@ from two sources that share the same field:
   `markdown_glossary.py` strips emphasis from term/kind cells but not the
   description cell)
 
-The description is rendered in **three** places, all of which currently show
+The description is rendered in **two** places, both of which currently show
 Markdown markers literally:
 
 1. **Glossary-tab entry** (`report.html.j2`, the `.entry-def` block) —
@@ -48,14 +48,18 @@ Markdown markers literally:
 2. **Hover tooltip** on every term pill across the report — `renderer.py`
    `_term_pill` emits `data-term-def="{escape(tooltip_def)}"`; `app.js`
    `_initTermTooltip` sets `defEl.textContent = pill.dataset.termDef`.
-3. **Search-match string** (`report.html.j2` entry `x-show`) —
-   `(term.canonical + ' ' + (term.definition or '')) | lower`, matched against
-   `glossarySearch`.
+
+The description also currently feeds a **third** consumer, the glossary
+**search-match string** (`report.html.j2` entry `x-show`):
+`(term.canonical + ' ' + (term.definition or '')) | lower`, matched against
+`glossarySearch`. This design removes the description from that match target
+(and hardens the target itself) — see *Glossary search hardening* below.
 
 ## Approach
 
-A single pure render-time function converts inline Markdown to safe HTML;
-consumers 1 and 2 render that HTML, consumer 3 keeps the raw plain text.
+A single pure render-time function converts inline Markdown to safe HTML for the
+two description consumers. The glossary search is reworked separately so the
+description no longer feeds it and its match key can no longer break the page.
 
 ### `report/inline_markdown.py` (new)
 
@@ -100,13 +104,35 @@ def render_inline_markdown(text: str) -> str:
    `dataset.termDef` → `innerHTML`. Content is generated from trusted test
    source, so `innerHTML` carries no XSS concern; the escaping is for
    correctness (a literal `<` in a description).
-3. **Search** — the raw description text stays the match target (searching `VIP`
-   still hits `A **VIP** guest`), but a literal `\n` in a description would
-   inject a raw newline into the single-quoted JS string the search filter is
-   embedded in (`report.html.j2` entry `x-show`) and break it. Collapse `\r` /
-   `\n` to a space in the match target (a small Jinja `replace` chain or filter)
-   so the embedded literal stays single-line and valid. A `<br>` written by the
-   author carries no newline and is already safe.
+
+### Glossary search hardening
+
+The entry `x-show` (`report.html.j2:489`) currently inlines the lowercased match
+key **into JavaScript source** as a single-quoted string literal:
+`'{{ (term.canonical + ' ' + (term.definition or '')) | lower }}'.includes(...)`.
+Any character that can't sit inside a `'…'` literal — an apostrophe, a newline,
+a backslash, a Unicode line separator — breaks the Alpine expression and
+silently kills that entry's filtering. Adding `<br>`/`\n` line breaks to
+descriptions makes the newline case reachable, but the apostrophe case is a
+pre-existing latent hazard independent of this feature.
+
+Two coupled changes fix it at the root:
+
+- **Move the key out of JS source into a `data-search` attribute.** Emit
+  `data-search="{{ … | lower }}"` on the entry `div` (Jinja autoescapes the
+  attribute value — quotes, `<`, `&`, newlines all handled) and change the
+  `x-show` string clause to `$el.dataset.search.includes(glossarySearch.toLowerCase())`.
+  Nothing runtime-derived is inlined into the expression any more, so the whole
+  JS-literal injection class is gone — for term **names** as well as
+  descriptions. The definition-filter clause is unchanged: it bakes in a
+  compile-time boolean (`{{ 'true' if term.definition is none else 'false' }}`),
+  not a string, so it was never at risk.
+- **Search on the term name only.** The match key becomes `term.canonical | lower`
+  — the description is dropped from search. The box is labelled "Search terms…"
+  and filters the term *list*; full-text search over descriptions (always
+  visible in each entry) is left to the browser's native find. This also means
+  the line-break work has **no** interaction with search at all — the earlier
+  `\n`-collapse step is no longer needed.
 
 ### CSS
 
@@ -123,7 +149,9 @@ inline-code look.
   escaped (`<script>` → `&lt;script&gt;`, not re-admitted).
 - **No markup-pinning Python tests** on the renderer or template, per AGENTS.md.
 - **Playwright-verify** the rendered entry and a pill tooltip in a regenerated
-  example (console clean after init; emphasis renders; `<` shows literally).
+  example (console clean after init; emphasis renders; `<` shows literally); and
+  the glossary search — typing a term name filters the list, and a description
+  with a newline/apostrophe no longer throws a console error or breaks filtering.
 - Regenerate `examples/` (`nox -s examples`) and `self_report`
   (`nox -s self_report`); commit only reports whose content actually changed.
 
