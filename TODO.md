@@ -2,13 +2,11 @@
 
 ## Now
 
-- [ ] Give some indication / filter in Glossary for number of corresponding scenarios, maybe add sort option
-
 ## Next
 
-- [ ] enable definition of a custom mapping for boolean values to strings in parameterized scenarios
+- [ ] Add sort option in GLossary, to sort by number of scenarios, instances, or stories
+- [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
-- [ ] Example PDF attachment in report
 - [ ] add the prepared diagram to the readme with Agent <-> Dev <-> Domain Expert
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)

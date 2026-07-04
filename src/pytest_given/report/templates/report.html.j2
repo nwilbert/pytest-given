@@ -489,6 +489,8 @@
         {% endif %}
         {% for term in kind_terms %}
         {% set agg = glossary_aggregations.get(term.id) %}
+        {% set scn_ids = term_scenario_index.get(term.id, []) %}
+        {% set show_instances = agg and kind_key in ('actor', 'object') and agg.instances %}
         {% set q = 'glossarySearch' %}
         <div class="entry" id="term-{{ term.id }}"
              data-search="{{ term.canonical | lower }}"
@@ -501,11 +503,20 @@
             <div class="entry-body">
               <div class="entry-def">{{ term.definition | inline_md }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
               <div class="entry-summary">
-                {% if agg %}
-                {% set show_instances = kind_key in ('actor', 'object') and agg.instances %}
-                {% if show_instances %}{{ agg.instances | length }} instance{{ 's' if agg.instances | length != 1 else '' }}{% endif %}
-                {% if agg.stories %}{% if show_instances %} · {% endif %}used in {{ agg.stories | length }} stor{{ 'ies' if agg.stories | length != 1 else 'y' }}{% endif %}
+                {% set summary_parts = [] %}
+                {% if show_instances %}
+                {% set n = agg.instances | length %}
+                {% set _ = summary_parts.append('%d instance%s' | format(n, 's' if n != 1 else '')) %}
                 {% endif %}
+                {% if agg and agg.stories %}
+                {% set n = agg.stories | length %}
+                {% set _ = summary_parts.append('%d stor%s' | format(n, 'ies' if n != 1 else 'y')) %}
+                {% endif %}
+                {% if scn_ids %}
+                {% set n = scn_ids | length %}
+                {% set _ = summary_parts.append('%d scenario%s' | format(n, 's' if n != 1 else '')) %}
+                {% endif %}
+                {{ summary_parts | join(' · ') }}
               </div>
             </div>
             {{ anchor_link('view=glossary&term=' ~ term.id) }}
@@ -521,7 +532,7 @@
                   {% endfor %}
                 </div>
                 {% endif %}
-                {% if agg and kind_key in ('actor', 'object') and agg.instances %}
+                {% if show_instances %}
                 <div class="refs-line">
                   <span class="refs-label">Instances:</span>
                   {% for inst in agg.instances %}
@@ -537,7 +548,6 @@
                   {% endfor %}
                 </div>
                 {% endif %}
-                {% set scn_ids = term_scenario_index.get(term.id, []) %}
                 {% if scn_ids %}
                 <div class="refs-line">
                   <a class="use-chip" href="#"
