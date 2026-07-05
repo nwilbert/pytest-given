@@ -188,6 +188,117 @@ def test_failing_step_is_marked_with_minimal_error() -> None:
     assert 'assert 1 == 0' not in md  # only the first message line
 
 
+def test_single_line_attachment_renders_inline() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_inline',
+        narration=Narration(text='Inline'),
+        module='tests/t.py',
+        steps=[
+            Step(
+                phase='then',
+                narration=Narration(text='result'),
+                attachments=[Attachment(label='S', content='x=1')],
+            )
+        ],
+    )
+    md = render_md(_report(scn))
+    assert '  - 📎 S — `x=1`' in md
+
+
+def test_multiline_attachment_renders_fenced_block() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_multiline',
+        narration=Narration(text='Multi'),
+        module='tests/t.py',
+        steps=[
+            Step(
+                phase='then',
+                narration=Narration(text='result'),
+                attachments=[Attachment(label='Doc', content='line1\nline2')],
+            )
+        ],
+    )
+    md = render_md(_report(scn))
+    assert '  - 📎 Doc:' in md
+    assert '\n    ```\n' in md
+    assert '\n    line1\n' in md
+    assert '\n    line2\n' in md
+    assert '— `line1' not in md
+
+
+def test_carriage_return_attachment_renders_fenced_block() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_cr',
+        narration=Narration(text='CR'),
+        module='tests/t.py',
+        steps=[
+            Step(
+                phase='then',
+                narration=Narration(text='result'),
+                attachments=[Attachment(label='Doc', content='line1\rline2')],
+            )
+        ],
+    )
+    md = render_md(_report(scn))
+    assert '  - 📎 Doc:' in md
+    assert '\n    ```\n' in md
+    assert '\n    line1\n' in md
+    assert '\n    line2\n' in md
+    assert '— `line1' not in md
+    assert '\r' not in md
+
+
+def test_attachment_with_triple_backtick_uses_longer_fence() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_backtick',
+        narration=Narration(text='Backtick'),
+        module='tests/t.py',
+        steps=[
+            Step(
+                phase='then',
+                narration=Narration(text='result'),
+                attachments=[Attachment(label='Code', content='```python\nx = 1\n```')],
+            )
+        ],
+    )
+    md = render_md(_report(scn))
+    assert '````' in md
+    assert '\n    ````\n' in md
+
+
+def test_param_table_escapes_pipe_in_value() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_pipe',
+        narration=Narration(text='Pipe'),
+        module='tests/t.py',
+        steps=[Step(phase='when', narration=Narration(text='act'))],
+        parameters=ParameterTable(
+            names=['label'],
+            cases=[ParameterCase(values=['a|b'], status='passed')],
+        ),
+    )
+    md = render_md(_report(scn))
+    row = next(line for line in md.splitlines() if line.startswith('| a'))
+    assert row == '| a\\|b | ✓ |'
+    assert row.count(' | ') == 1
+
+
+def test_param_table_escapes_newline_in_value() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_nl',
+        narration=Narration(text='NL'),
+        module='tests/t.py',
+        steps=[Step(phase='when', narration=Narration(text='act'))],
+        parameters=ParameterTable(
+            names=['label'],
+            cases=[ParameterCase(values=['a\nb'], status='passed')],
+        ),
+    )
+    md = render_md(_report(scn))
+    assert '| a<br>b |' in md
+    assert 'a\nb' not in md
+
+
 def test_skipped_scenario_shows_reason() -> None:
     scn = Scenario(
         id='tests/t.py::test_skip',

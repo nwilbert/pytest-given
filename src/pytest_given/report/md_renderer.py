@@ -1,6 +1,8 @@
+import re
 from pathlib import Path
 
 from ..model import (
+    Attachment,
     ErrorInfo,
     Narration,
     NarrationLiteral,
@@ -48,17 +50,28 @@ def _scenario_md(scenario: Scenario) -> str:
 
 
 def _param_table_md(table: ParameterTable) -> str:
-    header = '| ' + ' | '.join([*table.names, '']) + '|'
+    header = '| ' + ' | '.join([*(_cell(n) for n in table.names), '']) + '|'
     separator = '|' + '---|' * (len(table.names) + 1)
     rows = [
         '| '
         + ' | '.join(
-            [*(str(v) for v in case.values), _STATUS_GLYPH.get(case.status, '✗')]
+            [
+                *(_cell(v) for v in case.values),
+                _STATUS_GLYPH.get(case.status, '✗'),
+            ]
         )
         + ' |'
         for case in table.cases
     ]
     return '\n'.join([header, separator, *rows])
+
+
+def _cell(value: object) -> str:
+    text = str(value)
+    text = text.replace('|', '\\|')
+    for nl in ('\r\n', '\n', '\r'):
+        text = text.replace(nl, '<br>')
+    return text
 
 
 def _step_md(step: Step, depth: int) -> str:
@@ -70,10 +83,26 @@ def _step_md(step: Step, depth: int) -> str:
     if step.error is not None:
         lines.extend(_error_lines(step.error, indent))
     for attachment in step.attachments:
-        lines.append(f'{indent}  - 📎 {attachment.label} — `{attachment.content}`')
+        lines.extend(_attachment_lines(attachment, indent))
     for child in step.children:
         lines.append(_step_md(child, depth + 1))
     return '\n'.join(lines)
+
+
+def _attachment_lines(attachment: Attachment, indent: str) -> list[str]:
+    content = attachment.content
+    is_multiline = any(nl in content for nl in ('\r\n', '\n', '\r'))
+    if not is_multiline and '`' not in content:
+        return [f'{indent}  - 📎 {attachment.label} — `{content}`']
+    longest_run = max((len(run) for run in re.findall(r'`+', content)), default=0)
+    fence = '`' * max(3, longest_run + 1)
+    body_indent = f'{indent}    '
+    return [
+        f'{indent}  - 📎 {attachment.label}:',
+        f'{body_indent}{fence}',
+        *(f'{body_indent}{line}' for line in content.splitlines()),
+        f'{body_indent}{fence}',
+    ]
 
 
 def _error_lines(error: ErrorInfo, indent: str) -> list[str]:
