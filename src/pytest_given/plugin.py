@@ -48,6 +48,7 @@ from .model import (
     Scenario,
     Step,
     Story,
+    report_from_dict,
     report_to_dict,
 )
 from .report import (
@@ -55,6 +56,7 @@ from .report import (
     detect_commit_sha,
     find_violations,
     render_html,
+    render_md,
     resolve_template,
 )
 
@@ -62,25 +64,40 @@ collector = Collector()
 
 _PHASE_CHECK_LEVELS = ('off', 'warn', 'error')
 _phase_check_violations: pytest.StashKey[list[PhaseViolation]] = pytest.StashKey()
+_md_stdout: pytest.StashKey[str] = pytest.StashKey()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     group = parser.getgroup('given', 'pytest-given report generation')
     group.addoption(
         '--given-json',
-        default='given-report/report-data.json',
-        help='Output path for JSON report data',
+        nargs='?',
+        const='given-report/report-data.json',
+        default=None,
+        help=(
+            'Write JSON report data. Bare uses the default path; =PATH '
+            'overrides. Off when absent.'
+        ),
     )
     group.addoption(
         '--given-html',
-        action='store_true',
-        default=False,
-        help='Also generate HTML report from JSON data',
+        nargs='?',
+        const='given-report/report.html',
+        default=None,
+        help=(
+            'Write the HTML report. Bare uses the default path; =PATH '
+            'overrides. Off when absent.'
+        ),
     )
     group.addoption(
-        '--given-html-output',
-        default='given-report/report.html',
-        help='Output path for HTML report (default: given-report/report.html)',
+        '--given-md',
+        nargs='?',
+        const='-',
+        default=None,
+        help=(
+            'Write the Markdown report. Bare renders to stdout (fenced); '
+            '=PATH writes a file. Off when absent.'
+        ),
     )
     group.addoption(
         '--given-all-frames',
@@ -551,7 +568,6 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
 
 
 def pytest_sessionfinish(session: pytest.Session) -> None:
-    json_path = Path(session.config.getoption('given_json'))
     scenarios = _group_parameterized(collector.scenarios, collector.param_info)
     collector.param_info.clear()
     stories = list(collector._discovered_stories.values())
@@ -570,15 +586,33 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         stories=stories,
         glossary=glossary,
     )
-    json_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(report_to_dict(report), indent=2), encoding='utf-8')
-    if session.config.getoption('given_html'):
+    report_dict = report_to_dict(report)
+    report = report_from_dict(report_dict)  # serde round-trip = fidelity guarantee
+
+    json_opt = session.config.getoption('given_json')
+    if json_opt is not None:
+        json_path = Path(json_opt)
+        json_path.parent.mkdir(parents=True, exist_ok=True)
+        json_path.write_text(json.dumps(report_dict, indent=2), encoding='utf-8')
+
+    html_opt = session.config.getoption('given_html')
+    if html_opt is not None:
         raw_link = session.config.getoption(
             'given_source_link'
         ) or session.config.getini('given_source_link')
         template = resolve_template(raw_link)
-        html_path = Path(session.config.getoption('given_html_output'))
-        render_html(report, html_path, source_link_template=template)
+        render_html(report, Path(html_opt), source_link_template=template)
+
+    md_opt = session.config.getoption('given_md')
+    if md_opt is not None:
+        md = render_md(report)
+        if md_opt == '-':
+            session.config.stash[_md_stdout] = md
+        else:
+            md_path = Path(md_opt)
+            md_path.parent.mkdir(parents=True, exist_ok=True)
+            md_path.write_text(md, encoding='utf-8')
+
     _run_phase_check(session, scenarios)
 
 
@@ -598,15 +632,20 @@ def _run_phase_check(session: pytest.Session, scenarios: list[Scenario]) -> None
 
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
     violations = terminalreporter.config.stash.get(_phase_check_violations, [])
-    if not violations:
-        return
-    terminalreporter.write_sep(
-        '=', f'pytest-given: incomplete scenarios ({len(violations)})', yellow=True
-    )
-    for violation in violations:
-        terminalreporter.line(
-            f'{violation.node_id}  missing: {", ".join(violation.missing)}'
+    if violations:
+        terminalreporter.write_sep(
+            '=', f'pytest-given: incomplete scenarios ({len(violations)})', yellow=True
         )
+        for violation in violations:
+            terminalreporter.line(
+                f'{violation.node_id}  missing: {", ".join(violation.missing)}'
+            )
+    md = terminalreporter.config.stash.get(_md_stdout, None)
+    if md is not None:
+        terminalreporter.write_line('<!-- pytest-given:md:start -->')
+        for line in md.splitlines():
+            terminalreporter.write_line(line)
+        terminalreporter.write_line('<!-- pytest-given:md:end -->')
 
 
 def _resolve_glossary(stories: list[Story], session: pytest.Session) -> Glossary | None:

@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 
 def test_basic_scenario_generates_json(pytester, tmp_path):
     """A simple @scenario test produces JSON output."""
@@ -282,8 +284,7 @@ def test_full_html_report_generation(pytester, tmp_path):
     html_path = tmp_path / 'report.html'
     result = pytester.runpytest(
         f'--given-json={json_path}',
-        '--given-html',
-        f'--given-html-output={html_path}',
+        f'--given-html={html_path}',
     )
     result.assert_outcomes(passed=1, failed=1)
     assert json_path.exists()
@@ -1197,8 +1198,7 @@ def test_given_source_link_cli_flag_emits_anchor(pytester, tmp_path):
     html_path = tmp_path / 'report.html'
     result = pytester.runpytest(
         f'--given-json={json_path}',
-        '--given-html',
-        f'--given-html-output={html_path}',
+        f'--given-html={html_path}',
         '--given-source-link=vscode',
     )
     result.assert_outcomes(passed=1)
@@ -1228,8 +1228,7 @@ def test_given_source_link_ini_value(pytester, tmp_path):
     html_path = tmp_path / 'report.html'
     pytester.runpytest(
         f'--given-json={json_path}',
-        '--given-html',
-        f'--given-html-output={html_path}',
+        f'--given-html={html_path}',
     )
     content = html_path.read_text(encoding='utf-8')
     assert '<a href="zed://file/' in content
@@ -1256,8 +1255,7 @@ def test_given_source_link_cli_overrides_ini(pytester, tmp_path):
     html_path = tmp_path / 'report.html'
     pytester.runpytest(
         f'--given-json={json_path}',
-        '--given-html',
-        f'--given-html-output={html_path}',
+        f'--given-html={html_path}',
         '--given-source-link=vscode',
     )
     content = html_path.read_text(encoding='utf-8')
@@ -1790,3 +1788,57 @@ def test_mixed_fixture_and_param_annotated_order(pytester, tmp_path):
         s['narration']['text'] for s in merged['steps'] if s['phase'] == 'given'
     ]
     assert given_texts == ['a machine', 'the name {text}']
+
+
+_SUITE = """
+    import pytest
+    from pytest_given import scenario, given, when, then
+
+    @scenario('Buy coffee')
+    def test_buy():
+        with given('a machine'):
+            pass
+        with when('I insert money'):
+            pass
+        with then('I get coffee'):
+            assert True
+"""
+
+
+def test_no_output_flags_writes_nothing(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(_SUITE)
+    result = pytester.runpytest()
+    assert result.ret == 0
+    assert not (pytester.path / 'given-report').exists()
+
+
+def test_given_md_prints_fenced_block(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(_SUITE)
+    result = pytester.runpytest('--given-md')
+    out = result.stdout.str()
+    assert '<!-- pytest-given:md:start -->' in out
+    assert '<!-- pytest-given:md:end -->' in out
+    assert '## ✓ Buy coffee' in out
+
+
+def test_given_md_path_writes_file_no_stdout(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(_SUITE)
+    md_path = pytester.path / 'out.md'
+    result = pytester.runpytest(f'--given-md={md_path}')
+    assert '## ✓ Buy coffee' in md_path.read_text(encoding='utf-8')
+    assert 'pytest-given:md:start' not in result.stdout.str()
+
+
+def test_given_html_alone_writes_no_json(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(_SUITE)
+    html_path = pytester.path / 'r.html'
+    pytester.runpytest(f'--given-html={html_path}')
+    assert html_path.exists()
+    assert not (pytester.path / 'given-report' / 'report-data.json').exists()
+
+
+def test_given_json_alone_writes_json(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(_SUITE)
+    json_path = pytester.path / 'r.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    assert json_path.exists()
