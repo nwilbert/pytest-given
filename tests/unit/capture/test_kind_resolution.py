@@ -50,7 +50,7 @@ def _kind(glossary, term_id):
 def test_infers_actor_verb_object_by_position():
     with given(t'a glossary of three {pg["Kindless"]} {pg["Term"]} entries'):
         glossary = Glossary(terms=[_term('guest'), _term('search'), _term('room')])
-    with when(t'kind resolution runs over a {pg["Story"]}'):
+    with when(t'{pg["Kind inference"]} runs over a {pg["Story"]}'):
         resolved = resolve_glossary_kinds(
             glossary, [_story('S', ('guest', 'search', 'room'))]
         )
@@ -89,7 +89,7 @@ def test_actor_anywhere_beats_object():
 def test_never_used_stays_kindless():
     with given(t'a {pg["Term"]} referenced by no {pg["Story"]}'):
         glossary = Glossary(terms=[_term('orphan')])
-    with when('kind resolution runs with no stories'):
+    with when(t'{pg["Kind inference"]} runs with no stories'):
         resolved = resolve_glossary_kinds(glossary, [])
     with then(t'the {pg["Term"]} remains {pg["Kindless"]}'):
         assert _kind(resolved, 'orphan') is None
@@ -129,7 +129,7 @@ def test_declared_kind_verified_and_kept():
                 _term('room', 'object'),
             ]
         )
-    with when(t'kind resolution runs over a matching {pg["Story"]}'):
+    with when(t'{pg["Kind inference"]} runs over a matching {pg["Story"]}'):
         resolved = resolve_glossary_kinds(
             glossary, [_story('S', ('guest', 'search', 'room'))]
         )
@@ -283,7 +283,7 @@ def test_declared_verb_in_noun_slot_raises():
 def test_slot_for_maps_odd_positions_to_verb():
     from pytest_given.capture.kind_resolution import _slot_for
 
-    with when('the slot rule is applied to successive path positions'):
+    with when(t'the {pg["Slot"]} rule is applied to successive positions'):
         slots = [_slot_for(i) for i in range(5)]
-    with then('position 0 is actor, then verb and noun alternate'):
+    with then(t'position 0 is the actor {pg["Slot"]}, then verb and noun alternate'):
         assert slots == ['actor', 'verb', 'noun', 'verb', 'noun']

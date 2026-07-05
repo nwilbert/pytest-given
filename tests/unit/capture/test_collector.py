@@ -1,6 +1,6 @@
 import pytest
 
-from pytest_given import Template
+from pytest_given import Template, given, scenario, then, when
 from pytest_given.capture.collector import Collector
 from pytest_given.model import (
     FixtureRecording,
@@ -13,6 +13,7 @@ from pytest_given.model import (
     SourceLocation,
     Step,
 )
+from tests._vocab import pg
 
 
 def _n(text: str) -> Narration:
@@ -191,16 +192,23 @@ def test_enter_fixture_teardown_transitions_state() -> None:
     assert collector.state == 'idle'
 
 
+@scenario(
+    'Steps pushed during fixture setup record into the fixture recording',
+    tags=['happy-path'],
+)
 def test_push_step_during_fixture_setup_records_into_recording() -> None:
     collector = Collector()
-    root = Step(phase='given', narration=_n('a shop'))
-    recording = FixtureRecording(root=root)
-    token = collector.enter_fixture_setup(recording)
-    collector.push_step('given', _n('with 3 items'))
-    collector.pop_step()
-    collector.exit_fixture_setup(token)
-    assert len(root.children) == 1
-    assert root.children[0].narration.text == 'with 3 items'
+    with given(t'a {pg["Fixture recording"]} under setup'):
+        root = Step(phase='given', narration=_n('a shop'))
+        recording = FixtureRecording(root=root)
+        token = collector.enter_fixture_setup(recording)
+    with when(t'a {pg["Step"]} is pushed inside the fixture body'):
+        collector.push_step('given', _n('with 3 items'))
+        collector.pop_step()
+        collector.exit_fixture_setup(token)
+    with then('it is recorded as a child of the recording root'):
+        assert len(root.children) == 1
+        assert root.children[0].narration.text == 'with 3 items'
 
 
 def test_attach_during_fixture_setup_records_into_recording() -> None:
@@ -214,20 +222,25 @@ def test_attach_during_fixture_setup_records_into_recording() -> None:
     assert root.attachments[0].label == 'snapshot'
 
 
+@scenario(
+    'Fixture-body steps do not leak into the active scenario',
+    tags=['happy-path'],
+)
 def test_push_step_routing_isolates_recording_from_scenario() -> None:
-    """Steps recorded inside fixture setup must NOT leak into the active scenario."""
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    root = Step(phase='given', narration=_n('a shop'))
-    recording = FixtureRecording(root=root)
-    token = collector.enter_fixture_setup(recording)
-    collector.push_step('given', _n('fixture-internal'))
-    collector.pop_step()
-    collector.exit_fixture_setup(token)
-    # Scenario should still be empty — fixture body's step lives only in recording.
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
-    assert scenario.steps == []
-    assert root.children[0].narration.text == 'fixture-internal'
+    with given(t'an {pg["Active scenario"]} with a {pg["Fixture recording"]}'):
+        root = Step(phase='given', narration=_n('a shop'))
+        recording = FixtureRecording(root=root)
+        token = collector.enter_fixture_setup(recording)
+    with when(t'a {pg["Step"]} is pushed inside the fixture body'):
+        collector.push_step('given', _n('fixture-internal'))
+        collector.pop_step()
+        collector.exit_fixture_setup(token)
+        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+    with then('the step lives only in the recording, not the scenario'):
+        assert recorded.steps == []
+        assert root.children[0].narration.text == 'fixture-internal'
 
 
 def test_push_step_during_idle_raises() -> None:
@@ -270,22 +283,23 @@ def test_store_and_retrieve_recording_by_key() -> None:
     assert collector.get_recording(('fixdef_b', None)) is None
 
 
+@scenario('A fixture recording is deep-copied when grafted', tags=['happy-path'])
 def test_graft_recording_deep_copies_into_scenario() -> None:
     collector = Collector()
-    root = Step(phase='given', narration=_n('a shop'))
-    root.children.append(Step(phase='given', narration=_n('with 3 items')))
-    recording = FixtureRecording(root=root)
-
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.graft_recording(recording)
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
-
-    assert len(scenario.steps) == 1
-    assert scenario.steps[0].narration.text == 'a shop'
-    assert scenario.steps[0].children[0].narration.text == 'with 3 items'
-    # Deep-copy: mutating the recording must not affect the scenario.
-    root.children[0].narration = _n('mutated')
-    assert scenario.steps[0].children[0].narration.text == 'with 3 items'
+    with given(t'a {pg["Fixture recording"]} with a nested child {pg["Step"]}'):
+        root = Step(phase='given', narration=_n('a shop'))
+        root.children.append(Step(phase='given', narration=_n('with 3 items')))
+        recording = FixtureRecording(root=root)
+    with when(t'a {pg["Graft"]} copies it into the {pg["Active scenario"]}'):
+        collector.graft_recording(recording)
+        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+    with then('the scenario gains a deep copy of the recorded steps'):
+        assert recorded.steps[0].narration.text == 'a shop'
+        assert recorded.steps[0].children[0].narration.text == 'with 3 items'
+        # Mutating the recording must not affect the grafted copy.
+        root.children[0].narration = _n('mutated')
+        assert recorded.steps[0].children[0].narration.text == 'with 3 items'
 
 
 def test_graft_recording_with_no_scenario_is_noop() -> None:
@@ -405,39 +419,51 @@ def test_start_scenario_source_defaults_to_none() -> None:
     assert scenario.source is None
 
 
+@scenario('A leaf given is grafted as a childless given step', tags=['happy-path'])
 def test_graft_leaf_given_appends_childless_given_step() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    collector.graft_leaf_given(_n('the name {text}'))
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
-    assert len(scenario.steps) == 1
-    leaf = scenario.steps[0]
-    assert leaf.phase == 'given'
-    assert leaf.narration.text == 'the name {text}'
-    assert leaf.children == []
+    with when(t'a leaf {pg["Graft"]} appends a childless {pg["Step"]}'):
+        collector.graft_leaf_given(_n('the name {text}'))
+        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+    with then('the step is a given with no children'):
+        leaf = recorded.steps[0]
+        assert leaf.phase == 'given'
+        assert leaf.narration.text == 'the name {text}'
+        assert leaf.children == []
 
 
+@scenario(
+    'Grafting with an override replaces the root label but keeps children',
+    tags=['happy-path'],
+)
 def test_graft_recording_override_replaces_root_narration_keeps_children() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
-    root = Step(phase='given', narration=_n('original label'), fixture_name='machine')
-    root.children.append(Step(phase='given', narration=_n('a recorded child')))
-    recording = FixtureRecording(root=root)
+    with given(t'a {pg["Fixture recording"]} whose root has a label and a child'):
+        root = Step(
+            phase='given', narration=_n('original label'), fixture_name='machine'
+        )
+        root.children.append(Step(phase='given', narration=_n('a recorded child')))
+        recording = FixtureRecording(root=root)
+    with when(t'a {pg["Graft"]} supplies an override {pg["Narration"]}'):
+        collector.graft_recording(recording, override_narration=_n('a fancy machine'))
+        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+    with then('the grafted root shows the override text and keeps its children'):
+        grafted = recorded.steps[0]
+        assert grafted.narration.text == 'a fancy machine'
+        assert [c.narration.text for c in grafted.children] == ['a recorded child']
+        # The stored recording's root is untouched (deep copy on graft).
+        assert recording.root.narration.text == 'original label'
 
-    collector.graft_recording(recording, override_narration=_n('a fancy machine'))
 
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
-    grafted = scenario.steps[0]
-    assert grafted.narration.text == 'a fancy machine'
-    assert [c.narration.text for c in grafted.children] == ['a recorded child']
-    # The stored recording's root is untouched (deep copy on graft).
-    assert recording.root.narration.text == 'original label'
-
-
+@scenario('Grafting with no active scenario is a no-op', tags=['happy-path'])
 def test_graft_leaf_given_without_scenario_is_noop() -> None:
     collector = Collector()
-    collector.graft_leaf_given(_n('orphan'))
-    assert collector.scenarios == []
+    with when(t'a leaf {pg["Graft"]} runs with no {pg["Active scenario"]}'):
+        collector.graft_leaf_given(_n('orphan'))
+    with then('no scenario is recorded'):
+        assert collector.scenarios == []
 
 
 def test_graft_recording_without_override_is_unchanged() -> None:

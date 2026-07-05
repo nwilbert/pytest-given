@@ -1,12 +1,530 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-05T06:13:59.136281+00:00",
+    "timestamp": "2026-07-05T06:55:30.776340+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "8934f67270aa4c223e82a917bef16bfb82e5c831"
+    "commit_sha": "9468c02228d6261425ce8f7733acfd1023c71a3b"
   },
   "scenarios": [
+    {
+      "id": "tests/unit/capture/test_collector.py::test_push_step_during_fixture_setup_records_into_recording",
+      "narration": {
+        "text": "Steps pushed during fixture setup record into the fixture recording",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Fixture recording under setup",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "fixture-recording",
+                "display": "Fixture recording",
+                "expression": "pg[\"Fixture recording\"]",
+                "param_column": null
+              },
+              {
+                "value": " under setup"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a Step is pushed inside the fixture body",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " is pushed inside the fixture body"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it is recorded as a child of the recording root",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 195
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_collector.py::test_push_step_routing_isolates_recording_from_scenario",
+      "narration": {
+        "text": "Fixture-body steps do not leak into the active scenario",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Active scenario with a Fixture recording",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "active-scenario",
+                "display": "Active scenario",
+                "expression": "pg[\"Active scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " with a "
+              },
+              {
+                "term_id": "fixture-recording",
+                "display": "Fixture recording",
+                "expression": "pg[\"Fixture recording\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a Step is pushed inside the fixture body",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " is pushed inside the fixture body"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the step lives only in the recording, not the scenario",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 225
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_collector.py::test_graft_recording_deep_copies_into_scenario",
+      "narration": {
+        "text": "A fixture recording is deep-copied when grafted",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Fixture recording with a nested child Step",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "fixture-recording",
+                "display": "Fixture recording",
+                "expression": "pg[\"Fixture recording\"]",
+                "param_column": null
+              },
+              {
+                "value": " with a nested child "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a Graft copies it into the Active scenario",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "graft",
+                "display": "Graft",
+                "expression": "pg[\"Graft\"]",
+                "param_column": null
+              },
+              {
+                "value": " copies it into the "
+              },
+              {
+                "term_id": "active-scenario",
+                "display": "Active scenario",
+                "expression": "pg[\"Active scenario\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the scenario gains a deep copy of the recorded steps",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 286
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_collector.py::test_graft_leaf_given_appends_childless_given_step",
+      "narration": {
+        "text": "A leaf given is grafted as a childless given step",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a leaf Graft appends a childless Step",
+            "parts": [
+              {
+                "value": "a leaf "
+              },
+              {
+                "term_id": "graft",
+                "display": "Graft",
+                "expression": "pg[\"Graft\"]",
+                "param_column": null
+              },
+              {
+                "value": " appends a childless "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the step is a given with no children",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 422
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_collector.py::test_graft_recording_override_replaces_root_narration_keeps_children",
+      "narration": {
+        "text": "Grafting with an override replaces the root label but keeps children",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Fixture recording whose root has a label and a child",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "fixture-recording",
+                "display": "Fixture recording",
+                "expression": "pg[\"Fixture recording\"]",
+                "param_column": null
+              },
+              {
+                "value": " whose root has a label and a child"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a Graft supplies an override Narration",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "graft",
+                "display": "Graft",
+                "expression": "pg[\"Graft\"]",
+                "param_column": null
+              },
+              {
+                "value": " supplies an override "
+              },
+              {
+                "term_id": "narration",
+                "display": "Narration",
+                "expression": "pg[\"Narration\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the grafted root shows the override text and keeps its children",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 436
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_collector.py::test_graft_leaf_given_without_scenario_is_noop",
+      "narration": {
+        "text": "Grafting with no active scenario is a no-op",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a leaf Graft runs with no Active scenario",
+            "parts": [
+              {
+                "value": "a leaf "
+              },
+              {
+                "term_id": "graft",
+                "display": "Graft",
+                "expression": "pg[\"Graft\"]",
+                "param_column": null
+              },
+              {
+                "value": " runs with no "
+              },
+              {
+                "term_id": "active-scenario",
+                "display": "Active scenario",
+                "expression": "pg[\"Active scenario\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no scenario is recorded",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 460
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
     {
       "id": "tests/unit/capture/test_file_glossary.py::test_lookup_is_case_insensitive",
       "narration": {
@@ -1939,7 +2457,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -2184,7 +2702,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -2562,10 +3080,16 @@
         {
           "phase": "when",
           "narration": {
-            "text": "kind resolution runs over a Story",
+            "text": "Kind inference runs over a Story",
             "parts": [
               {
-                "value": "kind resolution runs over a "
+                "term_id": "kind-inference",
+                "display": "Kind inference",
+                "expression": "pg[\"Kind inference\"]",
+                "param_column": null
+              },
+              {
+                "value": " runs over a "
               },
               {
                 "term_id": "story",
@@ -2801,8 +3325,18 @@
         {
           "phase": "when",
           "narration": {
-            "text": "kind resolution runs with no stories",
-            "parts": []
+            "text": "Kind inference runs with no stories",
+            "parts": [
+              {
+                "term_id": "kind-inference",
+                "display": "Kind inference",
+                "expression": "pg[\"Kind inference\"]",
+                "param_column": null
+              },
+              {
+                "value": " runs with no stories"
+              }
+            ]
           },
           "status": "passed",
           "children": [],
@@ -2983,10 +3517,16 @@
         {
           "phase": "when",
           "narration": {
-            "text": "kind resolution runs over a matching Story",
+            "text": "Kind inference runs over a matching Story",
             "parts": [
               {
-                "value": "kind resolution runs over a matching "
+                "term_id": "kind-inference",
+                "display": "Kind inference",
+                "expression": "pg[\"Kind inference\"]",
+                "param_column": null
+              },
+              {
+                "value": " runs over a matching "
               },
               {
                 "term_id": "story",
@@ -3660,8 +4200,21 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the slot rule is applied to successive path positions",
-            "parts": []
+            "text": "the Slot rule is applied to successive positions",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "slot",
+                "display": "Slot",
+                "expression": "pg[\"Slot\"]",
+                "param_column": null
+              },
+              {
+                "value": " rule is applied to successive positions"
+              }
+            ]
           },
           "status": "passed",
           "children": [],
@@ -3673,8 +4226,21 @@
         {
           "phase": "then",
           "narration": {
-            "text": "position 0 is actor, then verb and noun alternate",
-            "parts": []
+            "text": "position 0 is the actor Slot, then verb and noun alternate",
+            "parts": [
+              {
+                "value": "position 0 is the actor "
+              },
+              {
+                "term_id": "slot",
+                "display": "Slot",
+                "expression": "pg[\"Slot\"]",
+                "param_column": null
+              },
+              {
+                "value": ", then verb and noun alternate"
+              }
+            ]
           },
           "status": "passed",
           "children": [],
@@ -9541,7 +10107,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
