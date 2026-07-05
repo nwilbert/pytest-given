@@ -34,7 +34,7 @@ def _scenario_md(scenario: Scenario) -> str:
     elif scenario.parameters is not None:
         suffix = f' · {len(scenario.parameters.cases)} cases'
     lines = [f'## {glyph} {_narration_md(scenario.narration)}{suffix}']
-    subtitle = f'`{scenario.id}`'
+    subtitle = f'`{_source_md(scenario)}`'
     if scenario.tags:
         subtitle += ' · ' + ', '.join(scenario.tags)
     if scenario.skip_reason:
@@ -47,6 +47,25 @@ def _scenario_md(scenario: Scenario) -> str:
         lines.append('')
         lines.append(_param_table_md(scenario.parameters))
     return '\n'.join(lines)
+
+
+def _source_md(scenario: Scenario) -> str:
+    """The subtitle source pointer: `relpath:line::test_name`.
+
+    The parametrize suffix (`[case-id]`) is dropped — the merged scenario
+    narrates every case, so the representative case id is noise. When a
+    SourceLocation is present its `line` is spliced in after the file path
+    (a terminal-clickable `file:line`); the test-name segment comes from the
+    node id.
+    """
+    head, sep, tail = scenario.id.rpartition('::')
+    tail = re.sub(r'\[.*\]$', '', tail)
+    node = f'{head}{sep}{tail}'
+    if scenario.source is None:
+        return node
+    _path, path_sep, name = node.partition('::')
+    located = f'{scenario.source.relpath}:{scenario.source.line}'
+    return f'{located}{path_sep}{name}'
 
 
 def _param_table_md(table: ParameterTable) -> str:

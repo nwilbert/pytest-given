@@ -2,11 +2,6 @@
 
 ## Now
 
-- [ ] Markdown improvement
-  - remove last source part in `tests/unit/capture/test_glossary.py::test_id_derive_produces_expected_slug[Guest-guest]`
-  - add line numbers to sources
-  - use indentation for nested steps
-
 ## Next
 
 - [ ] Add sort option in GLossary, to sort by number of scenarios, instances, or stories
@@ -17,6 +12,7 @@
 - [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
 - [ ] Provide an agent skill for work with pytest-given, and document how LLM agents can benefit from pytest-given — synthesize from the portable narration rules in [AGENTS.md](AGENTS.md#narration-rules-portable)
+  - review skill: use a haiku subagent to check per file that all scenarios do what they say
 - [ ] Narration lint: extend the phase check into a general narration linter that catches steps whose narration lies about their body — rule catalog in [docs/specs/proposed/2026-07-05-narration-lint-design.md](docs/specs/proposed/2026-07-05-narration-lint-design.md)
 
 ## Later

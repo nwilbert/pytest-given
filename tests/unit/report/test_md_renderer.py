@@ -11,6 +11,7 @@ from pytest_given.model import (
     ParameterTable,
     ReportData,
     Scenario,
+    SourceLocation,
     Step,
     TracebackFrame,
 )
@@ -65,6 +66,30 @@ def test_no_tags_omits_the_separator() -> None:
     md = render_md(_report(scn))
     assert '`tests/t.py::test_x`\n' in md
     assert '·' not in md.split('## ✓ X')[1].split('\n')[1]
+
+
+def test_source_splices_line_and_drops_parametrize_suffix() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_slug[Guest-guest]',
+        narration=Narration(text='Slug'),
+        module='tests/t.py',
+        source=SourceLocation(relpath='tests/t.py', line=42),
+        steps=[Step(phase='when', narration=Narration(text='act'))],
+    )
+    md = render_md(_report(scn))
+    assert '`tests/t.py:42::test_slug`\n' in md
+    assert 'Guest-guest' not in md
+
+
+def test_source_without_location_still_drops_parametrize_suffix() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_slug[case]',
+        narration=Narration(text='Slug'),
+        module='tests/t.py',
+        steps=[Step(phase='when', narration=Narration(text='act'))],
+    )
+    md = render_md(_report(scn))
+    assert '`tests/t.py::test_slug`\n' in md
 
 
 def test_nested_steps_indent() -> None:

@@ -1,7 +1,7 @@
 # pytest-given — pytest-given
 
 ## ✓ Basic scenario with when/then and a JSON attachment
-`examples/coffeeshop/test_coffeeshop.py::test_buy_coffee` · billing, happy-path
+`examples/coffeeshop/test_coffeeshop.py:22::test_buy_coffee` · billing, happy-path
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -15,7 +15,7 @@
     ```
 
 ## ✓ Plain text attachment
-`examples/coffeeshop/test_coffeeshop.py::test_text_attachment` · billing
+`examples/coffeeshop/test_coffeeshop.py:34::test_text_attachment` · billing
 
 - **given** a coffee machine
 - **when** I print the receipt
@@ -28,14 +28,14 @@
     ```
 
 ## ✓ Generator fixture with teardown
-`examples/coffeeshop/test_coffeeshop.py::test_generator_fixture`
+`examples/coffeeshop/test_coffeeshop.py:42::test_generator_fixture`
 
 - **given** a database connection
 - **when** I run a query
 - **then** the connection is open and the query was logged
 
 ## ✓ T-string with a non-parametrize value (neutral highlight)
-`examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight`
+`examples/coffeeshop/test_coffeeshop.py:78::test_neutral_highlight`
 
 - **given** a coffee machine
 - **given** I have some coins in hand
@@ -43,7 +43,7 @@
 - **then** the machine has 9 coffees left
 
 ## ✓ Helper functions can record their own steps
-`examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation` · billing
+`examples/coffeeshop/test_coffeeshop.py:117::test_buy_with_validation` · billing
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -61,7 +61,7 @@
       ```
 
 ## ✓ Top-level `given` block and deeply nested steps
-`examples/coffeeshop/test_coffeeshop.py::test_complex_order` · billing
+`examples/coffeeshop/test_coffeeshop.py:130::test_complex_order` · billing
 
 - **given** a coffee machine
 - **given** a loyalty card with 5 points
@@ -90,7 +90,7 @@
     ```
 
 ## ✓ An expected error, narrated as when + then (when_then)
-`examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected` · billing, validation
+`examples/coffeeshop/test_coffeeshop.py:163::test_sold_out_is_rejected` · billing, validation
 
 - **given** a coffee machine
 - **given** a machine that has sold its last coffee
@@ -98,17 +98,17 @@
 - **then** the machine reports it is sold out
 
 ## ✗ Failure rendering (intentionally failing)
-`examples/coffeeshop/test_coffeeshop.py::test_failing`
+`examples/coffeeshop/test_coffeeshop.py:180::test_failing`
 
 - **given** a coffee machine
 - **then** the machine has 20 coffees
 
 ## ⤼ Skipped scenario rendering · skipped
-`examples/coffeeshop/test_coffeeshop.py::test_skipped` — reason: demonstrates skipped status
+`examples/coffeeshop/test_coffeeshop.py:186::test_skipped` — reason: demonstrates skipped status
 
 
 ## ✓ Parameterized test (renders as a parameter table) · 3 cases
-`examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]` · billing
+`examples/coffeeshop/test_coffeeshop.py:51::test_pricing` · billing
 
 - **given** a coffee machine
 - **when** I insert ${euros}
@@ -121,7 +121,7 @@
 | 3 | True | ✓ |
 
 ## ✓ Parametrize value surfaced as a given (Annotated) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]` · billing
+`examples/coffeeshop/test_coffeeshop.py:63::test_annotated_given_label` · billing
 
 - **given** a coffee machine
 - **given** an order for a {cup_size} ml cup
@@ -134,7 +134,7 @@
 | 350 | ✓ |
 
 ## ✓ Brew {cup_size} ml (templated scenario name) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py::test_brew[200]` · billing
+`examples/coffeeshop/test_coffeeshop.py:88::test_brew` · billing
 
 - **given** a coffee machine
 - **when** I brew a {cup_size} ml cup
@@ -146,7 +146,7 @@
 | 300 | ✓ |
 
 ## ⤼ All cases skipped · skipped
-`examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]`
+`examples/coffeeshop/test_coffeeshop.py:193::test_parametrized_all_skipped`
 
 
 | n | |
