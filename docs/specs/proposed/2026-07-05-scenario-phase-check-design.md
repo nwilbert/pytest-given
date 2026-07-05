@@ -5,8 +5,8 @@
 An opt-in check that flags `@scenario`-decorated tests which don't cover all three Given/When/Then phases, so a suite can catch *accidentally* two-phase scenarios in CI.
 
 ```toml
-# pyproject.toml
-[tool.pytest.ini_options]
+# pyproject.toml — pytest native TOML mode (this project's [tool.pytest] table)
+[tool.pytest]
 given_phase_check = "error"          # off | warn | error   (default: off)
 given_phase_check_ignore = [
     # scenarios that are honestly two-phase — exempt by node-id glob
@@ -66,7 +66,7 @@ Mirrors the `--given-source-link` / `given_source_link` precedent (CLI option ov
 
 Resolution: `level = cli_value or ini_value`; an unrecognised value raises `pytest.UsageError` at `pytest_configure` (fail fast, like a bad preset). When `level == 'off'` the check is skipped entirely (zero cost).
 
-`type='linelist'` is read from the `[tool.pytest.ini_options]` table in `pyproject.toml` (or `pytest.ini` / `tox.ini`) as a newline-separated list — this is the ignore mechanism the feature ships with.
+In pytest's native TOML mode (the `[tool.pytest]` table this project uses since pytest 8.4/9.0), `given_phase_check_ignore` is a real TOML array of strings and the `addini(type='linelist')` declaration accepts that array directly. Under the legacy `[tool.pytest.ini_options]` table or a `pytest.ini` / `tox.ini`, the same key is a newline-separated list. Either way this is the ignore mechanism the feature ships with.
 
 ### Ignore-list matching
 
