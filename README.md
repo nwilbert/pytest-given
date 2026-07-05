@@ -10,6 +10,8 @@ Live examples:
 
 ## Quick start
 
+Requires **Python ≥ 3.14** (t-strings — [PEP 750](https://peps.python.org/pep-0750/) — are part of the step-text API) and **pytest ≥ 9.0**.
+
 ```python
 import pytest
 from pytest_given import attach, given, scenario, then, when
@@ -406,11 +408,22 @@ Four example suites live under [`examples/`](examples/), each with pre-rendered 
 
 Run `nox -s examples` to regenerate the first three, and `nox -s self_report` for the self-report.
 
-## Working with LLMs
+## Working with AI agents
 
-pytest-given may be a good fit for AI-assisted workflows. A human can describe a scenario in plain prose — more flexible than a rigid Gherkin DSL — and an LLM can generate the full test: scaffolding, steps, and assertions. The explicit `with given(...)` / `with when(...)` / `with then(...)` blocks then act as a verifiable backbone: each step records *what* the implementation claims to do, making it easier for a human or another model to audit whether the generated code actually matches that intent.
+pytest-given fits agent-driven development, where the scarce resource is human review attention rather than typing effort. A human describes a scenario in plain prose — more flexible than a rigid Gherkin DSL — and an agent generates the full test: scaffolding, steps, and assertions. As more implementation is generated rather than hand-written, the human's attention shifts from line-by-line code review to a domain-level view of behavior — which is exactly the artifact pytest-given produces.
 
-As more implementation is generated rather than hand-written, the human's attention can shift away from line-by-line code review toward a domain-level view of behavior — which is exactly the artifact pytest-given produces. The HTML report reads as a behavior specification, useful for confirming that the generated code does what was asked.
+The `with given(...)` / `with when(...)` / `with then(...)` blocks keep the *claim* about behavior directly adjacent to the code that implements it. That proximity is the point: auditing "does the code under `with when('I insert $2')` actually insert $2?" is cheaper and higher-leverage than reading raw test code, and far less prone to drift than documentation kept in separate files.
+
+**Know what the narration is and isn't.** Narration is *auditable, not verified*: in an agentic workflow the same agent writes both the code and the claim about the code, and nothing mechanically checks that a step's text matches its body. The [phase check](#phase-check) validates structure (all three phases present), never truth. The report is worth as much as your review process's habit of reading step text against step bodies — treat it as a review aid, not as evidence.
+
+What the agent itself gets out of it:
+
+- **Context economy.** `pytest --given-md` renders a run's narration as Markdown to stdout — a fraction of the tokens of the test code it summarizes, useful for orienting in an unfamiliar suite or handing a run summary to a human. Combine with pytest's own selection (`-k`, `--lf`, node ids).
+- **Structured queries.** `--given-json` + `jq` filter scenarios by tag, status, or glossary term.
+- **A controlled vocabulary.** A `Glossary` — or a `FileGlossary` over the `GLOSSARY.md` you already keep — gives the agent a stable set of domain terms to narrate with, keeping naming consistent across sessions.
+- **Early, typed errors.** Misusing a step-text form (a t-string on a decorator, a `Template` in a test body) raises `PytestGivenError` immediately with a clear message — cheap for an agent to learn from.
+
+Adopt selectively: decorate the tests that assert behavior, and leave plumbing (trivial getters, constructors, round-trips) as plain tests — they add report noise, not signal. pytest-given's own suite decorates about a fifth of its tests. Codify your narration conventions where agents will read them; this repo's [AGENTS.md](AGENTS.md#writing-self-report-scenarios) has a battle-tested set of rules for keeping narration truthful.
 
 ## Development
 
