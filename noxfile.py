@@ -142,6 +142,10 @@ def examples(session: nox.Session) -> None:
             '--given-html',
             f'--given-html-output=examples/{slug}/{slug}.html',
             '--given-source-link=github',
+            # warn (not error): these suites have intentional failures, so the
+            # run already returns a tolerated exit 1 (success_codes below) — an
+            # error-mode phase failure would be masked. The printed summary is
+            # the signal here.
             '--given-phase-check=warn',
             '--tb=no',
             '--no-header',
@@ -175,7 +179,9 @@ def self_report(session: nox.Session) -> None:
         '--given-html',
         '--given-html-output=examples/self-report/self-report.html',
         '--given-source-link=github',
-        '--given-phase-check=warn',
+        # error (not warn): the backend suite has no intentional failures, so a
+        # phase regression turns this session red — a real gate.
+        '--given-phase-check=error',
         '--tb=no',
         '--no-header',
         '-q',
