@@ -50,9 +50,18 @@ from .model import (
     Story,
     report_to_dict,
 )
-from .report import detect_commit_sha, render_html, resolve_template
+from .report import (
+    PhaseViolation,
+    detect_commit_sha,
+    find_violations,
+    render_html,
+    resolve_template,
+)
 
 collector = Collector()
+
+_PHASE_CHECK_LEVELS = ('off', 'warn', 'error')
+_phase_check_violations: pytest.StashKey[list[PhaseViolation]] = pytest.StashKey()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -91,12 +100,48 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             'github, none). See README for available variables.'
         ),
     )
+    group.addoption(
+        '--given-phase-check',
+        default=None,
+        choices=_PHASE_CHECK_LEVELS,
+        help=(
+            'Report scenarios missing a Given/When/Then phase: off | warn | '
+            'error (error fails the run). Overrides the given_phase_check ini.'
+        ),
+    )
     parser.addini(
         'given_source_link',
         type='string',
         default='none',
         help='Source-link template or preset name (CLI flag overrides this).',
     )
+    parser.addini(
+        'given_phase_check',
+        type='string',
+        default='off',
+        help='Phase-check level: off | warn | error (CLI flag overrides this).',
+    )
+    parser.addini(
+        'given_phase_check_ignore',
+        type='linelist',
+        default=[],
+        help='Node-id globs exempt from the phase check (fnmatch patterns).',
+    )
+
+
+def _phase_check_level(config: pytest.Config) -> str:
+    """Resolve the phase-check level: CLI flag wins over the ini value."""
+    level = config.getoption('given_phase_check') or config.getini('given_phase_check')
+    return cast('str', level)
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    level = _phase_check_level(config)
+    if level not in _PHASE_CHECK_LEVELS:
+        raise pytest.UsageError(
+            f'invalid given_phase_check value {level!r}; '
+            f'expected one of {", ".join(_PHASE_CHECK_LEVELS)}.'
+        )
 
 
 def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
@@ -534,6 +579,34 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         template = resolve_template(raw_link)
         html_path = Path(session.config.getoption('given_html_output'))
         render_html(json_path, html_path, source_link_template=template)
+    _run_phase_check(session, scenarios)
+
+
+def _run_phase_check(session: pytest.Session, scenarios: list[Scenario]) -> None:
+    """Flag scenarios missing a phase; stash the result for the terminal
+    summary and fail the run in `error` mode."""
+    level = _phase_check_level(session.config)
+    if level == 'off':
+        return
+    violations = find_violations(
+        scenarios, session.config.getini('given_phase_check_ignore')
+    )
+    session.config.stash[_phase_check_violations] = violations
+    if violations and level == 'error':
+        session.exitstatus = pytest.ExitCode.TESTS_FAILED
+
+
+def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
+    violations = terminalreporter.config.stash.get(_phase_check_violations, [])
+    if not violations:
+        return
+    terminalreporter.write_sep(
+        '=', f'pytest-given: incomplete scenarios ({len(violations)})', yellow=True
+    )
+    for violation in violations:
+        terminalreporter.line(
+            f'{violation.node_id}  missing: {", ".join(violation.missing)}'
+        )
 
 
 def _resolve_glossary(stories: list[Story], session: pytest.Session) -> Glossary | None:

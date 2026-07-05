@@ -296,6 +296,32 @@ The JSON report is **always written** whenever the plugin is loaded — every `p
 | `--given-html-output=PATH` | `given-report/report.html` | HTML output path (used only with `--given-html`) |
 | `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. See [Source links](#source-links). |
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
+| `--given-phase-check=LEVEL` | `off` | Report scenarios missing a Given/When/Then phase: `off` \| `warn` \| `error` (error fails the run). See [Phase check](#phase-check). |
+
+## Phase check
+
+`--given-phase-check` flags `@scenario` tests that don't cover all three Given/When/Then phases — a quick way to catch an action accidentally folded into a `given` (the missing `when`), or an arrangement hidden inside the assertion.
+
+| Level | Effect |
+|------|--------|
+| `off` (default) | No check. |
+| `warn` | Prints an "incomplete scenarios" summary naming each offender and its missing phase; the exit code is unchanged. |
+| `error` | Same summary, and the run exits non-zero — for CI gating. |
+
+Only **passed** scenarios are checked (a skipped or failed one is exempt), and each logical scenario is evaluated once regardless of parametrization. A `given` supplied by a `@given` fixture or an `Annotated[..., given(...)]` parameter counts, so those don't trip the check.
+
+Set a default in `pyproject.toml`, and exempt scenarios that are *intentionally* two-phase (a static-property assertion, a pure `when_then` raise) by node-id glob:
+
+```toml
+[tool.pytest]
+given_phase_check = "error"
+given_phase_check_ignore = [
+    "*::test_*_raises",
+    "tests/unit/test_math.py::test_constant_is_stable",
+]
+```
+
+The CLI flag overrides the `given_phase_check` ini value for a single run.
 
 ## Traceback frames
 
