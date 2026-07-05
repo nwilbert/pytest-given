@@ -1,7 +1,9 @@
 import argparse
+import json
 import sys
 from pathlib import Path
 
+from ..model import report_from_dict
 from .html_renderer import render_html
 from .source_link import resolve_template
 
@@ -40,7 +42,10 @@ def main(argv: list[str] | None = None) -> int:
             print(f'Error: {args.json_file} not found', file=sys.stderr)
             return 1
         template = resolve_template(args.source_link)
-        render_html(args.json_file, args.output, source_link_template=template)
+        report = report_from_dict(
+            json.loads(args.json_file.read_text(encoding='utf-8'))
+        )
+        render_html(report, args.output, source_link_template=template)
         print(f'Report generated: {args.output}')
         return 0
 

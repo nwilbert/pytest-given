@@ -1,5 +1,5 @@
-from .phase_check import PhaseViolation, find_violations
 from .html_renderer import render_html
+from .phase_check import PhaseViolation, find_violations
 from .source_link import detect_commit_sha, resolve_template
 
 __all__ = [

@@ -578,7 +578,7 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         ) or session.config.getini('given_source_link')
         template = resolve_template(raw_link)
         html_path = Path(session.config.getoption('given_html_output'))
-        render_html(json_path, html_path, source_link_template=template)
+        render_html(report, html_path, source_link_template=template)
     _run_phase_check(session, scenarios)
 
 
