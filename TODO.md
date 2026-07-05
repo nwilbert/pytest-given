@@ -2,6 +2,11 @@
 
 ## Now
 
+- [ ] Markdown improvement
+  - remove last source part in `tests/unit/capture/test_glossary.py::test_id_derive_produces_expected_slug[Guest-guest]`
+  - add line numbers to sources
+  - use indentation for nested steps
+
 ## Next
 
 - [ ] Add sort option in GLossary, to sort by number of scenarios, instances, or stories
@@ -10,9 +15,9 @@
 - [ ] add the prepared diagram to the readme with Agent <-> Dev <-> Domain Expert
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
-- [ ] Add option to not generate the JSON file on test run, rethink default behavior
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
-- [ ] Provide an agent skill for work with pytest-given, and document how LLM agents can benefit from pytest-given
+- [ ] Provide an agent skill for work with pytest-given, and document how LLM agents can benefit from pytest-given — synthesize from the portable narration rules in [AGENTS.md](AGENTS.md#narration-rules-portable)
+- [ ] Narration lint: extend the phase check into a general narration linter that catches steps whose narration lies about their body — rule catalog in [docs/specs/proposed/2026-07-05-narration-lint-design.md](docs/specs/proposed/2026-07-05-narration-lint-design.md)
 
 ## Later
 
@@ -24,4 +29,3 @@
   - emit each case as its own scenario (named per case via Template substitution, or by appending the parametrize id to a `str` name).
   - Needed when narration structure genuinely varies per case; today's behavior silently shows case 1's structure for all rows. See caveat in `docs/specs/2026-05-23-structured-step-text-design.md`.
   - This is also where per-case substitution of `Template` scenario names and t-string step text (`step_text(case=...)` / `Template.substitute(...)`) becomes load-bearing. Today the substitution machinery is wired but unreachable — the merged view only shows `{name}` tokens, so `Template` for scenario names mostly just Questioncontributes the placeholder highlight in the merged title.
-- [ ] Use annotations in prod code to connect to glossary? Probably not worth it. 
