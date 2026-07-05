@@ -105,8 +105,18 @@ The section lists the node id and the sorted missing phases. It does not fail in
 | `src/pytest_given/plugin.py` | Add the two `addoption`/`addini` declarations. In `pytest_configure`, validate the resolved level. In `pytest_sessionfinish`, after `_group_parameterized(...)`, run the check over the grouped scenarios when `level != 'off'`; store violations on the session/config stash. Add `pytest_terminal_summary` to print them; set `session.exitstatus` in `error` mode. |
 | `src/pytest_given/report/phase_check.py` (new) | Pure helpers: `scenario_phases(scenario) -> set[Phase]`, `missing_phases(scenario) -> list[Phase]`, `is_ignored(node_id, patterns) -> bool`, and `find_violations(scenarios, patterns) -> list[PhaseViolation]`. No pytest imports — unit-testable in isolation. Lives under `report/` because it consumes the built model (leaf `model/` dependency only). |
 | `src/pytest_given/model/schema.py` | (Optional) a small frozen `PhaseViolation(node_id: str, missing: tuple[Phase, ...])` dataclass, or keep it local to `phase_check.py`. |
+| `noxfile.py` | Add `--given-phase-check=warn` to the `pytest` invocations in the `examples` and `self_report` sessions, so regenerating the reports surfaces any incomplete scenario as a warning (see [Project dogfooding](#project-dogfooding)). |
 | `README.md` | Document the flag, the ini keys, the ignore list, and the "two phases is fine when honest → use the ignore list" guidance. |
-| `AGENTS.md` | Cross-reference: the existing GWT-phase conventions plus how to run the check locally (`--given-phase-check=warn`). |
+| `AGENTS.md` | Cross-reference: the existing GWT-phase conventions plus how to run the check locally (`--given-phase-check=warn`). Note that the `examples` / `self_report` sessions run it in `warn` mode. |
+
+### Project dogfooding
+
+pytest-given generates its own example and self-report artifacts through the `examples` and `self_report` nox sessions (each an ordinary `pytest` run with the `--given-*` flags). Passing `--given-phase-check=warn` on those runs makes the check dogfood itself: whenever a contributor regenerates the reports (required after touching example or backend test files — see the Quality gates in AGENTS.md), any scenario that has slipped to two phases prints in the summary. `warn`, not `error`, because:
+
+- The example suites (coffeeshop, hotel-booking, file-glossary-booking) are didactic and may keep a deliberately two-phase scenario; a warning is a nudge, not a wall that blocks regeneration.
+- The signal lands exactly where a regression would be introduced (the regeneration step) without coupling report generation to a hard gate.
+
+A stricter `error`-mode gate over the backend suite — the `self_report` scenarios are currently all three-phase — can be added later (e.g. in the `test` session or CI) once the ignore list has absorbed the honest exceptions. That tightening is out of scope here; this spec only wires the `warn`-mode dogfooding.
 
 ## Test Coverage
 
