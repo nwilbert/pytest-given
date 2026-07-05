@@ -1,12 +1,17 @@
-# Booking Glossary
+# pytest-given — pytest-given
 
-Terms for a minimal hotel booking domain.
+## ✓ Guest books an available room
+`examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room`
 
-| Term | Meaning |
-|---|---|
-| Guest | A person making a room reservation. |
-| book | Reserve a room for a given stay. |
-| Room | A bookable hotel room. |
-| Confirmation | A notification acknowledging a successful reservation. |
-| Cancellation Policy | The rules governing **how** and **when** a booking may be cancelled.<br>Enforced by the `CancellationPolicy` type. |
-| Overbooking | Accepting more reservations than there are rooms available. |
+- **given** the «Room» is available
+- **when** «Guest» «books» the «Room»
+- **then** the «Guest» receives a «Confirmation»
+- **then** the «Cancellation Policy» applies to the «Room»
+
+## ✓ Guest cannot book an unavailable room
+`examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room`
+
+- **given** no «Room» is available
+- **when** «Guest» «books» a «Room»
+- **then** no «Confirmation» is issued
+- **then** the «Cancellation Policy» does not apply

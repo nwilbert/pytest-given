@@ -140,6 +140,7 @@ def examples(session: nox.Session) -> None:
             test_file,
             f'--given-json=examples/{slug}/{slug}-data.json',
             f'--given-html=examples/{slug}/{slug}.html',
+            f'--given-md=examples/{slug}/{slug}.md',
             '--given-source-link=github',
             # warn (not error): these suites have intentional failures, so the
             # run already returns a tolerated exit 1 (success_codes below) — an
@@ -176,6 +177,7 @@ def self_report(session: nox.Session) -> None:
         'tests/unit',
         '--given-json=examples/self-report/self-report-data.json',
         '--given-html=examples/self-report/self-report.html',
+        '--given-md=examples/self-report/self-report.md',
         '--given-source-link=github',
         # error (not warn): the backend suite has no intentional failures, so a
         # phase regression turns this session red — a real gate.

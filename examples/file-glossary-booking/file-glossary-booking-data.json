@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-04T12:50:11.290848+00:00",
+    "timestamp": "2026-07-05T13:44:05.001840+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "591306a32f50cc05080050029343690b374de246"
+    "commit_sha": "ccc8e33bf75efd67739335fb1995ea34b5e97894"
   },
   "scenarios": [
     {
@@ -304,7 +304,7 @@
         "canonical": "Guest",
         "definition": "A person making a room reservation.",
         "source": {
-          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 7
         }
       },
@@ -314,7 +314,7 @@
         "canonical": "book",
         "definition": "Reserve a room for a given stay.",
         "source": {
-          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 8
         }
       },
@@ -324,7 +324,7 @@
         "canonical": "Room",
         "definition": "A bookable hotel room.",
         "source": {
-          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 9
         }
       },
@@ -334,7 +334,7 @@
         "canonical": "Confirmation",
         "definition": "A notification acknowledging a successful reservation.",
         "source": {
-          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 10
         }
       },
@@ -344,7 +344,7 @@
         "canonical": "Cancellation Policy",
         "definition": "The rules governing **how** and **when** a booking may be cancelled.<br>Enforced by the `CancellationPolicy` type.",
         "source": {
-          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 11
         }
       },
@@ -354,7 +354,7 @@
         "canonical": "Overbooking",
         "definition": "Accepting more reservations than there are rooms available.",
         "source": {
-          "relpath": "examples/file-glossary-booking/file-glossary-booking.md",
+          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 12
         }
       }
