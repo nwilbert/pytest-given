@@ -13,7 +13,7 @@
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
 - [ ] Provide an agent skill for work with pytest-given, and document how LLM agents can benefit from pytest-given — synthesize from the portable narration rules in [AGENTS.md](AGENTS.md#narration-rules-portable)
   - review skill: use a haiku subagent to check per file that all scenarios do what they say
-- [ ] Narration lint: extend the phase check into a general narration linter that catches steps whose narration lies about their body — rule catalog in [docs/specs/proposed/2026-07-05-narration-lint-design.md](docs/specs/proposed/2026-07-05-narration-lint-design.md)
+- [ ] Narration lint: extend the phase check into a general narration linter that catches steps whose narration lies about their body — full design in [docs/specs/proposed/2026-07-05-narration-lint-design.md](docs/specs/proposed/2026-07-05-narration-lint-design.md)
 
 ## Later
 
