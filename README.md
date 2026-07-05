@@ -36,7 +36,7 @@ Run it:
 pytest --given-html
 ```
 
-This produces `given-report/report-data.json` and `given-report/report.html` — a single self-contained HTML file with all assets inlined.
+This produces `given-report/report.html` — a single self-contained HTML file with all assets inlined.
 
 ## Why pytest-given?
 
@@ -287,13 +287,13 @@ attach('Machine state', {'coffees': 9, 'price': 2})  # JSON
 
 ## pytest options
 
-The JSON report is **always written** whenever the plugin is loaded — every `pytest` run produces it at the path given by `--given-json` (the default is created if missing). The HTML report is opt-in via `--given-html`.
+All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-*` flag enables its own sink independently, and they combine freely (e.g. pass both `--given-json` and `--given-html` to get both files from one run). `--given-html` no longer writes a JSON file alongside it.
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--given-json=PATH` | `given-report/report-data.json` | JSON output path (always written) |
-| `--given-html` | off | Also generate the HTML report |
-| `--given-html-output=PATH` | `given-report/report.html` | HTML output path (used only with `--given-html`) |
+| `--given-json[=PATH]` | off | Write JSON report data (bare → `given-report/report-data.json`). |
+| `--given-html[=PATH]` | off | Write the HTML report (bare → `given-report/report.html`). |
+| `--given-md[=PATH]` | off | Write the Markdown report; **bare renders to stdout** (fenced). |
 | `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. See [Source links](#source-links). |
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
 | `--given-phase-check=LEVEL` | `off` | Report scenarios missing a Given/When/Then phase: `off` \| `warn` \| `error` (error fails the run). See [Phase check](#phase-check). |
@@ -390,6 +390,8 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
 ```
 
 `--source-link` accepts the same presets and raw templates as `--given-source-link` (see [Source links](#source-links)). Omit it (or pass `--source-link=none`) to render plain file:line text without an anchor.
+
+Pass `--format md` to render Markdown instead of HTML; the format is also inferred from the `-o` extension, so `-o report.md` renders Markdown without needing `--format` explicitly. Omit `-o` with `--format md` to print to stdout.
 
 ## Examples
 

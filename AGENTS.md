@@ -35,7 +35,8 @@ Run all checks: `uv run nox`. List individual sessions with `uv run nox -l`.
 - `src/pytest_given/model/schema.py` — Frozen / mutable dataclasses for the report tree (`ReportData`, `Metadata`, `Scenario`, `Step`, `Attachment`, `ErrorInfo`, `ParameterTable`, `ParameterCase`, `SourceLocation`); `Narration` + `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationPart` union; `NodeId` / `Phase` aliases
 - `src/pytest_given/model/serde.py` — `report_to_dict` / `report_from_dict` boundary between JSON and the dataclass model; discriminates the three `NarrationPart` variants by key
 - `src/pytest_given/model/errors.py` — `PytestGivenError`
-- `src/pytest_given/report/renderer.py` — Reads JSON via `report_from_dict` and walks typed dataclasses; emits self-contained HTML (Jinja2 + Alpine.js); single structural `narration` filter dispatching on `NarrationPart` variants via `match`/`case`
+- `src/pytest_given/report/html_renderer.py` — Reads JSON via `report_from_dict` and walks typed dataclasses; emits self-contained HTML (Jinja2 + Alpine.js); single structural `narration` filter dispatching on `NarrationPart` variants via `match`/`case`
+- `src/pytest_given/report/md_renderer.py` — Plain-text Markdown renderer over the same typed model; `«term»` markers, no browser needed
 - `src/pytest_given/report/source_link.py` — Preset resolution (`vscode` / `cursor` / `zed` / `pycharm` / `github`), template variable substitution, GitHub org/repo + commit-SHA detection for `--given-source-link`
 - `src/pytest_given/report/cli.py` — Standalone `pytest-given report` command (mirrors `--given-source-link` as `--source-link`)
 - `src/pytest_given/report/templates/` — Jinja2 template, CSS, bundled Alpine.js
@@ -56,9 +57,17 @@ Three authoring forms (see [README](README.md#step-text--placeholders) for user-
 
 Lanes don't overlap: t-strings are rejected in `@scenario` and on any decorator (their values aren't in scope at decoration time); `pytest_given.Template` is rejected in `with given/when/then(...)` (test-body t-strings handle that case) and on fixtures (use a plain string label). `Template` accepts bare identifiers only (no attribute access, no expressions) — t-strings have full expression syntax in test bodies. Helper-function `Template` placeholders must name a positional-or-keyword parameter; `*args` / `**kwargs` placeholders raise at decoration time. Parametrized scenarios use case 1's step structure as the merged-template view; if narration *structure* varies per case, split the test instead.
 
+## Handling report output
+
+Outputs are opt-in; a bare `uv run pytest` writes nothing.
+
+- **Read a run's narration:** `uv run pytest <selection> --given-md` renders Markdown to stdout between `<!-- pytest-given:md:start -->` / `:end` fences — slice that block out. Select scenarios with pytest's own args (`node-id`, `-k`, `--lf`); the renderer narrates whatever collected.
+- **Filter by tag / term / status:** not a Markdown feature. Write the structured data with `--given-json` and query it with `jq` (scenarios carry `tags`, `status`, and term refs). Markdown is the readable view; JSON is the queryable one.
+- **Re-render a saved run:** `uv run pytest-given report <data.json> --format md`.
+
 ## Report testing
 
-Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filter in `renderer.py` **must** be Playwright-verified before commit — Python-side regex tests on rendered HTML do not catch broken Alpine expressions, malformed `:class` bindings, or other runtime browser issues (the substring matches even when the attribute is unparseable). Open e.g. `examples/coffeeshop/coffeeshop.html` (regenerate via `uv run nox -s examples`) with the Playwright MCP server, check `browser_console_messages` for errors after init, then drive the changed surface (hover, click, URL hash). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
+Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filter in `html_renderer.py` **must** be Playwright-verified before commit — Python-side regex tests on rendered HTML do not catch broken Alpine expressions, malformed `:class` bindings, or other runtime browser issues (the substring matches even when the attribute is unparseable). Open e.g. `examples/coffeeshop/coffeeshop.html` (regenerate via `uv run nox -s examples`) with the Playwright MCP server, check `browser_console_messages` for errors after init, then drive the changed surface (hover, click, URL hash). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
 
 - **Don't write Python tests that pin frontend markup** (specific class names, wrapper structure, inline-handler shape, SVG strings). They check implementation details, not behavior, and rot the moment the renderer is refactored. The project has no JS-side UI tests; Playwright is the only verification for frontend concerns. Python tests stay on the renderer's data-shaped contract (what `data-param` value, which scenario IDs, which counts) — not on how the markup is assembled.
 - **Don't TDD frontend changes** for the same reason: a failing markup assertion isn't proving the bug exists in the browser, and a passing one isn't proving the fix works. Apply the change, regenerate `examples/`, drive it in Playwright, capture the result.
