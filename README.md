@@ -298,6 +298,8 @@ All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
 | `--given-phase-check=LEVEL` | `off` | Report scenarios missing a Given/When/Then phase: `off` \| `warn` \| `error` (error fails the run). See [Phase check](#phase-check). |
 
+Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection.
+
 ## Phase check
 
 `--given-phase-check` flags `@scenario` tests that don't cover all three Given/When/Then phases — a quick way to catch an action accidentally folded into a `given` (the missing `when`), or an arrangement hidden inside the assertion.

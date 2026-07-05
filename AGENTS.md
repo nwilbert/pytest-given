@@ -65,6 +65,8 @@ Outputs are opt-in; a bare `uv run pytest` writes nothing.
 - **Filter by tag / term / status:** not a Markdown feature. Write the structured data with `--given-json` and query it with `jq` (scenarios carry `tags`, `status`, and term refs). Markdown is the readable view; JSON is the queryable one.
 - **Re-render a saved run:** `uv run pytest-given report <data.json> --format md`.
 
+The `--given-md` above is deliberately last: a bare `--given-json` / `--given-html` / `--given-md` swallows the next token as its own output path, so a test selection placed after it silently changes what runs. Put your selection first, the flag last, or use `--given-md=PATH` if something must follow it.
+
 ## Report testing
 
 Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filter in `html_renderer.py` **must** be Playwright-verified before commit — Python-side regex tests on rendered HTML do not catch broken Alpine expressions, malformed `:class` bindings, or other runtime browser issues (the substring matches even when the attribute is unparseable). Open e.g. `examples/coffeeshop/coffeeshop.html` (regenerate via `uv run nox -s examples`) with the Playwright MCP server, check `browser_console_messages` for errors after init, then drive the changed surface (hover, click, URL hash). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
