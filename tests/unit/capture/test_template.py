@@ -387,7 +387,7 @@ def file_glossary(tmp_path: Path) -> FileGlossary:
 def test_tstring_with_file_term_handle_emits_term_ref(
     file_glossary: FileGlossary,
 ) -> None:
-    with given(t'a {pg["DeferredTermHandle"]} from a {pg["FileGlossary"]}'):
+    with given(t'a {pg["Deferred term"]} from a {pg["File glossary"]}'):
         guest = file_glossary['Guest']
     with when('it is interpolated into a t-string step'):
         _, parts = parse_tstring(t'a {guest} arrives')

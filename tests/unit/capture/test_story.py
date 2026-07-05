@@ -120,7 +120,7 @@ def test_path_dispatches_bare_string_to_activity_word(guest, search, room):
     with when(t'a {pg["Path"]} is built with a bare word between term nodes'):
         p = path(guest, search, room, 'for', guest('Alice'))
     with then(
-        t'the bare word becomes an {pg["ActivityPart"]} word, not a {pg["Term ref"]}'
+        t'the bare word becomes an {pg["Activity Part"]} word, not a {pg["Term ref"]}'
     ):
         assert p.parts[3] == ActivityWord(text='for')
 
@@ -180,7 +180,7 @@ def test_path_rejects_verb_in_position_0(guest, search, room):
 def test_path_allows_bare_string_in_position_0(search, room):
     with when(t'a bare string takes position 0 of a {pg["Path"]}'):
         p = path('Guest', search, room)
-    with then(t'it is accepted as an {pg["ActivityPart"]} word'):
+    with then(t'it is accepted as an {pg["Activity Part"]} word'):
         assert p.parts[0] == ActivityWord(text='Guest')
 
 
@@ -252,7 +252,7 @@ def test_path_allows_bare_verb_between_term_nodes(guest, room):
 def test_path_allows_fully_bare_path():
     with when(t'a {pg["Path"]} is built from plain strings only'):
         p = path('Guest', 'receives', 'Confirmation')
-    with then(t'every part is an {pg["ActivityPart"]} word'):
+    with then(t'every part is an {pg["Activity Part"]} word'):
         assert [type(part) for part in p.parts] == [
             ActivityWord,
             ActivityWord,

@@ -71,7 +71,7 @@ Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filt
 
 When decorating a backend test with `@scenario`, the goal is a report that reads as a truthful behavioural spec. Keep these rules:
 
-- **Narrate in glossary vocabulary.** Reference terms as `pg['Term']` inside t-string step text (e.g. `t'a {pg["FileGlossary"]} loaded from a file'`). Term refs are what power the Glossary tab's per-term filter, and they render as pills.
+- **Narrate in glossary vocabulary.** Reference terms as `pg['Term']` inside t-string step text (e.g. `t'a {pg["File glossary"]} loaded from a file'`). Term refs are what power the Glossary tab's per-term filter, and they render as pills.
 - **Every step maps to load-bearing code.** `given` arranges, `when` performs the one call under test, `then` asserts its result. Never write a placeholder step like `with given(...): pass` — a step with no code is a lie in the report. Delete it.
 - **Put the system-under-test call in `when`, not folded into the `then` assertion.** Prefer `with when(...): result = sut(x)` then `with then(...): assert result == …` over `with then(...): assert sut(x) == …`. The report should show the action, not hide it inside a check.
 - **Two phases is fine when honest.** If the assertion inspects a *static property of the arranged state* (not a return value of an action), `given` + `then` is truthful — don't invent a `when`. Likewise a pure "constructing X raises" check needs no `given`.
@@ -88,6 +88,8 @@ When decorating a backend test with `@scenario`, the goal is a report that reads
 ## Conventions
 
 - Use the project's canonical vocabulary — see [GLOSSARY.md](GLOSSARY.md). Renames touch the glossary in the same commit.
+  - **Term headers are natural-language, not class names.** Name a term for the concept a human would say (`Activity Part`, `File glossary`, `Deferred term`) and spell the implementing class (`ActivityPart`, `FileGlossary`, `DeferredTermHandle`) inside the *meaning* column. A one-word term may coincide with its class (`Scenario`, `Step`, `Story`) only because the class is already the natural word — multi-word CamelCase never is.
+  - **Renaming or removing a term header is a code change, not just a doc edit.** `GLOSSARY.md` is loaded live as a `FileGlossary` (`pg`) by the backend tests (`tests/_vocab.py`), and a header's slug (`id_derive`: lowercased, non-alnum → `-`) is the lookup key. `FileGlossary` and `File glossary` derive *different* slugs, so a rename breaks every `pg['OldName']` reference. When you rename/remove a term: grep `pg\[` for the old name, update the references, then `uv run nox -s self_report` and commit the regenerated report. Adding a new term is safe (it just appears in the Glossary tab), but still regenerate the self-report since its content changed.
 - Avoid `Any` — use precise types, generics, `TYPE_CHECKING` imports, or `ContextVar[T]` over untyped `threading.local`.
 - Use `NewType` for domain-specific IDs (e.g., `NodeId`) and PEP 695 `type` statements for aliases. Avoid raw complex types like `dict[str, tuple[list[str], list[Any]]]` — introduce named types instead.
 - Only module-level imports — no inline/function-level imports.

@@ -26,7 +26,7 @@ def simple_doc():
     tags=['markdown', 'happy-path'],
 )
 def test_parses_default_columns(simple_doc):
-    with when(t'the parser reads it into rows for a {pg["FileGlossary"]}'):
+    with when(t'the parser reads it into rows for a {pg["File glossary"]}'):
         rows = parse_glossary_tables(
             simple_doc, term_column=0, description_column=1, kind_column=None
         )
@@ -121,7 +121,7 @@ def test_no_table_raises():
         attach('Markdown document', text)
     with (
         when_then(
-            t'the parser reads it for a {pg["FileGlossary"]}',
+            t'the parser reads it for a {pg["File glossary"]}',
             'no pipe table is reported',
         ),
         pytest.raises(PytestGivenError, match=r'no .*table'),
