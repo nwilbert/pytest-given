@@ -372,8 +372,10 @@ def test_subscript_get_only_returns_handle():
     with given(t'a glossary with one declared {pg["Term"]}'):
         g = Glossary()
         g('redeems')
-    with then(t'subscripting the name returns that {pg["Term"]}'):
-        assert g['redeems'].term.canonical == 'redeems'
+    with when('the name is looked up by subscript'):
+        handle = g['redeems']
+    with then(t'the returned {pg["Term"]} is the declared one'):
+        assert handle.term.canonical == 'redeems'
 
 
 @scenario(

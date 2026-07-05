@@ -250,8 +250,10 @@ def test_path_allows_bare_verb_between_term_nodes(guest, room):
     tags=['story-grammar', 'happy-path'],
 )
 def test_path_allows_fully_bare_path():
-    with when(t'a {pg["Path"]} is built from plain strings only'):
-        p = path('Guest', 'receives', 'Confirmation')
+    with given('three plain words with no glossary handles'):
+        words = ('Guest', 'receives', 'Confirmation')
+    with when(t'a {pg["Path"]} is built from them'):
+        p = path(*words)
     with then(t'every part is an {pg["Activity Part"]} word'):
         assert [type(part) for part in p.parts] == [
             ActivityWord,
@@ -434,8 +436,10 @@ def test_story_rejects_duplicate_activity_ids(guest, search, room):
     tags=['story-grammar', 'happy-path'],
 )
 def test_story_derives_id_from_title():
-    with when(t'a {pg["Story"]} is built with a human title'):
-        s = story('Book a Room', [])
+    with given('a human-readable story title'):
+        title = 'Book a Room'
+    with when(t'a {pg["Story"]} is built from it'):
+        s = story(title, [])
     with then('its id is the slugified title'):
         assert s.id == StoryId('book-a-room')
 

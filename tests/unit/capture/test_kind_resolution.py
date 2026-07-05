@@ -283,7 +283,9 @@ def test_declared_verb_in_noun_slot_raises():
 def test_slot_for_maps_odd_positions_to_verb():
     from pytest_given.capture.kind_resolution import _slot_for
 
-    with when(t'the {pg["Slot"]} rule is applied to successive positions'):
-        slots = [_slot_for(i) for i in range(5)]
+    with given('the five positions of a short activity path'):
+        positions = range(5)
+    with when(t'the {pg["Slot"]} rule is applied to each position'):
+        slots = [_slot_for(i) for i in positions]
     with then(t'position 0 is the actor {pg["Slot"]}, then verb and noun alternate'):
         assert slots == ['actor', 'verb', 'noun', 'verb', 'noun']

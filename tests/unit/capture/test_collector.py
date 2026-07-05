@@ -422,7 +422,8 @@ def test_start_scenario_source_defaults_to_none() -> None:
 @scenario('A leaf given is grafted as a childless given step', tags=['happy-path'])
 def test_graft_leaf_given_appends_childless_given_step() -> None:
     collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
+    with given(t'an {pg["Active scenario"]} is being recorded'):
+        collector.start_scenario('id', 'name', 'mod', [])
     with when(t'a leaf {pg["Graft"]} appends a childless {pg["Step"]}'):
         collector.graft_leaf_given(_n('the name {text}'))
         recorded = collector.finish_scenario(status='passed', duration_ms=0)
@@ -459,8 +460,9 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
 
 @scenario('Grafting with no active scenario is a no-op', tags=['happy-path'])
 def test_graft_leaf_given_without_scenario_is_noop() -> None:
-    collector = Collector()
-    with when(t'a leaf {pg["Graft"]} runs with no {pg["Active scenario"]}'):
+    with given(t'a collector with no {pg["Active scenario"]}'):
+        collector = Collector()
+    with when(t'a leaf {pg["Graft"]} runs'):
         collector.graft_leaf_given(_n('orphan'))
     with then('no scenario is recorded'):
         assert collector.scenarios == []
