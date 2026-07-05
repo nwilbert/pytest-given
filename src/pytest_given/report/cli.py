@@ -2,7 +2,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from .renderer import render_html
+from .html_renderer import render_html
 from .source_link import resolve_template
 
 

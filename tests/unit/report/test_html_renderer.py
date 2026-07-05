@@ -5,7 +5,7 @@ from typing import Any, cast
 
 import pytest
 
-from pytest_given.report.renderer import (
+from pytest_given.report.html_renderer import (
     _inline_md,
     _render_narration_part,
     render_html,
@@ -1042,7 +1042,7 @@ from pytest_given.model import (  # noqa: E402
     NarrationTermRef,
     TermId,
 )
-from pytest_given.report.renderer import _make_narration_filter  # noqa: E402
+from pytest_given.report.html_renderer import _make_narration_filter  # noqa: E402
 
 
 def _glossary() -> Glossary:
@@ -1167,7 +1167,7 @@ from pytest_given.model import (  # noqa: E402
     ActivityTermRef,
     ActivityWord,
 )
-from pytest_given.report.renderer import _make_activity_part_filter  # noqa: E402
+from pytest_given.report.html_renderer import _make_activity_part_filter  # noqa: E402
 
 
 def test_activity_part_filter_actor_term_ref():
