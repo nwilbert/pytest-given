@@ -35,8 +35,9 @@ def test_buy_coffee(machine):
 def test_text_attachment(machine):
     with when('I print the receipt'):
         receipt = 'Coffee x1     $2.00\n----------------\nTotal:        $2.00'
-    with then('the receipt is recorded verbatim'):
+    with then('the receipt shows the total'):
         attach('Receipt', receipt)
+        assert receipt.splitlines()[-1] == 'Total:        $2.00'
 
 
 @scenario('Generator fixture with teardown')
