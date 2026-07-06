@@ -174,7 +174,7 @@ A parent `then` whose nested `then` child contains a check passes. `when_then`-p
 
 `when_then` needs care on both sides of the rule:
 
-- A `when_then`'s `when` counts as acting **unconditionally** — not via the body-contains-a-`Call` test. The construct wraps the act by definition, and the acting expression need not be a call (`with when_then(…), pytest.raises(KeyError): mapping[key]` acts via a subscript). A plain `when` acts iff its body contains a `Call`.
+- A `when_then`'s `when` counts as acting **unconditionally** — not via the body-contains-a-`Call` test. The construct wraps the act by definition, and the acting expression need not be a call (`with when_then(…), pytest.raises(KeyError): mapping[key]` acts via a subscript). A plain `when` acts iff its body contains a `Call` **or a `Subscript`** — the subscript half is the same reasoning applied to plain `when`s, added in rollout step 2 when a call-only test false-positived on this suite's `glossary['Guest']` lookup-as-action.
 - A `when_then`'s `then` is **excluded from the then-side scan**: it anchors to the shared `With` node, so its "body" is the acting body — any call there *is* the act, not an action folded into a check.
 
 **Why it's a lie:** the action under test is invisible in the report — the scenario reads as if an outcome materialized without an act. The "most common missed `when`" from AGENTS.md.

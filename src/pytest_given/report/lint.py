@@ -12,14 +12,13 @@ from __future__ import annotations
 import ast
 import dataclasses
 import re
-from collections import defaultdict
 from collections.abc import Iterator
 from dataclasses import dataclass
 from fnmatch import fnmatch
 from pathlib import Path, PurePosixPath
 from typing import Literal, NewType
 
-from ..model import NodeId, Scenario, SourceLocation, Step
+from ..model import NarrationValue, NodeId, Scenario, SourceLocation, Step
 
 type Level = Literal['off', 'warn', 'error']
 type Surface = Literal['runtime', 'ast']
@@ -58,6 +57,9 @@ class LintRule:
 RULES: tuple[LintRule, ...] = (
     LintRule(id=RuleId('empty-step'), surface='ast', default='error'),
     LintRule(id=RuleId('then-without-check'), surface='ast', default='error'),
+    LintRule(id=RuleId('check-outside-then'), surface='ast', default='warn'),
+    LintRule(id=RuleId('action-in-then'), surface='ast', default='warn'),
+    LintRule(id=RuleId('unused-interpolation'), surface='ast', default='warn'),
 )
 
 _RULES_BY_ID: dict[RuleId, LintRule] = {rule.id: rule for rule in RULES}
@@ -134,29 +136,38 @@ def parse_ignore_entries(lines: list[str]) -> list[IgnoreEntry]:
 def run_ast_rules(scenarios: list[Scenario], rootdir: Path) -> list[Finding]:
     """Run the AST-surface rules over every step that carries a source anchor.
 
-    Groups anchored steps by file, parses each file once, and resolves each
-    step to its `with` statement or helper `FunctionDef` by recorded line.
+    Each file is parsed once (cached across scenarios) and every anchored step
+    resolves to its `with` statement or helper `FunctionDef` by recorded line.
     Failure-tolerant by design: an unreadable or unparseable file, or a line
     with no matching node, silently skips that step's rules — lint must never
     crash the run.
     """
-    by_file: dict[str, list[_AnchoredStep]] = defaultdict(list)
-    for scenario in scenarios:
-        for anchored in _anchored_steps(scenario):
-            by_file[anchored.source.relpath].append(anchored)
+    indexes: dict[str, dict[int, _BodyNode] | None] = {}
     findings: list[Finding] = []
-    for relpath, anchored_steps in by_file.items():
-        index = _index_body_nodes(rootdir / relpath)
-        if index is None:
-            continue
-        for anchored in anchored_steps:
-            node = index.get(anchored.source.line)
-            if node is None:
-                continue
-            for rule in (_empty_step_finding, _then_without_check_finding):
-                finding = rule(anchored, node)
+    for scenario in scenarios:
+        resolved: list[tuple[_AnchoredStep, _BodyNode]] = []
+        node_by_step: dict[int, _BodyNode] = {}
+        for anchored in _anchored_steps(scenario):
+            relpath = anchored.source.relpath
+            if relpath not in indexes:
+                indexes[relpath] = _index_body_nodes(rootdir / relpath)
+            index = indexes[relpath]
+            node = index.get(anchored.source.line) if index is not None else None
+            if node is not None:
+                resolved.append((anchored, node))
+                node_by_step[id(anchored.step)] = node
+        for anchored, node in resolved:
+            for finding in (
+                _empty_step_finding(anchored, node),
+                _then_without_check_finding(anchored, node),
+                _check_outside_then_finding(anchored, node, node_by_step),
+            ):
                 if finding is not None:
                     findings.append(finding)
+            findings.extend(_unused_interpolation_findings(anchored, node))
+        scenario_finding = _action_in_then_finding(scenario, resolved)
+        if scenario_finding is not None:
+            findings.append(scenario_finding)
     return findings
 
 
@@ -332,7 +343,123 @@ def _then_without_check_finding(
     )
 
 
+def _check_outside_then_finding(
+    anchored: _AnchoredStep,
+    node: _BodyNode,
+    node_by_step: dict[int, _BodyNode],
+) -> Finding | None:
+    """Rule `check-outside-then`: an `assert` sits in a `given` or `when` body.
+
+    `when_then` bodies are exempt — the shared body belongs to the pair's
+    `then` half. Asserts inside a nested child step's block are that child's
+    business (it is scanned as its own anchored step), so the parent's scan
+    excludes resolved child subtrees.
+    """
+    if anchored.step.phase == 'then' or anchored.pair_when:
+        return None
+    child_nodes = {
+        id(node_by_step[id(child)])
+        for child in anchored.step.children
+        if id(child) in node_by_step
+    }
+    if not _contains_assert_outside(node.body, child_nodes):
+        return None
+    return _anchored_finding(
+        RuleId('check-outside-then'),
+        anchored,
+        f'assert inside {anchored.step.phase} {anchored.step.narration.text!r}',
+    )
+
+
+def _unused_interpolation_findings(
+    anchored: _AnchoredStep, node: _BodyNode
+) -> list[Finding]:
+    """Rule `unused-interpolation`: a t-string step interpolates a bare
+    identifier its body never uses.
+
+    Only `with`-anchored steps are scanned — `Template` placeholders on
+    decorated helpers are tied to parameters by decoration-time validation
+    and are out of scope in v1. Term refs are exempt by type; complex
+    expressions are skipped entirely. For a `given`, a store (the step
+    binding the name) also counts as use.
+    """
+    if not isinstance(node, ast.With):
+        return []
+    values = [
+        part
+        for part in anchored.step.narration.parts
+        if isinstance(part, NarrationValue)
+    ]
+    if not values:
+        return []
+    used = _names_used(node, include_stores=anchored.step.phase == 'given')
+    findings: list[Finding] = []
+    seen: set[str] = set()
+    for part in values:
+        name = _bare_identifier(part.expression)
+        if name is None or name in seen:
+            continue
+        seen.add(name)
+        if name not in used:
+            findings.append(
+                _step_finding(
+                    RuleId('unused-interpolation'),
+                    anchored,
+                    f'interpolates {{{name}}} but never uses it',
+                )
+            )
+    return findings
+
+
+def _action_in_then_finding(
+    scenario: Scenario, resolved: list[tuple[_AnchoredStep, _BodyNode]]
+) -> Finding | None:
+    """Rule `action-in-then` (per scenario): a `then` assertion contains a
+    call, and no `when` step acts.
+
+    A `when_then`'s `when` acts unconditionally (the construct wraps the act
+    by definition — the acting expression need not be a call); a plain `when`
+    acts iff its body contains a call or a subscript (an indexing action —
+    the same reasoning, tuned on this repo's suite). Any `when` without a
+    resolved anchor skips the whole scenario — unknowable beats wrong. A
+    `when_then`'s `then` is excluded from the then-side scan: it anchors to
+    the shared `with`, so any call there *is* the act.
+    """
+    node_of = {id(a.step): (a, node) for a, node in resolved}
+    acts = False
+    for step in _iter_steps(scenario.steps):
+        if step.phase != 'when':
+            continue
+        entry = node_of.get(id(step))
+        if entry is None:
+            return None
+        anchored, node = entry
+        if anchored.pair_when or _body_performs_action(node):
+            acts = True
+    if acts:
+        return None
+    for anchored, node in resolved:
+        if anchored.step.phase != 'then' or anchored.pair_then:
+            continue
+        if _assert_with_call(node):
+            return _anchored_finding(
+                RuleId('action-in-then'),
+                anchored,
+                f'then {anchored.step.narration.text!r} folds the action into '
+                f'its assertion; no when acts',
+            )
+    return None
+
+
 def _step_finding(rule: RuleId, anchored: _AnchoredStep, problem: str) -> Finding:
+    return _anchored_finding(
+        rule,
+        anchored,
+        f'{anchored.step.phase} {anchored.step.narration.text!r} {problem}',
+    )
+
+
+def _anchored_finding(rule: RuleId, anchored: _AnchoredStep, text: str) -> Finding:
     location = anchored.source
     filename = PurePosixPath(location.relpath).name
     return Finding(
@@ -341,10 +468,7 @@ def _step_finding(rule: RuleId, anchored: _AnchoredStep, problem: str) -> Findin
         subject=anchored.node_id,
         node_id=anchored.node_id,
         location=location,
-        message=(
-            f'{anchored.step.phase} {anchored.step.narration.text!r} {problem} '
-            f'({filename}:{location.line})'
-        ),
+        message=f'{text} ({filename}:{location.line})',
     )
 
 
@@ -363,6 +487,73 @@ def _is_attach_stmt(stmt: ast.stmt) -> bool:
     return (isinstance(func, ast.Name) and func.id == 'attach') or (
         isinstance(func, ast.Attribute) and func.attr == 'attach'
     )
+
+
+def _iter_steps(steps: list[Step]) -> Iterator[Step]:
+    for step in steps:
+        yield step
+        yield from _iter_steps(step.children)
+
+
+def _bare_identifier(expression: str) -> str | None:
+    """The name if *expression* parses to a single `Name`, else None."""
+    try:
+        parsed = ast.parse(expression, mode='eval')
+    except SyntaxError:
+        return None
+    return parsed.body.id if isinstance(parsed.body, ast.Name) else None
+
+
+def _names_used(node: ast.With, *, include_stores: bool) -> set[str]:
+    """Names used anywhere under the `with` — items and body, nested steps
+    included — skipping t-string subtrees: an interpolation in a narration
+    (this step's own, or a nested step's) is text, not a code use."""
+    names: set[str] = set()
+    stack: list[ast.AST] = list(ast.iter_child_nodes(node))
+    while stack:
+        sub = stack.pop()
+        if isinstance(sub, ast.TemplateStr):
+            continue
+        if isinstance(sub, ast.Name) and (
+            include_stores or isinstance(sub.ctx, ast.Load)
+        ):
+            names.add(sub.id)
+        stack.extend(ast.iter_child_nodes(sub))
+    return names
+
+
+def _body_performs_action(node: _BodyNode) -> bool:
+    """Whether the node's body (not its with-items) performs a call or an
+    indexing action (subscript)."""
+    return any(
+        isinstance(sub, (ast.Call, ast.Subscript))
+        for stmt in node.body
+        for sub in ast.walk(stmt)
+    )
+
+
+def _assert_with_call(node: _BodyNode) -> bool:
+    """Whether any `assert` in the node's subtree tests an expression
+    containing a call."""
+    return any(
+        isinstance(sub, ast.Assert)
+        and any(isinstance(part, ast.Call) for part in ast.walk(sub.test))
+        for sub in ast.walk(node)
+    )
+
+
+def _contains_assert_outside(stmts: list[ast.stmt], excluded: set[int]) -> bool:
+    """Whether an `assert` exists under *stmts*, skipping excluded subtrees
+    (child-step blocks, identified by node id)."""
+    stack: list[ast.AST] = list(stmts)
+    while stack:
+        node = stack.pop()
+        if id(node) in excluded:
+            continue
+        if isinstance(node, ast.Assert):
+            return True
+        stack.extend(ast.iter_child_nodes(node))
+    return False
 
 
 def _contains_check(node: _BodyNode) -> bool:

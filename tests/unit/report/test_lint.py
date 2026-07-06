@@ -1,8 +1,18 @@
+import dataclasses
 import textwrap
 
 import pytest
 
-from pytest_given.model import Narration, NodeId, Scenario, SourceLocation, Step
+from pytest_given.model import (
+    Narration,
+    NarrationTermRef,
+    NarrationValue,
+    NodeId,
+    Scenario,
+    SourceLocation,
+    Step,
+    TermId,
+)
 from pytest_given.report.lint import (
     Finding,
     RuleId,
@@ -505,3 +515,569 @@ def test_anchor_line_with_no_matching_node_is_skipped(tmp_path) -> None:
     )
     scenario = _scenario([_step('given', 'a value', _line(src, 'x = 1'))])
     assert run_ast_rules([scenario], tmp_path) == []
+
+
+# --- Rule 3: check-outside-then ---
+
+
+@pytest.mark.parametrize('phase', ['given', 'when'])
+def test_check_outside_then_fires_on_assert_in_given_or_when(tmp_path, phase) -> None:
+    src = _write(
+        tmp_path,
+        f"""\
+        def test_a():
+            with {phase}('a stocked machine'):
+                machine = stock()
+                assert machine['coffees'] > 0
+        """,
+    )
+    with_line = _line(src, 'with ')
+    scenario = _scenario([_step(phase, 'a stocked machine', with_line)])
+    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then')
+    [finding] = findings
+    assert finding.severity == 'warn'
+    assert finding.message == (
+        f"assert inside {phase} 'a stocked machine' (test_x.py:{with_line})"
+    )
+
+
+def test_check_outside_then_reports_one_finding_for_many_asserts(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given('a machine'):
+                machine = stock()
+                assert machine['coffees'] > 0
+                assert machine['price'] == 2
+        """,
+    )
+    scenario = _scenario([_step('given', 'a machine', _line(src, 'with given'))])
+    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then')
+    assert len(findings) == 1
+
+
+def test_check_outside_then_ignores_assert_in_then(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with then('it is one'):
+                assert x == 1
+        """,
+    )
+    scenario = _scenario([_step('then', 'it is one', _line(src, 'with then'))])
+    assert (
+        _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then') == []
+    )
+
+
+def test_check_outside_then_exempts_when_then_body(tmp_path) -> None:
+    # The shared body belongs to the pair's `then` half, so an assert there is
+    # a check in `then` territory.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with when_then('acting', 'outcome'):
+                result = act()
+                assert result
+        """,
+    )
+    line = _line(src, 'with when_then')
+    scenario = _scenario(
+        [_step('when', 'acting', line), _step('then', 'outcome', line)]
+    )
+    assert (
+        _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then') == []
+    )
+
+
+def test_check_outside_then_conditional_assert_still_fires(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with when('acting'):
+                result = act()
+                if result:
+                    assert result > 0
+        """,
+    )
+    scenario = _scenario([_step('when', 'acting', _line(src, 'with when'))])
+    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then')
+    assert len(findings) == 1
+
+
+def test_check_outside_then_child_assert_reported_on_the_child_only(
+    tmp_path,
+) -> None:
+    # The assert lives in the nested step's block; the parent must not
+    # double-report it.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given('outer'):
+                x = 1
+                with given('inner'):
+                    assert x
+        """,
+    )
+    inner_line = _line(src, "with given('inner')")
+    inner = _step('given', 'inner', inner_line)
+    outer = _step('given', 'outer', _line(src, "with given('outer')"), [inner])
+    findings = _rule_findings(
+        run_ast_rules([_scenario([outer])], tmp_path), 'check-outside-then'
+    )
+    [finding] = findings
+    assert finding.location == SourceLocation(relpath='test_x.py', line=inner_line)
+
+
+def test_check_outside_then_fires_on_helper_body_assert(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        @given('a validated machine')
+        def make_machine():
+            machine = stock()
+            assert machine['coffees'] > 0
+            return machine
+        """,
+    )
+    scenario = _scenario([_step('given', 'a validated machine', _line(src, '@given'))])
+    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then')
+    assert len(findings) == 1
+
+
+# --- Rule 4: action-in-then (per scenario) ---
+
+
+def test_action_in_then_fires_when_no_when_exists(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given('a machine'):
+                machine = stock()
+            with then('it brews'):
+                assert brew(machine) == 'coffee'
+        """,
+    )
+    then_line = _line(src, 'with then')
+    scenario = _scenario(
+        [
+            _step('given', 'a machine', _line(src, 'with given')),
+            _step('then', 'it brews', then_line),
+        ]
+    )
+    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then')
+    [finding] = findings
+    assert finding.severity == 'warn'
+    assert finding.subject == 'test_x.py::test_a'
+    assert finding.location == SourceLocation(relpath='test_x.py', line=then_line)
+    assert finding.message == (
+        f"then 'it brews' folds the action into its assertion; "
+        f'no when acts (test_x.py:{then_line})'
+    )
+
+
+def test_action_in_then_fires_when_no_when_acts(tmp_path) -> None:
+    # A `when` whose body only rebinds a value performs no call — the acting
+    # call hides in the then's assert.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with when('preparing'):
+                x = 1
+            with then('it brews'):
+                assert brew(x) == 'coffee'
+        """,
+    )
+    scenario = _scenario(
+        [
+            _step('when', 'preparing', _line(src, 'with when')),
+            _step('then', 'it brews', _line(src, 'with then')),
+        ]
+    )
+    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then')
+    assert len(findings) == 1
+
+
+def test_action_in_then_passes_when_a_when_acts(tmp_path) -> None:
+    # Comparison-helper calls in the then never trigger the rule once a when
+    # acts.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with when('brewing'):
+                result = brew()
+            with then('it is close enough'):
+                assert math.isclose(result, 1.0)
+        """,
+    )
+    scenario = _scenario(
+        [
+            _step('when', 'brewing', _line(src, 'with when')),
+            _step('then', 'it is close enough', _line(src, 'with then')),
+        ]
+    )
+    assert _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then') == []
+
+
+def test_action_in_then_passes_without_a_call_in_the_assert(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given('a value'):
+                x = 1
+            with then('it stays one'):
+                assert x == 1
+        """,
+    )
+    scenario = _scenario(
+        [
+            _step('given', 'a value', _line(src, 'with given')),
+            _step('then', 'it stays one', _line(src, 'with then')),
+        ]
+    )
+    assert _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then') == []
+
+
+def test_action_in_then_when_then_pair_acts_without_a_call(tmp_path) -> None:
+    # The pair wraps the act by definition; a subscript raise is still acting,
+    # and the pair's then never contributes to the then-side scan.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with when_then('looking up', 'it is missing'), pytest.raises(KeyError):
+                mapping[key]
+            with then('the log calls it out'):
+                assert log.count('missing') == 1
+        """,
+    )
+    pair_line = _line(src, 'with when_then')
+    scenario = _scenario(
+        [
+            _step('when', 'looking up', pair_line),
+            _step('then', 'it is missing', pair_line),
+            _step('then', 'the log calls it out', _line(src, "with then('the log")),
+        ]
+    )
+    assert _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then') == []
+
+
+def test_action_in_then_skips_scenario_with_anchorless_when(tmp_path) -> None:
+    # Unknowable beats wrong: a `when` without an anchor may well act.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with then('it brews'):
+                assert brew() == 'coffee'
+        """,
+    )
+    scenario = _scenario(
+        [
+            _step('when', 'acting somewhere unseen', None),
+            _step('then', 'it brews', _line(src, 'with then')),
+        ]
+    )
+    assert _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then') == []
+
+
+def test_action_in_then_reports_once_per_scenario(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with then('it brews'):
+                assert brew() == 'coffee'
+            with then('it grinds'):
+                assert grind() == 'powder'
+        """,
+    )
+    scenario = _scenario(
+        [
+            _step('then', 'it brews', _line(src, "with then('it brews')")),
+            _step('then', 'it grinds', _line(src, "with then('it grinds')")),
+        ]
+    )
+    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then')
+    assert len(findings) == 1
+
+
+# --- Rule 5: unused-interpolation ---
+
+
+def _value_step(phase, text, line, expressions, children=()):
+    parts = [
+        NarrationValue(rendered='<v>', expression=expression)
+        for expression in expressions
+    ]
+    step = _step(phase, text, line, children)
+    return dataclasses.replace(step, narration=Narration(text=text, parts=parts))
+
+
+def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
+    # The `{size}` inside the step's own t-string narration must not count as
+    # a use — only code uses count.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given(t'a {size} ml cup'):
+                cup = make_cup()
+        """,
+    )
+    with_line = _line(src, 'with given')
+    scenario = _scenario([_value_step('given', 'a 200 ml cup', with_line, ['size'])])
+    findings = _rule_findings(
+        run_ast_rules([scenario], tmp_path), 'unused-interpolation'
+    )
+    [finding] = findings
+    assert finding.severity == 'warn'
+    assert finding.message == (
+        f"given 'a 200 ml cup' interpolates {{size}} but never uses it "
+        f'(test_x.py:{with_line})'
+    )
+
+
+def test_unused_interpolation_passes_when_the_name_is_loaded(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given(t'a {size} ml cup'):
+                cup = make_cup(size)
+        """,
+    )
+    scenario = _scenario(
+        [_value_step('given', 'a 200 ml cup', _line(src, 'with given'), ['size'])]
+    )
+    assert (
+        _rule_findings(run_ast_rules([scenario], tmp_path), 'unused-interpolation')
+        == []
+    )
+
+
+def test_unused_interpolation_store_counts_for_given(tmp_path) -> None:
+    # The step *binding* the name is an honest given.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given(t'a {size} ml cup'):
+                size = compute()
+        """,
+    )
+    scenario = _scenario(
+        [_value_step('given', 'a 200 ml cup', _line(src, 'with given'), ['size'])]
+    )
+    assert (
+        _rule_findings(run_ast_rules([scenario], tmp_path), 'unused-interpolation')
+        == []
+    )
+
+
+def test_unused_interpolation_store_does_not_count_for_when(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with when(t'inserting {amount}'):
+                amount = compute()
+        """,
+    )
+    scenario = _scenario(
+        [_value_step('when', 'inserting 2', _line(src, 'with when'), ['amount'])]
+    )
+    findings = _rule_findings(
+        run_ast_rules([scenario], tmp_path), 'unused-interpolation'
+    )
+    assert len(findings) == 1
+
+
+@pytest.mark.parametrize('expression', ['machine["coffees"]', 'str(x)', '!!'])
+def test_unused_interpolation_skips_complex_expressions(tmp_path, expression) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given(t'a loaded machine'):
+                y = 1
+        """,
+    )
+    scenario = _scenario(
+        [
+            _value_step(
+                'given', 'a loaded machine', _line(src, 'with given'), [expression]
+            )
+        ]
+    )
+    assert (
+        _rule_findings(run_ast_rules([scenario], tmp_path), 'unused-interpolation')
+        == []
+    )
+
+
+def test_unused_interpolation_skips_term_refs(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given(t'a {pg["File glossary"]} on disk'):
+                y = 1
+        """,
+    )
+    step = _step('given', 'a File glossary on disk', _line(src, 'with given'))
+    step = dataclasses.replace(
+        step,
+        narration=Narration(
+            text='a File glossary on disk',
+            parts=[
+                NarrationTermRef(
+                    term_id=TermId('file-glossary'),
+                    display='File glossary',
+                    expression='pg["File glossary"]',
+                )
+            ],
+        ),
+    )
+    assert (
+        _rule_findings(
+            run_ast_rules([_scenario([step])], tmp_path), 'unused-interpolation'
+        )
+        == []
+    )
+
+
+def test_unused_interpolation_counts_use_in_nested_step_body(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given(t'a {size} ml cup'):
+                with given('poured'):
+                    cup = pour(size)
+        """,
+    )
+    inner = _step('given', 'poured', _line(src, "with given('poured')"))
+    outer = _value_step(
+        'given', 'a 200 ml cup', _line(src, 'with given(t'), ['size'], [inner]
+    )
+    assert (
+        _rule_findings(
+            run_ast_rules([_scenario([outer])], tmp_path), 'unused-interpolation'
+        )
+        == []
+    )
+
+
+def test_unused_interpolation_nested_narration_does_not_count_as_use(
+    tmp_path,
+) -> None:
+    # A nested step re-narrating {x} still parades a value the code ignores.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given(t'a {x} thing'):
+                with given(t'still about {x}'):
+                    y = 1
+        """,
+    )
+    inner = _step('given', 'still about 1', _line(src, 'still about'))
+    outer = _value_step(
+        'given', 'a 1 thing', _line(src, "with given(t'a"), ['x'], [inner]
+    )
+    findings = _rule_findings(
+        run_ast_rules([_scenario([outer])], tmp_path), 'unused-interpolation'
+    )
+    assert len(findings) == 1
+
+
+def test_unused_interpolation_use_in_a_with_item_counts(tmp_path) -> None:
+    # e.g. a pytest.raises match built from the interpolated value.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with then(t'rejects {code}'), pytest.raises(ValueError, match=str(code)):
+                act()
+        """,
+    )
+    scenario = _scenario(
+        [_value_step('then', 'rejects 404', _line(src, 'with then'), ['code'])]
+    )
+    assert (
+        _rule_findings(run_ast_rules([scenario], tmp_path), 'unused-interpolation')
+        == []
+    )
+
+
+def test_unused_interpolation_skips_template_helper_steps(tmp_path) -> None:
+    # Decorated helpers are out of scope in v1: signature validation already
+    # ties each placeholder to a parameter.
+    src = _write(
+        tmp_path,
+        """\
+        @when(Template('I insert ${amount}'))
+        def insert(amount):
+            return 1
+        """,
+    )
+    scenario = _scenario(
+        [_value_step('when', 'I insert $2', _line(src, '@when'), ['amount'])]
+    )
+    assert (
+        _rule_findings(run_ast_rules([scenario], tmp_path), 'unused-interpolation')
+        == []
+    )
+
+
+def test_unused_interpolation_dedupes_repeated_names(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with given(t'{size} of {size}'):
+                y = 1
+        """,
+    )
+    scenario = _scenario(
+        [_value_step('given', '200 of 200', _line(src, 'with given'), ['size', 'size'])]
+    )
+    findings = _rule_findings(
+        run_ast_rules([scenario], tmp_path), 'unused-interpolation'
+    )
+    assert len(findings) == 1
+
+
+def test_action_in_then_plain_when_acts_via_subscript(tmp_path) -> None:
+    # An indexing action (a lookup) is acting, same as the when_then
+    # rationale — tuned on this repo's suite, where `glossary['Guest']`
+    # in a plain `when` false-positived under a call-only test.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with when('the term is looked up in three cases'):
+                handles = [glossary['Guest'], glossary['guest']]
+            with then('every lookup resolves'):
+                assert all(isinstance(h, Handle) for h in handles)
+        """,
+    )
+    scenario = _scenario(
+        [
+            _step(
+                'when', 'the term is looked up in three cases', _line(src, 'with when')
+            ),
+            _step('then', 'every lookup resolves', _line(src, 'with then')),
+        ]
+    )
+    assert _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then') == []
