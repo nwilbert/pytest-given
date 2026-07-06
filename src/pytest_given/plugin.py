@@ -52,18 +52,25 @@ from .model import (
     report_to_dict,
 )
 from .report import (
+    Finding,
     PhaseViolation,
+    apply_config,
     detect_commit_sha,
     find_violations,
+    parse_ignore_entries,
+    parse_rule_levels,
     render_html,
     render_md,
     resolve_template,
+    run_ast_rules,
 )
 
 collector = Collector()
 
 _PHASE_CHECK_LEVELS = ('off', 'warn', 'error')
+_LINT_CHOICES = ('true', 'false')
 _phase_check_violations: pytest.StashKey[list[PhaseViolation]] = pytest.StashKey()
+_lint_findings: pytest.StashKey[list[Finding]] = pytest.StashKey()
 _md_stdout: pytest.StashKey[str] = pytest.StashKey()
 
 
@@ -126,6 +133,15 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             'error (error fails the run). Overrides the given_phase_check ini.'
         ),
     )
+    group.addoption(
+        '--given-lint',
+        default=None,
+        choices=_LINT_CHOICES,
+        help=(
+            'Run the narration lint: true | false. Overrides the given_lint '
+            'ini for one run.'
+        ),
+    )
     parser.addini(
         'given_source_link',
         type='string',
@@ -144,12 +160,42 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         default=[],
         help='Node-id globs exempt from the phase check (fnmatch patterns).',
     )
+    parser.addini(
+        'given_lint',
+        type='bool',
+        default=False,
+        help='Run the narration lint (CLI flag overrides this).',
+    )
+    parser.addini(
+        'given_lint_rules',
+        type='linelist',
+        default=[],
+        help='Per-rule severity overrides: rule-id=level (off | warn | error).',
+    )
+    parser.addini(
+        'given_lint_ignore',
+        type='linelist',
+        default=[],
+        help=(
+            'Subject globs exempt from lint findings, optionally rule-scoped '
+            "with a 'rule-id:' prefix. Entries that suppress nothing fail the "
+            'run.'
+        ),
+    )
 
 
 def _phase_check_level(config: pytest.Config) -> str:
     """Resolve the phase-check level: CLI flag wins over the ini value."""
     level = config.getoption('given_phase_check') or config.getini('given_phase_check')
     return cast('str', level)
+
+
+def _lint_enabled(config: pytest.Config) -> bool:
+    """Resolve the lint switch: CLI flag (when given) wins over the ini value."""
+    cli = config.getoption('given_lint')
+    if cli is not None:
+        return cast('str', cli) == 'true'
+    return bool(config.getini('given_lint'))
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -159,6 +205,13 @@ def pytest_configure(config: pytest.Config) -> None:
             f'invalid given_phase_check value {level!r}; '
             f'expected one of {", ".join(_PHASE_CHECK_LEVELS)}.'
         )
+    # Validate the lint rule config eagerly (fail fast), even when the lint
+    # itself is disabled for this run.
+    try:
+        parse_rule_levels(config.getini('given_lint_rules'))
+        parse_ignore_entries(config.getini('given_lint_ignore'))
+    except ValueError as error:
+        raise pytest.UsageError(str(error)) from error
 
 
 def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
@@ -177,6 +230,7 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     """Reset the collector at the start of each session."""
     global collector
     collector = Collector()
+    collector.capture_step_source = _lint_enabled(session.config)
     clear_story_registry()
 
 
@@ -614,6 +668,7 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             md_path.write_text(md, encoding='utf-8')
 
     _run_phase_check(session, scenarios)
+    _run_lint(session, scenarios)
 
 
 def _run_phase_check(session: pytest.Session, scenarios: list[Scenario]) -> None:
@@ -630,6 +685,24 @@ def _run_phase_check(session: pytest.Session, scenarios: list[Scenario]) -> None
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
+def _run_lint(session: pytest.Session, scenarios: list[Scenario]) -> None:
+    """Run the narration lint; stash the findings for the terminal summary
+    and fail the run when any is error-level."""
+    config = session.config
+    if not _lint_enabled(config):
+        return
+    findings = apply_config(
+        run_ast_rules(scenarios, Path(config.rootpath)),
+        parse_rule_levels(config.getini('given_lint_rules')),
+        parse_ignore_entries(config.getini('given_lint_ignore')),
+    )
+    if not findings:
+        return
+    config.stash[_lint_findings] = findings
+    if any(finding.severity == 'error' for finding in findings):
+        session.exitstatus = pytest.ExitCode.TESTS_FAILED
+
+
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
     violations = terminalreporter.config.stash.get(_phase_check_violations, [])
     if violations:
@@ -640,12 +713,31 @@ def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
             terminalreporter.line(
                 f'{violation.node_id}  missing: {", ".join(violation.missing)}'
             )
+    findings = terminalreporter.config.stash.get(_lint_findings, [])
+    if findings:
+        errors = sum(1 for f in findings if f.severity == 'error')
+        title = (
+            f'pytest-given: narration lint '
+            f'({_count(len(findings), "finding")}, {_count(errors, "error")})'
+        )
+        terminalreporter.write_sep('=', title, red=errors > 0, yellow=errors == 0)
+        rule_width = max(len(f.rule) for f in findings)
+        subject_width = max(len(f.subject) for f in findings)
+        for f in findings:
+            terminalreporter.line(
+                f'{f.severity.upper():<5} {f.rule:<{rule_width}}  '
+                f'{f.subject:<{subject_width}}  {f.message}'
+            )
     md = terminalreporter.config.stash.get(_md_stdout, None)
     if md is not None:
         terminalreporter.write_line('<!-- pytest-given:md:start -->')
         for line in md.splitlines():
             terminalreporter.write_line(line)
         terminalreporter.write_line('<!-- pytest-given:md:end -->')
+
+
+def _count(n: int, noun: str) -> str:
+    return f'{n} {noun}' if n == 1 else f'{n} {noun}s'
 
 
 def _resolve_glossary(stories: list[Story], session: pytest.Session) -> Glossary | None:

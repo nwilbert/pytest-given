@@ -7,6 +7,7 @@ from pytest_given.capture.source import (
     _co_filename_to_path,
     _reset_rootdir,
     capture_caller_source,
+    code_source,
     item_source,
     set_rootdir,
 )
@@ -155,3 +156,22 @@ def test_file_source_returns_location_inside_rootdir(tmp_path: Path):
     assert loc is not None
     assert loc.relpath == 'glossary/terms.md'
     assert loc.line == 42
+
+
+def test_code_source_returns_none_when_rootdir_unset():
+    def f() -> None: ...
+
+    assert code_source(f.__code__) is None
+
+
+def test_code_source_anchors_at_the_function_definition():
+    repo_root = Path(__file__).resolve().parents[3]
+    set_rootdir(repo_root)
+    base = sys._getframe().f_lineno
+
+    def f() -> None: ...
+
+    loc = code_source(f.__code__)
+    assert loc == SourceLocation(
+        relpath='tests/unit/capture/test_source.py', line=base + 2
+    )

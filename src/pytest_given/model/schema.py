@@ -251,6 +251,12 @@ class Step:
     error: ErrorInfo | None = None
     activity_ids: tuple[ActivityId, ...] = ()
     fixture_name: str | None = None
+    # Anchor of the step's body for the narration lint; captured only when
+    # lint is enabled, and never serialized so report artifacts stay
+    # byte-identical either way.
+    source: SourceLocation | None = field(
+        default=None, metadata={'serde_exclude': True}
+    )
 
 
 @dataclass

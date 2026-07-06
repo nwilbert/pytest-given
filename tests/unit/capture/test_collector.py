@@ -475,3 +475,22 @@ def test_graft_recording_without_override_is_unchanged() -> None:
     collector.graft_recording(recording)
     scenario = collector.finish_scenario(status='passed', duration_ms=0)
     assert scenario.steps[0].narration.text == 'kept label'
+
+
+def test_capture_step_source_defaults_off() -> None:
+    assert Collector().capture_step_source is False
+
+
+def test_push_step_stores_source_when_given() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    loc = SourceLocation(relpath='tests/t.py', line=3)
+    step = collector.push_step('given', _n('a thing'), source=loc)
+    assert step.source == loc
+
+
+def test_push_step_source_defaults_to_none() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    step = collector.push_step('given', _n('a thing'))
+    assert step.source is None

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import re
 import sys
+import types
 from pathlib import Path
 
 from ..model import SourceLocation
@@ -154,6 +155,18 @@ def item_source(relpath_raw: str, line: int) -> SourceLocation:
     behaviour where every scenario carried a source.
     """
     return SourceLocation(relpath=to_relpath(relpath_raw), line=line)
+
+
+def code_source(code: types.CodeType) -> SourceLocation | None:
+    """SourceLocation for a code object's definition site (used to anchor
+    decorated step-helper functions for the narration lint).
+
+    `co_firstlineno` points at the function's first decorator line when it has
+    decorators; the lint's AST index accounts for that. Returns None if rootdir
+    is unset or the file lies outside it.
+    """
+    abs_path = _co_filename_to_path(code.co_filename)
+    return _optional_source(abs_path, code.co_firstlineno)
 
 
 def file_source(path: Path, line: int) -> SourceLocation | None:
