@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-06T18:14:13.768212+00:00",
+    "timestamp": "2026-07-06T18:31:02.003143+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "2348f5a478311f71159408d83ecde67eaa8ba572"
+    "commit_sha": "0ccee312a0829f7acc32ee99201c37c6e06bacb9"
   },
   "scenarios": [
     {
@@ -104,22 +104,9 @@
           "fixture_name": "machine"
         },
         {
-          "phase": "when",
+          "phase": "given",
           "narration": {
-            "text": "I print the receipt",
-            "parts": []
-          },
-          "status": "passed",
-          "children": [],
-          "attachments": [],
-          "error": null,
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the receipt shows the total",
+            "text": "a printed receipt",
             "parts": []
           },
           "status": "passed",
@@ -131,6 +118,19 @@
               "content_type": "text"
             }
           ],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it records the total",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -315,7 +315,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -436,7 +436,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 118
+        "line": 119
       },
       "story_id": null,
       "activity_ids": []
@@ -452,7 +452,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -632,7 +632,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 131
+        "line": 132
       },
       "story_id": null,
       "activity_ids": []
@@ -709,7 +709,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 164
+        "line": 166
       },
       "story_id": null,
       "activity_ids": []
@@ -723,7 +723,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 280,
+      "duration_ms": 284,
       "steps": [
         {
           "phase": "given",
@@ -849,7 +849,7 @@
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 184,
+            "lineno": 186,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
             "is_internal": false
@@ -860,7 +860,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 181
+        "line": 183
       },
       "story_id": null,
       "activity_ids": []
@@ -881,7 +881,7 @@
       "skip_reason": "demonstrates skipped status",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 187
+        "line": 189
       },
       "story_id": null,
       "activity_ids": []
@@ -1208,7 +1208,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 89
+        "line": 90
       },
       "story_id": null,
       "activity_ids": []
@@ -1249,7 +1249,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 194
+        "line": 196
       },
       "story_id": null,
       "activity_ids": []

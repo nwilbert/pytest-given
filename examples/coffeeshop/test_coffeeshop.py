@@ -33,11 +33,11 @@ def test_buy_coffee(machine):
 
 @scenario('Plain text attachment', tags=['billing'])
 def test_text_attachment(machine):
-    with when('I print the receipt'):
+    with given('a printed receipt'):
         receipt = 'Coffee x1     $2.00\n----------------\nTotal:        $2.00'
-    with then('the receipt shows the total'):
         attach('Receipt', receipt)
-        assert receipt.splitlines()[-1] == 'Total:        $2.00'
+    with then('it records the total'):
+        assert 'Total:        $2.00' in receipt
 
 
 @scenario('Generator fixture with teardown')
@@ -81,6 +81,7 @@ def test_neutral_highlight(machine):
     with given('I have some coins in hand'):
         amount = 5
     with when(t'I insert ${amount}'):
+        machine['credit'] = amount
         machine['coffees'] -= 1
     with then(t'the machine has {machine["coffees"]} coffees left'):
         assert machine['coffees'] == 9
@@ -137,7 +138,8 @@ def test_complex_order(machine):
             order_count = 3
         with when('I apply loyalty discount'):
             with when('the loyalty card is validated'):
-                assert loyalty['points'] >= 3
+                if loyalty['points'] <= 0:
+                    raise ValueError('no loyalty points')
             with when('the discount is calculated'):
                 discount = min(loyalty['points'], order_count)
                 loyalty['points'] -= discount

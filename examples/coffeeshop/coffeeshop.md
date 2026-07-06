@@ -18,14 +18,14 @@
 `examples/coffeeshop/test_coffeeshop.py:34::test_text_attachment` · billing
 
 - **given** a coffee machine
-- **when** I print the receipt
-- **then** the receipt shows the total
+- **given** a printed receipt
   - 📎 Receipt:
     ```
     Coffee x1     $2.00
     ----------------
     Total:        $2.00
     ```
+- **then** it records the total
 
 ## ✓ Generator fixture with teardown
 `examples/coffeeshop/test_coffeeshop.py:43::test_generator_fixture`
@@ -43,7 +43,7 @@
 - **then** the machine has 9 coffees left
 
 ## ✓ Helper functions can record their own steps
-`examples/coffeeshop/test_coffeeshop.py:118::test_buy_with_validation` · billing
+`examples/coffeeshop/test_coffeeshop.py:119::test_buy_with_validation` · billing
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -61,7 +61,7 @@
       ```
 
 ## ✓ Top-level `given` block and deeply nested steps
-`examples/coffeeshop/test_coffeeshop.py:131::test_complex_order` · billing
+`examples/coffeeshop/test_coffeeshop.py:132::test_complex_order` · billing
 
 - **given** a coffee machine
 - **given** a loyalty card with 5 points
@@ -90,7 +90,7 @@
     ```
 
 ## ✓ An expected error, narrated as when + then (when_then)
-`examples/coffeeshop/test_coffeeshop.py:164::test_sold_out_is_rejected` · billing, validation
+`examples/coffeeshop/test_coffeeshop.py:166::test_sold_out_is_rejected` · billing, validation
 
 - **given** a coffee machine
 - **given** a machine that has sold its last coffee
@@ -98,13 +98,13 @@
 - **then** the machine reports it is sold out
 
 ## ✗ Failure rendering (intentionally failing)
-`examples/coffeeshop/test_coffeeshop.py:181::test_failing`
+`examples/coffeeshop/test_coffeeshop.py:183::test_failing`
 
 - **given** a coffee machine
 - **then** the machine has 20 coffees
 
 ## ⤼ Skipped scenario rendering · skipped
-`examples/coffeeshop/test_coffeeshop.py:187::test_skipped` — reason: demonstrates skipped status
+`examples/coffeeshop/test_coffeeshop.py:189::test_skipped` — reason: demonstrates skipped status
 
 
 ## ✓ Parameterized test (renders as a parameter table) · 3 cases
@@ -134,7 +134,7 @@
 | 350 | ✓ |
 
 ## ✓ Brew {cup_size} ml (templated scenario name) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:89::test_brew` · billing
+`examples/coffeeshop/test_coffeeshop.py:90::test_brew` · billing
 
 - **given** a coffee machine
 - **when** I brew a {cup_size} ml cup
@@ -146,7 +146,7 @@
 | 300 | ✓ |
 
 ## ⤼ All cases skipped · skipped
-`examples/coffeeshop/test_coffeeshop.py:194::test_parametrized_all_skipped`
+`examples/coffeeshop/test_coffeeshop.py:196::test_parametrized_all_skipped`
 
 
 | n | |
