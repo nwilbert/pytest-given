@@ -53,23 +53,20 @@ from .model import (
 )
 from .report import (
     Finding,
-    PhaseViolation,
     apply_config,
     detect_commit_sha,
-    find_violations,
     parse_ignore_entries,
     parse_rule_levels,
     render_html,
     render_md,
     resolve_template,
     run_ast_rules,
+    run_runtime_rules,
 )
 
 collector = Collector()
 
-_PHASE_CHECK_LEVELS = ('off', 'warn', 'error')
 _LINT_CHOICES = ('true', 'false')
-_phase_check_violations: pytest.StashKey[list[PhaseViolation]] = pytest.StashKey()
 _lint_findings: pytest.StashKey[list[Finding]] = pytest.StashKey()
 _md_stdout: pytest.StashKey[str] = pytest.StashKey()
 
@@ -125,15 +122,6 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     group.addoption(
-        '--given-phase-check',
-        default=None,
-        choices=_PHASE_CHECK_LEVELS,
-        help=(
-            'Report scenarios missing a Given/When/Then phase: off | warn | '
-            'error (error fails the run). Overrides the given_phase_check ini.'
-        ),
-    )
-    group.addoption(
         '--given-lint',
         default=None,
         choices=_LINT_CHOICES,
@@ -147,18 +135,6 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         type='string',
         default='none',
         help='Source-link template or preset name (CLI flag overrides this).',
-    )
-    parser.addini(
-        'given_phase_check',
-        type='string',
-        default='off',
-        help='Phase-check level: off | warn | error (CLI flag overrides this).',
-    )
-    parser.addini(
-        'given_phase_check_ignore',
-        type='linelist',
-        default=[],
-        help='Node-id globs exempt from the phase check (fnmatch patterns).',
     )
     parser.addini(
         'given_lint',
@@ -184,12 +160,6 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
-def _phase_check_level(config: pytest.Config) -> str:
-    """Resolve the phase-check level: CLI flag wins over the ini value."""
-    level = config.getoption('given_phase_check') or config.getini('given_phase_check')
-    return cast('str', level)
-
-
 def _lint_enabled(config: pytest.Config) -> bool:
     """Resolve the lint switch: CLI flag (when given) wins over the ini value."""
     cli = config.getoption('given_lint')
@@ -199,12 +169,6 @@ def _lint_enabled(config: pytest.Config) -> bool:
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    level = _phase_check_level(config)
-    if level not in _PHASE_CHECK_LEVELS:
-        raise pytest.UsageError(
-            f'invalid given_phase_check value {level!r}; '
-            f'expected one of {", ".join(_PHASE_CHECK_LEVELS)}.'
-        )
     # Validate the lint rule config eagerly (fail fast), even when the lint
     # itself is disabled for this run.
     try:
@@ -667,32 +631,24 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             md_path.parent.mkdir(parents=True, exist_ok=True)
             md_path.write_text(md, encoding='utf-8')
 
-    _run_phase_check(session, scenarios)
-    _run_lint(session, scenarios)
+    _run_lint(session, scenarios, collector.scenarios, glossary, stories)
 
 
-def _run_phase_check(session: pytest.Session, scenarios: list[Scenario]) -> None:
-    """Flag scenarios missing a phase; stash the result for the terminal
-    summary and fail the run in `error` mode."""
-    level = _phase_check_level(session.config)
-    if level == 'off':
-        return
-    violations = find_violations(
-        scenarios, session.config.getini('given_phase_check_ignore')
-    )
-    session.config.stash[_phase_check_violations] = violations
-    if violations and level == 'error':
-        session.exitstatus = pytest.ExitCode.TESTS_FAILED
-
-
-def _run_lint(session: pytest.Session, scenarios: list[Scenario]) -> None:
+def _run_lint(
+    session: pytest.Session,
+    scenarios: list[Scenario],
+    per_case: list[Scenario],
+    glossary: Glossary | None,
+    stories: list[Story],
+) -> None:
     """Run the narration lint; stash the findings for the terminal summary
     and fail the run when any is error-level."""
     config = session.config
     if not _lint_enabled(config):
         return
     findings = apply_config(
-        run_ast_rules(scenarios, Path(config.rootpath)),
+        run_runtime_rules(scenarios, per_case, glossary, stories)
+        + run_ast_rules(scenarios, Path(config.rootpath)),
         parse_rule_levels(config.getini('given_lint_rules')),
         parse_ignore_entries(config.getini('given_lint_ignore')),
     )
@@ -704,15 +660,6 @@ def _run_lint(session: pytest.Session, scenarios: list[Scenario]) -> None:
 
 
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
-    violations = terminalreporter.config.stash.get(_phase_check_violations, [])
-    if violations:
-        terminalreporter.write_sep(
-            '=', f'pytest-given: incomplete scenarios ({len(violations)})', yellow=True
-        )
-        for violation in violations:
-            terminalreporter.line(
-                f'{violation.node_id}  missing: {", ".join(violation.missing)}'
-            )
     findings = terminalreporter.config.stash.get(_lint_findings, [])
     if findings:
         errors = sum(1 for f in findings if f.severity == 'error')

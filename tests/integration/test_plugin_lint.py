@@ -235,3 +235,154 @@ def test_report_outputs_are_identical_with_and_without_lint(pytester, tmp_path):
 
     on_steps = json.loads(on_json.read_text(encoding='utf-8'))['scenarios'][0]['steps']
     assert 'source' not in set(step_keys(on_steps))
+
+
+TWO_PHASE = """
+from pytest_given import scenario, given, then
+
+@scenario("Two phase")
+def test_two_phase():
+    with given("a value"):
+        x = 1
+    with then("it stays one"):
+        assert x == 1
+"""
+
+PARAMETRIZED_TWO_PHASE = """
+import pytest
+from pytest_given import scenario, given, then
+
+@scenario("Parametrized two phase")
+@pytest.mark.parametrize("n", [1, 2])
+def test_param(n):
+    with given("a value"):
+        x = n
+    with then("it is truthy"):
+        assert x
+"""
+
+DIVERGENT_CASES = """
+import pytest
+from pytest_given import scenario, given, when, then
+
+@scenario("Divergent")
+@pytest.mark.parametrize("n", [1, 2])
+def test_divergent(n):
+    with given("a value"):
+        x = n
+    if n == 2:
+        with when("doubling"):
+            x = x * 2
+    with then("it is positive"):
+        assert x > 0
+"""
+
+TAGGED_GLOSSARY_CONFTEST = """
+from pytest_given import Glossary
+
+g = Glossary()
+guest = g.actor('Guest')
+"""
+
+TAGGED_SUITE = """
+from pytest_given import scenario, given, when, then
+
+@scenario("Tagged", tags=["guest"])
+def test_tagged():
+    with given("a value"):
+        x = 1
+    with when("doubling"):
+        x = x * 2
+    with then("it is two"):
+        assert x == 2
+"""
+
+
+def test_missing_phase_warns_by_default(pytester):
+    result = _run(pytester, TWO_PHASE, '--given-lint=true')
+    result.assert_outcomes(passed=1)
+    assert result.ret == 0
+    result.stdout.fnmatch_lines(
+        ['*WARN*missing-phase*test_sample.py::test_two_phase*missing: when*']
+    )
+
+
+def test_missing_phase_error_override_fails_the_run(pytester):
+    result = _run(
+        pytester,
+        TWO_PHASE,
+        '--given-lint=true',
+        '-o',
+        'given_lint_rules=missing-phase=error',
+    )
+    result.assert_outcomes(passed=1)
+    assert result.ret == pytest.ExitCode.TESTS_FAILED
+
+
+def test_missing_phase_honest_two_phase_is_ignorable(pytester):
+    result = _run(
+        pytester,
+        TWO_PHASE,
+        '--given-lint=true',
+        '-o',
+        'given_lint_ignore=missing-phase: *::test_two_phase',
+    )
+    assert result.ret == 0
+    assert 'narration lint' not in result.stdout.str()
+
+
+def test_missing_phase_parametrized_scenario_reported_once(pytester):
+    result = _run(pytester, PARAMETRIZED_TWO_PHASE, '--given-lint=true')
+    result.assert_outcomes(passed=2)
+    assert result.stdout.str().count('missing: when') == 1
+
+
+def test_divergent_case_structure_warns_naming_the_case(pytester):
+    result = _run(pytester, DIVERGENT_CASES, '--given-lint=true')
+    result.assert_outcomes(passed=2)
+    assert result.ret == 0
+    result.stdout.fnmatch_lines(
+        ['*WARN*divergent-case-structure*test_sample.py::test_divergent*[[]2[]]*']
+    )
+
+
+def test_tag_shadows_term_warns_on_slug_collision(pytester):
+    pytester.makeconftest(TAGGED_GLOSSARY_CONFTEST)
+    result = _run(pytester, TAGGED_SUITE, '--given-lint=true')
+    result.assert_outcomes(passed=1)
+    assert result.ret == 0
+    result.stdout.fnmatch_lines(
+        ["*WARN*tag-shadows-term*guest*duplicates glossary term 'Guest'*"]
+    )
+
+
+def test_dead_term_is_off_by_default(pytester):
+    pytester.makeconftest(TAGGED_GLOSSARY_CONFTEST)
+    result = _run(pytester, TAGGED_SUITE, '--given-lint=true')
+    assert 'dead-term' not in result.stdout.str()
+
+
+def test_dead_term_opt_in_flags_unreferenced_term(pytester):
+    pytester.makeconftest(TAGGED_GLOSSARY_CONFTEST)
+    result = _run(
+        pytester,
+        TAGGED_SUITE,
+        '--given-lint=true',
+        '-o',
+        'given_lint_rules=dead-term=warn',
+    )
+    result.stdout.fnmatch_lines(
+        ["*WARN*dead-term*guest*term 'Guest' is referenced by no step and no story*"]
+    )
+
+
+def test_removed_phase_check_cli_flag_is_unrecognized(pytester):
+    result = _run(pytester, TWO_PHASE, '--given-phase-check=warn')
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+
+
+def test_removed_phase_check_ini_key_is_unknown(pytester):
+    result = _run(pytester, TWO_PHASE, '-o', 'given_phase_check=warn')
+    result.assert_outcomes(passed=1)
+    assert 'incomplete scenarios' not in result.stdout.str()
+    assert 'Unknown config option: given_phase_check' in result.stdout.str()
