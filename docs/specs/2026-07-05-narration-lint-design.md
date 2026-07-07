@@ -2,7 +2,7 @@
 
 ## Goal
 
-Extend the [phase check](../2026-07-05-scenario-phase-check-design.md) into a general **narration linter**: a rule catalog that mechanically catches steps whose narration lies about their body, sharing one config surface, one summary section, and one severity/ignore mechanism.
+Extend the [phase check](2026-07-05-scenario-phase-check-design.md) into a general **narration linter**: a rule catalog that mechanically catches steps whose narration lies about their body, sharing one config surface, one summary section, and one severity/ignore mechanism.
 
 ```toml
 # pyproject.toml — pytest native TOML mode (this project's [tool.pytest] table)
@@ -33,7 +33,7 @@ The linter **replaces** the standalone phase check: `--given-phase-check`, `give
 
 pytest-given's narration is **auditable, not verified**: the same author (increasingly, the same agent) writes both the code and the claim about the code, and nothing compares a step's text to its body. The report's proximity argument — narration in the same `with` block, same diff hunk, same review pane as the code — makes drift *visible*; this linter makes the structural subset of drift *detectable*.
 
-Most rules are the mechanical faces of narration rules already written down in [AGENTS.md](../../../AGENTS.md#narration-rules-portable): "never write a placeholder step" (`empty-step`), "put the system-under-test call in `when`, not folded into the `then` assertion" (`action-in-then`, `check-outside-then`), "step structure must not depend on parameter values" (`divergent-case-structure`), "tag orthogonally to the glossary" (`tag-shadows-term`).
+Most rules are the mechanical faces of narration rules already written down in [AGENTS.md](../../AGENTS.md#narration-rules-portable): "never write a placeholder step" (`empty-step`), "put the system-under-test call in `when`, not folded into the `then` assertion" (`action-in-then`, `check-outside-then`), "step structure must not depend on parameter values" (`divergent-case-structure`), "tag orthogonally to the glossary" (`tag-shadows-term`).
 
 ## What the linter cannot catch (non-goal)
 

@@ -298,34 +298,46 @@ All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-
 | `--given-md[=PATH]` | off | Write the Markdown report; **bare renders to stdout** (fenced). |
 | `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. See [Source links](#source-links). |
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
-| `--given-phase-check=LEVEL` | `off` | Report scenarios missing a Given/When/Then phase: `off` \| `warn` \| `error` (error fails the run). See [Phase check](#phase-check). |
+| `--given-lint=BOOL` | `false` | Run the narration lint (`true` \| `false`); an error-level finding fails the run. See [Narration lint](#narration-lint). |
 
 Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection.
 
-## Phase check
+## Narration lint
 
-`--given-phase-check` flags `@scenario` tests that don't cover all three Given/When/Then phases — a quick way to catch an action accidentally folded into a `given` (the missing `when`), or an arrangement hidden inside the assertion.
+`--given-lint=true` runs a rule catalog over the scenarios the run just recorded, catching steps whose narration lies about their body — an empty `given`, a `then` that checks nothing, an action smuggled into an assertion. The AST rules analyze exactly the steps the run identified (there is no parallel static discovery), so decorated helpers, fixtures, and `when_then` pairs are all attributed correctly.
 
-| Level | Effect |
-|------|--------|
-| `off` (default) | No check. |
-| `warn` | Prints an "incomplete scenarios" summary naming each offender and its missing phase; the exit code is unchanged. |
-| `error` | Same summary, and the run exits non-zero — for CI gating. |
+Each rule has a fixed default severity; there is no master level. A `warn` finding prints in the terminal summary; an `error` finding also fails the run.
 
-Only **passed** scenarios are checked (a skipped or failed one is exempt), and each logical scenario is evaluated once regardless of parametrization. A `given` supplied by a `@given` fixture or an `Annotated[..., given(...)]` parameter counts, so those don't trip the check.
+| Rule | Default | Catches |
+|------|---------|---------|
+| `empty-step` | `error` | A step whose body does nothing (only constants/`pass`, or — for `when`/`then` — only an `attach(...)` call). |
+| `then-without-check` | `error` | A `then` whose body contains no `assert` and no checking call (`pytest.raises`, `pytest.approx`, …). |
+| `missing-phase` | `warn` | A passed scenario that doesn't cover all three Given/When/Then phases. Fixture `@given`s and `Annotated[..., given(...)]` parameters count; each logical scenario is evaluated once regardless of parametrization. |
+| `check-outside-then` | `warn` | An `assert` inside a `given` or `when` (the `when` half of a `when_then` pair is exempt). |
+| `action-in-then` | `warn` | A scenario where no `when` performs an action and a `then` folds the action into its assertion. |
+| `unused-interpolation` | `warn` | A t-string narration that interpolates `{name}` but never uses `name` in the step body. |
+| `divergent-case-structure` | `warn` | A parametrized scenario whose passed cases record different step structures (the report shows only case 1's tree). |
+| `tag-shadows-term` | `warn` | A scenario tag whose slug duplicates a glossary term — one concept named through two mechanisms. |
+| `dead-term` | `off` | A glossary term referenced by no step narration and no story activity. Opt in on suites whose glossary is meant to be fully exercised. |
 
-Set a default in `pyproject.toml`, and exempt scenarios that are *intentionally* two-phase (a static-property assertion, a pure `when_then` raise) by node-id glob:
+Override severities per rule with `given_lint_rules`, and exempt individual subjects with `given_lint_ignore` — bare node-id globs, or scoped to one rule with a `rule-id:` prefix:
 
 ```toml
 [tool.pytest]
-given_phase_check = "error"
-given_phase_check_ignore = [
-    "*::test_*_raises",
+given_lint = true
+given_lint_rules = [
+    "missing-phase=error",
+    "dead-term=warn",
+]
+given_lint_ignore = [
+    "missing-phase: *::test_*_raises",
     "tests/unit/test_math.py::test_constant_is_stable",
 ]
 ```
 
-The CLI flag overrides the `given_phase_check` ini value for a single run.
+An ignore entry that suppresses no finding is itself an error-level `stale-ignore` finding — the list can only shrink, never rot. The `--given-lint` CLI flag overrides the `given_lint` ini value for a single run.
+
+The lint is zero-cost when off: nothing extra is captured, and report artifacts are byte-identical with the lint on or off.
 
 ## Traceback frames
 
@@ -414,7 +426,7 @@ pytest-given fits agent-driven development, where the scarce resource is human r
 
 The `with given(...)` / `with when(...)` / `with then(...)` blocks keep the *claim* about behavior directly adjacent to the code that implements it. That proximity is the point: auditing "does the code under `with when('I insert $2')` actually insert $2?" is cheaper and higher-leverage than reading raw test code, and far less prone to drift than documentation kept in separate files.
 
-**Know what the narration is and isn't.** Narration is *auditable, not verified*: in an agentic workflow the same agent writes both the code and the claim about the code, and nothing mechanically checks that a step's text matches its body. The [phase check](#phase-check) validates structure (all three phases present), never truth. The report is worth as much as your review process's habit of reading step text against step bodies — treat it as a review aid, not as evidence.
+**Know what the narration is and isn't.** Narration is *auditable, not verified*: in an agentic workflow the same agent writes both the code and the claim about the code, and nothing mechanically checks that a step's text matches its body. The [narration lint](#narration-lint) catches structural lies (an empty step, a `then` that checks nothing, a missing phase), never semantic truth. The report is worth as much as your review process's habit of reading step text against step bodies — treat it as a review aid, not as evidence.
 
 What the agent itself gets out of it:
 
