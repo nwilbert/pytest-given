@@ -77,7 +77,7 @@
 - **then** both lookups return the one memoized handle
 
 ## ✓ File-loaded terms start kindless
-`tests/unit/capture/test_file_glossary.py:56::test_terms_start_kindless` · kind-inference, happy-path
+`tests/unit/capture/test_file_glossary.py:56::test_terms_start_kindless` · happy-path
 
 - **given** a Markdown glossary file with no kind column
   - 📎 Glossary file:
@@ -91,7 +91,7 @@
     | search | Look up options. |
     ```
 - **when** a «File glossary» loads it
-- **then** each «Term» is «Kindless» until inference runs
+- **then** each «Term» is «Kindless» until «Kind inference» runs
 
 ## ✓ An unknown name raises with a suggestion
 `tests/unit/capture/test_file_glossary.py:69::test_unknown_name_raises_with_suggestion` · validation
@@ -343,7 +343,7 @@
 - **then** the «Term» records a «Source link» to this file
 
 ## ✓ Calling the glossary declares a kindless term
-`tests/unit/capture/test_glossary.py:334::test_call_declares_kindless_term` · kind-inference, happy-path
+`tests/unit/capture/test_glossary.py:334::test_call_declares_kindless_term` · happy-path
 
 - **given** an empty glossary
 - **when** a «Term» is declared by call, without a kind
@@ -364,91 +364,91 @@
 - **then** a PytestGivenError is raised with a spelling hint
 
 ## ✓ Term kinds are inferred from activity-slot positions
-`tests/unit/capture/test_kind_resolution.py:46::test_infers_actor_verb_object_by_position` · kind-inference, happy-path
+`tests/unit/capture/test_kind_resolution.py:46::test_infers_actor_verb_object_by_position` · happy-path
 
 - **given** a glossary of three «Kindless» «Term» entries
 - **when** «Kind inference» runs over a «Story»
 - **then** they resolve to «Actor», «Verb», «Work Object» by slot
 
 ## ✓ An actor slot anywhere wins over a noun slot elsewhere
-`tests/unit/capture/test_kind_resolution.py:65::test_actor_anywhere_beats_object` · kind-inference, happy-path
+`tests/unit/capture/test_kind_resolution.py:65::test_actor_anywhere_beats_object` · happy-path
 
 - **given** a «Term» that sits in a noun slot in one «Story»
 - **when** the same «Term» also appears in an «Actor» slot
 - **then** its inferred kind is «Actor»
 
 ## ✓ A term used in no story stays kindless
-`tests/unit/capture/test_kind_resolution.py:85::test_never_used_stays_kindless` · kind-inference, happy-path
+`tests/unit/capture/test_kind_resolution.py:85::test_never_used_stays_kindless` · happy-path
 
 - **given** a «Term» referenced by no «Story»
 - **when** «Kind inference» runs with no stories
 - **then** the «Term» remains «Kindless»
 
 ## ✓ A term in both a verb and a noun slot is a conflict
-`tests/unit/capture/test_kind_resolution.py:98::test_verb_and_noun_conflict_raises` · kind-inference, validation
+`tests/unit/capture/test_kind_resolution.py:98::test_verb_and_noun_conflict_raises` · validation
 
 - **given** a «Kindless» «Term» used in a verb slot and a noun slot
 - **when** kind resolution runs over both stories
 - **then** a PytestGivenError names the conflicting term
 
 ## ✓ A declared kind consistent with its slot is kept
-`tests/unit/capture/test_kind_resolution.py:119::test_declared_kind_verified_and_kept` · kind-inference, happy-path
+`tests/unit/capture/test_kind_resolution.py:119::test_declared_kind_verified_and_kept` · happy-path
 
 - **given** a glossary with explicitly declared «Term» kinds
 - **when** «Kind inference» runs over a matching «Story»
 - **then** the declared kinds are verified and preserved
 
 ## ✓ A declared verb in an actor slot is rejected
-`tests/unit/capture/test_kind_resolution.py:140::test_declared_verb_in_actor_slot_raises` · kind-inference, validation
+`tests/unit/capture/test_kind_resolution.py:140::test_declared_verb_in_actor_slot_raises` · validation
 
 - **given** a «Term» declared as a «Verb»
 - **when** kind resolution places it in the «Actor» slot
 - **then** a PytestGivenError names the misplaced term
 
 ## ✓ A term used as both verb and actor is a conflict
-`tests/unit/capture/test_kind_resolution.py:157::test_verb_and_actor_conflict_raises` · kind-inference, validation
+`tests/unit/capture/test_kind_resolution.py:157::test_verb_and_actor_conflict_raises` · validation
 
 - **given** a «Kindless» «Term» used in a verb slot and an actor slot
 - **when** kind resolution runs over both stories
 - **then** a PytestGivenError names the conflicting term
 
 ## ✓ A declared work object in an actor slot is rejected
-`tests/unit/capture/test_kind_resolution.py:182::test_declared_object_in_actor_slot_raises` · kind-inference, validation
+`tests/unit/capture/test_kind_resolution.py:182::test_declared_object_in_actor_slot_raises` · validation
 
 - **given** a «Term» declared as a «Work Object»
 - **when** kind resolution places it in the «Actor» slot
 - **then** a PytestGivenError names the misplaced term
 
 ## ✓ A declared actor in a verb slot is rejected
-`tests/unit/capture/test_kind_resolution.py:199::test_declared_actor_in_verb_slot_raises` · kind-inference, validation
+`tests/unit/capture/test_kind_resolution.py:199::test_declared_actor_in_verb_slot_raises` · validation
 
 - **given** a «Term» declared as an «Actor»
 - **when** kind resolution places it at position 1 (the verb slot)
 - **then** a PytestGivenError says an actor cannot fill the verb slot
 
 ## ✓ A conflict error names only the offending stories
-`tests/unit/capture/test_kind_resolution.py:218::test_conflict_where_names_only_offending_stories` · kind-inference, validation
+`tests/unit/capture/test_kind_resolution.py:218::test_conflict_where_names_only_offending_stories` · validation
 
 - **given** an «Actor» «Term» that also appears in a verb slot
 - **when** kind resolution raises
 - **then** only the offending story is named in the message
 
 ## ✓ A conflict message excludes stories with an unrelated slot
-`tests/unit/capture/test_kind_resolution.py:238::test_inferred_conflict_where_excludes_unrelated_slot_stories` · kind-inference, validation
+`tests/unit/capture/test_kind_resolution.py:238::test_inferred_conflict_where_excludes_unrelated_slot_stories` · validation
 
 - **given** a «Kindless» «Term» used in verb, actor and noun slots
 - **when** the verb-vs-actor conflict is raised
 - **then** only the verb and actor stories are named, not the noun one
 
 ## ✓ A declared verb in a noun slot is rejected
-`tests/unit/capture/test_kind_resolution.py:260::test_declared_verb_in_noun_slot_raises` · kind-inference, validation
+`tests/unit/capture/test_kind_resolution.py:260::test_declared_verb_in_noun_slot_raises` · validation
 
 - **given** a «Term» declared as a «Verb»
 - **when** kind resolution places it at position ≥2 (a noun slot)
 - **then** a PytestGivenError says a verb cannot fill the noun slot
 
 ## ✓ Slot positions alternate verb/noun after the actor
-`tests/unit/capture/test_kind_resolution.py:279::test_slot_for_maps_odd_positions_to_verb` · kind-inference, happy-path
+`tests/unit/capture/test_kind_resolution.py:279::test_slot_for_maps_odd_positions_to_verb` · happy-path
 
 - **given** the five positions of a short activity path
 - **when** the «Slot» rule is applied to each position

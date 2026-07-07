@@ -45,7 +45,7 @@ def _kind(glossary, term_id):
 
 @scenario(
     'Term kinds are inferred from activity-slot positions',
-    tags=['kind-inference', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_infers_actor_verb_object_by_position():
     with given(t'a glossary of three {pg["Kindless"]} {pg["Term"]} entries'):
@@ -64,7 +64,7 @@ def test_infers_actor_verb_object_by_position():
 
 @scenario(
     'An actor slot anywhere wins over a noun slot elsewhere',
-    tags=['kind-inference', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_actor_anywhere_beats_object():
     with given(t'a {pg["Term"]} that sits in a noun slot in one {pg["Story"]}'):
@@ -84,7 +84,7 @@ def test_actor_anywhere_beats_object():
 
 @scenario(
     'A term used in no story stays kindless',
-    tags=['kind-inference', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_never_used_stays_kindless():
     with given(t'a {pg["Term"]} referenced by no {pg["Story"]}'):
@@ -97,7 +97,7 @@ def test_never_used_stays_kindless():
 
 @scenario(
     'A term in both a verb and a noun slot is a conflict',
-    tags=['kind-inference', 'validation'],
+    tags=['validation'],
 )
 def test_verb_and_noun_conflict_raises():
     with given(t'a {pg["Kindless"]} {pg["Term"]} used in a verb slot and a noun slot'):
@@ -118,7 +118,7 @@ def test_verb_and_noun_conflict_raises():
 
 @scenario(
     'A declared kind consistent with its slot is kept',
-    tags=['kind-inference', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_declared_kind_verified_and_kept():
     with given(t'a glossary with explicitly declared {pg["Term"]} kinds'):
@@ -139,7 +139,7 @@ def test_declared_kind_verified_and_kept():
 
 @scenario(
     'A declared verb in an actor slot is rejected',
-    tags=['kind-inference', 'validation'],
+    tags=['validation'],
 )
 def test_declared_verb_in_actor_slot_raises():
     with given(t'a {pg["Term"]} declared as a {pg["Verb"]}'):
@@ -156,7 +156,7 @@ def test_declared_verb_in_actor_slot_raises():
 
 @scenario(
     'A term used as both verb and actor is a conflict',
-    tags=['kind-inference', 'validation'],
+    tags=['validation'],
 )
 def test_verb_and_actor_conflict_raises():
     with given(
@@ -181,7 +181,7 @@ def test_verb_and_actor_conflict_raises():
 
 @scenario(
     'A declared work object in an actor slot is rejected',
-    tags=['kind-inference', 'validation'],
+    tags=['validation'],
 )
 def test_declared_object_in_actor_slot_raises():
     with given(t'a {pg["Term"]} declared as a {pg["Work Object"]}'):
@@ -198,7 +198,7 @@ def test_declared_object_in_actor_slot_raises():
 
 @scenario(
     'A declared actor in a verb slot is rejected',
-    tags=['kind-inference', 'validation'],
+    tags=['validation'],
 )
 def test_declared_actor_in_verb_slot_raises():
     with given(t'a {pg["Term"]} declared as an {pg["Actor"]}'):
@@ -217,7 +217,7 @@ def test_declared_actor_in_verb_slot_raises():
 
 @scenario(
     'A conflict error names only the offending stories',
-    tags=['kind-inference', 'validation'],
+    tags=['validation'],
 )
 def test_conflict_where_names_only_offending_stories():
     with given(t'an {pg["Actor"]} {pg["Term"]} that also appears in a verb slot'):
@@ -237,7 +237,7 @@ def test_conflict_where_names_only_offending_stories():
 
 @scenario(
     'A conflict message excludes stories with an unrelated slot',
-    tags=['kind-inference', 'validation'],
+    tags=['validation'],
 )
 def test_inferred_conflict_where_excludes_unrelated_slot_stories():
     with given(t'a {pg["Kindless"]} {pg["Term"]} used in verb, actor and noun slots'):
@@ -259,7 +259,7 @@ def test_inferred_conflict_where_excludes_unrelated_slot_stories():
 
 @scenario(
     'A declared verb in a noun slot is rejected',
-    tags=['kind-inference', 'validation'],
+    tags=['validation'],
 )
 def test_declared_verb_in_noun_slot_raises():
     with given(t'a {pg["Term"]} declared as a {pg["Verb"]}'):
@@ -278,7 +278,7 @@ def test_declared_verb_in_noun_slot_raises():
 
 @scenario(
     'Slot positions alternate verb/noun after the actor',
-    tags=['kind-inference', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_slot_for_maps_odd_positions_to_verb():
     from pytest_given.capture.kind_resolution import _slot_for

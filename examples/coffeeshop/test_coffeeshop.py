@@ -36,8 +36,10 @@ def test_text_attachment(machine):
     with given('a printed receipt'):
         receipt = 'Coffee x1     $2.00\n----------------\nTotal:        $2.00'
         attach('Receipt', receipt)
-    with then('it records the total'):
-        assert 'Total:        $2.00' in receipt
+    with when('the total line is read back'):
+        total_line = receipt.splitlines()[-1]
+    with then('it shows the $2.00 total'):
+        assert total_line == 'Total:        $2.00'
 
 
 @scenario('Generator fixture with teardown')
