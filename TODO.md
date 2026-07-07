@@ -4,7 +4,6 @@
 
 ## Next
 
-- [ ] Session-scope the remaining module-global state the way the collector was (`config.stash`, see `plugin._collector_key`): the story registry (`clear_story_registry` at sessionstart wipes the outer session's stories during a nested in-process run) and the rootdir + relpath cache in `capture/source.py` (`set_rootdir` at nested `pytest_load_initial_conftests` repoints the outer session's path resolution). Both are harmless for the current suites but are the same leakage class the collector had.
 - [ ] Review and refactor lint.py into new subpackage?
 - [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios

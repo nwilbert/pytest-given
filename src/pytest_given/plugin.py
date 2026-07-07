@@ -27,8 +27,17 @@ from .capture import (
 from .capture.decorators import ScenarioDecorator, StepDescriptor
 from .capture.file_glossary import FileGlossary
 from .capture.kind_resolution import resolve_glossary_kinds
-from .capture.source import item_source, set_rootdir
-from .capture.story import clear_story_registry
+from .capture.source import (
+    current_rootdir,
+    item_source,
+    restore_rootdir,
+    set_rootdir,
+)
+from .capture.story import (
+    clear_story_registry,
+    restore_story_registry,
+    snapshot_story_registry,
+)
 from .model import (
     FixtureRecording,
     Glossary,
@@ -49,6 +58,7 @@ from .model import (
     Scenario,
     Step,
     Story,
+    StoryId,
     report_from_dict,
     report_to_dict,
 )
@@ -76,6 +86,13 @@ def _collector(config: pytest.Config) -> Collector:
     and thereby clobbering — the outer session's.
     """
     return config.stash[_collector_key]
+
+
+# Module-global state this config displaced when it took over the process —
+# put back at `pytest_unconfigure` so a nested in-process run (pytester,
+# `pytest.main`) leaves the outer session's state as it found it.
+_displaced_rootdir_key: pytest.StashKey[Path | None] = pytest.StashKey()
+_displaced_stories_key: pytest.StashKey[dict[StoryId, str]] = pytest.StashKey()
 
 
 _LINT_CHOICES = ('true', 'false')
@@ -199,15 +216,28 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
     rootdir is set *before* root conftest.py is imported — users commonly
     declare shared glossaries / stories at conftest module level, and that
     code runs during conftest import."""
+    early_config.stash[_displaced_rootdir_key] = current_rootdir()
     set_rootdir(Path(early_config.rootpath))
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
-    """Give the session its own collector."""
+    """Give the session its own collector and a clean story registry."""
     collector = Collector()
     collector.capture_step_source = _lint_enabled(session.config)
     session.config.stash[_collector_key] = collector
+    session.config.stash[_displaced_stories_key] = snapshot_story_registry()
     clear_story_registry()
+
+
+def pytest_unconfigure(config: pytest.Config) -> None:
+    """Put back the module-global state this config displaced, so a nested
+    in-process run leaves the outer session's rootdir and story registry as it
+    found them. Guarded per key: a run that aborted before the corresponding
+    save point has nothing to restore."""
+    if _displaced_rootdir_key in config.stash:
+        restore_rootdir(config.stash[_displaced_rootdir_key])
+    if _displaced_stories_key in config.stash:
+        restore_story_registry(config.stash[_displaced_stories_key])
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:

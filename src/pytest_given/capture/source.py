@@ -86,6 +86,23 @@ def set_rootdir(path: Path) -> None:
     _relpath_cache.clear()
 
 
+def current_rootdir() -> Path | None:
+    """The rootdir as last set (already resolved). The plugin saves this before
+    a nested in-process run re-points it via `set_rootdir`, and hands it back
+    to `restore_rootdir` when that run unconfigures."""
+    return _rootdir
+
+
+def restore_rootdir(previous: Path | None) -> None:
+    """Reinstate a rootdir captured with `current_rootdir`. Unlike
+    `set_rootdir`, the value is used as-is — it was already normalised and
+    resolved when first set. Clears the relpath cache, whose entries are only
+    valid for the rootdir they were computed against."""
+    global _rootdir
+    _rootdir = previous
+    _relpath_cache.clear()
+
+
 def _reset_rootdir() -> None:
     """Test-only — reset module state between cases."""
     global _rootdir
