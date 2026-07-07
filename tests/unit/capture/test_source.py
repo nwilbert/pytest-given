@@ -8,6 +8,7 @@ from pytest_given.capture.source import (
     _reset_rootdir,
     capture_caller_source,
     code_source,
+    file_source,
     item_source,
     set_rootdir,
 )
@@ -148,14 +149,46 @@ def test_item_source_keeps_absolute_path_outside_rootdir():
 def test_file_source_returns_location_inside_rootdir(tmp_path: Path):
     """file_source returns a SourceLocation with posix relpath when the path
     is inside the configured rootdir."""
-    from pytest_given.capture.source import file_source
-
     set_rootdir(tmp_path)
     target = tmp_path / 'glossary' / 'terms.md'
     loc = file_source(target, 42)
     assert loc is not None
     assert loc.relpath == 'glossary/terms.md'
     assert loc.line == 42
+
+
+def test_resolution_is_cached_per_path(tmp_path: Path, monkeypatch):
+    """`Path.resolve` walks every path component on disk (one lstat each),
+    which dominates lint-enabled runs on slow mounts. The rootdir-relative
+    result is memoized per path so repeated captures from the same file
+    resolve only once."""
+    set_rootdir(tmp_path)
+    target = tmp_path / 'test_a.py'
+    calls = 0
+    real_resolve = Path.resolve
+
+    def counting_resolve(self: Path, strict: bool = False) -> Path:
+        nonlocal calls
+        calls += 1
+        return real_resolve(self, strict=strict)
+
+    monkeypatch.setattr(Path, 'resolve', counting_resolve)
+    assert file_source(target, 1) == SourceLocation(relpath='test_a.py', line=1)
+    assert file_source(target, 2) == SourceLocation(relpath='test_a.py', line=2)
+    assert calls == 1
+
+
+def test_cached_resolution_is_dropped_when_rootdir_changes(tmp_path: Path):
+    """A cached relpath is only valid for the rootdir it was computed against;
+    `set_rootdir` must invalidate it or a pytester-style second session would
+    see the first session's relpaths."""
+    root_a = tmp_path / 'a'
+    root_a.mkdir()
+    set_rootdir(root_a)
+    target = root_a / 'f.py'
+    assert file_source(target, 1) is not None  # primes the cache
+    set_rootdir(tmp_path / 'b')
+    assert file_source(target, 1) is None
 
 
 def test_code_source_returns_none_when_rootdir_unset():

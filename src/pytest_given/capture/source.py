@@ -66,6 +66,12 @@ def _co_filename_to_path(filename: str) -> Path:
 
 _rootdir: Path | None = None
 
+# path string -> rootdir-relative result, valid only for the current _rootdir.
+# `Path.resolve` lstats every path component, and with the lint enabled it runs
+# once per captured step — memoizing per file keeps that O(distinct files)
+# instead of O(steps), which matters on slow mounts (WSL 9p: ~2ms per resolve).
+_relpath_cache: dict[str, str | None] = {}
+
 
 def set_rootdir(path: Path) -> None:
     """Called by the plugin in `pytest_load_initial_conftests`.
@@ -77,12 +83,14 @@ def set_rootdir(path: Path) -> None:
     """
     global _rootdir
     _rootdir = _co_filename_to_path(str(path)).resolve()
+    _relpath_cache.clear()
 
 
 def _reset_rootdir() -> None:
     """Test-only — reset module state between cases."""
     global _rootdir
     _rootdir = None
+    _relpath_cache.clear()
 
 
 def _relativize(abs_path: Path) -> str | None:
@@ -92,10 +100,15 @@ def _relativize(abs_path: Path) -> str | None:
     """
     if _rootdir is None:
         return None
+    key = str(abs_path)
+    if key in _relpath_cache:
+        return _relpath_cache[key]
     try:
-        return abs_path.resolve().relative_to(_rootdir).as_posix()
+        rel: str | None = abs_path.resolve().relative_to(_rootdir).as_posix()
     except ValueError:
-        return None
+        rel = None
+    _relpath_cache[key] = rel
+    return rel
 
 
 def _optional_source(abs_path: Path, line: int) -> SourceLocation | None:
