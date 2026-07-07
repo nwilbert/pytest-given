@@ -4,7 +4,6 @@
 
 ## Next
 
-- [ ] Review and refactor lint.py into new subpackage?
 - [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
 - [ ] Glossary: Optionally hide kind? Group / filter by story?

@@ -38,6 +38,14 @@ from .capture.story import (
     restore_story_registry,
     snapshot_story_registry,
 )
+from .lint import (
+    Finding,
+    apply_config,
+    parse_ignore_entries,
+    parse_rule_levels,
+    run_ast_rules,
+    run_runtime_rules,
+)
 from .model import (
     FixtureRecording,
     Glossary,
@@ -62,18 +70,7 @@ from .model import (
     report_from_dict,
     report_to_dict,
 )
-from .report import (
-    Finding,
-    apply_config,
-    detect_commit_sha,
-    parse_ignore_entries,
-    parse_rule_levels,
-    render_html,
-    render_md,
-    resolve_template,
-    run_ast_rules,
-    run_runtime_rules,
-)
+from .report import detect_commit_sha, render_html, render_md, resolve_template
 
 _collector_key: pytest.StashKey[Collector] = pytest.StashKey()
 
