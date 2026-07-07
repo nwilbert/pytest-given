@@ -56,30 +56,39 @@ def _run(pytester, source, *args):
     return pytester.runpytest(*args)
 
 
-def _recorded_steps():
-    """All steps (recursively) recorded by the inner run's collector.
+class _ConfigCapture:
+    """Extra inner-run plugin that captures the inner session's Config, whose
+    stash owns that session's collector."""
 
-    The module-level collector is rebound at inner sessionstart, so after
-    `runpytest` it holds the inner run's data — the only place `Step.source`
-    is observable, since it is never serialized.
-    """
+    config = None
+
+    def pytest_configure(self, config):
+        self.config = config
+
+
+def _run_observed(pytester, source, *args):
+    """Like `_run`, but also returns all steps (recursively) recorded by the
+    inner session's collector — the only place `Step.source` is observable,
+    since it is never serialized."""
+    pytester.makepyfile(test_sample=source)
+    capture = _ConfigCapture()
+    result = pytester.runpytest(*args, plugins=[capture])
 
     def walk(steps):
         for step in steps:
             yield step
             yield from walk(step.children)
 
-    return [
-        step for scenario in plugin.collector.scenarios for step in walk(scenario.steps)
-    ]
+    collector = plugin._collector(capture.config)
+    steps = [step for scenario in collector.scenarios for step in walk(scenario.steps)]
+    return result, steps
 
 
 def test_disabled_by_default_records_no_sources_and_reports_nothing(pytester):
-    result = _run(pytester, EMPTY_GIVEN)
+    result, steps = _run_observed(pytester, EMPTY_GIVEN)
     result.assert_outcomes(passed=1)
     assert result.ret == 0
     assert 'narration lint' not in result.stdout.str()
-    steps = _recorded_steps()
     assert steps  # sanity: the scenario recorded its steps
     assert all(step.source is None for step in steps)
 
@@ -97,11 +106,10 @@ def test_enabled_error_finding_fails_the_run(pytester):
 
 
 def test_enabled_clean_suite_exits_zero_and_captures_sources(pytester):
-    result = _run(pytester, CLEAN, '--given-lint=true')
+    result, steps = _run_observed(pytester, CLEAN, '--given-lint=true')
     result.assert_outcomes(passed=1)
     assert result.ret == 0
     assert 'narration lint' not in result.stdout.str()
-    steps = _recorded_steps()
     assert steps
     assert all(step.source is not None for step in steps)
 
@@ -198,11 +206,11 @@ def test_unknown_ignore_prefix_is_a_usage_error(pytester):
 
 
 def test_fixture_root_step_stays_unanchored_and_unflagged(pytester):
-    result = _run(pytester, FIXTURE_SUITE, '--given-lint=true')
+    result, steps = _run_observed(pytester, FIXTURE_SUITE, '--given-lint=true')
     result.assert_outcomes(passed=1)
     assert result.ret == 0
-    roots = [s for s in _recorded_steps() if s.fixture_name == 'machine']
-    inline = [s for s in _recorded_steps() if s.fixture_name is None]
+    roots = [s for s in steps if s.fixture_name == 'machine']
+    inline = [s for s in steps if s.fixture_name is None]
     assert roots
     assert all(s.source is None for s in roots)
     assert inline

@@ -1,4 +1,9 @@
-from .collector import Collector, FixtureInstanceKey, set_active_collector
+from .collector import (
+    Collector,
+    FixtureInstanceKey,
+    get_active_collector,
+    set_active_collector,
+)
 from .decorators import attach, given, scenario, then, when, when_then
 from .file_glossary import FileGlossary
 from .glossary import DeferredTermHandle, DeferredTermInstance
@@ -16,6 +21,7 @@ __all__ = [
     'activity',
     'attach',
     'filter_internal_frames',
+    'get_active_collector',
     'given',
     'narration_from',
     'parse_short_repr',

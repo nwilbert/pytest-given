@@ -4,8 +4,9 @@
 
 ## Next
 
-- [ ] Move the collector off the module global in `plugin.py` (e.g. into `config.stash`) so each session owns its instance. Today an in-process `pytester.runpytest` (integration tests) rebinds the shared global at inner sessionstart, so an outer run over `tests/integration` with `--given-lint=true` or report sinks sees the last inner run's scenarios — which is why `nox -s self_report` runs `tests/unit` only. Note: the integration tests' `_recorded_steps()` helper deliberately reads the leaked inner collector to observe the never-serialized `Step.source`, so it needs a new observation path.
-- [ ] Add sort option in GLossary, to sort by number of scenarios, instances, or stories
+- [ ] Session-scope the remaining module-global state the way the collector was (`config.stash`, see `plugin._collector_key`): the story registry (`clear_story_registry` at sessionstart wipes the outer session's stories during a nested in-process run) and the rootdir + relpath cache in `capture/source.py` (`set_rootdir` at nested `pytest_load_initial_conftests` repoints the outer session's path resolution). Both are harmless for the current suites but are the same leakage class the collector had.
+- [ ] Review and refactor lint.py into new subpackage?
+- [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
 - [ ] add the prepared diagram to the readme with Agent <-> Dev <-> Domain Expert

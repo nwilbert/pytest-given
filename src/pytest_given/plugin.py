@@ -20,6 +20,7 @@ from .capture import (
     FixtureInstanceKey,
     Template,
     filter_internal_frames,
+    get_active_collector,
     parse_short_repr,
     set_active_collector,
 )
@@ -64,7 +65,18 @@ from .report import (
     run_runtime_rules,
 )
 
-collector = Collector()
+_collector_key: pytest.StashKey[Collector] = pytest.StashKey()
+
+
+def _collector(config: pytest.Config) -> Collector:
+    """The collector owned by this session, created at `pytest_sessionstart`.
+
+    Lives in `config.stash` rather than a module global so a nested in-process
+    run (pytester, `pytest.main`) gets its own instance instead of rebinding —
+    and thereby clobbering — the outer session's.
+    """
+    return config.stash[_collector_key]
+
 
 _LINT_CHOICES = ('true', 'false')
 _lint_findings: pytest.StashKey[list[Finding]] = pytest.StashKey()
@@ -191,10 +203,10 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
-    """Reset the collector at the start of each session."""
-    global collector
+    """Give the session its own collector."""
     collector = Collector()
     collector.capture_step_source = _lint_enabled(session.config)
+    session.config.stash[_collector_key] = collector
     clear_story_registry()
 
 
@@ -262,6 +274,7 @@ def _validate_scenario_story_binding(
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
 def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
+    collector = _collector(item.config)
     scenario_marker = _get_scenario_marker(item)
     if scenario_marker is None:
         # Unannotated test: set the flag so `with given(...)` inside it warns
@@ -293,7 +306,7 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
         collector.param_info[node_id] = ParamSpec(names=names, values=values)
     # Pre-fixture-setup work done; let pytest run fixture setup here.
     yield
-    _graft_fixture_recordings(item)
+    _graft_fixture_recordings(item, collector)
     collector.start_times[node_id] = time.monotonic()
 
 
@@ -318,12 +331,13 @@ def pytest_fixture_setup(
             'yet supported; use a plain string label, or move the step into a '
             'helper function.'
         )
+    collector = _collector(request.config)
     if collector.state == 'idle':
         # Fixture is being set up outside any tracked scenario (e.g. unannotated
         # test pulling in a step fixture). Don't record.
         yield
         return
-    _ensure_teardown_wrapped(fixturedef)
+    _ensure_teardown_wrapped(fixturedef, collector)
     recording = FixtureRecording(
         root=Step(
             phase=desc.phase,
@@ -340,9 +354,15 @@ def pytest_fixture_setup(
         collector.store_recording(key, recording)
 
 
-def _ensure_teardown_wrapped(fixturedef: pytest.FixtureDef[object]) -> None:
+def _ensure_teardown_wrapped(
+    fixturedef: pytest.FixtureDef[object], collector: Collector
+) -> None:
     """Wrap a generator fixture's body once so post-yield code runs in
-    fixture_teardown state. Idempotent."""
+    fixture_teardown state. Idempotent.
+
+    The closure captures the collector directly: fixturedefs live for exactly
+    one session, and teardown can fire where no config is reachable (e.g. a
+    session-scoped fixture finalized after the last item)."""
     func = fixturedef.func
     if getattr(func, '_pytest_given_teardown_wrapped', False):
         return
@@ -462,7 +482,7 @@ def _annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
     return out
 
 
-def _graft_fixture_recordings(item: pytest.Item) -> None:
+def _graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
     """Graft this item's fixture step-recordings and Annotated `given` labels.
 
     Phase 1: fixture recordings in `collector.recordings()` setup order
@@ -528,6 +548,7 @@ def _graft_fixture_recordings(item: pytest.Item) -> None:
 
 @pytest.hookimpl(trylast=True)
 def pytest_runtest_teardown(item: pytest.Item) -> None:
+    collector = _collector(item.config)
     if collector.inside_unannotated_test:
         collector.inside_unannotated_test = False
         set_active_collector(None)
@@ -539,6 +560,7 @@ def pytest_runtest_teardown(item: pytest.Item) -> None:
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) -> None:
+    collector = _collector(item.config)
     if collector.active_scenario_id != NodeId(item.nodeid):
         return
     # Capture errors from both setup (fixture exception) and call (test-body
@@ -563,6 +585,14 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
 
 @pytest.hookimpl(trylast=True)
 def pytest_runtest_logreport(report: pytest.TestReport) -> None:
+    # This hook's spec carries no config or item, so the session's stash is
+    # unreachable here; use the active collector instead. It is set for a
+    # tracked scenario's whole runtest protocol, and every terminal report
+    # handled below (setup skip/fail, call) arrives before
+    # pytest_runtest_teardown clears it.
+    collector = get_active_collector()
+    if collector is None:
+        return
     node_id = NodeId(report.nodeid)
     if collector.active_scenario_id != node_id:
         return
@@ -586,6 +616,7 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
 
 
 def pytest_sessionfinish(session: pytest.Session) -> None:
+    collector = _collector(session.config)
     scenarios = _group_parameterized(collector.scenarios, collector.param_info)
     collector.param_info.clear()
     stories = list(collector._discovered_stories.values())
