@@ -1,5 +1,5 @@
 from .errors import PytestGivenError
-from .ids import id_derive
+from .ids import case_suffix, id_derive, node_base
 from .schema import (
     Activity,
     ActivityId,
@@ -76,7 +76,9 @@ __all__ = [
     'StoryId',
     'TermId',
     'TracebackFrame',
+    'case_suffix',
     'id_derive',
+    'node_base',
     'report_from_dict',
     'report_to_dict',
 ]

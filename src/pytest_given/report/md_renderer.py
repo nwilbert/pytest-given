@@ -14,6 +14,7 @@ from ..model import (
     ReportData,
     Scenario,
     Step,
+    node_base,
 )
 
 _STATUS_GLYPH = {'passed': '✓', 'failed': '✗', 'skipped': '⤼'}
@@ -58,9 +59,7 @@ def _source_md(scenario: Scenario) -> str:
     (a terminal-clickable `file:line`); the test-name segment comes from the
     node id.
     """
-    head, sep, tail = scenario.id.rpartition('::')
-    tail = re.sub(r'\[.*\]$', '', tail)
-    node = f'{head}{sep}{tail}'
+    node = node_base(scenario.id)
     if scenario.source is None:
         return node
     _path, path_sep, name = node.partition('::')

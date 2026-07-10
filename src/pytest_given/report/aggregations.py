@@ -25,6 +25,7 @@ from ..model import (
     Story,
     StoryId,
     TermId,
+    node_base,
 )
 from .coverage import StepRef, compute_coverage, is_coverage_eligible, walk_steps
 
@@ -368,5 +369,5 @@ def _scenario_slug(node_id: NodeId, *, with_tail: bool) -> str:
     basename = file_part.rsplit('/', 1)[-1].removesuffix('.py')
     func = func_part.removeprefix('test_')
     if not with_tail:
-        func = func.split('[', 1)[0]
+        func = node_base(func)
     return f'{basename.removeprefix("test_")}/{func}'

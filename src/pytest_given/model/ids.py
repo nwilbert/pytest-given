@@ -16,3 +16,17 @@ def id_derive(name: str) -> TermId:
             f'one ASCII alphanumeric character.'
         )
     return TermId(slug)
+
+
+def node_base(node_id: str) -> str:
+    """A node id (or a bare function segment) without its parametrize tail:
+    ``'f.py::t[1-2]' -> 'f.py::t'``, ``'t[1-2]' -> 't'``. Two cases of one
+    parametrized function share this; two different functions never do."""
+    return node_id.split('[', 1)[0]
+
+
+def case_suffix(node_id: str) -> str:
+    """The parametrize tail of a node id, brackets included, or ``''`` when it
+    has none: ``'f.py::t[1-2]' -> '[1-2]'``, ``'f.py::t' -> ''``."""
+    _, bracket, rest = node_id.partition('[')
+    return f'{bracket}{rest}'

@@ -17,7 +17,9 @@ from ..model import (
     Step,
     Story,
     TermId,
+    case_suffix,
     id_derive,
+    node_base,
 )
 from .base import RULES_BY_ID, Finding, RuleId, iter_steps
 
@@ -88,9 +90,8 @@ def _divergent_case_findings(per_case: list[Scenario]) -> list[Finding]:
     """
     groups: dict[str, list[Scenario]] = {}
     for scenario in per_case:
-        base, bracket, _ = scenario.id.partition('[')
-        if bracket:
-            groups.setdefault(base, []).append(scenario)
+        if '[' in scenario.id:
+            groups.setdefault(node_base(scenario.id), []).append(scenario)
     findings: list[Finding] = []
     for base, cases in groups.items():
         passed = [case for case in cases if case.status == 'passed']
@@ -98,7 +99,7 @@ def _divergent_case_findings(per_case: list[Scenario]) -> list[Finding]:
             continue
         baseline = _structure_signature(passed[0].steps)
         diverging = [
-            _case_suffix(case)
+            case_suffix(case.id)
             for case in passed[1:]
             if _structure_signature(case.steps) != baseline
         ]
@@ -112,15 +113,11 @@ def _divergent_case_findings(per_case: list[Scenario]) -> list[Finding]:
                     location=passed[0].source,
                     message=(
                         f'cases {", ".join(diverging)} record a different step '
-                        f'structure than case {_case_suffix(passed[0])}'
+                        f'structure than case {case_suffix(passed[0].id)}'
                     ),
                 )
             )
     return findings
-
-
-def _case_suffix(scenario: Scenario) -> str:
-    return '[' + scenario.id.partition('[')[2]
 
 
 def _structure_signature(steps: list[Step]) -> _StepSignature:
