@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import re
 import sys
+import types
 from pathlib import Path
 
 from ..model import SourceLocation
@@ -65,6 +66,12 @@ def _co_filename_to_path(filename: str) -> Path:
 
 _rootdir: Path | None = None
 
+# path string -> rootdir-relative result, valid only for the current _rootdir.
+# `Path.resolve` lstats every path component, and with the lint enabled it runs
+# once per captured step — memoizing per file keeps that O(distinct files)
+# instead of O(steps), which matters on slow mounts (WSL 9p: ~2ms per resolve).
+_relpath_cache: dict[str, str | None] = {}
+
 
 def set_rootdir(path: Path) -> None:
     """Called by the plugin in `pytest_load_initial_conftests`.
@@ -76,12 +83,31 @@ def set_rootdir(path: Path) -> None:
     """
     global _rootdir
     _rootdir = _co_filename_to_path(str(path)).resolve()
+    _relpath_cache.clear()
+
+
+def current_rootdir() -> Path | None:
+    """The rootdir as last set (already resolved). The plugin saves this before
+    a nested in-process run re-points it via `set_rootdir`, and hands it back
+    to `restore_rootdir` when that run unconfigures."""
+    return _rootdir
+
+
+def restore_rootdir(previous: Path | None) -> None:
+    """Reinstate a rootdir captured with `current_rootdir`. Unlike
+    `set_rootdir`, the value is used as-is — it was already normalised and
+    resolved when first set. Clears the relpath cache, whose entries are only
+    valid for the rootdir they were computed against."""
+    global _rootdir
+    _rootdir = previous
+    _relpath_cache.clear()
 
 
 def _reset_rootdir() -> None:
     """Test-only — reset module state between cases."""
     global _rootdir
     _rootdir = None
+    _relpath_cache.clear()
 
 
 def _relativize(abs_path: Path) -> str | None:
@@ -91,10 +117,15 @@ def _relativize(abs_path: Path) -> str | None:
     """
     if _rootdir is None:
         return None
+    key = str(abs_path)
+    if key in _relpath_cache:
+        return _relpath_cache[key]
     try:
-        return abs_path.resolve().relative_to(_rootdir).as_posix()
+        rel: str | None = abs_path.resolve().relative_to(_rootdir).as_posix()
     except ValueError:
-        return None
+        rel = None
+    _relpath_cache[key] = rel
+    return rel
 
 
 def _optional_source(abs_path: Path, line: int) -> SourceLocation | None:
@@ -154,6 +185,18 @@ def item_source(relpath_raw: str, line: int) -> SourceLocation:
     behaviour where every scenario carried a source.
     """
     return SourceLocation(relpath=to_relpath(relpath_raw), line=line)
+
+
+def code_source(code: types.CodeType) -> SourceLocation | None:
+    """SourceLocation for a code object's definition site (used to anchor
+    decorated step-helper functions for the narration lint).
+
+    `co_firstlineno` points at the function's first decorator line when it has
+    decorators; the lint's AST index accounts for that. Returns None if rootdir
+    is unset or the file lies outside it.
+    """
+    abs_path = _co_filename_to_path(code.co_filename)
+    return _optional_source(abs_path, code.co_firstlineno)
 
 
 def file_source(path: Path, line: int) -> SourceLocation | None:

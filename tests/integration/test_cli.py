@@ -103,3 +103,55 @@ def test_cli_source_link_none_renders_plain_span(tmp_path: Path) -> None:
     content = html_path.read_text(encoding='utf-8')
     assert 'tests/x.py:2' in content
     assert '<a href="zed' not in content
+
+
+def test_cli_format_md_to_stdout(tmp_path, capsys) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'cli',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'tests/t.py::test_a',
+                        'narration': {'text': 'Alpha', 'parts': []},
+                        'module': 'tests/t.py',
+                        'tags': [],
+                        'status': 'passed',
+                        'steps': [
+                            {'phase': 'when', 'narration': {'text': 'act', 'parts': []}}
+                        ],
+                    }
+                ],
+            }
+        )
+    )
+    rc = main(['report', str(json_path), '--format', 'md'])
+    assert rc == 0
+    assert '## ✓ Alpha' in capsys.readouterr().out
+
+
+def test_cli_md_inferred_from_output_extension(tmp_path) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'cli',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [],
+            }
+        )
+    )
+    out = tmp_path / 'r.md'
+    rc = main(['report', str(json_path), '-o', str(out)])
+    assert rc == 0
+    assert out.read_text(encoding='utf-8').startswith('# pytest-given — cli')

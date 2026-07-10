@@ -32,7 +32,7 @@ from pytest_given import (
 
 # Load the glossary from the Markdown file alongside this module.
 # Module-level declaration registers it with the plugin for kind inference.
-g = FileGlossary(Path(__file__).parent / 'file-glossary-booking.md')
+g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')
 
 # Story: Guest → book (slot 1, verb) → Room (slot 2, object).
 # The first activity is deliberately under-anchored — only one glossary term

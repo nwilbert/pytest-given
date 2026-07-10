@@ -5,7 +5,7 @@ from typing import Any, cast
 
 import pytest
 
-from pytest_given.report.renderer import (
+from pytest_given.report.html_renderer import (
     _inline_md,
     _render_narration_part,
     render_html,
@@ -41,7 +41,7 @@ def test_render_produces_html_file(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     assert html_path.exists()
     content = html_path.read_text(encoding='utf-8')
     assert 'test-proj' in content
@@ -85,7 +85,7 @@ def test_render_includes_scenario_data(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'My Scenario' in content
     assert 'billing' in content
@@ -152,7 +152,7 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'debug log' in content
     assert 'some log output' in content
@@ -223,7 +223,7 @@ def test_render_parameterized_step_with_structured_narration(tmp_path: Path) -> 
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'param-color-0' in content
     # The merged step shows the {name} token
@@ -300,7 +300,7 @@ def test_render_merged_placeholder_drops_format_spec_and_conversion(
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '{n}' in content
     assert '{obj}' in content
@@ -348,7 +348,7 @@ def test_render_plain_str_step_with_empty_parts_escapes_braces(
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'config: {key: value}' in content
 
@@ -402,7 +402,7 @@ def test_render_value_part_uses_param_value_class(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'param-value' in content
     assert '12.0' in content
@@ -453,7 +453,7 @@ def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     # The template emits exactly two `</script>` tags (data block + alpine block).
     # An unescaped attachment payload would add a third.
@@ -493,7 +493,7 @@ def test_render_escapes_script_close_in_node_id_blobs(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     # Two literal `</script>` tags only (data block + alpine block); an
     # unescaped node id in any blob would add a third.
@@ -524,7 +524,7 @@ def test_render_self_contained(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '<style>' in content
     assert '<script>' in content
@@ -561,7 +561,7 @@ def test_render_clickable_tag_badges(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert "filterByTag('billing')" in content
     assert "filterByTag('happy-path')" in content
@@ -612,7 +612,7 @@ def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'expandedScenarios' in content
     assert 'toggleScenario' in content
@@ -635,7 +635,7 @@ def test_render_status_filter_pills(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'status-pill' in content
     assert 'showPassed' in content
@@ -672,7 +672,7 @@ def test_render_includes_skip_reason_block_and_chevron(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'awaiting fixture' in content
     assert 'skip-reason' in content
@@ -709,7 +709,7 @@ def test_render_skipped_without_reason_has_no_chevron(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '<span class="scenario-chevron-placeholder">' in content
     assert 'class="skip-reason"' not in content
@@ -751,7 +751,7 @@ def test_render_parameter_table_skipped_case_uses_dot_skipped(tmp_path: Path) ->
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '<span class="dot-skipped">○</span>' in content
     assert '<span class="dot-failed">✗</span>' not in content
@@ -788,7 +788,9 @@ def test_renderer_emits_source_links_when_template_set(tmp_path: Path) -> None:
     )
     html_path = tmp_path / 'report.html'
     render_html(
-        json_path, html_path, source_link_template='vscode://file/{path}:{line}'
+        report_from_dict(json.loads(json_path.read_text())),
+        html_path,
+        source_link_template='vscode://file/{path}:{line}',
     )
     content = html_path.read_text(encoding='utf-8')
     assert 'tests/test_x.py:9' in content
@@ -825,7 +827,7 @@ def test_renderer_without_template_renders_plain_relpath(tmp_path: Path) -> None
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'tests/test_x.py:9' in content
     assert '<a href="vscode' not in content
@@ -868,7 +870,9 @@ def test_render_includes_resolved_source_urls_when_template_set(tmp_path: Path) 
     )
     html_path = tmp_path / 'report.html'
     render_html(
-        json_path, html_path, source_link_template='vscode://file/{path}:{line}'
+        report_from_dict(json.loads(json_path.read_text())),
+        html_path,
+        source_link_template='vscode://file/{path}:{line}',
     )
     content = html_path.read_text(encoding='utf-8')
     assert 'vscode://file/' in content
@@ -907,7 +911,9 @@ def test_renderer_skips_link_block_when_scenario_has_no_source(
     )
     html_path = tmp_path / 'report.html'
     render_html(
-        json_path, html_path, source_link_template='vscode://file/{path}:{line}'
+        report_from_dict(json.loads(json_path.read_text())),
+        html_path,
+        source_link_template='vscode://file/{path}:{line}',
     )
     content = html_path.read_text(encoding='utf-8')
     # The CSS class is always emitted in the stylesheet; what we care about
@@ -968,7 +974,7 @@ def test_render_placeholder_gets_data_param_attribute(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'data-param="euros"' in content
     # The placeholder span carries both class and data-param
@@ -1018,7 +1024,7 @@ def test_render_param_table_cells_get_data_param(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     # Header carries data-param
     assert 'data-param="euros"' in content
@@ -1042,7 +1048,7 @@ from pytest_given.model import (  # noqa: E402
     NarrationTermRef,
     TermId,
 )
-from pytest_given.report.renderer import _make_narration_filter  # noqa: E402
+from pytest_given.report.html_renderer import _make_narration_filter  # noqa: E402
 
 
 def _glossary() -> Glossary:
@@ -1167,7 +1173,7 @@ from pytest_given.model import (  # noqa: E402
     ActivityTermRef,
     ActivityWord,
 )
-from pytest_given.report.renderer import _make_activity_part_filter  # noqa: E402
+from pytest_given.report.html_renderer import _make_activity_part_filter  # noqa: E402
 
 
 def test_activity_part_filter_actor_term_ref():
@@ -1329,7 +1335,7 @@ def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert html_path.exists()
     assert 'Book a Room' in content
@@ -1388,7 +1394,7 @@ def test_render_emits_term_scenario_index_global(tmp_path: Path) -> None:
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '__termScenarios' in content
     assert 'test.py::test_x' in content
@@ -1481,7 +1487,7 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
     assert {t.id for t in rt.glossary.terms} == {'guest', 'search', 'room'}
 
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'term-ref-actor' in content
     assert 'term-ref-verb' in content
@@ -1512,7 +1518,7 @@ def test_render_glossary_all_uncategorized_hides_kind_ui(tmp_path: Path) -> None
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     # Kind filter section is gone.
     assert 'Show kinds' not in content
@@ -1548,7 +1554,7 @@ def test_render_glossary_with_categorized_terms_keeps_kind_ui(tmp_path: Path) ->
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'Show kinds' in content
     assert 'kind-title term-kindless' in content
@@ -1584,7 +1590,7 @@ def test_render_glossary_all_uncategorized_header_omits_kind_breakdown(
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '2 terms' in content
     # These phrases only ever appear in the header breakdown.
@@ -1621,7 +1627,7 @@ def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> N
         )
     )
     html_path = tmp_path / 'report.html'
-    render_html(json_path, html_path)
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     # Anchor carries the short slug, not the raw node id.
     assert 'scenario=booking/make' in content
@@ -1629,3 +1635,27 @@ def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> N
     # Reverse map global resolves slug -> node id.
     assert 'window.__scenarioSlugs = {' in content
     assert '"booking/make": "pkg/test_booking.py::test_make"' in content
+
+
+# ---------------------------------------------------------------------------
+# render_html accepts a ReportData model directly
+# ---------------------------------------------------------------------------
+
+from pytest_given.model import report_from_dict  # noqa: E402
+
+
+def test_render_html_accepts_report_data(tmp_path: Path) -> None:
+    report = report_from_dict(
+        {
+            'metadata': {
+                'project': 'from-model',
+                'timestamp': 't',
+                'pytest_version': '9',
+                'plugin_version': '0.1',
+            },
+            'scenarios': [],
+        }
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(report, html_path)
+    assert 'from-model' in html_path.read_text(encoding='utf-8')

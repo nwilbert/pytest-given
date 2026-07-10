@@ -67,6 +67,9 @@ class Collector:
         self._active_fixture_descriptor: object | None = None
         self._recordings: dict[FixtureInstanceKey, FixtureRecording] = {}
         self.inside_unannotated_test: bool = False
+        # Whether steps record their body's source anchor (narration lint
+        # only); off is the zero-cost default — no frame walking happens.
+        self.capture_step_source: bool = False
         self.active_scenario_story: Story | None = None
         self.active_scenario_activity_ids: tuple[ActivityId, ...] = ()
         self._discovered_stories: dict[StoryId, Story] = {}
@@ -235,6 +238,7 @@ class Collector:
         narration: Narration,
         *,
         activity_ids: tuple[ActivityId, ...] = (),
+        source: SourceLocation | None = None,
     ) -> Step:
         if self._state == 'idle':
             raise PytestGivenError(
@@ -254,7 +258,9 @@ class Collector:
             )
         if activity_ids:
             self._check_step_activity_scope(phase, activity_ids)
-        step = Step(phase=phase, narration=narration, activity_ids=activity_ids)
+        step = Step(
+            phase=phase, narration=narration, activity_ids=activity_ids, source=source
+        )
         if stack:
             stack[-1].children.append(step)
         elif self._state == 'test' and self._current_scenario is not None:

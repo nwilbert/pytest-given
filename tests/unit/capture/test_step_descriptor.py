@@ -1,3 +1,6 @@
+import inspect
+from pathlib import Path
+
 import pytest
 
 from pytest_given import Template
@@ -11,6 +14,7 @@ from pytest_given.capture.decorators import (
     then,
     when,
 )
+from pytest_given.capture.source import _reset_rootdir, set_rootdir
 from pytest_given.capture.story import (
     activity as activity_fn,
 )
@@ -28,6 +32,7 @@ from pytest_given.model import (
     NarrationLiteral,
     NarrationValue,
     PytestGivenError,
+    SourceLocation,
     Step,
 )
 
@@ -853,3 +858,84 @@ def test_push_step_requires_story_when_activity_ids_given() -> None:
         collector.push_step(
             'given', Narration(text='a thing'), activity_ids=(ActivityId(1),)
         )
+
+
+# --- Gated step-source capture (narration-lint anchors) ---
+
+
+@pytest.fixture
+def _rootdir_here():
+    _reset_rootdir()
+    set_rootdir(Path(__file__).parent)
+    yield
+    _reset_rootdir()
+
+
+def _capturing_collector() -> Collector:
+    collector = Collector()
+    collector.capture_step_source = True
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    return collector
+
+
+@pytest.mark.usefixtures('_rootdir_here')
+def test_step_source_stays_none_when_capture_disabled() -> None:
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with given('a machine'):
+            pass
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert scenario.steps[0].source is None
+
+
+@pytest.mark.usefixtures('_rootdir_here')
+def test_context_manager_captures_the_with_line() -> None:
+    collector = _capturing_collector()
+    try:
+        with given('a machine'):
+            with_line = inspect.currentframe().f_lineno - 1
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert scenario.steps[0].source == SourceLocation(
+        relpath='test_step_descriptor.py', line=with_line
+    )
+
+
+@pytest.mark.usefixtures('_rootdir_here')
+def test_when_then_steps_share_the_with_statement_anchor() -> None:
+    from pytest_given.capture.decorators import when_then
+
+    collector = _capturing_collector()
+    try:
+        with when_then('act', 'outcome'):
+            with_line = inspect.currentframe().f_lineno - 1
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    expected = SourceLocation(relpath='test_step_descriptor.py', line=with_line)
+    assert [s.source for s in scenario.steps] == [expected, expected]
+
+
+@pytest.mark.usefixtures('_rootdir_here')
+def test_helper_decorator_anchors_at_the_function_definition() -> None:
+    collector = _capturing_collector()
+    try:
+        base = inspect.currentframe().f_lineno
+
+        @when('inserting money')
+        def insert() -> None: ...
+
+        insert()
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    # co_firstlineno of a decorated function is its first decorator line.
+    assert scenario.steps[0].source == SourceLocation(
+        relpath='test_step_descriptor.py', line=base + 2
+    )

@@ -333,7 +333,7 @@ def test_real_definition_is_kept():
 
 @scenario(
     'Calling the glossary declares a kindless term',
-    tags=['kind-inference', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_call_declares_kindless_term():
     with given('an empty glossary'):

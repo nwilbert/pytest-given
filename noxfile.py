@@ -139,14 +139,14 @@ def examples(session: nox.Session) -> None:
             'pytest',
             test_file,
             f'--given-json=examples/{slug}/{slug}-data.json',
-            '--given-html',
-            f'--given-html-output=examples/{slug}/{slug}.html',
+            f'--given-html=examples/{slug}/{slug}.html',
+            f'--given-md=examples/{slug}/{slug}.md',
             '--given-source-link=github',
-            # warn (not error): these suites have intentional failures, so the
-            # run already returns a tolerated exit 1 (success_codes below) — an
-            # error-mode phase failure would be masked. The printed summary is
-            # the signal here.
-            '--given-phase-check=warn',
+            # These suites have intentional failures, so the run already
+            # returns a tolerated exit 1 (success_codes below), which masks
+            # error-level lint findings. The printed summary is the signal
+            # here.
+            '--given-lint=true',
             '--tb=no',
             '--no-header',
             '-q',
@@ -169,19 +169,20 @@ def self_report(session: nox.Session) -> None:
     the vocabulary of GLOSSARY.md (loaded as a FileGlossary in tests/conftest.py).
     """
     _sync(session, 'test', include_project=True)
-    # Only tests/unit: the integration tests drive pytest-given through an
-    # in-process `pytester.runpytest`, whose inner `@scenario`s would otherwise
-    # leak into this report via the shared module-level collector.
+    # Only tests/unit: the integration tests carry no @scenario functions of
+    # their own (their @scenario code lives in string literals fed to inner
+    # pytester runs, which own their collectors), so including them would only
+    # slow the regeneration down.
     session.run(
         'pytest',
         'tests/unit',
         '--given-json=examples/self-report/self-report-data.json',
-        '--given-html',
-        '--given-html-output=examples/self-report/self-report.html',
+        '--given-html=examples/self-report/self-report.html',
+        '--given-md=examples/self-report/self-report.md',
         '--given-source-link=github',
-        # error (not warn): the backend suite has no intentional failures, so a
-        # phase regression turns this session red — a real gate.
-        '--given-phase-check=error',
+        # The backend suite has no intentional failures, so an error-level
+        # lint finding turns this session red — a real gate.
+        '--given-lint=true',
         '--tb=no',
         '--no-header',
         '-q',
@@ -201,8 +202,7 @@ def benchmark(session: nox.Session) -> None:
         'pytest',
         'benchmarks/test_large_scenarios.py',
         '--given-json=benchmarks/large-scenarios-data.json',
-        '--given-html',
-        '--given-html-output=benchmarks/large-scenarios.html',
+        '--given-html=benchmarks/large-scenarios.html',
         '--given-source-link=github',
         '--tb=no',
         '--no-header',

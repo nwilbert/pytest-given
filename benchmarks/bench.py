@@ -83,13 +83,12 @@ def sweep(sizes: list[int]) -> None:
         regen(n)
         items = collect_count()
         t_none = run_phase(['--given-json=/tmp/discard.json'])
-        # JSON only (default behavior is to write JSON)
+        # JSON only
         t_json = run_phase(['--given-json=/tmp/pg.json'])
         t_html = run_phase(
             [
                 '--given-json=/tmp/pg.json',
-                '--given-html',
-                '--given-html-output=/tmp/pg.html',
+                '--given-html=/tmp/pg.html',
             ]
         )
         print(f'{n:>6} {items:>7} {t_none:>10.2f} {t_json:>8.2f} {t_html:>8.2f}')
@@ -109,8 +108,7 @@ def profile_run(count: int) -> None:
             '--no-header',
             '-q',
             '--given-json=/tmp/pg.json',
-            '--given-html',
-            '--given-html-output=/tmp/pg.html',
+            '--given-html=/tmp/pg.html',
         ]
     )
     profiler.disable()

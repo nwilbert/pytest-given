@@ -1,8 +1,11 @@
 import argparse
+import json
 import sys
 from pathlib import Path
 
-from .renderer import render_html
+from ..model import report_from_dict
+from .html_renderer import render_html
+from .md_renderer import render_md
 from .source_link import resolve_template
 
 
@@ -21,8 +24,8 @@ def main(argv: list[str] | None = None) -> int:
         '-o',
         '--output',
         type=Path,
-        default=Path('given-report/report.html'),
-        help='Output HTML file path (default: given-report/report.html)',
+        default=None,
+        help='Output file path (default: given-report/report.html)',
     )
     report_parser.add_argument(
         '--source-link',
@@ -32,6 +35,12 @@ def main(argv: list[str] | None = None) -> int:
             'github, none). See README for variables.'
         ),
     )
+    report_parser.add_argument(
+        '--format',
+        choices=['html', 'md'],
+        default=None,
+        help='Output format. Inferred from -o extension when omitted (default: html).',
+    )
 
     args = parser.parse_args(argv)
 
@@ -39,13 +48,31 @@ def main(argv: list[str] | None = None) -> int:
         if not args.json_file.exists():
             print(f'Error: {args.json_file} not found', file=sys.stderr)
             return 1
-        template = resolve_template(args.source_link)
-        render_html(args.json_file, args.output, source_link_template=template)
-        print(f'Report generated: {args.output}')
+        report_dict = json.loads(args.json_file.read_text(encoding='utf-8'))
+        report = report_from_dict(report_dict)
+        fmt = args.format or _infer_format(args.output)
+        if fmt == 'md':
+            md = render_md(report)
+            if args.output is None:
+                print(md)
+            else:
+                args.output.write_text(md, encoding='utf-8')
+                print(f'Report generated: {args.output}')
+        else:
+            template = resolve_template(args.source_link)
+            output = args.output or Path('given-report/report.html')
+            render_html(report, output, source_link_template=template)
+            print(f'Report generated: {output}')
         return 0
 
     parser.print_help()
     return 1
+
+
+def _infer_format(output: Path | None) -> str:
+    if output is not None and output.suffix.lower() == '.md':
+        return 'md'
+    return 'html'
 
 
 if __name__ == '__main__':  # pragma: no cover

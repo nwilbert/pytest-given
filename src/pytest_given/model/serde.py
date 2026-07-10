@@ -55,12 +55,13 @@ def report_to_dict(report: ReportData) -> dict[str, Any]:
 
 
 def _asdict_filtered(obj: Any) -> Any:
-    """Recursively convert dataclasses to dicts, skipping underscore fields."""
+    """Recursively convert dataclasses to dicts, skipping underscore fields
+    and fields marked ``metadata={'serde_exclude': True}``."""
     if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
         return {
             f.name: _asdict_filtered(getattr(obj, f.name))
             for f in dataclasses.fields(obj)
-            if not f.name.startswith('_')
+            if not f.name.startswith('_') and not f.metadata.get('serde_exclude')
         }
     if isinstance(obj, (list, tuple)):
         return [_asdict_filtered(x) for x in obj]

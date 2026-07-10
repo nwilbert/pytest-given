@@ -171,6 +171,19 @@ def clear_story_registry() -> None:
     _STORY_REGISTRY.clear()
 
 
+def snapshot_story_registry() -> dict[StoryId, str]:
+    """A copy of the registry. The plugin takes one before clearing at
+    sessionstart, so a nested in-process run can hand the outer session's
+    registrations back via `restore_story_registry` when it unconfigures."""
+    return dict(_STORY_REGISTRY)
+
+
+def restore_story_registry(snapshot: dict[StoryId, str]) -> None:
+    """Reinstate a snapshot taken with `snapshot_story_registry`."""
+    _STORY_REGISTRY.clear()
+    _STORY_REGISTRY.update(snapshot)
+
+
 def _register_story(sid: StoryId, title: str) -> None:
     frame = sys._getframe(2)
     site = f'{frame.f_code.co_filename}:{frame.f_lineno}'

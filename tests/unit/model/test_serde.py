@@ -163,6 +163,23 @@ def test_scenario_source_optional_defaults_to_none() -> None:
     assert report.scenarios[0].source is None
 
 
+def test_step_source_is_not_serialized() -> None:
+    # Step.source is lint-only capture state; report artifacts must stay
+    # byte-identical whether or not it was captured.
+    step = Step(
+        phase='given',
+        narration=Narration(text='g'),
+        source=SourceLocation(relpath='tests/t.py', line=3),
+    )
+    scenario = Scenario(
+        id=NodeId('i'), narration=Narration(text='n'), module='m', steps=[step]
+    )
+    report = ReportData(metadata=_meta(), scenarios=[scenario])
+    step_dict = report_to_dict(report)['scenarios'][0]['steps'][0]
+    assert 'source' not in step_dict
+    assert _round_trip(report).scenarios[0].steps[0].source is None
+
+
 def test_step_with_attachment_and_error_and_children() -> None:
     report = report_from_dict(
         {

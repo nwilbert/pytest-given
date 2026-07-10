@@ -55,14 +55,16 @@ def test_handles_are_memoized(glossary_file):
 
 @scenario(
     'File-loaded terms start kindless',
-    tags=['kind-inference', 'happy-path'],
+    tags=['happy-path'],
 )
 def test_terms_start_kindless(glossary_file):
     with given('a Markdown glossary file with no kind column'):
         attach('Glossary file', GLOSSARY_MD)
     with when(t'a {pg["File glossary"]} loads it'):
         glossary = FileGlossary(glossary_file)
-    with then(t'each {pg["Term"]} is {pg["Kindless"]} until inference runs'):
+    with then(
+        t'each {pg["Term"]} is {pg["Kindless"]} until {pg["Kind inference"]} runs'
+    ):
         assert glossary['Guest'].term.kind is None
 
 

@@ -18,9 +18,11 @@ from ..model import (
     NarrationValue,
     Phase,
     PytestGivenError,
+    SourceLocation,
     Story,
 )
 from .collector import get_active_collector
+from .source import capture_caller_source, code_source
 from .template import Template, narration_from
 
 
@@ -82,6 +84,12 @@ class StepDescriptor:
         self._source: str | templatelib.Template | Template = text
         self.narration: Narration = narration_from(text)
         self.activity_ids: tuple[ActivityId, ...] = activity_ids
+        # Lint anchor of the step's `with` statement. A descriptor normally
+        # captures its own caller frame on __enter__; when_then composes two
+        # descriptors behind an extra frame, so it captures once itself and
+        # pins the shared location here (_captures_own_source False).
+        self._pinned_source: SourceLocation | None = None
+        self._captures_own_source: bool = True
 
     def __enter__(self) -> Self:
         if isinstance(self._source, Template):
@@ -106,7 +114,16 @@ class StepDescriptor:
                 f"Cannot enter '{self.phase}: {self.narration.text}' — "
                 'no active scenario or fixture.'
             )
-        collector.push_step(self.phase, self.narration, activity_ids=self.activity_ids)
+        source: SourceLocation | None = None
+        if collector.capture_step_source:
+            source = (
+                capture_caller_source(skip=2)
+                if self._captures_own_source
+                else self._pinned_source
+            )
+        collector.push_step(
+            self.phase, self.narration, activity_ids=self.activity_ids, source=source
+        )
         return self
 
     def __exit__(
@@ -161,7 +178,14 @@ class StepDescriptor:
                 if sig is not None
                 else self.narration
             )
-            collector.push_step(self.phase, narration, activity_ids=self.activity_ids)
+            # The helper's FunctionDef *is* the step body — anchor there, no
+            # frame walk needed.
+            source = (
+                code_source(func.__code__) if collector.capture_step_source else None
+            )
+            collector.push_step(
+                self.phase, narration, activity_ids=self.activity_ids, source=source
+            )
             try:
                 return func(*args, **kwargs)
             finally:
@@ -337,8 +361,18 @@ class WhenThen:
     ) -> None:
         self._when = StepDescriptor('when', when_text)
         self._then = StepDescriptor('then', then_text)
+        self._when._captures_own_source = False
+        self._then._captures_own_source = False
 
     def __enter__(self) -> Self:
+        collector = get_active_collector()
+        if collector is not None and collector.capture_step_source:
+            # Both steps share the pair's `with` statement as their anchor —
+            # captured here because the composed descriptors' own caller frame
+            # would be this method, not user code.
+            source = capture_caller_source(skip=2)
+            self._when._pinned_source = source
+            self._then._pinned_source = source
         self._when.__enter__()
         return self
 

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-04T17:17:18.607093+00:00",
+    "timestamp": "2026-07-07T06:18:21.945231+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "47b7c55eedbed3c84d48104f3d07ad30b15c42a8"
+    "commit_sha": "2196cbec19707754c3b02217127dddc424954d87"
   },
   "scenarios": [
     {
@@ -19,7 +19,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -88,7 +88,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -104,9 +104,28 @@
           "fixture_name": "machine"
         },
         {
+          "phase": "given",
+          "narration": {
+            "text": "a printed receipt",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [
+            {
+              "label": "Receipt",
+              "content": "Coffee x1     $2.00\n----------------\nTotal:        $2.00",
+              "content_type": "text"
+            }
+          ],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "when",
           "narration": {
-            "text": "I print the receipt",
+            "text": "the total line is read back",
             "parts": []
           },
           "status": "passed",
@@ -119,18 +138,12 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the receipt is recorded verbatim",
+            "text": "it shows the $2.00 total",
             "parts": []
           },
           "status": "passed",
           "children": [],
-          "attachments": [
-            {
-              "label": "Receipt",
-              "content": "Coffee x1     $2.00\n----------------\nTotal:        $2.00",
-              "content_type": "text"
-            }
-          ],
+          "attachments": [],
           "error": null,
           "activity_ids": [],
           "fixture_name": null
@@ -155,7 +168,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -202,7 +215,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 42
+        "line": 45
       },
       "story_id": null,
       "activity_ids": []
@@ -216,7 +229,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -299,7 +312,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 78
+        "line": 81
       },
       "story_id": null,
       "activity_ids": []
@@ -315,7 +328,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -436,7 +449,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 117
+        "line": 121
       },
       "story_id": null,
       "activity_ids": []
@@ -452,7 +465,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -632,7 +645,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 130
+        "line": 134
       },
       "story_id": null,
       "activity_ids": []
@@ -649,7 +662,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -709,7 +722,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 163
+        "line": 168
       },
       "story_id": null,
       "activity_ids": []
@@ -723,7 +736,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 264,
+      "duration_ms": 280,
       "steps": [
         {
           "phase": "given",
@@ -842,14 +855,14 @@
           },
           {
             "path": "src/pytest_given/capture/decorators.py",
-            "lineno": 223,
+            "lineno": 247,
             "func": "wrapper",
             "code": "    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 183,
+            "lineno": 188,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
             "is_internal": false
@@ -860,7 +873,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 180
+        "line": 185
       },
       "story_id": null,
       "activity_ids": []
@@ -881,7 +894,7 @@
       "skip_reason": "demonstrates skipped status",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 186
+        "line": 191
       },
       "story_id": null,
       "activity_ids": []
@@ -897,7 +910,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -993,7 +1006,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 51
+        "line": 54
       },
       "story_id": null,
       "activity_ids": []
@@ -1009,7 +1022,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -1101,7 +1114,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 63
+        "line": 66
       },
       "story_id": null,
       "activity_ids": []
@@ -1129,7 +1142,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -1208,7 +1221,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 88
+        "line": 92
       },
       "story_id": null,
       "activity_ids": []
@@ -1249,7 +1262,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 193
+        "line": 198
       },
       "story_id": null,
       "activity_ids": []

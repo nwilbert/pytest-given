@@ -10,6 +10,8 @@ Live examples:
 
 ## Quick start
 
+Requires **Python ≥ 3.14** (t-strings — [PEP 750](https://peps.python.org/pep-0750/) — are part of the step-text API) and **pytest ≥ 9.0**.
+
 ```python
 import pytest
 from pytest_given import attach, given, scenario, then, when
@@ -36,7 +38,7 @@ Run it:
 pytest --given-html
 ```
 
-This produces `given-report/report-data.json` and `given-report/report.html` — a single self-contained HTML file with all assets inlined.
+This produces `given-report/report.html` — a single self-contained HTML file with all assets inlined.
 
 ## Why pytest-given?
 
@@ -287,41 +289,55 @@ attach('Machine state', {'coffees': 9, 'price': 2})  # JSON
 
 ## pytest options
 
-The JSON report is **always written** whenever the plugin is loaded — every `pytest` run produces it at the path given by `--given-json` (the default is created if missing). The HTML report is opt-in via `--given-html`.
+All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-*` flag enables its own sink independently, and they combine freely (e.g. pass both `--given-json` and `--given-html` to get both files from one run). `--given-html` no longer writes a JSON file alongside it.
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--given-json=PATH` | `given-report/report-data.json` | JSON output path (always written) |
-| `--given-html` | off | Also generate the HTML report |
-| `--given-html-output=PATH` | `given-report/report.html` | HTML output path (used only with `--given-html`) |
+| `--given-json[=PATH]` | off | Write JSON report data (bare → `given-report/report-data.json`). |
+| `--given-html[=PATH]` | off | Write the HTML report (bare → `given-report/report.html`). |
+| `--given-md[=PATH]` | off | Write the Markdown report; **bare renders to stdout** (fenced). |
 | `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. See [Source links](#source-links). |
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
-| `--given-phase-check=LEVEL` | `off` | Report scenarios missing a Given/When/Then phase: `off` \| `warn` \| `error` (error fails the run). See [Phase check](#phase-check). |
+| `--given-lint=BOOL` | `false` | Run the narration lint (`true` \| `false`); an error-level finding fails the run. See [Narration lint](#narration-lint). |
 
-## Phase check
+Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection.
 
-`--given-phase-check` flags `@scenario` tests that don't cover all three Given/When/Then phases — a quick way to catch an action accidentally folded into a `given` (the missing `when`), or an arrangement hidden inside the assertion.
+## Narration lint
 
-| Level | Effect |
-|------|--------|
-| `off` (default) | No check. |
-| `warn` | Prints an "incomplete scenarios" summary naming each offender and its missing phase; the exit code is unchanged. |
-| `error` | Same summary, and the run exits non-zero — for CI gating. |
+`--given-lint=true` runs a rule catalog over the scenarios the run just recorded, catching steps whose narration lies about their body — an empty `given`, a `then` that checks nothing, an action smuggled into an assertion. The AST rules analyze exactly the steps the run identified (there is no parallel static discovery), so decorated helpers, fixtures, and `when_then` pairs are all attributed correctly.
 
-Only **passed** scenarios are checked (a skipped or failed one is exempt), and each logical scenario is evaluated once regardless of parametrization. A `given` supplied by a `@given` fixture or an `Annotated[..., given(...)]` parameter counts, so those don't trip the check.
+Each rule has a fixed default severity; there is no master level. A `warn` finding prints in the terminal summary; an `error` finding also fails the run.
 
-Set a default in `pyproject.toml`, and exempt scenarios that are *intentionally* two-phase (a static-property assertion, a pure `when_then` raise) by node-id glob:
+| Rule | Default | Catches |
+|------|---------|---------|
+| `empty-step` | `error` | A step whose body does nothing (only constants/`pass`, or — for `when`/`then` — only an `attach(...)` call). |
+| `then-without-check` | `error` | A `then` whose body contains no `assert` and no checking call (`pytest.raises`, `pytest.approx`, …). |
+| `missing-phase` | `warn` | A passed scenario that doesn't cover all three Given/When/Then phases. Fixture `@given`s and `Annotated[..., given(...)]` parameters count; each logical scenario is evaluated once regardless of parametrization. |
+| `check-outside-then` | `warn` | An `assert` inside a `given` or `when` (the `when` half of a `when_then` pair is exempt). |
+| `action-in-then` | `warn` | A scenario where no `when` performs an action and a `then` folds the action into its assertion. |
+| `unused-interpolation` | `warn` | A t-string narration that interpolates `{name}` but never uses `name` in the step body. |
+| `divergent-case-structure` | `warn` | A parametrized scenario whose passed cases record different step structures (the report shows only case 1's tree). |
+| `tag-shadows-term` | `warn` | A scenario tag whose slug duplicates a glossary term — one concept named through two mechanisms. |
+| `dead-term` | `off` | A glossary term referenced by no step narration and no story activity. Opt in on suites whose glossary is meant to be fully exercised. |
+
+Override severities per rule with `given_lint_rules`, and exempt individual subjects with `given_lint_ignore` — bare node-id globs, or scoped to one rule with a `rule-id:` prefix:
 
 ```toml
 [tool.pytest]
-given_phase_check = "error"
-given_phase_check_ignore = [
-    "*::test_*_raises",
+given_lint = true
+given_lint_rules = [
+    "missing-phase=error",
+    "dead-term=warn",
+]
+given_lint_ignore = [
+    "missing-phase: *::test_*_raises",
     "tests/unit/test_math.py::test_constant_is_stable",
 ]
 ```
 
-The CLI flag overrides the `given_phase_check` ini value for a single run.
+An ignore entry that suppresses no finding is itself an error-level `stale-ignore` finding — the list can only shrink, never rot. The `--given-lint` CLI flag overrides the `given_lint` ini value for a single run.
+
+The lint is zero-cost when off: nothing extra is captured, and report artifacts are byte-identical with the lint on or off.
 
 ## Traceback frames
 
@@ -391,6 +407,8 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
 
 `--source-link` accepts the same presets and raw templates as `--given-source-link` (see [Source links](#source-links)). Omit it (or pass `--source-link=none`) to render plain file:line text without an anchor.
 
+Pass `--format md` to render Markdown instead of HTML; the format is also inferred from the `-o` extension, so `-o report.md` renders Markdown without needing `--format` explicitly. Omit `-o` with `--format md` to print to stdout.
+
 ## Examples
 
 Four example suites live under [`examples/`](examples/), each with pre-rendered JSON + HTML committed:
@@ -402,11 +420,22 @@ Four example suites live under [`examples/`](examples/), each with pre-rendered 
 
 Run `nox -s examples` to regenerate the first three, and `nox -s self_report` for the self-report.
 
-## Working with LLMs
+## Working with AI agents
 
-pytest-given may be a good fit for AI-assisted workflows. A human can describe a scenario in plain prose — more flexible than a rigid Gherkin DSL — and an LLM can generate the full test: scaffolding, steps, and assertions. The explicit `with given(...)` / `with when(...)` / `with then(...)` blocks then act as a verifiable backbone: each step records *what* the implementation claims to do, making it easier for a human or another model to audit whether the generated code actually matches that intent.
+pytest-given fits agent-driven development, where the scarce resource is human review attention rather than typing effort. A human describes a scenario in plain prose — more flexible than a rigid Gherkin DSL — and an agent generates the full test: scaffolding, steps, and assertions. As more implementation is generated rather than hand-written, the human's attention shifts from line-by-line code review to a domain-level view of behavior — which is exactly the artifact pytest-given produces.
 
-As more implementation is generated rather than hand-written, the human's attention can shift away from line-by-line code review toward a domain-level view of behavior — which is exactly the artifact pytest-given produces. The HTML report reads as a behavior specification, useful for confirming that the generated code does what was asked.
+The `with given(...)` / `with when(...)` / `with then(...)` blocks keep the *claim* about behavior directly adjacent to the code that implements it. That proximity is the point: auditing "does the code under `with when('I insert $2')` actually insert $2?" is cheaper and higher-leverage than reading raw test code, and far less prone to drift than documentation kept in separate files.
+
+**Know what the narration is and isn't.** Narration is *auditable, not verified*: in an agentic workflow the same agent writes both the code and the claim about the code, and nothing mechanically checks that a step's text matches its body. The [narration lint](#narration-lint) catches structural lies (an empty step, a `then` that checks nothing, a missing phase), never semantic truth. The report is worth as much as your review process's habit of reading step text against step bodies — treat it as a review aid, not as evidence.
+
+What the agent itself gets out of it:
+
+- **Context economy.** `pytest --given-md` renders a run's narration as Markdown to stdout — a fraction of the tokens of the test code it summarizes, useful for orienting in an unfamiliar suite or handing a run summary to a human. Combine with pytest's own selection (`-k`, `--lf`, node ids).
+- **Structured queries.** `--given-json` + `jq` filter scenarios by tag, status, or glossary term.
+- **A controlled vocabulary.** A `Glossary` — or a `FileGlossary` over the `GLOSSARY.md` you already keep — gives the agent a stable set of domain terms to narrate with, keeping naming consistent across sessions.
+- **Early, typed errors.** Misusing a step-text form (a t-string on a decorator, a `Template` in a test body) raises `PytestGivenError` immediately with a clear message — cheap for an agent to learn from.
+
+Adopt selectively: decorate the tests that assert behavior, and leave plumbing (trivial getters, constructors, round-trips) as plain tests — they add report noise, not signal. pytest-given's own suite decorates about a fifth of its tests. Codify your narration conventions where agents will read them; this repo's [AGENTS.md](AGENTS.md#writing-self-report-scenarios) has a battle-tested set of rules for keeping narration truthful.
 
 ## Development
 

@@ -17,9 +17,10 @@ from ..model import (
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
+    ReportData,
     Scenario,
     SourceLocation,
-    report_from_dict,
+    report_to_dict,
 )
 from .aggregations import (
     build_coverage_maps,
@@ -65,18 +66,16 @@ def _inline_md(text: str | None) -> Markup:
 
 
 def render_html(
-    json_path: Path,
+    report: ReportData,
     html_path: Path,
     source_link_template: str | None = None,
 ) -> None:
-    """Render a JSON report to a self-contained HTML file.
+    """Render a report model to a self-contained HTML file.
 
     `source_link_template` is the already-resolved template string (preset
-    expansion happens before this point). None disables source linking;
-    each scenario then renders a plain `<span>` for its source location.
+    expansion happens before this point). None disables source linking.
     """
-    raw_json = json_path.read_text(encoding='utf-8')
-    report = report_from_dict(json.loads(raw_json))
+    raw_json = json.dumps(report_to_dict(report), indent=2)
     # JSON doesn't escape `</` inside string literals, but we embed `raw_json`
     # inside an inline <script>; an attachment containing `</script>` would
     # close the tag and yield stored XSS. `\/` is a valid JSON/JS escape for

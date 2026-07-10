@@ -31,8 +31,25 @@ from .capture.decorators import (
 )
 from .capture.file_glossary import FileGlossary
 from .capture.kind_resolution import resolve_glossary_kinds
-from .capture.source import item_source, set_rootdir
-from .capture.story import clear_story_registry
+from .capture.source import (
+    current_rootdir,
+    item_source,
+    restore_rootdir,
+    set_rootdir,
+)
+from .capture.story import (
+    clear_story_registry,
+    restore_story_registry,
+    snapshot_story_registry,
+)
+from .lint import (
+    Finding,
+    apply_config,
+    parse_ignore_entries,
+    parse_rule_levels,
+    run_ast_rules,
+    run_runtime_rules,
+)
 from .model import (
     FixtureRecording,
     Glossary,
@@ -53,53 +70,68 @@ from .model import (
     Scenario,
     Step,
     Story,
+    StoryId,
+    report_from_dict,
     report_to_dict,
 )
-from .report import (
-    PhaseViolation,
-    detect_commit_sha,
-    find_violations,
-    render_html,
-    resolve_template,
-)
+from .report import detect_commit_sha, render_html, render_md, resolve_template
 
-_PHASE_CHECK_LEVELS = ('off', 'warn', 'error')
-_phase_check_violations: pytest.StashKey[list[PhaseViolation]] = pytest.StashKey()
 _collector_key: pytest.StashKey[Collector] = pytest.StashKey()
 
 
-def _get_collector(session: pytest.Session) -> Collector:
-    """Return the session-scoped Collector, creating it on first access.
+def _collector(config: pytest.Config) -> Collector:
+    """The collector owned by this session, created at `pytest_sessionstart`.
 
-    Stored on ``session.stash`` rather than a module global so there is no
-    mutable singleton read by ~25 hookimpl sites; the active-collector signal
-    for the capture layer (``with given(...)`` etc.) is the ``ContextVar``
-    in ``capture.collector``, set/cleared per test in setup/teardown.
+    Lives in `config.stash` rather than a module global so a nested in-process
+    run (pytester, `pytest.main`) gets its own instance instead of rebinding —
+    and thereby clobbering — the outer session's.
     """
-    collector = session.stash.get(_collector_key, None)
-    if collector is None:
-        collector = Collector()
-        session.stash[_collector_key] = collector
-    return collector
+    return config.stash[_collector_key]
+
+
+# Module-global state this config displaced when it took over the process —
+# put back at `pytest_unconfigure` so a nested in-process run (pytester,
+# `pytest.main`) leaves the outer session's state as it found it.
+_displaced_rootdir_key: pytest.StashKey[Path | None] = pytest.StashKey()
+_displaced_stories_key: pytest.StashKey[dict[StoryId, str]] = pytest.StashKey()
+
+
+_LINT_CHOICES = ('true', 'false')
+_lint_findings: pytest.StashKey[list[Finding]] = pytest.StashKey()
+_md_stdout: pytest.StashKey[str] = pytest.StashKey()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     group = parser.getgroup('given', 'pytest-given report generation')
     group.addoption(
         '--given-json',
-        default='given-report/report-data.json',
-        help='Output path for JSON report data',
+        nargs='?',
+        const='given-report/report-data.json',
+        default=None,
+        help=(
+            'Write JSON report data. Bare uses the default path; =PATH '
+            'overrides. Off when absent.'
+        ),
     )
     group.addoption(
         '--given-html',
-        action='store_true',
-        default=False,
-        help='Also generate HTML report from JSON data',
+        nargs='?',
+        const='given-report/report.html',
+        default=None,
+        help=(
+            'Write the HTML report. Bare uses the default path; =PATH '
+            'overrides. Off when absent.'
+        ),
     )
     group.addoption(
-        '--given-html-output',
-        default='given-report/report.html',
-        help='Output path for HTML report (default: given-report/report.html)',
+        '--given-md',
+        nargs='?',
+        const='-',
+        default=None,
+        help=(
+            'Write the Markdown report. Bare renders to stdout (fenced); '
+            '=PATH writes a file. Off when absent.'
+        ),
     )
     group.addoption(
         '--given-all-frames',
@@ -120,12 +152,12 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     group.addoption(
-        '--given-phase-check',
+        '--given-lint',
         default=None,
-        choices=_PHASE_CHECK_LEVELS,
+        choices=_LINT_CHOICES,
         help=(
-            'Report scenarios missing a Given/When/Then phase: off | warn | '
-            'error (error fails the run). Overrides the given_phase_check ini.'
+            'Run the narration lint: true | false. Overrides the given_lint '
+            'ini for one run.'
         ),
     )
     parser.addini(
@@ -135,32 +167,45 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         help='Source-link template or preset name (CLI flag overrides this).',
     )
     parser.addini(
-        'given_phase_check',
-        type='string',
-        default='off',
-        help='Phase-check level: off | warn | error (CLI flag overrides this).',
+        'given_lint',
+        type='bool',
+        default=False,
+        help='Run the narration lint (CLI flag overrides this).',
     )
     parser.addini(
-        'given_phase_check_ignore',
+        'given_lint_rules',
         type='linelist',
         default=[],
-        help='Node-id globs exempt from the phase check (fnmatch patterns).',
+        help='Per-rule severity overrides: rule-id=level (off | warn | error).',
+    )
+    parser.addini(
+        'given_lint_ignore',
+        type='linelist',
+        default=[],
+        help=(
+            'Subject globs exempt from lint findings, optionally rule-scoped '
+            "with a 'rule-id:' prefix. Entries that suppress nothing fail the "
+            'run.'
+        ),
     )
 
 
-def _phase_check_level(config: pytest.Config) -> str:
-    """Resolve the phase-check level: CLI flag wins over the ini value."""
-    level = config.getoption('given_phase_check') or config.getini('given_phase_check')
-    return cast('str', level)
+def _lint_enabled(config: pytest.Config) -> bool:
+    """Resolve the lint switch: CLI flag (when given) wins over the ini value."""
+    cli = config.getoption('given_lint')
+    if cli is not None:
+        return cast('str', cli) == 'true'
+    return bool(config.getini('given_lint'))
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    level = _phase_check_level(config)
-    if level not in _PHASE_CHECK_LEVELS:
-        raise pytest.UsageError(
-            f'invalid given_phase_check value {level!r}; '
-            f'expected one of {", ".join(_PHASE_CHECK_LEVELS)}.'
-        )
+    # Validate the lint rule config eagerly (fail fast), even when the lint
+    # itself is disabled for this run.
+    try:
+        parse_rule_levels(config.getini('given_lint_rules'))
+        parse_ignore_entries(config.getini('given_lint_ignore'))
+    except ValueError as error:
+        raise pytest.UsageError(str(error)) from error
 
 
 def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
@@ -172,13 +217,28 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
     rootdir is set *before* root conftest.py is imported — users commonly
     declare shared glossaries / stories at conftest module level, and that
     code runs during conftest import."""
+    early_config.stash[_displaced_rootdir_key] = current_rootdir()
     set_rootdir(Path(early_config.rootpath))
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
-    """Reset the collector at the start of each session."""
-    session.stash[_collector_key] = Collector()
+    """Give the session its own collector and a clean story registry."""
+    collector = Collector()
+    collector.capture_step_source = _lint_enabled(session.config)
+    session.config.stash[_collector_key] = collector
+    session.config.stash[_displaced_stories_key] = snapshot_story_registry()
     clear_story_registry()
+
+
+def pytest_unconfigure(config: pytest.Config) -> None:
+    """Put back the module-global state this config displaced, so a nested
+    in-process run leaves the outer session's rootdir and story registry as it
+    found them. Guarded per key: a run that aborted before the corresponding
+    save point has nothing to restore."""
+    if _displaced_rootdir_key in config.stash:
+        restore_rootdir(config.stash[_displaced_rootdir_key])
+    if _displaced_stories_key in config.stash:
+        restore_story_registry(config.stash[_displaced_stories_key])
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
@@ -245,8 +305,8 @@ def _validate_scenario_story_binding(
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
 def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
+    collector = _collector(item.config)
     scenario_marker = _get_scenario_marker(item)
-    collector = _get_collector(item.session)
     if scenario_marker is None:
         # Unannotated test: set the flag so `with given(...)` inside it warns
         # instead of raising. Teardown clears the flag and active collector.
@@ -277,7 +337,7 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
         collector.param_info[node_id] = ParamSpec(names=names, values=values)
     # Pre-fixture-setup work done; let pytest run fixture setup here.
     yield
-    _graft_fixture_recordings(item)
+    _graft_fixture_recordings(item, collector)
     collector.start_times[node_id] = time.monotonic()
 
 
@@ -302,13 +362,13 @@ def pytest_fixture_setup(
             'yet supported; use a plain string label, or move the step into a '
             'helper function.'
         )
-    collector = get_active_collector()
-    if collector is None or collector.state == 'idle':
+    collector = _collector(request.config)
+    if collector.state == 'idle':
         # Fixture is being set up outside any tracked scenario (e.g. unannotated
         # test pulling in a step fixture). Don't record.
         yield
         return
-    _ensure_teardown_wrapped(fixturedef, request.session)
+    _ensure_teardown_wrapped(fixturedef, collector)
     recording = FixtureRecording(
         root=Step(
             phase=desc.phase,
@@ -326,16 +386,14 @@ def pytest_fixture_setup(
 
 
 def _ensure_teardown_wrapped(
-    fixturedef: pytest.FixtureDef[object], session: pytest.Session
+    fixturedef: pytest.FixtureDef[object], collector: Collector
 ) -> None:
     """Wrap a generator fixture's body once so post-yield code runs in
     fixture_teardown state. Idempotent.
 
-    The session is captured so the wrapped closure can resolve the
-    session-scoped collector at teardown time (including session-end teardown of
-    session-scoped generators, when the active-collector ContextVar is already
-    cleared).
-    """
+    The closure captures the collector directly: fixturedefs live for exactly
+    one session, and teardown can fire where no config is reachable (e.g. a
+    session-scoped fixture finalized after the last item)."""
     func = fixturedef.func
     if getattr(func, '_pytest_given_teardown_wrapped', False):
         return
@@ -353,10 +411,9 @@ def _ensure_teardown_wrapped(
         except StopIteration:
             return
         yield value
-        # Past the yield → teardown. Resolve the collector off the session
-        # stash rather than the ContextVar: session-scoped fixtures tear down
-        # at session end, after the per-test active collector is cleared.
-        collector = _get_collector(session)
+        # Past the yield → teardown. Use the captured collector (not the
+        # ContextVar): session-scoped fixtures tear down at session end, after
+        # the per-test active collector is cleared.
         token = collector.enter_fixture_teardown()
         try:
             with contextlib.suppress(StopIteration):
@@ -461,7 +518,7 @@ def _annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
     return out
 
 
-def _graft_fixture_recordings(item: pytest.Item) -> None:
+def _graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
     """Graft this item's fixture step-recordings and Annotated `given` labels.
 
     Phase 1: fixture recordings in `collector.recordings()` setup order
@@ -473,7 +530,6 @@ def _graft_fixture_recordings(item: pytest.Item) -> None:
     test-signature order.
     """
     assert hasattr(item, 'fixturenames'), f'expected fixturenames on {item!r}'
-    collector = _get_collector(item.session)
     func = getattr(item, 'function', None)
     descriptors = _annotated_given_descriptors(func) if func is not None else {}
 
@@ -528,7 +584,7 @@ def _graft_fixture_recordings(item: pytest.Item) -> None:
 
 @pytest.hookimpl(trylast=True)
 def pytest_runtest_teardown(item: pytest.Item) -> None:
-    collector = _get_collector(item.session)
+    collector = _collector(item.config)
     if collector.inside_unannotated_test:
         collector.inside_unannotated_test = False
         set_active_collector(None)
@@ -540,7 +596,7 @@ def pytest_runtest_teardown(item: pytest.Item) -> None:
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) -> None:
-    collector = _get_collector(item.session)
+    collector = _collector(item.config)
     if collector.active_scenario_id != NodeId(item.nodeid):
         return
     # Capture errors from both setup (fixture exception) and call (test-body
@@ -565,6 +621,11 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
 
 @pytest.hookimpl(trylast=True)
 def pytest_runtest_logreport(report: pytest.TestReport) -> None:
+    # This hook's spec carries no config or item, so the session's stash is
+    # unreachable here; use the active collector instead. It is set for a
+    # tracked scenario's whole runtest protocol, and every terminal report
+    # handled below (setup skip/fail, call) arrives before
+    # pytest_runtest_teardown clears it.
     node_id = NodeId(report.nodeid)
     collector = get_active_collector()
     if collector is None or collector.active_scenario_id != node_id:
@@ -593,8 +654,7 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
 
 
 def pytest_sessionfinish(session: pytest.Session) -> None:
-    collector = _get_collector(session)
-    json_path = Path(session.config.getoption('given_json'))
+    collector = _collector(session.config)
     scenarios = _group_parameterized(collector.scenarios, collector.param_info)
     collector.param_info.clear()
     stories = list(collector._discovered_stories.values())
@@ -613,43 +673,87 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         stories=stories,
         glossary=glossary,
     )
-    json_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(report_to_dict(report), indent=2), encoding='utf-8')
-    if session.config.getoption('given_html'):
+    report_dict = report_to_dict(report)
+    report = report_from_dict(report_dict)  # serde round-trip = fidelity guarantee
+
+    json_opt = session.config.getoption('given_json')
+    if json_opt is not None:
+        json_path = Path(json_opt)
+        json_path.parent.mkdir(parents=True, exist_ok=True)
+        json_path.write_text(json.dumps(report_dict, indent=2), encoding='utf-8')
+
+    html_opt = session.config.getoption('given_html')
+    if html_opt is not None:
         raw_link = session.config.getoption(
             'given_source_link'
         ) or session.config.getini('given_source_link')
         template = resolve_template(raw_link)
-        html_path = Path(session.config.getoption('given_html_output'))
-        render_html(json_path, html_path, source_link_template=template)
-    _run_phase_check(session, scenarios)
+        render_html(report, Path(html_opt), source_link_template=template)
+
+    md_opt = session.config.getoption('given_md')
+    if md_opt is not None:
+        md = render_md(report)
+        if md_opt == '-':
+            session.config.stash[_md_stdout] = md
+        else:
+            md_path = Path(md_opt)
+            md_path.parent.mkdir(parents=True, exist_ok=True)
+            md_path.write_text(md, encoding='utf-8')
+
+    _run_lint(session, scenarios, collector.scenarios, glossary, stories)
 
 
-def _run_phase_check(session: pytest.Session, scenarios: list[Scenario]) -> None:
-    """Flag scenarios missing a phase; stash the result for the terminal
-    summary and fail the run in `error` mode."""
-    level = _phase_check_level(session.config)
-    if level == 'off':
+def _run_lint(
+    session: pytest.Session,
+    scenarios: list[Scenario],
+    per_case: list[Scenario],
+    glossary: Glossary | None,
+    stories: list[Story],
+) -> None:
+    """Run the narration lint; stash the findings for the terminal summary
+    and fail the run when any is error-level."""
+    config = session.config
+    if not _lint_enabled(config):
         return
-    violations = find_violations(
-        scenarios, session.config.getini('given_phase_check_ignore')
+    findings = apply_config(
+        run_runtime_rules(scenarios, per_case, glossary, stories)
+        + run_ast_rules(scenarios, Path(config.rootpath)),
+        parse_rule_levels(config.getini('given_lint_rules')),
+        parse_ignore_entries(config.getini('given_lint_ignore')),
     )
-    session.config.stash[_phase_check_violations] = violations
-    if violations and level == 'error':
+    if not findings:
+        return
+    config.stash[_lint_findings] = findings
+    if any(finding.severity == 'error' for finding in findings):
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
-    violations = terminalreporter.config.stash.get(_phase_check_violations, [])
-    if not violations:
-        return
-    terminalreporter.write_sep(
-        '=', f'pytest-given: incomplete scenarios ({len(violations)})', yellow=True
-    )
-    for violation in violations:
-        terminalreporter.line(
-            f'{violation.node_id}  missing: {", ".join(violation.missing)}'
+    findings = terminalreporter.config.stash.get(_lint_findings, [])
+    if findings:
+        errors = sum(1 for f in findings if f.severity == 'error')
+        title = (
+            f'pytest-given: narration lint '
+            f'({_count(len(findings), "finding")}, {_count(errors, "error")})'
         )
+        terminalreporter.write_sep('=', title, red=errors > 0, yellow=errors == 0)
+        rule_width = max(len(f.rule) for f in findings)
+        subject_width = max(len(f.subject) for f in findings)
+        for f in findings:
+            terminalreporter.line(
+                f'{f.severity.upper():<5} {f.rule:<{rule_width}}  '
+                f'{f.subject:<{subject_width}}  {f.message}'
+            )
+    md = terminalreporter.config.stash.get(_md_stdout, None)
+    if md is not None:
+        terminalreporter.write_line('<!-- pytest-given:md:start -->')
+        for line in md.splitlines():
+            terminalreporter.write_line(line)
+        terminalreporter.write_line('<!-- pytest-given:md:end -->')
+
+
+def _count(n: int, noun: str) -> str:
+    return f'{n} {noun}' if n == 1 else f'{n} {noun}s'
 
 
 def _resolve_glossary(stories: list[Story], session: pytest.Session) -> Glossary | None:
