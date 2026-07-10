@@ -56,6 +56,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.output is None:
                 print(md)
             else:
+                args.output.parent.mkdir(parents=True, exist_ok=True)
                 args.output.write_text(md, encoding='utf-8')
                 print(f'Report generated: {args.output}')
         else:

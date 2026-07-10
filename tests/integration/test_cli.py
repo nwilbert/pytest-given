@@ -155,3 +155,24 @@ def test_cli_md_inferred_from_output_extension(tmp_path) -> None:
     rc = main(['report', str(json_path), '-o', str(out)])
     assert rc == 0
     assert out.read_text(encoding='utf-8').startswith('# pytest-given — cli')
+
+
+def test_cli_md_creates_missing_parent_dirs(tmp_path) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'cli',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [],
+            }
+        )
+    )
+    out = tmp_path / 'nested' / 'dir' / 'r.md'
+    rc = main(['report', str(json_path), '--format', 'md', '-o', str(out)])
+    assert rc == 0
+    assert out.read_text(encoding='utf-8').startswith('# pytest-given — cli')
