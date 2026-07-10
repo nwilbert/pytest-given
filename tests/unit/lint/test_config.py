@@ -122,6 +122,15 @@ def test_apply_config_suppressing_entry_is_not_stale() -> None:
     assert out == []
 
 
+def test_apply_config_ignore_matching_is_case_sensitive_cross_platform() -> None:
+    # fnmatchcase (not fnmatch, which normcases on Windows): a case-mismatched
+    # glob suppresses nothing on every platform, so the finding survives and
+    # the entry is flagged stale.
+    findings = [_finding(subject='tests/Foo.py::test_A')]
+    out = apply_config(findings, {}, parse_ignore_entries(['tests/foo.py::test_a']))
+    assert [f.rule for f in out] == [RuleId('empty-step'), RuleId('stale-ignore')]
+
+
 def test_apply_config_entry_scoped_to_an_off_rule_is_stale() -> None:
     # The off rule's findings are dropped before ignore matching, so the entry
     # suppresses nothing — stale by definition, per the spec.

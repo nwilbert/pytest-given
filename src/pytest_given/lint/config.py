@@ -7,7 +7,7 @@ from __future__ import annotations
 import dataclasses
 import re
 from dataclasses import dataclass
-from fnmatch import fnmatch
+from fnmatch import fnmatchcase
 
 from .base import LEVELS, RULES, RULES_BY_ID, STALE_IGNORE, Finding, Level, RuleId
 
@@ -104,7 +104,7 @@ def apply_config(
         for i, entry in enumerate(ignores):
             if entry.rule is not None and entry.rule != finding.rule:
                 continue
-            if fnmatch(finding.subject, entry.pattern):
+            if fnmatchcase(finding.subject, entry.pattern):
                 used.add(i)
                 suppressed = True
         if not suppressed:
