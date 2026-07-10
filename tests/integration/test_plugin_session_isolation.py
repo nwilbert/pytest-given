@@ -96,3 +96,45 @@ def test_lint_still_anchors_steps_after_nested_inprocess_run(pytester):
     result.stdout.fnmatch_lines(
         ["*ERROR*empty-step*test_outer.py::test_after*'a value'*has no code*"]
     )
+
+
+OUTER_STORY = '''
+import pytest
+from pytest_given import scenario, story, then
+
+# A story declared at test-module level: it registers during the outer
+# session's collection and stays registered for the run.
+OUTER_STORY = story("Shared Title")
+
+NESTED_CONFTEST = """
+from pytest_given import story
+
+# Same id as the outer story: the nested run must not see the outer
+# session's registration, or this collides at conftest-import time.
+NESTED_STORY = story("Shared Title")
+"""
+
+
+def test_middle_runs_nested_pytest(tmp_path):
+    sub = tmp_path / "nested"
+    sub.mkdir()
+    (sub / "conftest.py").write_text(NESTED_CONFTEST)
+    (sub / "test_nested.py").write_text("def test_ok():\\n    assert True\\n")
+    assert pytest.main([str(sub), "-p", "no:cacheprovider"]) == 0
+
+
+@scenario("After the nested run")
+def test_after():
+    with then("the outer story registration is untouched"):
+        assert True
+'''
+
+
+def test_story_registry_isolated_across_nested_inprocess_run(pytester):
+    """A nested run declaring a story whose id collides with an outer
+    module-level story must not fail: the story registry is displaced before
+    the nested run imports its conftests, so the outer registration is invisible
+    to the nested session (and the nested one does not leak back)."""
+    pytester.makepyfile(test_outer=OUTER_STORY)
+    result = pytester.runpytest()
+    result.assert_outcomes(passed=2)

@@ -216,18 +216,23 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
     Uses `pytest_load_initial_conftests` (not `pytest_configure`) so that
     rootdir is set *before* root conftest.py is imported — users commonly
     declare shared glossaries / stories at conftest module level, and that
-    code runs during conftest import."""
+    code runs during conftest import. The story registry is snapshotted and
+    cleared here for the same reason: a nested in-process run's conftests
+    import during *its* load-initial-conftests, before its sessionstart, so
+    clearing at sessionstart would leave the outer session's registrations
+    visible (spurious `already declared` collisions) and let the nested run's
+    own registrations leak back into the outer session."""
     early_config.stash[_displaced_rootdir_key] = current_rootdir()
     set_rootdir(Path(early_config.rootpath))
+    early_config.stash[_displaced_stories_key] = snapshot_story_registry()
+    clear_story_registry()
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
-    """Give the session its own collector and a clean story registry."""
+    """Give the session its own collector."""
     collector = Collector()
     collector.capture_step_source = _lint_enabled(session.config)
     session.config.stash[_collector_key] = collector
-    session.config.stash[_displaced_stories_key] = snapshot_story_registry()
-    clear_story_registry()
 
 
 def pytest_unconfigure(config: pytest.Config) -> None:

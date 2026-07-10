@@ -230,20 +230,25 @@ def test_sessionstart_gives_each_session_its_own_collector() -> None:
 
 
 @pytest.mark.usefixtures('_reset_story_registry_plugin')
-def test_nested_session_restores_the_outer_story_registry() -> None:
-    """Each session starts with a clean story registry (sessionstart clears
-    it), but a nested in-process session must put the outer session's
-    registrations back when it unconfigures — otherwise the outer session
-    silently loses duplicate-declaration detection."""
-    outer = _fake_session()
-    inner = _fake_session()
-    plugin.pytest_sessionstart(cast(pytest.Session, outer))
-    story_fn('Shared Title')
-    plugin.pytest_sessionstart(cast(pytest.Session, inner))
-    story_fn('Shared Title')  # fresh registry per session: no duplicate error
-    plugin.pytest_unconfigure(cast(pytest.Config, inner.config))
-    with pytest.raises(PytestGivenError, match='already declared'):
-        story_fn('Shared Title')  # the outer registration is back
+def test_nested_session_restores_the_outer_story_registry(tmp_path: Any) -> None:
+    """The story registry is displaced at `load_initial_conftests` time (before
+    conftests import), so each session starts clean, but a nested in-process
+    session must put the outer session's registrations back when it
+    unconfigures — otherwise the outer session silently loses
+    duplicate-declaration detection."""
+    outer = SimpleNamespace(stash=pytest.Stash(), rootpath=tmp_path / 'outer')
+    inner = SimpleNamespace(stash=pytest.Stash(), rootpath=tmp_path / 'inner')
+    plugin.pytest_load_initial_conftests(cast(pytest.Config, outer))
+    try:
+        story_fn('Shared Title')
+        plugin.pytest_load_initial_conftests(cast(pytest.Config, inner))
+        story_fn('Shared Title')  # fresh registry per session: no duplicate error
+        plugin.pytest_unconfigure(cast(pytest.Config, inner))
+        with pytest.raises(PytestGivenError, match='already declared'):
+            story_fn('Shared Title')  # the outer registration is back
+    finally:
+        # Puts back whatever rootdir the real surrounding session had.
+        plugin.pytest_unconfigure(cast(pytest.Config, outer))
 
 
 def test_nested_config_lifecycle_restores_the_outer_rootdir(tmp_path: Any) -> None:
