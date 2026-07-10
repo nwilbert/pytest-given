@@ -94,6 +94,7 @@ def _collector(config: pytest.Config) -> Collector:
 # `pytest.main`) leaves the outer session's state as it found it.
 _displaced_rootdir_key: pytest.StashKey[Path | None] = pytest.StashKey()
 _displaced_stories_key: pytest.StashKey[dict[StoryId, str]] = pytest.StashKey()
+_displaced_active_collector_key: pytest.StashKey[Collector | None] = pytest.StashKey()
 
 
 _LINT_CHOICES = ('true', 'false')
@@ -226,6 +227,10 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
     set_rootdir(Path(early_config.rootpath))
     early_config.stash[_displaced_stories_key] = snapshot_story_registry()
     clear_story_registry()
+    # The active-collector ContextVar is process-global too: a nested run's
+    # per-test teardown clears it, so remember the outer session's value (the
+    # scenario mid-flight when the nested run began, if any) to restore it.
+    early_config.stash[_displaced_active_collector_key] = get_active_collector()
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
@@ -244,6 +249,8 @@ def pytest_unconfigure(config: pytest.Config) -> None:
         restore_rootdir(config.stash[_displaced_rootdir_key])
     if _displaced_stories_key in config.stash:
         restore_story_registry(config.stash[_displaced_stories_key])
+    if _displaced_active_collector_key in config.stash:
+        set_active_collector(config.stash[_displaced_active_collector_key])
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:

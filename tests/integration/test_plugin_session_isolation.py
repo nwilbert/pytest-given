@@ -138,3 +138,39 @@ def test_story_registry_isolated_across_nested_inprocess_run(pytester):
     pytester.makepyfile(test_outer=OUTER_STORY)
     result = pytester.runpytest()
     result.assert_outcomes(passed=2)
+
+
+OUTER_NESTED_IN_STEP = '''
+import pytest
+from pytest_given import scenario, when, then
+
+NESTED = """
+from pytest_given import scenario, then
+
+@scenario("Nested")
+def test_nested():
+    with then("the nested suite runs"):
+        assert True
+"""
+
+
+@scenario("A nested run inside a step")
+def test_nested_in_step(tmp_path):
+    sub = tmp_path / "nested"
+    sub.mkdir()
+    (sub / "test_nested.py").write_text(NESTED)
+    with when("a nested pytest runs mid-scenario"):
+        assert pytest.main([str(sub), "-p", "no:cacheprovider"]) == 0
+    with then("the outer scenario still records steps afterward"):
+        assert True
+'''
+
+
+def test_active_collector_restored_after_nested_run_inside_step(pytester):
+    """A nested run clears the process-global active-collector ContextVar via
+    its per-test teardown; the outer session's active collector must be put
+    back when the nested run unconfigures, or the outer scenario's next step
+    raises 'no active scenario or fixture'."""
+    pytester.makepyfile(test_outer=OUTER_NESTED_IN_STEP)
+    result = pytester.runpytest()
+    result.assert_outcomes(passed=1)
