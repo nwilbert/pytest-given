@@ -85,12 +85,20 @@ def _param_table_md(table: ParameterTable) -> str:
     return '\n'.join([header, separator, *rows])
 
 
-def _cell(value: object) -> str:
-    text = str(value)
-    text = text.replace('|', '\\|')
+def _inline(text: str) -> str:
+    """Keep *text* on a single Markdown line by folding newlines to ``<br>``.
+
+    A raw newline in a heading, list bullet, or attachment label would break
+    out of the block (the tail dedents into a stray paragraph); ``<br>`` renders
+    the break in place without corrupting the surrounding structure.
+    """
     for nl in ('\r\n', '\n', '\r'):
         text = text.replace(nl, '<br>')
     return text
+
+
+def _cell(value: object) -> str:
+    return _inline(str(value).replace('|', '\\|'))
 
 
 def _step_md(step: Step, depth: int) -> str:
@@ -110,14 +118,15 @@ def _step_md(step: Step, depth: int) -> str:
 
 def _attachment_lines(attachment: Attachment, indent: str) -> list[str]:
     content = attachment.content
+    label = _inline(attachment.label)
     is_multiline = any(nl in content for nl in ('\r\n', '\n', '\r'))
     if not is_multiline and '`' not in content:
-        return [f'{indent}  - 📎 {attachment.label} — `{content}`']
+        return [f'{indent}  - 📎 {label} — `{content}`']
     longest_run = max((len(run) for run in re.findall(r'`+', content)), default=0)
     fence = '`' * max(3, longest_run + 1)
     body_indent = f'{indent}    '
     return [
-        f'{indent}  - 📎 {attachment.label}:',
+        f'{indent}  - 📎 {label}:',
         f'{body_indent}{fence}',
         *(f'{body_indent}{line}' for line in content.splitlines()),
         f'{body_indent}{fence}',
@@ -140,8 +149,8 @@ def _error_lines(error: ErrorInfo, indent: str) -> list[str]:
 
 def _narration_md(narration: Narration) -> str:
     if not narration.parts:
-        return narration.text
-    return ''.join(_part_md(part) for part in narration.parts)
+        return _inline(narration.text)
+    return _inline(''.join(_part_md(part) for part in narration.parts))
 
 
 def _part_md(part: NarrationPart) -> str:

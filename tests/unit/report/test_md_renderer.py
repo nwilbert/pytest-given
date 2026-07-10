@@ -56,6 +56,39 @@ def test_passed_scenario_heading_and_steps() -> None:
     assert '- **then** I get a coffee' in md
 
 
+def test_newlines_in_narration_do_not_break_heading_or_bullet() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_x',
+        narration=Narration(text='line one\nline two'),
+        module='tests/t.py',
+        status='passed',
+        steps=[Step(phase='when', narration=Narration(text='act one\nact two'))],
+    )
+    md = render_md(_report(scn))
+    # Every heading and bullet line stays a single physical line.
+    assert '## ✓ line one<br>line two' in md
+    assert '- **when** act one<br>act two' in md
+    assert 'line two' not in md.replace('line one<br>line two', '')
+
+
+def test_newline_in_attachment_label_stays_inline() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_x',
+        narration=Narration(text='X'),
+        module='tests/t.py',
+        status='passed',
+        steps=[
+            Step(
+                phase='given',
+                narration=Narration(text='a thing'),
+                attachments=[Attachment(label='multi\nline', content='v')],
+            )
+        ],
+    )
+    md = render_md(_report(scn))
+    assert '📎 multi<br>line — `v`' in md
+
+
 def test_no_tags_omits_the_separator() -> None:
     scn = Scenario(
         id='tests/t.py::test_x',
