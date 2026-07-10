@@ -41,13 +41,21 @@ from pytest_given.model import (
 
 @pytest.fixture(autouse=True)
 def fresh_collector() -> Any:
-    """Swap plugin.collector for an isolated one per test."""
-    original = plugin.collector
-    plugin.collector = Collector()
+    """Give each test an isolated Collector on a fake session stash.
+
+    The plugin stores the session-scoped collector on ``session.stash``
+    (``_collector_key``) rather than a module global, so tests seed that stash
+    on their fake session and publish the same instance to the ContextVar that
+    the capture layer reads.
+    """
+    collector = Collector()
+    fake_session = SimpleNamespace(stash={plugin._collector_key: collector})
+    collector._fake_session = fake_session  # type: ignore[attr-defined]
+    set_active_collector(collector)
     try:
-        yield plugin.collector
+        yield collector
     finally:
-        plugin.collector = original
+        set_active_collector(None)
 
 
 def _drive_fixture_setup(fixturedef: Any, request: Any) -> None:
@@ -67,9 +75,12 @@ def _fake_func(desc: StepDescriptor | None = None) -> Any:
     return f
 
 
-def _fake_item(fixturedefs: dict[str, Any]) -> pytest.Item:
+def _fake_item(
+    fixturedefs: dict[str, Any], collector: Collector | None = None
+) -> pytest.Item:
     fm = SimpleNamespace(getfixturedefs=lambda name, _item: fixturedefs.get(name))
-    session = SimpleNamespace(_fixturemanager=fm)
+    stash = {plugin._collector_key: collector} if collector is not None else {}
+    session = SimpleNamespace(_fixturemanager=fm, stash=stash)
     return cast(
         pytest.Item,
         SimpleNamespace(fixturenames=list(fixturedefs.keys()), session=session),
@@ -93,6 +104,11 @@ def test_pytest_fixture_setup_skips_when_collector_idle(
     assert list(fresh_collector.recordings()) == []
 
 
+def _fake_session(collector: Collector | None = None) -> Any:
+    stash = {plugin._collector_key: collector} if collector is not None else {}
+    return SimpleNamespace(stash=stash)
+
+
 def test_ensure_teardown_wrapped_is_idempotent() -> None:
     desc = StepDescriptor('given', 'a thing')
 
@@ -101,17 +117,17 @@ def test_ensure_teardown_wrapped_is_idempotent() -> None:
 
     gen_fixture._step_descriptor = desc  # type: ignore[attr-defined]
     fixturedef = SimpleNamespace(func=gen_fixture)
-    plugin._ensure_teardown_wrapped(fixturedef)
+    plugin._ensure_teardown_wrapped(fixturedef, _fake_session())
     first_wrap = fixturedef.func
     assert first_wrap is not gen_fixture
-    plugin._ensure_teardown_wrapped(fixturedef)
+    plugin._ensure_teardown_wrapped(fixturedef, _fake_session())
     assert fixturedef.func is first_wrap
 
 
 def test_ensure_teardown_wrapped_skips_non_generator() -> None:
     plain = _fake_func(StepDescriptor('given', 'a thing'))
     fixturedef = SimpleNamespace(func=plain)
-    plugin._ensure_teardown_wrapped(fixturedef)
+    plugin._ensure_teardown_wrapped(fixturedef, _fake_session())
     assert fixturedef.func is plain
 
 
@@ -125,7 +141,7 @@ def test_wrapped_generator_handles_no_yield() -> None:
 
     degenerate._step_descriptor = desc  # type: ignore[attr-defined]
     fixturedef = SimpleNamespace(func=degenerate)
-    plugin._ensure_teardown_wrapped(fixturedef)
+    plugin._ensure_teardown_wrapped(fixturedef, _fake_session())
     wrapped = fixturedef.func
     assert inspect.isgeneratorfunction(wrapped)
     assert list(wrapped()) == []
@@ -135,7 +151,7 @@ def test_graft_fixture_recordings_skips_plain_fixtures(
     fresh_collector: Collector,
 ) -> None:
     fixturedef = SimpleNamespace(func=lambda: None, cached_result=('v', None, None))
-    item = _fake_item({'plain': [fixturedef]})
+    item = _fake_item({'plain': [fixturedef]}, fresh_collector)
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
     plugin._graft_fixture_recordings(item)
     assert fresh_collector._current_scenario is not None
@@ -147,7 +163,7 @@ def test_graft_fixture_recordings_skips_uncached_fixtures(
 ) -> None:
     deco = _fake_func(StepDescriptor('given', 'a thing'))
     fixturedef = SimpleNamespace(func=deco, cached_result=None)
-    item = _fake_item({'deco': [fixturedef]})
+    item = _fake_item({'deco': [fixturedef]}, fresh_collector)
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
     plugin._graft_fixture_recordings(item)
     assert fresh_collector._current_scenario is not None
@@ -157,7 +173,7 @@ def test_graft_fixture_recordings_skips_uncached_fixtures(
 def test_graft_fixture_recordings_skips_unknown_fixturename(
     fresh_collector: Collector,
 ) -> None:
-    item = _fake_item({'missing': None})
+    item = _fake_item({'missing': None}, fresh_collector)
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
     plugin._graft_fixture_recordings(item)
     assert fresh_collector._current_scenario is not None
@@ -169,7 +185,13 @@ def test_pytest_runtest_teardown_ignores_mismatched_item(
 ) -> None:
     fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
     set_active_collector(fresh_collector)
-    item = cast(pytest.Item, SimpleNamespace(nodeid='t::b'))
+    item = cast(
+        pytest.Item,
+        SimpleNamespace(
+            nodeid='t::b',
+            session=SimpleNamespace(stash={plugin._collector_key: fresh_collector}),
+        ),
+    )
     plugin.pytest_runtest_teardown(item)
     assert get_active_collector() is fresh_collector
     set_active_collector(None)
@@ -180,7 +202,13 @@ def test_pytest_runtest_teardown_clears_collector_when_matched(
 ) -> None:
     fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
     set_active_collector(fresh_collector)
-    item = cast(pytest.Item, SimpleNamespace(nodeid='t::a'))
+    item = cast(
+        pytest.Item,
+        SimpleNamespace(
+            nodeid='t::a',
+            session=SimpleNamespace(stash={plugin._collector_key: fresh_collector}),
+        ),
+    )
     plugin.pytest_runtest_teardown(item)
     assert get_active_collector() is None
 
@@ -190,7 +218,13 @@ def test_pytest_runtest_teardown_clears_unannotated_flag(
 ) -> None:
     fresh_collector.inside_unannotated_test = True
     set_active_collector(fresh_collector)
-    item = cast(pytest.Item, SimpleNamespace(nodeid='t::x'))
+    item = cast(
+        pytest.Item,
+        SimpleNamespace(
+            nodeid='t::x',
+            session=SimpleNamespace(stash={plugin._collector_key: fresh_collector}),
+        ),
+    )
     plugin.pytest_runtest_teardown(item)
     assert fresh_collector.inside_unannotated_test is False
     assert get_active_collector() is None
@@ -201,6 +235,29 @@ def test_get_scenario_marker_returns_none_for_item_without_function() -> None:
     lookup must tolerate that rather than asserting."""
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::doctest'))
     assert plugin._get_scenario_marker(item) is None
+
+
+def test_collector_lives_on_session_stash_not_a_module_global() -> None:
+    """The session-scoped Collector is stored on `session.stash` (keyed by
+    `_collector_key`), not as a mutable module global. `_get_collector` reads
+    it from the stash and lazily creates one if absent; it never falls back to
+    a module attribute."""
+    assert not hasattr(plugin, 'collector')
+    session = cast(pytest.Session, SimpleNamespace(stash={}))
+    c1 = plugin._get_collector(session)
+    c2 = plugin._get_collector(session)
+    assert c1 is c2  # same instance read back from the stash
+    assert session.stash[plugin._collector_key] is c1
+
+
+def test_sessionstart_resets_the_stashed_collector() -> None:
+    """`pytest_sessionstart` drops a fresh Collector onto the session stash,
+    discarding any prior one so a reused process (e.g. pytester) starts clean."""
+    old = Collector()
+    session = cast(pytest.Session, SimpleNamespace(stash={plugin._collector_key: old}))
+    plugin.pytest_sessionstart(session)
+    assert session.stash[plugin._collector_key] is not old
+    assert isinstance(session.stash[plugin._collector_key], Collector)
 
 
 def test_templatize_narration_rejects_unknown_placeholder() -> None:
@@ -485,7 +542,7 @@ def test_graft_skips_recording_not_belonging_to_item(
         root=Step(phase='given', narration=Narration(text='stale'), fixture_name='o')
     )
     fresh_collector.store_recording((object(), None), stale)
-    item = _fake_item({})
+    item = _fake_item({}, fresh_collector)
     plugin._graft_fixture_recordings(item)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
@@ -505,7 +562,9 @@ def test_graft_phase2_skips_decorated_fixture_without_recording(
     fm = SimpleNamespace(
         getfixturedefs=lambda name, _i: {'machine': [fixturedef]}.get(name)
     )
-    session = SimpleNamespace(_fixturemanager=fm)
+    session = SimpleNamespace(
+        _fixturemanager=fm, stash={plugin._collector_key: fresh_collector}
+    )
     item = cast(
         pytest.Item,
         SimpleNamespace(fixturenames=['machine'], session=session, function=testfn),

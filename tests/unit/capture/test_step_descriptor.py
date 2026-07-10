@@ -59,6 +59,25 @@ def test_decorator_basic() -> None:
     assert insert_money._step_descriptor.narration.text == 'inserting money'
 
 
+def test_decorated_function_satisfies_step_decorated_protocol() -> None:
+    """A function returned by StepDescriptor.__call__ structurally satisfies the
+    StepDecorated protocol — the typed contract callers cast through to read
+    `_step_descriptor` without a type: ignore."""
+    from pytest_given.capture.decorators import StepDecorated
+
+    @when('inserting money')
+    def insert_money() -> str:
+        return 'done'
+
+    assert isinstance(insert_money, StepDecorated)
+
+    # A plain undecorated function does not satisfy the protocol.
+    def plain() -> None:
+        pass
+
+    assert not isinstance(plain, StepDecorated)
+
+
 def test_decorator_preserves_function_metadata() -> None:
     """Decorated function keeps its original name and docstring."""
     desc = StepDescriptor('given', 'a machine')
@@ -349,6 +368,24 @@ def test_scenario_with_plain_str_keeps_name() -> None:
     deco = scenario('Brew coffee')
     assert deco.name == 'Brew coffee'
     assert isinstance(deco.name, str)
+
+
+def test_marked_function_satisfies_scenario_marked_protocol() -> None:
+    """A function returned by ScenarioDecorator.__call__ structurally satisfies
+    the ScenarioMarked protocol — the typed contract `_get_scenario_marker`
+    reads through to recover the ScenarioDecorator without a type: ignore."""
+    from pytest_given.capture.decorators import ScenarioMarked
+
+    @scenario('Brew coffee')
+    def brew() -> None:
+        pass
+
+    assert isinstance(brew, ScenarioMarked)
+
+    def plain() -> None:
+        pass
+
+    assert not isinstance(plain, ScenarioMarked)
 
 
 def test_scenario_with_template_keeps_template() -> None:

@@ -3,9 +3,9 @@ import inspect
 import json
 import types
 import warnings
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from string import Formatter, templatelib
-from typing import Any, Self
+from typing import Any, Protocol, Self, cast, runtime_checkable
 
 import pytest
 
@@ -22,6 +22,32 @@ from ..model import (
 )
 from .collector import get_active_collector
 from .template import Template, narration_from
+
+
+@runtime_checkable
+class StepDecorated(Protocol):
+    """A function carrying a pytest-given step descriptor.
+
+    `StepDescriptor.__call__` stashes `self` as ``_step_descriptor`` on the
+    wrapped function; `_ensure_teardown_wrapped` does the same for the
+    generator-fixture wrapper. Read sites (`pytest_fixture_setup`,
+    `_graft_fixture_recordings`) cast to this Protocol instead of probing an
+    untyped attribute.
+    """
+
+    _step_descriptor: StepDescriptor
+
+
+@runtime_checkable
+class ScenarioMarked(Protocol):
+    """A test function carrying a `ScenarioDecorator` marker.
+
+    `ScenarioDecorator.__call__` stashes `self` as ``_scenario`` on the
+    wrapper; `_get_scenario_marker` reads it via this Protocol.
+    """
+
+    _scenario: ScenarioDecorator
+
 
 _TEMPLATE_PARAM_KINDS = frozenset(
     {
@@ -94,7 +120,7 @@ class StepDescriptor:
             return
         collector.pop_step()
 
-    def __call__(self, func: Any) -> Any:
+    def __call__(self, func: Callable[..., object]) -> StepDecorated:
         is_fixture = (
             getattr(func, '_fixture_function_marker', None) is not None
             or getattr(func, '_pytestfixturefunction', None) is not None
@@ -119,7 +145,7 @@ class StepDescriptor:
                 yield from func(*args, **kwargs)
 
             gen_wrapper._step_descriptor = self  # type: ignore[attr-defined]
-            return gen_wrapper
+            return cast('StepDecorated', gen_wrapper)
 
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -142,7 +168,7 @@ class StepDescriptor:
                 collector.pop_step()
 
         wrapper._step_descriptor = self  # type: ignore[attr-defined]
-        return wrapper
+        return cast('StepDecorated', wrapper)
 
     def _check_tstring_decorator_safety(self) -> None:
         """A t-string passed to a decorator is evaluated once at module load;
@@ -168,7 +194,9 @@ class StepDescriptor:
                 f'given/when/then(t"...")) where the value is in scope.'
             )
 
-    def _validate_template_against_signature(self, func: Any) -> inspect.Signature:
+    def _validate_template_against_signature(
+        self, func: Callable[..., object]
+    ) -> inspect.Signature:
         assert isinstance(self._source, Template)
         sig = inspect.signature(func)
         for name in self._source.get_identifiers():
@@ -217,13 +245,13 @@ class ScenarioDecorator:
         self.story = story
         self.activity_ids = activity_ids
 
-    def __call__(self, func: Any) -> Any:
+    def __call__(self, func: Callable[..., object]) -> ScenarioMarked:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             return func(*args, **kwargs)
 
         wrapper._scenario = self  # type: ignore[attr-defined]
-        return wrapper
+        return cast('ScenarioMarked', wrapper)
 
 
 def _normalize_activity(
