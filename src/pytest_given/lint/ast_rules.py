@@ -7,10 +7,10 @@ from __future__ import annotations
 import ast
 from collections.abc import Iterator
 from dataclasses import dataclass
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 
 from ..model import NarrationValue, NodeId, Scenario, SourceLocation, Step
-from .base import RULES_BY_ID, Finding, RuleId, iter_steps
+from .base import RULES_BY_ID, Finding, RuleId, iter_steps, location_suffix
 
 # A step body's anchored AST node: the `with` statement of an inline step, or
 # the decorated helper function whose body is the step body.
@@ -282,15 +282,13 @@ def _step_finding(rule: RuleId, anchored: _AnchoredStep, problem: str) -> Findin
 
 
 def _anchored_finding(rule: RuleId, anchored: _AnchoredStep, text: str) -> Finding:
-    location = anchored.source
-    filename = PurePosixPath(location.relpath).name
     return Finding(
         rule=rule,
         severity=RULES_BY_ID[rule].default,
         subject=anchored.node_id,
         node_id=anchored.node_id,
-        location=location,
-        message=f'{text} ({filename}:{location.line})',
+        location=anchored.source,
+        message=f'{text}{location_suffix(anchored.source)}',
     )
 
 

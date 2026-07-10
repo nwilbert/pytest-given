@@ -4,7 +4,6 @@ source access needed."""
 from __future__ import annotations
 
 from collections.abc import Iterator
-from pathlib import PurePosixPath
 
 from ..model import (
     ActivityTermRef,
@@ -21,7 +20,7 @@ from ..model import (
     id_derive,
     node_base,
 )
-from .base import RULES_BY_ID, Finding, RuleId, iter_steps
+from .base import RULES_BY_ID, Finding, RuleId, iter_steps, location_suffix
 
 
 def run_runtime_rules(
@@ -203,15 +202,11 @@ def _iter_narrations(scenario: Scenario) -> Iterator[Narration]:
 
 
 def _scenario_finding(rule: RuleId, scenario: Scenario, text: str) -> Finding:
-    location = scenario.source
-    if location is not None:
-        filename = PurePosixPath(location.relpath).name
-        text = f'{text} ({filename}:{location.line})'
     return Finding(
         rule=rule,
         severity=RULES_BY_ID[rule].default,
         subject=scenario.id,
         node_id=scenario.id,
-        location=location,
-        message=text,
+        location=scenario.source,
+        message=f'{text}{location_suffix(scenario.source)}',
     )

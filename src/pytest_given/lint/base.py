@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
+from pathlib import PurePosixPath
 from typing import Literal, NewType
 
 from ..model import NodeId, SourceLocation, Step
@@ -66,3 +67,11 @@ def iter_steps(steps: list[Step]) -> Iterator[Step]:
     for step in steps:
         yield step
         yield from iter_steps(step.children)
+
+
+def location_suffix(location: SourceLocation | None) -> str:
+    """The `` (filename:line)`` locator appended to a finding message, or ``''``
+    when the finding carries no source location."""
+    if location is None:
+        return ''
+    return f' ({PurePosixPath(location.relpath).name}:{location.line})'
