@@ -49,8 +49,6 @@ def fresh_collector() -> Any:
     the capture layer reads.
     """
     collector = Collector()
-    fake_session = SimpleNamespace(stash={plugin._collector_key: collector})
-    collector._fake_session = fake_session  # type: ignore[attr-defined]
     set_active_collector(collector)
     try:
         yield collector

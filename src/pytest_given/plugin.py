@@ -346,9 +346,7 @@ def _ensure_teardown_wrapped(
     original_typed = cast('Callable[..., Generator[object]]', original)
 
     @functools.wraps(original)
-    def wrapped(
-        *args: object, _session: pytest.Session = session, **kwargs: object
-    ) -> Generator[object]:
+    def wrapped(*args: object, **kwargs: object) -> Generator[object]:
         gen = original_typed(*args, **kwargs)
         try:
             value = next(gen)
@@ -358,7 +356,7 @@ def _ensure_teardown_wrapped(
         # Past the yield → teardown. Resolve the collector off the session
         # stash rather than the ContextVar: session-scoped fixtures tear down
         # at session end, after the per-test active collector is cleared.
-        collector = _get_collector(_session)
+        collector = _get_collector(session)
         token = collector.enter_fixture_teardown()
         try:
             with contextlib.suppress(StopIteration):
