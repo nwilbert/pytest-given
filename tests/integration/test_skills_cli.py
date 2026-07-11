@@ -80,3 +80,11 @@ def test_check_writes_nothing(tmp_path: Path) -> None:
 
 def test_skills_without_subcommand_prints_help_and_fails() -> None:
     assert main(['skills']) == 1
+
+
+REPO_SKILLS = Path(__file__).resolve().parents[2] / '.claude' / 'skills'
+
+
+def test_repo_dogfood_copy_is_in_sync() -> None:
+    """`.claude/skills/` is regenerated via `uv run pytest-given skills install`."""
+    assert main(['skills', 'install', '--dest', str(REPO_SKILLS), '--check']) == 0
