@@ -66,6 +66,8 @@ def test_terms_start_kindless(glossary_file):
         t'each {pg["Term"]} is {pg["Kindless"]} until {pg["Kind inference"]} runs'
     ):
         assert glossary['Guest'].term.kind is None
+        assert glossary['Room'].term.kind is None
+        assert glossary['search'].term.kind is None
 
 
 @scenario(
@@ -81,7 +83,7 @@ def test_unknown_name_raises_with_suggestion(glossary_file):
             t'a misspelt {pg["Term"]} is looked up',
             'a PytestGivenError is raised with a spelling hint',
         ),
-        pytest.raises(PytestGivenError, match='Gues'),
+        pytest.raises(PytestGivenError, match='Did you mean: Guest'),
     ):
         glossary['Gues']
 
@@ -100,6 +102,7 @@ def test_usable_inline_in_activity(glossary_file):
         parts = built.paths[0].parts
         assert parts[0] == ActivityTermRef(term_id='guest', display='Guest')
         assert parts[1] == ActivityTermRef(term_id='search', display='search')
+        assert parts[2] == ActivityTermRef(term_id='room', display='Room')
 
 
 @scenario(
@@ -240,7 +243,7 @@ def test_empty_id_term_cell_raises(tmp_path):
             t'the {pg["File glossary"]} loads the file',
             'a PytestGivenError is raised with file:line context',
         ),
-        pytest.raises(PytestGivenError, match=r'@#\$|id'),
+        pytest.raises(PytestGivenError, match=r'bad\.md:3'),
     ):
         FileGlossary(path)
 
@@ -339,8 +342,10 @@ def test_file_glossary_call_unknown_name_raises(glossary_file):
     with (
         when_then(
             'an unknown name is called',
-            t'a PytestGivenError is raised — it never creates a {pg["Term"]}',
+            'a PytestGivenError is raised',
         ),
         pytest.raises(PytestGivenError, match='no glossary term'),
     ):
         glossary('Unknown Term')
+    with then(t'no new {pg["Term"]} was created'):
+        assert len(glossary.glossary.terms) == 3

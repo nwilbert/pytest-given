@@ -135,6 +135,8 @@ def test_declared_kind_verified_and_kept():
         )
     with then('the declared kinds are verified and preserved'):
         assert _kind(resolved, 'guest') == 'actor'
+        assert _kind(resolved, 'search') == 'verb'
+        assert _kind(resolved, 'room') == 'object'
 
 
 @scenario(

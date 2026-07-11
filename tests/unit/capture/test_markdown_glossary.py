@@ -141,7 +141,7 @@ def test_missing_named_column_raises(simple_doc):
             'the parser selects a header name that is absent',
             'a PytestGivenError names the missing column',
         ),
-        pytest.raises(PytestGivenError, match='column'),
+        pytest.raises(PytestGivenError, match=r"column 'Nope' not found"),
     ):
         parse_glossary_tables(
             simple_doc, term_column='Nope', description_column=1, kind_column=None
@@ -158,7 +158,7 @@ def test_index_out_of_range_raises(simple_doc):
             'the parser selects a column index past the table width',
             'a PytestGivenError names the out-of-range column',
         ),
-        pytest.raises(PytestGivenError, match='column'),
+        pytest.raises(PytestGivenError, match='column index 5 is out of range'),
     ):
         parse_glossary_tables(
             simple_doc, term_column=0, description_column=5, kind_column=None
@@ -185,7 +185,7 @@ def test_data_row_with_fewer_columns_raises():
             'the parser reads the short row',
             'a PytestGivenError points at the short row',
         ),
-        pytest.raises(PytestGivenError, match=r'(?i)column'),
+        pytest.raises(PytestGivenError, match='row at line 3'),
     ):
         parse_glossary_tables(text, term_column=0, description_column=1, kind_column=2)
 

@@ -11,6 +11,7 @@
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
+- [ ] Dogfood `story(...)`: narrate a small domain story for pytest-given itself and bind self-report scenarios to it via `story=`/`activities=`. Today no backend scenario binds to a story, so the Stories tab of the self-report is empty and many GLOSSARY.md terms trip the opt-in `dead-term` lint rule ("referenced by no step and no story") — e.g. Phase, Tag, Attachment, Report. A story would exercise story coverage on our own suite and retire several dead terms.
 
 ## Later
 

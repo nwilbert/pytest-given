@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-07T06:18:29.046851+00:00",
+    "timestamp": "2026-07-11T20:58:50.695732+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "2196cbec19707754c3b02217127dddc424954d87"
+    "commit_sha": "a534facfb48547983197d1c23b01857e885f0408"
   },
   "scenarios": [
     {
@@ -18,7 +18,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -107,7 +107,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -202,7 +202,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -303,7 +303,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -398,7 +398,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -493,7 +493,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -579,7 +579,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -674,7 +674,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -769,7 +769,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -882,7 +882,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -961,7 +961,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 69
+        "line": 73
       },
       "story_id": null,
       "activity_ids": []
@@ -977,7 +977,7 @@
         "story-grammar"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1063,7 +1063,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 87
+        "line": 91
       },
       "story_id": null,
       "activity_ids": []
@@ -1079,7 +1079,7 @@
         "story-grammar"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1168,7 +1168,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 103
+        "line": 108
       },
       "story_id": null,
       "activity_ids": []
@@ -1184,7 +1184,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1267,7 +1267,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 123
+        "line": 128
       },
       "story_id": null,
       "activity_ids": []
@@ -1283,7 +1283,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1349,7 +1349,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 143
+        "line": 148
       },
       "story_id": null,
       "activity_ids": []
@@ -1365,7 +1365,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1448,7 +1448,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 163
+        "line": 168
       },
       "story_id": null,
       "activity_ids": []
@@ -1464,7 +1464,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1530,7 +1530,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 179
+        "line": 184
       },
       "story_id": null,
       "activity_ids": []
@@ -1546,7 +1546,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1606,7 +1606,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 199
+        "line": 204
       },
       "story_id": null,
       "activity_ids": []
@@ -1622,7 +1622,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1701,7 +1701,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 226
+        "line": 231
       },
       "story_id": null,
       "activity_ids": []
@@ -1717,7 +1717,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1796,7 +1796,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 246
+        "line": 251
       },
       "story_id": null,
       "activity_ids": []
@@ -1812,7 +1812,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1901,7 +1901,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 270
+        "line": 275
       },
       "story_id": null,
       "activity_ids": []
@@ -1917,7 +1917,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2003,7 +2003,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 288
+        "line": 293
       },
       "story_id": null,
       "activity_ids": []
@@ -2019,7 +2019,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2111,7 +2111,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 314
+        "line": 319
       },
       "story_id": null,
       "activity_ids": []
@@ -2127,7 +2127,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2177,16 +2177,32 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a PytestGivenError is raised \u2014 it never creates a Term",
+            "text": "a PytestGivenError is raised",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no new Term was created",
             "parts": [
               {
-                "value": "a PytestGivenError is raised \u2014 it never creates a "
+                "value": "no new "
               },
               {
                 "term_id": "term",
                 "display": "Term",
                 "expression": "pg[\"Term\"]",
                 "param_column": null
+              },
+              {
+                "value": " was created"
               }
             ]
           },
@@ -2203,7 +2219,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 329
+        "line": 334
       },
       "story_id": null,
       "activity_ids": []
@@ -2219,7 +2235,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2321,7 +2337,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2423,7 +2439,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2521,7 +2537,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2607,7 +2623,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2683,7 +2699,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2766,7 +2782,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -3731,7 +3747,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 140
+        "line": 142
       },
       "story_id": null,
       "activity_ids": []
@@ -3816,7 +3832,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 157
+        "line": 159
       },
       "story_id": null,
       "activity_ids": []
@@ -3911,7 +3927,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 182
+        "line": 184
       },
       "story_id": null,
       "activity_ids": []
@@ -3993,7 +4009,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 199
+        "line": 201
       },
       "story_id": null,
       "activity_ids": []
@@ -4078,7 +4094,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 218
+        "line": 220
       },
       "story_id": null,
       "activity_ids": []
@@ -4163,7 +4179,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 238
+        "line": 240
       },
       "story_id": null,
       "activity_ids": []
@@ -4245,7 +4261,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 260
+        "line": 262
       },
       "story_id": null,
       "activity_ids": []
@@ -4334,7 +4350,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 279
+        "line": 281
       },
       "story_id": null,
       "activity_ids": []
@@ -10652,7 +10668,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 82,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -10817,7 +10833,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",

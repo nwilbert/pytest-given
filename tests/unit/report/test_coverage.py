@@ -75,7 +75,7 @@ def test_identity_of_activity_term_ref_verb_ignores_display(g):
         id1 = identity_of_part(g, p1)
         id2 = identity_of_part(g, p2)
     with then('both collapse to the one canonical verb identity'):
-        assert id1 == id2
+        assert id1 == id2 == Identity(term_id='search', instance_id=None)
 
 
 def test_identity_of_word_is_none(g):

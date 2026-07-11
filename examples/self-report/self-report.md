@@ -94,7 +94,7 @@
 - **then** each «Term» is «Kindless» until «Kind inference» runs
 
 ## ✓ An unknown name raises with a suggestion
-`tests/unit/capture/test_file_glossary.py:69::test_unknown_name_raises_with_suggestion` · validation
+`tests/unit/capture/test_file_glossary.py:73::test_unknown_name_raises_with_suggestion` · validation
 
 - **given** a «File glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -111,7 +111,7 @@
 - **then** a PytestGivenError is raised with a spelling hint
 
 ## ✓ Handles are usable inline in an activity
-`tests/unit/capture/test_file_glossary.py:87::test_usable_inline_in_activity` · story-grammar
+`tests/unit/capture/test_file_glossary.py:91::test_usable_inline_in_activity` · story-grammar
 
 - **given** a «File glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -128,7 +128,7 @@
 - **then** each slot becomes a «Term ref»
 
 ## ✓ Calling a handle overrides its display
-`tests/unit/capture/test_file_glossary.py:103::test_call_overrides_display` · story-grammar
+`tests/unit/capture/test_file_glossary.py:108::test_call_overrides_display` · story-grammar
 
 - **given** a «File glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -145,7 +145,7 @@
 - **then** the «Term ref» carries the overridden display
 
 ## ✓ An explicit kind column sets term kinds
-`tests/unit/capture/test_file_glossary.py:123::test_explicit_kind_column` · happy-path
+`tests/unit/capture/test_file_glossary.py:128::test_explicit_kind_column` · happy-path
 
 - **given** a Markdown glossary with an explicit Kind column
   - 📎 Glossary file:
@@ -159,7 +159,7 @@
 - **then** kinds come straight from the file, not «Kindless» inference
 
 ## ✓ A kind column can be selected by integer index
-`tests/unit/capture/test_file_glossary.py:143::test_kind_column_by_integer_index` · happy-path
+`tests/unit/capture/test_file_glossary.py:148::test_kind_column_by_integer_index` · happy-path
 
 - **given** a Markdown glossary with the kind in the third column
   - 📎 Glossary file:
@@ -173,7 +173,7 @@
 - **then** the kinds are read from that column
 
 ## ✓ A work_object kind alias maps to the object kind
-`tests/unit/capture/test_file_glossary.py:163::test_work_object_underscore_alias` · happy-path
+`tests/unit/capture/test_file_glossary.py:168::test_work_object_underscore_alias` · happy-path
 
 - **given** a glossary whose Kind cell says work_object
   - 📎 Glossary file:
@@ -186,7 +186,7 @@
 - **then** it normalizes to the «Work Object» kind
 
 ## ✓ An unrecognised kind value is rejected
-`tests/unit/capture/test_file_glossary.py:179::test_unrecognised_kind_value_raises` · validation
+`tests/unit/capture/test_file_glossary.py:184::test_unrecognised_kind_value_raises` · validation
 
 - **given** a glossary whose Kind cell holds an unknown value
   - 📎 Glossary file:
@@ -199,14 +199,14 @@
 - **then** a PytestGivenError names the unrecognised kind
 
 ## ✓ A missing glossary file is reported clearly
-`tests/unit/capture/test_file_glossary.py:199::test_missing_file_raises` · validation
+`tests/unit/capture/test_file_glossary.py:204::test_missing_file_raises` · validation
 
 - **given** a path to a file that does not exist
 - **when** a «File glossary» is opened on that path
 - **then** a PytestGivenError reports the file is not found
 
 ## ✓ A term cell with no alphanumeric characters is rejected
-`tests/unit/capture/test_file_glossary.py:226::test_empty_id_term_cell_raises` · validation
+`tests/unit/capture/test_file_glossary.py:231::test_empty_id_term_cell_raises` · validation
 
 - **given** a row whose «Term» cell has no id-able characters
   - 📎 Glossary file:
@@ -219,7 +219,7 @@
 - **then** a PytestGivenError is raised with file:line context
 
 ## ✓ Conflicting duplicate rows are rejected
-`tests/unit/capture/test_file_glossary.py:246::test_conflicting_duplicate_rows_raise` · validation
+`tests/unit/capture/test_file_glossary.py:251::test_conflicting_duplicate_rows_raise` · validation
 
 - **given** two rows for one «Term» with different definitions
   - 📎 Glossary file:
@@ -233,7 +233,7 @@
 - **then** a PytestGivenError reports the conflicting rows
 
 ## ✓ A blank description normalizes to undefined
-`tests/unit/capture/test_file_glossary.py:270::test_blank_description_cell_normalizes_to_none` · happy-path
+`tests/unit/capture/test_file_glossary.py:275::test_blank_description_cell_normalizes_to_none` · happy-path
 
 - **given** a row whose description cell is blank
   - 📎 Glossary file:
@@ -246,7 +246,7 @@
 - **then** the «Term» definition is None, i.e. «Undefined»
 
 ## ✓ Identical duplicate rows collapse to one term
-`tests/unit/capture/test_file_glossary.py:288::test_idempotent_duplicate_rows_ok` · happy-path
+`tests/unit/capture/test_file_glossary.py:293::test_idempotent_duplicate_rows_ok` · happy-path
 
 - **given** two identical rows for the same «Term»
   - 📎 Glossary file:
@@ -260,7 +260,7 @@
 - **then** they collapse to a single «Term»
 
 ## ✓ Calling FileGlossary looks up a known term
-`tests/unit/capture/test_file_glossary.py:314::test_file_glossary_call_known_name_returns_handle` · happy-path
+`tests/unit/capture/test_file_glossary.py:319::test_file_glossary_call_known_name_returns_handle` · happy-path
 
 - **given** a «File glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -277,7 +277,7 @@
 - **then** a «Deferred term» is returned
 
 ## ✓ FileGlossary is a closed vocabulary
-`tests/unit/capture/test_file_glossary.py:329::test_file_glossary_call_unknown_name_raises` · validation
+`tests/unit/capture/test_file_glossary.py:334::test_file_glossary_call_unknown_name_raises` · validation
 
 - **given** a «File glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -291,7 +291,8 @@
     | search | Look up options. |
     ```
 - **when** an unknown name is called
-- **then** a PytestGivenError is raised — it never creates a «Term»
+- **then** a PytestGivenError is raised
+- **then** no new «Term» was created
 
 ## ✓ Calling an actor names a distinct instance
 `tests/unit/capture/test_glossary.py:105::test_actor_call_returns_instance_with_distinct_display` · happy-path
@@ -399,56 +400,56 @@
 - **then** the declared kinds are verified and preserved
 
 ## ✓ A declared verb in an actor slot is rejected
-`tests/unit/capture/test_kind_resolution.py:140::test_declared_verb_in_actor_slot_raises` · validation
+`tests/unit/capture/test_kind_resolution.py:142::test_declared_verb_in_actor_slot_raises` · validation
 
 - **given** a «Term» declared as a «Verb»
 - **when** kind resolution places it in the «Actor» slot
 - **then** a PytestGivenError names the misplaced term
 
 ## ✓ A term used as both verb and actor is a conflict
-`tests/unit/capture/test_kind_resolution.py:157::test_verb_and_actor_conflict_raises` · validation
+`tests/unit/capture/test_kind_resolution.py:159::test_verb_and_actor_conflict_raises` · validation
 
 - **given** a «Kindless» «Term» used in a verb slot and an actor slot
 - **when** kind resolution runs over both stories
 - **then** a PytestGivenError names the conflicting term
 
 ## ✓ A declared work object in an actor slot is rejected
-`tests/unit/capture/test_kind_resolution.py:182::test_declared_object_in_actor_slot_raises` · validation
+`tests/unit/capture/test_kind_resolution.py:184::test_declared_object_in_actor_slot_raises` · validation
 
 - **given** a «Term» declared as a «Work Object»
 - **when** kind resolution places it in the «Actor» slot
 - **then** a PytestGivenError names the misplaced term
 
 ## ✓ A declared actor in a verb slot is rejected
-`tests/unit/capture/test_kind_resolution.py:199::test_declared_actor_in_verb_slot_raises` · validation
+`tests/unit/capture/test_kind_resolution.py:201::test_declared_actor_in_verb_slot_raises` · validation
 
 - **given** a «Term» declared as an «Actor»
 - **when** kind resolution places it at position 1 (the verb slot)
 - **then** a PytestGivenError says an actor cannot fill the verb slot
 
 ## ✓ A conflict error names only the offending stories
-`tests/unit/capture/test_kind_resolution.py:218::test_conflict_where_names_only_offending_stories` · validation
+`tests/unit/capture/test_kind_resolution.py:220::test_conflict_where_names_only_offending_stories` · validation
 
 - **given** an «Actor» «Term» that also appears in a verb slot
 - **when** kind resolution raises
 - **then** only the offending story is named in the message
 
 ## ✓ A conflict message excludes stories with an unrelated slot
-`tests/unit/capture/test_kind_resolution.py:238::test_inferred_conflict_where_excludes_unrelated_slot_stories` · validation
+`tests/unit/capture/test_kind_resolution.py:240::test_inferred_conflict_where_excludes_unrelated_slot_stories` · validation
 
 - **given** a «Kindless» «Term» used in verb, actor and noun slots
 - **when** the verb-vs-actor conflict is raised
 - **then** only the verb and actor stories are named, not the noun one
 
 ## ✓ A declared verb in a noun slot is rejected
-`tests/unit/capture/test_kind_resolution.py:260::test_declared_verb_in_noun_slot_raises` · validation
+`tests/unit/capture/test_kind_resolution.py:262::test_declared_verb_in_noun_slot_raises` · validation
 
 - **given** a «Term» declared as a «Verb»
 - **when** kind resolution places it at position ≥2 (a noun slot)
 - **then** a PytestGivenError says a verb cannot fill the noun slot
 
 ## ✓ Slot positions alternate verb/noun after the actor
-`tests/unit/capture/test_kind_resolution.py:279::test_slot_for_maps_odd_positions_to_verb` · happy-path
+`tests/unit/capture/test_kind_resolution.py:281::test_slot_for_maps_odd_positions_to_verb` · happy-path
 
 - **given** the five positions of a short activity path
 - **when** the «Slot» rule is applied to each position

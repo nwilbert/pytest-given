@@ -191,7 +191,7 @@ def test_glossary_re_registration_with_matching_fields_is_idempotent():
     with when('the same name and definition are registered again'):
         a2 = g.actor('Guest', definition='d')
     with then(t'both handles share the one {pg["Term"]}'):
-        assert a1.term == a2.term
+        assert a1.term is a2.term
 
 
 @scenario(
