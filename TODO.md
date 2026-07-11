@@ -11,10 +11,10 @@
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
-- [ ] Agent skills phase 3 (see [docs/specs/2026-07-11-agent-skills-design.md](docs/specs/2026-07-11-agent-skills-design.md)): `pytest-given-reviewing` (narration lint + semantic audit via cheap-model subagent fan-out per file, fed by a future `pytest-given audit` command)
 
 ## Later
 
+- [ ] `pytest-given audit` command: serialize the already-captured `Step.source` anchors and emit (step text, body source) pairs as a machine-readable feed for the reviewing skill's semantic audit (see the [lint spec](docs/specs/2026-07-05-narration-lint-design.md) non-goals and the [agent-skills spec](docs/specs/2026-07-11-agent-skills-design.md) phase 3). Validation showed hand-anchoring via `source.relpath:line` works fine on small suites — the command earns its keep when a large suite is fanned out to per-file reviewers.
 - [ ] define a UI component library?
 - [ ] `GLOSSARY.md` export from a code-defined glossary (reverse direction of `FileGlossary`), plus sectioned/heading-scoped glossaries — one table per section on input, grouped sections in the HTML Glossary view. Both features pair naturally and were deferred from the file-backed glossary spec (see `docs/specs/2026-06-18-file-backed-glossary-design.md` forward notes).
 - [ ] Create a proper documentation page, maybe using https://posit-dev.github.io/great-docs

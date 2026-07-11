@@ -21,7 +21,11 @@ def _frontmatter(skill_md: Traversable) -> dict[str, str]:
     return fields
 
 
-BUNDLED_SKILLS = ['pytest-given-authoring', 'pytest-given-navigating']
+BUNDLED_SKILLS = [
+    'pytest-given-authoring',
+    'pytest-given-navigating',
+    'pytest-given-reviewing',
+]
 
 
 def test_bundles_the_expected_skills() -> None:
@@ -29,10 +33,19 @@ def test_bundles_the_expected_skills() -> None:
 
 
 @pytest.mark.parametrize('skill', BUNDLED_SKILLS)
-@pytest.mark.parametrize('required', ['SKILL.md', 'references'])
-def test_skill_layout(skill: str, required: str) -> None:
-    root = files('pytest_given') / 'skills_data' / skill
-    assert (root / required).is_dir() or (root / required).is_file()
+def test_every_skill_has_a_skill_md(skill: str) -> None:
+    assert (files('pytest_given') / 'skills_data' / skill / 'SKILL.md').is_file()
+
+
+@pytest.mark.parametrize('skill', ['pytest-given-authoring', 'pytest-given-navigating'])
+def test_reference_guides_are_bundled(skill: str) -> None:
+    assert (files('pytest_given') / 'skills_data' / skill / 'references').is_dir()
+
+
+def test_reviewing_skill_cross_reference_target_exists() -> None:
+    """The reviewing skill links ../pytest-given-authoring/references/scenarios.md."""
+    root = files('pytest_given') / 'skills_data'
+    assert (root / 'pytest-given-authoring' / 'references' / 'scenarios.md').is_file()
 
 
 def test_skill_frontmatter_names_match_directories() -> None:
