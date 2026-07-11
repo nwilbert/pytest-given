@@ -16,8 +16,8 @@ This is the authoring-relevant surface, version-matched to the installed package
 - **`@scenario(name, tags=None, story=None)`** — marks a test for the report; required for it to appear. `name` is a plain string or a `Template` (for parametrized names). `story=` binds the scenario to a `story(...)` for coverage.
 - **`given(text)` / `when(text)` / `then(text)`** — dual-purpose:
   - **Context manager** in a test body: `with when('…'): result = sut(x)`. Steps nest freely.
-  - **Fixture decorator** — `@given` only (`@pytest.fixture` then `@given('…')`); `@when`/`@then` on a fixture is rejected at runtime. Generator fixtures work; recording steps after `yield` is not allowed.
-  - **Helper-function decorator** (any phase): the helper records its own step per call; use `Template` to reference the helper's parameters (`@when(Template('I insert {amount}'))`).
+  - **Fixture decorator** — `@given` only (`@pytest.fixture` then `@given('…')`); `@when`/`@then` on a fixture is rejected at runtime, and the label must be a plain string. Generator fixtures work; recording steps after `yield` is not allowed.
+  - **Helper-function decorator** (any phase): the helper records its own step per call; use `Template` to reference the helper's parameters (`@when(Template('I insert {amount}'))`). Placeholders must name a positional-or-keyword parameter — `*args`/`**kwargs` placeholders raise at decoration time.
   - **Call-site label** via `Annotated` on a test parameter — `given` only: `def test(text: Annotated[str, given(Template('the name {text}'))])` surfaces a fixture or parametrize value as a `given` step. Plain string or `Template` only; a t-string is rejected here.
 - **`when_then(when_text, then_text)`** — one `with` emitting a `when` (wrapping the body) and a sibling `then` (emitted once the body exits cleanly). Pair with a nested `pytest.raises(...)` for expected-raise scenarios. If the body raises uncaught, the `then` is skipped.
 - **`attach(label, content)`** — attach data to the current step. Strings stored verbatim; other types JSON-serialized.
