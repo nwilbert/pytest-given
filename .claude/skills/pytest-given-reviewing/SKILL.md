@@ -19,13 +19,16 @@ pytest <selection> --given-lint=true -o "given_lint_rules=dead-term=warn"
 
 ## 2. Semantic audit — step text vs step body
 
+**Reviewing a change rather than a whole suite? Diff the Markdown report first.** Render `pytest <selection> --given-md=<file>` at base and head and diff the two files (or diff the committed report, if the project checks one in). The Markdown sink is deterministic — no timestamps or commit SHAs, unlike the JSON/HTML sinks — so the diff *is* the behavioural delta in prose, and it scopes the audit to the scenarios whose narration actually changed. Read it in both directions: narration that changed needs its body re-checked, and a change to step *bodies* that leaves the narration diff empty is the drift signature — behaviour may have moved while the spec stood still.
+
 For each scenario under review, read the step texts against their bodies (jump via the ``file.py:line`` anchor under each `--given-md` heading, or `.source` in the JSON report) and judge with one rubric:
 
 **Step text may abstract; it must never overstate.**
 
 - **Values** — a quantity, date, or amount in the text must match the body: `'three copies'` over `catalog={'Dune': 1}` is a lie, even when every assertion passes.
+- **Quantifiers** — "each", "every", "both", "all" in a `then` is a claim about every item it ranges over; assertions on a representative subset ("each slot becomes a term ref" backed by two of three slots) overstate. The fix is asserting the rest or narrowing the text.
 - **Outcomes** — everything a `then` claims must be asserted in it: "…and recorded in the ledger" with no such assertion is fabricated behaviour.
-- **Raises** — the `then` of an expected raise may translate the `match=`-pinned message into domain terms, but must not add claims the message doesn't carry.
+- **Raises** — the `then` of an expected raise may translate the `match=`-pinned message into domain terms, but must not add claims the message doesn't carry. Judge against the pin, not the implementation: a `then` promising the message names the offender, a hint, or a file:line is under-pinned when the regex would also pass on a message without that detail (e.g. `match='Gues'` matching the echoed bad input rather than the did-you-mean suggestion) — even if the implementation currently includes it, the narrated claim is unverified and can regress silently.
 - **Actions** — what the `when` names must be what the body calls.
 
 For a large suite, fan the audit out: one reviewer per test file — a subagent where the harness has them (a cheap, fast model suffices; the rubric is local to each file) — each returning findings; otherwise audit inline, file by file. Verify a sample of any fan-out findings yourself before reporting them.
