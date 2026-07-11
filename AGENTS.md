@@ -87,6 +87,8 @@ When decorating a backend test with `@scenario`, the goal is a report that reads
 
 The narration rules live in the **`pytest-given-authoring` skill** — auto-discovered by contributor agents from [.claude/skills/pytest-given-authoring/](.claude/skills/pytest-given-authoring/SKILL.md) and shipped to downstream projects via `pytest-given skills install`. The canonical source is [src/pytest_given/skills_data/](src/pytest_given/skills_data/pytest-given-authoring/SKILL.md); after editing it, regenerate the committed copy with `uv run pytest-given skills install` and commit both (a sync test fails otherwise). The subsection below covers only what is specific to this repo's self-report.
 
+**The skill is documentation with the same sync duty as the README.** A change to the public API surface or its rules updates the README *and* the skill's [references/api.md](src/pytest_given/skills_data/pytest-given-authoring/references/api.md) (which downstream agents rely on instead of the README — it ships in the wheel, version-matched); a change to narration/lint semantics updates [references/scenarios.md](src/pytest_given/skills_data/pytest-given-authoring/references/scenarios.md) and friends. No mechanical check catches content drift between README and skill — treat "does the skill need this too?" as part of every user-facing change.
+
 ### Self-report mechanics (this repo)
 
 - The glossary handle is `pg` — `GLOSSARY.md` loaded as a `FileGlossary` in `tests/conftest.py` via `tests/_vocab.py`. Term-rename mechanics live under [Conventions](#conventions).
