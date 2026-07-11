@@ -178,8 +178,10 @@ type Phase = Literal['given', 'when', 'then']
 # Lifecycle state of the collector — determines where push_step/attach route.
 type RecordingState = Literal['idle', 'test', 'fixture_setup', 'fixture_teardown']
 
-# Arbitrary Python value from @pytest.mark.parametrize (int, str, bool, etc.)
-type ParamValue = Any
+# A @pytest.mark.parametrize value as captured for the report: JSON primitives
+# pass through; anything else (dates, objects) is captured as its str(), since
+# parametrize values only feed display and the JSON sink must serialize them.
+type ParamValue = str | int | float | bool | None
 
 
 class ParamSpec(NamedTuple):

@@ -228,6 +228,31 @@ def test_parameterized_test_as_table(pytester, tmp_path):
     assert then_placeholders == ['expected']
 
 
+def test_parameterized_non_json_values_are_captured_as_str(pytester, tmp_path):
+    """Non-JSON-primitive parametrize values (dates, objects) must not crash
+    the JSON sink; they are captured as their str() while primitives keep
+    their type."""
+    pytester.makepyfile(
+        """
+        from datetime import date
+        import pytest
+        from pytest_given import scenario, then
+
+        @scenario("Date param")
+        @pytest.mark.parametrize("day,fee", [(date(2026, 3, 15), 0)])
+        def test_fee(day, fee):
+            with then(t"the fee on {day} is {fee}"):
+                assert fee == 0
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    cases = data['scenarios'][0]['parameters']['cases']
+    assert cases[0]['values'] == ['2026-03-15', 0]
+
+
 def test_parameterized_with_failure(pytester, tmp_path):
     """A parameterized test with a failing case marks the scenario as failed."""
     pytester.makepyfile(

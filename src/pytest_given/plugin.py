@@ -65,6 +65,7 @@ from .model import (
     ParameterTable,
     ParamInfo,
     ParamSpec,
+    ParamValue,
     PytestGivenError,
     ReportData,
     Scenario,
@@ -346,12 +347,18 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     callspec = getattr(item, 'callspec', None)
     if callspec is not None:
         names = list(callspec.params.keys())
-        values = [callspec.params[n] for n in names]
+        values = [_param_value(callspec.params[n]) for n in names]
         collector.param_info[node_id] = ParamSpec(names=names, values=values)
     # Pre-fixture-setup work done; let pytest run fixture setup here.
     yield
     _graft_fixture_recordings(item, collector)
     collector.start_times[node_id] = time.monotonic()
+
+
+def _param_value(value: object) -> ParamValue:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    return str(value)
 
 
 @pytest.hookimpl(hookwrapper=True)
