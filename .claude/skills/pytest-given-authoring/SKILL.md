@@ -21,6 +21,9 @@ Read the guide for the artifact you are about to touch — not all of them:
 | Adding, renaming, or reorganizing glossary terms | `references/glossaries.md` |
 | Writing or extending `story(...)` definitions | `references/stories.md` |
 | Modeling questions (actors vs work objects, granularity), or the project's first story | `references/domain-storytelling.md` |
+| Exact signatures, imports, step-text forms (t-string vs `Template`), parametrize behavior | `references/api.md` |
+
+`references/api.md` matches the installed package version — prefer it over external docs for syntax questions. Setup tasks (installing pytest-given, enabling report output or the narration lint in CI) are out of scope for these guides; see the project README at <https://github.com/nwilbert/pytest-given>.
 
 ## Adoption levels
 
