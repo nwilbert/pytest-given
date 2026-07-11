@@ -409,6 +409,13 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
 
 Pass `--format md` to render Markdown instead of HTML; the format is also inferred from the `-o` extension, so `-o report.md` renders Markdown without needing `--format` explicitly. Omit `-o` with `--format md` to print to stdout.
 
+Install the bundled [agent skills](#agent-skills) into a project:
+
+```bash
+pytest-given skills install            # copies into ./.claude/skills/
+pytest-given skills install --check    # exit 1 if the installed files drifted from the bundled ones
+```
+
 ## Examples
 
 Four example suites live under [`examples/`](examples/), each with pre-rendered JSON + HTML committed:
@@ -435,7 +442,11 @@ What the agent itself gets out of it:
 - **A controlled vocabulary.** A `Glossary` — or a `FileGlossary` over the `GLOSSARY.md` you already keep — gives the agent a stable set of domain terms to narrate with, keeping naming consistent across sessions.
 - **Early, typed errors.** Misusing a step-text form (a t-string on a decorator, a `Template` in a test body) raises `PytestGivenError` immediately with a clear message — cheap for an agent to learn from.
 
-Adopt selectively: decorate the tests that assert behavior, and leave plumbing (trivial getters, constructors, round-trips) as plain tests — they add report noise, not signal. pytest-given's own suite decorates about a fifth of its tests. Codify your narration conventions where agents will read them; this repo's [AGENTS.md](AGENTS.md#writing-self-report-scenarios) has a battle-tested set of rules for keeping narration truthful.
+Adopt selectively: decorate the tests that assert behavior, and leave plumbing (trivial getters, constructors, round-trips) as plain tests — they add report noise, not signal. pytest-given's own suite decorates about a fifth of its tests. Codify your narration conventions where agents will read them; the bundled [authoring skill](src/pytest_given/skills_data/pytest-given-authoring/SKILL.md) ships a battle-tested set of rules for keeping narration truthful.
+
+### Agent skills
+
+`pytest-given skills install` copies the bundled [Agent Skills](https://agentskills.io) into your repo's `.claude/skills/`, where Claude Code (and other harnesses following the same format) auto-discover them. It ships **`pytest-given-authoring`**: a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories. The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` detects drift in CI. Use `--dest` for a non-default skills directory.
 
 ## Development
 

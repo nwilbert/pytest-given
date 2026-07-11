@@ -11,8 +11,7 @@
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
-- [ ] Provide an agent skill for work with pytest-given, and document how LLM agents can benefit from pytest-given — synthesize from the portable narration rules in [AGENTS.md](AGENTS.md#narration-rules-portable)
-  - review skill: use a haiku subagent to check per file that all scenarios do what they say
+- [ ] Agent skills phases 2–3 (see [docs/specs/2026-07-11-agent-skills-design.md](docs/specs/2026-07-11-agent-skills-design.md)): `pytest-given-navigating` (reading a codebase through its reports), `pytest-given-reviewing` (narration lint + semantic audit via cheap-model subagent fan-out per file, fed by a future `pytest-given audit` command)
 
 ## Later
 
