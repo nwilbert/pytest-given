@@ -79,6 +79,8 @@ def test_order():
         assert len(cart) == 1
 ```
 
+Pick the phase by **role**, not syntax: all arrangement belongs in `given` — including state-mutating setup calls (`machine.insert(200)`, seeding a database) — `when` performs the one action under test, and `then` only observes its outcome. A scenario with two `when` steps usually hides an arrangement in the first one, and a `then` that calls the action (`assert machine.buy() == …`) hides the action inside a check.
+
 As a fixture decorator (**only `@given` is allowed** — fixtures are setup, so `@when`/`@then` on a fixture is rejected at runtime):
 
 ```python
