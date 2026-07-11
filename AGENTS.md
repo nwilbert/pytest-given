@@ -49,13 +49,7 @@ The authoring forms (t-string vs `Template` vs plain string, and where each is r
 
 ## Handling report output
 
-Outputs are opt-in; a bare `uv run pytest` writes nothing.
-
-- **Read a run's narration:** `uv run pytest <selection> --given-md` renders Markdown to stdout between `<!-- pytest-given:md:start -->` / `:end` fences — slice that block out. Select scenarios with pytest's own args (`node-id`, `-k`, `--lf`); the renderer narrates whatever collected.
-- **Filter by tag / term / status:** not a Markdown feature. Write the structured data with `--given-json` and query it with `jq` (scenarios carry `tags`, `status`, and term refs). Markdown is the readable view; JSON is the queryable one.
-- **Re-render a saved run:** `uv run pytest-given report <data.json> --format md`.
-
-The `--given-md` above is deliberately last: a bare `--given-json` / `--given-html` / `--given-md` swallows the next token as its own output path, so a test selection placed after it silently changes what runs. Put your selection first, the flag last, or use `--given-md=PATH` if something must follow it.
+Outputs are opt-in; a bare `uv run pytest` writes nothing. The workflow for reading a run's narration (`--given-md`), querying the JSON report with `jq` by tag/term/status, re-rendering a saved run, and the bare-flag-order trap lives in the [navigating skill](.claude/skills/pytest-given-navigating/SKILL.md).
 
 ## Report testing
 

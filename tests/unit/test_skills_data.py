@@ -21,13 +21,17 @@ def _frontmatter(skill_md: Traversable) -> dict[str, str]:
     return fields
 
 
-def test_bundles_the_authoring_skill() -> None:
-    assert 'pytest-given-authoring' in [d.name for d in _skill_dirs()]
+BUNDLED_SKILLS = ['pytest-given-authoring', 'pytest-given-navigating']
 
 
+def test_bundles_the_expected_skills() -> None:
+    assert sorted(d.name for d in _skill_dirs()) == BUNDLED_SKILLS
+
+
+@pytest.mark.parametrize('skill', BUNDLED_SKILLS)
 @pytest.mark.parametrize('required', ['SKILL.md', 'references'])
-def test_authoring_skill_layout(required: str) -> None:
-    root = files('pytest_given') / 'skills_data' / 'pytest-given-authoring'
+def test_skill_layout(skill: str, required: str) -> None:
+    root = files('pytest_given') / 'skills_data' / skill
     assert (root / required).is_dir() or (root / required).is_file()
 
 
