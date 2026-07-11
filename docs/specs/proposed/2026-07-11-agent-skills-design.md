@@ -31,12 +31,12 @@ Decisions baked into the table:
 
 Phases 2 and 3 are content sketches only (see [Later phases](#later-phases-sketch)); everything else in this spec is phase 1.
 
-## Source layout: `.claude/skills/` is canonical
+## Source layout: package data, dogfooded via the installer
 
-The skill directories live directly in this repo's `.claude/skills/`, committed:
+The canonical skill directories live inside the package, as ordinary package data:
 
 ```
-.claude/skills/
+src/pytest_given/skills_data/
   pytest-given-authoring/
     SKILL.md                      # slim router, target <500 words
     references/
@@ -46,7 +46,9 @@ The skill directories live directly in this repo's `.claude/skills/`, committed:
       domain-storytelling.md      # general Domain Storytelling concepts
 ```
 
-Why there and not a root `skills/` directory: Claude Code auto-discovers project skills only from `.claude/skills/`, so the canonical location *is* the dogfooding location — this repo's contributor agents pick the skills up with zero duplication and no sync check. (Symlinks were rejected: unreliable on the Windows-checkout/WSL seam this project supports.) A later plugin-marketplace wrapper can point at the same directory.
+Package data (not a root `skills/` or `.claude/skills/` directory with a hatchling `force-include`) because the installer reads the bundle through `importlib.resources`, and only files under the package directory are visible that way in **editable installs** — a force-included out-of-package directory exists in built wheels but not in this repo's own dev environment, which would break the installer and its tests exactly where they're developed.
+
+This repo still dogfoods through `.claude/skills/` (the only place Claude Code auto-discovers project skills): it holds a **committed copy produced by the installer itself** — after editing `skills_data/`, run `uv run pytest-given skills install` and commit the result, the same regenerate-and-commit workflow as `nox -s examples`. A sync test runs the installer's `--check` against the repo's `.claude/skills/` so the copy can't drift. (Symlinks were rejected: unreliable on the Windows-checkout/WSL seam this project supports.) A later plugin-marketplace wrapper can point at the committed copy.
 
 ## The authoring skill
 
@@ -94,13 +96,13 @@ The console script currently points at `pytest_given.report.cli:main`. A `skills
 
 ### Packaging
 
-Hatchling `force-include` maps `.claude/skills/` into the wheel as `pytest_given/skills_data/` (a data directory, not a package — the name avoids clashing with any future `skills/` subpackage). The installer walks it via `importlib.resources`. sdists include the directory through the same mapping.
+`skills_data/` sits inside the package directory, so hatchling ships it in wheels and sdists by default — no `force-include`, no extra configuration. It is a data directory, not a package (no `__init__.py`; the name avoids clashing with any future `skills/` subpackage), and the installer walks it via `importlib.resources.files('pytest_given') / 'skills_data'`, which resolves identically in editable and wheel installs.
 
 ## Testing
 
 Two mechanical layers plus the skill-content gate:
 
-1. **Packaging test** — a unit test asserts the resources visible through `importlib.resources` match the repo's `.claude/skills/` tree byte-for-byte, so the force-include mapping can't silently rot.
+1. **Dogfood sync test** — a test runs the installer's `--check` against this repo's committed `.claude/skills/` copy, failing when `skills_data/` is edited without rerunning `pytest-given skills install` (or the copy is edited directly). A frontmatter test validates each bundled `SKILL.md` (has `name` matching its directory, has a `description`, frontmatter within the 1024-char limit).
 2. **Installer tests** — `install` into a `tmp_path` (fresh, and over a stale copy to prove overwrite), `--check` in the in-sync / drifted / missing cases, `--dest` handling.
 3. **Skill baseline test (RED/GREEN)** — before the authoring skill ships, run a subagent on a realistic "decorate this test with `@scenario`" task *without* the skill and record the failure modes (expected: folded constructor, missing `when`, placeholder steps, narration written after the code); then rerun with the skill installed and verify the failures disappear. The recorded baseline goes in the PR description, not the repo.
 
@@ -108,7 +110,7 @@ Two mechanical layers plus the skill-content gate:
 
 - **Phase 2, `pytest-given-navigating`:** how to read a codebase through its reports — `--given-md` for prose, `--given-json` + `jq` for filtering by tag/term/status, the glossary as the domain map, stories as the interaction map, source links back to code. Seed material: the "Handling report output" section of AGENTS.md, generalized.
 - **Phase 3, `pytest-given-reviewing`:** the narration lint as the structural gate; the semantic audit (does each step text match its body?) as a per-file fan-out to cheap fast-model subagents (TODO.md's haiku-reviewer idea; phrased harness-neutrally — audit inline where subagents aren't available). Semantic truth is exactly what the [lint spec](../2026-07-05-narration-lint-design.md) declared out of mechanical reach, and its anticipated `audit` command (serializing the already-captured `Step.source` ranges into (step text, body source) pairs) is the natural input feed — phase 3 may be what motivates building it. The judge takes the narration rules as its rubric (step text may abstract, never overstate), and findings are advisory review comments, not an exit code. Plus glossary/story review: term coverage, `tag-shadows-term`, dead terms. References the authoring skill's `scenarios.md` rather than restating it.
-- **Maybe later:** a Claude Code plugin-marketplace wrapper around the same `.claude/skills/` directory, for `/plugin`-based updates.
+- **Maybe later:** a Claude Code plugin-marketplace wrapper around the committed `.claude/skills/` copy, for `/plugin`-based updates.
 
 ## Out of scope
 
