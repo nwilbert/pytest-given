@@ -30,18 +30,26 @@ def test_start_and_finish_scenario() -> None:
     assert scenario.tags == ['tag1']
 
 
+@scenario(
+    'Steps record with their phases',
+    tags=['happy-path'],
+    story=adopt_pytest_given,
+)
 def test_collect_steps() -> None:
     collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('given', _n('a machine'))
-    collector.pop_step()
-    collector.push_step('when', _n('I press start'))
-    collector.pop_step()
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
-    assert len(scenario.steps) == 2
-    assert scenario.steps[0].phase == 'given'
-    assert scenario.steps[0].narration.text == 'a machine'
-    assert scenario.steps[1].phase == 'when'
+    with given(t'an {pg["Active scenario"]} in a fresh {pg["Collector"]}'):
+        collector.start_scenario('id', 'name', 'mod', [])
+    with when(t'a given and a when {pg["Step"]} are pushed', activity=7):
+        collector.push_step('given', _n('a machine'))
+        collector.pop_step()
+        collector.push_step('when', _n('I press start'))
+        collector.pop_step()
+        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+    with then(t'each {pg["Step"]} carries its {pg["Phase"]}'):
+        assert len(recorded.steps) == 2
+        assert recorded.steps[0].phase == 'given'
+        assert recorded.steps[0].narration.text == 'a machine'
+        assert recorded.steps[1].phase == 'when'
 
 
 def test_nested_steps() -> None:
@@ -211,15 +219,23 @@ def test_push_step_during_fixture_setup_records_into_recording() -> None:
         assert root.children[0].narration.text == 'with 3 items'
 
 
+@scenario(
+    'An attachment lands on the step being recorded',
+    tags=['happy-path'],
+    story=adopt_pytest_given,
+)
 def test_attach_during_fixture_setup_records_into_recording() -> None:
     collector = Collector()
-    root = Step(phase='given', narration=_n('a shop'))
-    recording = FixtureRecording(root=root)
-    token = collector.enter_fixture_setup(recording)
-    collector.attach('snapshot', 'data')
-    collector.exit_fixture_setup(token)
-    assert len(root.attachments) == 1
-    assert root.attachments[0].label == 'snapshot'
+    with given(t'a {pg["Fixture recording"]} under setup'):
+        root = Step(phase='given', narration=_n('a shop'))
+        recording = FixtureRecording(root=root)
+        token = collector.enter_fixture_setup(recording)
+    with when(t'an {pg["Attachment"]} is attached inside the fixture body', activity=6):
+        collector.attach('snapshot', 'data')
+        collector.exit_fixture_setup(token)
+    with then(t'the {pg["Attachment"]} lands on the recording root'):
+        assert len(root.attachments) == 1
+        assert root.attachments[0].label == 'snapshot'
 
 
 @scenario(
