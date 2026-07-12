@@ -55,6 +55,12 @@ select = ["B", "C4", "E", "F", "I", "PT", "RUF", "SIM", "UP", "W", "PYI"]
 
 [tool.pytest]
 testpaths = ["tests"]
+given_lint_ignore = [
+    # Honestly two-phase: constructing the descriptor is the action under
+    # test and there is no input to arrange (see the authoring skill's
+    # honest-two-phase convention).
+    "missing-phase: tests/unit/capture/test_step_descriptor.py::test_context_manager_basic",
+]
 
 [tool.mypy]
 python_version = "3.14"
