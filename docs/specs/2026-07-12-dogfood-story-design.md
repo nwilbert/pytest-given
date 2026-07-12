@@ -106,6 +106,7 @@ def test_...():
 
 ## Non-goals
 
+- No activity for the human→Agent guidance hand-off or for the implementation co-evolving with the scenarios. The guidance is already implicit in activity 4 — the Story and Glossary *are* how humans brief the Agent — and the application code's side of the loop sits outside pytest-given's bounded context. If worth recording, it belongs in the README narrative around the Agent ↔ Dev ↔ Domain Expert diagram.
 - No legacy-stabilisation story (possible future README narrative, not dogfood).
 - No multi-story self-report — Stories-tab multi-story parts (story filter, cross-story term reuse) remain exercised by the hotel-booking example only.
 - No retirement of the 4 remaining dead terms.
