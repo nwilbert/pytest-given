@@ -20,14 +20,21 @@ def _n(text: str) -> Narration:
     return Narration(text=text)
 
 
+@scenario('A scenario records under its node ID', tags=['happy-path'])
 def test_start_and_finish_scenario() -> None:
-    collector = Collector()
-    collector.start_scenario('test.py::test_x', 'Test X', 'test_module', ['tag1'])
-    scenario = collector.finish_scenario(status='passed', duration_ms=10)
-    assert scenario.narration.text == 'Test X'
-    assert scenario.status == 'passed'
-    assert scenario.duration_ms == 10
-    assert scenario.tags == ['tag1']
+    with given(t'a fresh {pg["Collector"]}'):
+        collector = Collector()
+    with when(t'a {pg["Scenario"]} starts under its {pg["Node ID"]} and finishes'):
+        collector.start_scenario('test.py::test_x', 'Test X', 'test_module', ['tag1'])
+        recorded = collector.finish_scenario(status='passed', duration_ms=10)
+    with then(
+        t'it carries its {pg["Node ID"]}, name, status, duration and {pg["Tag"]}'
+    ):
+        assert recorded.id == 'test.py::test_x'
+        assert recorded.narration.text == 'Test X'
+        assert recorded.status == 'passed'
+        assert recorded.duration_ms == 10
+        assert recorded.tags == ['tag1']
 
 
 @scenario(

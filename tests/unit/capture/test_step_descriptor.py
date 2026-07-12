@@ -4,7 +4,11 @@ from pathlib import Path
 import pytest
 
 from pytest_given import Template
-from pytest_given.capture.collector import Collector, set_active_collector
+from pytest_given.capture.collector import (
+    Collector,
+    get_active_collector,
+    set_active_collector,
+)
 from pytest_given.capture.decorators import (
     StepDescriptor,
     _normalize_activity,
@@ -240,69 +244,88 @@ def test_step_descriptor_decorator_rejects_tstring_mixed_glossary_and_value() ->
         desc(helper)
 
 
+@scenario(
+    'when_then records the action and its outcome as siblings',
+    tags=['happy-path'],
+)
 def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
-    """when_then('W', 'T') wraps the body as a `when` and emits a sibling
-    `then` once the body exits cleanly."""
     from pytest_given.capture.decorators import when_then
 
-    collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
-    set_active_collector(collector)
-    try:
-        with when_then('the action runs', 'the outcome holds'):
-            pass
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
-    finally:
-        set_active_collector(None)
-    assert [(s.phase, s.narration.text) for s in scenario.steps] == [
-        ('when', 'the action runs'),
-        ('then', 'the outcome holds'),
-    ]
-    assert all(s.status == 'passed' for s in scenario.steps)
-    assert all(s.children == [] for s in scenario.steps)
+    session_collector = get_active_collector()
+    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+        collector = Collector()
+        collector.start_scenario('id', 'name', 'mod', [])
+    with when(t'a {pg["when_then"]} block exits cleanly'):
+        set_active_collector(collector)
+        try:
+            with when_then('the action runs', 'the outcome holds'):
+                pass
+            recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        finally:
+            set_active_collector(session_collector)
+    with then(t'a when and a sibling then {pg["Step"]} are recorded'):
+        assert [(s.phase, s.narration.text) for s in recorded.steps] == [
+            ('when', 'the action runs'),
+            ('then', 'the outcome holds'),
+        ]
+        assert all(s.status == 'passed' for s in recorded.steps)
+        assert all(s.children == [] for s in recorded.steps)
 
 
+@scenario(
+    'when_then pairs with an inner pytest.raises',
+    tags=['happy-path'],
+)
 def test_when_then_pairs_with_inner_pytest_raises() -> None:
-    """The canonical raise pattern: an inner pytest.raises swallows the error
-    the body throws, so when_then still emits both sibling steps."""
     from pytest_given.capture.decorators import when_then
 
-    collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
-    set_active_collector(collector)
-    try:
-        with (
-            when_then('the parser reads a bad document', 'it is rejected'),
-            pytest.raises(ValueError, match='boom'),
-        ):
-            raise ValueError('boom')
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
-    finally:
-        set_active_collector(None)
-    assert [(s.phase, s.narration.text) for s in scenario.steps] == [
-        ('when', 'the parser reads a bad document'),
-        ('then', 'it is rejected'),
-    ]
+    session_collector = get_active_collector()
+    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+        collector = Collector()
+        collector.start_scenario('id', 'name', 'mod', [])
+    with when(
+        t'the {pg["when_then"]} body raises and an inner pytest.raises swallows it'
+    ):
+        set_active_collector(collector)
+        try:
+            with (
+                when_then('the parser reads a bad document', 'it is rejected'),
+                pytest.raises(ValueError, match='boom'),
+            ):
+                raise ValueError('boom')
+            recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        finally:
+            set_active_collector(session_collector)
+    with then('both sibling steps are still recorded'):
+        assert [(s.phase, s.narration.text) for s in recorded.steps] == [
+            ('when', 'the parser reads a bad document'),
+            ('then', 'it is rejected'),
+        ]
 
 
+@scenario(
+    'when_then omits the then when the body raises uncaught',
+    tags=['validation'],
+)
 def test_when_then_omits_then_when_body_raises_uncaught() -> None:
-    """If the body raises and nothing catches it, the outcome never held —
-    the `when` is recorded but no `then` sibling is emitted, and the
-    exception propagates."""
     from pytest_given.capture.decorators import when_then
 
-    collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
-    set_active_collector(collector)
-    try:
-        with pytest.raises(RuntimeError, match='nope'), when_then('act', 'result'):
-            raise RuntimeError('nope')
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
-    finally:
-        set_active_collector(None)
-    assert [(s.phase, s.narration.text) for s in scenario.steps] == [
-        ('when', 'act'),
-    ]
+    session_collector = get_active_collector()
+    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+        collector = Collector()
+        collector.start_scenario('id', 'name', 'mod', [])
+    with when(t'the {pg["when_then"]} body raises with nothing catching inside'):
+        set_active_collector(collector)
+        try:
+            with pytest.raises(RuntimeError, match='nope'), when_then('act', 'result'):
+                raise RuntimeError('nope')
+            recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        finally:
+            set_active_collector(session_collector)
+    with then('only the when step is recorded — the outcome never held'):
+        assert [(s.phase, s.narration.text) for s in recorded.steps] == [
+            ('when', 'act'),
+        ]
 
 
 def test_when_then_accepts_tstrings_for_glossary_refs() -> None:
@@ -326,47 +349,67 @@ def test_when_then_accepts_tstrings_for_glossary_refs() -> None:
     ]
 
 
-@pytest.mark.parametrize('phase_factory', [given, then])
-def test_when_then_rejects_cross_phase_nested_step(phase_factory) -> None:
-    """A `given` or `then` opened inside a when_then body hits the collector's
-    cross-phase guard (it would nest under the active `when`), and the step
-    stack is left balanced so the scenario can still finish."""
+@scenario(
+    'A cross-phase step cannot open inside a when_then body',
+    tags=['validation'],
+)
+@pytest.mark.parametrize('phase_name', ['given', 'then'])
+def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
     from pytest_given.capture.decorators import when_then
 
-    collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
-    set_active_collector(collector)
-    try:
-        with pytest.raises(PytestGivenError, match=r"Cannot nest .* inside 'when'"):
+    phase_factory = {'given': given, 'then': then}[phase_name]
+    session_collector = get_active_collector()
+    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+        collector = Collector()
+        collector.start_scenario('id', 'name', 'mod', [])
+    def open_cross_phase_step() -> None:
+        set_active_collector(collector)
+        try:
             with when_then('act', 'result'), phase_factory('sneaky'):
                 pass
+        finally:
+            set_active_collector(session_collector)
+
+    with (
+        when_then(
+            t'a given or then opens inside the {pg["when_then"]} body',
+            'a PytestGivenError reports the cross-phase nesting',
+        ),
+        pytest.raises(PytestGivenError, match=r"Cannot nest .* inside 'when'"),
+    ):
+        open_cross_phase_step()
+    with then(t'the {pg["Step stack"]} is left balanced'):
         assert collector._step_stack == []
-    finally:
-        set_active_collector(None)
 
 
+@scenario(
+    'A nested when becomes a child of the when_then action',
+    tags=['happy-path'],
+)
 def test_when_then_allows_nested_when_as_child_sub_step() -> None:
-    """A nested `when` is the same phase, so it becomes a child sub-step of the
-    action — the `then` sibling is still emitted after the body exits."""
     from pytest_given.capture.decorators import when_then
 
-    collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
-    set_active_collector(collector)
-    try:
-        with when_then('the action runs', 'the outcome holds'):
-            with when('a sub-action runs'):
-                pass
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
-    finally:
-        set_active_collector(None)
-    assert [(s.phase, s.narration.text) for s in scenario.steps] == [
-        ('when', 'the action runs'),
-        ('then', 'the outcome holds'),
-    ]
-    assert [(c.phase, c.narration.text) for c in scenario.steps[0].children] == [
-        ('when', 'a sub-action runs'),
-    ]
+    session_collector = get_active_collector()
+    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+        collector = Collector()
+        collector.start_scenario('id', 'name', 'mod', [])
+    with when(t'a when opens inside the {pg["when_then"]} body'):
+        set_active_collector(collector)
+        try:
+            with when_then('the action runs', 'the outcome holds'):
+                with when('a sub-action runs'):
+                    pass
+            recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        finally:
+            set_active_collector(session_collector)
+    with then('the sub-action is a child of the action and the then still follows'):
+        assert [(s.phase, s.narration.text) for s in recorded.steps] == [
+            ('when', 'the action runs'),
+            ('then', 'the outcome holds'),
+        ]
+        assert [(c.phase, c.narration.text) for c in recorded.steps[0].children] == [
+            ('when', 'a sub-action runs'),
+        ]
 
 
 def test_when_then_exported_from_package() -> None:
