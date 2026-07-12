@@ -759,7 +759,7 @@ span.param-highlight {
   font-weight: 600;
   flex-shrink: 0;
 }
-.activity-row:hover .activity-num { border-color: var(--color-accent); color: var(--color-accent); }
+.activity-row:hover .activity-num:not(.activity-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
 .activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 
@@ -810,6 +810,16 @@ span.param-highlight {
   flex-wrap: wrap;
 }
 .scn-act-label { color: var(--text-muted); font-weight: 600; }
+/* Activity-id bubbles are single numbers: keep them round, not elongated pills. */
+.scn-act-strip .use-chip {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .scn-act-strip-section { margin-top: var(--space-xl); }
 
 /* Kind filter rows in sidebar */
