@@ -32,13 +32,13 @@ Defined in `tests/ubiquitous_language.py` next to `pg`, registered on import as 
 | # | Activity (canonical prose) | Retires | Coverage (as implemented) |
 |---|---|---|---|
 | 1 | Domain Expert **tells** Story to the Developer | — | honest gap (nothing implements elicitation) |
-| 2 | Developer **captures** Story as Activity | — | pin in `tests/unit/capture/test_story.py` (auto-numbering scenario) |
-| 3 | Developer **builds** Glossary with the Domain Expert | Glossary | pin in `tests/unit/capture/test_glossary.py` (actor registration) |
+| 2 | Developer **captures** Story as Activity | — | 3 pins in `tests/unit/capture/test_story.py` (auto-numbering, single-path, multi-path) |
+| 3 | Developer **builds** Glossary with the Domain Expert | Glossary | 3 pins in `tests/unit/capture/test_glossary.py` (actor registration, idempotent re-registration, kindless declaration) |
 | 4 | Agent **writes** Scenario with Tag against the Glossary | Tag | pin in `tests/unit/capture/test_template.py` (file-glossary handle in a t-string step) |
-| 5 | Agent **narrates** Step with a Phase | Phase | pin in `tests/unit/capture/test_step_descriptor.py` |
+| 5 | Agent **narrates** Step with a Phase | Phase | 3 pins in `tests/unit/capture/test_step_descriptor.py` (descriptor basics, when_then siblings, nested when) |
 | 6 | Agent **attaches** Attachment to a Step | Attachment | pin in `tests/unit/capture/test_collector.py` (attach during fixture setup) |
-| 7 | Collector **records** Step on the Step stack | Collector, Step stack | pin in `tests/unit/capture/test_collector.py` (steps record with phases) |
-| 8 | Collector **grafts** Fixture recording from a Step fixture | Step fixture | pin in `tests/unit/capture/test_collector.py` (graft deep-copy) |
+| 7 | Collector **records** Step on the Step stack | Collector, Step stack | 3 pins in `tests/unit/capture/test_collector.py` (steps record with phases, fixture-setup recording, recording isolation) |
+| 8 | Collector **grafts** Fixture recording from a Step fixture | Step fixture | 3 pins in `tests/unit/capture/test_collector.py` (deep-copy, leaf given, override narration) |
 | 9 | Collector **groups** Parametrized scenario into a Parameter table | Parametrized scenario, Group | pin in `tests/unit/test_plugin.py` (grouping merges cases) |
 | 10 | Renderer **renders** Report with Parameter coloring | Renderer, Report, Parameter coloring | pin in `tests/unit/report/test_html_renderer.py` (parameter coloring) |
 | 11 | Domain Expert **reviews** Scenario in the Report | — | honest gap (review is a human activity) |
