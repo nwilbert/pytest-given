@@ -43,27 +43,26 @@ Defined in `tests/_vocab.py` next to `pg`, registered on import as today. Activi
 | 10 | Renderer **renders** Report with Parameter coloring | Renderer, Report, Parameter coloring | pin in a renderer test |
 | 11 | Domain Expert **reviews** Scenario in the Report | — | pin in a report/coverage test if a genuine match exists, else honest gap |
 
-Sketch (handle names illustrative). Every part except the connective words is a term handle looked up from `pg` — the closed `FileGlossary` over GLOSSARY.md — so each verb/actor/work object needs its row; a bare string would be an `ActivityWord` with no term identity, no pill, and no effect on coverage or `dead-term`. Calling a verb handle supplies the inflection (`tell('tells')`: canonical *tell*, surface form *tells*):
+Sketch (noun/actor handle names illustrative; each is a `pg[...]` lookup from the closed `FileGlossary` over GLOSSARY.md). **Verbs are bare `ActivityWord` strings, not glossary terms** — generic process verbs (*tells*, *captures*, *builds*, …) are story prose, not pytest-given vocabulary, and a word in a verb slot is grammatically fine. The two exceptions are `Graft` and `Group`: existing glossary rows whose meaning *is* the verb, referenced as handles with an inflection (`pg['Graft']('grafts')`). Every activity keeps at least two noun/actor term refs, so all remain coverage-eligible:
 
 ```python
 domain_expert, developer, agent = pg['Domain Expert'], pg['Developer'], pg['Agent']
-tell, capture, build = pg['tell'], pg['capture'], pg['build']
-# … one handle per Collaboration-section row, plus the existing technical terms
+# … noun handles for the existing technical terms
 
 adopt = story(
     'Adopt pytest-given',
     [
-        activity(domain_expert, tell('tells'), story_t, 'to the', developer),
-        activity(developer, capture('captures'), story_t, 'as', activity_t),
-        activity(developer, build('builds'), glossary_t, 'with the', domain_expert),
-        activity(agent, write('writes'), scenario_t, 'with', tag_t, 'against the', glossary_t),
-        activity(agent, narrate('narrates'), step_t, 'with a', phase_t),
-        activity(agent, attach('attaches'), attachment_t, 'to a', step_t),
-        activity(collector, record('records'), step_t, 'on the', step_stack_t),
+        activity(domain_expert, 'tells', story_t, 'to the', developer),
+        activity(developer, 'captures', story_t, 'as', activity_t),
+        activity(developer, 'builds', glossary_t, 'with the', domain_expert),
+        activity(agent, 'writes', scenario_t, 'with', tag_t, 'against the', glossary_t),
+        activity(agent, 'narrates', step_t, 'with a', phase_t),
+        activity(agent, 'attaches', attachment_t, 'to a', step_t),
+        activity(collector, 'records', step_t, 'on the', step_stack_t),
         activity(collector, pg['Graft']('grafts'), fixture_recording_t, 'from a', step_fixture_t),
         activity(collector, pg['Group']('groups'), parametrized_scenario_t, 'into a', parameter_table_t),
-        activity(renderer, render('renders'), report_t, 'with', parameter_coloring_t),
-        activity(domain_expert, review('reviews'), scenario_t, 'in the', report_t),
+        activity(renderer, 'renders', report_t, 'with', parameter_coloring_t),
+        activity(domain_expert, 'reviews', scenario_t, 'in the', report_t),
     ],
 )
 ```
@@ -72,15 +71,15 @@ Path-grammar notes, all verified against `path()` validation and `kind_resolutio
 
 - Every path is a valid node/edge alternation (odd length ≥ 3); connectives like `'to the'` / `'with a'` are single edge words. No standalone articles — a bare word consumes a position and would shift the following noun into a verb slot.
 - Actor + noun slots are compatible (`Developer` at position 0 in most activities and position 4 in activity 1; actor wins). Only verb-vs-other slot conflicts raise.
-- **Graft** and **Group** are existing GLOSSARY.md rows used in verb slots via deferred-handle inflections (`pg['Graft']('grafts')`) — kind inference classifies them as verbs; neither appears in any noun slot.
+- **Graft** and **Group** are existing GLOSSARY.md rows used in verb slots via deferred-handle inflections (`pg['Graft']('grafts')`) — kind inference classifies them as verbs; neither appears in any noun slot. All other verb slots carry bare words.
 
 ## GLOSSARY.md changes
 
-**New "Collaboration" section** (a new pipe table; `FileGlossary` parses all tables in the file) with the process vocabulary:
-- Actors: **Developer** (writes the application code and, with the Agent, the scenarios), **Domain Expert** (owns the domain knowledge and the ubiquitous language; source and reviewer of stories and scenarios), **Agent** (AI coding agent authoring and maintaining scenarios alongside the Developer, guided by the pytest-given skills).
-- Verbs: **tell**, **capture**, **build**, **write**, **narrate**, **attach**, **record**, **render**, **review** — each with a one-line definition.
+**New "Collaboration" section** (a new pipe table; `FileGlossary` parses all tables in the file) with exactly three actor rows: **Developer** (writes the application code and, with the Agent, the scenarios), **Domain Expert** (owns the domain knowledge and the ubiquitous language; source and reviewer of stories and scenarios), **Agent** (AI coding agent authoring and maintaining scenarios alongside the Developer, guided by the pytest-given skills).
 
-Kinds are not declared in the file (no kind column); inference assigns them from the story's slots: Developer / Domain Expert / Agent / Collector / Renderer → actor; the nine new verbs plus Graft and Group → verb; Story, Activity, Glossary, Scenario, Tag, Step, Phase, Attachment, Step stack, Fixture recording, Step fixture, Parametrized scenario, Parameter table, Report, Parameter coloring → work object. Terms referenced only in step narration (Term, Coverage, Path, File glossary, …) stay kindless/Uncategorized — unchanged.
+**No verb rows.** Generic process verbs (*tells*, *builds*, *reviews*, …) are bare `ActivityWord`s in the story, not glossary terms — they are story prose, not pytest-given's ubiquitous language. The plugin-operation verbs (*attach*, *record*, *render*, *narrate*) also stay out: each concept already has its noun row (Attachment — whose definition names `attach(...)` — Fixture recording, Renderer, Narration).
+
+Kinds are not declared in the file (no kind column); inference assigns them from the story's slots: Developer / Domain Expert / Agent / Collector / Renderer → actor; Graft and Group → verb; Story, Activity, Glossary, Scenario, Tag, Step, Phase, Attachment, Step stack, Fixture recording, Step fixture, Parametrized scenario, Parameter table, Report, Parameter coloring → work object. Terms referenced only in step narration (Term, Coverage, Path, File glossary, …) stay kindless/Uncategorized — unchanged.
 
 ## Pinning mechanics
 
