@@ -7,7 +7,7 @@ from typing import Annotated, Any, cast
 
 import pytest
 
-from pytest_given import Template, given, plugin, then, when
+from pytest_given import Template, given, plugin, scenario, then, when
 from pytest_given.capture.collector import (
     Collector,
     get_active_collector,
@@ -37,6 +37,7 @@ from pytest_given.model import (
     Step,
     TermId,
 )
+from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 @pytest.fixture
@@ -353,20 +354,35 @@ def test_group_parameterized_mixed_pass_skip_merges_as_passed() -> None:
     assert merged[0].status == 'passed'
 
 
+@scenario(
+    'Grouping merges parametrize cases into one scenario',
+    tags=['parametrization'],
+    story=adopt_pytest_given,
+)
 def test_group_parameterized_any_failed_merges_as_failed() -> None:
-    nid1, nid2, nid3 = NodeId('t::x[1]'), NodeId('t::x[2]'), NodeId('t::x[3]')
-    scenarios = [
-        Scenario(id=nid1, narration=Narration(text='x'), module='m', status='passed'),
-        Scenario(id=nid2, narration=Narration(text='x'), module='m', status='failed'),
-        Scenario(id=nid3, narration=Narration(text='x'), module='m', status='skipped'),
-    ]
-    param_info = {
-        nid1: ParamSpec(names=['n'], values=[1]),
-        nid2: ParamSpec(names=['n'], values=[2]),
-        nid3: ParamSpec(names=['n'], values=[3]),
-    }
-    merged = plugin._group_parameterized(scenarios, param_info)
-    assert merged[0].status == 'failed'
+    with given(t'three {pg["Case"]} records of one {pg["Parametrized scenario"]}'):
+        nid1, nid2, nid3 = NodeId('t::x[1]'), NodeId('t::x[2]'), NodeId('t::x[3]')
+        scenarios = [
+            Scenario(
+                id=nid1, narration=Narration(text='x'), module='m', status='passed'
+            ),
+            Scenario(
+                id=nid2, narration=Narration(text='x'), module='m', status='failed'
+            ),
+            Scenario(
+                id=nid3, narration=Narration(text='x'), module='m', status='skipped'
+            ),
+        ]
+        param_info = {
+            nid1: ParamSpec(names=['n'], values=[1]),
+            nid2: ParamSpec(names=['n'], values=[2]),
+            nid3: ParamSpec(names=['n'], values=[3]),
+        }
+    with when(t'the {pg["Group"]("grouping")} pass merges them', activity=9):
+        merged = plugin._group_parameterized(scenarios, param_info)
+    with then(t'one scenario remains and any failed {pg["Case"]} fails it'):
+        assert len(merged) == 1
+        assert merged[0].status == 'failed'
 
 
 def test_group_parameterized_distinct_functions_same_name_do_not_merge() -> None:
