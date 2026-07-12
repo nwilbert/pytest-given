@@ -57,5 +57,6 @@ Terms are actors, verbs, or work objects. Three ways a term gets its kind:
 
 ## Keeping the glossary honest
 
+- **Don't dilute the glossary — keep it sharp.** A term earns its row by being vocabulary the team actually speaks: something someone would look up, with a meaning specific to the domain. Never add terms to make activities render more pills or to improve lint metrics; a generic word in an activity is better left a bare string, and the honest fix for a dead term is as often deleting it as manufacturing a reference.
 - **Tags never duplicate terms** — filter a feature area via its term, and keep tags for what the glossary can't carry (behaviour, mechanism). The `tag-shadows-term` lint rule enforces this.
 - **Every file term appears in the report**, even one no step or story references. On suites whose glossary should be fully exercised, opt into the `dead-term` lint rule to flag unreferenced terms.

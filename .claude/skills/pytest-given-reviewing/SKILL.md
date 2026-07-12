@@ -35,7 +35,8 @@ For a large suite, fan the audit out: one reviewer per test file — a subagent 
 
 ## 3. Glossary, tags, stories
 
-- A **dead term** (layer 1, opt-in rule) that describes unimplemented behaviour is misleading domain documentation — flag it.
+- A **dead term** (layer 1, opt-in rule) that describes unimplemented behaviour is misleading domain documentation — flag it. The fix is as often deleting the term as adding a reference; don't accept references manufactured to appease the rule.
+- **Dilution** is the inverse finding: a row nothing would miss — a generic verb minted to fill a story slot (a bare word belongs there), a concept duplicated under a second name, a term added only to render as a pill. A sharp, lean glossary outranks an impressive-looking one.
 - `tag-shadows-term` is linted; the fix is dropping the tag, **not spreading tags wider**. Tags stay orthogonal to the glossary (behaviour, mechanism), so sparse tagging is usually correct — don't report it as a finding.
 - A story activity no scenario covers is a gap worth noting: check scenarios' `story_id` bindings and term coverage (the HTML report's Stories tab shows a coverage chip per activity).
 
