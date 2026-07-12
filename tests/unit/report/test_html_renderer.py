@@ -5,11 +5,13 @@ from typing import Any, cast
 
 import pytest
 
+from pytest_given import given, scenario, then, when
 from pytest_given.report.html_renderer import (
     _inline_md,
     _render_narration_part,
     render_html,
 )
+from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 def _narration(text: str, parts: list | None = None) -> dict:
@@ -160,77 +162,92 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
     assert '- 1' in content
 
 
+@scenario(
+    'Parameter coloring marks placeholders and table headers',
+    tags=['happy-path'],
+    story=adopt_pytest_given,
+)
 def test_render_parameterized_step_with_structured_narration(tmp_path: Path) -> None:
-    """Merged parametric step renders placeholder with color span and {name} token."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
-            {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 'test.py::test_p',
-                        'narration': _narration('Param scenario'),
-                        'module': 'mod',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [
-                            {
-                                'phase': 'when',
-                                'narration': _narration(
-                                    'I insert 1 into shop',
-                                    [
-                                        {'value': 'I insert '},
-                                        {
-                                            'name': 'euros',
-                                            'format_spec': '',
-                                            'conversion': None,
-                                        },
-                                        {'value': ' into shop'},
-                                    ],
-                                ),
-                                'status': 'passed',
-                                'children': [],
-                                'attachments': [],
-                                'error': None,
-                            }
-                        ],
-                        'parameters': {
-                            'names': ['euros', 'expect'],
-                            'cases': [
+    with given(
+        t'a {pg["Report"]} holding a {pg["Parametrized scenario"]} '
+        t'with a {pg["Parameter table"]}'
+    ):
+        json_path = tmp_path / 'data.json'
+        json_path.write_text(
+            json.dumps(
+                {
+                    'metadata': {
+                        'project': 'p',
+                        'timestamp': 't',
+                        'pytest_version': '9',
+                        'plugin_version': '0.1',
+                    },
+                    'scenarios': [
+                        {
+                            'id': 'test.py::test_p',
+                            'narration': _narration('Param scenario'),
+                            'module': 'mod',
+                            'tags': [],
+                            'status': 'passed',
+                            'duration_ms': 0,
+                            'steps': [
                                 {
-                                    'values': [1, False],
+                                    'phase': 'when',
+                                    'narration': _narration(
+                                        'I insert 1 into shop',
+                                        [
+                                            {'value': 'I insert '},
+                                            {
+                                                'name': 'euros',
+                                                'format_spec': '',
+                                                'conversion': None,
+                                            },
+                                            {'value': ' into shop'},
+                                        ],
+                                    ),
                                     'status': 'passed',
+                                    'children': [],
+                                    'attachments': [],
                                     'error': None,
-                                },
-                                {
-                                    'values': [2, True],
-                                    'status': 'passed',
-                                    'error': None,
-                                },
+                                }
                             ],
-                        },
-                        'error': None,
-                    }
-                ],
-            }
+                            'parameters': {
+                                'names': ['euros', 'expect'],
+                                'cases': [
+                                    {
+                                        'values': [1, False],
+                                        'status': 'passed',
+                                        'error': None,
+                                    },
+                                    {
+                                        'values': [2, True],
+                                        'status': 'passed',
+                                        'error': None,
+                                    },
+                                ],
+                            },
+                            'error': None,
+                        }
+                    ],
+                }
+            )
         )
-    )
-    html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
-    content = html_path.read_text(encoding='utf-8')
-    assert 'param-color-0' in content
-    # The merged step shows the {name} token
-    assert '{euros}' in content
-    # Headers carry color class + data-param so the crosshair JS can light them up
-    assert re.search(r'<th[^>]*\bparam-color-0\b[^>]*\bdata-param="euros"', content)
-    assert re.search(r'<th[^>]*\bparam-color-1\b[^>]*\bdata-param="expect"', content)
+    with when(t'the {pg["Renderer"]} renders the HTML page', activity=10):
+        html_path = tmp_path / 'report.html'
+        render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+        content = html_path.read_text(encoding='utf-8')
+    with then(
+        t'{pg["Parameter coloring"]} classes mark the merged placeholder '
+        t'and the table headers'
+    ):
+        assert 'param-color-0' in content
+        # The merged step shows the {name} token
+        assert '{euros}' in content
+        # Headers carry color class + data-param for the crosshair JS
+        assert re.search(r'<th[^>]*\bparam-color-0\b[^>]*\bdata-param="euros"', content)
+        assert re.search(
+            r'<th[^>]*\bparam-color-1\b[^>]*\bdata-param="expect"', content
+        )
 
 
 def test_render_merged_placeholder_drops_format_spec_and_conversion(
