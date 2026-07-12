@@ -1,56 +1,63 @@
 # pytest-given — pytest-given
 
+## ✓ A scenario records under its node ID
+`tests/unit/capture/test_collector.py:23::test_start_and_finish_scenario` · happy-path
+
+- **given** a fresh «Collector»
+- **when** a «Scenario» starts under its «Node ID» and finishes
+- **then** it carries its «Node ID», name, status, duration and «Tag»
+
 ## ✓ Steps record with their phases
-`tests/unit/capture/test_collector.py:33::test_collect_steps` · happy-path
+`tests/unit/capture/test_collector.py:40::test_collect_steps` · happy-path
 
 - **given** an «Active scenario» in a fresh «Collector»
 - **when** a given and a when «Step» are pushed
 - **then** each «Step» carries its «Phase»
 
 ## ✓ Steps pushed during fixture setup record into the fixture recording
-`tests/unit/capture/test_collector.py:203::test_push_step_during_fixture_setup_records_into_recording` · happy-path
+`tests/unit/capture/test_collector.py:210::test_push_step_during_fixture_setup_records_into_recording` · happy-path
 
 - **given** a «Fixture recording» under setup
 - **when** a «Step» is pushed inside the fixture body
 - **then** it is recorded as a child of the recording root
 
 ## ✓ An attachment lands on the step being recorded
-`tests/unit/capture/test_collector.py:222::test_attach_during_fixture_setup_records_into_recording` · happy-path
+`tests/unit/capture/test_collector.py:229::test_attach_during_fixture_setup_records_into_recording` · happy-path
 
 - **given** a «Fixture recording» under setup
 - **when** an «Attachment» is attached inside the fixture body
 - **then** the «Attachment» lands on the recording root
 
 ## ✓ Fixture-body steps do not leak into the active scenario
-`tests/unit/capture/test_collector.py:241::test_push_step_routing_isolates_recording_from_scenario` · happy-path
+`tests/unit/capture/test_collector.py:248::test_push_step_routing_isolates_recording_from_scenario` · happy-path
 
 - **given** an «Active scenario» with a «Fixture recording»
 - **when** a «Step» is pushed inside the fixture body
 - **then** the step lives only in the recording, not the scenario
 
 ## ✓ A fixture recording is deep-copied when grafted
-`tests/unit/capture/test_collector.py:302::test_graft_recording_deep_copies_into_scenario` · happy-path
+`tests/unit/capture/test_collector.py:309::test_graft_recording_deep_copies_into_scenario` · happy-path
 
 - **given** a «Fixture recording» with a nested child «Step»
 - **when** a «Graft» copies it into the «Active scenario»
 - **then** the scenario gains a deep copy of the recorded steps
 
 ## ✓ A leaf given is grafted as a childless given step
-`tests/unit/capture/test_collector.py:444::test_graft_leaf_given_appends_childless_given_step` · happy-path
+`tests/unit/capture/test_collector.py:451::test_graft_leaf_given_appends_childless_given_step` · happy-path
 
 - **given** an «Active scenario» is being recorded
 - **when** a leaf «Graft» appends a childless «Step»
 - **then** the step is a given with no children
 
 ## ✓ Grafting with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:459::test_graft_recording_override_replaces_root_narration_keeps_children` · happy-path
+`tests/unit/capture/test_collector.py:466::test_graft_recording_override_replaces_root_narration_keeps_children` · happy-path
 
 - **given** a «Fixture recording» whose root has a label and a child
 - **when** a «Graft» supplies an override «Narration»
 - **then** the grafted root shows the override text and keeps its children
 
 ## ✓ Grafting with no active scenario is a no-op
-`tests/unit/capture/test_collector.py:483::test_graft_leaf_given_without_scenario_is_noop` · happy-path
+`tests/unit/capture/test_collector.py:490::test_graft_leaf_given_without_scenario_is_noop` · happy-path
 
 - **given** a collector with no «Active scenario»
 - **when** a leaf «Graft» runs
@@ -694,10 +701,38 @@
 - **then** only the real pipe table produces rows
 
 ## ✓ A step pairs its narration with a phase
-`tests/unit/capture/test_step_descriptor.py:48::test_context_manager_basic` · happy-path
+`tests/unit/capture/test_step_descriptor.py:52::test_context_manager_basic` · happy-path
 
 - **when** a given «Step» descriptor is created
 - **then** it carries the given «Phase» and its «Narration»
+
+## ✓ when_then records the action and its outcome as siblings
+`tests/unit/capture/test_step_descriptor.py:247::test_when_then_records_two_sibling_steps_on_clean_exit` · happy-path
+
+- **given** an «Active scenario» in a local «Collector»
+- **when** a «when_then» block exits cleanly
+- **then** a when and a sibling then «Step» are recorded
+
+## ✓ when_then pairs with an inner pytest.raises
+`tests/unit/capture/test_step_descriptor.py:275::test_when_then_pairs_with_inner_pytest_raises` · happy-path
+
+- **given** an «Active scenario» in a local «Collector»
+- **when** the «when_then» body raises and an inner pytest.raises swallows it
+- **then** both sibling steps are still recorded
+
+## ✓ when_then omits the then when the body raises uncaught
+`tests/unit/capture/test_step_descriptor.py:306::test_when_then_omits_then_when_body_raises_uncaught` · validation
+
+- **given** an «Active scenario» in a local «Collector»
+- **when** the «when_then» body raises with nothing catching inside
+- **then** only the when step is recorded — the outcome never held
+
+## ✓ A nested when becomes a child of the when_then action
+`tests/unit/capture/test_step_descriptor.py:385::test_when_then_allows_nested_when_as_child_sub_step` · happy-path
+
+- **given** an «Active scenario» in a local «Collector»
+- **when** a when opens inside the «when_then» body
+- **then** the sub-action is a child of the action and the then still follows
 
 ## ✓ An actor handle in a path becomes a term ref
 `tests/unit/capture/test_story.py:54::test_path_dispatches_actor_to_activity_term_ref` · story-grammar, happy-path
@@ -1124,6 +1159,19 @@
 |     | ✓ |
 |  | ✓ |
 | ### | ✓ |
+
+## ✓ A cross-phase step cannot open inside a when_then body · 2 cases
+`tests/unit/capture/test_step_descriptor.py:352::test_when_then_rejects_cross_phase_nested_step` · validation
+
+- **given** an «Active scenario» in a local «Collector»
+- **when** a given or then opens inside the «when_then» body
+- **then** a PytestGivenError reports the cross-phase nesting
+- **then** the «Step stack» is left balanced
+
+| phase_name | |
+|---|---|
+| given | ✓ |
+| then | ✓ |
 
 ## ✓ A Template accepts bare identifiers only · 3 cases
 `tests/unit/capture/test_template.py:98::test_template_non_identifier_raises_pytest_given_error` · step-text, validation

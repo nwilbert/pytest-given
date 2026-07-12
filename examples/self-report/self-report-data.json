@@ -1,12 +1,126 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-12T10:54:27.318679+00:00",
+    "timestamp": "2026-07-12T12:10:53.306726+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "d4bccc1a75c38594951b597a8d0ca809a7a79238"
+    "commit_sha": "57975199960dc40eaa8558dee99035f24cc83bc4"
   },
   "scenarios": [
+    {
+      "id": "tests/unit/capture/test_collector.py::test_start_and_finish_scenario",
+      "narration": {
+        "text": "A scenario records under its node ID",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 5,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a fresh Collector",
+            "parts": [
+              {
+                "value": "a fresh "
+              },
+              {
+                "term_id": "collector",
+                "display": "Collector",
+                "expression": "pg[\"Collector\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a Scenario starts under its Node ID and finishes",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " starts under its "
+              },
+              {
+                "term_id": "node-id",
+                "display": "Node ID",
+                "expression": "pg[\"Node ID\"]",
+                "param_column": null
+              },
+              {
+                "value": " and finishes"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it carries its Node ID, name, status, duration and Tag",
+            "parts": [
+              {
+                "value": "it carries its "
+              },
+              {
+                "term_id": "node-id",
+                "display": "Node ID",
+                "expression": "pg[\"Node ID\"]",
+                "param_column": null
+              },
+              {
+                "value": ", name, status, duration and "
+              },
+              {
+                "term_id": "tag",
+                "display": "Tag",
+                "expression": "pg[\"Tag\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 23
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
     {
       "id": "tests/unit/capture/test_collector.py::test_collect_steps",
       "narration": {
@@ -18,7 +132,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -118,7 +232,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 33
+        "line": 40
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -207,7 +321,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 203
+        "line": 210
       },
       "story_id": null,
       "activity_ids": []
@@ -311,7 +425,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 222
+        "line": 229
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -406,7 +520,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 241
+        "line": 248
       },
       "story_id": null,
       "activity_ids": []
@@ -509,7 +623,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 302
+        "line": 309
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -604,7 +718,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 444
+        "line": 451
       },
       "story_id": null,
       "activity_ids": []
@@ -699,7 +813,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 459
+        "line": 466
       },
       "story_id": null,
       "activity_ids": []
@@ -785,7 +899,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 483
+        "line": 490
       },
       "story_id": null,
       "activity_ids": []
@@ -3006,7 +3120,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -5790,9 +5904,402 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 48
+        "line": 52
       },
       "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_step_descriptor.py::test_when_then_records_two_sibling_steps_on_clean_exit",
+      "narration": {
+        "text": "when_then records the action and its outcome as siblings",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_step_descriptor",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Active scenario in a local Collector",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "active-scenario",
+                "display": "Active scenario",
+                "expression": "pg[\"Active scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " in a local "
+              },
+              {
+                "term_id": "collector",
+                "display": "Collector",
+                "expression": "pg[\"Collector\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a when_then block exits cleanly",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "when-then",
+                "display": "when_then",
+                "expression": "pg[\"when_then\"]",
+                "param_column": null
+              },
+              {
+                "value": " block exits cleanly"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a when and a sibling then Step are recorded",
+            "parts": [
+              {
+                "value": "a when and a sibling then "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " are recorded"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_step_descriptor.py",
+        "line": 247
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_step_descriptor.py::test_when_then_pairs_with_inner_pytest_raises",
+      "narration": {
+        "text": "when_then pairs with an inner pytest.raises",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_step_descriptor",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Active scenario in a local Collector",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "active-scenario",
+                "display": "Active scenario",
+                "expression": "pg[\"Active scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " in a local "
+              },
+              {
+                "term_id": "collector",
+                "display": "Collector",
+                "expression": "pg[\"Collector\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the when_then body raises and an inner pytest.raises swallows it",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "when-then",
+                "display": "when_then",
+                "expression": "pg[\"when_then\"]",
+                "param_column": null
+              },
+              {
+                "value": " body raises and an inner pytest.raises swallows it"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "both sibling steps are still recorded",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_step_descriptor.py",
+        "line": 275
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_step_descriptor.py::test_when_then_omits_then_when_body_raises_uncaught",
+      "narration": {
+        "text": "when_then omits the then when the body raises uncaught",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_step_descriptor",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Active scenario in a local Collector",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "active-scenario",
+                "display": "Active scenario",
+                "expression": "pg[\"Active scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " in a local "
+              },
+              {
+                "term_id": "collector",
+                "display": "Collector",
+                "expression": "pg[\"Collector\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the when_then body raises with nothing catching inside",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "when-then",
+                "display": "when_then",
+                "expression": "pg[\"when_then\"]",
+                "param_column": null
+              },
+              {
+                "value": " body raises with nothing catching inside"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "only the when step is recorded \u2014 the outcome never held",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_step_descriptor.py",
+        "line": 306
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_step_descriptor.py::test_when_then_allows_nested_when_as_child_sub_step",
+      "narration": {
+        "text": "A nested when becomes a child of the when_then action",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_step_descriptor",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Active scenario in a local Collector",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "active-scenario",
+                "display": "Active scenario",
+                "expression": "pg[\"Active scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " in a local "
+              },
+              {
+                "term_id": "collector",
+                "display": "Collector",
+                "expression": "pg[\"Collector\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a when opens inside the when_then body",
+            "parts": [
+              {
+                "value": "a when opens inside the "
+              },
+              {
+                "term_id": "when-then",
+                "display": "when_then",
+                "expression": "pg[\"when_then\"]",
+                "param_column": null
+              },
+              {
+                "value": " body"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the sub-action is a child of the action and the then still follows",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_step_descriptor.py",
+        "line": 385
+      },
+      "story_id": null,
       "activity_ids": []
     },
     {
@@ -10980,7 +11487,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -11475,6 +11982,147 @@
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 57
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_step_descriptor.py::test_when_then_rejects_cross_phase_nested_step[given]",
+      "narration": {
+        "text": "A cross-phase step cannot open inside a when_then body",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_step_descriptor",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Active scenario in a local Collector",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "active-scenario",
+                "display": "Active scenario",
+                "expression": "pg[\"Active scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " in a local "
+              },
+              {
+                "term_id": "collector",
+                "display": "Collector",
+                "expression": "pg[\"Collector\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a given or then opens inside the when_then body",
+            "parts": [
+              {
+                "value": "a given or then opens inside the "
+              },
+              {
+                "term_id": "when-then",
+                "display": "when_then",
+                "expression": "pg[\"when_then\"]",
+                "param_column": null
+              },
+              {
+                "value": " body"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError reports the cross-phase nesting",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Step stack is left balanced",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "step-stack",
+                "display": "Step stack",
+                "expression": "pg[\"Step stack\"]",
+                "param_column": null
+              },
+              {
+                "value": " is left balanced"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "names": [
+          "phase_name"
+        ],
+        "cases": [
+          {
+            "values": [
+              "given"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "then"
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_step_descriptor.py",
+        "line": 352
       },
       "story_id": null,
       "activity_ids": []
