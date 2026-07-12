@@ -1,12 +1,128 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-11T20:58:50.695732+00:00",
+    "timestamp": "2026-07-12T10:54:27.318679+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "a534facfb48547983197d1c23b01857e885f0408"
+    "commit_sha": "d4bccc1a75c38594951b597a8d0ca809a7a79238"
   },
   "scenarios": [
+    {
+      "id": "tests/unit/capture/test_collector.py::test_collect_steps",
+      "narration": {
+        "text": "Steps record with their phases",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 5,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Active scenario in a fresh Collector",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "active-scenario",
+                "display": "Active scenario",
+                "expression": "pg[\"Active scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " in a fresh "
+              },
+              {
+                "term_id": "collector",
+                "display": "Collector",
+                "expression": "pg[\"Collector\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a given and a when Step are pushed",
+            "parts": [
+              {
+                "value": "a given and a when "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " are pushed"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [
+            7
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each Step carries its Phase",
+            "parts": [
+              {
+                "value": "each "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " carries its "
+              },
+              {
+                "term_id": "phase",
+                "display": "Phase",
+                "expression": "pg[\"Phase\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 33
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
     {
       "id": "tests/unit/capture/test_collector.py::test_push_step_during_fixture_setup_records_into_recording",
       "narration": {
@@ -18,7 +134,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -91,9 +207,113 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 195
+        "line": 203
       },
       "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_collector.py::test_attach_during_fixture_setup_records_into_recording",
+      "narration": {
+        "text": "An attachment lands on the step being recorded",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Fixture recording under setup",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "fixture-recording",
+                "display": "Fixture recording",
+                "expression": "pg[\"Fixture recording\"]",
+                "param_column": null
+              },
+              {
+                "value": " under setup"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "an Attachment is attached inside the fixture body",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "attachment",
+                "display": "Attachment",
+                "expression": "pg[\"Attachment\"]",
+                "param_column": null
+              },
+              {
+                "value": " is attached inside the fixture body"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [
+            6
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Attachment lands on the recording root",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "attachment",
+                "display": "Attachment",
+                "expression": "pg[\"Attachment\"]",
+                "param_column": null
+              },
+              {
+                "value": " lands on the recording root"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 222
+      },
+      "story_id": "adopt-pytest-given",
       "activity_ids": []
     },
     {
@@ -186,7 +406,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 225
+        "line": 241
       },
       "story_id": null,
       "activity_ids": []
@@ -265,7 +485,9 @@
           "children": [],
           "attachments": [],
           "error": null,
-          "activity_ids": [],
+          "activity_ids": [
+            8
+          ],
           "fixture_name": null
         },
         {
@@ -287,9 +509,9 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 286
+        "line": 302
       },
-      "story_id": null,
+      "story_id": "adopt-pytest-given",
       "activity_ids": []
     },
     {
@@ -382,7 +604,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 422
+        "line": 444
       },
       "story_id": null,
       "activity_ids": []
@@ -477,7 +699,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 437
+        "line": 459
       },
       "story_id": null,
       "activity_ids": []
@@ -563,7 +785,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 461
+        "line": 483
       },
       "story_id": null,
       "activity_ids": []
@@ -2477,7 +2699,9 @@
           "children": [],
           "attachments": [],
           "error": null,
-          "activity_ids": [],
+          "activity_ids": [
+            3
+          ],
           "fixture_name": null
         },
         {
@@ -2523,7 +2747,7 @@
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 152
       },
-      "story_id": null,
+      "story_id": "adopt-pytest-given",
       "activity_ids": []
     },
     {
@@ -2607,7 +2831,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 183
+        "line": 184
       },
       "story_id": null,
       "activity_ids": []
@@ -2683,7 +2907,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 197
+        "line": 198
       },
       "story_id": null,
       "activity_ids": []
@@ -2766,7 +2990,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 215
+        "line": 216
       },
       "story_id": null,
       "activity_ids": []
@@ -2782,7 +3006,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -2864,7 +3088,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 239
+        "line": 240
       },
       "story_id": null,
       "activity_ids": []
@@ -2959,7 +3183,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 334
+        "line": 335
       },
       "story_id": null,
       "activity_ids": []
@@ -3045,7 +3269,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 367
+        "line": 368
       },
       "story_id": null,
       "activity_ids": []
@@ -3118,7 +3342,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 381
+        "line": 382
       },
       "story_id": null,
       "activity_ids": []
@@ -5488,6 +5712,90 @@
       "activity_ids": []
     },
     {
+      "id": "tests/unit/capture/test_step_descriptor.py::test_context_manager_basic",
+      "narration": {
+        "text": "A step pairs its narration with a phase",
+        "parts": []
+      },
+      "module": "tests.unit.capture.test_step_descriptor",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a given Step descriptor is created",
+            "parts": [
+              {
+                "value": "a given "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " descriptor is created"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [
+            5
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it carries the given Phase and its Narration",
+            "parts": [
+              {
+                "value": "it carries the given "
+              },
+              {
+                "term_id": "phase",
+                "display": "Phase",
+                "expression": "pg[\"Phase\"]",
+                "param_column": null
+              },
+              {
+                "value": " and its "
+              },
+              {
+                "term_id": "narration",
+                "display": "Narration",
+                "expression": "pg[\"Narration\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_step_descriptor.py",
+        "line": 48
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
       "id": "tests/unit/capture/test_story.py::test_path_dispatches_actor_to_activity_term_ref",
       "narration": {
         "text": "An actor handle in a path becomes a term ref",
@@ -7559,7 +7867,9 @@
           "children": [],
           "attachments": [],
           "error": null,
-          "activity_ids": [],
+          "activity_ids": [
+            2
+          ],
           "fixture_name": null
         },
         {
@@ -7583,7 +7893,7 @@
         "relpath": "tests/unit/capture/test_story.py",
         "line": 381
       },
-      "story_id": null,
+      "story_id": "adopt-pytest-given",
       "activity_ids": []
     },
     {
@@ -7707,7 +8017,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 396
+        "line": 397
       },
       "story_id": null,
       "activity_ids": []
@@ -7833,7 +8143,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 414
+        "line": 415
       },
       "story_id": null,
       "activity_ids": []
@@ -7910,7 +8220,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 434
+        "line": 435
       },
       "story_id": null,
       "activity_ids": []
@@ -8026,7 +8336,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 447
+        "line": 448
       },
       "story_id": null,
       "activity_ids": []
@@ -8103,7 +8413,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 493
+        "line": 494
       },
       "story_id": null,
       "activity_ids": []
@@ -8224,7 +8534,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 563
+        "line": 564
       },
       "story_id": null,
       "activity_ids": []
@@ -9097,7 +9407,9 @@
           "children": [],
           "attachments": [],
           "error": null,
-          "activity_ids": [],
+          "activity_ids": [
+            4
+          ],
           "fixture_name": null
         },
         {
@@ -9134,7 +9446,7 @@
         "relpath": "tests/unit/capture/test_template.py",
         "line": 383
       },
-      "story_id": null,
+      "story_id": "adopt-pytest-given",
       "activity_ids": []
     },
     {
@@ -10658,6 +10970,232 @@
       "activity_ids": []
     },
     {
+      "id": "tests/unit/report/test_html_renderer.py::test_render_parameterized_step_with_structured_narration",
+      "narration": {
+        "text": "Parameter coloring marks placeholders and table headers",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_html_renderer",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 41,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Report holding a Parametrized scenario with a Parameter table",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "Report",
+                "expression": "pg[\"Report\"]",
+                "param_column": null
+              },
+              {
+                "value": " holding a "
+              },
+              {
+                "term_id": "parametrized-scenario",
+                "display": "Parametrized scenario",
+                "expression": "pg[\"Parametrized scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " with a "
+              },
+              {
+                "term_id": "parameter-table",
+                "display": "Parameter table",
+                "expression": "pg[\"Parameter table\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Renderer renders the HTML page",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "renderer",
+                "display": "Renderer",
+                "expression": "pg[\"Renderer\"]",
+                "param_column": null
+              },
+              {
+                "value": " renders the HTML page"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [
+            10
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "Parameter coloring classes mark the merged placeholder and the table headers",
+            "parts": [
+              {
+                "term_id": "parameter-coloring",
+                "display": "Parameter coloring",
+                "expression": "pg[\"Parameter coloring\"]",
+                "param_column": null
+              },
+              {
+                "value": " classes mark the merged placeholder and the table headers"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_html_renderer.py",
+        "line": 165
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/test_plugin.py::test_group_parameterized_any_failed_merges_as_failed",
+      "narration": {
+        "text": "Grouping merges parametrize cases into one scenario",
+        "parts": []
+      },
+      "module": "tests.unit.test_plugin",
+      "tags": [
+        "parametrization"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "three Case records of one Parametrized scenario",
+            "parts": [
+              {
+                "value": "three "
+              },
+              {
+                "term_id": "case",
+                "display": "Case",
+                "expression": "pg[\"Case\"]",
+                "param_column": null
+              },
+              {
+                "value": " records of one "
+              },
+              {
+                "term_id": "parametrized-scenario",
+                "display": "Parametrized scenario",
+                "expression": "pg[\"Parametrized scenario\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the grouping pass merges them",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "group",
+                "display": "grouping",
+                "expression": "pg[\"Group\"](\"grouping\")",
+                "param_column": null
+              },
+              {
+                "value": " pass merges them"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [
+            9
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "one scenario remains and any failed Case fails it",
+            "parts": [
+              {
+                "value": "one scenario remains and any failed "
+              },
+              {
+                "term_id": "case",
+                "display": "Case",
+                "expression": "pg[\"Case\"]",
+                "param_column": null
+              },
+              {
+                "value": " fails it"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/test_plugin.py",
+        "line": 357
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
       "id": "tests/unit/capture/test_glossary.py::test_id_derive_produces_expected_slug[Guest-guest]",
       "narration": {
         "text": "Term ids are derived as URL-safe slugs",
@@ -11059,7 +11597,7 @@
     "terms": [
       {
         "id": "scenario",
-        "kind": null,
+        "kind": "object",
         "canonical": "Scenario",
         "definition": "A test function decorated with `@scenario(...)`. Not every pytest test is a scenario \u2014 undecorated tests are tolerated but not collected.",
         "source": {
@@ -11069,7 +11607,7 @@
       },
       {
         "id": "step",
-        "kind": null,
+        "kind": "object",
         "canonical": "Step",
         "definition": "A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest. Each carries a phase, text, status (`'passed'` by default; set to `'failed'` on the step where a scenario fails, for highlighting in the report), optional error, attachments, and children.",
         "source": {
@@ -11089,7 +11627,7 @@
       },
       {
         "id": "phase",
-        "kind": null,
+        "kind": "object",
         "canonical": "Phase",
         "definition": "The category of a step: `given`, `when`, or `then`. A step has exactly one phase.",
         "source": {
@@ -11109,7 +11647,7 @@
       },
       {
         "id": "tag",
-        "kind": null,
+        "kind": "object",
         "canonical": "Tag",
         "definition": "Free-form string label attached via `@scenario(name, tags=[...])`. Used by the report's filter UI.",
         "source": {
@@ -11119,7 +11657,7 @@
       },
       {
         "id": "attachment",
-        "kind": null,
+        "kind": "object",
         "canonical": "Attachment",
         "definition": "A labeled blob (text or JSON) bound to the currently-active step via `attach(label, content)`.",
         "source": {
@@ -11129,7 +11667,7 @@
       },
       {
         "id": "parametrized-scenario",
-        "kind": null,
+        "kind": "object",
         "canonical": "Parametrized scenario",
         "definition": "A `@scenario`-decorated test that also carries `@pytest.mark.parametrize(...)`. Produces multiple scenario records during a run; pytest-given groups them.",
         "source": {
@@ -11149,7 +11687,7 @@
       },
       {
         "id": "parameter-table",
-        "kind": null,
+        "kind": "object",
         "canonical": "Parameter table",
         "definition": "The per-scenario grouping of column names + cases. Appears in the report below the grouped-template steps.",
         "source": {
@@ -11159,7 +11697,7 @@
       },
       {
         "id": "group",
-        "kind": null,
+        "kind": "verb",
         "canonical": "Group",
         "definition": "Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a parameter table. Scenarios group when they share the same name and module.",
         "source": {
@@ -11179,7 +11717,7 @@
       },
       {
         "id": "step-fixture",
-        "kind": null,
+        "kind": "object",
         "canonical": "Step fixture",
         "definition": "A pytest fixture whose function is wrapped with `@given(text)`. Only `@given` is allowed on fixtures; `@when` / `@then` are rejected.",
         "source": {
@@ -11199,7 +11737,7 @@
       },
       {
         "id": "fixture-recording",
-        "kind": null,
+        "kind": "object",
         "canonical": "Fixture recording",
         "definition": "A captured subtree of steps + attachments produced while a step fixture is being set up (and, for generator fixtures, torn down). Stored keyed by fixture-instance identity.",
         "source": {
@@ -11209,7 +11747,7 @@
       },
       {
         "id": "graft",
-        "kind": null,
+        "kind": "verb",
         "canonical": "Graft",
         "definition": "Attaching a fixture recording into the active scenario's step tree at the moment its host test starts.",
         "source": {
@@ -11219,7 +11757,7 @@
       },
       {
         "id": "collector",
-        "kind": null,
+        "kind": "actor",
         "canonical": "Collector",
         "definition": "The module-level singleton that accumulates scenarios, fixture recordings, and parameter info during a pytest session. Reset at the start of each session.",
         "source": {
@@ -11249,7 +11787,7 @@
       },
       {
         "id": "step-stack",
-        "kind": null,
+        "kind": "object",
         "canonical": "Step stack",
         "definition": "The chain of currently-open steps; entered by `with given(...)`, popped on exit. Mirrored inside a fixture recording while a fixture body is running.",
         "source": {
@@ -11259,7 +11797,7 @@
       },
       {
         "id": "report",
-        "kind": null,
+        "kind": "object",
         "canonical": "Report",
         "definition": "The output artifact: a JSON data file and an optional self-contained HTML page derived from it. The JSON is the source of truth.",
         "source": {
@@ -11269,7 +11807,7 @@
       },
       {
         "id": "renderer",
-        "kind": null,
+        "kind": "actor",
         "canonical": "Renderer",
         "definition": "Converts a JSON report into a self-contained HTML page.",
         "source": {
@@ -11279,7 +11817,7 @@
       },
       {
         "id": "parameter-coloring",
-        "kind": null,
+        "kind": "object",
         "canonical": "Parameter coloring",
         "definition": "Each parametrize column gets a stable highlight color; placeholders and matching values share that color wherever they appear in step text and the parameter table.",
         "source": {
@@ -11308,23 +11846,13 @@
         }
       },
       {
-        "id": "glossary-lowercase",
-        "kind": null,
-        "canonical": "glossary (lowercase)",
-        "definition": "The Ubiquitous-Language concept: the shared vocabulary a domain speaks in.",
+        "id": "glossary",
+        "kind": "object",
+        "canonical": "Glossary",
+        "definition": "The Ubiquitous-Language concept \u2014 the shared vocabulary a domain speaks in \u2014 and the class that realizes it: `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.verb(...)` registration methods and `g('foo')` (declare-or-get a kindless term, optional `definition=`) / `g['foo']` (get-only, raises on unknown) accessor forms.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 65
-        }
-      },
-      {
-        "id": "glossary-capitalized",
-        "kind": null,
-        "canonical": "Glossary (capitalized)",
-        "definition": "The class that holds glossary terms \u2014 `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.verb(...)` registration methods and `g('foo')` (declare-or-get a kindless term, optional `definition=`) / `g['foo']` (get-only, raises on unknown) accessor forms.",
-        "source": {
-          "relpath": "GLOSSARY.md",
-          "line": 66
         }
       },
       {
@@ -11334,7 +11862,7 @@
         "definition": "A glossary loaded from a Markdown file, via the `FileGlossary(path)` class. It parses all GFM pipe tables in the file into the same inner `Glossary` model; terms are accessed by name (`g['Guest']`, case-insensitive). *Kind inference* fills in term kinds post-collection from activity *slot* positions when no explicit `kind_column` is configured.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 67
+          "line": 66
         }
       },
       {
@@ -11344,7 +11872,7 @@
         "definition": "A term obtained before its kind is known \u2014 the `DeferredTermHandle` returned by the code glossary (`g('foo')` declare-or-get, `g['foo']` get-only) and by a *file glossary* (`g['Guest']`). One handle type serves all kinds (unlike the eager Actor/Work Object/Verb handles); the kind stays `None` until *kind inference* runs.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 68
+          "line": 67
         }
       },
       {
@@ -11354,7 +11882,7 @@
         "definition": "A registered glossary entry: an Actor, Work Object, Verb, or kindless term. Each carries an id (slug), a canonical name, a kind (`None` when kindless), and an optional definition (`str",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 69
+          "line": 68
         }
       },
       {
@@ -11364,7 +11892,7 @@
         "definition": "A glossary term for a participant in the domain (e.g., *Guest*). Renders with the actor pill style.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 70
+          "line": 69
         }
       },
       {
@@ -11374,7 +11902,7 @@
         "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*). Renders with the work-object pill style.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 71
+          "line": 70
         }
       },
       {
@@ -11384,7 +11912,7 @@
         "definition": "A glossary term for an action (e.g., *book*, *confirm*). Verbs accept inflections \u2014 calling `book('books')` records *books* as a surface form of the canonical *book*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 72
+          "line": 71
         }
       },
       {
@@ -11394,7 +11922,7 @@
         "definition": "An occurrence of a term inside narration. Modelled as `NarrationTermRef` in step text and as `ActivityTermRef` inside activity prose.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 73
+          "line": 72
         }
       },
       {
@@ -11404,7 +11932,7 @@
         "definition": "A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). Instances aggregate in the Glossary tab's refs block.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 74
+          "line": 73
         }
       },
       {
@@ -11414,27 +11942,27 @@
         "definition": "A surface form of a Verb other than its canonical name (e.g., *searches for* as an inflection of *search*). Reported under \"Also used as:\" in the Glossary.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 75
+          "line": 74
         }
       },
       {
         "id": "story",
-        "kind": null,
+        "kind": "object",
         "canonical": "Story",
         "definition": "A named flow modelled as a sequence of activities. Constructed by `story('Title', [activity(...), ...])`. Stories are first-class report tabs and the unit of coverage.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 76
+          "line": 75
         }
       },
       {
         "id": "activity",
-        "kind": null,
+        "kind": "object",
         "canonical": "Activity",
         "definition": "One row in a story \u2014 typically `actor + verb + work_object` plus optional connective words. Constructed by `activity(...)`.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 77
+          "line": 76
         }
       },
       {
@@ -11444,7 +11972,7 @@
         "definition": "The two-variant union making up an activity's prose (`ActivityPart` = `ActivityTermRef",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 78
+          "line": 77
         }
       },
       {
@@ -11454,7 +11982,7 @@
         "definition": "A branching segment inside a story \u2014 `path(...)` lets alternate activity sequences share a prefix.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 79
+          "line": 78
         }
       },
       {
@@ -11464,7 +11992,7 @@
         "definition": "A position role in an activity path, from its node/edge alternation: position 0 is the actor slot, odd positions are verb slots, and even positions \u2265 2 are noun slots. Slots drive both path validation and *kind inference*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 80
+          "line": 79
         }
       },
       {
@@ -11474,17 +12002,17 @@
         "definition": "The link between a scenario (or step) and one or more story activities. Carried by `@scenario(story=, activities=)` and the `activity=` kwarg on `given`/`when`/`then`.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 81
+          "line": 80
         }
       },
       {
         "id": "coverage",
         "kind": null,
         "canonical": "Coverage",
-        "definition": "The \"did this scenario touch that activity\" relation. Computed by the *A_refs \u2286 S* rule: an activity is covered when its set of term references (as identities, with a canonical fallback) is a subset of the union of term-reference identities across the scenario's steps.",
+        "definition": "The \"did this scenario touch that activity\" relation. Computed by the *A_refs \u2286 S* rule: an activity is covered when its set of term references (as identities, with a canonical fallback) is a subset of a single step's term-reference identities \u2014 matching is per step, not against the union across steps. A step can also cover an activity explicitly via the `activity=` pin, regardless of its narration.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 82
+          "line": 81
         }
       },
       {
@@ -11494,7 +12022,7 @@
         "definition": "The post-collection pass (`resolve_glossary_kinds`) that assigns each undeclared term a kind from the *slot* positions it occupies across all story activities; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any activity stays *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 83
+          "line": 82
         }
       },
       {
@@ -11504,7 +12032,7 @@
         "definition": "A term with `kind=None` \u2014 left unset when *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in an activity). Shown in the report's *Uncategorized* bucket.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 84
+          "line": 83
         }
       },
       {
@@ -11514,20 +12042,357 @@
         "definition": "A term with `definition is None`; surfaced by a badge and filter in the Glossary view. Orthogonal to *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 85
+          "line": 84
         }
       },
       {
-        "id": "uncategorized",
-        "kind": null,
-        "canonical": "Uncategorized",
-        "definition": "The Glossary-view bucket for kindless terms (kind inference left `kind=None`).",
+        "id": "developer",
+        "kind": "actor",
+        "canonical": "Developer",
+        "definition": "Person who writes the application code and \u2014 together with the *Agent* \u2014 the scenarios; curates the glossary with the *Domain Expert*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 86
+          "line": 92
+        }
+      },
+      {
+        "id": "domain-expert",
+        "kind": "actor",
+        "canonical": "Domain Expert",
+        "definition": "Person who owns the domain knowledge and the ubiquitous language; source of domain stories and reviewer of scenarios and reports. A stakeholder in the broad sense.",
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 93
+        }
+      },
+      {
+        "id": "agent",
+        "kind": "actor",
+        "canonical": "Agent",
+        "definition": "AI coding agent that authors and maintains scenarios alongside the *Developer*, guided by the pytest-given skills.",
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 94
         }
       }
     ]
   },
-  "stories": []
+  "stories": [
+    {
+      "id": "adopt-pytest-given",
+      "title": "Adopt pytest-given",
+      "activities": [
+        {
+          "id": 1,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "domain-expert",
+                  "display": "Domain Expert"
+                },
+                {
+                  "text": "tells"
+                },
+                {
+                  "term_id": "story",
+                  "display": "Story"
+                },
+                {
+                  "text": "to the"
+                },
+                {
+                  "term_id": "developer",
+                  "display": "Developer"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "developer",
+                  "display": "Developer"
+                },
+                {
+                  "text": "captures"
+                },
+                {
+                  "term_id": "story",
+                  "display": "Story"
+                },
+                {
+                  "text": "as"
+                },
+                {
+                  "term_id": "activity",
+                  "display": "Activity"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "developer",
+                  "display": "Developer"
+                },
+                {
+                  "text": "builds"
+                },
+                {
+                  "term_id": "glossary",
+                  "display": "Glossary"
+                },
+                {
+                  "text": "with the"
+                },
+                {
+                  "term_id": "domain-expert",
+                  "display": "Domain Expert"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "agent",
+                  "display": "Agent"
+                },
+                {
+                  "text": "writes"
+                },
+                {
+                  "term_id": "scenario",
+                  "display": "Scenario"
+                },
+                {
+                  "text": "with"
+                },
+                {
+                  "term_id": "tag",
+                  "display": "Tag"
+                },
+                {
+                  "text": "against the"
+                },
+                {
+                  "term_id": "glossary",
+                  "display": "Glossary"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "agent",
+                  "display": "Agent"
+                },
+                {
+                  "text": "narrates"
+                },
+                {
+                  "term_id": "step",
+                  "display": "Step"
+                },
+                {
+                  "text": "with a"
+                },
+                {
+                  "term_id": "phase",
+                  "display": "Phase"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "agent",
+                  "display": "Agent"
+                },
+                {
+                  "text": "attaches"
+                },
+                {
+                  "term_id": "attachment",
+                  "display": "Attachment"
+                },
+                {
+                  "text": "to a"
+                },
+                {
+                  "term_id": "step",
+                  "display": "Step"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "collector",
+                  "display": "Collector"
+                },
+                {
+                  "text": "records"
+                },
+                {
+                  "term_id": "step",
+                  "display": "Step"
+                },
+                {
+                  "text": "on the"
+                },
+                {
+                  "term_id": "step-stack",
+                  "display": "Step stack"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "collector",
+                  "display": "Collector"
+                },
+                {
+                  "term_id": "graft",
+                  "display": "grafts"
+                },
+                {
+                  "term_id": "fixture-recording",
+                  "display": "Fixture recording"
+                },
+                {
+                  "text": "from a"
+                },
+                {
+                  "term_id": "step-fixture",
+                  "display": "Step fixture"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "collector",
+                  "display": "Collector"
+                },
+                {
+                  "term_id": "group",
+                  "display": "groups"
+                },
+                {
+                  "term_id": "parametrized-scenario",
+                  "display": "Parametrized scenario"
+                },
+                {
+                  "text": "into a"
+                },
+                {
+                  "term_id": "parameter-table",
+                  "display": "Parameter table"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "renderer",
+                  "display": "Renderer"
+                },
+                {
+                  "text": "renders"
+                },
+                {
+                  "term_id": "report",
+                  "display": "Report"
+                },
+                {
+                  "text": "with"
+                },
+                {
+                  "term_id": "parameter-coloring",
+                  "display": "Parameter coloring"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "paths": [
+            {
+              "parts": [
+                {
+                  "term_id": "domain-expert",
+                  "display": "Domain Expert"
+                },
+                {
+                  "text": "reviews"
+                },
+                {
+                  "term_id": "scenario",
+                  "display": "Scenario"
+                },
+                {
+                  "text": "in the"
+                },
+                {
+                  "term_id": "report",
+                  "display": "Report"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "source": {
+        "relpath": "tests/ubiquitous_language.py",
+        "line": 51
+      }
+    }
+  ]
 }

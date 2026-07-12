@@ -1,42 +1,56 @@
 # pytest-given — pytest-given
 
+## ✓ Steps record with their phases
+`tests/unit/capture/test_collector.py:33::test_collect_steps` · happy-path
+
+- **given** an «Active scenario» in a fresh «Collector»
+- **when** a given and a when «Step» are pushed
+- **then** each «Step» carries its «Phase»
+
 ## ✓ Steps pushed during fixture setup record into the fixture recording
-`tests/unit/capture/test_collector.py:195::test_push_step_during_fixture_setup_records_into_recording` · happy-path
+`tests/unit/capture/test_collector.py:203::test_push_step_during_fixture_setup_records_into_recording` · happy-path
 
 - **given** a «Fixture recording» under setup
 - **when** a «Step» is pushed inside the fixture body
 - **then** it is recorded as a child of the recording root
 
+## ✓ An attachment lands on the step being recorded
+`tests/unit/capture/test_collector.py:222::test_attach_during_fixture_setup_records_into_recording` · happy-path
+
+- **given** a «Fixture recording» under setup
+- **when** an «Attachment» is attached inside the fixture body
+- **then** the «Attachment» lands on the recording root
+
 ## ✓ Fixture-body steps do not leak into the active scenario
-`tests/unit/capture/test_collector.py:225::test_push_step_routing_isolates_recording_from_scenario` · happy-path
+`tests/unit/capture/test_collector.py:241::test_push_step_routing_isolates_recording_from_scenario` · happy-path
 
 - **given** an «Active scenario» with a «Fixture recording»
 - **when** a «Step» is pushed inside the fixture body
 - **then** the step lives only in the recording, not the scenario
 
 ## ✓ A fixture recording is deep-copied when grafted
-`tests/unit/capture/test_collector.py:286::test_graft_recording_deep_copies_into_scenario` · happy-path
+`tests/unit/capture/test_collector.py:302::test_graft_recording_deep_copies_into_scenario` · happy-path
 
 - **given** a «Fixture recording» with a nested child «Step»
 - **when** a «Graft» copies it into the «Active scenario»
 - **then** the scenario gains a deep copy of the recorded steps
 
 ## ✓ A leaf given is grafted as a childless given step
-`tests/unit/capture/test_collector.py:422::test_graft_leaf_given_appends_childless_given_step` · happy-path
+`tests/unit/capture/test_collector.py:444::test_graft_leaf_given_appends_childless_given_step` · happy-path
 
 - **given** an «Active scenario» is being recorded
 - **when** a leaf «Graft» appends a childless «Step»
 - **then** the step is a given with no children
 
 ## ✓ Grafting with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:437::test_graft_recording_override_replaces_root_narration_keeps_children` · happy-path
+`tests/unit/capture/test_collector.py:459::test_graft_recording_override_replaces_root_narration_keeps_children` · happy-path
 
 - **given** a «Fixture recording» whose root has a label and a child
 - **when** a «Graft» supplies an override «Narration»
 - **then** the grafted root shows the override text and keeps its children
 
 ## ✓ Grafting with no active scenario is a no-op
-`tests/unit/capture/test_collector.py:461::test_graft_leaf_given_without_scenario_is_noop` · happy-path
+`tests/unit/capture/test_collector.py:483::test_graft_leaf_given_without_scenario_is_noop` · happy-path
 
 - **given** a collector with no «Active scenario»
 - **when** a leaf «Graft» runs
@@ -316,49 +330,49 @@
 - **then** a typed «Actor» handle with the «Actor» kind is returned
 
 ## ✓ Re-registering a term with matching fields is idempotent
-`tests/unit/capture/test_glossary.py:183::test_glossary_re_registration_with_matching_fields_is_idempotent` · happy-path
+`tests/unit/capture/test_glossary.py:184::test_glossary_re_registration_with_matching_fields_is_idempotent` · happy-path
 
 - **given** an «Actor» already registered with a definition
 - **when** the same name and definition are registered again
 - **then** both handles share the one «Term»
 
 ## ✓ Re-registering a term with a different definition is rejected
-`tests/unit/capture/test_glossary.py:197::test_glossary_re_registration_with_mismatched_definition_raises` · validation
+`tests/unit/capture/test_glossary.py:198::test_glossary_re_registration_with_mismatched_definition_raises` · validation
 
 - **given** an «Actor» already registered with one definition
 - **when** the name is registered again with a different definition
 - **then** a PytestGivenError reports the conflict with the prior registration
 
 ## ✓ The same name cannot be two different kinds
-`tests/unit/capture/test_glossary.py:215::test_glossary_cross_kind_collision_raises` · validation
+`tests/unit/capture/test_glossary.py:216::test_glossary_cross_kind_collision_raises` · validation
 
 - **given** a name already registered as an «Actor»
 - **when** the same name is registered as a «Verb»
 - **then** a PytestGivenError reports the conflict with the prior registration
 
 ## ✓ Registering an actor captures its definition site
-`tests/unit/capture/test_glossary.py:239::test_glossary_actor_captures_source` · happy-path
+`tests/unit/capture/test_glossary.py:240::test_glossary_actor_captures_source` · happy-path
 
 - **given** a rootdir-aware glossary
 - **when** an «Actor» is registered
 - **then** the «Term» records a «Source link» to this file
 
 ## ✓ Calling the glossary declares a kindless term
-`tests/unit/capture/test_glossary.py:334::test_call_declares_kindless_term` · happy-path
+`tests/unit/capture/test_glossary.py:335::test_call_declares_kindless_term` · happy-path
 
 - **given** an empty glossary
 - **when** a «Term» is declared by call, without a kind
 - **then** the «Term» is registered as «Kindless»
 
 ## ✓ Subscript looks up an already-declared term
-`tests/unit/capture/test_glossary.py:367::test_subscript_get_only_returns_handle` · happy-path
+`tests/unit/capture/test_glossary.py:368::test_subscript_get_only_returns_handle` · happy-path
 
 - **given** a glossary with one declared «Term»
 - **when** the name is looked up by subscript
 - **then** the returned «Term» is the declared one
 
 ## ✓ Subscripting an unknown name raises with a hint
-`tests/unit/capture/test_glossary.py:381::test_subscript_unknown_name_raises_with_hint` · validation
+`tests/unit/capture/test_glossary.py:382::test_subscript_unknown_name_raises_with_hint` · validation
 
 - **given** a glossary with one declared «Term»
 - **when** a near-miss name is subscripted
@@ -679,6 +693,12 @@
 - **when** the parser reads the document
 - **then** only the real pipe table produces rows
 
+## ✓ A step pairs its narration with a phase
+`tests/unit/capture/test_step_descriptor.py:48::test_context_manager_basic` · happy-path
+
+- **when** a given «Step» descriptor is created
+- **then** it carries the given «Phase» and its «Narration»
+
 ## ✓ An actor handle in a path becomes a term ref
 `tests/unit/capture/test_story.py:54::test_path_dispatches_actor_to_activity_term_ref` · story-grammar, happy-path
 
@@ -841,7 +861,7 @@
 - **then** the activities are numbered 1 and 2
 
 ## ✓ Auto-numbering skips ids already taken explicitly
-`tests/unit/capture/test_story.py:396::test_story_auto_numbering_skips_taken_explicit_ids` · story-grammar, happy-path
+`tests/unit/capture/test_story.py:397::test_story_auto_numbering_skips_taken_explicit_ids` · story-grammar, happy-path
 
 - **given** a Guest actor
 - **given** a search verb
@@ -851,7 +871,7 @@
 - **then** auto picks skip the ids already used explicitly
 
 ## ✓ Duplicate activity ids in a story are rejected
-`tests/unit/capture/test_story.py:414::test_story_rejects_duplicate_activity_ids` · story-grammar, validation
+`tests/unit/capture/test_story.py:415::test_story_rejects_duplicate_activity_ids` · story-grammar, validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -861,14 +881,14 @@
 - **then** a PytestGivenError reports the duplicate activity id
 
 ## ✓ A story derives its id from its title
-`tests/unit/capture/test_story.py:434::test_story_derives_id_from_title` · story-grammar, happy-path
+`tests/unit/capture/test_story.py:435::test_story_derives_id_from_title` · story-grammar, happy-path
 
 - **given** a human-readable story title
 - **when** a «Story» is built from it
 - **then** its id is the slugified title
 
 ## ✓ A story may span only one glossary
-`tests/unit/capture/test_story.py:447::test_story_rejects_two_glossaries` · story-grammar, validation
+`tests/unit/capture/test_story.py:448::test_story_rejects_two_glossaries` · story-grammar, validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -878,14 +898,14 @@
 - **then** a PytestGivenError says a story spans multiple glossaries
 
 ## ✓ Two stories with the same id collide
-`tests/unit/capture/test_story.py:493::test_story_id_collision_raises_with_both_sites` · story-grammar, validation
+`tests/unit/capture/test_story.py:494::test_story_id_collision_raises_with_both_sites` · story-grammar, validation
 
 - **given** a «Story» already declared under an id
 - **when** a second story is declared with the same slug
 - **then** a PytestGivenError reports the id was already declared
 
 ## ✓ A path may chain a second verb-object pair
-`tests/unit/capture/test_story.py:563::test_path_allows_second_verb_edge` · story-grammar, happy-path
+`tests/unit/capture/test_story.py:564::test_path_allows_second_verb_edge` · story-grammar, happy-path
 
 - **given** an «Actor», two «Verb» and two «Work Object» handles
 - **when** they form a five-node «Path» (actor verb object verb object)
@@ -1058,6 +1078,20 @@
 - **given** a «Story» whose «Activity» is under-anchored
 - **when** a «Step» binds to it explicitly by id
 - **then** eligibility gates the binding, so «Coverage» stays empty
+
+## ✓ Parameter coloring marks placeholders and table headers
+`tests/unit/report/test_html_renderer.py:165::test_render_parameterized_step_with_structured_narration` · happy-path
+
+- **given** a «Report» holding a «Parametrized scenario» with a «Parameter table»
+- **when** the «Renderer» renders the HTML page
+- **then** «Parameter coloring» classes mark the merged placeholder and the table headers
+
+## ✓ Grouping merges parametrize cases into one scenario
+`tests/unit/test_plugin.py:357::test_group_parameterized_any_failed_merges_as_failed` · parametrization
+
+- **given** three «Case» records of one «Parametrized scenario»
+- **when** the «grouping» pass merges them
+- **then** one scenario remains and any failed «Case» fails it
 
 ## ✓ Term ids are derived as URL-safe slugs · 8 cases
 `tests/unit/capture/test_glossary.py:30::test_id_derive_produces_expected_slug` · happy-path
