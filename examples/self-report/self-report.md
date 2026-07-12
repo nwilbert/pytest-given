@@ -1016,6 +1016,176 @@
 - **when** it is interpolated into a t-string step
 - **then** the step carries a single «Term ref» pill
 
+## ✓ The glossary view aggregates instances and verb forms
+`tests/unit/report/test_aggregations.py:160::test_build_glossary_aggregations_collects_instances_and_forms` · happy-path
+
+- **given** a «Report» whose «Story» and «Scenario» reference entity «Instance»s and an «Inflection»
+  - 📎 Report data:
+    ```
+    {
+      "metadata": {
+        "project": "p",
+        "timestamp": "t",
+        "pytest_version": "8",
+        "plugin_version": "0",
+        "commit_sha": null
+      },
+      "scenarios": [
+        {
+          "id": "t",
+          "narration": {
+            "text": "s",
+            "parts": []
+          },
+          "module": "m",
+          "tags": [],
+          "status": "passed",
+          "duration_ms": 0,
+          "steps": [
+            {
+              "phase": "when",
+              "narration": {
+                "text": "x",
+                "parts": [
+                  {
+                    "term_id": "guest",
+                    "display": "Alice",
+                    "expression": "",
+                    "param_column": null
+                  },
+                  {
+                    "term_id": "search",
+                    "display": "searches",
+                    "expression": "",
+                    "param_column": null
+                  },
+                  {
+                    "term_id": "room",
+                    "display": "Deluxe Suite",
+                    "expression": "",
+                    "param_column": null
+                  }
+                ]
+              },
+              "status": "passed",
+              "children": [],
+              "attachments": [],
+              "error": null,
+              "activity_ids": [],
+              "fixture_name": null
+            }
+          ],
+          "parameters": null,
+          "error": null,
+          "skip_reason": null,
+          "source": null,
+          "story_id": "book",
+          "activity_ids": []
+        }
+      ],
+      "glossary": {
+        "terms": [
+          {
+            "id": "guest",
+            "kind": "actor",
+            "canonical": "Guest",
+            "definition": null,
+            "source": null
+          },
+          {
+            "id": "room",
+            "kind": "object",
+            "canonical": "Room",
+            "definition": null,
+            "source": null
+          },
+          {
+            "id": "search",
+            "kind": "verb",
+            "canonical": "search",
+            "definition": null,
+            "source": null
+          }
+        ]
+      },
+      "stories": [
+        {
+          "id": "book",
+          "title": "Book",
+          "activities": [
+            {
+              "id": 1,
+              "paths": [
+                {
+                  "parts": [
+                    {
+                      "term_id": "guest",
+                      "display": "Alice"
+                    },
+                    {
+                      "term_id": "search",
+                      "display": "searches for"
+                    },
+                    {
+                      "term_id": "room",
+                      "display": "Deluxe Suite"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "source": null
+        }
+      ]
+    }
+    ```
+- **when** the «Glossary» aggregations are built
+- **then** the entity terms collect their «Instance»s
+- **then** the verb collects its «Inflection» but not its canonical form
+
+## ✓ Terms referenced by an activity record the story
+`tests/unit/report/test_aggregations.py:264::test_build_glossary_aggregations_records_story_refs_via_activities` · happy-path
+
+- **given** a «Story» whose «Activity» references an actor and a verb
+- **when** the «Glossary» aggregations are built
+- **then** the actor and the verb each list that «Story»
+
+## ✓ A canonical entity reference is not an instance
+`tests/unit/report/test_aggregations.py:334::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance` · happy-path
+
+- **given** a «Story» activity and a «Step» referencing entities by canonical name only
+- **when** the «Glossary» aggregations are built
+- **then** neither entity term records an «Instance»
+
+## ✓ A kindless term records only its story ref
+`tests/unit/report/test_aggregations.py:423::test_build_glossary_aggregations_kindless_term_records_only_story_ref` · happy-path
+
+- **given** a «Kindless» «Term» referenced by a «Story» activity
+- **when** the «Glossary» aggregations are built
+- **then** the «Term» lists the «Story» but no «Instance» and no «Inflection»
+
+## ✓ An instance seen in a fixture step records its fixture provenance
+`tests/unit/report/test_aggregations.py:457::test_glossary_aggregations_annotates_fixture_provenance` · happy-path
+
+- **given** a «Scenario» whose fixture-sourced «Step» names an «Instance»
+- **when** the «Glossary» aggregations are built
+- **then** the «Instance» carries the fixture name
+
+## ✓ The term index maps each term to its scenarios once
+`tests/unit/report/test_aggregations.py:552::test_build_term_scenario_index_dedups_and_includes_scenario_narration` · happy-path
+
+- **given** a «Scenario» referencing one «Term» in two steps and another in its name
+- **when** the term-scenario index is built
+- **then** each «Term» maps to the scenario exactly once
+
+## ✓ An under-anchored activity is flagged ineligible in rollups
+`tests/unit/report/test_aggregations.py:664::test_build_story_rollups_flags_under_anchored_activity_ineligible` · happy-path
+
+- **given** a «Story» with an anchored and an under-anchored «Activity»
+- **when** the story rollups are built
+- **then** only the anchored «Activity» is «Coverage»-eligible
+
 ## ✓ A verb activity ref has one identity regardless of inflection
 `tests/unit/report/test_coverage.py:66::test_identity_of_activity_term_ref_verb_ignores_display` · happy-path
 
@@ -1069,49 +1239,49 @@
 `tests/unit/report/test_coverage.py:316::test_compute_coverage_scenario_constrained_to_activity_ids` · happy-path
 
 - **given** a «Story» with two matching activities
-- **when** the «Scenario» binds only to activity 1
+- **when** the «Scenario» «binds» only to activity 1
 - **then** «Coverage» considers only the bound «Activity»
 
 ## ✓ An activity with two distinct terms is coverage-eligible
-`tests/unit/report/test_coverage.py:359::test_is_coverage_eligible_true_for_two_distinct_terms` · happy-path
+`tests/unit/report/test_coverage.py:362::test_is_coverage_eligible_true_for_two_distinct_terms` · happy-path
 
 - **given** an «Activity» anchored by two distinct «Term» refs
 - **when** its «Coverage» eligibility is checked
 - **then** it is eligible for «Coverage» tracking
 
 ## ✓ An under-anchored activity is not coverage-eligible
-`tests/unit/report/test_coverage.py:381::test_is_coverage_eligible_false_for_one_distinct_term` · happy-path
+`tests/unit/report/test_coverage.py:384::test_is_coverage_eligible_false_for_one_distinct_term` · happy-path
 
 - **given** an «Activity» that mentions only one distinct «Term»
 - **when** its «Coverage» eligibility is checked
 - **then** it is ineligible — «Coverage» needs at least two anchors
 
 ## ✓ An under-anchored activity is never reported as covered
-`tests/unit/report/test_coverage.py:412::test_compute_coverage_excludes_under_anchored_activity` · happy-path
+`tests/unit/report/test_coverage.py:415::test_compute_coverage_excludes_under_anchored_activity` · happy-path
 
 - **given** a «Story» whose «Activity» is all bare words
 - **when** coverage is computed against a scenario
 - **then** «Coverage» excludes the under-anchored «Activity»
 
 ## ✓ Nested steps are walked for coverage
-`tests/unit/report/test_coverage.py:436::test_compute_coverage_nested_steps_are_walked` · happy-path
+`tests/unit/report/test_coverage.py:439::test_compute_coverage_nested_steps_are_walked` · happy-path
 
 - **given** a «Story» with one canonical «Activity»
 - **when** the covering «Term ref»s live in a nested child «Step»
 - **then** the nested «Step» still counts and the «Activity» is covered
 
 ## ✓ An explicit step binding covers an eligible activity
-`tests/unit/report/test_coverage.py:472::test_compute_coverage_explicit_step_binding_covers_eligible_activity` · happy-path
+`tests/unit/report/test_coverage.py:475::test_compute_coverage_explicit_step_binding_covers_eligible_activity` · happy-path
 
 - **given** a «Story» with a coverage-eligible «Activity»
-- **when** a «Step» binds to it explicitly by id
+- **when** a «Step» «binds» to it explicitly by id
 - **then** «Coverage» counts it directly, without identity matching
 
 ## ✓ An explicit binding still requires eligibility
-`tests/unit/report/test_coverage.py:498::test_compute_coverage_explicit_binding_ignored_for_ineligible_activity` · validation
+`tests/unit/report/test_coverage.py:504::test_compute_coverage_explicit_binding_ignored_for_ineligible_activity` · validation
 
 - **given** a «Story» whose «Activity» is under-anchored
-- **when** a «Step» binds to it explicitly by id
+- **when** a «Step» «binds» to it explicitly by id
 - **then** eligibility gates the binding, so «Coverage» stays empty
 
 ## ✓ Parameter coloring marks placeholders and table headers
@@ -1120,6 +1290,143 @@
 - **given** a «Report» holding a «Parametrized scenario» with a «Parameter table»
 - **when** the «Renderer» renders the HTML page
 - **then** «Parameter coloring» classes mark the merged placeholder and the table headers
+
+## ✓ A passed scenario renders as a checked heading with step bullets
+`tests/unit/report/test_md_renderer.py:41::test_passed_scenario_heading_and_steps` · happy-path
+
+- **given** a «Report» holding a passed «Scenario» with three steps
+  - 📎 Scenario record:
+    ```
+    {
+      "id": "tests/t.py::test_buy",
+      "narration": {
+        "text": "Buy coffee",
+        "parts": []
+      },
+      "module": "tests/t.py",
+      "tags": [
+        "billing",
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a machine",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I insert $2",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "I get a coffee",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": null,
+      "story_id": null,
+      "activity_ids": []
+    }
+    ```
+- **when** the Markdown «Report» is rendered
+- **then** the heading is checked and each «Step» is a phase bullet
+
+## ✓ Nested steps indent under their parent
+`tests/unit/report/test_md_renderer.py:140::test_nested_steps_indent` · happy-path
+
+- **given** a «Scenario» whose when «Step» has a nested child
+- **when** the Markdown «Report» is rendered
+- **then** the child bullet indents under its parent
+
+## ✓ Structured narration renders terms, values and placeholders
+`tests/unit/report/test_md_renderer.py:162::test_narration_parts_resolve_terms_and_values` · step-text
+
+- **given** a «Step» whose «Narration» carries a «Term ref», a value and a placeholder
+- **when** the Markdown «Report» is rendered
+- **then** the «Term ref» renders in guillemets, the value verbatim and the placeholder in braces
+
+## ✓ A parametrized scenario renders its parameter table
+`tests/unit/report/test_md_renderer.py:216::test_parametrized_scenario_renders_table` · parametrization
+
+- **given** a «Parametrized scenario» with a two-«Case» «Parameter table»
+- **when** the Markdown «Report» is rendered
+- **then** the heading counts the cases and the «Parameter table» lists each row
+
+## ✓ A failing step is marked with a minimal error digest
+`tests/unit/report/test_md_renderer.py:249::test_failing_step_is_marked_with_minimal_error` · happy-path
+
+- **given** a failed «Scenario» whose then «Step» carries a two-line error and an internal frame
+  - 📎 Error record:
+    ```
+    {
+      "message": "ValueError: not sold out\nassert 1 == 0",
+      "frames": [
+        {
+          "path": "/x/_pytest/runner.py",
+          "lineno": 1,
+          "func": "run",
+          "code": "",
+          "is_internal": true
+        },
+        {
+          "path": "/x/tests/test_shop.py",
+          "lineno": 88,
+          "func": "test_sold_out",
+          "code": "buy(m)",
+          "is_internal": false
+        }
+      ],
+      "error_tail": null
+    }
+    ```
+- **when** the Markdown «Report» is rendered
+- **then** the heading is crossed and the failed step is marked
+- **then** only the first message line and the non-internal frame are quoted
+
+## ✓ A multi-line attachment renders as a fenced block
+`tests/unit/report/test_md_renderer.py:321::test_multiline_attachment_renders_fenced_block` · happy-path
+
+- **given** a «Step» carrying a multi-line «Attachment»
+- **when** the Markdown «Report» is rendered
+- **then** the «Attachment» content sits in an indented fence, not inline
+
+## ✓ A skipped scenario shows its skip reason
+`tests/unit/report/test_md_renderer.py:419::test_skipped_scenario_shows_reason` · happy-path
+
+- **given** a skipped «Scenario» with a reason
+- **when** the Markdown «Report» is rendered
+- **then** the heading is marked skipped and the reason follows the node id
 
 ## ✓ Grouping merges parametrize cases into one scenario
 `tests/unit/test_plugin.py:357::test_group_parameterized_any_failed_merges_as_failed` · parametrization

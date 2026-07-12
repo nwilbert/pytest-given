@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-12T12:16:06.457947+00:00",
+    "timestamp": "2026-07-12T12:26:30.518768+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "af79af068d6399995b544be54e0ee292171edf69"
+    "commit_sha": "9bb81788678343225a953ea42605c51768b34165"
   },
   "scenarios": [
     {
@@ -18,7 +18,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -9977,6 +9977,852 @@
       "activity_ids": []
     },
     {
+      "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_collects_instances_and_forms",
+      "narration": {
+        "text": "The glossary view aggregates instances and verb forms",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_aggregations",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Report whose Story and Scenario reference entity Instances and an Inflection",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "Report",
+                "expression": "pg[\"Report\"]",
+                "param_column": null
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]",
+                "param_column": null
+              },
+              {
+                "value": " and "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " reference entity "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]",
+                "param_column": null
+              },
+              {
+                "value": "s and an "
+              },
+              {
+                "term_id": "inflection",
+                "display": "Inflection",
+                "expression": "pg[\"Inflection\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [
+            {
+              "label": "Report data",
+              "content": "{\n  \"metadata\": {\n    \"project\": \"p\",\n    \"timestamp\": \"t\",\n    \"pytest_version\": \"8\",\n    \"plugin_version\": \"0\",\n    \"commit_sha\": null\n  },\n  \"scenarios\": [\n    {\n      \"id\": \"t\",\n      \"narration\": {\n        \"text\": \"s\",\n        \"parts\": []\n      },\n      \"module\": \"m\",\n      \"tags\": [],\n      \"status\": \"passed\",\n      \"duration_ms\": 0,\n      \"steps\": [\n        {\n          \"phase\": \"when\",\n          \"narration\": {\n            \"text\": \"x\",\n            \"parts\": [\n              {\n                \"term_id\": \"guest\",\n                \"display\": \"Alice\",\n                \"expression\": \"\",\n                \"param_column\": null\n              },\n              {\n                \"term_id\": \"search\",\n                \"display\": \"searches\",\n                \"expression\": \"\",\n                \"param_column\": null\n              },\n              {\n                \"term_id\": \"room\",\n                \"display\": \"Deluxe Suite\",\n                \"expression\": \"\",\n                \"param_column\": null\n              }\n            ]\n          },\n          \"status\": \"passed\",\n          \"children\": [],\n          \"attachments\": [],\n          \"error\": null,\n          \"activity_ids\": [],\n          \"fixture_name\": null\n        }\n      ],\n      \"parameters\": null,\n      \"error\": null,\n      \"skip_reason\": null,\n      \"source\": null,\n      \"story_id\": \"book\",\n      \"activity_ids\": []\n    }\n  ],\n  \"glossary\": {\n    \"terms\": [\n      {\n        \"id\": \"guest\",\n        \"kind\": \"actor\",\n        \"canonical\": \"Guest\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"room\",\n        \"kind\": \"object\",\n        \"canonical\": \"Room\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"search\",\n        \"kind\": \"verb\",\n        \"canonical\": \"search\",\n        \"definition\": null,\n        \"source\": null\n      }\n    ]\n  },\n  \"stories\": [\n    {\n      \"id\": \"book\",\n      \"title\": \"Book\",\n      \"activities\": [\n        {\n          \"id\": 1,\n          \"paths\": [\n            {\n              \"parts\": [\n                {\n                  \"term_id\": \"guest\",\n                  \"display\": \"Alice\"\n                },\n                {\n                  \"term_id\": \"search\",\n                  \"display\": \"searches for\"\n                },\n                {\n                  \"term_id\": \"room\",\n                  \"display\": \"Deluxe Suite\"\n                }\n              ]\n            }\n          ]\n        }\n      ],\n      \"source\": null\n    }\n  ]\n}",
+              "content_type": "json"
+            }
+          ],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Glossary aggregations are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "Glossary",
+                "expression": "pg[\"Glossary\"]",
+                "param_column": null
+              },
+              {
+                "value": " aggregations are built"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the entity terms collect their Instances",
+            "parts": [
+              {
+                "value": "the entity terms collect their "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]",
+                "param_column": null
+              },
+              {
+                "value": "s"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the verb collects its Inflection but not its canonical form",
+            "parts": [
+              {
+                "value": "the verb collects its "
+              },
+              {
+                "term_id": "inflection",
+                "display": "Inflection",
+                "expression": "pg[\"Inflection\"]",
+                "param_column": null
+              },
+              {
+                "value": " but not its canonical form"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_aggregations.py",
+        "line": 160
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_records_story_refs_via_activities",
+      "narration": {
+        "text": "Terms referenced by an activity record the story",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_aggregations",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Story whose Activity references an actor and a verb",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]",
+                "param_column": null
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]",
+                "param_column": null
+              },
+              {
+                "value": " references an actor and a verb"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Glossary aggregations are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "Glossary",
+                "expression": "pg[\"Glossary\"]",
+                "param_column": null
+              },
+              {
+                "value": " aggregations are built"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the actor and the verb each list that Story",
+            "parts": [
+              {
+                "value": "the actor and the verb each list that "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_aggregations.py",
+        "line": 264
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance",
+      "narration": {
+        "text": "A canonical entity reference is not an instance",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_aggregations",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Story activity and a Step referencing entities by canonical name only",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]",
+                "param_column": null
+              },
+              {
+                "value": " activity and a "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " referencing entities by canonical name only"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Glossary aggregations are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "Glossary",
+                "expression": "pg[\"Glossary\"]",
+                "param_column": null
+              },
+              {
+                "value": " aggregations are built"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "neither entity term records an Instance",
+            "parts": [
+              {
+                "value": "neither entity term records an "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_aggregations.py",
+        "line": 334
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_kindless_term_records_only_story_ref",
+      "narration": {
+        "text": "A kindless term records only its story ref",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_aggregations",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Kindless Term referenced by a Story activity",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "kindless",
+                "display": "Kindless",
+                "expression": "pg[\"Kindless\"]",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]",
+                "param_column": null
+              },
+              {
+                "value": " referenced by a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]",
+                "param_column": null
+              },
+              {
+                "value": " activity"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Glossary aggregations are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "Glossary",
+                "expression": "pg[\"Glossary\"]",
+                "param_column": null
+              },
+              {
+                "value": " aggregations are built"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Term lists the Story but no Instance and no Inflection",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]",
+                "param_column": null
+              },
+              {
+                "value": " lists the "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]",
+                "param_column": null
+              },
+              {
+                "value": " but no "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]",
+                "param_column": null
+              },
+              {
+                "value": " and no "
+              },
+              {
+                "term_id": "inflection",
+                "display": "Inflection",
+                "expression": "pg[\"Inflection\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_aggregations.py",
+        "line": 423
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_aggregations.py::test_glossary_aggregations_annotates_fixture_provenance",
+      "narration": {
+        "text": "An instance seen in a fixture step records its fixture provenance",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_aggregations",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Scenario whose fixture-sourced Step names an Instance",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " whose fixture-sourced "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " names an "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Glossary aggregations are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "Glossary",
+                "expression": "pg[\"Glossary\"]",
+                "param_column": null
+              },
+              {
+                "value": " aggregations are built"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Instance carries the fixture name",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]",
+                "param_column": null
+              },
+              {
+                "value": " carries the fixture name"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_aggregations.py",
+        "line": 457
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_aggregations.py::test_build_term_scenario_index_dedups_and_includes_scenario_narration",
+      "narration": {
+        "text": "The term index maps each term to its scenarios once",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_aggregations",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Scenario referencing one Term in two steps and another in its name",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " referencing one "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]",
+                "param_column": null
+              },
+              {
+                "value": " in two steps and another in its name"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the term-scenario index is built",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each Term maps to the scenario exactly once",
+            "parts": [
+              {
+                "value": "each "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]",
+                "param_column": null
+              },
+              {
+                "value": " maps to the scenario exactly once"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_aggregations.py",
+        "line": 552
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_aggregations.py::test_build_story_rollups_flags_under_anchored_activity_ineligible",
+      "narration": {
+        "text": "An under-anchored activity is flagged ineligible in rollups",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_aggregations",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Story with an anchored and an under-anchored Activity",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]",
+                "param_column": null
+              },
+              {
+                "value": " with an anchored and an under-anchored "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the story rollups are built",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "only the anchored Activity is Coverage-eligible",
+            "parts": [
+              {
+                "value": "only the anchored "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]",
+                "param_column": null
+              },
+              {
+                "value": " is "
+              },
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": "-eligible"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_aggregations.py",
+        "line": 664
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "tests/unit/report/test_coverage.py::test_identity_of_activity_term_ref_verb_ignores_display",
       "narration": {
         "text": "A verb activity ref has one identity regardless of inflection",
@@ -10786,7 +11632,16 @@
                 "param_column": null
               },
               {
-                "value": " binds only to activity 1"
+                "value": " "
+              },
+              {
+                "term_id": "scenario-activity-binding",
+                "display": "binds",
+                "expression": "pg[\"Scenario\u2194activity binding\"](\"binds\")",
+                "param_column": null
+              },
+              {
+                "value": " only to activity 1"
               }
             ]
           },
@@ -10943,7 +11798,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 359
+        "line": 362
       },
       "story_id": null,
       "activity_ids": []
@@ -11051,7 +11906,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 381
+        "line": 384
       },
       "story_id": null,
       "activity_ids": []
@@ -11152,7 +12007,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 412
+        "line": 415
       },
       "story_id": null,
       "activity_ids": []
@@ -11275,7 +12130,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 436
+        "line": 439
       },
       "story_id": null,
       "activity_ids": []
@@ -11340,7 +12195,16 @@
                 "param_column": null
               },
               {
-                "value": " binds to it explicitly by id"
+                "value": " "
+              },
+              {
+                "term_id": "scenario-activity-binding",
+                "display": "binds",
+                "expression": "pg[\"Scenario\u2194activity binding\"](\"binds\")",
+                "param_column": null
+              },
+              {
+                "value": " to it explicitly by id"
               }
             ]
           },
@@ -11380,7 +12244,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 472
+        "line": 475
       },
       "story_id": null,
       "activity_ids": []
@@ -11448,7 +12312,16 @@
                 "param_column": null
               },
               {
-                "value": " binds to it explicitly by id"
+                "value": " "
+              },
+              {
+                "term_id": "scenario-activity-binding",
+                "display": "binds",
+                "expression": "pg[\"Scenario\u2194activity binding\"](\"binds\")",
+                "param_column": null
+              },
+              {
+                "value": " to it explicitly by id"
               }
             ]
           },
@@ -11491,7 +12364,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 498
+        "line": 504
       },
       "story_id": null,
       "activity_ids": []
@@ -11507,7 +12380,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -11610,6 +12483,772 @@
         "line": 165
       },
       "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_md_renderer.py::test_passed_scenario_heading_and_steps",
+      "narration": {
+        "text": "A passed scenario renders as a checked heading with step bullets",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_md_renderer",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Report holding a passed Scenario with three steps",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "Report",
+                "expression": "pg[\"Report\"]",
+                "param_column": null
+              },
+              {
+                "value": " holding a passed "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " with three steps"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [
+            {
+              "label": "Scenario record",
+              "content": "{\n  \"id\": \"tests/t.py::test_buy\",\n  \"narration\": {\n    \"text\": \"Buy coffee\",\n    \"parts\": []\n  },\n  \"module\": \"tests/t.py\",\n  \"tags\": [\n    \"billing\",\n    \"happy-path\"\n  ],\n  \"status\": \"passed\",\n  \"duration_ms\": 0,\n  \"steps\": [\n    {\n      \"phase\": \"given\",\n      \"narration\": {\n        \"text\": \"a machine\",\n        \"parts\": []\n      },\n      \"status\": \"passed\",\n      \"children\": [],\n      \"attachments\": [],\n      \"error\": null,\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    },\n    {\n      \"phase\": \"when\",\n      \"narration\": {\n        \"text\": \"I insert $2\",\n        \"parts\": []\n      },\n      \"status\": \"passed\",\n      \"children\": [],\n      \"attachments\": [],\n      \"error\": null,\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    },\n    {\n      \"phase\": \"then\",\n      \"narration\": {\n        \"text\": \"I get a coffee\",\n        \"parts\": []\n      },\n      \"status\": \"passed\",\n      \"children\": [],\n      \"attachments\": [],\n      \"error\": null,\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    }\n  ],\n  \"parameters\": null,\n  \"error\": null,\n  \"skip_reason\": null,\n  \"source\": null,\n  \"story_id\": null,\n  \"activity_ids\": []\n}",
+              "content_type": "json"
+            }
+          ],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Markdown Report is rendered",
+            "parts": [
+              {
+                "value": "the Markdown "
+              },
+              {
+                "term_id": "report",
+                "display": "Report",
+                "expression": "pg[\"Report\"]",
+                "param_column": null
+              },
+              {
+                "value": " is rendered"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the heading is checked and each Step is a phase bullet",
+            "parts": [
+              {
+                "value": "the heading is checked and each "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " is a phase bullet"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_md_renderer.py",
+        "line": 41
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_md_renderer.py::test_nested_steps_indent",
+      "narration": {
+        "text": "Nested steps indent under their parent",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_md_renderer",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Scenario whose when Step has a nested child",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " whose when "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " has a nested child"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Markdown Report is rendered",
+            "parts": [
+              {
+                "value": "the Markdown "
+              },
+              {
+                "term_id": "report",
+                "display": "Report",
+                "expression": "pg[\"Report\"]",
+                "param_column": null
+              },
+              {
+                "value": " is rendered"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the child bullet indents under its parent",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_md_renderer.py",
+        "line": 140
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_md_renderer.py::test_narration_parts_resolve_terms_and_values",
+      "narration": {
+        "text": "Structured narration renders terms, values and placeholders",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_md_renderer",
+      "tags": [
+        "step-text"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Step whose Narration carries a Term ref, a value and a placeholder",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "narration",
+                "display": "Narration",
+                "expression": "pg[\"Narration\"]",
+                "param_column": null
+              },
+              {
+                "value": " carries a "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "Term ref",
+                "expression": "pg[\"Term ref\"]",
+                "param_column": null
+              },
+              {
+                "value": ", a value and a placeholder"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Markdown Report is rendered",
+            "parts": [
+              {
+                "value": "the Markdown "
+              },
+              {
+                "term_id": "report",
+                "display": "Report",
+                "expression": "pg[\"Report\"]",
+                "param_column": null
+              },
+              {
+                "value": " is rendered"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Term ref renders in guillemets, the value verbatim and the placeholder in braces",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "Term ref",
+                "expression": "pg[\"Term ref\"]",
+                "param_column": null
+              },
+              {
+                "value": " renders in guillemets, the value verbatim and the placeholder in braces"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_md_renderer.py",
+        "line": 162
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_md_renderer.py::test_parametrized_scenario_renders_table",
+      "narration": {
+        "text": "A parametrized scenario renders its parameter table",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_md_renderer",
+      "tags": [
+        "parametrization"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Parametrized scenario with a two-Case Parameter table",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "parametrized-scenario",
+                "display": "Parametrized scenario",
+                "expression": "pg[\"Parametrized scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " with a two-"
+              },
+              {
+                "term_id": "case",
+                "display": "Case",
+                "expression": "pg[\"Case\"]",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "parameter-table",
+                "display": "Parameter table",
+                "expression": "pg[\"Parameter table\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Markdown Report is rendered",
+            "parts": [
+              {
+                "value": "the Markdown "
+              },
+              {
+                "term_id": "report",
+                "display": "Report",
+                "expression": "pg[\"Report\"]",
+                "param_column": null
+              },
+              {
+                "value": " is rendered"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the heading counts the cases and the Parameter table lists each row",
+            "parts": [
+              {
+                "value": "the heading counts the cases and the "
+              },
+              {
+                "term_id": "parameter-table",
+                "display": "Parameter table",
+                "expression": "pg[\"Parameter table\"]",
+                "param_column": null
+              },
+              {
+                "value": " lists each row"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_md_renderer.py",
+        "line": 216
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_md_renderer.py::test_failing_step_is_marked_with_minimal_error",
+      "narration": {
+        "text": "A failing step is marked with a minimal error digest",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_md_renderer",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a failed Scenario whose then Step carries a two-line error and an internal frame",
+            "parts": [
+              {
+                "value": "a failed "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " whose then "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " carries a two-line error and an internal frame"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [
+            {
+              "label": "Error record",
+              "content": "{\n  \"message\": \"ValueError: not sold out\\nassert 1 == 0\",\n  \"frames\": [\n    {\n      \"path\": \"/x/_pytest/runner.py\",\n      \"lineno\": 1,\n      \"func\": \"run\",\n      \"code\": \"\",\n      \"is_internal\": true\n    },\n    {\n      \"path\": \"/x/tests/test_shop.py\",\n      \"lineno\": 88,\n      \"func\": \"test_sold_out\",\n      \"code\": \"buy(m)\",\n      \"is_internal\": false\n    }\n  ],\n  \"error_tail\": null\n}",
+              "content_type": "json"
+            }
+          ],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Markdown Report is rendered",
+            "parts": [
+              {
+                "value": "the Markdown "
+              },
+              {
+                "term_id": "report",
+                "display": "Report",
+                "expression": "pg[\"Report\"]",
+                "param_column": null
+              },
+              {
+                "value": " is rendered"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the heading is crossed and the failed step is marked",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "only the first message line and the non-internal frame are quoted",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_md_renderer.py",
+        "line": 249
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_md_renderer.py::test_multiline_attachment_renders_fenced_block",
+      "narration": {
+        "text": "A multi-line attachment renders as a fenced block",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_md_renderer",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Step carrying a multi-line Attachment",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " carrying a multi-line "
+              },
+              {
+                "term_id": "attachment",
+                "display": "Attachment",
+                "expression": "pg[\"Attachment\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Markdown Report is rendered",
+            "parts": [
+              {
+                "value": "the Markdown "
+              },
+              {
+                "term_id": "report",
+                "display": "Report",
+                "expression": "pg[\"Report\"]",
+                "param_column": null
+              },
+              {
+                "value": " is rendered"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Attachment content sits in an indented fence, not inline",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "attachment",
+                "display": "Attachment",
+                "expression": "pg[\"Attachment\"]",
+                "param_column": null
+              },
+              {
+                "value": " content sits in an indented fence, not inline"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_md_renderer.py",
+        "line": 321
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_md_renderer.py::test_skipped_scenario_shows_reason",
+      "narration": {
+        "text": "A skipped scenario shows its skip reason",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_md_renderer",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a skipped Scenario with a reason",
+            "parts": [
+              {
+                "value": "a skipped "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " with a reason"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Markdown Report is rendered",
+            "parts": [
+              {
+                "value": "the Markdown "
+              },
+              {
+                "term_id": "report",
+                "display": "Report",
+                "expression": "pg[\"Report\"]",
+                "param_column": null
+              },
+              {
+                "value": " is rendered"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the heading is marked skipped and the reason follows the node id",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_md_renderer.py",
+        "line": 419
+      },
+      "story_id": null,
       "activity_ids": []
     },
     {
@@ -12467,7 +14106,7 @@
         "id": "report",
         "kind": "object",
         "canonical": "Report",
-        "definition": "The output artifact: a JSON data file and an optional self-contained HTML page derived from it. The JSON is the source of truth.",
+        "definition": "The output artifact: a JSON data file and optional self-contained HTML and Markdown renderings derived from it. The JSON is the source of truth.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 53
