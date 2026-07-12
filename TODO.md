@@ -4,6 +4,12 @@
 
 ## Next
 
+- [ ] UI bugs & improvements for story activities:
+  - For activities with no coverage the numbers are wrong (e.g., 0/19 on the self-report).
+    - Maybe replace this with a simpler "3 stories" text, and show additional "(2 failing)" when there are cases.
+  - Don't show individual scenarions in the activity card (this doesn't scale).
+  - Simplify selection of activity cards (for scenario filtering), by making the whole card clickable.
+- [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
 - [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
@@ -12,6 +18,7 @@
 - [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
 - [ ] Glossary-ref t-strings in `@scenario` names, so scenario titles get term pills. The plumbing is fully wired already — `Scenario.narration.parts` is honored by the term-scenario index and both renderers (HTML pipes titles through the pill `narration` filter, `report.html.j2:195`; the Markdown heading goes through `_narration_md`) — only the blanket t-string rejection in `decorators.py` blocks authoring. Its import-time rationale is right for parametrize values but over-blocks glossary handles, which are in scope at import. Fix mirrors the step-fixture rule: accept a t-string name whose interpolations are all glossary handles, eagerly render to a `Narration` with parts, keep rejecting value/expression interpolations with the current message. Design wrinkle: parametrized-name `Template`s and grouping key off the rendered title, so the eager path must produce stable text — glossary handles render deterministically, but the templatize/grouping code paths need checking. Small feature: mini-spec, decorator + parse path, tests.
+  - Probably needs a redesign of the scenario cards for the story view (which probably would benefit from a redesign anyway).
 - [ ] Narrate more backend tests into scenarios — continue the dogfood conversion, converting behaviour, not plumbing (leave schema/serde round-trips, metadata/protocol checks, and config parsing plain). In priority order:
   - lint rule tests (`tests/unit/lint/test_runtime_rules.py`, `test_ast_rules.py`, ~65) — each asserts a user-facing rule ("missing-phase fires on a two-phase scenario"); the report would document the lint's semantics
   - source-link preset resolution (`tests/unit/report/test_source_link.py`) — the preset rules earn narration; the URL-template internals stay plain
