@@ -507,9 +507,7 @@ def test_glossary_aggregations_annotates_fixture_provenance() -> None:
     with when(t'the {pg["Glossary"]} aggregations are built'):
         aggs = build_glossary_aggregations(rd)
     with then(t'the {pg["Instance"]} carries the fixture name'):
-        alice = next(
-            i for i in aggs[TermId('guest')].instances if i.display == 'Alice'
-        )
+        alice = next(i for i in aggs[TermId('guest')].instances if i.display == 'Alice')
         assert alice.fixture_name == 'alice'
 
 
@@ -704,3 +702,57 @@ def test_build_story_rollups_flags_under_anchored_activity_ineligible() -> None:
         per_activity = rollups[StoryId('book')].per_activity
         assert per_activity[ActivityId(1)].eligible is True
         assert per_activity[ActivityId(2)].eligible is False
+
+
+def _covering_scn(node_id: str, status: str) -> Scenario:
+    """A scenario whose single step references guest/search/room, so it covers
+    the guest-search-room activity used across the rollup-count tests."""
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='x',
+            parts=[
+                NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+                NarrationTermRef(term_id=TermId('search'), display='search'),
+                NarrationTermRef(term_id=TermId('room'), display='Room'),
+            ],
+        ),
+    )
+    return Scenario(
+        id=NodeId(node_id),
+        narration=Narration(text='scn'),
+        module='m',
+        steps=[step],
+        story_id=StoryId('book'),
+        status=status,
+    )
+
+
+def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
+    g = _g()
+    activity = Activity(
+        id=ActivityId(1),
+        paths=(
+            ActivityPath(
+                parts=(
+                    _ent('guest', 'Guest'),
+                    _verb_part('search'),
+                    _ent('room', 'Room'),
+                )
+            ),
+        ),
+    )
+    story = Story(id=StoryId('book'), title='Book', activities=(activity,))
+    scns = [
+        _covering_scn('test::a', 'passed'),
+        _covering_scn('test::b', 'passed'),
+        _covering_scn('test::c', 'failed'),
+        _covering_scn('test::d', 'skipped'),
+    ]
+    rd = ReportData(metadata=_meta(), scenarios=scns, stories=[story], glossary=g)
+    rollups = build_story_rollups(rd, build_coverage_maps(rd))
+    cov = rollups[StoryId('book')].per_activity[ActivityId(1)]
+    assert cov.total == 4
+    assert cov.passed == 2
+    assert cov.failed == 1
+    assert cov.skipped == 1

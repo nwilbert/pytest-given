@@ -60,16 +60,21 @@ class GlossaryAggregation:
 
 @dataclass
 class ActivityCoverage:
-    """Per-activity coverage rollup: which scenarios cover it, pass count,
+    """Per-activity coverage rollup: which scenarios cover it, pass/skip counts,
     total, and whether it is eligible for coverage matching at all."""
 
     scenario_ids: list[NodeId] = field(default_factory=list)
     passed: int = 0
+    skipped: int = 0
     eligible: bool = True
 
     @property
     def total(self) -> int:
         return len(self.scenario_ids)
+
+    @property
+    def failed(self) -> int:
+        return self.total - self.passed - self.skipped
 
 
 @dataclass
@@ -142,15 +147,19 @@ def build_story_rollups(
         for activity in story.activities:
             covered_by: list[NodeId] = []
             passed = 0
+            skipped = 0
             for scn in scenarios:
                 if activity.id not in coverage_maps[scn.id]:
                     continue
                 covered_by.append(scn.id)
                 if scn.status == 'passed':
                     passed += 1
+                elif scn.status == 'skipped':
+                    skipped += 1
             per_activity[activity.id] = ActivityCoverage(
                 scenario_ids=covered_by,
                 passed=passed,
+                skipped=skipped,
                 eligible=is_coverage_eligible(activity),
             )
         rollups[story.id] = StoryRollup(scenarios=scenarios, per_activity=per_activity)

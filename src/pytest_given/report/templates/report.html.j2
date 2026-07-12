@@ -314,8 +314,9 @@
           {% for activity in story.activities %}
           {% set cov = rollup.per_activity[activity.id] %}
           <div class="activity-row" id="activity-{{ story.id }}-{{ activity.id }}"
+               data-activity-id="{{ activity.id }}"
                :class="{ 'activity-row-highlight': highlightedActivities['{{ activity.id }}'] }">
-            <div class="activity-num" data-activity-id="{{ activity.id }}"
+            <div class="activity-num"
                  :class="{ 'activity-num-highlight': highlightedActivities['{{ activity.id }}'] }">{{ activity.id }}</div>
             <div class="activity-body">
               {% for path in activity.paths %}
@@ -328,25 +329,11 @@
               {% if not cov.eligible %}
               <span class="cov-chip cov-untracked" title="insufficient number of glossary terms for matching">—</span>
               {% elif cov.total == 0 %}
-              <span class="cov-chip cov-uncovered">0/{{ total_scns }}</span>
-              {% elif cov.passed == cov.total %}
-              <span class="cov-chip cov-passed">{{ cov.passed }}/{{ cov.total }}</span>
-              {% elif cov.passed == 0 %}
-              <span class="cov-chip cov-failed">0/{{ cov.total }}</span>
+              <span class="cov-chip cov-uncovered">no coverage</span>
               {% else %}
-              <span class="cov-chip cov-mixed">{{ cov.passed }}/{{ cov.total }}</span>
+              {% set cov_class = 'cov-passed' if (cov.failed == 0 and cov.skipped == 0) else ('cov-failed' if cov.failed == cov.total else 'cov-mixed') %}
+              <span class="cov-chip {{ cov_class }}">{{ cov.total }} scenario{{ 's' if cov.total != 1 else '' }}{% if cov.failed %} · {{ cov.failed }} failing{% endif %}{% if cov.skipped %} · {{ cov.skipped }} skipped{% endif %}</span>
               {% endif %}
-            </div>
-            <div class="activity-badges">
-              {% for scn in story_scns %}
-              {% if scn.id in cov.scenario_ids %}
-              <a class="use-chip use-chip-{{ scn.status }}"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('{{ scn.id }}'))">
-                <span class="dot-{{ scn.status }}">{{ '✓' if scn.status == 'passed' else ('✗' if scn.status == 'failed' else '○') }}</span>
-                {{ scn.narration.text | truncate(30) }}
-              </a>
-              {% endif %}
-              {% endfor %}
             </div>
           </div>
           {% endfor %}

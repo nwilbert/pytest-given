@@ -749,7 +749,9 @@ span.param-highlight {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
 }
+.activity-row:hover { border-color: var(--color-accent); }
 .activity-num {
   min-width: 24px;
   height: 24px;
@@ -763,9 +765,8 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   font-weight: 600;
   flex-shrink: 0;
-  cursor: pointer;
 }
-.activity-num:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.activity-row:hover .activity-num { border-color: var(--color-accent); color: var(--color-accent); }
 .activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 
@@ -790,7 +791,6 @@ span.param-highlight {
 }
 
 /* === Scenario badge strip === */
-.activity-badges { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 .use-chip {
   display: inline-block;
   padding: 2px 8px;
@@ -806,9 +806,6 @@ span.param-highlight {
 /* Non-interactive chips (term instances, verb forms): no link affordance. */
 .use-chip--static { cursor: default; }
 .use-chip--static:hover { border-color: var(--border); color: var(--text-secondary); }
-.use-chip-passed { border-color: var(--color-passed); }
-.use-chip-failed { border-color: var(--color-failed); }
-.use-chip-skipped { border-color: var(--color-skipped); }
 .scn-act-strip {
   display: flex;
   align-items: center;
@@ -1127,7 +1124,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L148">examples/hotel-booking/test_hotel_booking.py:148</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L148">examples/hotel-booking/test_hotel_booking.py:148</a></div>
       
     </div>
     </div>
@@ -1179,7 +1176,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L163">examples/hotel-booking/test_hotel_booking.py:163</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L163">examples/hotel-booking/test_hotel_booking.py:163</a></div>
       
     </div>
     </div>
@@ -1225,7 +1222,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L240">examples/hotel-booking/test_hotel_booking.py:240</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L240">examples/hotel-booking/test_hotel_booking.py:240</a></div>
       
     </div>
     </div>
@@ -1247,7 +1244,7 @@ span.param-highlight {
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">198ms</span>
+        <span class="scenario-duration">32ms</span>
       </span>
     </div>
 
@@ -1377,7 +1374,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L198">examples/hotel-booking/test_hotel_booking.py:198</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L198">examples/hotel-booking/test_hotel_booking.py:198</a></div>
       
     </div>
     </div>
@@ -1428,8 +1425,9 @@ span.param-highlight {
           
           
           <div class="activity-row" id="activity-book-a-group-trip-1"
+               data-activity-id="1"
                :class="{ 'activity-row-highlight': highlightedActivities['1'] }">
-            <div class="activity-num" data-activity-id="1"
+            <div class="activity-num"
                  :class="{ 'activity-num-highlight': highlightedActivities['1'] }">1</div>
             <div class="activity-body">
               
@@ -1440,30 +1438,17 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">1/1</span>
               
-            </div>
-            <div class="activity-badges">
-              
-              
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_pick_suite'))">
-                <span class="dot-passed">✓</span>
-                Carol picks a suite for the group
-              </a>
-              
-              
-              
-              
-              
+              <span class="cov-chip cov-passed">1 scenario</span>
               
             </div>
           </div>
           
           
           <div class="activity-row" id="activity-book-a-group-trip-2"
+               data-activity-id="2"
                :class="{ 'activity-row-highlight': highlightedActivities['2'] }">
-            <div class="activity-num" data-activity-id="2"
+            <div class="activity-num"
                  :class="{ 'activity-num-highlight': highlightedActivities['2'] }">2</div>
             <div class="activity-body">
               
@@ -1474,36 +1459,17 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">2/2</span>
               
-            </div>
-            <div class="activity-badges">
-              
-              
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_pick_suite'))">
-                <span class="dot-passed">✓</span>
-                Carol picks a suite for the group
-              </a>
-              
-              
-              
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_complete_booking'))">
-                <span class="dot-passed">✓</span>
-                Carol completes the...
-              </a>
-              
-              
-              
+              <span class="cov-chip cov-passed">2 scenarios</span>
               
             </div>
           </div>
           
           
           <div class="activity-row" id="activity-book-a-group-trip-3"
+               data-activity-id="3"
                :class="{ 'activity-row-highlight': highlightedActivities['3'] }">
-            <div class="activity-num" data-activity-id="3"
+            <div class="activity-num"
                  :class="{ 'activity-num-highlight': highlightedActivities['3'] }">3</div>
             <div class="activity-body">
               
@@ -1518,36 +1484,17 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-mixed">1/2</span>
               
-            </div>
-            <div class="activity-badges">
-              
-              
-              
-              
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_complete_booking'))">
-                <span class="dot-passed">✓</span>
-                Carol completes the...
-              </a>
-              
-              
-              
-              <a class="use-chip use-chip-failed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]'))">
-                <span class="dot-failed">✗</span>
-                Payment is declined — the...
-              </a>
-              
+              <span class="cov-chip cov-mixed">2 scenarios · 1 failing</span>
               
             </div>
           </div>
           
           
           <div class="activity-row" id="activity-book-a-group-trip-4"
+               data-activity-id="4"
                :class="{ 'activity-row-highlight': highlightedActivities['4'] }">
-            <div class="activity-num" data-activity-id="4"
+            <div class="activity-num"
                  :class="{ 'activity-num-highlight': highlightedActivities['4'] }">4</div>
             <div class="activity-body">
               
@@ -1558,36 +1505,17 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-mixed">1/2</span>
               
-            </div>
-            <div class="activity-badges">
-              
-              
-              
-              
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_complete_booking'))">
-                <span class="dot-passed">✓</span>
-                Carol completes the...
-              </a>
-              
-              
-              
-              <a class="use-chip use-chip-failed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]'))">
-                <span class="dot-failed">✗</span>
-                Payment is declined — the...
-              </a>
-              
+              <span class="cov-chip cov-mixed">2 scenarios · 1 failing</span>
               
             </div>
           </div>
           
           
           <div class="activity-row" id="activity-book-a-group-trip-5"
+               data-activity-id="5"
                :class="{ 'activity-row-highlight': highlightedActivities['5'] }">
-            <div class="activity-num" data-activity-id="5"
+            <div class="activity-num"
                  :class="{ 'activity-num-highlight': highlightedActivities['5'] }">5</div>
             <div class="activity-body">
               
@@ -1598,30 +1526,17 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">1/1</span>
               
-            </div>
-            <div class="activity-badges">
-              
-              
-              
-              
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_complete_booking'))">
-                <span class="dot-passed">✓</span>
-                Carol completes the...
-              </a>
-              
-              
-              
+              <span class="cov-chip cov-passed">1 scenario</span>
               
             </div>
           </div>
           
           
           <div class="activity-row" id="activity-book-a-group-trip-6"
+               data-activity-id="6"
                :class="{ 'activity-row-highlight': highlightedActivities['6'] }">
-            <div class="activity-num" data-activity-id="6"
+            <div class="activity-num"
                  :class="{ 'activity-num-highlight': highlightedActivities['6'] }">6</div>
             <div class="activity-body">
               
@@ -1636,30 +1551,17 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">1/1</span>
               
-            </div>
-            <div class="activity-badges">
-              
-              
-              
-              
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_complete_booking'))">
-                <span class="dot-passed">✓</span>
-                Carol completes the...
-              </a>
-              
-              
-              
+              <span class="cov-chip cov-passed">1 scenario</span>
               
             </div>
           </div>
           
           
           <div class="activity-row" id="activity-book-a-group-trip-7"
+               data-activity-id="7"
                :class="{ 'activity-row-highlight': highlightedActivities['7'] }">
-            <div class="activity-num" data-activity-id="7"
+            <div class="activity-num"
                  :class="{ 'activity-num-highlight': highlightedActivities['7'] }">7</div>
             <div class="activity-body">
               
@@ -1670,16 +1572,7 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-uncovered">0/3</span>
-              
-            </div>
-            <div class="activity-badges">
-              
-              
-              
-              
-              
-              
+              <span class="cov-chip cov-uncovered">no coverage</span>
               
             </div>
           </div>
@@ -1785,7 +1678,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
         
       </div>
       
@@ -1806,8 +1699,9 @@ span.param-highlight {
           
           
           <div class="activity-row" id="activity-cancel-a-booking-1"
+               data-activity-id="1"
                :class="{ 'activity-row-highlight': highlightedActivities['1'] }">
-            <div class="activity-num" data-activity-id="1"
+            <div class="activity-num"
                  :class="{ 'activity-num-highlight': highlightedActivities['1'] }">1</div>
             <div class="activity-body">
               
@@ -1818,26 +1712,17 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">1/1</span>
               
-            </div>
-            <div class="activity-badges">
-              
-              
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_cancel_booking'))">
-                <span class="dot-passed">✓</span>
-                Alice cancels her booking...
-              </a>
-              
+              <span class="cov-chip cov-passed">1 scenario</span>
               
             </div>
           </div>
           
           
           <div class="activity-row" id="activity-cancel-a-booking-2"
+               data-activity-id="2"
                :class="{ 'activity-row-highlight': highlightedActivities['2'] }">
-            <div class="activity-num" data-activity-id="2"
+            <div class="activity-num"
                  :class="{ 'activity-num-highlight': highlightedActivities['2'] }">2</div>
             <div class="activity-body">
               
@@ -1848,26 +1733,17 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">1/1</span>
               
-            </div>
-            <div class="activity-badges">
-              
-              
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_cancel_booking'))">
-                <span class="dot-passed">✓</span>
-                Alice cancels her booking...
-              </a>
-              
+              <span class="cov-chip cov-passed">1 scenario</span>
               
             </div>
           </div>
           
           
           <div class="activity-row" id="activity-cancel-a-booking-3"
+               data-activity-id="3"
                :class="{ 'activity-row-highlight': highlightedActivities['3'] }">
-            <div class="activity-num" data-activity-id="3"
+            <div class="activity-num"
                  :class="{ 'activity-num-highlight': highlightedActivities['3'] }">3</div>
             <div class="activity-body">
               
@@ -1878,18 +1754,8 @@ span.param-highlight {
             </div>
             <div class="activity-cov">
               
-              <span class="cov-chip cov-passed">1/1</span>
               
-            </div>
-            <div class="activity-badges">
-              
-              
-              <a class="use-chip use-chip-passed"
-                 href="#" @click.prevent="mainView = 'scenarios'; $nextTick(() => scrollToAndExpand('examples/hotel-booking/test_hotel_booking.py::test_cancel_booking'))">
-                <span class="dot-passed">✓</span>
-                Alice cancels her booking...
-              </a>
-              
+              <span class="cov-chip cov-passed">1 scenario</span>
               
             </div>
           </div>
@@ -1931,7 +1797,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L116">examples/hotel-booking/test_hotel_booking.py:116</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L116">examples/hotel-booking/test_hotel_booking.py:116</a></div>
         
       </div>
       
@@ -2089,7 +1955,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L56">examples/hotel-booking/test_hotel_booking.py:56</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L56">examples/hotel-booking/test_hotel_booking.py:56</a></div>
                 
               </div>
             </div>
@@ -2163,7 +2029,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L57">examples/hotel-booking/test_hotel_booking.py:57</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L57">examples/hotel-booking/test_hotel_booking.py:57</a></div>
                 
               </div>
             </div>
@@ -2225,7 +2091,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L58">examples/hotel-booking/test_hotel_booking.py:58</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L58">examples/hotel-booking/test_hotel_booking.py:58</a></div>
                 
               </div>
             </div>
@@ -2310,7 +2176,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L60">examples/hotel-booking/test_hotel_booking.py:60</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L60">examples/hotel-booking/test_hotel_booking.py:60</a></div>
                 
               </div>
             </div>
@@ -2372,7 +2238,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L61">examples/hotel-booking/test_hotel_booking.py:61</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L61">examples/hotel-booking/test_hotel_booking.py:61</a></div>
                 
               </div>
             </div>
@@ -2434,7 +2300,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L62">examples/hotel-booking/test_hotel_booking.py:62</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L62">examples/hotel-booking/test_hotel_booking.py:62</a></div>
                 
               </div>
             </div>
@@ -2496,7 +2362,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L63">examples/hotel-booking/test_hotel_booking.py:63</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L63">examples/hotel-booking/test_hotel_booking.py:63</a></div>
                 
               </div>
             </div>
@@ -2546,7 +2412,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L107">examples/hotel-booking/test_hotel_booking.py:107</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L107">examples/hotel-booking/test_hotel_booking.py:107</a></div>
                 
               </div>
             </div>
@@ -2628,7 +2494,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
                 
               </div>
             </div>
@@ -2695,7 +2561,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
                 
               </div>
             </div>
@@ -2762,7 +2628,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
                 
               </div>
             </div>
@@ -2829,7 +2695,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L68">examples/hotel-booking/test_hotel_booking.py:68</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L68">examples/hotel-booking/test_hotel_booking.py:68</a></div>
                 
               </div>
             </div>
@@ -2896,7 +2762,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
                 
               </div>
             </div>
@@ -2965,7 +2831,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
                 
               </div>
             </div>
@@ -3015,7 +2881,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
                 
               </div>
             </div>
@@ -3082,7 +2948,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L75">examples/hotel-booking/test_hotel_booking.py:75</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L75">examples/hotel-booking/test_hotel_booking.py:75</a></div>
                 
               </div>
             </div>
@@ -3149,7 +3015,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
                 
               </div>
             </div>
@@ -3199,7 +3065,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/8da63de317e52e773141d8b5b8d8aeaff493274a/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27c81846ba049e4a20fbf5f4fcb011db2f72fd5c/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
                 
               </div>
             </div>
@@ -3232,10 +3098,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-04T17:19:33.556867+00:00",
+    "timestamp": "2026-07-12T13:08:32.834935+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "8da63de317e52e773141d8b5b8d8aeaff493274a"
+    "commit_sha": "27c81846ba049e4a20fbf5f4fcb011db2f72fd5c"
   },
   "scenarios": [
     {
@@ -3973,7 +3839,7 @@ window.__REPORT_DATA__ = {
       "module": "test_hotel_booking",
       "tags": [],
       "status": "failed",
-      "duration_ms": 198,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",

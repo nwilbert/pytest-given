@@ -4,11 +4,6 @@
 
 ## Next
 
-- [ ] UI bugs & improvements for story activities:
-  - For activities with no coverage the numbers are wrong (e.g., 0/19 on the self-report).
-    - Maybe replace this with a simpler "3 stories" text, and show additional "(2 failing)" when there are cases.
-  - Don't show individual scenarions in the activity card (this doesn't scale).
-  - Simplify selection of activity cards (for scenario filtering), by making the whole card clickable.
 - [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
 - [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios

@@ -1173,14 +1173,14 @@
 - **then** the «Instance» carries the fixture name
 
 ## ✓ The term index maps each term to its scenarios once
-`tests/unit/report/test_aggregations.py:552::test_build_term_scenario_index_dedups_and_includes_scenario_narration` · happy-path
+`tests/unit/report/test_aggregations.py:550::test_build_term_scenario_index_dedups_and_includes_scenario_narration` · happy-path
 
 - **given** a «Scenario» referencing one «Term» in two steps and another in its name
 - **when** the term-scenario index is built
 - **then** each «Term» maps to the scenario exactly once
 
 ## ✓ An under-anchored activity is flagged ineligible in rollups
-`tests/unit/report/test_aggregations.py:664::test_build_story_rollups_flags_under_anchored_activity_ineligible` · happy-path
+`tests/unit/report/test_aggregations.py:662::test_build_story_rollups_flags_under_anchored_activity_ineligible` · happy-path
 
 - **given** a «Story» with an anchored and an under-anchored «Activity»
 - **when** the story rollups are built
