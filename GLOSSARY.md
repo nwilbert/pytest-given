@@ -82,3 +82,13 @@ The Domain-Driven Design layer atop the core surface. All terms here are optiona
 | **Kind inference** | The post-collection pass (`resolve_glossary_kinds`) that assigns each undeclared term a kind from the *slot* positions it occupies across all story activities; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any activity stays *kindless*. |
 | **Kindless** | A term with `kind=None` — left unset when *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in an activity). Shown in the report's *Uncategorized* bucket. |
 | **Undefined** | A term with `definition is None`; surfaced by a badge and filter in the Glossary view. Orthogonal to *kindless*. |
+
+## Collaboration
+
+The people and machines collaborating on a pytest-given test suite — the cast of the project's own domain story (defined in `tests/ubiquitous_language.py`).
+
+| Term | Meaning |
+|---|---|
+| **Developer** | Person who writes the application code and — together with the *Agent* — the scenarios; curates the glossary with the *Domain Expert*. |
+| **Domain Expert** | Person who owns the domain knowledge and the ubiquitous language; source of domain stories and reviewer of scenarios and reports. A stakeholder in the broad sense. |
+| **Agent** | AI coding agent that authors and maintains scenarios alongside the *Developer*, guided by the pytest-given skills. |
