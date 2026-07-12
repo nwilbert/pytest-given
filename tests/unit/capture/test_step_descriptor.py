@@ -247,6 +247,7 @@ def test_step_descriptor_decorator_rejects_tstring_mixed_glossary_and_value() ->
 @scenario(
     'when_then records the action and its outcome as siblings',
     tags=['happy-path'],
+    story=adopt_pytest_given,
 )
 def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
     from pytest_given.capture.decorators import when_then
@@ -255,7 +256,7 @@ def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
     with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
-    with when(t'a {pg["when_then"]} block exits cleanly'):
+    with when(t'a {pg["when_then"]} block exits cleanly', activity=5):
         set_active_collector(collector)
         try:
             with when_then('the action runs', 'the outcome holds'):
@@ -385,6 +386,7 @@ def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
 @scenario(
     'A nested when becomes a child of the when_then action',
     tags=['happy-path'],
+    story=adopt_pytest_given,
 )
 def test_when_then_allows_nested_when_as_child_sub_step() -> None:
     from pytest_given.capture.decorators import when_then
@@ -393,7 +395,7 @@ def test_when_then_allows_nested_when_as_child_sub_step() -> None:
     with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
-    with when(t'a when opens inside the {pg["when_then"]} body'):
+    with when(t'a when opens inside the {pg["when_then"]} body', activity=5):
         set_active_collector(collector)
         try:
             with when_then('the action runs', 'the outcome holds'):

@@ -319,9 +319,10 @@ def test_path_rejects_dangling_edge():
 @scenario(
     'A single-path activity synthesizes one path',
     tags=['story-grammar', 'happy-path'],
+    story=adopt_pytest_given,
 )
 def test_activity_single_path_synthesizes_one_path(guest, search, room):
-    with when(t'an {pg["Activity"]} is built from handles directly'):
+    with when(t'an {pg["Activity"]} is built from handles directly', activity=2):
         a = activity(guest, search, room)
     with then(t'it wraps a single {pg["Path"]}'):
         assert isinstance(a, Activity)
@@ -332,12 +333,13 @@ def test_activity_single_path_synthesizes_one_path(guest, search, room):
 @scenario(
     'An activity may branch into multiple paths',
     tags=['story-grammar', 'happy-path'],
+    story=adopt_pytest_given,
 )
 def test_activity_multi_path_accepts_multiple_paths(guest, search, room):
     with given(t'two alternate {pg["Path"]} branches'):
         p1 = path(guest, search, room)
         p2 = path(guest('Bob'), search, room)
-    with when(t'they are combined into one {pg["Activity"]}'):
+    with when(t'they are combined into one {pg["Activity"]}', activity=2):
         a = activity(p1, p2)
     with then('the activity carries both paths'):
         assert a.paths == (p1, p2)

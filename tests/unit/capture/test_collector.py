@@ -210,6 +210,7 @@ def test_enter_fixture_teardown_transitions_state() -> None:
 @scenario(
     'Steps pushed during fixture setup record into the fixture recording',
     tags=['happy-path'],
+    story=adopt_pytest_given,
 )
 def test_push_step_during_fixture_setup_records_into_recording() -> None:
     collector = Collector()
@@ -217,7 +218,7 @@ def test_push_step_during_fixture_setup_records_into_recording() -> None:
         root = Step(phase='given', narration=_n('a shop'))
         recording = FixtureRecording(root=root)
         token = collector.enter_fixture_setup(recording)
-    with when(t'a {pg["Step"]} is pushed inside the fixture body'):
+    with when(t'a {pg["Step"]} is pushed inside the fixture body', activity=7):
         collector.push_step('given', _n('with 3 items'))
         collector.pop_step()
         collector.exit_fixture_setup(token)
@@ -248,6 +249,7 @@ def test_attach_during_fixture_setup_records_into_recording() -> None:
 @scenario(
     'Fixture-body steps do not leak into the active scenario',
     tags=['happy-path'],
+    story=adopt_pytest_given,
 )
 def test_push_step_routing_isolates_recording_from_scenario() -> None:
     collector = Collector()
@@ -256,7 +258,7 @@ def test_push_step_routing_isolates_recording_from_scenario() -> None:
         root = Step(phase='given', narration=_n('a shop'))
         recording = FixtureRecording(root=root)
         token = collector.enter_fixture_setup(recording)
-    with when(t'a {pg["Step"]} is pushed inside the fixture body'):
+    with when(t'a {pg["Step"]} is pushed inside the fixture body', activity=7):
         collector.push_step('given', _n('fixture-internal'))
         collector.pop_step()
         collector.exit_fixture_setup(token)
@@ -448,12 +450,16 @@ def test_start_scenario_source_defaults_to_none() -> None:
     assert scenario.source is None
 
 
-@scenario('A leaf given is grafted as a childless given step', tags=['happy-path'])
+@scenario(
+    'A leaf given is grafted as a childless given step',
+    tags=['happy-path'],
+    story=adopt_pytest_given,
+)
 def test_graft_leaf_given_appends_childless_given_step() -> None:
     collector = Collector()
     with given(t'an {pg["Active scenario"]} is being recorded'):
         collector.start_scenario('id', 'name', 'mod', [])
-    with when(t'a leaf {pg["Graft"]} appends a childless {pg["Step"]}'):
+    with when(t'a leaf {pg["Graft"]} appends a childless {pg["Step"]}', activity=8):
         collector.graft_leaf_given(_n('the name {text}'))
         recorded = collector.finish_scenario(status='passed', duration_ms=0)
     with then('the step is a given with no children'):
@@ -466,6 +472,7 @@ def test_graft_leaf_given_appends_childless_given_step() -> None:
 @scenario(
     'Grafting with an override replaces the root label but keeps children',
     tags=['happy-path'],
+    story=adopt_pytest_given,
 )
 def test_graft_recording_override_replaces_root_narration_keeps_children() -> None:
     collector = Collector()
@@ -476,7 +483,7 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
         )
         root.children.append(Step(phase='given', narration=_n('a recorded child')))
         recording = FixtureRecording(root=root)
-    with when(t'a {pg["Graft"]} supplies an override {pg["Narration"]}'):
+    with when(t'a {pg["Graft"]} supplies an override {pg["Narration"]}', activity=8):
         collector.graft_recording(recording, override_narration=_n('a fancy machine'))
         recorded = collector.finish_scenario(status='passed', duration_ms=0)
     with then('the grafted root shows the override text and keeps its children'):
