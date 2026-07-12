@@ -31,7 +31,7 @@ room = g.work_object('Room', definition='A bookable hotel room.')
 search = g.verb('search', definition='Look up available options.')
 ```
 
-Either way, put the glossary in a `conftest.py` so the plugin discovers it. Glossary-only mode is fine — you get the Glossary tab without writing any stories.
+Either way, **give the language a public home**: define the glossary — and the stories, once there are some — in one dedicated, publicly named module, e.g. `tests/ubiquitous_language.py`, imported from `conftest.py` so the plugin discovers it. The module *is* the suite's ubiquitous language, not a private helper — don't underscore-prefix it; test modules import their handles from it (`from tests.ubiquitous_language import pg`). Glossary-only mode is fine — you get the Glossary tab without writing any stories.
 
 ## Using terms in narration
 
