@@ -43,7 +43,7 @@ Defined in `tests/_vocab.py` next to `pg`, registered on import as today. Activi
 | 10 | Renderer **renders** Report with Parameter coloring | Renderer, Report, Parameter coloring | pin in a renderer test |
 | 11 | Domain Expert **reviews** Scenario in the Report | — | pin in a report/coverage test if a genuine match exists, else honest gap |
 
-Sketch (noun/actor handle names illustrative; each is a `pg[...]` lookup from the closed `FileGlossary` over GLOSSARY.md). **Verbs are bare `ActivityWord` strings, not glossary terms** — generic process verbs (*tells*, *captures*, *builds*, …) are story prose, not pytest-given vocabulary, and a word in a verb slot is grammatically fine. The two exceptions are `Graft` and `Group`: existing glossary rows whose meaning *is* the verb, referenced as handles with an inflection (`pg['Graft']('grafts')`). Every activity keeps at least two noun/actor term refs, so all remain coverage-eligible:
+Sketch (noun/actor handle names illustrative; each is a `pg[...]` lookup from the closed `FileGlossary` over GLOSSARY.md — the `_t` suffix means "term handle" and dodges shadowing the `story`/`activity` constructors and `scenario` decorator used in the same module). **Verbs are bare `ActivityWord` strings, not glossary terms** — generic process verbs (*tells*, *captures*, *builds*, …) are story prose, not pytest-given vocabulary, and a word in a verb slot is grammatically fine. The two exceptions are `Graft` and `Group`: existing glossary rows whose meaning *is* the verb, referenced as handles with an inflection (`pg['Graft']('grafts')`). Every activity keeps at least two noun/actor term refs, so all remain coverage-eligible:
 
 ```python
 domain_expert, developer, agent = pg['Domain Expert'], pg['Developer'], pg['Agent']
