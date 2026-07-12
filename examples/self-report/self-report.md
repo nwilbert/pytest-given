@@ -22,42 +22,42 @@
 - **then** it is recorded as a child of the recording root
 
 ## ✓ An attachment lands on the step being recorded
-`tests/unit/capture/test_collector.py:229::test_attach_during_fixture_setup_records_into_recording` · happy-path
+`tests/unit/capture/test_collector.py:230::test_attach_during_fixture_setup_records_into_recording` · happy-path
 
 - **given** a «Fixture recording» under setup
 - **when** an «Attachment» is attached inside the fixture body
 - **then** the «Attachment» lands on the recording root
 
 ## ✓ Fixture-body steps do not leak into the active scenario
-`tests/unit/capture/test_collector.py:248::test_push_step_routing_isolates_recording_from_scenario` · happy-path
+`tests/unit/capture/test_collector.py:249::test_push_step_routing_isolates_recording_from_scenario` · happy-path
 
 - **given** an «Active scenario» with a «Fixture recording»
 - **when** a «Step» is pushed inside the fixture body
 - **then** the step lives only in the recording, not the scenario
 
 ## ✓ A fixture recording is deep-copied when grafted
-`tests/unit/capture/test_collector.py:309::test_graft_recording_deep_copies_into_scenario` · happy-path
+`tests/unit/capture/test_collector.py:311::test_graft_recording_deep_copies_into_scenario` · happy-path
 
 - **given** a «Fixture recording» with a nested child «Step»
 - **when** a «Graft» copies it into the «Active scenario»
 - **then** the scenario gains a deep copy of the recorded steps
 
 ## ✓ A leaf given is grafted as a childless given step
-`tests/unit/capture/test_collector.py:451::test_graft_leaf_given_appends_childless_given_step` · happy-path
+`tests/unit/capture/test_collector.py:453::test_graft_leaf_given_appends_childless_given_step` · happy-path
 
 - **given** an «Active scenario» is being recorded
 - **when** a leaf «Graft» appends a childless «Step»
 - **then** the step is a given with no children
 
 ## ✓ Grafting with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:466::test_graft_recording_override_replaces_root_narration_keeps_children` · happy-path
+`tests/unit/capture/test_collector.py:472::test_graft_recording_override_replaces_root_narration_keeps_children` · happy-path
 
 - **given** a «Fixture recording» whose root has a label and a child
 - **when** a «Graft» supplies an override «Narration»
 - **then** the grafted root shows the override text and keeps its children
 
 ## ✓ Grafting with no active scenario is a no-op
-`tests/unit/capture/test_collector.py:490::test_graft_leaf_given_without_scenario_is_noop` · happy-path
+`tests/unit/capture/test_collector.py:497::test_graft_leaf_given_without_scenario_is_noop` · happy-path
 
 - **given** a collector with no «Active scenario»
 - **when** a leaf «Graft» runs
@@ -344,42 +344,42 @@
 - **then** both handles share the one «Term»
 
 ## ✓ Re-registering a term with a different definition is rejected
-`tests/unit/capture/test_glossary.py:198::test_glossary_re_registration_with_mismatched_definition_raises` · validation
+`tests/unit/capture/test_glossary.py:199::test_glossary_re_registration_with_mismatched_definition_raises` · validation
 
 - **given** an «Actor» already registered with one definition
 - **when** the name is registered again with a different definition
 - **then** a PytestGivenError reports the conflict with the prior registration
 
 ## ✓ The same name cannot be two different kinds
-`tests/unit/capture/test_glossary.py:216::test_glossary_cross_kind_collision_raises` · validation
+`tests/unit/capture/test_glossary.py:217::test_glossary_cross_kind_collision_raises` · validation
 
 - **given** a name already registered as an «Actor»
 - **when** the same name is registered as a «Verb»
 - **then** a PytestGivenError reports the conflict with the prior registration
 
 ## ✓ Registering an actor captures its definition site
-`tests/unit/capture/test_glossary.py:240::test_glossary_actor_captures_source` · happy-path
+`tests/unit/capture/test_glossary.py:241::test_glossary_actor_captures_source` · happy-path
 
 - **given** a rootdir-aware glossary
 - **when** an «Actor» is registered
 - **then** the «Term» records a «Source link» to this file
 
 ## ✓ Calling the glossary declares a kindless term
-`tests/unit/capture/test_glossary.py:335::test_call_declares_kindless_term` · happy-path
+`tests/unit/capture/test_glossary.py:336::test_call_declares_kindless_term` · happy-path
 
 - **given** an empty glossary
 - **when** a «Term» is declared by call, without a kind
 - **then** the «Term» is registered as «Kindless»
 
 ## ✓ Subscript looks up an already-declared term
-`tests/unit/capture/test_glossary.py:368::test_subscript_get_only_returns_handle` · happy-path
+`tests/unit/capture/test_glossary.py:370::test_subscript_get_only_returns_handle` · happy-path
 
 - **given** a glossary with one declared «Term»
 - **when** the name is looked up by subscript
 - **then** the returned «Term» is the declared one
 
 ## ✓ Subscripting an unknown name raises with a hint
-`tests/unit/capture/test_glossary.py:382::test_subscript_unknown_name_raises_with_hint` · validation
+`tests/unit/capture/test_glossary.py:384::test_subscript_unknown_name_raises_with_hint` · validation
 
 - **given** a glossary with one declared «Term»
 - **when** a near-miss name is subscripted
@@ -714,21 +714,21 @@
 - **then** a when and a sibling then «Step» are recorded
 
 ## ✓ when_then pairs with an inner pytest.raises
-`tests/unit/capture/test_step_descriptor.py:275::test_when_then_pairs_with_inner_pytest_raises` · happy-path
+`tests/unit/capture/test_step_descriptor.py:276::test_when_then_pairs_with_inner_pytest_raises` · happy-path
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises and an inner pytest.raises swallows it
 - **then** both sibling steps are still recorded
 
 ## ✓ when_then omits the then when the body raises uncaught
-`tests/unit/capture/test_step_descriptor.py:306::test_when_then_omits_then_when_body_raises_uncaught` · validation
+`tests/unit/capture/test_step_descriptor.py:307::test_when_then_omits_then_when_body_raises_uncaught` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises with nothing catching inside
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ A nested when becomes a child of the when_then action
-`tests/unit/capture/test_step_descriptor.py:385::test_when_then_allows_nested_when_as_child_sub_step` · happy-path
+`tests/unit/capture/test_step_descriptor.py:386::test_when_then_allows_nested_when_as_child_sub_step` · happy-path
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a when opens inside the «when_then» body
@@ -858,7 +858,7 @@
 - **then** it wraps a single «Path»
 
 ## ✓ An activity may branch into multiple paths
-`tests/unit/capture/test_story.py:332::test_activity_multi_path_accepts_multiple_paths` · story-grammar, happy-path
+`tests/unit/capture/test_story.py:333::test_activity_multi_path_accepts_multiple_paths` · story-grammar, happy-path
 
 - **given** a Guest actor
 - **given** a search verb
@@ -868,7 +868,7 @@
 - **then** the activity carries both paths
 
 ## ✓ Mixing loose parts and prebuilt paths is rejected
-`tests/unit/capture/test_story.py:346::test_activity_mixing_parts_and_paths_raises` · story-grammar, validation
+`tests/unit/capture/test_story.py:348::test_activity_mixing_parts_and_paths_raises` · story-grammar, validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -878,7 +878,7 @@
 - **then** a PytestGivenError rejects the mix
 
 ## ✓ Activity id 0 is reserved
-`tests/unit/capture/test_story.py:363::test_activity_explicit_id_zero_raises` · story-grammar, validation
+`tests/unit/capture/test_story.py:365::test_activity_explicit_id_zero_raises` · story-grammar, validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -887,7 +887,7 @@
 - **then** a PytestGivenError says id=0 is reserved
 
 ## ✓ A story auto-numbers its activities from one
-`tests/unit/capture/test_story.py:381::test_story_auto_numbers_activities_from_one` · story-grammar, happy-path
+`tests/unit/capture/test_story.py:383::test_story_auto_numbers_activities_from_one` · story-grammar, happy-path
 
 - **given** a Guest actor
 - **given** a search verb
@@ -896,7 +896,7 @@
 - **then** the activities are numbered 1 and 2
 
 ## ✓ Auto-numbering skips ids already taken explicitly
-`tests/unit/capture/test_story.py:397::test_story_auto_numbering_skips_taken_explicit_ids` · story-grammar, happy-path
+`tests/unit/capture/test_story.py:399::test_story_auto_numbering_skips_taken_explicit_ids` · story-grammar, happy-path
 
 - **given** a Guest actor
 - **given** a search verb
@@ -906,7 +906,7 @@
 - **then** auto picks skip the ids already used explicitly
 
 ## ✓ Duplicate activity ids in a story are rejected
-`tests/unit/capture/test_story.py:415::test_story_rejects_duplicate_activity_ids` · story-grammar, validation
+`tests/unit/capture/test_story.py:417::test_story_rejects_duplicate_activity_ids` · story-grammar, validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -916,14 +916,14 @@
 - **then** a PytestGivenError reports the duplicate activity id
 
 ## ✓ A story derives its id from its title
-`tests/unit/capture/test_story.py:435::test_story_derives_id_from_title` · story-grammar, happy-path
+`tests/unit/capture/test_story.py:437::test_story_derives_id_from_title` · story-grammar, happy-path
 
 - **given** a human-readable story title
 - **when** a «Story» is built from it
 - **then** its id is the slugified title
 
 ## ✓ A story may span only one glossary
-`tests/unit/capture/test_story.py:448::test_story_rejects_two_glossaries` · story-grammar, validation
+`tests/unit/capture/test_story.py:450::test_story_rejects_two_glossaries` · story-grammar, validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -933,14 +933,14 @@
 - **then** a PytestGivenError says a story spans multiple glossaries
 
 ## ✓ Two stories with the same id collide
-`tests/unit/capture/test_story.py:494::test_story_id_collision_raises_with_both_sites` · story-grammar, validation
+`tests/unit/capture/test_story.py:496::test_story_id_collision_raises_with_both_sites` · story-grammar, validation
 
 - **given** a «Story» already declared under an id
 - **when** a second story is declared with the same slug
 - **then** a PytestGivenError reports the id was already declared
 
 ## ✓ A path may chain a second verb-object pair
-`tests/unit/capture/test_story.py:564::test_path_allows_second_verb_edge` · story-grammar, happy-path
+`tests/unit/capture/test_story.py:566::test_path_allows_second_verb_edge` · story-grammar, happy-path
 
 - **given** an «Actor», two «Verb» and two «Work Object» handles
 - **when** they form a five-node «Path» (actor verb object verb object)
@@ -1161,7 +1161,7 @@
 | ### | ✓ |
 
 ## ✓ A cross-phase step cannot open inside a when_then body · 2 cases
-`tests/unit/capture/test_step_descriptor.py:352::test_when_then_rejects_cross_phase_nested_step` · validation
+`tests/unit/capture/test_step_descriptor.py:353::test_when_then_rejects_cross_phase_nested_step` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a given or then opens inside the «when_then» body
