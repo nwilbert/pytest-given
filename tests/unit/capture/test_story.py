@@ -18,7 +18,7 @@ from pytest_given.model import (
     Glossary,
     StoryId,
 )
-from tests.ubiquitous_language import pg
+from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 @pytest.fixture(autouse=True)
@@ -381,9 +381,10 @@ def test_activity_explicit_id_zero_raises(guest, search, room):
 @scenario(
     'A story auto-numbers its activities from one',
     tags=['story-grammar', 'happy-path'],
+    story=adopt_pytest_given,
 )
 def test_story_auto_numbers_activities_from_one(guest, search, room):
-    with when(t'a {pg["Story"]} is built from two {pg["Activity"]} rows'):
+    with when(t'a {pg["Story"]} is built from two {pg["Activity"]} rows', activity=2):
         s = story(
             'Book a Room',
             [activity(guest, search, room), activity(guest('Alice'), search, room)],

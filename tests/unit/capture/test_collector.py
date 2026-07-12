@@ -13,7 +13,7 @@ from pytest_given.model import (
     SourceLocation,
     Step,
 )
-from tests.ubiquitous_language import pg
+from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 def _n(text: str) -> Narration:
@@ -283,7 +283,11 @@ def test_store_and_retrieve_recording_by_key() -> None:
     assert collector.get_recording(('fixdef_b', None)) is None
 
 
-@scenario('A fixture recording is deep-copied when grafted', tags=['happy-path'])
+@scenario(
+    'A fixture recording is deep-copied when grafted',
+    tags=['happy-path'],
+    story=adopt_pytest_given,
+)
 def test_graft_recording_deep_copies_into_scenario() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
@@ -291,7 +295,9 @@ def test_graft_recording_deep_copies_into_scenario() -> None:
         root = Step(phase='given', narration=_n('a shop'))
         root.children.append(Step(phase='given', narration=_n('with 3 items')))
         recording = FixtureRecording(root=root)
-    with when(t'a {pg["Graft"]} copies it into the {pg["Active scenario"]}'):
+    with when(
+        t'a {pg["Graft"]} copies it into the {pg["Active scenario"]}', activity=8
+    ):
         collector.graft_recording(recording)
         recorded = collector.finish_scenario(status='passed', duration_ms=0)
     with then('the scenario gains a deep copy of the recorded steps'):

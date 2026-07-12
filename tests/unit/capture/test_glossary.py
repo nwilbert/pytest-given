@@ -24,7 +24,7 @@ from pytest_given.capture.glossary import (
     id_derive,
 )
 from pytest_given.model import Glossary, GlossaryTerm, SourceLocation, TermId
-from tests.ubiquitous_language import pg
+from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 @scenario(
@@ -152,11 +152,12 @@ def test_verb_call_returns_inflection_sharing_term_identity():
 @scenario(
     'Registering an actor returns a typed handle',
     tags=['happy-path'],
+    story=adopt_pytest_given,
 )
 def test_glossary_actor_registers_and_returns_handle():
     with given('an empty glossary'):
         g = Glossary()
-    with when(t'an {pg["Actor"]} is registered with a definition'):
+    with when(t'an {pg["Actor"]} is registered with a definition', activity=3):
         a = g.actor('Guest', definition='Person booking accommodation.')
     with then(t'a typed {pg["Actor"]} handle with the {pg["Actor"]} kind is returned'):
         assert isinstance(a, Actor)

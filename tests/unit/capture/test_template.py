@@ -15,7 +15,7 @@ from pytest_given.model import (
     NarrationValue,
     PytestGivenError,
 )
-from tests.ubiquitous_language import pg
+from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 def test_template_parses_literal_only() -> None:
@@ -383,13 +383,14 @@ def file_glossary(tmp_path: Path) -> FileGlossary:
 @scenario(
     'A FileGlossary handle works in a t-string step',
     tags=['step-text'],
+    story=adopt_pytest_given,
 )
 def test_tstring_with_file_term_handle_emits_term_ref(
     file_glossary: FileGlossary,
 ) -> None:
     with given(t'a {pg["Deferred term"]} from a {pg["File glossary"]}'):
         guest = file_glossary['Guest']
-    with when('it is interpolated into a t-string step'):
+    with when('it is interpolated into a t-string step', activity=4):
         _, parts = parse_tstring(t'a {guest} arrives')
     with then(t'the step carries a single {pg["Term ref"]} pill'):
         term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
