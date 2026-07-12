@@ -339,15 +339,14 @@
           {% endfor %}
         </div>
         <div class="scn-act-strip-section">
+          <div class="story-section-heading">Scenarios</div>
           {% for scn in story_scns %}
           <div class="scenario {{ scn.status }}" style="margin-bottom: var(--space-sm);"
                x-show="activitySelectionMatches({{ scn_covers.get(scn.id, []) }})">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
-                <span class="scenario-chevron-placeholder"></span>
-                <a href="#" class="scenario-name scenario-name--link"
-                   data-goto-scenario="{{ scn.id }}"
-                   @click.prevent>{{ scn.narration.text }}</a>
+                <span class="scenario-name scenario-name--goto"
+                      data-goto-scenario="{{ scn.id }}">{{ scn.narration | narration }}</span>
               </div>
               <span class="scenario-meta">
                 <span class="scenario-status {{ scn.status }}">

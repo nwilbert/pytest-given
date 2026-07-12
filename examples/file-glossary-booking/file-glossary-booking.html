@@ -325,18 +325,20 @@ body {
 }
 
 .scenario-name { font-size: var(--font-size-md); font-weight: 500; }
-.scenario-name--link {
+/* Story-view scenario title: a plain clickable heading (jumps to the scenario).
+   No hover underline — it would bleed onto the term pills the title can carry;
+   the trailing → cue signals clickability instead. */
+.scenario-name--goto {
   color: inherit;
   text-decoration: none;
   cursor: pointer;
 }
-.scenario-name--link:hover { text-decoration: underline; }
-.scenario-name--link::after {
+.scenario-name--goto::after {
   content: " →";
   opacity: 0;
   transition: opacity 0.1s;
 }
-.scenario-header:hover .scenario-name--link::after { opacity: 0.6; }
+.scenario-header:hover .scenario-name--goto::after { opacity: 0.6; }
 .scenario-tag {
   display: inline-block;
   background: var(--color-accent-bg);
@@ -812,8 +814,6 @@ span.param-highlight {
   gap: var(--space-xs);
   padding: var(--space-xs) var(--space-md);
   font-size: var(--font-size-sm);
-  border-top: 1px solid var(--border);
-  margin-top: var(--space-xs);
   flex-wrap: wrap;
 }
 .scn-act-label { color: var(--text-muted); font-weight: 600; }
@@ -828,6 +828,15 @@ span.param-highlight {
   justify-content: center;
 }
 .scn-act-strip-section { margin-top: var(--space-xl); }
+/* Section label separating the scenario list from the activity timeline above. */
+.story-section-heading {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-sm);
+}
 
 /* Kind filter rows in sidebar */
 .kind-filter-row {
@@ -1132,7 +1141,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/64bff947842a96a87cea2e8174537fd441a961c5/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d00d5df32e3ff2f15a4da2df5a281e24856953aa/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
       
     </div>
     </div>
@@ -1176,7 +1185,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/64bff947842a96a87cea2e8174537fd441a961c5/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d00d5df32e3ff2f15a4da2df5a281e24856953aa/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
       
     </div>
     </div>
@@ -1282,15 +1291,14 @@ span.param-highlight {
           
         </div>
         <div class="scn-act-strip-section">
+          <div class="story-section-heading">Scenarios</div>
           
           <div class="scenario passed" style="margin-bottom: var(--space-sm);"
                x-show="activitySelectionMatches([2, 3])">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
-                <span class="scenario-chevron-placeholder"></span>
-                <a href="#" class="scenario-name scenario-name--link"
-                   data-goto-scenario="examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room"
-                   @click.prevent>Guest books an available room</a>
+                <span class="scenario-name scenario-name--goto"
+                      data-goto-scenario="examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room">Guest books an available room</span>
               </div>
               <span class="scenario-meta">
                 <span class="scenario-status passed">
@@ -1316,10 +1324,8 @@ span.param-highlight {
                x-show="activitySelectionMatches([2])">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
-                <span class="scenario-chevron-placeholder"></span>
-                <a href="#" class="scenario-name scenario-name--link"
-                   data-goto-scenario="examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room"
-                   @click.prevent>Guest cannot book an unavailable room</a>
+                <span class="scenario-name scenario-name--goto"
+                      data-goto-scenario="examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room">Guest cannot book an unavailable room</span>
               </div>
               <span class="scenario-meta">
                 <span class="scenario-status passed">
@@ -1340,7 +1346,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/64bff947842a96a87cea2e8174537fd441a961c5/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d00d5df32e3ff2f15a4da2df5a281e24856953aa/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -1487,7 +1493,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/64bff947842a96a87cea2e8174537fd441a961c5/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d00d5df32e3ff2f15a4da2df5a281e24856953aa/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
                 
               </div>
             </div>
@@ -1562,7 +1568,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/64bff947842a96a87cea2e8174537fd441a961c5/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d00d5df32e3ff2f15a4da2df5a281e24856953aa/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
                 
               </div>
             </div>
@@ -1622,7 +1628,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/64bff947842a96a87cea2e8174537fd441a961c5/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d00d5df32e3ff2f15a4da2df5a281e24856953aa/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
                 
               </div>
             </div>
@@ -1704,7 +1710,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/64bff947842a96a87cea2e8174537fd441a961c5/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d00d5df32e3ff2f15a4da2df5a281e24856953aa/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
                 
               </div>
             </div>
@@ -1769,7 +1775,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/64bff947842a96a87cea2e8174537fd441a961c5/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d00d5df32e3ff2f15a4da2df5a281e24856953aa/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
                 
               </div>
             </div>
@@ -1809,7 +1815,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/64bff947842a96a87cea2e8174537fd441a961c5/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d00d5df32e3ff2f15a4da2df5a281e24856953aa/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
                 
               </div>
             </div>
@@ -1837,10 +1843,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-12T16:04:23.398909+00:00",
+    "timestamp": "2026-07-12T16:31:59.078721+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "64bff947842a96a87cea2e8174537fd441a961c5"
+    "commit_sha": "d00d5df32e3ff2f15a4da2df5a281e24856953aa"
   },
   "scenarios": [
     {
