@@ -109,7 +109,6 @@ body {
 .sidebar-section {
   margin-top: var(--space-xl);
   padding-top: var(--space-lg);
-  border-top: 1px solid var(--border);
 }
 .sidebar-label {
   color: var(--text-muted);
@@ -230,7 +229,6 @@ body {
 .header {
   margin-bottom: var(--space-xl);
   padding-bottom: var(--space-lg);
-  border-bottom: 1px solid var(--border);
 }
 .header-context {
   font-size: var(--font-size-md);
@@ -861,7 +859,6 @@ span.param-highlight {
   margin-top: var(--space-xl);
   margin-bottom: var(--space-md);
   padding-bottom: var(--space-xs);
-  border-bottom: 1px solid var(--border);
 }
 .kind-title {
   font-size: var(--font-size-md);

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-07T06:18:21.945231+00:00",
+    "timestamp": "2026-07-12T18:12:33.384779+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "2196cbec19707754c3b02217127dddc424954d87"
+    "commit_sha": "05eec6ef8b5086a090233245280fad10a867fec2"
   },
   "scenarios": [
     {
@@ -19,7 +19,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -88,7 +88,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -168,7 +168,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -229,7 +229,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -328,7 +328,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -465,7 +465,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -662,7 +662,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -736,7 +736,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 280,
+      "duration_ms": 84,
       "steps": [
         {
           "phase": "given",
@@ -855,7 +855,7 @@
           },
           {
             "path": "src/pytest_given/capture/decorators.py",
-            "lineno": 247,
+            "lineno": 275,
             "func": "wrapper",
             "code": "    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
@@ -887,7 +887,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [],
       "parameters": null,
       "error": null,
@@ -910,7 +910,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1022,7 +1022,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1142,7 +1142,7 @@
         "billing"
       ],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1235,7 +1235,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "skipped",
-      "duration_ms": 2,
+      "duration_ms": 0,
       "steps": [],
       "parameters": {
         "names": [

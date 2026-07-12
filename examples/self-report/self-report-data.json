@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-12T13:08:36.040261+00:00",
+    "timestamp": "2026-07-12T18:12:36.990998+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "27c81846ba049e4a20fbf5f4fcb011db2f72fd5c"
+    "commit_sha": "05eec6ef8b5086a090233245280fad10a867fec2"
   },
   "scenarios": [
     {
@@ -1113,7 +1113,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -1321,7 +1321,7 @@
         "story-grammar"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1808,7 +1808,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -6313,7 +6313,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 386
+        "line": 387
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -12380,7 +12380,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",

@@ -728,7 +728,7 @@
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ A nested when becomes a child of the when_then action
-`tests/unit/capture/test_step_descriptor.py:386::test_when_then_allows_nested_when_as_child_sub_step` · happy-path
+`tests/unit/capture/test_step_descriptor.py:387::test_when_then_allows_nested_when_as_child_sub_step` · happy-path
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a when opens inside the «when_then» body
