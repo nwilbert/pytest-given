@@ -49,5 +49,5 @@ Write a story for flows with distinguishable actors and hand-offs — a user and
 ## Authoring workflow
 
 - **Keep activities at domain granularity** — what the actor does ("submits payment for the booking"), never what the code does ("calls `submit_payment()`"). If an activity only makes sense to someone reading the implementation, it's too fine.
-- **Grow the glossary from the activities.** Every slot wants a term; with a file glossary and no kind column, kinds are inferred from slot positions for free (see [glossaries.md](glossaries.md)). Unclassified vocabulary can enter as `g('loyalty points')` and be triaged later.
+- **Grow the glossary from the activities — but only with real vocabulary.** A slot gets a term when the word is domain language someone would look up; a word that is just sentence prose (generic verbs like *tells*, *reviews*) stays a bare string. Don't mint glossary rows to satisfy the grammar. With a file glossary and no kind column, term kinds are inferred from slot positions for free (see [glossaries.md](glossaries.md)); unclassified vocabulary can enter as `g('loyalty points')` and be triaged later.
 - **Derive stories from Domain Storytelling sessions** where you can: transfer the sentences recorded with stakeholders into `activity(...)` rows, then write scenarios against them — see [domain-storytelling.md](domain-storytelling.md).
