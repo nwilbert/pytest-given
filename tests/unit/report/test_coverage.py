@@ -340,7 +340,10 @@ def test_compute_coverage_scenario_constrained_to_activity_ids(g):
             ),
         )
         story = Story(id=StoryId('s'), title='S', activities=(a1, a2))
-    with when(t'the {pg["Scenario"]} binds only to activity 1'):
+    with when(
+        t'the {pg["Scenario"]} {pg["Scenario↔activity binding"]("binds")} '
+        t'only to activity 1'
+    ):
         scenario = _scenario_with_steps(
             _step(
                 'when',
@@ -488,7 +491,10 @@ def test_compute_coverage_explicit_step_binding_covers_eligible_activity(g):
             ),
         )
         story = Story(id=StoryId('s'), title='S', activities=(activity,))
-    with when(t'a {pg["Step"]} binds to it explicitly by id'):
+    with when(
+        t'a {pg["Step"]} {pg["Scenario↔activity binding"]("binds")} '
+        t'to it explicitly by id'
+    ):
         scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
         coverage = compute_coverage(g, scenario, story)
     with then(t'{pg["Coverage"]} counts it directly, without identity matching'):
@@ -514,7 +520,10 @@ def test_compute_coverage_explicit_binding_ignored_for_ineligible_activity(g):
             ),
         )
         story = Story(id=StoryId('s'), title='S', activities=(activity,))
-    with when(t'a {pg["Step"]} binds to it explicitly by id'):
+    with when(
+        t'a {pg["Step"]} {pg["Scenario↔activity binding"]("binds")} '
+        t'to it explicitly by id'
+    ):
         scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
         coverage = compute_coverage(g, scenario, story)
     with then(t'eligibility gates the binding, so {pg["Coverage"]} stays empty'):

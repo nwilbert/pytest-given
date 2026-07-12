@@ -50,7 +50,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 
 | Term | Meaning |
 |---|---|
-| **Report** | The output artifact: a JSON data file and an optional self-contained HTML page derived from it. The JSON is the source of truth. |
+| **Report** | The output artifact: a JSON data file and optional self-contained HTML and Markdown renderings derived from it. The JSON is the source of truth. |
 | **Renderer** | Converts a JSON report into a self-contained HTML page. |
 | **Parameter coloring** | Each parametrize column gets a stable highlight color; placeholders and matching values share that color wherever they appear in step text and the parameter table. |
 | **Value highlight** | A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column (e.g., a computed expression like `price * 1.2`). |
