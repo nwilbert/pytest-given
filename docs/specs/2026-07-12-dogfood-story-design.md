@@ -43,9 +43,13 @@ Defined in `tests/_vocab.py` next to `pg`, registered on import as today. Activi
 | 10 | Renderer **renders** Report with Parameter coloring | Renderer, Report, Parameter coloring | pin in a renderer test |
 | 11 | Domain Expert **reviews** Scenario in the Report | — | pin in a report/coverage test if a genuine match exists, else honest gap |
 
-Sketch (handle names illustrative):
+Sketch (handle names illustrative). Every part except the connective words is a term handle looked up from `pg` — the closed `FileGlossary` over GLOSSARY.md — so each verb/actor/work object needs its row; a bare string would be an `ActivityWord` with no term identity, no pill, and no effect on coverage or `dead-term`. Calling a verb handle supplies the inflection (`tell('tells')`: canonical *tell*, surface form *tells*):
 
 ```python
+domain_expert, developer, agent = pg['Domain Expert'], pg['Developer'], pg['Agent']
+tell, capture, build = pg['tell'], pg['capture'], pg['build']
+# … one handle per Collaboration-section row, plus the existing technical terms
+
 adopt = story(
     'Adopt pytest-given',
     [
