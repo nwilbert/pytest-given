@@ -58,9 +58,7 @@ adopt_pytest_given = story(
         # 3
         activity(developer, 'builds', glossary_t, 'with the', domain_expert),
         # 4
-        activity(
-            agent, 'writes', scenario_t, 'with', tag_t, 'against the', glossary_t
-        ),
+        activity(agent, 'writes', scenario_t, 'with', tag_t, 'against the', glossary_t),
         # 5
         activity(agent, 'narrates', step_t, 'with a', phase_t),
         # 6

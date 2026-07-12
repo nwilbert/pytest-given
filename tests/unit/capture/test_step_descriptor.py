@@ -363,6 +363,7 @@ def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
     with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
+
     def open_cross_phase_step() -> None:
         set_active_collector(collector)
         try:
