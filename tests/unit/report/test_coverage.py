@@ -29,7 +29,7 @@ from pytest_given.report.coverage import (
     is_coverage_eligible,
     s_for_step,
 )
-from tests._vocab import pg
+from tests.ubiquitous_language import pg
 
 
 def _term(kind, name):

@@ -13,7 +13,7 @@ from pytest_given.model import (
     SourceLocation,
     Step,
 )
-from tests._vocab import pg
+from tests.ubiquitous_language import pg
 
 
 def _n(text: str) -> Narration:

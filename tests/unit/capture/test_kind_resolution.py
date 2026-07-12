@@ -14,7 +14,7 @@ from pytest_given.model import (
     StoryId,
     TermId,
 )
-from tests._vocab import pg
+from tests.ubiquitous_language import pg
 
 
 def _term(term_id, kind=None):

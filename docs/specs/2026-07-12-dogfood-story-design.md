@@ -10,7 +10,7 @@ Narrate one domain story for pytest-given itself and bind self-report scenarios 
 
 ## Background
 
-The backend tests narrate in the project's own vocabulary via `tests/_vocab.py`, which loads `GLOSSARY.md` as a closed `FileGlossary` (`pg`). Today no backend scenario binds to a story, so:
+The backend tests narrate in the project's own vocabulary via `tests/ubiquitous_language.py`, which loads `GLOSSARY.md` as a closed `FileGlossary` (`pg`). Today no backend scenario binds to a story, so:
 
 - the self-report's Stories tab is empty;
 - 16 terms trip the opt-in `dead-term` rule ("referenced by no step and no story"): Phase, when_then, Tag, Attachment, Parametrized scenario, Group, Step fixture, Plain fixture, Collector, Node ID, Step stack, Report, Renderer, Parameter coloring, Glossary, Scenario↔activity binding (baseline after the glossary-hygiene commit landed with this spec, which merged the `glossary (lowercase)` / `Glossary (capitalized)` rows into one **Glossary** term, dropped the `Uncategorized` row as a duplicate of *Kindless*, and corrected the *Coverage* definition to per-step matching);
@@ -27,7 +27,7 @@ Coverage matching is per-step: an activity gets a badge when some step's narrati
 
 ## The story
 
-Defined in `tests/_vocab.py` next to `pg`, registered on import as today. Activities auto-number 1–11; pins reference those ints.
+Defined in `tests/ubiquitous_language.py` next to `pg`, registered on import as today. Activities auto-number 1–11; pins reference those ints.
 
 | # | Activity (canonical prose) | Retires | Coverage |
 |---|---|---|---|

@@ -18,7 +18,7 @@ from pytest_given.model import (
     Glossary,
     StoryId,
 )
-from tests._vocab import pg
+from tests.ubiquitous_language import pg
 
 
 @pytest.fixture(autouse=True)

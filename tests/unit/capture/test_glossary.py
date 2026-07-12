@@ -24,7 +24,7 @@ from pytest_given.capture.glossary import (
     id_derive,
 )
 from pytest_given.model import Glossary, GlossaryTerm, SourceLocation, TermId
-from tests._vocab import pg
+from tests.ubiquitous_language import pg
 
 
 @scenario(

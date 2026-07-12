@@ -3,7 +3,7 @@ import pytest
 from pytest_given import attach, given, scenario, then, when, when_then
 from pytest_given.capture.markdown_glossary import GlossaryRow, parse_glossary_tables
 from pytest_given.model import PytestGivenError
-from tests._vocab import pg
+from tests.ubiquitous_language import pg
 
 SIMPLE = """# Glossary
 

@@ -15,7 +15,7 @@ from pytest_given.model import (
     NarrationValue,
     PytestGivenError,
 )
-from tests._vocab import pg
+from tests.ubiquitous_language import pg
 
 
 def test_template_parses_literal_only() -> None:

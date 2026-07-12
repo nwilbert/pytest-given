@@ -71,7 +71,7 @@ The narration rules live in the **`pytest-given-authoring` skill** — auto-disc
 
 ### Self-report mechanics (this repo)
 
-- The glossary handle is `pg` — `GLOSSARY.md` loaded as a `FileGlossary` in `tests/conftest.py` via `tests/_vocab.py`. Term-rename mechanics live under [Conventions](#conventions).
+- The glossary handle is `pg` — `GLOSSARY.md` loaded as a `FileGlossary` in `tests/conftest.py` via `tests/ubiquitous_language.py`. Term-rename mechanics live under [Conventions](#conventions).
 - Regeneration (`uv run nox -s self_report`), narration-lint gating, and the commit-noise / `.md`-diff-review rules live under [Quality gates](#quality-gates).
 
 ## Conventions

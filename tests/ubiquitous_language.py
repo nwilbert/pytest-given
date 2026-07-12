@@ -1,4 +1,4 @@
-"""Shared pytest-given self-documentation vocabulary.
+"""The ubiquitous language of pytest-given's own bounded context.
 
 The project's own ``GLOSSARY.md`` is the ubiquitous language of pytest-given's
 bounded context. Loading it as a :class:`FileGlossary` lets the backend tests

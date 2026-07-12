@@ -5,7 +5,7 @@ from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.glossary import DeferredTermHandle
 from pytest_given.capture.story import activity
 from pytest_given.model import ActivityTermRef, PytestGivenError
-from tests._vocab import pg
+from tests.ubiquitous_language import pg
 
 GLOSSARY_MD = """# Glossary
 
