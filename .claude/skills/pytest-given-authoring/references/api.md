@@ -13,7 +13,7 @@ This is the authoring-relevant surface, version-matched to the installed package
 
 ## Core
 
-- **`@scenario(name, tags=None, story=None)`** — marks a test for the report; required for it to appear. `name` is a plain string or a `Template` (for parametrized names). `story=` binds the scenario to a `story(...)` for coverage.
+- **`@scenario(name, tags=None, story=None)`** — marks a test for the report; required for it to appear. `name` is a plain string, a `Template` (for parametrized names), or a t-string whose interpolations are all glossary handles (they render as term pills in the title). `story=` binds the scenario to a `story(...)` for coverage.
 - **`given(text)` / `when(text)` / `then(text)`** — dual-purpose:
   - **Context manager** in a test body: `with when('…'): result = sut(x)`. Steps nest freely.
   - **Fixture decorator** — `@given` only (`@pytest.fixture` then `@given('…')`); `@when`/`@then` on a fixture is rejected at runtime, and the label must be a plain string. Generator fixtures work; recording steps after `yield` is not allowed.
@@ -28,12 +28,13 @@ This is the authoring-relevant surface, version-matched to the installed package
 |---|---|---|
 | Plain string / f-string | anywhere | Rendered verbatim; f-string values are not highlighted. |
 | T-string `t'a {cup_size} cup'` | test-body steps only | Interpolated at runtime; values color-coded when the expression matches a parametrize column. Full expression syntax allowed. |
+| T-string `t'a {guest} checks in'` | `@scenario(...)` name — glossary handles only | Evaluated eagerly at import; each handle renders as a term pill in the title. A value/expression interpolation is rejected (values aren't in scope at import). |
 | `Template('… {col} …')` | `@scenario(...)`, helper decorators, `Annotated[..., given(...)]` | Deferred substitution — against parametrize columns (`@scenario`, `Annotated`) or the helper's bound arguments (decorators). |
 
 Hard rules (each raises `PytestGivenError`):
 
 1. **`Template` accepts bare identifiers only** — `{name}`, `{name:spec}`, `{name!conv}`. No attribute access, indexing, or expressions. Workaround: parametrize by the attribute, or move the step to a test-body t-string.
-2. **`Template` and t-strings don't swap places.** A `Template` in a test-body step is rejected (values are in scope — use a t-string); a t-string in `@scenario(...)`, on a fixture/helper decorator, or in `Annotated[..., given(...)]` is rejected (values aren't in scope — use `Template` or a plain string).
+2. **`Template` and t-strings don't swap places.** A `Template` in a test-body step is rejected (values are in scope — use a t-string); a t-string on a fixture/helper decorator or in `Annotated[..., given(...)]` is rejected (values aren't in scope — use `Template` or a plain string). A t-string in `@scenario(...)` is the one exception: it's accepted when every interpolation is a glossary handle (a term reference is in scope at import and renders as a title pill), but a value/expression interpolation is still rejected — use `Template` for a parametrized name. A term pill and a per-case value can't combine in one name.
 
 ## Parametrized tests
 

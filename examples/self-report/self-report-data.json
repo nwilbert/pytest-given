@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-12T18:12:36.990998+00:00",
+    "timestamp": "2026-07-12T18:39:05.582950+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "05eec6ef8b5086a090233245280fad10a867fec2"
+    "commit_sha": "f8906e05d77b9ff9dab90214e4429a4b1bc3bba1"
   },
   "scenarios": [
     {
@@ -1113,7 +1113,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1321,7 +1321,7 @@
         "story-grammar"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -1423,7 +1423,7 @@
         "story-grammar"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1709,7 +1709,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -1808,7 +1808,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -1966,7 +1966,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2471,7 +2471,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -5916,7 +5916,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 52
+        "line": 53
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -6026,7 +6026,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 247
+        "line": 248
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -6121,7 +6121,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 276
+        "line": 277
       },
       "story_id": null,
       "activity_ids": []
@@ -6216,7 +6216,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 307
+        "line": 308
       },
       "story_id": null,
       "activity_ids": []
@@ -6313,7 +6313,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 387
+        "line": 388
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -9151,7 +9151,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 27
+        "line": 35
       },
       "story_id": null,
       "activity_ids": []
@@ -9250,7 +9250,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 59
+        "line": 67
       },
       "story_id": null,
       "activity_ids": []
@@ -9327,7 +9327,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 127
+        "line": 135
       },
       "story_id": null,
       "activity_ids": []
@@ -9404,7 +9404,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 191
+        "line": 199
       },
       "story_id": null,
       "activity_ids": []
@@ -9499,7 +9499,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 231
+        "line": 239
       },
       "story_id": null,
       "activity_ids": []
@@ -9594,7 +9594,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 261
+        "line": 269
       },
       "story_id": null,
       "activity_ids": []
@@ -9689,7 +9689,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 283
+        "line": 291
       },
       "story_id": null,
       "activity_ids": []
@@ -9784,7 +9784,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 299
+        "line": 307
       },
       "story_id": null,
       "activity_ids": []
@@ -9874,7 +9874,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 340
+        "line": 348
       },
       "story_id": null,
       "activity_ids": []
@@ -9971,7 +9971,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 383
+        "line": 391
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -12380,7 +12380,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -13781,7 +13781,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 353
+        "line": 354
       },
       "story_id": null,
       "activity_ids": []
@@ -13894,7 +13894,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 98
+        "line": 106
       },
       "story_id": null,
       "activity_ids": []

@@ -25,8 +25,14 @@ from .glossary import (
 _FORMATTER = Formatter()
 
 
-def narration_from(value: str | Template | templatelib.Template) -> Narration:
-    """Build a Narration from a plain string, a Template, or a t-string."""
+def narration_from(
+    value: str | Template | templatelib.Template | Narration,
+) -> Narration:
+    """Build a Narration from a plain string, a Template, a t-string, or an
+    already-rendered Narration (which passes through unchanged — used for eager
+    glossary-t-string scenario names)."""
+    if isinstance(value, Narration):
+        return value
     if isinstance(value, templatelib.Template):
         text, parts = parse_tstring(value)
         return Narration(text=text, parts=parts)

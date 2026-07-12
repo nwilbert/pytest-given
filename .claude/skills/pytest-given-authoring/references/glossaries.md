@@ -1,6 +1,6 @@
 # Authoring glossaries
 
-A glossary declares the ubiquitous language your tests speak: actors, work objects, and verbs, each with a definition. Steps and stories reference terms through handles; every reference renders as a kind-coloured pill with the definition as tooltip and feeds the report's Glossary tab (with per-term scenario filtering).
+A glossary declares the ubiquitous language your tests speak: actors, work objects, and verbs, each with a definition. Steps, stories, and scenario titles reference terms through handles; every reference renders as a kind-coloured pill with the definition as tooltip and feeds the report's Glossary tab (with per-term scenario filtering).
 
 ## Two ways to declare a glossary
 
@@ -35,7 +35,7 @@ Either way, **give the language a public home**: define the glossary — and the
 
 ## Using terms in narration
 
-Look up handles by name — `g['Room']` (case-insensitive) — or use the captured variables from a code-defined glossary. Both work in t-string steps and in story activities; the callable form supplies the inflection an activity or sentence needs:
+Look up handles by name — `g['Room']` (case-insensitive) — or use the captured variables from a code-defined glossary. Both work in t-string steps, `@scenario(...)` titles, and story activities; the callable form supplies the inflection an activity or sentence needs:
 
 ```python
 with when(t'a {g["Guest"]} {g["book"]("books")} a {g["Room"]}'):

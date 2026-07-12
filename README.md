@@ -182,6 +182,16 @@ def test_brew(cup_size):
     ...
 ```
 
+A scenario name can also be a **t-string** whose interpolations are all glossary handles — they render as term pills in the title, exactly as they do in step text:
+
+```python
+@scenario(t'a {guest} checks in')
+def test_check_in(guest):
+    ...
+```
+
+Because a t-string is evaluated at import, only glossary handles (which are in scope then) are allowed in a scenario name; a parametrize-value interpolation is rejected — use `Template` for that. The two don't combine in one name: a title needing both a term pill and a per-case value isn't expressible today.
+
 #### Step text & placeholders
 
 | Form | Example | How it renders |
@@ -189,6 +199,7 @@ def test_brew(cup_size):
 | Plain string (including f-strings) | `with given('a cup')` <br> `with given(f'a {cup_size} cup')` | Rendered verbatim. F-string interpolation happens before pytest-given runs, so values aren't highlighted. |
 | T-string | `with given(t'a {cup_size} cup')` | pytest-given interpolates at runtime. Values are color-coded when the interpolation expression matches a parametrize column; otherwise highlighted neutrally. |
 | `Template` in `@scenario(...)` | `@scenario(Template('Brew {cup_size} ml'))` | Deferred substitution against parametrize columns at report time. Unmatched placeholders raise `PytestGivenError` at collection. |
+| T-string in `@scenario(...)` | `@scenario(t'a {guest} checks in')` | Glossary handles render as term pills in the title. Evaluated eagerly at import, so only glossary handles are allowed; a value/expression interpolation raises `PytestGivenError`. |
 | `Template` on a helper-function decorator | `@when(Template('I insert {amount}'))` | Deferred substitution against the function's bound arguments at each call. Placeholders must name a positional-or-keyword parameter of the helper. Unmatched placeholders raise `PytestGivenError` at decoration time. |
 | `Annotated[..., given(...)]` on a test parameter | `def test(text: Annotated[str, given(Template('a {text} cup'))])` | Synthesizes a `given` step for a fixture or parametrize value at the call site. Plain string renders verbatim; `Template` does deferred substitution against parametrize columns. Only `given` is allowed; a t-string is rejected. |
 
@@ -196,7 +207,7 @@ Three things worth knowing:
 
 1. **`pytest_given.Template` only accepts bare identifiers** — `{name}`, `{name:spec}`, `{name!conv}`. Attribute access (`{obj.attr}`), indexing (`{d[key]}`), and arbitrary expressions (`{x + 1}`) raise `PytestGivenError` at construction. Workaround: parametrize by the attributes directly, or move the step into a test-body t-string (which supports full expression syntax).
 
-2. **`Template` is for deferred substitution.** It works on `@scenario(...)` (against parametrize columns) and on helper-function decorators like `@when(Template(...))` (against the helper's bound arguments). It is **not** allowed in a test body — values are in scope there, so use a t-string. `with given(Template(...))` / `when(Template(...))` / `then(Template(...))` raise `PytestGivenError` at entry. T-strings in `@scenario(...)` or on a fixture/helper decorator are rejected for the symmetric reason: the values aren't in scope at decoration time.
+2. **`Template` is for deferred substitution.** It works on `@scenario(...)` (against parametrize columns) and on helper-function decorators like `@when(Template(...))` (against the helper's bound arguments). It is **not** allowed in a test body — values are in scope there, so use a t-string. `with given(Template(...))` / `when(Template(...))` / `then(Template(...))` raise `PytestGivenError` at entry. A t-string on a fixture/helper decorator is rejected for the symmetric reason: the values aren't in scope at decoration time. A t-string in `@scenario(...)` is allowed **only** when every interpolation is a glossary handle — a term reference *is* in scope at import and renders as a title pill; any value/expression interpolation is rejected the same way.
 
 3. **Parametrized scenarios use the first case's steps as the template.** All rows of the parameter table share the step structure recorded by case 1, with values substituted per row. That's the right behaviour when every case runs the same code with different values — and misleading when the steps themselves vary, e.g. a conditional `with given(t'...')` will only show case 1's branch. If steps diverge per case, split into separate `@scenario` tests.
 

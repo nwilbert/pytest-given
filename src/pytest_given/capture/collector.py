@@ -110,7 +110,7 @@ class Collector:
     def start_scenario(
         self,
         scenario_id: NodeId,
-        name: str | Template,
+        name: str | Template | Narration,
         module: str,
         tags: list[str],
         source: SourceLocation | None = None,

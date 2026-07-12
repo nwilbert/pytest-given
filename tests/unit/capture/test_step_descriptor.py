@@ -34,6 +34,7 @@ from pytest_given.model import (
     Glossary,
     Narration,
     NarrationLiteral,
+    NarrationTermRef,
     NarrationValue,
     PytestGivenError,
     SourceLocation,
@@ -452,10 +453,30 @@ def test_scenario_with_template_keeps_template() -> None:
     assert deco.name is tmpl
 
 
-def test_scenario_with_tstring_raises() -> None:
+def test_scenario_with_value_tstring_raises() -> None:
     cup_size = 200
-    with pytest.raises(PytestGivenError, match=r't-string.*@scenario'):
+    with pytest.raises(PytestGivenError, match=r'non-glossary value'):
         scenario(t'Brew {cup_size} ml')
+
+
+def test_scenario_with_glossary_tstring_stores_narration() -> None:
+    g = Glossary()
+    guest = g.actor('Guest', definition='')
+    deco = scenario(t'{guest} checks in')
+    assert isinstance(deco.name, Narration)
+    assert deco.name.text == 'Guest checks in'
+    ref = next(p for p in deco.name.parts if isinstance(p, NarrationTermRef))
+    assert ref.term_id == guest.id
+
+
+def test_scenario_with_glossary_tstring_preserves_surface_text() -> None:
+    """A display override keeps the title text byte-identical to its former
+    plain-string wording (case, plurals)."""
+    g = Glossary()
+    guest = g.actor('Guest', definition='')
+    deco = scenario(t'{guest("guests")} arrive')
+    assert isinstance(deco.name, Narration)
+    assert deco.name.text == 'guests arrive'
 
 
 def test_attach_with_tstring_label_renders_eagerly() -> None:

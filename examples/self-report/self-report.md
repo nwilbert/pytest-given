@@ -701,34 +701,34 @@
 - **then** only the real pipe table produces rows
 
 ## ✓ A step pairs its narration with a phase
-`tests/unit/capture/test_step_descriptor.py:52::test_context_manager_basic` · happy-path
+`tests/unit/capture/test_step_descriptor.py:53::test_context_manager_basic` · happy-path
 
 - **when** a given «Step» descriptor is created
 - **then** it carries the given «Phase» and its «Narration»
 
 ## ✓ when_then records the action and its outcome as siblings
-`tests/unit/capture/test_step_descriptor.py:247::test_when_then_records_two_sibling_steps_on_clean_exit` · happy-path
+`tests/unit/capture/test_step_descriptor.py:248::test_when_then_records_two_sibling_steps_on_clean_exit` · happy-path
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a «when_then» block exits cleanly
 - **then** a when and a sibling then «Step» are recorded
 
 ## ✓ when_then pairs with an inner pytest.raises
-`tests/unit/capture/test_step_descriptor.py:276::test_when_then_pairs_with_inner_pytest_raises` · happy-path
+`tests/unit/capture/test_step_descriptor.py:277::test_when_then_pairs_with_inner_pytest_raises` · happy-path
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises and an inner pytest.raises swallows it
 - **then** both sibling steps are still recorded
 
 ## ✓ when_then omits the then when the body raises uncaught
-`tests/unit/capture/test_step_descriptor.py:307::test_when_then_omits_then_when_body_raises_uncaught` · validation
+`tests/unit/capture/test_step_descriptor.py:308::test_when_then_omits_then_when_body_raises_uncaught` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises with nothing catching inside
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ A nested when becomes a child of the when_then action
-`tests/unit/capture/test_step_descriptor.py:387::test_when_then_allows_nested_when_as_child_sub_step` · happy-path
+`tests/unit/capture/test_step_descriptor.py:388::test_when_then_allows_nested_when_as_child_sub_step` · happy-path
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a when opens inside the «when_then» body
@@ -947,70 +947,70 @@
 - **then** every slot is a «Term ref», with no bare words
 
 ## ✓ A Template parses a bare placeholder
-`tests/unit/capture/test_template.py:27::test_template_parses_single_placeholder` · step-text, parametrization
+`tests/unit/capture/test_template.py:35::test_template_parses_single_placeholder` · step-text, parametrization
 
 - **given** a deferred «Templatize» template with one placeholder
 - **when** the template is parsed
 - **then** it splits into literal and placeholder «Narration» parts
 
 ## ✓ A Template substitutes parametrize values
-`tests/unit/capture/test_template.py:59::test_template_substitute_basic` · step-text, parametrization
+`tests/unit/capture/test_template.py:67::test_template_substitute_basic` · step-text, parametrization
 
 - **given** a «Templatize» template referencing a «Case» column
 - **when** a «Parameter table» value is substituted in
 - **then** the placeholder is filled with that value
 
 ## ✓ A t-string interpolation becomes a value part
-`tests/unit/capture/test_template.py:127::test_parse_tstring_single_interpolation` · step-text, happy-path
+`tests/unit/capture/test_template.py:135::test_parse_tstring_single_interpolation` · step-text, happy-path
 
 - **given** a t-string step with one interpolated value
 - **when** the t-string is parsed at runtime
 - **then** the interpolation becomes a «Narration» value part
 
 ## ✓ A t-string can interpolate an arbitrary expression
-`tests/unit/capture/test_template.py:191::test_parse_tstring_expression` · step-text, happy-path
+`tests/unit/capture/test_template.py:199::test_parse_tstring_expression` · step-text, happy-path
 
 - **given** a t-string step interpolating a computed expression
 - **when** the t-string is parsed
 - **then** the «Value highlight» part records the full expression
 
 ## ✓ A glossary handle in a t-string emits a term ref
-`tests/unit/capture/test_template.py:231::test_tstring_with_actor_emits_term_ref` · step-text
+`tests/unit/capture/test_template.py:239::test_tstring_with_actor_emits_term_ref` · step-text
 
 - **given** an «Actor» handle from the glossary
 - **when** the handle is interpolated into a t-string step
 - **then** the step carries a «Term ref» pill for that «Actor»
 
 ## ✓ A work object handle in a t-string emits a term ref
-`tests/unit/capture/test_template.py:261::test_tstring_with_work_object_emits_term_ref` · step-text
+`tests/unit/capture/test_template.py:269::test_tstring_with_work_object_emits_term_ref` · step-text
 
 - **given** a «Work Object» handle from the glossary
 - **when** it is interpolated into a t-string step
 - **then** the step carries a «Term ref» for that «Work Object»
 
 ## ✓ A bare verb handle keeps its canonical display
-`tests/unit/capture/test_template.py:283::test_tstring_with_verb_emits_term_ref_with_canonical_display` · step-text
+`tests/unit/capture/test_template.py:291::test_tstring_with_verb_emits_term_ref_with_canonical_display` · step-text
 
 - **given** a «Verb» handle used without an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the canonical verb
 
 ## ✓ An inflected verb in a t-string shows the inflection
-`tests/unit/capture/test_template.py:299::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display` · step-text
+`tests/unit/capture/test_template.py:307::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display` · step-text
 
 - **given** a «Verb» handle called with an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the inflection but keeps the verb id
 
 ## ✓ A term ref may not carry a format spec
-`tests/unit/capture/test_template.py:340::test_tstring_term_ref_with_format_spec_raises` · step-text, validation
+`tests/unit/capture/test_template.py:348::test_tstring_term_ref_with_format_spec_raises` · step-text, validation
 
 - **given** an «Actor» handle interpolated with a format spec
 - **when** the t-string is parsed
 - **then** a PytestGivenError says a «Term ref» takes no format spec
 
 ## ✓ A FileGlossary handle works in a t-string step
-`tests/unit/capture/test_template.py:383::test_tstring_with_file_term_handle_emits_term_ref` · step-text
+`tests/unit/capture/test_template.py:391::test_tstring_with_file_term_handle_emits_term_ref` · step-text
 
 - **given** a «Deferred term» from a «File glossary»
 - **when** it is interpolated into a t-string step
@@ -1468,7 +1468,7 @@
 | ### | ✓ |
 
 ## ✓ A cross-phase step cannot open inside a when_then body · 2 cases
-`tests/unit/capture/test_step_descriptor.py:353::test_when_then_rejects_cross_phase_nested_step` · validation
+`tests/unit/capture/test_step_descriptor.py:354::test_when_then_rejects_cross_phase_nested_step` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a given or then opens inside the «when_then» body
@@ -1481,7 +1481,7 @@
 | then | ✓ |
 
 ## ✓ A Template accepts bare identifiers only · 3 cases
-`tests/unit/capture/test_template.py:98::test_template_non_identifier_raises_pytest_given_error` · step-text, validation
+`tests/unit/capture/test_template.py:106::test_template_non_identifier_raises_pytest_given_error` · step-text, validation
 
 - **given** the placeholder {text}
 - **when** a «Templatize» template is built from it

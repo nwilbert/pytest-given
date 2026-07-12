@@ -258,13 +258,13 @@ class ScenarioDecorator:
 
     def __init__(
         self,
-        name: str | Template,
+        name: str | Template | Narration,
         tags: list[str],
         *,
         story: Story | None = None,
         activity_ids: tuple[ActivityId, ...] = (),
     ) -> None:
-        self.name: str | Template = name
+        self.name: str | Template | Narration = name
         self.tags = tags
         self.story = story
         self.activity_ids = activity_ids
@@ -461,20 +461,34 @@ def attach(label: str | templatelib.Template, content: object) -> None:
 
 
 def scenario(
-    name: str | Template,
+    name: str | templatelib.Template | Template,
     tags: list[str] | None = None,
     *,
     story: Story | None = None,
     activities: Sequence[int] | None = None,
 ) -> ScenarioDecorator:
     """Mark a test for inclusion in the report."""
+    resolved_name: str | Template | Narration
     if isinstance(name, templatelib.Template):
-        raise PytestGivenError(
-            't-string in @scenario(...) is not supported; @scenario runs at '
-            'module-import time, so the parametrize parameters are not yet in '
-            'scope. Use pytest_given.Template(...) for parametrized scenario '
-            'names, or a plain string for static names.'
-        )
+        # @scenario runs at module-import time. Glossary handles are in scope
+        # then and render eagerly to term pills; a parametrize value is not,
+        # so it would be baked into the name frozen. Accept the first, reject
+        # the second — mirrors the step-decorator rule.
+        narration = narration_from(name)
+        for part in narration.parts:
+            if isinstance(part, NarrationValue):
+                raise PytestGivenError(
+                    f'@scenario(t"...") interpolates non-glossary value '
+                    f'{{{part.expression}}} (rendered as {part.rendered!r}); '
+                    f'@scenario runs at module-import time, so parametrize '
+                    f'values are not in scope. Use pytest_given.Template(...) '
+                    f'for a parametrized name, a glossary handle '
+                    f'(g.actor/g.work_object/g.verb) for a term pill, or a '
+                    f'plain string for a static name.'
+                )
+        resolved_name = narration
+    else:
+        resolved_name = name
     if story is not None and not isinstance(story, Story):
         raise PytestGivenError(
             f'@scenario(story=...) must be a Story instance; '
@@ -483,4 +497,6 @@ def scenario(
     activity_ids: tuple[ActivityId, ...] = (
         tuple(ActivityId(i) for i in activities) if activities else ()
     )
-    return ScenarioDecorator(name, tags or [], story=story, activity_ids=activity_ids)
+    return ScenarioDecorator(
+        resolved_name, tags or [], story=story, activity_ids=activity_ids
+    )

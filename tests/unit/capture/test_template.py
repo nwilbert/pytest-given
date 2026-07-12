@@ -6,9 +6,10 @@ import pytest
 
 from pytest_given import given, scenario, then, when, when_then
 from pytest_given.capture.file_glossary import FileGlossary
-from pytest_given.capture.template import Template, parse_tstring
+from pytest_given.capture.template import Template, narration_from, parse_tstring
 from pytest_given.model import (
     Glossary,
+    Narration,
     NarrationLiteral,
     NarrationPlaceholder,
     NarrationTermRef,
@@ -16,6 +17,13 @@ from pytest_given.model import (
     PytestGivenError,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
+
+
+def test_narration_from_passes_through_narration() -> None:
+    """A pre-rendered Narration (an eager glossary-t-string scenario name)
+    flows through unchanged, without a second parse."""
+    narration = Narration(text='hi', parts=[NarrationLiteral(value='hi')])
+    assert narration_from(narration) is narration
 
 
 def test_template_parses_literal_only() -> None:
