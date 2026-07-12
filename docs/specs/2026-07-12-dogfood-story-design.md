@@ -29,19 +29,19 @@ Coverage matching is per-step: an activity gets a badge when some step's narrati
 
 Defined in `tests/ubiquitous_language.py` next to `pg`, registered on import as today. Activities auto-number 1–11; pins reference those ints.
 
-| # | Activity (canonical prose) | Retires | Coverage |
+| # | Activity (canonical prose) | Retires | Coverage (as implemented) |
 |---|---|---|---|
 | 1 | Domain Expert **tells** Story to the Developer | — | honest gap (nothing implements elicitation) |
-| 2 | Developer **captures** Story as Activity | — | pin in `tests/unit/capture/test_story.py` |
-| 3 | Developer **builds** Glossary with the Domain Expert | Glossary | pin in `tests/unit/capture/test_glossary.py` |
-| 4 | Agent **writes** Scenario with Tag against the Glossary | Tag | pin in `tests/integration/test_plugin.py` (a tags-carrying collection scenario) |
-| 5 | Agent **narrates** Step with a Phase | Phase | pin in a decorator/step test |
-| 6 | Agent **attaches** Attachment to a Step | Attachment | pin in an attachment test |
-| 7 | Collector **records** Step on the Step stack | Collector, Step stack | pin in `tests/unit/capture/test_collector.py` |
-| 8 | Collector **grafts** Fixture recording from a Step fixture | Step fixture | pin in a fixture-recording test |
-| 9 | Collector **groups** Parametrized scenario into a Parameter table | Parametrized scenario, Group | pin in `tests/unit/capture/test_template.py` |
-| 10 | Renderer **renders** Report with Parameter coloring | Renderer, Report, Parameter coloring | pin in a renderer test |
-| 11 | Domain Expert **reviews** Scenario in the Report | — | pin in a report/coverage test if a genuine match exists, else honest gap |
+| 2 | Developer **captures** Story as Activity | — | pin in `tests/unit/capture/test_story.py` (auto-numbering scenario) |
+| 3 | Developer **builds** Glossary with the Domain Expert | Glossary | pin in `tests/unit/capture/test_glossary.py` (actor registration) |
+| 4 | Agent **writes** Scenario with Tag against the Glossary | Tag | pin in `tests/unit/capture/test_template.py` (file-glossary handle in a t-string step) |
+| 5 | Agent **narrates** Step with a Phase | Phase | pin in `tests/unit/capture/test_step_descriptor.py` |
+| 6 | Agent **attaches** Attachment to a Step | Attachment | pin in `tests/unit/capture/test_collector.py` (attach during fixture setup) |
+| 7 | Collector **records** Step on the Step stack | Collector, Step stack | pin in `tests/unit/capture/test_collector.py` (steps record with phases) |
+| 8 | Collector **grafts** Fixture recording from a Step fixture | Step fixture | pin in `tests/unit/capture/test_collector.py` (graft deep-copy) |
+| 9 | Collector **groups** Parametrized scenario into a Parameter table | Parametrized scenario, Group | pin in `tests/unit/test_plugin.py` (grouping merges cases) |
+| 10 | Renderer **renders** Report with Parameter coloring | Renderer, Report, Parameter coloring | pin in `tests/unit/report/test_html_renderer.py` (parameter coloring) |
+| 11 | Domain Expert **reviews** Scenario in the Report | — | honest gap (review is a human activity) |
 
 Sketch (noun/actor handle names illustrative; each is a `pg[...]` lookup from the closed `FileGlossary` over GLOSSARY.md — the `_t` suffix means "term handle" and dodges shadowing the `story`/`activity` constructors and `scenario` decorator used in the same module). **Verbs are bare `ActivityWord` strings, not glossary terms** — generic process verbs (*tells*, *captures*, *builds*, …) are story prose, not pytest-given vocabulary, and a word in a verb slot is grammatically fine. The two exceptions are `Graft` and `Group`: existing glossary rows whose meaning *is* the verb, referenced as handles with an inflection (`pg['Graft']('grafts')`). Every activity keeps at least two noun/actor term refs, so all remain coverage-eligible:
 
@@ -92,7 +92,7 @@ def test_...():
         ...
 ```
 
-`activity=` takes an int or sequence of ints (the auto-assigned 1-based activity ids). Scenario-level `activities=` scoping is not needed — step pins alone produce coverage. Exact scenario choices are an implementation-plan concern; candidates are in the story table.
+`activity=` takes an int or sequence of ints (the auto-assigned 1-based activity ids). Scenario-level `activities=` scoping is not needed — step pins alone produce coverage. The story table's Coverage column records the implemented pins. Four previously plain tests were narrated to host pins (activities 5, 6, 7, 9), since only `@scenario`-decorated tests can carry them; one of those (`test_context_manager_basic`) is honestly two-phase and sits on the `given_lint_ignore` list for `missing-phase`.
 
 ## Dead-term accounting
 
