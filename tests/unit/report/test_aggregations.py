@@ -1,5 +1,6 @@
 import pytest
 
+from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import (
     Activity,
     ActivityId,
@@ -18,6 +19,7 @@ from pytest_given.model import (
     Story,
     StoryId,
     TermId,
+    report_to_dict,
 )
 from pytest_given.report.aggregations import (
     build_coverage_maps,
@@ -27,6 +29,7 @@ from pytest_given.report.aggregations import (
     build_term_scenario_index,
     tab_visibility,
 )
+from tests.ubiquitous_language import pg
 
 
 def _ent(tid: str, display: str) -> ActivityTermRef:
@@ -154,49 +157,60 @@ def test_build_glossary_aggregations_empty_when_no_glossary() -> None:
     assert build_glossary_aggregations(rd) == {}
 
 
+@scenario(
+    'The glossary view aggregates instances and verb forms',
+    tags=['happy-path'],
+)
 def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
-    g = _g()
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            ActivityPath(
-                parts=(
-                    _ent('guest', 'Alice'),
-                    ActivityTermRef(term_id=TermId('search'), display='searches for'),
-                    _ent('room', 'Deluxe Suite'),
-                )
+    with given(
+        t'a {pg["Report"]} whose {pg["Story"]} and {pg["Scenario"]} reference '
+        t'entity {pg["Instance"]}s and an {pg["Inflection"]}'
+    ):
+        g = _g()
+        a = Activity(
+            id=ActivityId(1),
+            paths=(
+                ActivityPath(
+                    parts=(
+                        _ent('guest', 'Alice'),
+                        ActivityTermRef(
+                            term_id=TermId('search'), display='searches for'
+                        ),
+                        _ent('room', 'Deluxe Suite'),
+                    )
+                ),
             ),
-        ),
-    )
-    story = Story(id=StoryId('book'), title='Book', activities=(a,))
-    step = Step(
-        phase='when',
-        narration=Narration(
-            text='x',
-            parts=[
-                NarrationTermRef(term_id=TermId('guest'), display='Alice'),
-                NarrationTermRef(term_id=TermId('search'), display='searches'),
-                NarrationTermRef(term_id=TermId('room'), display='Deluxe Suite'),
-            ],
-        ),
-    )
-    scn = Scenario(
-        id=NodeId('t'),
-        narration=Narration(text='s'),
-        module='m',
-        steps=[step],
-        story_id=StoryId('book'),
-    )
-    rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
-    aggs = build_glossary_aggregations(rd)
-    guest_agg = aggs[TermId('guest')]
-    assert 'Alice' in [i.display for i in guest_agg.instances]
-    room_agg = aggs[TermId('room')]
-    assert 'Deluxe Suite' in [i.display for i in room_agg.instances]
-    search_agg = aggs[TermId('search')]
-    forms = [f.display for f in search_agg.forms]
-    assert 'searches for' in forms
-    assert 'search' not in forms
+        )
+        story = Story(id=StoryId('book'), title='Book', activities=(a,))
+        step = Step(
+            phase='when',
+            narration=Narration(
+                text='x',
+                parts=[
+                    NarrationTermRef(term_id=TermId('guest'), display='Alice'),
+                    NarrationTermRef(term_id=TermId('search'), display='searches'),
+                    NarrationTermRef(term_id=TermId('room'), display='Deluxe Suite'),
+                ],
+            ),
+        )
+        scn = Scenario(
+            id=NodeId('t'),
+            narration=Narration(text='s'),
+            module='m',
+            steps=[step],
+            story_id=StoryId('book'),
+        )
+        rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
+        attach('Report data', report_to_dict(rd))
+    with when(t'the {pg["Glossary"]} aggregations are built'):
+        aggs = build_glossary_aggregations(rd)
+    with then(t'the entity terms collect their {pg["Instance"]}s'):
+        assert 'Alice' in [i.display for i in aggs[TermId('guest')].instances]
+        assert 'Deluxe Suite' in [i.display for i in aggs[TermId('room')].instances]
+    with then(t'the verb collects its {pg["Inflection"]} but not its canonical form'):
+        forms = [f.display for f in aggs[TermId('search')].forms]
+        assert 'searches for' in forms
+        assert 'search' not in forms
 
 
 def test_build_glossary_aggregations_skips_unknown_term_in_scenario_narration() -> None:
@@ -247,25 +261,34 @@ def test_build_glossary_aggregations_walks_nested_steps() -> None:
     assert 'Alice' in [i.display for i in aggs[TermId('guest')].instances]
 
 
+@scenario(
+    'Terms referenced by an activity record the story',
+    tags=['happy-path'],
+)
 def test_build_glossary_aggregations_records_story_refs_via_activities() -> None:
-    g = _g()
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            ActivityPath(
-                parts=(
-                    _ent('guest', 'Guest'),
-                    _verb_part('search'),
-                    _ent('room', 'Room'),
-                )
+    with given(
+        t'a {pg["Story"]} whose {pg["Activity"]} references an actor and a verb'
+    ):
+        g = _g()
+        a = Activity(
+            id=ActivityId(1),
+            paths=(
+                ActivityPath(
+                    parts=(
+                        _ent('guest', 'Guest'),
+                        _verb_part('search'),
+                        _ent('room', 'Room'),
+                    )
+                ),
             ),
-        ),
-    )
-    story = Story(id=StoryId('book'), title='Book', activities=(a,))
-    rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
-    aggs = build_glossary_aggregations(rd)
-    assert aggs[TermId('guest')].stories == [StoryId('book')]
-    assert aggs[TermId('search')].stories == [StoryId('book')]
+        )
+        story = Story(id=StoryId('book'), title='Book', activities=(a,))
+        rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
+    with when(t'the {pg["Glossary"]} aggregations are built'):
+        aggs = build_glossary_aggregations(rd)
+    with then(t'the actor and the verb each list that {pg["Story"]}'):
+        assert aggs[TermId('guest')].stories == [StoryId('book')]
+        assert aggs[TermId('search')].stories == [StoryId('book')]
 
 
 def test_build_coverage_maps_empty_for_scenario_with_unknown_story_id() -> None:
@@ -308,45 +331,51 @@ def test_build_glossary_aggregations_verb_in_step_not_collected_as_instance() ->
     assert TermId('search') not in aggs
 
 
+@scenario(
+    'A canonical entity reference is not an instance',
+    tags=['happy-path'],
+)
 def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -> None:
-    """A canonical-name entity reference (display == term.canonical) names the
-    canonical concept, not a distinct instance — it must not appear in the
-    Glossary view's Instances list, whether seen in a scenario step narration
-    or in a story activity path."""
-    g = _g()
-    # Story activity uses bare canonical Guest + canonical Room.
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            ActivityPath(
-                parts=(
-                    _ent('guest', 'Guest'),
-                    ActivityTermRef(term_id=TermId('search'), display='searches for'),
-                    _ent('room', 'Room'),
-                )
+    with given(
+        t'a {pg["Story"]} activity and a {pg["Step"]} referencing entities '
+        t'by canonical name only'
+    ):
+        g = _g()
+        a = Activity(
+            id=ActivityId(1),
+            paths=(
+                ActivityPath(
+                    parts=(
+                        _ent('guest', 'Guest'),
+                        ActivityTermRef(
+                            term_id=TermId('search'), display='searches for'
+                        ),
+                        _ent('room', 'Room'),
+                    )
+                ),
             ),
-        ),
-    )
-    story = Story(id=StoryId('book'), title='Book', activities=(a,))
-    # Scenario narration also references the canonical Guest.
-    step = Step(
-        phase='when',
-        narration=Narration(
-            text='x',
-            parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
-        ),
-    )
-    scn = Scenario(
-        id=NodeId('t'),
-        narration=Narration(text='s'),
-        module='m',
-        steps=[step],
-        story_id=StoryId('book'),
-    )
-    rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
-    aggs = build_glossary_aggregations(rd)
-    assert aggs[TermId('guest')].instances == []
-    assert aggs[TermId('room')].instances == []
+        )
+        story = Story(id=StoryId('book'), title='Book', activities=(a,))
+        step = Step(
+            phase='when',
+            narration=Narration(
+                text='x',
+                parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
+            ),
+        )
+        scn = Scenario(
+            id=NodeId('t'),
+            narration=Narration(text='s'),
+            module='m',
+            steps=[step],
+            story_id=StoryId('book'),
+        )
+        rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
+    with when(t'the {pg["Glossary"]} aggregations are built'):
+        aggs = build_glossary_aggregations(rd)
+    with then(t'neither entity term records an {pg["Instance"]}'):
+        assert aggs[TermId('guest')].instances == []
+        assert aggs[TermId('room')].instances == []
 
 
 def test_build_glossary_aggregations_skips_non_term_ref_narration_parts() -> None:
@@ -391,73 +420,97 @@ def test_build_glossary_aggregations_skips_unknown_term_ref_in_activity() -> Non
     assert TermId('unknown-term') not in aggs
 
 
+@scenario(
+    'A kindless term records only its story ref',
+    tags=['happy-path'],
+)
 def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> None:
-    """A glossary term with kind=None in a story activity records the story ref
-    but does NOT produce an entity instance observation or a verb form entry."""
-    g = _g()
-    g._register(GlossaryTerm(id=TermId('widget'), kind=None, canonical='Widget'))
-    kindless_part = ActivityTermRef(term_id=TermId('widget'), display='My Widget')
-    a = Activity(
-        id=ActivityId(1),
-        paths=(ActivityPath(parts=(kindless_part,)),),
-    )
-    story = Story(id=StoryId('book'), title='Book', activities=(a,))
-    rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
-    aggs = build_glossary_aggregations(rd)
-    assert TermId('widget') in aggs, 'kindless term should still appear in aggregations'
-    widget_agg = aggs[TermId('widget')]
-    assert widget_agg.stories == [StoryId('book')], 'story ref must be recorded'
-    assert widget_agg.instances == [], (
-        'kindless term must not produce an entity instance'
-    )
-    assert widget_agg.forms == [], 'kindless term must not produce a verb form'
+    with given(
+        t'a {pg["Kindless"]} {pg["Term"]} referenced by a {pg["Story"]} activity'
+    ):
+        g = _g()
+        g._register(GlossaryTerm(id=TermId('widget'), kind=None, canonical='Widget'))
+        kindless_part = ActivityTermRef(term_id=TermId('widget'), display='My Widget')
+        a = Activity(
+            id=ActivityId(1),
+            paths=(ActivityPath(parts=(kindless_part,)),),
+        )
+        story = Story(id=StoryId('book'), title='Book', activities=(a,))
+        rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
+    with when(t'the {pg["Glossary"]} aggregations are built'):
+        aggs = build_glossary_aggregations(rd)
+    with then(
+        t'the {pg["Term"]} lists the {pg["Story"]} but no {pg["Instance"]} '
+        t'and no {pg["Inflection"]}'
+    ):
+        assert TermId('widget') in aggs, (
+            'kindless term should still appear in aggregations'
+        )
+        widget_agg = aggs[TermId('widget')]
+        assert widget_agg.stories == [StoryId('book')], 'story ref must be recorded'
+        assert widget_agg.instances == [], (
+            'kindless term must not produce an entity instance'
+        )
+        assert widget_agg.forms == [], 'kindless term must not produce a verb form'
 
 
+@scenario(
+    'An instance seen in a fixture step records its fixture provenance',
+    tags=['happy-path'],
+)
 def test_glossary_aggregations_annotates_fixture_provenance() -> None:
-    g = _g()
-    fixture_step = Step(
-        phase='given',
-        narration=Narration(
-            text='our guest Alice',
-            parts=[
-                NarrationTermRef(term_id=TermId('guest'), display='Alice'),
-            ],
-        ),
-        fixture_name='alice',
-    )
-    body_step = Step(
-        phase='when',
-        narration=Narration(
-            text='Alice does',
-            parts=[
-                NarrationTermRef(term_id=TermId('guest'), display='Alice'),
-            ],
-        ),
-    )
-    scn = Scenario(
-        id=NodeId('t'),
-        narration=Narration(text='s'),
-        module='m',
-        steps=[fixture_step, body_step],
-        story_id=StoryId('book'),
-    )
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            ActivityPath(
-                parts=(
-                    _ent('guest', 'Guest'),
-                    _verb_part('search'),
-                    _ent('room', 'Room'),
-                )
+    with given(
+        t'a {pg["Scenario"]} whose fixture-sourced {pg["Step"]} names '
+        t'an {pg["Instance"]}'
+    ):
+        g = _g()
+        fixture_step = Step(
+            phase='given',
+            narration=Narration(
+                text='our guest Alice',
+                parts=[
+                    NarrationTermRef(term_id=TermId('guest'), display='Alice'),
+                ],
             ),
-        ),
-    )
-    story = Story(id=StoryId('book'), title='Book', activities=(a,))
-    rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
-    aggs = build_glossary_aggregations(rd)
-    alice = next(i for i in aggs[TermId('guest')].instances if i.display == 'Alice')
-    assert alice.fixture_name == 'alice'
+            fixture_name='alice',
+        )
+        body_step = Step(
+            phase='when',
+            narration=Narration(
+                text='Alice does',
+                parts=[
+                    NarrationTermRef(term_id=TermId('guest'), display='Alice'),
+                ],
+            ),
+        )
+        scn = Scenario(
+            id=NodeId('t'),
+            narration=Narration(text='s'),
+            module='m',
+            steps=[fixture_step, body_step],
+            story_id=StoryId('book'),
+        )
+        a = Activity(
+            id=ActivityId(1),
+            paths=(
+                ActivityPath(
+                    parts=(
+                        _ent('guest', 'Guest'),
+                        _verb_part('search'),
+                        _ent('room', 'Room'),
+                    )
+                ),
+            ),
+        )
+        story = Story(id=StoryId('book'), title='Book', activities=(a,))
+        rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
+    with when(t'the {pg["Glossary"]} aggregations are built'):
+        aggs = build_glossary_aggregations(rd)
+    with then(t'the {pg["Instance"]} carries the fixture name'):
+        alice = next(
+            i for i in aggs[TermId('guest')].instances if i.display == 'Alice'
+        )
+        assert alice.fixture_name == 'alice'
 
 
 def test_build_term_scenario_index_empty_when_no_glossary() -> None:
@@ -496,35 +549,45 @@ def test_build_term_scenario_index_maps_terms_to_scenarios() -> None:
     assert TermId('search') not in index
 
 
+@scenario(
+    'The term index maps each term to its scenarios once',
+    tags=['happy-path'],
+)
 def test_build_term_scenario_index_dedups_and_includes_scenario_narration() -> None:
-    g = _g()
-    step_one = Step(
-        phase='when',
-        narration=Narration(
-            text='x',
-            parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
-        ),
-    )
-    step_two = Step(
-        phase='then',
-        narration=Narration(
-            text='y',
-            parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
-        ),
-    )
-    scn = Scenario(
-        id=NodeId('test::a'),
-        narration=Narration(
-            text='scn',
-            parts=[NarrationTermRef(term_id=TermId('room'), display='Room')],
-        ),
-        module='m',
-        steps=[step_one, step_two],
-    )
-    rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
-    index = build_term_scenario_index(rd)
-    assert index[TermId('guest')] == [NodeId('test::a')]  # dedup across steps
-    assert index[TermId('room')] == [NodeId('test::a')]  # scenario narration counts
+    with given(
+        t'a {pg["Scenario"]} referencing one {pg["Term"]} in two steps '
+        t'and another in its name'
+    ):
+        g = _g()
+        step_one = Step(
+            phase='when',
+            narration=Narration(
+                text='x',
+                parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
+            ),
+        )
+        step_two = Step(
+            phase='then',
+            narration=Narration(
+                text='y',
+                parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
+            ),
+        )
+        scn = Scenario(
+            id=NodeId('test::a'),
+            narration=Narration(
+                text='scn',
+                parts=[NarrationTermRef(term_id=TermId('room'), display='Room')],
+            ),
+            module='m',
+            steps=[step_one, step_two],
+        )
+        rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
+    with when('the term-scenario index is built'):
+        index = build_term_scenario_index(rd)
+    with then(t'each {pg["Term"]} maps to the scenario exactly once'):
+        assert index[TermId('guest')] == [NodeId('test::a')]  # dedup across steps
+        assert index[TermId('room')] == [NodeId('test::a')]  # narration counts
 
 
 def _scn(node_id: str) -> Scenario:
@@ -598,37 +661,46 @@ def test_scenario_slug_duplicate_basename_raises() -> None:
         build_scenario_slug_index(rd)
 
 
+@scenario(
+    'An under-anchored activity is flagged ineligible in rollups',
+    tags=['happy-path'],
+)
 def test_build_story_rollups_flags_under_anchored_activity_ineligible() -> None:
-    g = _g()
-    eligible = Activity(
-        id=ActivityId(1),
-        paths=(
-            ActivityPath(
-                parts=(
-                    _ent('guest', 'Guest'),
-                    _verb_part('search'),
-                    _ent('room', 'Room'),
-                )
+    with given(
+        t'a {pg["Story"]} with an anchored and an under-anchored {pg["Activity"]}'
+    ):
+        g = _g()
+        eligible = Activity(
+            id=ActivityId(1),
+            paths=(
+                ActivityPath(
+                    parts=(
+                        _ent('guest', 'Guest'),
+                        _verb_part('search'),
+                        _ent('room', 'Room'),
+                    )
+                ),
             ),
-        ),
-    )
-    under_anchored = Activity(
-        id=ActivityId(2),
-        paths=(
-            ActivityPath(
-                parts=(
-                    _ent('guest', 'Guest'),
-                    ActivityWord(text='browses'),
-                    ActivityWord(text='listings'),
-                )
+        )
+        under_anchored = Activity(
+            id=ActivityId(2),
+            paths=(
+                ActivityPath(
+                    parts=(
+                        _ent('guest', 'Guest'),
+                        ActivityWord(text='browses'),
+                        ActivityWord(text='listings'),
+                    )
+                ),
             ),
-        ),
-    )
-    story = Story(
-        id=StoryId('book'), title='Book', activities=(eligible, under_anchored)
-    )
-    rd = ReportData(metadata=_meta(), scenarios=[], stories=[story], glossary=g)
-    rollups = build_story_rollups(rd, build_coverage_maps(rd))
-    per_activity = rollups[StoryId('book')].per_activity
-    assert per_activity[ActivityId(1)].eligible is True
-    assert per_activity[ActivityId(2)].eligible is False
+        )
+        story = Story(
+            id=StoryId('book'), title='Book', activities=(eligible, under_anchored)
+        )
+        rd = ReportData(metadata=_meta(), scenarios=[], stories=[story], glossary=g)
+    with when('the story rollups are built'):
+        rollups = build_story_rollups(rd, build_coverage_maps(rd))
+    with then(t'only the anchored {pg["Activity"]} is {pg["Coverage"]}-eligible'):
+        per_activity = rollups[StoryId('book')].per_activity
+        assert per_activity[ActivityId(1)].eligible is True
+        assert per_activity[ActivityId(2)].eligible is False
