@@ -47,13 +47,13 @@ Hard rules (each raises `PytestGivenError`):
 - **Code-defined**: `g = Glossary()`, then `guest = g.actor('Guest', definition='…')`, `g.work_object('Room', …)`, `g.verb('search', …)`. Put `g` in a `conftest.py` so the plugin discovers it.
 - **File-backed**: `g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')` — needs at least one GFM pipe table; first column = term, second = description by default (`term_column=` / `description_column=` / `kind_column=` override, 0-based index or header name, case-insensitive).
 - **Handles in t-strings** render as kind-coloured pills with definition tooltips: `t'a {guest} {search("searches for")} a {room}'`. Calling a handle supplies the display text (verb conjugation `g["borrow"]("borrows")`, or a concrete instance `organizer('Carol')`).
-- **Lookup and deferral**: `g['Guest']` fetches a declared term (case-insensitive; raises if unknown). `g('foo')` declares an as-yet-unclassified term (lands in *Uncategorized*, shows *Undefined* until `definition=` is supplied). Both return handles usable in t-strings and activities.
-- Without a `kind_column`, kinds are inferred from story activity-slot positions (slot 0 → actor, 1 → verb, ≥2 → work object); a term used only in steps stays kindless.
+- **Lookup and deferral**: `g['Guest']` fetches a declared term (case-insensitive; raises if unknown). On a code-defined glossary, `g('foo')` declares an as-yet-unclassified term (lands in *Uncategorized*, shows *Undefined* until `definition=` is supplied); on a `FileGlossary` the vocabulary is closed — `g('foo')` only looks up, and new terms are added as rows in the file. Both forms return handles usable in t-strings and activities.
+- Without a `kind_column`, kinds are inferred from story activity-slot positions (position 0 → actor, odd → verb, even ≥ 2 → work object; actor + noun slots resolve to actor, a verb slot plus any other raises); a term used only in steps stays kindless.
 
 ## Stories
 
 - `story('Name', [activity(...), ...])` — a flow of `activity(actor, verb, work_object, ...)` rows, read left-to-right; parts may be bare strings, but an activity needs **two distinct glossary terms** to be coverage-tracked. `path(...)` branches alternate sequences off a shared prefix.
-- Bind a scenario with `@scenario(..., story=the_story)`; steps' term refs match against activities for coverage. A step can bind explicitly: `given(text, activity=...)`.
+- Bind a scenario with `@scenario(..., story=the_story)`; coverage matches per step — an activity is covered when a single step's term refs include all the activity's terms. A step can pin an activity explicitly with `given(text, activity=3)` (1-based activity number or sequence); a pinned step covers regardless of its narration.
 
 ## Verifying
 

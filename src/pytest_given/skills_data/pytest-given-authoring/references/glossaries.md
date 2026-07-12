@@ -52,8 +52,8 @@ with when(t'a {g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
 Terms are actors, verbs, or work objects. Three ways a term gets its kind:
 
 1. **Explicit** — `g.actor(...)` / `g.verb(...)` / `g.work_object(...)`, or a `kind_column` in the glossary file.
-2. **Inferred from stories** — when a file glossary has no kind column, kinds are inferred from story activity-slot positions (slot 0 → actor, slot 1 → verb, slot ≥ 2 → work object). A term used only in steps stays kindless (neutral pill).
-3. **Deliberately deferred** — `g('foo')` declares a term the team hasn't classified yet: it lands in the *Uncategorized* bucket and shows an *Undefined* badge until a definition arrives. Use it as a triage bucket, not a resting place.
+2. **Inferred from stories** — when a file glossary has no kind column, kinds are inferred from story activity-slot positions: position 0 → actor, odd positions → verb, even positions ≥ 2 → work object. A term seen in both actor and noun slots resolves to actor (an actor can be the target of a hand-off); a term seen in a verb slot *and* any other slot raises — add a kind column to disambiguate. A term used only in steps stays kindless (neutral pill).
+3. **Deliberately deferred** — `g('foo')` declares a term the team hasn't classified yet: it lands in the *Uncategorized* bucket and shows an *Undefined* badge until a definition arrives. Use it as a triage bucket, not a resting place. Code-defined glossaries only: a `FileGlossary` is a **closed vocabulary** — `g('foo')` and `g['foo']` both merely look up and raise on unknown names; new vocabulary is added as a row in the file.
 
 ## Keeping the glossary honest
 

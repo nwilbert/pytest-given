@@ -14,7 +14,8 @@ book_a_group_trip = story('Book a Group Trip', [
 ])
 ```
 
-- An activity reads left-to-right: **actor → verb → work object**, with optional connective words (`'for'`, `'to'`) between parts.
+- An activity reads left-to-right: **actor → verb → work object**, with optional connective words (`'for'`, `'to'`) between parts. Structurally it is a strict node/edge alternation of odd length ≥ 3: even positions are entity nodes (position 0 is the acting actor), odd positions are edges (a verb or a connective).
+- **A bare word consumes a position.** Write a connective as one string in an edge slot (`'to the'`, `'with a'`); never insert a standalone article before a noun — it shifts the noun into a verb slot and construction fails.
 - Handles come from the glossary; calling one supplies an instance or inflection — `organizer('Carol')`, `search('searches for')`.
 - Any part may be a **bare string** instead of a glossary handle — but an activity needs at least two distinct glossary terms to be coverage-tracked; under-anchored activities render as "not coverage-tracked".
 - `path(...)` branches an activity where alternate sequences run in parallel or share a prefix:
@@ -35,7 +36,9 @@ def test_select_suite(carol):
         ...
 ```
 
-Each step's term references are matched against the story's activities to compute coverage; the Stories tab shows a coverage chip per activity with the scenarios that touch it. A step can also bind to a specific activity explicitly: `given(text, activity=...)`.
+Coverage is matched **per step**: an activity is covered when a *single step's* term references include all of the activity's terms (an instance also counts for its canonical term) — references spread across several steps don't add up. The Stories tab shows a coverage chip per activity with the scenarios that touch it.
+
+A step can also **pin** an activity explicitly — `given(text, activity=3)`, taking the 1-based activity number in the story (or a sequence of numbers). A pinned step covers the activity regardless of what its narration references; use a pin when the activity is phrased above the vocabulary the step narrates (e.g. a process-level activity implemented by a technical test), and keep it on the one step that genuinely demonstrates the activity.
 
 An uncovered activity is a signal, not an error — it marks vocabulary and behaviour no test exercises yet.
 
