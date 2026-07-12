@@ -35,6 +35,7 @@ from pytest_given.model import (
     SourceLocation,
     Step,
 )
+from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 @pytest.fixture(autouse=True)
@@ -44,11 +45,17 @@ def _reset_story_registry():
     clear_story_registry()
 
 
+@scenario(
+    'A step pairs its narration with a phase',
+    tags=['happy-path'],
+    story=adopt_pytest_given,
+)
 def test_context_manager_basic() -> None:
-    """StepDescriptor exposes phase and narration attributes."""
-    desc = StepDescriptor('given', 'a coffee machine')
-    assert desc.phase == 'given'
-    assert desc.narration.text == 'a coffee machine'
+    with when(t'a given {pg["Step"]} descriptor is created', activity=5):
+        desc = StepDescriptor('given', 'a coffee machine')
+    with then(t'it carries the given {pg["Phase"]} and its {pg["Narration"]}'):
+        assert desc.phase == 'given'
+        assert desc.narration.text == 'a coffee machine'
 
 
 def test_decorator_basic() -> None:
