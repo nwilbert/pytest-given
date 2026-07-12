@@ -11,6 +11,12 @@
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
+- [ ] Narrate more backend tests into scenarios — continue the dogfood conversion, converting behaviour, not plumbing (leave schema/serde round-trips, metadata/protocol checks, and config parsing plain). In priority order:
+  - lint rule tests (`tests/unit/lint/test_runtime_rules.py`, `test_ast_rules.py`, ~65) — each asserts a user-facing rule ("missing-phase fires on a two-phase scenario"); the report would document the lint's semantics
+  - report behaviour (`tests/unit/report/test_aggregations.py`, `test_md_renderer.py`, ~48) — narrates naturally in glossary vocabulary (Instance, Inflection, Story, Term)
+  - source-link preset resolution (`tests/unit/report/test_source_link.py`) — the preset rules earn narration; the URL-template internals stay plain
+  - integration-test spike (`tests/integration/`, 124 plain): the plugin's outermost behaviour — "when the suite runs with `--given-json` then the report shows …". Technically feasible (`test_plugin_session_isolation.py` proves narrated outer scenarios survive nested pytester runs) but needs its own spike for nested-session edge cases around open step stacks. Would retire the `Plain fixture` dead term.
+  - `Scenario↔activity binding` is the last dead term with no narration path: the coverage scenarios that demonstrate it are already narrated but naturally say "binds". Rename the term to something narratable (e.g. *Binding*) or accept it as permanently dead — don't force the arrow name into a step.
 
 ## Later
 
