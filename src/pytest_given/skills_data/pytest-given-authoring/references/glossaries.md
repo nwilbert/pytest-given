@@ -51,7 +51,7 @@ Pick the lightest surface form for the word you need — the same three forms on
 ## Naming terms
 
 - **Term names are natural language, not class names.** Name the concept a human would say (`File glossary`, `Activity Part`) and spell the implementing class (`FileGlossary`, `ActivityPart`) inside the definition. A one-word term may coincide with its class only when the class is already the natural word — multi-word CamelCase never is.
-- **Renaming or removing a term is a code change, not just a doc edit.** A term's slug (lowercased, non-alphanumeric → `-`) is the lookup key, so `File glossary` and `FileGlossary` are *different* keys and a rename breaks every `g['Old name']` reference. Grep for the old name, update the references, re-render the reports. Adding a term is always safe.
+- **Renaming or removing a term is a code change, not just a doc edit.** A term's slug (lowercased, non-alphanumeric → `-`) is the lookup key, so `File glossary` and `FileGlossary` are *different* keys and a rename breaks every `g['Old name']` reference. Grep for the old name, update the references, re-render the reports — and carry the rename into the implementation naming: leaving the old name in the code creates exactly the language drift the vocabulary rule forbids (see [scenarios.md](scenarios.md)). Adding a term is always safe.
 
 ## Kinds
 

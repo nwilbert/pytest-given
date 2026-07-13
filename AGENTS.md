@@ -76,7 +76,7 @@ The narration rules live in the **`pytest-given-authoring` skill** — auto-disc
 
 ## Conventions
 
-- Use the project's canonical vocabulary — see [GLOSSARY.md](GLOSSARY.md). Term-naming and rename mechanics (natural-language headers, slug-is-the-lookup-key) live in the skill's [references/glossaries.md](src/pytest_given/skills_data/pytest-given-authoring/references/glossaries.md). Repo specifics: renames touch the glossary in the same commit; on a rename/removal grep `pg\[` for the old name, update the references, then `uv run nox -s self_report` and commit the regenerated report (adding a term is safe, but still regenerate).
+- Use the project's canonical vocabulary — see [GLOSSARY.md](GLOSSARY.md) — in prose as well as code: docs, skill references, and specs say the official term (`term ref`, not a paraphrase like "narrated term"). Term-naming and rename mechanics live in the skill's [references/glossaries.md](src/pytest_given/skills_data/pytest-given-authoring/references/glossaries.md) — a rename lands everywhere at once: glossary row, `pg\[` references, and the implementation naming. Repo specifics: all of it in the same commit, then `uv run nox -s self_report` and commit the regenerated report (adding a term is safe, but still regenerate).
 - Avoid `Any` — use precise types, generics, `TYPE_CHECKING` imports, or `ContextVar[T]` over untyped `threading.local`.
 - Use `NewType` for domain-specific IDs (e.g., `NodeId`) and PEP 695 `type` statements for aliases. Avoid raw complex types like `dict[str, tuple[list[str], list[Any]]]` — introduce named types instead.
 - Only module-level imports — no inline/function-level imports.
