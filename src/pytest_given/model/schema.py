@@ -185,7 +185,7 @@ type ParamValue = str | int | float | bool | None
 
 
 class ParamSpec(NamedTuple):
-    """Parameter names and values for a single parameterized test run."""
+    """Parameter names and values for a single parametrized test run."""
 
     names: list[str]
     values: list[ParamValue]

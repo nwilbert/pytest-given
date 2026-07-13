@@ -325,7 +325,7 @@ def test_extract_skip_reason_returns_none_for_unrecognized_shapes() -> None:
     assert plugin._extract_skip_reason(('t.py', 12, 42)) is None
 
 
-def test_group_parameterized_all_skipped_merges_as_skipped() -> None:
+def test_group_parametrized_all_skipped_merges_as_skipped() -> None:
     nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
     scenarios = [
         Scenario(id=nid1, narration=Narration(text='x'), module='m', status='skipped'),
@@ -335,12 +335,12 @@ def test_group_parameterized_all_skipped_merges_as_skipped() -> None:
         nid1: ParamSpec(names=['n'], values=[1]),
         nid2: ParamSpec(names=['n'], values=[2]),
     }
-    merged = plugin._group_parameterized(scenarios, param_info)
+    merged = plugin._group_parametrized(scenarios, param_info)
     assert len(merged) == 1
     assert merged[0].status == 'skipped'
 
 
-def test_group_parameterized_mixed_pass_skip_merges_as_passed() -> None:
+def test_group_parametrized_mixed_pass_skip_merges_as_passed() -> None:
     nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
     scenarios = [
         Scenario(id=nid1, narration=Narration(text='x'), module='m', status='passed'),
@@ -350,7 +350,7 @@ def test_group_parameterized_mixed_pass_skip_merges_as_passed() -> None:
         nid1: ParamSpec(names=['n'], values=[1]),
         nid2: ParamSpec(names=['n'], values=[2]),
     }
-    merged = plugin._group_parameterized(scenarios, param_info)
+    merged = plugin._group_parametrized(scenarios, param_info)
     assert merged[0].status == 'passed'
 
 
@@ -360,7 +360,7 @@ def test_group_parameterized_mixed_pass_skip_merges_as_passed() -> None:
     tags=['parametrization'],
     story=adopt_pytest_given,
 )
-def test_group_parameterized_any_failed_merges_as_failed() -> None:
+def test_group_parametrized_any_failed_merges_as_failed() -> None:
     with given(t'three {pg["Case"]} records of one {pg["Parametrized scenario"]}'):
         nid1, nid2, nid3 = NodeId('t::x[1]'), NodeId('t::x[2]'), NodeId('t::x[3]')
         scenarios = [
@@ -380,13 +380,13 @@ def test_group_parameterized_any_failed_merges_as_failed() -> None:
             nid3: ParamSpec(names=['n'], values=[3]),
         }
     with when(t'the {pg["Group"]("grouping")} pass merges them', activity=9):
-        merged = plugin._group_parameterized(scenarios, param_info)
+        merged = plugin._group_parametrized(scenarios, param_info)
     with then(t'one scenario remains and any failed {pg["Case"]} fails it'):
         assert len(merged) == 1
         assert merged[0].status == 'failed'
 
 
-def test_group_parameterized_distinct_functions_same_name_do_not_merge() -> None:
+def test_group_parametrized_distinct_functions_same_name_do_not_merge() -> None:
     # Two different parametrized functions in one module that happen to share a
     # scenario label must stay separate — grouping keys on the test function
     # (node id without its parametrize tail), not on the rendered label.
@@ -399,7 +399,7 @@ def test_group_parameterized_distinct_functions_same_name_do_not_merge() -> None
         nid1: ParamSpec(names=['n'], values=[1]),
         nid2: ParamSpec(names=['k'], values=[1]),
     }
-    merged = plugin._group_parameterized(scenarios, param_info)
+    merged = plugin._group_parametrized(scenarios, param_info)
     assert {s.id for s in merged} == {nid1, nid2}
     assert {tuple(s.parameters.names) for s in merged if s.parameters} == {
         ('n',),

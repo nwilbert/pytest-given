@@ -189,8 +189,8 @@ def test_step_fixture_appears_as_given_step(pytester, tmp_path):
     assert steps[0]['narration']['text'] == 'a prepared value'
 
 
-def test_parameterized_test_as_table(pytester, tmp_path):
-    """Parameterized tests produce a parameter table in the report."""
+def test_parametrized_test_as_table(pytester, tmp_path):
+    """Parametrized tests produce a parameter table in the report."""
     pytester.makepyfile(
         """
         import pytest
@@ -209,7 +209,7 @@ def test_parameterized_test_as_table(pytester, tmp_path):
     result = pytester.runpytest(f'--given-json={json_path}')
     result.assert_outcomes(passed=2)
     data = json.loads(json_path.read_text())
-    # Parameterized tests are grouped into one scenario with a parameter table
+    # Parametrized tests are grouped into one scenario with a parameter table
     assert len(data['scenarios']) == 1
     s = data['scenarios'][0]
     assert s['narration']['text'] == 'Param test'
@@ -228,7 +228,7 @@ def test_parameterized_test_as_table(pytester, tmp_path):
     assert then_placeholders == ['expected']
 
 
-def test_parameterized_non_json_values_are_captured_as_str(pytester, tmp_path):
+def test_parametrized_non_json_values_are_captured_as_str(pytester, tmp_path):
     """Non-JSON-primitive parametrize values (dates, objects) must not crash
     the JSON sink; they are captured as their str() while primitives keep
     their type."""
@@ -253,8 +253,8 @@ def test_parameterized_non_json_values_are_captured_as_str(pytester, tmp_path):
     assert cases[0]['values'] == ['2026-03-15', 0]
 
 
-def test_parameterized_with_failure(pytester, tmp_path):
-    """A parameterized test with a failing case marks the scenario as failed."""
+def test_parametrized_with_failure(pytester, tmp_path):
+    """A parametrized test with a failing case marks the scenario as failed."""
     pytester.makepyfile(
         """
         import pytest
@@ -1060,8 +1060,8 @@ def test_scenario_source_captured_in_json(pytester, tmp_path):
     assert src['line'] >= 1
 
 
-def test_parameterized_scenario_source_captured_in_json(pytester, tmp_path):
-    """Parameterized scenarios survive grouping with their source intact."""
+def test_parametrized_scenario_source_captured_in_json(pytester, tmp_path):
+    """Parametrized scenarios survive grouping with their source intact."""
     pytester.makepyfile(
         test_src_link_param="""
         import pytest

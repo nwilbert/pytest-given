@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-13T06:33:58.437458+00:00",
+    "timestamp": "2026-07-13T20:08:36.393154+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "a0a121efb103686525d036f9d7d96d15d9d134c1"
+    "commit_sha": "5221178eb4ed0ed039d1c9fca507a2af9f1b5361"
   },
   "scenarios": [
     {
@@ -1301,7 +1301,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1414,7 +1414,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1519,7 +1519,7 @@
         "story-grammar"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2032,7 +2032,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2216,7 +2216,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -2311,7 +2311,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -3910,7 +3910,7 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_infers_actor_verb_object_by_position",
+      "id": "tests/unit/capture/test_kind_inference.py::test_infers_actor_verb_object_by_position",
       "narration": {
         "text": "Term kinds are inferred from activity-slot positions",
         "parts": [
@@ -3925,12 +3925,12 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -3999,10 +3999,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "they resolve to Actor, Verb, Work Object by slot",
+            "text": "they are inferred as Actor, Verb, Work Object by slot",
             "parts": [
               {
-                "value": "they resolve to "
+                "value": "they are inferred as "
               },
               {
                 "term_id": "actor",
@@ -4045,14 +4045,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 46
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_actor_anywhere_beats_object",
+      "id": "tests/unit/capture/test_kind_inference.py::test_actor_anywhere_beats_object",
       "narration": {
         "text": "An actor slot anywhere wins over a noun slot elsewhere",
         "parts": [
@@ -4088,7 +4088,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "happy-path"
       ],
@@ -4190,14 +4190,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 65
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_never_used_stays_kindless",
+      "id": "tests/unit/capture/test_kind_inference.py::test_never_used_stays_kindless",
       "narration": {
         "text": "A term used in no story stays kindless",
         "parts": [
@@ -4230,7 +4230,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "happy-path"
       ],
@@ -4329,14 +4329,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 86
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_verb_and_noun_conflict_raises",
+      "id": "tests/unit/capture/test_kind_inference.py::test_verb_and_noun_conflict_raises",
       "narration": {
         "text": "A term in both a verb and a noun slot is a conflict",
         "parts": [
@@ -4372,7 +4372,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "validation"
       ],
@@ -4445,14 +4445,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 99
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_declared_kind_verified_and_kept",
+      "id": "tests/unit/capture/test_kind_inference.py::test_declared_kind_verified_and_kept",
       "narration": {
         "text": "A declared kind consistent with its slot is kept",
         "parts": [
@@ -4470,7 +4470,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "happy-path"
       ],
@@ -4550,14 +4550,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 121
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_declared_verb_in_actor_slot_raises",
+      "id": "tests/unit/capture/test_kind_inference.py::test_declared_verb_in_actor_slot_raises",
       "narration": {
         "text": "A declared verb in an actor slot is rejected",
         "parts": [
@@ -4593,7 +4593,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "validation"
       ],
@@ -4676,14 +4676,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 144
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_verb_and_actor_conflict_raises",
+      "id": "tests/unit/capture/test_kind_inference.py::test_verb_and_actor_conflict_raises",
       "narration": {
         "text": "A term used as both verb and actor is a conflict",
         "parts": [
@@ -4719,7 +4719,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "validation"
       ],
@@ -4792,14 +4792,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 161
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_declared_object_in_actor_slot_raises",
+      "id": "tests/unit/capture/test_kind_inference.py::test_declared_object_in_actor_slot_raises",
       "narration": {
         "text": "A declared work object in an actor slot is rejected",
         "parts": [
@@ -4835,7 +4835,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "validation"
       ],
@@ -4918,14 +4918,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 187
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_declared_actor_in_verb_slot_raises",
+      "id": "tests/unit/capture/test_kind_inference.py::test_declared_actor_in_verb_slot_raises",
       "narration": {
         "text": "A declared actor in a verb slot is rejected",
         "parts": [
@@ -4961,7 +4961,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "validation"
       ],
@@ -5031,14 +5031,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 205
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_conflict_where_names_only_offending_stories",
+      "id": "tests/unit/capture/test_kind_inference.py::test_conflict_where_names_only_offending_stories",
       "narration": {
         "text": "A conflict error names only the offending stories",
         "parts": [
@@ -5053,7 +5053,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "validation"
       ],
@@ -5126,14 +5126,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 224
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_inferred_conflict_where_excludes_unrelated_slot_stories",
+      "id": "tests/unit/capture/test_kind_inference.py::test_inferred_conflict_where_excludes_unrelated_slot_stories",
       "narration": {
         "text": "A conflict message excludes stories with an unrelated slot",
         "parts": [
@@ -5157,7 +5157,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "validation"
       ],
@@ -5230,14 +5230,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 244
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_declared_verb_in_noun_slot_raises",
+      "id": "tests/unit/capture/test_kind_inference.py::test_declared_verb_in_noun_slot_raises",
       "narration": {
         "text": "A declared verb in a noun slot is rejected",
         "parts": [
@@ -5264,7 +5264,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "validation"
       ],
@@ -5334,14 +5334,14 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 267
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_resolution.py::test_slot_for_maps_odd_positions_to_verb",
+      "id": "tests/unit/capture/test_kind_inference.py::test_slot_for_maps_odd_positions_to_verb",
       "narration": {
         "text": "Slot positions alternate verb/noun after the actor",
         "parts": [
@@ -5362,7 +5362,7 @@
           }
         ]
       },
-      "module": "tests.unit.capture.test_kind_resolution",
+      "module": "tests.unit.capture.test_kind_inference",
       "tags": [
         "happy-path"
       ],
@@ -5439,7 +5439,7 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/capture/test_kind_resolution.py",
+        "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 286
       },
       "story_id": null,
@@ -14193,7 +14193,7 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_html_renderer.py::test_render_parameterized_step_with_structured_narration",
+      "id": "tests/unit/report/test_html_renderer.py::test_render_parametrized_step_with_structured_narration",
       "narration": {
         "text": "Parameter coloring marks placeholders and table headers",
         "parts": [
@@ -14213,7 +14213,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -15187,7 +15187,7 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/test_plugin.py::test_group_parameterized_any_failed_merges_as_failed",
+      "id": "tests/unit/test_plugin.py::test_group_parametrized_any_failed_merges_as_failed",
       "narration": {
         "text": "Grouping merges parametrize cases into one scenario",
         "parts": [
@@ -16318,7 +16318,7 @@
         "id": "kind-inference",
         "kind": null,
         "canonical": "Kind inference",
-        "definition": "The post-collection pass (`resolve_glossary_kinds`) that assigns each undeclared term a kind from the *slot* positions it occupies across all story activities; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any activity stays *kindless*.",
+        "definition": "The post-collection pass (`infer_glossary_kinds`) that assigns each undeclared term a kind from the *slot* positions it occupies across all story activities; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any activity stays *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 82

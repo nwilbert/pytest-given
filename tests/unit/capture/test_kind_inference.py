@@ -1,7 +1,7 @@
 import pytest
 
 from pytest_given import given, scenario, then, when, when_then
-from pytest_given.capture.kind_resolution import resolve_glossary_kinds
+from pytest_given.capture.kind_inference import infer_glossary_kinds
 from pytest_given.model import (
     Activity,
     ActivityId,
@@ -51,15 +51,15 @@ def test_infers_actor_verb_object_by_position():
     with given(t'a glossary of three {pg["Kindless"]} {pg["Term"]} entries'):
         glossary = Glossary(terms=[_term('guest'), _term('search'), _term('room')])
     with when(t'{pg["Kind inference"]} runs over a {pg["Story"]}'):
-        resolved = resolve_glossary_kinds(
+        inferred = infer_glossary_kinds(
             glossary, [_story('S', ('guest', 'search', 'room'))]
         )
     with then(
-        t'they resolve to {pg["Actor"]}, {pg["Verb"]}, {pg["Work Object"]} by slot'
+        t'they are inferred as {pg["Actor"]}, {pg["Verb"]}, {pg["Work Object"]} by slot'
     ):
-        assert _kind(resolved, 'guest') == 'actor'
-        assert _kind(resolved, 'search') == 'verb'
-        assert _kind(resolved, 'room') == 'object'
+        assert _kind(inferred, 'guest') == 'actor'
+        assert _kind(inferred, 'search') == 'verb'
+        assert _kind(inferred, 'room') == 'object'
 
 
 @scenario(
@@ -78,9 +78,9 @@ def test_actor_anywhere_beats_object():
             _story('S1', ('host', 'greet', 'guest')),
             _story('S2', ('guest', 'wave', 'host')),
         ]
-        resolved = resolve_glossary_kinds(glossary, stories)
+        inferred = infer_glossary_kinds(glossary, stories)
     with then(t'its inferred kind is {pg["Actor"]}'):
-        assert _kind(resolved, 'guest') == 'actor'
+        assert _kind(inferred, 'guest') == 'actor'
 
 
 @scenario(
@@ -91,9 +91,9 @@ def test_never_used_stays_kindless():
     with given(t'a {pg["Term"]} referenced by no {pg["Story"]}'):
         glossary = Glossary(terms=[_term('orphan')])
     with when(t'{pg["Kind inference"]} runs with no stories'):
-        resolved = resolve_glossary_kinds(glossary, [])
+        inferred = infer_glossary_kinds(glossary, [])
     with then(t'the {pg["Term"]} remains {pg["Kindless"]}'):
-        assert _kind(resolved, 'orphan') is None
+        assert _kind(inferred, 'orphan') is None
 
 
 @scenario(
@@ -115,7 +115,7 @@ def test_verb_and_noun_conflict_raises():
         ),
         pytest.raises(PytestGivenError, match=r'(?i)book'),
     ):
-        resolve_glossary_kinds(glossary, stories)
+        infer_glossary_kinds(glossary, stories)
 
 
 @scenario(
@@ -132,13 +132,13 @@ def test_declared_kind_verified_and_kept():
             ]
         )
     with when(t'{pg["Kind inference"]} runs over a matching {pg["Story"]}'):
-        resolved = resolve_glossary_kinds(
+        inferred = infer_glossary_kinds(
             glossary, [_story('S', ('guest', 'search', 'room'))]
         )
     with then('the declared kinds are verified and preserved'):
-        assert _kind(resolved, 'guest') == 'actor'
-        assert _kind(resolved, 'search') == 'verb'
-        assert _kind(resolved, 'room') == 'object'
+        assert _kind(inferred, 'guest') == 'actor'
+        assert _kind(inferred, 'search') == 'verb'
+        assert _kind(inferred, 'room') == 'object'
 
 
 @scenario(
@@ -155,7 +155,7 @@ def test_declared_verb_in_actor_slot_raises():
         ),
         pytest.raises(PytestGivenError, match=r'(?i)search'),
     ):
-        resolve_glossary_kinds(glossary, [_story('S', ('search', 'x', 'y'))])
+        infer_glossary_kinds(glossary, [_story('S', ('search', 'x', 'y'))])
 
 
 @scenario(
@@ -181,7 +181,7 @@ def test_verb_and_actor_conflict_raises():
         ),
         pytest.raises(PytestGivenError, match=r'(?i)examine'),
     ):
-        resolve_glossary_kinds(glossary, stories)
+        infer_glossary_kinds(glossary, stories)
 
 
 @scenario(
@@ -199,7 +199,7 @@ def test_declared_object_in_actor_slot_raises():
         ),
         pytest.raises(PytestGivenError, match=r'(?i)room'),
     ):
-        resolve_glossary_kinds(glossary, [_story('S', ('room', 'x', 'y'))])
+        infer_glossary_kinds(glossary, [_story('S', ('room', 'x', 'y'))])
 
 
 @scenario(
@@ -218,7 +218,7 @@ def test_declared_actor_in_verb_slot_raises():
         ),
         pytest.raises(PytestGivenError, match=r'(?i)verb slot'),
     ):
-        resolve_glossary_kinds(glossary, [_story('S', ('subject', 'guest', 'y'))])
+        infer_glossary_kinds(glossary, [_story('S', ('subject', 'guest', 'y'))])
 
 
 @scenario(
@@ -234,7 +234,7 @@ def test_conflict_where_names_only_offending_stories():
         ]
     with when('kind resolution raises'):
         with pytest.raises(PytestGivenError) as excinfo:
-            resolve_glossary_kinds(glossary, stories)
+            infer_glossary_kinds(glossary, stories)
     with then('only the offending story is named in the message'):
         message = str(excinfo.value)
         assert 'VerbStory' in message
@@ -256,7 +256,7 @@ def test_inferred_conflict_where_excludes_unrelated_slot_stories():
         ]
     with when('the verb-vs-actor conflict is raised'):
         with pytest.raises(PytestGivenError) as excinfo:
-            resolve_glossary_kinds(glossary, stories)
+            infer_glossary_kinds(glossary, stories)
     with then('only the verb and actor stories are named, not the noun one'):
         message = str(excinfo.value)
         assert 'VerbStory' in message
@@ -280,7 +280,7 @@ def test_declared_verb_in_noun_slot_raises():
         ),
         pytest.raises(PytestGivenError, match=r'(?i)noun slot'),
     ):
-        resolve_glossary_kinds(glossary, [_story('S', ('subject', 'action', 'search'))])
+        infer_glossary_kinds(glossary, [_story('S', ('subject', 'action', 'search'))])
 
 
 @scenario(
@@ -288,7 +288,7 @@ def test_declared_verb_in_noun_slot_raises():
     tags=['happy-path'],
 )
 def test_slot_for_maps_odd_positions_to_verb():
-    from pytest_given.capture.kind_resolution import _slot_for
+    from pytest_given.capture.kind_inference import _slot_for
 
     with given('the five positions of a short activity path'):
         positions = range(5)

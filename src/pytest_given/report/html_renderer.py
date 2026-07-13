@@ -206,7 +206,7 @@ def _make_narration_filter(
     The narration is a `Narration` dataclass with a flat `text` and a list
     of typed `NarrationPart` variants:
       - `NarrationLiteral` → escape `value`
-      - `NarrationValue`   → `.param-value` highlight around `rendered`
+      - `NarrationValue`   → `.value-highlight` around `rendered`
       - `NarrationPlaceholder` → color-coded `{name}` token
       - `NarrationTermRef` → kind-coloured pill resolved via glossary
     Empty parts → escape `text` and emit verbatim.
@@ -236,7 +236,7 @@ def _render_narration_part(
         case NarrationLiteral(value=value):
             return str(escape(value))
         case NarrationValue(rendered=rendered):
-            return f'<span class="param-value">{escape(rendered)}</span>'
+            return f'<span class="value-highlight">{escape(rendered)}</span>'
         case NarrationPlaceholder(name=name):
             color_idx = param_color_map.get(name, 0) % _NUM_PARAM_COLORS
             label = _placeholder_token(part)

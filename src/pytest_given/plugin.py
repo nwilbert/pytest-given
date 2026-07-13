@@ -30,7 +30,7 @@ from .capture.decorators import (
     StepDescriptor,
 )
 from .capture.file_glossary import FileGlossary
-from .capture.kind_resolution import resolve_glossary_kinds
+from .capture.kind_inference import infer_glossary_kinds
 from .capture.source import (
     current_rootdir,
     item_source,
@@ -675,12 +675,12 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
 
 def pytest_sessionfinish(session: pytest.Session) -> None:
     collector = _collector(session.config)
-    scenarios = _group_parameterized(collector.scenarios, collector.param_info)
+    scenarios = _group_parametrized(collector.scenarios, collector.param_info)
     collector.param_info.clear()
     stories = list(collector._discovered_stories.values())
     glossary = _resolve_glossary(stories, session)
     if glossary is not None:
-        glossary = resolve_glossary_kinds(glossary, stories)
+        glossary = infer_glossary_kinds(glossary, stories)
     report = ReportData(
         metadata=Metadata(
             project=session.config.rootpath.name,
@@ -833,11 +833,11 @@ def _scan_conftests_for_glossary(session: pytest.Session) -> Glossary | None:
     return None
 
 
-def _group_parameterized(
+def _group_parametrized(
     scenarios: list[Scenario],
     param_info: ParamInfo,
 ) -> list[Scenario]:
-    """Group parameterized scenarios into single scenarios with parameter tables."""
+    """Group parametrized scenarios into single scenarios with parameter tables."""
     result: list[Scenario] = []
     groups: dict[tuple[str, str], list[Scenario]] = {}
     group_order: list[tuple[str, str]] = []

@@ -167,7 +167,7 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
-def test_render_parameterized_step_with_structured_narration(tmp_path: Path) -> None:
+def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> None:
     with given(
         t'a {pg["Report"]} holding a {pg["Parametrized scenario"]} '
         t'with a {pg["Parameter table"]}'
@@ -370,8 +370,8 @@ def test_render_plain_str_step_with_empty_parts_escapes_braces(
     assert 'config: {key: value}' in content
 
 
-def test_render_value_part_uses_param_value_class(tmp_path: Path) -> None:
-    """A NarrationValue (non-param t-string interpolation) gets .param-value."""
+def test_render_value_part_uses_value_highlight_class(tmp_path: Path) -> None:
+    """A NarrationValue (non-param t-string interpolation) gets .value-highlight."""
     json_path = tmp_path / 'data.json'
     json_path.write_text(
         json.dumps(
@@ -421,7 +421,7 @@ def test_render_value_part_uses_param_value_class(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
-    assert 'param-value' in content
+    assert 'value-highlight' in content
     assert '12.0' in content
 
 

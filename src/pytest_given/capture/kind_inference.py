@@ -24,7 +24,7 @@ type _Kind = Literal['actor', 'object', 'verb']
 type _Slot = Literal['actor', 'verb', 'noun']
 
 
-def resolve_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary:
+def infer_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary:
     """Return a new Glossary with each term's kind inferred/verified."""
     stories_by_slot: dict[TermId, dict[_Slot, set[str]]] = defaultdict(
         lambda: defaultdict(set)
@@ -36,11 +36,11 @@ def resolve_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary
                     if isinstance(part, ActivityTermRef):
                         slot = _slot_for(position)
                         stories_by_slot[part.term_id][slot].add(story.title)
-    resolved_terms = [
-        replace(term, kind=_resolve_one(term, stories_by_slot.get(term.id, {})))
+    inferred_terms = [
+        replace(term, kind=_infer_one(term, stories_by_slot.get(term.id, {})))
         for term in glossary.terms
     ]
-    return Glossary(terms=resolved_terms)
+    return Glossary(terms=inferred_terms)
 
 
 def _slot_for(position: int) -> _Slot:
@@ -51,7 +51,7 @@ def _slot_for(position: int) -> _Slot:
     return 'noun'
 
 
-def _resolve_one(
+def _infer_one(
     term: GlossaryTerm,
     stories_by_slot: dict[_Slot, set[str]],
 ) -> _Kind | None:
