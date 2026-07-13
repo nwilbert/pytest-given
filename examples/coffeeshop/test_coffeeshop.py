@@ -52,7 +52,7 @@ def test_generator_fixture(db):
 
 
 @scenario(
-    'Parameterized test (renders as a parameter table)',
+    'Parametrized test (renders as a parameter table)',
     tags=['billing'],
 )
 @pytest.mark.parametrize(('euros', 'expect'), [(1, False), (2, True), (3, True)])

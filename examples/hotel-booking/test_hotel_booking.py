@@ -14,7 +14,7 @@ Given/When/Then form:
 * `test_complete_booking` — happy path through the rest, covers 2-6.
   Activity 2 is intentionally shared with `test_pick_suite` so the Stories tab
   shows two badges on that row.
-* `test_payment_declined` — parameterized error branch using a `reject` verb
+* `test_payment_declined` — parametrized error branch using a `reject` verb
   that lives in the glossary but isn't part of any story activity. Cases pair
   a payment method with its decline reason (credit card / insufficient funds,
   debit card / expired card, bank transfer / fraud check), all funneling
@@ -221,7 +221,7 @@ def test_payment_declined(carol, alice, bob, payment_method, decline_reason):
         t'{organizer("Carol")} {submit("submits")} the {payment} '
         t'by {payment_method} for the {booking}'
     ):
-        # Payment processor reports the parameterized decline reason.
+        # Payment processor reports the parametrized decline reason.
         processor_response = decline_reason
     with then(
         t'the {booking_system} {reject("rejects")} the {payment} '

@@ -108,7 +108,7 @@
 `examples/coffeeshop/test_coffeeshop.py:191::test_skipped` — reason: demonstrates skipped status
 
 
-## ✓ Parameterized test (renders as a parameter table) · 3 cases
+## ✓ Parametrized test (renders as a parameter table) · 3 cases
 `examples/coffeeshop/test_coffeeshop.py:54::test_pricing` · billing
 
 - **given** a coffee machine
