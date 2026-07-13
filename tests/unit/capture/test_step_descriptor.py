@@ -51,7 +51,7 @@ def _reset_story_registry():
 
 
 @scenario(
-    'A step pairs its narration with a phase',
+    t'A {pg["Step"].low} pairs its {pg["Narration"].low} with a {pg["Phase"].low}',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -246,7 +246,7 @@ def test_step_descriptor_decorator_rejects_tstring_mixed_glossary_and_value() ->
 
 
 @scenario(
-    'when_then records the action and its outcome as siblings',
+    t'{pg["when_then"]} records the action and its outcome as siblings',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -275,7 +275,7 @@ def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
 
 
 @scenario(
-    'when_then pairs with an inner pytest.raises',
+    t'{pg["when_then"]} pairs with an inner pytest.raises',
     tags=['happy-path'],
 )
 def test_when_then_pairs_with_inner_pytest_raises() -> None:
@@ -306,7 +306,7 @@ def test_when_then_pairs_with_inner_pytest_raises() -> None:
 
 
 @scenario(
-    'when_then omits the then when the body raises uncaught',
+    t'{pg["when_then"]} omits the then when the body raises uncaught',
     tags=['validation'],
 )
 def test_when_then_omits_then_when_body_raises_uncaught() -> None:
@@ -352,7 +352,7 @@ def test_when_then_accepts_tstrings_for_glossary_refs() -> None:
 
 
 @scenario(
-    'A cross-phase step cannot open inside a when_then body',
+    t'A cross-phase {pg["Step"].low} cannot open inside a {pg["when_then"]} body',
     tags=['validation'],
 )
 @pytest.mark.parametrize('phase_name', ['given', 'then'])
@@ -386,7 +386,7 @@ def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
 
 
 @scenario(
-    'A nested when becomes a child of the when_then action',
+    t'A nested when becomes a child of the {pg["when_then"]} action',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )

@@ -237,7 +237,7 @@ def glossary() -> Glossary:
 
 
 @scenario(
-    'A glossary handle in a t-string emits a term ref',
+    t'A {pg["Glossary"].low} handle in a t-string emits a {pg["Term ref"].low}',
     tags=['step-text'],
 )
 def test_tstring_with_actor_emits_term_ref(glossary: Glossary) -> None:
@@ -267,7 +267,7 @@ def test_tstring_with_actor_instance_emits_term_ref_with_instance_display(
 
 
 @scenario(
-    'A work object handle in a t-string emits a term ref',
+    t'A {pg["Work Object"].low} handle in a t-string emits a {pg["Term ref"].low}',
     tags=['step-text'],
 )
 def test_tstring_with_work_object_emits_term_ref(glossary: Glossary) -> None:
@@ -289,7 +289,7 @@ def test_tstring_with_work_object_instance_emits_term_ref(glossary: Glossary) ->
 
 
 @scenario(
-    'A bare verb handle keeps its canonical display',
+    t'A bare {pg["Verb"].low} handle keeps its canonical display',
     tags=['step-text'],
 )
 def test_tstring_with_verb_emits_term_ref_with_canonical_display(
@@ -305,7 +305,7 @@ def test_tstring_with_verb_emits_term_ref_with_canonical_display(
 
 
 @scenario(
-    'An inflected verb in a t-string shows the inflection',
+    t'An inflected {pg["Verb"].low} in a t-string shows the {pg["Inflection"].low}',
     tags=['step-text'],
 )
 def test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display(
@@ -346,7 +346,7 @@ def test_tstring_with_term_ref_populates_expression(glossary: Glossary) -> None:
 
 
 @scenario(
-    'A term ref may not carry a format spec',
+    t'A {pg["Term ref"].low} may not carry a format spec',
     tags=['step-text', 'validation'],
 )
 def test_tstring_term_ref_with_format_spec_raises(glossary: Glossary) -> None:
@@ -389,7 +389,8 @@ def file_glossary(tmp_path: Path) -> FileGlossary:
 
 
 @scenario(
-    'A FileGlossary handle works in a t-string step',
+    t'A {pg["File glossary"]("FileGlossary")} handle works in a t-string '
+    t'{pg["Step"].low}',
     tags=['step-text'],
     story=adopt_pytest_given,
 )

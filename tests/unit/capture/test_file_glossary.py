@@ -25,7 +25,7 @@ def glossary_file(tmp_path):
 
 
 @scenario(
-    'FileGlossary lookup is case-insensitive',
+    t'{pg["File glossary"]("FileGlossary")} lookup is case-insensitive',
     tags=['happy-path'],
 )
 def test_lookup_is_case_insensitive(glossary_file):
@@ -54,7 +54,7 @@ def test_handles_are_memoized(glossary_file):
 
 
 @scenario(
-    'File-loaded terms start kindless',
+    t'File-loaded {pg["Term"]("terms")} start {pg["Kindless"].low}',
     tags=['happy-path'],
 )
 def test_terms_start_kindless(glossary_file):
@@ -89,7 +89,7 @@ def test_unknown_name_raises_with_suggestion(glossary_file):
 
 
 @scenario(
-    'Handles are usable inline in an activity',
+    t'Handles are usable inline in an {pg["Activity"].low}',
     tags=['story-grammar'],
 )
 def test_usable_inline_in_activity(glossary_file):
@@ -126,7 +126,7 @@ def test_call_overrides_display(glossary_file):
 
 
 @scenario(
-    'An explicit kind column sets term kinds',
+    t'An explicit kind column sets {pg["Term"].low} kinds',
     tags=['happy-path'],
 )
 def test_explicit_kind_column(tmp_path):
@@ -166,7 +166,7 @@ def test_kind_column_by_integer_index(tmp_path):
 
 
 @scenario(
-    'A work_object kind alias maps to the object kind',
+    t'A {pg["Work Object"]("work_object")} kind alias maps to the object kind',
     tags=['happy-path'],
 )
 def test_work_object_underscore_alias(tmp_path):
@@ -202,7 +202,7 @@ def test_unrecognised_kind_value_raises(tmp_path):
 
 
 @scenario(
-    'A missing glossary file is reported clearly',
+    t'A missing {pg["Glossary"].low} file is reported clearly',
     tags=['validation'],
 )
 def test_missing_file_raises(tmp_path):
@@ -229,7 +229,7 @@ def test_glossary_property_returns_inner_glossary(glossary_file):
 
 
 @scenario(
-    'A term cell with no alphanumeric characters is rejected',
+    t'A {pg["Term"].low} cell with no alphanumeric characters is rejected',
     tags=['validation'],
 )
 def test_empty_id_term_cell_raises(tmp_path):
@@ -273,7 +273,7 @@ def test_conflicting_duplicate_rows_raise(tmp_path):
 
 
 @scenario(
-    'A blank description normalizes to undefined',
+    t'A blank description normalizes to {pg["Undefined"].low}',
     tags=['happy-path'],
 )
 def test_blank_description_cell_normalizes_to_none(tmp_path):
@@ -291,7 +291,7 @@ def test_blank_description_cell_normalizes_to_none(tmp_path):
 
 
 @scenario(
-    'Identical duplicate rows collapse to one term',
+    t'Identical duplicate rows collapse to one {pg["Term"].low}',
     tags=['happy-path'],
 )
 def test_idempotent_duplicate_rows_ok(tmp_path):
@@ -317,7 +317,7 @@ def test_idempotent_duplicate_rows_ok(tmp_path):
 
 
 @scenario(
-    'Calling FileGlossary looks up a known term',
+    t'Calling {pg["File glossary"]("FileGlossary")} looks up a known {pg["Term"].low}',
     tags=['happy-path'],
 )
 def test_file_glossary_call_known_name_returns_handle(glossary_file):
@@ -332,7 +332,7 @@ def test_file_glossary_call_known_name_returns_handle(glossary_file):
 
 
 @scenario(
-    'FileGlossary is a closed vocabulary',
+    t'{pg["File glossary"]("FileGlossary")} is a closed vocabulary',
     tags=['validation'],
 )
 def test_file_glossary_call_unknown_name_raises(glossary_file):

@@ -355,7 +355,8 @@ def test_group_parameterized_mixed_pass_skip_merges_as_passed() -> None:
 
 
 @scenario(
-    'Grouping merges parametrize cases into one scenario',
+    t'{pg["Group"]("Grouping")} merges parametrize {pg["Case"]("cases")} into one '
+    t'{pg["Scenario"].low}',
     tags=['parametrization'],
     story=adopt_pytest_given,
 )

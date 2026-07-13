@@ -1,17 +1,36 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-12T18:39:05.582950+00:00",
+    "timestamp": "2026-07-13T05:56:26.312937+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "f8906e05d77b9ff9dab90214e4429a4b1bc3bba1"
+    "commit_sha": "5fb6c214efd29de782482e991e1c08e200a29ccd"
   },
   "scenarios": [
     {
       "id": "tests/unit/capture/test_collector.py::test_start_and_finish_scenario",
       "narration": {
         "text": "A scenario records under its node ID",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].low",
+            "param_column": null
+          },
+          {
+            "value": " records under its "
+          },
+          {
+            "term_id": "node-id",
+            "display": "node ID",
+            "expression": "pg[\"Node ID\"](\"node ID\")",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_collector",
       "tags": [
@@ -125,7 +144,23 @@
       "id": "tests/unit/capture/test_collector.py::test_collect_steps",
       "narration": {
         "text": "Steps record with their phases",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "step",
+            "display": "Steps",
+            "expression": "pg[\"Step\"](\"Steps\")",
+            "param_column": null
+          },
+          {
+            "value": " record with their "
+          },
+          {
+            "term_id": "phase",
+            "display": "phases",
+            "expression": "pg[\"Phase\"](\"phases\")",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_collector",
       "tags": [
@@ -232,7 +267,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 40
+        "line": 43
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -241,7 +276,23 @@
       "id": "tests/unit/capture/test_collector.py::test_push_step_during_fixture_setup_records_into_recording",
       "narration": {
         "text": "Steps pushed during fixture setup record into the fixture recording",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "step",
+            "display": "Steps",
+            "expression": "pg[\"Step\"](\"Steps\")",
+            "param_column": null
+          },
+          {
+            "value": " pushed during fixture setup record into the "
+          },
+          {
+            "term_id": "fixture-recording",
+            "display": "fixture recording",
+            "expression": "pg[\"Fixture recording\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_collector",
       "tags": [
@@ -323,7 +374,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 210
+        "line": 213
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -332,7 +383,29 @@
       "id": "tests/unit/capture/test_collector.py::test_attach_during_fixture_setup_records_into_recording",
       "narration": {
         "text": "An attachment lands on the step being recorded",
-        "parts": []
+        "parts": [
+          {
+            "value": "An "
+          },
+          {
+            "term_id": "attachment",
+            "display": "attachment",
+            "expression": "pg[\"Attachment\"].low",
+            "param_column": null
+          },
+          {
+            "value": " lands on the "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " being recorded"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_collector",
       "tags": [
@@ -427,7 +500,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 230
+        "line": 234
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -436,7 +509,26 @@
       "id": "tests/unit/capture/test_collector.py::test_push_step_routing_isolates_recording_from_scenario",
       "narration": {
         "text": "Fixture-body steps do not leak into the active scenario",
-        "parts": []
+        "parts": [
+          {
+            "value": "Fixture-body "
+          },
+          {
+            "term_id": "step",
+            "display": "steps",
+            "expression": "pg[\"Step\"](\"steps\")",
+            "param_column": null
+          },
+          {
+            "value": " do not leak into the "
+          },
+          {
+            "term_id": "active-scenario",
+            "display": "active scenario",
+            "expression": "pg[\"Active scenario\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_collector",
       "tags": [
@@ -524,7 +616,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 249
+        "line": 253
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -533,7 +625,26 @@
       "id": "tests/unit/capture/test_collector.py::test_graft_recording_deep_copies_into_scenario",
       "narration": {
         "text": "A fixture recording is deep-copied when grafted",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "fixture-recording",
+            "display": "fixture recording",
+            "expression": "pg[\"Fixture recording\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is deep-copied when "
+          },
+          {
+            "term_id": "graft",
+            "display": "grafted",
+            "expression": "pg[\"Graft\"](\"grafted\")",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_collector",
       "tags": [
@@ -627,7 +738,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 311
+        "line": 316
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -636,7 +747,26 @@
       "id": "tests/unit/capture/test_collector.py::test_graft_leaf_given_appends_childless_given_step",
       "narration": {
         "text": "A leaf given is grafted as a childless given step",
-        "parts": []
+        "parts": [
+          {
+            "value": "A leaf given is "
+          },
+          {
+            "term_id": "graft",
+            "display": "grafted",
+            "expression": "pg[\"Graft\"](\"grafted\")",
+            "param_column": null
+          },
+          {
+            "value": " as a childless given "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_collector",
       "tags": [
@@ -724,7 +854,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 453
+        "line": 458
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -733,7 +863,17 @@
       "id": "tests/unit/capture/test_collector.py::test_graft_recording_override_replaces_root_narration_keeps_children",
       "narration": {
         "text": "Grafting with an override replaces the root label but keeps children",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "graft",
+            "display": "Grafting",
+            "expression": "pg[\"Graft\"](\"Grafting\")",
+            "param_column": null
+          },
+          {
+            "value": " with an override replaces the root label but keeps children"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_collector",
       "tags": [
@@ -821,7 +961,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 472
+        "line": 477
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -830,7 +970,26 @@
       "id": "tests/unit/capture/test_collector.py::test_graft_leaf_given_without_scenario_is_noop",
       "narration": {
         "text": "Grafting with no active scenario is a no-op",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "graft",
+            "display": "Grafting",
+            "expression": "pg[\"Graft\"](\"Grafting\")",
+            "param_column": null
+          },
+          {
+            "value": " with no "
+          },
+          {
+            "term_id": "active-scenario",
+            "display": "active scenario",
+            "expression": "pg[\"Active scenario\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is a no-op"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_collector",
       "tags": [
@@ -907,7 +1066,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 497
+        "line": 503
       },
       "story_id": null,
       "activity_ids": []
@@ -916,7 +1075,17 @@
       "id": "tests/unit/capture/test_file_glossary.py::test_lookup_is_case_insensitive",
       "narration": {
         "text": "FileGlossary lookup is case-insensitive",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "file-glossary",
+            "display": "FileGlossary",
+            "expression": "pg[\"File glossary\"](\"FileGlossary\")",
+            "param_column": null
+          },
+          {
+            "value": " lookup is case-insensitive"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
@@ -1106,7 +1275,26 @@
       "id": "tests/unit/capture/test_file_glossary.py::test_terms_start_kindless",
       "narration": {
         "text": "File-loaded terms start kindless",
-        "parts": []
+        "parts": [
+          {
+            "value": "File-loaded "
+          },
+          {
+            "term_id": "term",
+            "display": "terms",
+            "expression": "pg[\"Term\"](\"terms\")",
+            "param_column": null
+          },
+          {
+            "value": " start "
+          },
+          {
+            "term_id": "kindless",
+            "display": "kindless",
+            "expression": "pg[\"Kindless\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
@@ -1226,7 +1414,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1314,14 +1502,24 @@
       "id": "tests/unit/capture/test_file_glossary.py::test_usable_inline_in_activity",
       "narration": {
         "text": "Handles are usable inline in an activity",
-        "parts": []
+        "parts": [
+          {
+            "value": "Handles are usable inline in an "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
         "story-grammar"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1521,7 +1719,20 @@
       "id": "tests/unit/capture/test_file_glossary.py::test_explicit_kind_column",
       "narration": {
         "text": "An explicit kind column sets term kinds",
-        "parts": []
+        "parts": [
+          {
+            "value": "An explicit kind column sets "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " kinds"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
@@ -1702,14 +1913,27 @@
       "id": "tests/unit/capture/test_file_glossary.py::test_work_object_underscore_alias",
       "narration": {
         "text": "A work_object kind alias maps to the object kind",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "work-object",
+            "display": "work_object",
+            "expression": "pg[\"Work Object\"](\"work_object\")",
+            "param_column": null
+          },
+          {
+            "value": " kind alias maps to the object kind"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -1883,7 +2107,20 @@
       "id": "tests/unit/capture/test_file_glossary.py::test_missing_file_raises",
       "narration": {
         "text": "A missing glossary file is reported clearly",
-        "parts": []
+        "parts": [
+          {
+            "value": "A missing "
+          },
+          {
+            "term_id": "glossary",
+            "display": "glossary",
+            "expression": "pg[\"Glossary\"].low",
+            "param_column": null
+          },
+          {
+            "value": " file is reported clearly"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
@@ -1959,14 +2196,27 @@
       "id": "tests/unit/capture/test_file_glossary.py::test_empty_id_term_cell_raises",
       "narration": {
         "text": "A term cell with no alphanumeric characters is rejected",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " cell with no alphanumeric characters is rejected"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -2061,7 +2311,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -2149,7 +2399,17 @@
       "id": "tests/unit/capture/test_file_glossary.py::test_blank_description_cell_normalizes_to_none",
       "narration": {
         "text": "A blank description normalizes to undefined",
-        "parts": []
+        "parts": [
+          {
+            "value": "A blank description normalizes to "
+          },
+          {
+            "term_id": "undefined",
+            "display": "undefined",
+            "expression": "pg[\"Undefined\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
@@ -2254,7 +2514,17 @@
       "id": "tests/unit/capture/test_file_glossary.py::test_idempotent_duplicate_rows_ok",
       "narration": {
         "text": "Identical duplicate rows collapse to one term",
-        "parts": []
+        "parts": [
+          {
+            "value": "Identical duplicate rows collapse to one "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
@@ -2356,7 +2626,26 @@
       "id": "tests/unit/capture/test_file_glossary.py::test_file_glossary_call_known_name_returns_handle",
       "narration": {
         "text": "Calling FileGlossary looks up a known term",
-        "parts": []
+        "parts": [
+          {
+            "value": "Calling "
+          },
+          {
+            "term_id": "file-glossary",
+            "display": "FileGlossary",
+            "expression": "pg[\"File glossary\"](\"FileGlossary\")",
+            "param_column": null
+          },
+          {
+            "value": " looks up a known "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
@@ -2464,7 +2753,17 @@
       "id": "tests/unit/capture/test_file_glossary.py::test_file_glossary_call_unknown_name_raises",
       "narration": {
         "text": "FileGlossary is a closed vocabulary",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "file-glossary",
+            "display": "FileGlossary",
+            "expression": "pg[\"File glossary\"](\"FileGlossary\")",
+            "param_column": null
+          },
+          {
+            "value": " is a closed vocabulary"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
@@ -2572,7 +2871,26 @@
       "id": "tests/unit/capture/test_glossary.py::test_actor_call_returns_instance_with_distinct_display",
       "narration": {
         "text": "Calling an actor names a distinct instance",
-        "parts": []
+        "parts": [
+          {
+            "value": "Calling an "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          },
+          {
+            "value": " names a distinct "
+          },
+          {
+            "term_id": "instance",
+            "display": "instance",
+            "expression": "pg[\"Instance\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
@@ -2665,7 +2983,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 105
+        "line": 106
       },
       "story_id": null,
       "activity_ids": []
@@ -2674,7 +2992,35 @@
       "id": "tests/unit/capture/test_glossary.py::test_verb_call_returns_inflection_sharing_term_identity",
       "narration": {
         "text": "Calling a verb records an inflection of the same term",
-        "parts": []
+        "parts": [
+          {
+            "value": "Calling a "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " records an "
+          },
+          {
+            "term_id": "inflection",
+            "display": "inflection",
+            "expression": "pg[\"Inflection\"].low",
+            "param_column": null
+          },
+          {
+            "value": " of the same "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
@@ -2767,7 +3113,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 132
+        "line": 133
       },
       "story_id": null,
       "activity_ids": []
@@ -2776,7 +3122,20 @@
       "id": "tests/unit/capture/test_glossary.py::test_glossary_actor_registers_and_returns_handle",
       "narration": {
         "text": "Registering an actor returns a typed handle",
-        "parts": []
+        "parts": [
+          {
+            "value": "Registering an "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          },
+          {
+            "value": " returns a typed handle"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
@@ -2867,7 +3226,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 152
+        "line": 154
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -2876,7 +3235,20 @@
       "id": "tests/unit/capture/test_glossary.py::test_glossary_re_registration_with_matching_fields_is_idempotent",
       "narration": {
         "text": "Re-registering a term with matching fields is idempotent",
-        "parts": []
+        "parts": [
+          {
+            "value": "Re-registering a "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " with matching fields is idempotent"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
@@ -2955,7 +3327,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 184
+        "line": 186
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -2964,7 +3336,20 @@
       "id": "tests/unit/capture/test_glossary.py::test_glossary_re_registration_with_mismatched_definition_raises",
       "narration": {
         "text": "Re-registering a term with a different definition is rejected",
-        "parts": []
+        "parts": [
+          {
+            "value": "Re-registering a "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " with a different definition is rejected"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
@@ -3031,7 +3416,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 199
+        "line": 201
       },
       "story_id": null,
       "activity_ids": []
@@ -3114,7 +3499,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 217
+        "line": 219
       },
       "story_id": null,
       "activity_ids": []
@@ -3123,7 +3508,20 @@
       "id": "tests/unit/capture/test_glossary.py::test_glossary_actor_captures_source",
       "narration": {
         "text": "Registering an actor captures its definition site",
-        "parts": []
+        "parts": [
+          {
+            "value": "Registering an "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          },
+          {
+            "value": " captures its definition site"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
@@ -3212,7 +3610,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 241
+        "line": 243
       },
       "story_id": null,
       "activity_ids": []
@@ -3221,7 +3619,35 @@
       "id": "tests/unit/capture/test_glossary.py::test_call_declares_kindless_term",
       "narration": {
         "text": "Calling the glossary declares a kindless term",
-        "parts": []
+        "parts": [
+          {
+            "value": "Calling the "
+          },
+          {
+            "term_id": "glossary",
+            "display": "glossary",
+            "expression": "pg[\"Glossary\"].low",
+            "param_column": null
+          },
+          {
+            "value": " declares a "
+          },
+          {
+            "term_id": "kindless",
+            "display": "kindless",
+            "expression": "pg[\"Kindless\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
@@ -3309,7 +3735,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 336
+        "line": 338
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -3318,7 +3744,17 @@
       "id": "tests/unit/capture/test_glossary.py::test_subscript_get_only_returns_handle",
       "narration": {
         "text": "Subscript looks up an already-declared term",
-        "parts": []
+        "parts": [
+          {
+            "value": "Subscript looks up an already-declared "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
@@ -3395,7 +3831,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 370
+        "line": 382
       },
       "story_id": null,
       "activity_ids": []
@@ -3468,7 +3904,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 384
+        "line": 396
       },
       "story_id": null,
       "activity_ids": []
@@ -3477,7 +3913,17 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_infers_actor_verb_object_by_position",
       "narration": {
         "text": "Term kinds are inferred from activity-slot positions",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "term",
+            "display": "Term",
+            "expression": "pg[\"Term\"]",
+            "param_column": null
+          },
+          {
+            "value": " kinds are inferred from activity-slot positions"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -3609,7 +4055,38 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_actor_anywhere_beats_object",
       "narration": {
         "text": "An actor slot anywhere wins over a noun slot elsewhere",
-        "parts": []
+        "parts": [
+          {
+            "value": "An "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          },
+          {
+            "value": " anywhere wins over a noun "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          },
+          {
+            "value": " elsewhere"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -3723,7 +4200,35 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_never_used_stays_kindless",
       "narration": {
         "text": "A term used in no story stays kindless",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " used in no "
+          },
+          {
+            "term_id": "story",
+            "display": "story",
+            "expression": "pg[\"Story\"].low",
+            "param_column": null
+          },
+          {
+            "value": " stays "
+          },
+          {
+            "term_id": "kindless",
+            "display": "kindless",
+            "expression": "pg[\"Kindless\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -3825,7 +4330,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 85
+        "line": 86
       },
       "story_id": null,
       "activity_ids": []
@@ -3834,7 +4339,38 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_verb_and_noun_conflict_raises",
       "narration": {
         "text": "A term in both a verb and a noun slot is a conflict",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " in both a "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " and a noun "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is a conflict"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -3910,7 +4446,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 98
+        "line": 99
       },
       "story_id": null,
       "activity_ids": []
@@ -3919,7 +4455,20 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_declared_kind_verified_and_kept",
       "narration": {
         "text": "A declared kind consistent with its slot is kept",
-        "parts": []
+        "parts": [
+          {
+            "value": "A declared kind consistent with its "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is kept"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -4002,7 +4551,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 119
+        "line": 121
       },
       "story_id": null,
       "activity_ids": []
@@ -4011,7 +4560,38 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_declared_verb_in_actor_slot_raises",
       "narration": {
         "text": "A declared verb in an actor slot is rejected",
-        "parts": []
+        "parts": [
+          {
+            "value": "A declared "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " in an "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is rejected"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -4097,7 +4677,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 142
+        "line": 144
       },
       "story_id": null,
       "activity_ids": []
@@ -4106,7 +4686,38 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_verb_and_actor_conflict_raises",
       "narration": {
         "text": "A term used as both verb and actor is a conflict",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " used as both "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " and "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is a conflict"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -4182,7 +4793,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 159
+        "line": 161
       },
       "story_id": null,
       "activity_ids": []
@@ -4191,7 +4802,38 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_declared_object_in_actor_slot_raises",
       "narration": {
         "text": "A declared work object in an actor slot is rejected",
-        "parts": []
+        "parts": [
+          {
+            "value": "A declared "
+          },
+          {
+            "term_id": "work-object",
+            "display": "work object",
+            "expression": "pg[\"Work Object\"].low",
+            "param_column": null
+          },
+          {
+            "value": " in an "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is rejected"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -4277,7 +4919,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 184
+        "line": 187
       },
       "story_id": null,
       "activity_ids": []
@@ -4286,7 +4928,38 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_declared_actor_in_verb_slot_raises",
       "narration": {
         "text": "A declared actor in a verb slot is rejected",
-        "parts": []
+        "parts": [
+          {
+            "value": "A declared "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          },
+          {
+            "value": " in a "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is rejected"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -4359,7 +5032,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 201
+        "line": 205
       },
       "story_id": null,
       "activity_ids": []
@@ -4368,7 +5041,17 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_conflict_where_names_only_offending_stories",
       "narration": {
         "text": "A conflict error names only the offending stories",
-        "parts": []
+        "parts": [
+          {
+            "value": "A conflict error names only the offending "
+          },
+          {
+            "term_id": "story",
+            "display": "stories",
+            "expression": "pg[\"Story\"](\"stories\")",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -4444,7 +5127,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 220
+        "line": 224
       },
       "story_id": null,
       "activity_ids": []
@@ -4453,7 +5136,26 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_inferred_conflict_where_excludes_unrelated_slot_stories",
       "narration": {
         "text": "A conflict message excludes stories with an unrelated slot",
-        "parts": []
+        "parts": [
+          {
+            "value": "A conflict message excludes "
+          },
+          {
+            "term_id": "story",
+            "display": "stories",
+            "expression": "pg[\"Story\"](\"stories\")",
+            "param_column": null
+          },
+          {
+            "value": " with an unrelated "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -4529,7 +5231,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 240
+        "line": 244
       },
       "story_id": null,
       "activity_ids": []
@@ -4538,7 +5240,29 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_declared_verb_in_noun_slot_raises",
       "narration": {
         "text": "A declared verb in a noun slot is rejected",
-        "parts": []
+        "parts": [
+          {
+            "value": "A declared "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " in a noun "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is rejected"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -4611,7 +5335,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 262
+        "line": 267
       },
       "story_id": null,
       "activity_ids": []
@@ -4620,7 +5344,23 @@
       "id": "tests/unit/capture/test_kind_resolution.py::test_slot_for_maps_odd_positions_to_verb",
       "narration": {
         "text": "Slot positions alternate verb/noun after the actor",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "slot",
+            "display": "Slot",
+            "expression": "pg[\"Slot\"]",
+            "param_column": null
+          },
+          {
+            "value": " positions alternate verb/noun after the "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_kind_resolution",
       "tags": [
@@ -4700,7 +5440,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_resolution.py",
-        "line": 281
+        "line": 286
       },
       "story_id": null,
       "activity_ids": []
@@ -4709,7 +5449,20 @@
       "id": "tests/unit/capture/test_markdown_glossary.py::test_parses_default_columns",
       "narration": {
         "text": "A pipe table parses into term and definition rows",
-        "parts": []
+        "parts": [
+          {
+            "value": "A pipe table parses into "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " and definition rows"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
@@ -5385,7 +6138,26 @@
       "id": "tests/unit/capture/test_markdown_glossary.py::test_strips_bold_from_term_cell",
       "narration": {
         "text": "Bold term cells render as clean terms",
-        "parts": []
+        "parts": [
+          {
+            "value": "Bold "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " cells render as clean "
+          },
+          {
+            "term_id": "term",
+            "display": "terms",
+            "expression": "pg[\"Term\"](\"terms\")",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
@@ -5468,7 +6240,20 @@
       "id": "tests/unit/capture/test_markdown_glossary.py::test_strips_italic_and_inline_code_from_term_cell",
       "narration": {
         "text": "Italic and inline-code term cells are unwrapped",
-        "parts": []
+        "parts": [
+          {
+            "value": "Italic and inline-code "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " cells are unwrapped"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
@@ -5841,7 +6626,35 @@
       "id": "tests/unit/capture/test_step_descriptor.py::test_context_manager_basic",
       "narration": {
         "text": "A step pairs its narration with a phase",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " pairs its "
+          },
+          {
+            "term_id": "narration",
+            "display": "narration",
+            "expression": "pg[\"Narration\"].low",
+            "param_column": null
+          },
+          {
+            "value": " with a "
+          },
+          {
+            "term_id": "phase",
+            "display": "phase",
+            "expression": "pg[\"Phase\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_step_descriptor",
       "tags": [
@@ -5925,7 +6738,17 @@
       "id": "tests/unit/capture/test_step_descriptor.py::test_when_then_records_two_sibling_steps_on_clean_exit",
       "narration": {
         "text": "when_then records the action and its outcome as siblings",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "when-then",
+            "display": "when_then",
+            "expression": "pg[\"when_then\"]",
+            "param_column": null
+          },
+          {
+            "value": " records the action and its outcome as siblings"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_step_descriptor",
       "tags": [
@@ -6035,7 +6858,17 @@
       "id": "tests/unit/capture/test_step_descriptor.py::test_when_then_pairs_with_inner_pytest_raises",
       "narration": {
         "text": "when_then pairs with an inner pytest.raises",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "when-then",
+            "display": "when_then",
+            "expression": "pg[\"when_then\"]",
+            "param_column": null
+          },
+          {
+            "value": " pairs with an inner pytest.raises"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_step_descriptor",
       "tags": [
@@ -6130,7 +6963,17 @@
       "id": "tests/unit/capture/test_step_descriptor.py::test_when_then_omits_then_when_body_raises_uncaught",
       "narration": {
         "text": "when_then omits the then when the body raises uncaught",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "when-then",
+            "display": "when_then",
+            "expression": "pg[\"when_then\"]",
+            "param_column": null
+          },
+          {
+            "value": " omits the then when the body raises uncaught"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_step_descriptor",
       "tags": [
@@ -6225,7 +7068,20 @@
       "id": "tests/unit/capture/test_step_descriptor.py::test_when_then_allows_nested_when_as_child_sub_step",
       "narration": {
         "text": "A nested when becomes a child of the when_then action",
-        "parts": []
+        "parts": [
+          {
+            "value": "A nested when becomes a child of the "
+          },
+          {
+            "term_id": "when-then",
+            "display": "when_then",
+            "expression": "pg[\"when_then\"]",
+            "param_column": null
+          },
+          {
+            "value": " action"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_step_descriptor",
       "tags": [
@@ -6322,7 +7178,35 @@
       "id": "tests/unit/capture/test_story.py::test_path_dispatches_actor_to_activity_term_ref",
       "narration": {
         "text": "An actor handle in a path becomes a term ref",
-        "parts": []
+        "parts": [
+          {
+            "value": "An "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          },
+          {
+            "value": " handle in a "
+          },
+          {
+            "term_id": "path",
+            "display": "path",
+            "expression": "pg[\"Path\"].low",
+            "param_column": null
+          },
+          {
+            "value": " becomes a "
+          },
+          {
+            "term_id": "term-ref",
+            "display": "term ref",
+            "expression": "pg[\"Term ref\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -6444,7 +7328,35 @@
       "id": "tests/unit/capture/test_story.py::test_path_dispatches_inflected_verb_to_activity_term_ref_with_inflected_display",
       "narration": {
         "text": "An inflected verb keeps its term identity but shows the inflection",
-        "parts": []
+        "parts": [
+          {
+            "value": "An inflected "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " keeps its "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " identity but shows the "
+          },
+          {
+            "term_id": "inflection",
+            "display": "inflection",
+            "expression": "pg[\"Inflection\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -6595,7 +7507,20 @@
       "id": "tests/unit/capture/test_story.py::test_path_dispatches_bare_string_to_activity_word",
       "narration": {
         "text": "A bare string in a path becomes a connective word",
-        "parts": []
+        "parts": [
+          {
+            "value": "A bare string in a "
+          },
+          {
+            "term_id": "path",
+            "display": "path",
+            "expression": "pg[\"Path\"].low",
+            "param_column": null
+          },
+          {
+            "value": " becomes a connective word"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -6708,7 +7633,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 115
+        "line": 116
       },
       "story_id": null,
       "activity_ids": []
@@ -6717,7 +7642,38 @@
       "id": "tests/unit/capture/test_story.py::test_path_rejects_path_with_fewer_than_three_parts",
       "narration": {
         "text": "A path needs at least an actor, a verb and a node",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "path",
+            "display": "path",
+            "expression": "pg[\"Path\"].low",
+            "param_column": null
+          },
+          {
+            "value": " needs at least an "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          },
+          {
+            "value": ", a "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " and a node"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -6798,7 +7754,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 131
+        "line": 132
       },
       "story_id": null,
       "activity_ids": []
@@ -6807,7 +7763,26 @@
       "id": "tests/unit/capture/test_story.py::test_path_rejects_work_object_in_position_0",
       "narration": {
         "text": "Position 0 of a path must be an actor",
-        "parts": []
+        "parts": [
+          {
+            "value": "Position 0 of a "
+          },
+          {
+            "term_id": "path",
+            "display": "path",
+            "expression": "pg[\"Path\"].low",
+            "param_column": null
+          },
+          {
+            "value": " must be an "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -6910,7 +7885,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 146
+        "line": 148
       },
       "story_id": null,
       "activity_ids": []
@@ -6919,7 +7894,26 @@
       "id": "tests/unit/capture/test_story.py::test_path_rejects_verb_in_position_0",
       "narration": {
         "text": "A verb cannot open a path",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " cannot open a "
+          },
+          {
+            "term_id": "path",
+            "display": "path",
+            "expression": "pg[\"Path\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -7032,7 +8026,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 161
+        "line": 163
       },
       "story_id": null,
       "activity_ids": []
@@ -7041,7 +8035,26 @@
       "id": "tests/unit/capture/test_story.py::test_path_allows_bare_string_in_position_0",
       "narration": {
         "text": "A bare string may stand in for the actor slot",
-        "parts": []
+        "parts": [
+          {
+            "value": "A bare string may stand in for the "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -7132,7 +8145,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 176
+        "line": 178
       },
       "story_id": null,
       "activity_ids": []
@@ -7141,7 +8154,26 @@
       "id": "tests/unit/capture/test_story.py::test_path_rejects_actor_in_position_1",
       "narration": {
         "text": "Position 1 of a path must be a verb",
-        "parts": []
+        "parts": [
+          {
+            "value": "Position 1 of a "
+          },
+          {
+            "term_id": "path",
+            "display": "path",
+            "expression": "pg[\"Path\"].low",
+            "param_column": null
+          },
+          {
+            "value": " must be a "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -7241,7 +8273,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 187
+        "line": 189
       },
       "story_id": null,
       "activity_ids": []
@@ -7250,7 +8282,35 @@
       "id": "tests/unit/capture/test_story.py::test_path_rejects_work_object_in_position_1",
       "narration": {
         "text": "A work object cannot fill the verb slot",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "work-object",
+            "display": "work object",
+            "expression": "pg[\"Work Object\"].low",
+            "param_column": null
+          },
+          {
+            "value": " cannot fill the "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -7350,7 +8410,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 202
+        "line": 204
       },
       "story_id": null,
       "activity_ids": []
@@ -7359,7 +8419,20 @@
       "id": "tests/unit/capture/test_story.py::test_path_rejects_verb_in_position_2",
       "narration": {
         "text": "Position 2 of a path must be a noun",
-        "parts": []
+        "parts": [
+          {
+            "value": "Position 2 of a "
+          },
+          {
+            "term_id": "path",
+            "display": "path",
+            "expression": "pg[\"Path\"].low",
+            "param_column": null
+          },
+          {
+            "value": " must be a noun"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -7446,7 +8519,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 217
+        "line": 219
       },
       "story_id": null,
       "activity_ids": []
@@ -7455,7 +8528,20 @@
       "id": "tests/unit/capture/test_story.py::test_path_allows_bare_verb_between_term_nodes",
       "narration": {
         "text": "A bare verb may sit between two real entity nodes",
-        "parts": []
+        "parts": [
+          {
+            "value": "A bare "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " may sit between two real entity nodes"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -7542,7 +8628,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 232
+        "line": 234
       },
       "story_id": null,
       "activity_ids": []
@@ -7551,7 +8637,20 @@
       "id": "tests/unit/capture/test_story.py::test_path_allows_fully_bare_path",
       "narration": {
         "text": "A path may be fully bare words",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "path",
+            "display": "path",
+            "expression": "pg[\"Path\"].low",
+            "param_column": null
+          },
+          {
+            "value": " may be fully bare words"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -7632,7 +8731,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 248
+        "line": 250
       },
       "story_id": null,
       "activity_ids": []
@@ -7740,7 +8839,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 268
+        "line": 270
       },
       "story_id": null,
       "activity_ids": []
@@ -7749,7 +8848,20 @@
       "id": "tests/unit/capture/test_story.py::test_path_rejects_dangling_edge",
       "narration": {
         "text": "A path may not end on a dangling edge",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "path",
+            "display": "path",
+            "expression": "pg[\"Path\"].low",
+            "param_column": null
+          },
+          {
+            "value": " may not end on a dangling edge"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -7835,7 +8947,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 294
+        "line": 296
       },
       "story_id": null,
       "activity_ids": []
@@ -7844,7 +8956,26 @@
       "id": "tests/unit/capture/test_story.py::test_activity_single_path_synthesizes_one_path",
       "narration": {
         "text": "A single-path activity synthesizes one path",
-        "parts": []
+        "parts": [
+          {
+            "value": "A single-path "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          },
+          {
+            "value": " synthesizes one "
+          },
+          {
+            "term_id": "path",
+            "display": "path",
+            "expression": "pg[\"Path\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -7950,7 +9081,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 319
+        "line": 321
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -7959,7 +9090,26 @@
       "id": "tests/unit/capture/test_story.py::test_activity_multi_path_accepts_multiple_paths",
       "narration": {
         "text": "An activity may branch into multiple paths",
-        "parts": []
+        "parts": [
+          {
+            "value": "An "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          },
+          {
+            "value": " may branch into multiple "
+          },
+          {
+            "term_id": "path",
+            "display": "paths",
+            "expression": "pg[\"Path\"](\"paths\")",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -8078,7 +9228,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 333
+        "line": 335
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -8087,7 +9237,20 @@
       "id": "tests/unit/capture/test_story.py::test_activity_mixing_parts_and_paths_raises",
       "narration": {
         "text": "Mixing loose parts and prebuilt paths is rejected",
-        "parts": []
+        "parts": [
+          {
+            "value": "Mixing loose parts and prebuilt "
+          },
+          {
+            "term_id": "path",
+            "display": "paths",
+            "expression": "pg[\"Path\"](\"paths\")",
+            "param_column": null
+          },
+          {
+            "value": " is rejected"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -8201,7 +9364,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 348
+        "line": 350
       },
       "story_id": null,
       "activity_ids": []
@@ -8210,7 +9373,17 @@
       "id": "tests/unit/capture/test_story.py::test_activity_explicit_id_zero_raises",
       "narration": {
         "text": "Activity id 0 is reserved",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "activity",
+            "display": "Activity",
+            "expression": "pg[\"Activity\"]",
+            "param_column": null
+          },
+          {
+            "value": " id 0 is reserved"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -8304,7 +9477,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 365
+        "line": 367
       },
       "story_id": null,
       "activity_ids": []
@@ -8313,7 +9486,29 @@
       "id": "tests/unit/capture/test_story.py::test_story_auto_numbers_activities_from_one",
       "narration": {
         "text": "A story auto-numbers its activities from one",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "story",
+            "display": "story",
+            "expression": "pg[\"Story\"].low",
+            "param_column": null
+          },
+          {
+            "value": " auto-numbers its "
+          },
+          {
+            "term_id": "activity",
+            "display": "activities",
+            "expression": "pg[\"Activity\"](\"activities\")",
+            "param_column": null
+          },
+          {
+            "value": " from one"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -8418,7 +9613,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 383
+        "line": 385
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -8544,7 +9739,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 399
+        "line": 401
       },
       "story_id": null,
       "activity_ids": []
@@ -8553,7 +9748,29 @@
       "id": "tests/unit/capture/test_story.py::test_story_rejects_duplicate_activity_ids",
       "narration": {
         "text": "Duplicate activity ids in a story are rejected",
-        "parts": []
+        "parts": [
+          {
+            "value": "Duplicate "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          },
+          {
+            "value": " ids in a "
+          },
+          {
+            "term_id": "story",
+            "display": "story",
+            "expression": "pg[\"Story\"].low",
+            "param_column": null
+          },
+          {
+            "value": " are rejected"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -8670,7 +9887,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 417
+        "line": 419
       },
       "story_id": null,
       "activity_ids": []
@@ -8679,7 +9896,20 @@
       "id": "tests/unit/capture/test_story.py::test_story_derives_id_from_title",
       "narration": {
         "text": "A story derives its id from its title",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "story",
+            "display": "story",
+            "expression": "pg[\"Story\"].low",
+            "param_column": null
+          },
+          {
+            "value": " derives its id from its title"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -8747,7 +9977,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 437
+        "line": 439
       },
       "story_id": null,
       "activity_ids": []
@@ -8756,7 +9986,26 @@
       "id": "tests/unit/capture/test_story.py::test_story_rejects_two_glossaries",
       "narration": {
         "text": "A story may span only one glossary",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "story",
+            "display": "story",
+            "expression": "pg[\"Story\"].low",
+            "param_column": null
+          },
+          {
+            "value": " may span only one "
+          },
+          {
+            "term_id": "glossary",
+            "display": "glossary",
+            "expression": "pg[\"Glossary\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -8863,7 +10112,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 450
+        "line": 452
       },
       "story_id": null,
       "activity_ids": []
@@ -8872,7 +10121,20 @@
       "id": "tests/unit/capture/test_story.py::test_story_id_collision_raises_with_both_sites",
       "narration": {
         "text": "Two stories with the same id collide",
-        "parts": []
+        "parts": [
+          {
+            "value": "Two "
+          },
+          {
+            "term_id": "story",
+            "display": "stories",
+            "expression": "pg[\"Story\"](\"stories\")",
+            "param_column": null
+          },
+          {
+            "value": " with the same id collide"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -8940,7 +10202,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 496
+        "line": 498
       },
       "story_id": null,
       "activity_ids": []
@@ -8949,7 +10211,20 @@
       "id": "tests/unit/capture/test_story.py::test_path_allows_second_verb_edge",
       "narration": {
         "text": "A path may chain a second verb-object pair",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "path",
+            "display": "path",
+            "expression": "pg[\"Path\"].low",
+            "param_column": null
+          },
+          {
+            "value": " may chain a second verb-object pair"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
@@ -9061,7 +10336,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 566
+        "line": 568
       },
       "story_id": null,
       "activity_ids": []
@@ -9413,7 +10688,26 @@
       "id": "tests/unit/capture/test_template.py::test_tstring_with_actor_emits_term_ref",
       "narration": {
         "text": "A glossary handle in a t-string emits a term ref",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "glossary",
+            "display": "glossary",
+            "expression": "pg[\"Glossary\"].low",
+            "param_column": null
+          },
+          {
+            "value": " handle in a t-string emits a "
+          },
+          {
+            "term_id": "term-ref",
+            "display": "term ref",
+            "expression": "pg[\"Term ref\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
@@ -9508,7 +10802,26 @@
       "id": "tests/unit/capture/test_template.py::test_tstring_with_work_object_emits_term_ref",
       "narration": {
         "text": "A work object handle in a t-string emits a term ref",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "work-object",
+            "display": "work object",
+            "expression": "pg[\"Work Object\"].low",
+            "param_column": null
+          },
+          {
+            "value": " handle in a t-string emits a "
+          },
+          {
+            "term_id": "term-ref",
+            "display": "term ref",
+            "expression": "pg[\"Term ref\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
@@ -9603,7 +10916,20 @@
       "id": "tests/unit/capture/test_template.py::test_tstring_with_verb_emits_term_ref_with_canonical_display",
       "narration": {
         "text": "A bare verb handle keeps its canonical display",
-        "parts": []
+        "parts": [
+          {
+            "value": "A bare "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " handle keeps its canonical display"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
@@ -9698,7 +11024,26 @@
       "id": "tests/unit/capture/test_template.py::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display",
       "narration": {
         "text": "An inflected verb in a t-string shows the inflection",
-        "parts": []
+        "parts": [
+          {
+            "value": "An inflected "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " in a t-string shows the "
+          },
+          {
+            "term_id": "inflection",
+            "display": "inflection",
+            "expression": "pg[\"Inflection\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
@@ -9793,7 +11138,20 @@
       "id": "tests/unit/capture/test_template.py::test_tstring_term_ref_with_format_spec_raises",
       "narration": {
         "text": "A term ref may not carry a format spec",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "term-ref",
+            "display": "term ref",
+            "expression": "pg[\"Term ref\"].low",
+            "param_column": null
+          },
+          {
+            "value": " may not carry a format spec"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
@@ -9883,7 +11241,26 @@
       "id": "tests/unit/capture/test_template.py::test_tstring_with_file_term_handle_emits_term_ref",
       "narration": {
         "text": "A FileGlossary handle works in a t-string step",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "file-glossary",
+            "display": "FileGlossary",
+            "expression": "pg[\"File glossary\"](\"FileGlossary\")",
+            "param_column": null
+          },
+          {
+            "value": " handle works in a t-string "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
@@ -9980,7 +11357,38 @@
       "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_collects_instances_and_forms",
       "narration": {
         "text": "The glossary view aggregates instances and verb forms",
-        "parts": []
+        "parts": [
+          {
+            "value": "The "
+          },
+          {
+            "term_id": "glossary",
+            "display": "glossary",
+            "expression": "pg[\"Glossary\"].low",
+            "param_column": null
+          },
+          {
+            "value": " view aggregates "
+          },
+          {
+            "term_id": "instance",
+            "display": "instances",
+            "expression": "pg[\"Instance\"](\"instances\")",
+            "param_column": null
+          },
+          {
+            "value": " and "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " forms"
+          }
+        ]
       },
       "module": "tests.unit.report.test_aggregations",
       "tags": [
@@ -10147,7 +11555,32 @@
       "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_records_story_refs_via_activities",
       "narration": {
         "text": "Terms referenced by an activity record the story",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "term",
+            "display": "Terms",
+            "expression": "pg[\"Term\"](\"Terms\")",
+            "param_column": null
+          },
+          {
+            "value": " referenced by an "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          },
+          {
+            "value": " record the "
+          },
+          {
+            "term_id": "story",
+            "display": "story",
+            "expression": "pg[\"Story\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.report.test_aggregations",
       "tags": [
@@ -10246,7 +11679,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 264
+        "line": 265
       },
       "story_id": null,
       "activity_ids": []
@@ -10255,7 +11688,17 @@
       "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance",
       "narration": {
         "text": "A canonical entity reference is not an instance",
-        "parts": []
+        "parts": [
+          {
+            "value": "A canonical entity reference is not an "
+          },
+          {
+            "term_id": "instance",
+            "display": "instance",
+            "expression": "pg[\"Instance\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.report.test_aggregations",
       "tags": [
@@ -10354,7 +11797,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 334
+        "line": 336
       },
       "story_id": null,
       "activity_ids": []
@@ -10363,7 +11806,38 @@
       "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_kindless_term_records_only_story_ref",
       "narration": {
         "text": "A kindless term records only its story ref",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "kindless",
+            "display": "kindless",
+            "expression": "pg[\"Kindless\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " records only its "
+          },
+          {
+            "term_id": "story",
+            "display": "story",
+            "expression": "pg[\"Story\"].low",
+            "param_column": null
+          },
+          {
+            "value": " ref"
+          }
+        ]
       },
       "module": "tests.unit.report.test_aggregations",
       "tags": [
@@ -10498,7 +11972,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 423
+        "line": 425
       },
       "story_id": null,
       "activity_ids": []
@@ -10507,7 +11981,29 @@
       "id": "tests/unit/report/test_aggregations.py::test_glossary_aggregations_annotates_fixture_provenance",
       "narration": {
         "text": "An instance seen in a fixture step records its fixture provenance",
-        "parts": []
+        "parts": [
+          {
+            "value": "An "
+          },
+          {
+            "term_id": "instance",
+            "display": "instance",
+            "expression": "pg[\"Instance\"].low",
+            "param_column": null
+          },
+          {
+            "value": " seen in a fixture "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " records its fixture provenance"
+          }
+        ]
       },
       "module": "tests.unit.report.test_aggregations",
       "tags": [
@@ -10615,7 +12111,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 457
+        "line": 459
       },
       "story_id": null,
       "activity_ids": []
@@ -10624,7 +12120,38 @@
       "id": "tests/unit/report/test_aggregations.py::test_build_term_scenario_index_dedups_and_includes_scenario_narration",
       "narration": {
         "text": "The term index maps each term to its scenarios once",
-        "parts": []
+        "parts": [
+          {
+            "value": "The "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " index maps each "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " to its "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenarios",
+            "expression": "pg[\"Scenario\"](\"scenarios\")",
+            "param_column": null
+          },
+          {
+            "value": " once"
+          }
+        ]
       },
       "module": "tests.unit.report.test_aggregations",
       "tags": [
@@ -10713,7 +12240,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 550
+        "line": 553
       },
       "story_id": null,
       "activity_ids": []
@@ -10722,7 +12249,20 @@
       "id": "tests/unit/report/test_aggregations.py::test_build_story_rollups_flags_under_anchored_activity_ineligible",
       "narration": {
         "text": "An under-anchored activity is flagged ineligible in rollups",
-        "parts": []
+        "parts": [
+          {
+            "value": "An under-anchored "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is flagged ineligible in rollups"
+          }
+        ]
       },
       "module": "tests.unit.report.test_aggregations",
       "tags": [
@@ -10817,7 +12357,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 662
+        "line": 666
       },
       "story_id": null,
       "activity_ids": []
@@ -10826,7 +12366,35 @@
       "id": "tests/unit/report/test_coverage.py::test_identity_of_activity_term_ref_verb_ignores_display",
       "narration": {
         "text": "A verb activity ref has one identity regardless of inflection",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          },
+          {
+            "value": " ref has one identity regardless of "
+          },
+          {
+            "term_id": "inflection",
+            "display": "inflection",
+            "expression": "pg[\"Inflection\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -10927,7 +12495,26 @@
       "id": "tests/unit/report/test_coverage.py::test_a_refs_unions_across_multi_path_activity",
       "narration": {
         "text": "A branching activity unions references across its paths",
-        "parts": []
+        "parts": [
+          {
+            "value": "A branching "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          },
+          {
+            "value": " unions references across its "
+          },
+          {
+            "term_id": "path",
+            "display": "paths",
+            "expression": "pg[\"Path\"](\"paths\")",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -11035,7 +12622,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 149
+        "line": 150
       },
       "story_id": null,
       "activity_ids": []
@@ -11044,7 +12631,29 @@
       "id": "tests/unit/report/test_coverage.py::test_s_for_step_instance_entity_ref_adds_canonical_fallback",
       "narration": {
         "text": "An instance step ref adds a canonical fallback",
-        "parts": []
+        "parts": [
+          {
+            "value": "An "
+          },
+          {
+            "term_id": "instance",
+            "display": "instance",
+            "expression": "pg[\"Instance\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " ref adds a canonical fallback"
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -11146,7 +12755,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 200
+        "line": 202
       },
       "story_id": null,
       "activity_ids": []
@@ -11155,7 +12764,20 @@
       "id": "tests/unit/report/test_coverage.py::test_s_for_step_verb_ref_always_canonical",
       "narration": {
         "text": "A verb ref always resolves to its canonical identity",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " ref always resolves to its canonical identity"
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -11247,7 +12869,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 216
+        "line": 218
       },
       "story_id": null,
       "activity_ids": []
@@ -11256,7 +12878,20 @@
       "id": "tests/unit/report/test_coverage.py::test_s_for_step_unknown_term_ref_skipped",
       "narration": {
         "text": "An unknown term ref is skipped",
-        "parts": []
+        "parts": [
+          {
+            "value": "An unknown "
+          },
+          {
+            "term_id": "term-ref",
+            "display": "term ref",
+            "expression": "pg[\"Term ref\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is skipped"
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -11342,7 +12977,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 229
+        "line": 231
       },
       "story_id": null,
       "activity_ids": []
@@ -11351,7 +12986,35 @@
       "id": "tests/unit/report/test_coverage.py::test_compute_coverage_covers_canonical_activity_via_instance_step",
       "narration": {
         "text": "An instance step covers a canonical activity",
-        "parts": []
+        "parts": [
+          {
+            "value": "An "
+          },
+          {
+            "term_id": "instance",
+            "display": "instance",
+            "expression": "pg[\"Instance\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " covers a canonical "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -11462,7 +13125,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 253
+        "line": 255
       },
       "story_id": null,
       "activity_ids": []
@@ -11471,7 +13134,35 @@
       "id": "tests/unit/report/test_coverage.py::test_compute_coverage_does_not_cover_instance_activity_with_canonical_step",
       "narration": {
         "text": "A canonical step does not cover an instance activity",
-        "parts": []
+        "parts": [
+          {
+            "value": "A canonical "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " does not cover an "
+          },
+          {
+            "term_id": "instance",
+            "display": "instance",
+            "expression": "pg[\"Instance\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -11573,7 +13264,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 285
+        "line": 287
       },
       "story_id": null,
       "activity_ids": []
@@ -11582,7 +13273,35 @@
       "id": "tests/unit/report/test_coverage.py::test_compute_coverage_scenario_constrained_to_activity_ids",
       "narration": {
         "text": "A scenario activity binding constrains coverage",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          },
+          {
+            "value": " binding constrains "
+          },
+          {
+            "term_id": "coverage",
+            "display": "coverage",
+            "expression": "pg[\"Coverage\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -11687,7 +13406,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 316
+        "line": 319
       },
       "story_id": null,
       "activity_ids": []
@@ -11696,7 +13415,38 @@
       "id": "tests/unit/report/test_coverage.py::test_is_coverage_eligible_true_for_two_distinct_terms",
       "narration": {
         "text": "An activity with two distinct terms is coverage-eligible",
-        "parts": []
+        "parts": [
+          {
+            "value": "An "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          },
+          {
+            "value": " with two distinct "
+          },
+          {
+            "term_id": "term",
+            "display": "terms",
+            "expression": "pg[\"Term\"](\"terms\")",
+            "param_column": null
+          },
+          {
+            "value": " is "
+          },
+          {
+            "term_id": "coverage",
+            "display": "coverage",
+            "expression": "pg[\"Coverage\"].low",
+            "param_column": null
+          },
+          {
+            "value": "-eligible"
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -11798,7 +13548,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 362
+        "line": 366
       },
       "story_id": null,
       "activity_ids": []
@@ -11807,7 +13557,29 @@
       "id": "tests/unit/report/test_coverage.py::test_is_coverage_eligible_false_for_one_distinct_term",
       "narration": {
         "text": "An under-anchored activity is not coverage-eligible",
-        "parts": []
+        "parts": [
+          {
+            "value": "An under-anchored "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is not "
+          },
+          {
+            "term_id": "coverage",
+            "display": "coverage",
+            "expression": "pg[\"Coverage\"].low",
+            "param_column": null
+          },
+          {
+            "value": "-eligible"
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -11906,7 +13678,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 384
+        "line": 389
       },
       "story_id": null,
       "activity_ids": []
@@ -11915,7 +13687,20 @@
       "id": "tests/unit/report/test_coverage.py::test_compute_coverage_excludes_under_anchored_activity",
       "narration": {
         "text": "An under-anchored activity is never reported as covered",
-        "parts": []
+        "parts": [
+          {
+            "value": "An under-anchored "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is never reported as covered"
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -12007,7 +13792,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 415
+        "line": 420
       },
       "story_id": null,
       "activity_ids": []
@@ -12016,7 +13801,26 @@
       "id": "tests/unit/report/test_coverage.py::test_compute_coverage_nested_steps_are_walked",
       "narration": {
         "text": "Nested steps are walked for coverage",
-        "parts": []
+        "parts": [
+          {
+            "value": "Nested "
+          },
+          {
+            "term_id": "step",
+            "display": "steps",
+            "expression": "pg[\"Step\"](\"steps\")",
+            "param_column": null
+          },
+          {
+            "value": " are walked for "
+          },
+          {
+            "term_id": "coverage",
+            "display": "coverage",
+            "expression": "pg[\"Coverage\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -12130,7 +13934,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 439
+        "line": 444
       },
       "story_id": null,
       "activity_ids": []
@@ -12139,7 +13943,26 @@
       "id": "tests/unit/report/test_coverage.py::test_compute_coverage_explicit_step_binding_covers_eligible_activity",
       "narration": {
         "text": "An explicit step binding covers an eligible activity",
-        "parts": []
+        "parts": [
+          {
+            "value": "An explicit "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " binding covers an eligible "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
       "tags": [
@@ -12244,7 +14067,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 475
+        "line": 480
       },
       "story_id": null,
       "activity_ids": []
@@ -12364,7 +14187,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 504
+        "line": 509
       },
       "story_id": null,
       "activity_ids": []
@@ -12373,7 +14196,17 @@
       "id": "tests/unit/report/test_html_renderer.py::test_render_parameterized_step_with_structured_narration",
       "narration": {
         "text": "Parameter coloring marks placeholders and table headers",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "parameter-coloring",
+            "display": "Parameter coloring",
+            "expression": "pg[\"Parameter coloring\"]",
+            "param_column": null
+          },
+          {
+            "value": " marks placeholders and table headers"
+          }
+        ]
       },
       "module": "tests.unit.report.test_html_renderer",
       "tags": [
@@ -12489,7 +14322,29 @@
       "id": "tests/unit/report/test_md_renderer.py::test_passed_scenario_heading_and_steps",
       "narration": {
         "text": "A passed scenario renders as a checked heading with step bullets",
-        "parts": []
+        "parts": [
+          {
+            "value": "A passed "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].low",
+            "param_column": null
+          },
+          {
+            "value": " renders as a checked heading with "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " bullets"
+          }
+        ]
       },
       "module": "tests.unit.report.test_md_renderer",
       "tags": [
@@ -12606,7 +14461,20 @@
       "id": "tests/unit/report/test_md_renderer.py::test_nested_steps_indent",
       "narration": {
         "text": "Nested steps indent under their parent",
-        "parts": []
+        "parts": [
+          {
+            "value": "Nested "
+          },
+          {
+            "term_id": "step",
+            "display": "steps",
+            "expression": "pg[\"Step\"](\"steps\")",
+            "param_column": null
+          },
+          {
+            "value": " indent under their parent"
+          }
+        ]
       },
       "module": "tests.unit.report.test_md_renderer",
       "tags": [
@@ -12695,7 +14563,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 140
+        "line": 141
       },
       "story_id": null,
       "activity_ids": []
@@ -12704,7 +14572,29 @@
       "id": "tests/unit/report/test_md_renderer.py::test_narration_parts_resolve_terms_and_values",
       "narration": {
         "text": "Structured narration renders terms, values and placeholders",
-        "parts": []
+        "parts": [
+          {
+            "value": "Structured "
+          },
+          {
+            "term_id": "narration",
+            "display": "narration",
+            "expression": "pg[\"Narration\"].low",
+            "param_column": null
+          },
+          {
+            "value": " renders "
+          },
+          {
+            "term_id": "term",
+            "display": "terms",
+            "expression": "pg[\"Term\"](\"terms\")",
+            "param_column": null
+          },
+          {
+            "value": ", values and placeholders"
+          }
+        ]
       },
       "module": "tests.unit.report.test_md_renderer",
       "tags": [
@@ -12815,7 +14705,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 162
+        "line": 165
       },
       "story_id": null,
       "activity_ids": []
@@ -12824,7 +14714,26 @@
       "id": "tests/unit/report/test_md_renderer.py::test_parametrized_scenario_renders_table",
       "narration": {
         "text": "A parametrized scenario renders its parameter table",
-        "parts": []
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "parametrized-scenario",
+            "display": "parametrized scenario",
+            "expression": "pg[\"Parametrized scenario\"].low",
+            "param_column": null
+          },
+          {
+            "value": " renders its "
+          },
+          {
+            "term_id": "parameter-table",
+            "display": "parameter table",
+            "expression": "pg[\"Parameter table\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.report.test_md_renderer",
       "tags": [
@@ -12932,7 +14841,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 216
+        "line": 220
       },
       "story_id": null,
       "activity_ids": []
@@ -12941,7 +14850,20 @@
       "id": "tests/unit/report/test_md_renderer.py::test_failing_step_is_marked_with_minimal_error",
       "narration": {
         "text": "A failing step is marked with a minimal error digest",
-        "parts": []
+        "parts": [
+          {
+            "value": "A failing "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is marked with a minimal error digest"
+          }
+        ]
       },
       "module": "tests.unit.report.test_md_renderer",
       "tags": [
@@ -13049,7 +14971,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 249
+        "line": 253
       },
       "story_id": null,
       "activity_ids": []
@@ -13058,7 +14980,20 @@
       "id": "tests/unit/report/test_md_renderer.py::test_multiline_attachment_renders_fenced_block",
       "narration": {
         "text": "A multi-line attachment renders as a fenced block",
-        "parts": []
+        "parts": [
+          {
+            "value": "A multi-line "
+          },
+          {
+            "term_id": "attachment",
+            "display": "attachment",
+            "expression": "pg[\"Attachment\"].low",
+            "param_column": null
+          },
+          {
+            "value": " renders as a fenced block"
+          }
+        ]
       },
       "module": "tests.unit.report.test_md_renderer",
       "tags": [
@@ -13157,7 +15092,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 321
+        "line": 325
       },
       "story_id": null,
       "activity_ids": []
@@ -13246,7 +15181,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 419
+        "line": 426
       },
       "story_id": null,
       "activity_ids": []
@@ -13255,7 +15190,32 @@
       "id": "tests/unit/test_plugin.py::test_group_parameterized_any_failed_merges_as_failed",
       "narration": {
         "text": "Grouping merges parametrize cases into one scenario",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "group",
+            "display": "Grouping",
+            "expression": "pg[\"Group\"](\"Grouping\")",
+            "param_column": null
+          },
+          {
+            "value": " merges parametrize "
+          },
+          {
+            "term_id": "case",
+            "display": "cases",
+            "expression": "pg[\"Case\"](\"cases\")",
+            "param_column": null
+          },
+          {
+            "value": " into one "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].low",
+            "param_column": null
+          }
+        ]
       },
       "module": "tests.unit.test_plugin",
       "tags": [
@@ -13365,7 +15325,17 @@
       "id": "tests/unit/capture/test_glossary.py::test_id_derive_produces_expected_slug[Guest-guest]",
       "narration": {
         "text": "Term ids are derived as URL-safe slugs",
-        "parts": []
+        "parts": [
+          {
+            "term_id": "term",
+            "display": "Term",
+            "expression": "pg[\"Term\"]",
+            "param_column": null
+          },
+          {
+            "value": " ids are derived as URL-safe slugs"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
@@ -13521,7 +15491,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 30
+        "line": 31
       },
       "story_id": null,
       "activity_ids": []
@@ -13640,7 +15610,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 57
+        "line": 58
       },
       "story_id": null,
       "activity_ids": []
@@ -13649,7 +15619,29 @@
       "id": "tests/unit/capture/test_step_descriptor.py::test_when_then_rejects_cross_phase_nested_step[given]",
       "narration": {
         "text": "A cross-phase step cannot open inside a when_then body",
-        "parts": []
+        "parts": [
+          {
+            "value": "A cross-phase "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " cannot open inside a "
+          },
+          {
+            "term_id": "when-then",
+            "display": "when_then",
+            "expression": "pg[\"when_then\"]",
+            "param_column": null
+          },
+          {
+            "value": " body"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_step_descriptor",
       "tags": [

@@ -22,7 +22,7 @@ def simple_doc():
 
 
 @scenario(
-    'A pipe table parses into term and definition rows',
+    t'A pipe table parses into {pg["Term"].low} and definition rows',
     tags=['markdown', 'happy-path'],
 )
 def test_parses_default_columns(simple_doc):
@@ -191,7 +191,7 @@ def test_data_row_with_fewer_columns_raises():
 
 
 @scenario(
-    'Bold term cells render as clean terms',
+    t'Bold {pg["Term"].low} cells render as clean {pg["Term"]("terms")}',
     tags=['markdown', 'happy-path'],
 )
 def test_strips_bold_from_term_cell():
@@ -211,7 +211,7 @@ def test_strips_bold_from_term_cell():
 
 
 @scenario(
-    'Italic and inline-code term cells are unwrapped',
+    t'Italic and inline-code {pg["Term"].low} cells are unwrapped',
     tags=['markdown', 'happy-path'],
 )
 def test_strips_italic_and_inline_code_from_term_cell():

@@ -158,7 +158,8 @@ def test_build_glossary_aggregations_empty_when_no_glossary() -> None:
 
 
 @scenario(
-    'The glossary view aggregates instances and verb forms',
+    t'The {pg["Glossary"].low} view aggregates {pg["Instance"]("instances")} '
+    t'and {pg["Verb"].low} forms',
     tags=['happy-path'],
 )
 def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
@@ -262,7 +263,8 @@ def test_build_glossary_aggregations_walks_nested_steps() -> None:
 
 
 @scenario(
-    'Terms referenced by an activity record the story',
+    t'{pg["Term"]("Terms")} referenced by an {pg["Activity"].low} record '
+    t'the {pg["Story"].low}',
     tags=['happy-path'],
 )
 def test_build_glossary_aggregations_records_story_refs_via_activities() -> None:
@@ -332,7 +334,7 @@ def test_build_glossary_aggregations_verb_in_step_not_collected_as_instance() ->
 
 
 @scenario(
-    'A canonical entity reference is not an instance',
+    t'A canonical entity reference is not an {pg["Instance"].low}',
     tags=['happy-path'],
 )
 def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -> None:
@@ -421,7 +423,7 @@ def test_build_glossary_aggregations_skips_unknown_term_ref_in_activity() -> Non
 
 
 @scenario(
-    'A kindless term records only its story ref',
+    t'A {pg["Kindless"].low} {pg["Term"].low} records only its {pg["Story"].low} ref',
     tags=['happy-path'],
 )
 def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> None:
@@ -455,7 +457,8 @@ def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> N
 
 
 @scenario(
-    'An instance seen in a fixture step records its fixture provenance',
+    t'An {pg["Instance"].low} seen in a fixture {pg["Step"].low} '
+    t'records its fixture provenance',
     tags=['happy-path'],
 )
 def test_glossary_aggregations_annotates_fixture_provenance() -> None:
@@ -548,7 +551,8 @@ def test_build_term_scenario_index_maps_terms_to_scenarios() -> None:
 
 
 @scenario(
-    'The term index maps each term to its scenarios once',
+    t'The {pg["Term"].low} index maps each {pg["Term"].low} to its '
+    t'{pg["Scenario"]("scenarios")} once',
     tags=['happy-path'],
 )
 def test_build_term_scenario_index_dedups_and_includes_scenario_narration() -> None:
@@ -660,7 +664,7 @@ def test_scenario_slug_duplicate_basename_raises() -> None:
 
 
 @scenario(
-    'An under-anchored activity is flagged ineligible in rollups',
+    t'An under-anchored {pg["Activity"].low} is flagged ineligible in rollups',
     tags=['happy-path'],
 )
 def test_build_story_rollups_flags_under_anchored_activity_ineligible() -> None:

@@ -163,7 +163,7 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
 
 
 @scenario(
-    'Parameter coloring marks placeholders and table headers',
+    t'{pg["Parameter coloring"]} marks placeholders and table headers',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )

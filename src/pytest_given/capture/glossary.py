@@ -84,6 +84,13 @@ class DeferredTermHandle(TermHandle):
     def __call__(self, display: str) -> DeferredTermInstance:
         return DeferredTermInstance(handle=self, display=display)
 
+    @property
+    def low(self) -> DeferredTermInstance:
+        """Display-override instance whose surface text is the canonical term
+        lowercased -- the common mid-sentence form (``pg['Attachment'].low``
+        instead of ``pg['Attachment']('attachment')``)."""
+        return self(self.canonical.lower())
+
 
 def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:
     """Whether two terms are the same registration: kind, canonical, and

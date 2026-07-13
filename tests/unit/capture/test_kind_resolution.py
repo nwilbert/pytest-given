@@ -44,7 +44,7 @@ def _kind(glossary, term_id):
 
 
 @scenario(
-    'Term kinds are inferred from activity-slot positions',
+    t'{pg["Term"]} kinds are inferred from activity-slot positions',
     tags=['happy-path'],
 )
 def test_infers_actor_verb_object_by_position():
@@ -63,7 +63,8 @@ def test_infers_actor_verb_object_by_position():
 
 
 @scenario(
-    'An actor slot anywhere wins over a noun slot elsewhere',
+    t'An {pg["Actor"].low} {pg["Slot"].low} anywhere wins over a noun '
+    t'{pg["Slot"].low} elsewhere',
     tags=['happy-path'],
 )
 def test_actor_anywhere_beats_object():
@@ -83,7 +84,7 @@ def test_actor_anywhere_beats_object():
 
 
 @scenario(
-    'A term used in no story stays kindless',
+    t'A {pg["Term"].low} used in no {pg["Story"].low} stays {pg["Kindless"].low}',
     tags=['happy-path'],
 )
 def test_never_used_stays_kindless():
@@ -96,7 +97,8 @@ def test_never_used_stays_kindless():
 
 
 @scenario(
-    'A term in both a verb and a noun slot is a conflict',
+    t'A {pg["Term"].low} in both a {pg["Verb"].low} and a noun '
+    t'{pg["Slot"].low} is a conflict',
     tags=['validation'],
 )
 def test_verb_and_noun_conflict_raises():
@@ -117,7 +119,7 @@ def test_verb_and_noun_conflict_raises():
 
 
 @scenario(
-    'A declared kind consistent with its slot is kept',
+    t'A declared kind consistent with its {pg["Slot"].low} is kept',
     tags=['happy-path'],
 )
 def test_declared_kind_verified_and_kept():
@@ -140,7 +142,7 @@ def test_declared_kind_verified_and_kept():
 
 
 @scenario(
-    'A declared verb in an actor slot is rejected',
+    t'A declared {pg["Verb"].low} in an {pg["Actor"].low} {pg["Slot"].low} is rejected',
     tags=['validation'],
 )
 def test_declared_verb_in_actor_slot_raises():
@@ -157,7 +159,8 @@ def test_declared_verb_in_actor_slot_raises():
 
 
 @scenario(
-    'A term used as both verb and actor is a conflict',
+    t'A {pg["Term"].low} used as both {pg["Verb"].low} and '
+    t'{pg["Actor"].low} is a conflict',
     tags=['validation'],
 )
 def test_verb_and_actor_conflict_raises():
@@ -182,7 +185,8 @@ def test_verb_and_actor_conflict_raises():
 
 
 @scenario(
-    'A declared work object in an actor slot is rejected',
+    t'A declared {pg["Work Object"].low} in an {pg["Actor"].low} '
+    t'{pg["Slot"].low} is rejected',
     tags=['validation'],
 )
 def test_declared_object_in_actor_slot_raises():
@@ -199,7 +203,7 @@ def test_declared_object_in_actor_slot_raises():
 
 
 @scenario(
-    'A declared actor in a verb slot is rejected',
+    t'A declared {pg["Actor"].low} in a {pg["Verb"].low} {pg["Slot"].low} is rejected',
     tags=['validation'],
 )
 def test_declared_actor_in_verb_slot_raises():
@@ -218,7 +222,7 @@ def test_declared_actor_in_verb_slot_raises():
 
 
 @scenario(
-    'A conflict error names only the offending stories',
+    t'A conflict error names only the offending {pg["Story"]("stories")}',
     tags=['validation'],
 )
 def test_conflict_where_names_only_offending_stories():
@@ -238,7 +242,8 @@ def test_conflict_where_names_only_offending_stories():
 
 
 @scenario(
-    'A conflict message excludes stories with an unrelated slot',
+    t'A conflict message excludes {pg["Story"]("stories")} with an unrelated '
+    t'{pg["Slot"].low}',
     tags=['validation'],
 )
 def test_inferred_conflict_where_excludes_unrelated_slot_stories():
@@ -260,7 +265,7 @@ def test_inferred_conflict_where_excludes_unrelated_slot_stories():
 
 
 @scenario(
-    'A declared verb in a noun slot is rejected',
+    t'A declared {pg["Verb"].low} in a noun {pg["Slot"].low} is rejected',
     tags=['validation'],
 )
 def test_declared_verb_in_noun_slot_raises():
@@ -279,7 +284,7 @@ def test_declared_verb_in_noun_slot_raises():
 
 
 @scenario(
-    'Slot positions alternate verb/noun after the actor',
+    t'{pg["Slot"]} positions alternate verb/noun after the {pg["Actor"].low}',
     tags=['happy-path'],
 )
 def test_slot_for_maps_odd_positions_to_verb():

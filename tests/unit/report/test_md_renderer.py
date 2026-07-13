@@ -39,7 +39,8 @@ def test_header_names_the_project() -> None:
 
 
 @scenario(
-    'A passed scenario renders as a checked heading with step bullets',
+    t'A passed {pg["Scenario"].low} renders as a checked heading with '
+    t'{pg["Step"].low} bullets',
     tags=['happy-path'],
 )
 def test_passed_scenario_heading_and_steps() -> None:
@@ -137,7 +138,9 @@ def test_source_without_location_still_drops_parametrize_suffix() -> None:
     assert '`tests/t.py::test_slug`\n' in md
 
 
-@scenario('Nested steps indent under their parent', tags=['happy-path'])
+@scenario(
+    t'Nested {pg["Step"]("steps")} indent under their parent', tags=['happy-path']
+)
 def test_nested_steps_indent() -> None:
     with given(t'a {pg["Scenario"]} whose when {pg["Step"]} has a nested child'):
         scn = Scenario(
@@ -160,7 +163,8 @@ def test_nested_steps_indent() -> None:
 
 
 @scenario(
-    'Structured narration renders terms, values and placeholders',
+    t'Structured {pg["Narration"].low} renders {pg["Term"]("terms")}, '
+    t'values and placeholders',
     tags=['step-text'],
 )
 def test_narration_parts_resolve_terms_and_values() -> None:
@@ -214,7 +218,7 @@ def test_attachment_renders_under_step() -> None:
 
 
 @scenario(
-    'A parametrized scenario renders its parameter table',
+    t'A {pg["Parametrized scenario"].low} renders its {pg["Parameter table"].low}',
     tags=['parametrization'],
 )
 def test_parametrized_scenario_renders_table() -> None:
@@ -247,7 +251,7 @@ def test_parametrized_scenario_renders_table() -> None:
 
 
 @scenario(
-    'A failing step is marked with a minimal error digest',
+    t'A failing {pg["Step"].low} is marked with a minimal error digest',
     tags=['happy-path'],
 )
 def test_failing_step_is_marked_with_minimal_error() -> None:
@@ -318,7 +322,10 @@ def test_single_line_attachment_renders_inline() -> None:
     assert '  - 📎 S — `x=1`' in md
 
 
-@scenario('A multi-line attachment renders as a fenced block', tags=['happy-path'])
+@scenario(
+    t'A multi-line {pg["Attachment"].low} renders as a fenced block',
+    tags=['happy-path'],
+)
 def test_multiline_attachment_renders_fenced_block() -> None:
     with given(t'a {pg["Step"]} carrying a multi-line {pg["Attachment"]}'):
         scn = Scenario(

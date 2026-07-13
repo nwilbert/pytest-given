@@ -17,6 +17,7 @@ from pytest_given.capture.glossary import (
     Actor,
     ActorInstance,
     DeferredTermHandle,
+    DeferredTermInstance,
     InflectedVerb,
     Verb,
     WorkObject,
@@ -28,7 +29,7 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 @scenario(
-    'Term ids are derived as URL-safe slugs',
+    t'{pg["Term"]} ids are derived as URL-safe slugs',
     tags=['happy-path'],
 )
 @pytest.mark.parametrize(
@@ -103,7 +104,7 @@ def test_verb_carries_term_and_glossary_back_ref():
 
 
 @scenario(
-    'Calling an actor names a distinct instance',
+    t'Calling an {pg["Actor"].low} names a distinct {pg["Instance"].low}',
     tags=['happy-path'],
 )
 def test_actor_call_returns_instance_with_distinct_display():
@@ -130,7 +131,8 @@ def test_work_object_call_returns_instance_with_distinct_display():
 
 
 @scenario(
-    'Calling a verb records an inflection of the same term',
+    t'Calling a {pg["Verb"].low} records an {pg["Inflection"].low} '
+    t'of the same {pg["Term"].low}',
     tags=['happy-path'],
 )
 def test_verb_call_returns_inflection_sharing_term_identity():
@@ -150,7 +152,7 @@ def test_verb_call_returns_inflection_sharing_term_identity():
 
 
 @scenario(
-    'Registering an actor returns a typed handle',
+    t'Registering an {pg["Actor"].low} returns a typed handle',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -182,7 +184,7 @@ def test_glossary_verb_registers_and_returns_handle():
 
 
 @scenario(
-    'Re-registering a term with matching fields is idempotent',
+    t'Re-registering a {pg["Term"].low} with matching fields is idempotent',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -197,7 +199,7 @@ def test_glossary_re_registration_with_matching_fields_is_idempotent():
 
 
 @scenario(
-    'Re-registering a term with a different definition is rejected',
+    t'Re-registering a {pg["Term"].low} with a different definition is rejected',
     tags=['validation'],
 )
 def test_glossary_re_registration_with_mismatched_definition_raises():
@@ -239,7 +241,7 @@ def test_glossary_actor_empty_name_raises():
 
 
 @scenario(
-    'Registering an actor captures its definition site',
+    t'Registering an {pg["Actor"].low} captures its definition site',
     tags=['happy-path'],
 )
 def test_glossary_actor_captures_source():
@@ -334,7 +336,8 @@ def test_real_definition_is_kept():
 
 
 @scenario(
-    'Calling the glossary declares a kindless term',
+    t'Calling the {pg["Glossary"].low} declares a '
+    t'{pg["Kindless"].low} {pg["Term"].low}',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -367,8 +370,17 @@ def test_call_returns_deferred_handle():
     assert isinstance(handle, DeferredTermHandle)
 
 
+def test_low_yields_lowercased_display_instance():
+    g = Glossary()
+    handle = g('Loyalty Points')
+    low = handle.low
+    assert isinstance(low, DeferredTermInstance)
+    assert low.handle is handle
+    assert low.display == 'loyalty points'
+
+
 @scenario(
-    'Subscript looks up an already-declared term',
+    t'Subscript looks up an already-declared {pg["Term"].low}',
     tags=['happy-path'],
 )
 def test_subscript_get_only_returns_handle():

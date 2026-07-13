@@ -20,7 +20,10 @@ def _n(text: str) -> Narration:
     return Narration(text=text)
 
 
-@scenario('A scenario records under its node ID', tags=['happy-path'])
+@scenario(
+    t'A {pg["Scenario"].low} records under its {pg["Node ID"]("node ID")}',
+    tags=['happy-path'],
+)
 def test_start_and_finish_scenario() -> None:
     with given(t'a fresh {pg["Collector"]}'):
         collector = Collector()
@@ -38,7 +41,7 @@ def test_start_and_finish_scenario() -> None:
 
 
 @scenario(
-    'Steps record with their phases',
+    t'{pg["Step"]("Steps")} record with their {pg["Phase"]("phases")}',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -208,7 +211,8 @@ def test_enter_fixture_teardown_transitions_state() -> None:
 
 
 @scenario(
-    'Steps pushed during fixture setup record into the fixture recording',
+    t'{pg["Step"]("Steps")} pushed during fixture setup record into the '
+    t'{pg["Fixture recording"].low}',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -228,7 +232,7 @@ def test_push_step_during_fixture_setup_records_into_recording() -> None:
 
 
 @scenario(
-    'An attachment lands on the step being recorded',
+    t'An {pg["Attachment"].low} lands on the {pg["Step"].low} being recorded',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -247,7 +251,8 @@ def test_attach_during_fixture_setup_records_into_recording() -> None:
 
 
 @scenario(
-    'Fixture-body steps do not leak into the active scenario',
+    t'Fixture-body {pg["Step"]("steps")} do not leak into the '
+    t'{pg["Active scenario"].low}',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -309,7 +314,7 @@ def test_store_and_retrieve_recording_by_key() -> None:
 
 
 @scenario(
-    'A fixture recording is deep-copied when grafted',
+    t'A {pg["Fixture recording"].low} is deep-copied when {pg["Graft"]("grafted")}',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -451,7 +456,7 @@ def test_start_scenario_source_defaults_to_none() -> None:
 
 
 @scenario(
-    'A leaf given is grafted as a childless given step',
+    t'A leaf given is {pg["Graft"]("grafted")} as a childless given {pg["Step"].low}',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -470,7 +475,8 @@ def test_graft_leaf_given_appends_childless_given_step() -> None:
 
 
 @scenario(
-    'Grafting with an override replaces the root label but keeps children',
+    t'{pg["Graft"]("Grafting")} with an override replaces the root label but '
+    t'keeps children',
     tags=['happy-path'],
     story=adopt_pytest_given,
 )
@@ -494,7 +500,10 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
         assert recording.root.narration.text == 'original label'
 
 
-@scenario('Grafting with no active scenario is a no-op', tags=['happy-path'])
+@scenario(
+    t'{pg["Graft"]("Grafting")} with no {pg["Active scenario"].low} is a no-op',
+    tags=['happy-path'],
+)
 def test_graft_leaf_given_without_scenario_is_noop() -> None:
     with given(t'a collector with no {pg["Active scenario"]}'):
         collector = Collector()
