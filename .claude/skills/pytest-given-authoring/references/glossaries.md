@@ -42,6 +42,12 @@ with when(t'a {g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
     ...
 ```
 
+Pick the lightest surface form for the word you need:
+
+- **Bare handle** — `g['Room']` renders the term's canonical text. Use it whenever the word appears as-is; restating it as `g['Room']('Room')` is redundant noise — drop the call.
+- **`.low`** — `g['Attachment'].low` renders the canonical lowercased, the usual mid-sentence form. Prefer it over the equivalent `g['Attachment']('attachment')`.
+- **Callable override** — `g['book']('books')` supplies any *other* surface: a verb inflection, a plural (`g['Term']('terms')`), or a concrete instance (`organizer('Carol')`).
+
 ## Naming terms
 
 - **Term names are natural language, not class names.** Name the concept a human would say (`File glossary`, `Activity Part`) and spell the implementing class (`FileGlossary`, `ActivityPart`) inside the definition. A one-word term may coincide with its class only when the class is already the natural word — multi-word CamelCase never is.

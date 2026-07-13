@@ -252,7 +252,7 @@ def test_select_suite(carol):
 
 Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it. A step can also bind explicitly with `given(text, activity=...)`.
 
-**Kindless and undefined terms** — use `g('foo')` to declare a term that the team hasn't classified yet. It registers under the *Uncategorized* bucket in the Glossary view (no kind pill) and shows an *Undefined* badge until `definition=` is supplied. Use `g['foo']` to look up an already-declared term by name (raises if unknown). Both forms return a `DeferredTermHandle` usable in t-strings and story activities.
+**Kindless and undefined terms** — use `g('foo')` to declare a term that the team hasn't classified yet. It registers under the *Uncategorized* bucket in the Glossary view (no kind pill) and shows an *Undefined* badge until `definition=` is supplied. Use `g['foo']` to look up an already-declared term by name (raises if unknown). Both forms return a `DeferredTermHandle` usable in t-strings and story activities. Reference the term with the lightest surface form: bare (`g['foo']`, canonical text — don't restate it as `g['foo']('foo')`), `.low` for the common lowercased mid-sentence form (`g['Foo'].low` over `g['Foo']('foo')`), or a call for any other inflection, plural, or instance (`g['book']('books')`).
 
 **Glossary-only mode** — if you want the Glossary tab without writing stories yet, put `g = Glossary()` in a `conftest.py` so the plugin discovers it.
 
