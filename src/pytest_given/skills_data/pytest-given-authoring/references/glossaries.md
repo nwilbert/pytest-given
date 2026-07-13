@@ -42,10 +42,10 @@ with when(t'a {g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
     ...
 ```
 
-Pick the lightest surface form for the word you need:
+Pick the lightest surface form for the word you need — the same three forms on every handle, captured (`guest = g.actor(...)`) or looked up (`g['Guest']`):
 
 - **Bare handle** — `g['Room']` renders the term's canonical text. Use it whenever the word appears as-is; restating it as `g['Room']('Room')` is redundant noise — drop the call.
-- **`.low`** — `g['Attachment'].low` renders the canonical lowercased, the usual mid-sentence form. Prefer it over the equivalent `g['Attachment']('attachment')`.
+- **`.low`** — `g['Attachment'].low` (or `guest.low`) renders the canonical lowercased, the usual mid-sentence form. Prefer it over the equivalent `g['Attachment']('attachment')`.
 - **Callable override** — `g['book']('books')` supplies any *other* surface: a verb inflection, a plural (`g['Term']('terms')`), or a concrete instance (`organizer('Carol')`).
 
 ## Naming terms

@@ -55,17 +55,35 @@ class Actor(TermHandle):
     def __call__(self, display: str) -> ActorInstance:
         return ActorInstance(actor=self, display=display)
 
+    @property
+    def low(self) -> ActorInstance:
+        """Instance whose surface is the canonical term lowercased -- the common
+        mid-sentence form (``guest.low`` instead of ``guest('guest')``)."""
+        return self(self.canonical.lower())
+
 
 @dataclass(frozen=True)
 class WorkObject(TermHandle):
     def __call__(self, display: str) -> WorkObjectInstance:
         return WorkObjectInstance(work_object=self, display=display)
 
+    @property
+    def low(self) -> WorkObjectInstance:
+        """Instance whose surface is the canonical term lowercased -- the common
+        mid-sentence form (``room.low`` instead of ``room('room')``)."""
+        return self(self.canonical.lower())
+
 
 @dataclass(frozen=True)
 class Verb(TermHandle):
     def __call__(self, display: str) -> InflectedVerb:
         return InflectedVerb(verb=self, display=display)
+
+    @property
+    def low(self) -> InflectedVerb:
+        """Inflection whose surface is the canonical term lowercased -- the common
+        mid-sentence form (``book.low`` instead of ``book('book')``)."""
+        return self(self.canonical.lower())
 
 
 @dataclass(frozen=True)
@@ -86,9 +104,9 @@ class DeferredTermHandle(TermHandle):
 
     @property
     def low(self) -> DeferredTermInstance:
-        """Display-override instance whose surface text is the canonical term
-        lowercased -- the common mid-sentence form (``pg['Attachment'].low``
-        instead of ``pg['Attachment']('attachment')``)."""
+        """Instance whose surface is the canonical term lowercased -- the common
+        mid-sentence form (``pg['Attachment'].low`` instead of
+        ``pg['Attachment']('attachment')``)."""
         return self(self.canonical.lower())
 
 

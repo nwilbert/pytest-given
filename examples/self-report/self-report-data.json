@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-13T05:56:26.312937+00:00",
+    "timestamp": "2026-07-13T06:33:58.437458+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "5fb6c214efd29de782482e991e1c08e200a29ccd"
+    "commit_sha": "a0a121efb103686525d036f9d7d96d15d9d134c1"
   },
   "scenarios": [
     {
@@ -1187,7 +1187,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -1301,7 +1301,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -1414,7 +1414,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -1519,7 +1519,7 @@
         "story-grammar"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -2216,7 +2216,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -3831,7 +3831,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 382
+        "line": 418
       },
       "story_id": null,
       "activity_ids": []
@@ -3904,7 +3904,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 396
+        "line": 432
       },
       "story_id": null,
       "activity_ids": []
@@ -14213,7 +14213,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 55,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",

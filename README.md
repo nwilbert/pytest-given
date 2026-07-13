@@ -228,6 +228,12 @@ search = g.verb('search', definition='Look up available options.')
 
 Use the captured handles directly in t-strings — `t'a {guest} {search("searches for")} a {room}'`. Each interpolation becomes a kind-coloured pill in the rendered step, with the term's definition as a tooltip. Glossary terms feed the Glossary tab.
 
+Reference a term with the lightest surface form that fits the sentence — the same three forms on every handle (captured or looked up):
+
+- **Bare** — `{guest}` renders the term's canonical text. Use it whenever the word appears as-is; restating it as `guest('Guest')` is redundant.
+- **`.low`** — `{guest.low}` renders the canonical lowercased, the common mid-sentence form, instead of the equivalent `guest('guest')`.
+- **Callable override** — `guest('Alice')` supplies any other surface: a verb inflection (`search('searches for')`), a plural (`room('rooms')`), or a concrete instance.
+
 **2. Domain Stories** — model a flow as a sequence of `activity(...)` rows tied together by `story(...)`:
 
 ```python
@@ -252,7 +258,7 @@ def test_select_suite(carol):
 
 Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it. A step can also bind explicitly with `given(text, activity=...)`.
 
-**Kindless and undefined terms** — use `g('foo')` to declare a term that the team hasn't classified yet. It registers under the *Uncategorized* bucket in the Glossary view (no kind pill) and shows an *Undefined* badge until `definition=` is supplied. Use `g['foo']` to look up an already-declared term by name (raises if unknown). Both forms return a `DeferredTermHandle` usable in t-strings and story activities. Reference the term with the lightest surface form: bare (`g['foo']`, canonical text — don't restate it as `g['foo']('foo')`), `.low` for the common lowercased mid-sentence form (`g['Foo'].low` over `g['Foo']('foo')`), or a call for any other inflection, plural, or instance (`g['book']('books')`).
+**Kindless and undefined terms** — use `g('foo')` to declare a term that the team hasn't classified yet. It registers under the *Uncategorized* bucket in the Glossary view (no kind pill) and shows an *Undefined* badge until `definition=` is supplied. Use `g['foo']` to look up an already-declared term by name (raises if unknown). Both forms return a `DeferredTermHandle` usable in t-strings and story activities, with the same bare / `.low` / callable surface forms as any other handle.
 
 **Glossary-only mode** — if you want the Glossary tab without writing stories yet, put `g = Glossary()` in a `conftest.py` so the plugin discovers it.
 

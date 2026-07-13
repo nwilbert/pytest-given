@@ -379,6 +379,42 @@ def test_low_yields_lowercased_display_instance():
     assert low.display == 'loyalty points'
 
 
+def test_actor_low_yields_lowercased_instance():
+    g = Glossary()
+    a = Actor(
+        _term=GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'),
+        _glossary=g,
+    )
+    low = a.low
+    assert isinstance(low, ActorInstance)
+    assert low.actor is a
+    assert low.display == 'guest'
+
+
+def test_work_object_low_yields_lowercased_instance():
+    g = Glossary()
+    w = WorkObject(
+        _term=GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'),
+        _glossary=g,
+    )
+    low = w.low
+    assert isinstance(low, WorkObjectInstance)
+    assert low.work_object is w
+    assert low.display == 'room'
+
+
+def test_verb_low_yields_lowercased_inflection():
+    g = Glossary()
+    v = Verb(
+        _term=GlossaryTerm(id=TermId('confirm'), kind='verb', canonical='Confirm'),
+        _glossary=g,
+    )
+    low = v.low
+    assert isinstance(low, InflectedVerb)
+    assert low.verb is v
+    assert low.display == 'confirm'
+
+
 @scenario(
     t'Subscript looks up an already-declared {pg["Term"].low}',
     tags=['happy-path'],

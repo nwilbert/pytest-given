@@ -372,14 +372,14 @@
 - **then** the «Term» is registered as «Kindless»
 
 ## ✓ Subscript looks up an already-declared «term»
-`tests/unit/capture/test_glossary.py:382::test_subscript_get_only_returns_handle` · happy-path
+`tests/unit/capture/test_glossary.py:418::test_subscript_get_only_returns_handle` · happy-path
 
 - **given** a glossary with one declared «Term»
 - **when** the name is looked up by subscript
 - **then** the returned «Term» is the declared one
 
 ## ✓ Subscripting an unknown name raises with a hint
-`tests/unit/capture/test_glossary.py:396::test_subscript_unknown_name_raises_with_hint` · validation
+`tests/unit/capture/test_glossary.py:432::test_subscript_unknown_name_raises_with_hint` · validation
 
 - **given** a glossary with one declared «Term»
 - **when** a near-miss name is subscripted
