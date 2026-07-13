@@ -30,6 +30,7 @@ For each scenario under review, read the step texts against their bodies (jump v
 - **Outcomes** — everything a `then` claims must be asserted in it: "…and recorded in the ledger" with no such assertion is fabricated behaviour.
 - **Raises** — the `then` of an expected raise may translate the `match=`-pinned message into domain terms, but must not add claims the message doesn't carry. Judge against the pin, not the implementation: a `then` promising the message names the offender, a hint, or a file:line is under-pinned when the regex would also pass on a message without that detail (e.g. `match='Gues'` matching the echoed bad input rather than the did-you-mean suggestion) — even if the implementation currently includes it, the narrated claim is unverified and can regress silently.
 - **Actions** — what the `when` names must be what the body calls.
+- **Vocabulary** — a term ref puts the ubiquitous language directly next to the code it describes: each referenced term should be reflected in the naming within the step — the body and the SUT names it directly calls. `File glossary` over a `FileGlossary` call matches by design (term names are natural language; the definition spells the class), but `Reservation` over code that only knows `Booking` is language drift. Flag once per term, not per step, and report the drift without prescribing which side renames.
 
 For a large suite, fan the audit out: one reviewer per test file — a subagent where the harness has them (a cheap, fast model suffices; the rubric is local to each file) — each returning findings; otherwise audit inline, file by file. Verify a sample of any fan-out findings yourself before reporting them.
 
@@ -42,4 +43,4 @@ For a large suite, fan the audit out: one reviewer per test file — a subagent 
 
 ## Findings are advisory review comments
 
-For each finding: file:line, what the narration claims, what the body actually does, why it matters. A false spec misleads every future reader — rate truthfulness findings accordingly. Style preferences the authoring rules don't state are not findings.
+For each finding: file:line, what the narration claims, what the body actually does, why it matters. A false spec misleads every future reader — rate truthfulness findings accordingly; language drift rates below truthfulness (a false spec misleads now, a drifted vocabulary erodes slowly). Style preferences the authoring rules don't state are not findings.
