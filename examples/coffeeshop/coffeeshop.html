@@ -197,7 +197,12 @@ body {
   margin-right: 6px;
 }
 .nav-group-toggle-open { transform: rotate(45deg); }
-.nav-group-name { font-weight: 500; }
+/* Dotted module paths are single unbreakable tokens; without a shrink
+   allowance and a forced break opportunity they widen the row past the
+   sidebar and produce a horizontal scrollbar. Wrap rather than ellipsize:
+   module names share long prefixes, so truncation would hide exactly the
+   distinguishing suffix. */
+.nav-group-name { font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
 .nav-group-active { background: var(--color-accent); color: #fff; border-radius: var(--radius-sm); padding-left: var(--space-xs); padding-right: var(--space-xs); }
 .nav-group-active .nav-group-toggle,
 .nav-group-active .nav-group-count { color: rgba(255, 255, 255, 0.7); }
@@ -1144,7 +1149,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1200,7 +1205,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1243,7 +1248,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1288,7 +1293,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
       
     </div>
     </div>
@@ -1355,7 +1360,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L121">examples/coffeeshop/test_coffeeshop.py:121</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L121">examples/coffeeshop/test_coffeeshop.py:121</a></div>
       
     </div>
     </div>
@@ -1443,7 +1448,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L134">examples/coffeeshop/test_coffeeshop.py:134</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L134">examples/coffeeshop/test_coffeeshop.py:134</a></div>
       
     </div>
     </div>
@@ -1492,7 +1497,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L168">examples/coffeeshop/test_coffeeshop.py:168</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L168">examples/coffeeshop/test_coffeeshop.py:168</a></div>
       
     </div>
     </div>
@@ -1551,7 +1556,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L185">examples/coffeeshop/test_coffeeshop.py:185</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L185">examples/coffeeshop/test_coffeeshop.py:185</a></div>
       
     </div>
     </div>
@@ -1650,7 +1655,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L201">examples/coffeeshop/test_coffeeshop.py:201</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L201">examples/coffeeshop/test_coffeeshop.py:201</a></div>
       
     </div>
     </div>
@@ -1692,7 +1697,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L207">examples/coffeeshop/test_coffeeshop.py:207</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L207">examples/coffeeshop/test_coffeeshop.py:207</a></div>
       
     </div>
     </div>
@@ -1811,7 +1816,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -1902,7 +1907,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -1991,7 +1996,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
       
     </div>
     </div>
@@ -2072,7 +2077,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/dc337afa9343f97194fcb6058814de9a0bd8e5ec/examples/coffeeshop/test_coffeeshop.py#L214">examples/coffeeshop/test_coffeeshop.py:214</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/2aad1c0b51f76bdaa67c0173c090a2b120e2554b/examples/coffeeshop/test_coffeeshop.py#L214">examples/coffeeshop/test_coffeeshop.py:214</a></div>
       
     </div>
     </div>
@@ -2103,10 +2108,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-18T06:47:25.767248+00:00",
+    "timestamp": "2026-07-18T06:51:44.931453+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "dc337afa9343f97194fcb6058814de9a0bd8e5ec"
+    "commit_sha": "2aad1c0b51f76bdaa67c0173c090a2b120e2554b"
   },
   "scenarios": [
     {

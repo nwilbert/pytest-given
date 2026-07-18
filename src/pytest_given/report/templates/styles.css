@@ -190,7 +190,12 @@ body {
   margin-right: 6px;
 }
 .nav-group-toggle-open { transform: rotate(45deg); }
-.nav-group-name { font-weight: 500; }
+/* Dotted module paths are single unbreakable tokens; without a shrink
+   allowance and a forced break opportunity they widen the row past the
+   sidebar and produce a horizontal scrollbar. Wrap rather than ellipsize:
+   module names share long prefixes, so truncation would hide exactly the
+   distinguishing suffix. */
+.nav-group-name { font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
 .nav-group-active { background: var(--color-accent); color: #fff; border-radius: var(--radius-sm); padding-left: var(--space-xs); padding-right: var(--space-xs); }
 .nav-group-active .nav-group-toggle,
 .nav-group-active .nav-group-count { color: rgba(255, 255, 255, 0.7); }
