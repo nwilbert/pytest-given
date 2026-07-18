@@ -193,12 +193,12 @@
       <div style="display:flex; align-items:center;">
         {% if has_body %}<span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
         <span class="scenario-name">{{ scenario.narration | narration }}</span>
-        {% for tag in scenario.tags %}
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
-        {% endfor %}
         {{ anchor_link('scenario=' ~ scenario_slugs[scenario.id]) }}
       </div>
       <span class="scenario-meta">
+        {% for tag in scenario.tags %}
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
+        {% endfor %}
         <span class="scenario-status {{ scenario.status }}">
           {% if scenario.status == 'passed' %}✓ passed{% elif scenario.status == 'failed' %}✗ failed{% else %}○ skipped{% endif %}
         </span>

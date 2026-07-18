@@ -344,7 +344,6 @@ body {
   font-size: var(--font-size-sm);
   padding: 1px 7px;
   border-radius: var(--radius-pill);
-  margin-left: var(--space-xs);
   cursor: pointer;
   border: 1px solid transparent;
 }
@@ -1108,11 +1107,11 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span>
         <span class="scenario-name">Carol picks a suite for the group</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=hotel_booking/pick_suite', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1140,7 +1139,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L148">examples/hotel-booking/test_hotel_booking.py:148</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L148">examples/hotel-booking/test_hotel_booking.py:148</a></div>
       
     </div>
     </div>
@@ -1154,11 +1153,11 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span>
         <span class="scenario-name">Carol completes the booking for both guests</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=hotel_booking/complete_booking', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1192,7 +1191,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L163">examples/hotel-booking/test_hotel_booking.py:163</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L163">examples/hotel-booking/test_hotel_booking.py:163</a></div>
       
     </div>
     </div>
@@ -1206,11 +1205,11 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span>
         <span class="scenario-name">Alice cancels her booking and is refunded</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=hotel_booking/cancel_booking', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1238,7 +1237,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L240">examples/hotel-booking/test_hotel_booking.py:240</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L240">examples/hotel-booking/test_hotel_booking.py:240</a></div>
       
     </div>
     </div>
@@ -1252,15 +1251,15 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span>
         <span class="scenario-name">Payment is declined — the booking is not finalized</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=hotel_booking/payment_declined', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">28ms</span>
+        <span class="scenario-duration">34ms</span>
       </span>
     </div>
 
@@ -1390,7 +1389,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L198">examples/hotel-booking/test_hotel_booking.py:198</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L198">examples/hotel-booking/test_hotel_booking.py:198</a></div>
       
     </div>
     </div>
@@ -1689,7 +1688,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
         
       </div>
       
@@ -1807,7 +1806,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L116">examples/hotel-booking/test_hotel_booking.py:116</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L116">examples/hotel-booking/test_hotel_booking.py:116</a></div>
         
       </div>
       
@@ -1965,7 +1964,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L56">examples/hotel-booking/test_hotel_booking.py:56</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L56">examples/hotel-booking/test_hotel_booking.py:56</a></div>
                 
               </div>
             </div>
@@ -2039,7 +2038,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L57">examples/hotel-booking/test_hotel_booking.py:57</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L57">examples/hotel-booking/test_hotel_booking.py:57</a></div>
                 
               </div>
             </div>
@@ -2101,7 +2100,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L58">examples/hotel-booking/test_hotel_booking.py:58</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L58">examples/hotel-booking/test_hotel_booking.py:58</a></div>
                 
               </div>
             </div>
@@ -2186,7 +2185,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L60">examples/hotel-booking/test_hotel_booking.py:60</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L60">examples/hotel-booking/test_hotel_booking.py:60</a></div>
                 
               </div>
             </div>
@@ -2248,7 +2247,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L61">examples/hotel-booking/test_hotel_booking.py:61</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L61">examples/hotel-booking/test_hotel_booking.py:61</a></div>
                 
               </div>
             </div>
@@ -2310,7 +2309,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L62">examples/hotel-booking/test_hotel_booking.py:62</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L62">examples/hotel-booking/test_hotel_booking.py:62</a></div>
                 
               </div>
             </div>
@@ -2372,7 +2371,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L63">examples/hotel-booking/test_hotel_booking.py:63</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L63">examples/hotel-booking/test_hotel_booking.py:63</a></div>
                 
               </div>
             </div>
@@ -2422,7 +2421,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L107">examples/hotel-booking/test_hotel_booking.py:107</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L107">examples/hotel-booking/test_hotel_booking.py:107</a></div>
                 
               </div>
             </div>
@@ -2504,7 +2503,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
                 
               </div>
             </div>
@@ -2571,7 +2570,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
                 
               </div>
             </div>
@@ -2638,7 +2637,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
                 
               </div>
             </div>
@@ -2705,7 +2704,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L68">examples/hotel-booking/test_hotel_booking.py:68</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L68">examples/hotel-booking/test_hotel_booking.py:68</a></div>
                 
               </div>
             </div>
@@ -2772,7 +2771,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
                 
               </div>
             </div>
@@ -2841,7 +2840,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
                 
               </div>
             </div>
@@ -2891,7 +2890,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
                 
               </div>
             </div>
@@ -2958,7 +2957,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L75">examples/hotel-booking/test_hotel_booking.py:75</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L75">examples/hotel-booking/test_hotel_booking.py:75</a></div>
                 
               </div>
             </div>
@@ -3025,7 +3024,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
                 
               </div>
             </div>
@@ -3075,7 +3074,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5221178eb4ed0ed039d1c9fca507a2af9f1b5361/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
                 
               </div>
             </div>
@@ -3108,10 +3107,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-13T20:08:33.514597+00:00",
+    "timestamp": "2026-07-18T06:27:41.514361+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "5221178eb4ed0ed039d1c9fca507a2af9f1b5361"
+    "commit_sha": "d526fd07f66eacd0b9d86e56fb095fa66168898c"
   },
   "scenarios": [
     {
@@ -3849,7 +3848,7 @@ window.__REPORT_DATA__ = {
       "module": "test_hotel_booking",
       "tags": [],
       "status": "failed",
-      "duration_ms": 28,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",

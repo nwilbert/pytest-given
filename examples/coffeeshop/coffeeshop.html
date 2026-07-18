@@ -344,7 +344,6 @@ body {
   font-size: var(--font-size-sm);
   padding: 1px 7px;
   border-radius: var(--radius-pill);
-  margin-left: var(--space-xs);
   cursor: pointer;
   border: 1px solid transparent;
 }
@@ -1092,15 +1091,15 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span>
         <span class="scenario-name">Basic scenario with when/then and a JSON attachment</span>
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/buy_coffee', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+      </div>
+      <span class="scenario-meta">
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'happy-path' }" @click.stop="filterByTag('happy-path')">happy-path</span>
         
-        <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/buy_coffee', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
-      </div>
-      <span class="scenario-meta">
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1134,7 +1133,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1148,13 +1147,13 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span>
         <span class="scenario-name">Plain text attachment</span>
-        
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=coffeeshop/text_attachment', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1189,7 +1188,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1203,11 +1202,11 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span>
         <span class="scenario-name">Generator fixture with teardown</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=coffeeshop/generator_fixture', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1231,7 +1230,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1245,11 +1244,11 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span>
         <span class="scenario-name">T-string with a non-parametrize value (neutral highlight)</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=coffeeshop/neutral_highlight', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1275,7 +1274,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
       
     </div>
     </div>
@@ -1289,13 +1288,13 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[4] }"></span>
         <span class="scenario-name">Helper functions can record their own steps</span>
-        
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=coffeeshop/buy_with_validation', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1341,7 +1340,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L121">examples/coffeeshop/test_coffeeshop.py:121</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L121">examples/coffeeshop/test_coffeeshop.py:121</a></div>
       
     </div>
     </div>
@@ -1355,13 +1354,13 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[5] }"></span>
         <span class="scenario-name">Top-level `given` block and deeply nested steps</span>
-        
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=coffeeshop/complex_order', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1428,7 +1427,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L134">examples/coffeeshop/test_coffeeshop.py:134</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L134">examples/coffeeshop/test_coffeeshop.py:134</a></div>
       
     </div>
     </div>
@@ -1442,15 +1441,15 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[6] }"></span>
         <span class="scenario-name">An expected error, narrated as when + then (when_then)</span>
+        <button type="button" class="anchor-link" title="Copy link"
+            @click.stop="copyAnchor('scenario=coffeeshop/sold_out_is_rejected', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+      </div>
+      <span class="scenario-meta">
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
         
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'validation' }" @click.stop="filterByTag('validation')">validation</span>
         
-        <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/sold_out_is_rejected', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
-      </div>
-      <span class="scenario-meta">
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1476,7 +1475,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L168">examples/coffeeshop/test_coffeeshop.py:168</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L168">examples/coffeeshop/test_coffeeshop.py:168</a></div>
       
     </div>
     </div>
@@ -1490,15 +1489,15 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[7] }"></span>
         <span class="scenario-name">Failure rendering (intentionally failing)</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=coffeeshop/failing', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">77ms</span>
+        <span class="scenario-duration">88ms</span>
       </span>
     </div>
 
@@ -1574,7 +1573,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L185">examples/coffeeshop/test_coffeeshop.py:185</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L185">examples/coffeeshop/test_coffeeshop.py:185</a></div>
       
     </div>
     </div>
@@ -1588,11 +1587,11 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[8] }"></span>
         <span class="scenario-name">Skipped scenario rendering</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=coffeeshop/skipped', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
         <span class="scenario-status skipped">
           ○ skipped
         </span>
@@ -1615,7 +1614,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L191">examples/coffeeshop/test_coffeeshop.py:191</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L191">examples/coffeeshop/test_coffeeshop.py:191</a></div>
       
     </div>
     </div>
@@ -1629,13 +1628,13 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[9] }"></span>
         <span class="scenario-name">Parametrized test (renders as a parameter table)</span>
-        
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=coffeeshop/pricing', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1733,7 +1732,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -1747,13 +1746,13 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[10] }"></span>
         <span class="scenario-name">Parametrize value surfaced as a given (Annotated)</span>
-        
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=coffeeshop/annotated_given_label', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1823,7 +1822,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -1837,13 +1836,13 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[11] }"></span>
         <span class="scenario-name">Brew <span class="param-color-2" data-param="cup_size" @mouseenter="setHoverParam('cup_size', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{cup_size}</span> ml (templated scenario name)</span>
-        
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=coffeeshop/brew', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
+        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        
         <span class="scenario-status passed">
           ✓ passed
         </span>
@@ -1911,7 +1910,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
       
     </div>
     </div>
@@ -1925,11 +1924,11 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[12] }"></span>
         <span class="scenario-name">All cases skipped</span>
-        
         <button type="button" class="anchor-link" title="Copy link"
             @click.stop="copyAnchor('scenario=coffeeshop/parametrized_all_skipped', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
+        
         <span class="scenario-status skipped">
           ○ skipped
         </span>
@@ -1991,7 +1990,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b514a8aab57be86b2eddabce5534607933c8c16a/examples/coffeeshop/test_coffeeshop.py#L198">examples/coffeeshop/test_coffeeshop.py:198</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/d526fd07f66eacd0b9d86e56fb095fa66168898c/examples/coffeeshop/test_coffeeshop.py#L198">examples/coffeeshop/test_coffeeshop.py:198</a></div>
       
     </div>
     </div>
@@ -2022,10 +2021,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-13T20:11:06.465897+00:00",
+    "timestamp": "2026-07-18T06:27:41.107898+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "b514a8aab57be86b2eddabce5534607933c8c16a"
+    "commit_sha": "d526fd07f66eacd0b9d86e56fb095fa66168898c"
   },
   "scenarios": [
     {
@@ -2757,7 +2756,7 @@ window.__REPORT_DATA__ = {
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 77,
+      "duration_ms": 88,
       "steps": [
         {
           "phase": "given",
