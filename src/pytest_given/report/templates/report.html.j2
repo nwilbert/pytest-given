@@ -197,12 +197,13 @@
       </div>
       <span class="scenario-meta">
         {#- Cap visible tags so a long tag list can't crowd out the title:
-            beyond 3 tags, show the first 2 plus a "+N" pill that reveals the
-            rest. A hidden tag still surfaces while it is the active filter. -#}
+            beyond 4 tags, show the first 3 plus a "+N" pill that reveals the
+            rest (never a "+1" — it costs as much space as the tag it hides).
+            A hidden tag still surfaces while it is the active filter. -#}
         {%- set scenario_idx = loop.index0 -%}
-        {%- set collapse_tags = scenario.tags | length > 3 -%}
-        {%- set visible_tags = scenario.tags[:2] if collapse_tags else scenario.tags -%}
-        {%- set overflow_tags = scenario.tags[2:] if collapse_tags else [] -%}
+        {%- set collapse_tags = scenario.tags | length > 4 -%}
+        {%- set visible_tags = scenario.tags[:3] if collapse_tags else scenario.tags -%}
+        {%- set overflow_tags = scenario.tags[3:] if collapse_tags else [] -%}
         {% for tag in visible_tags %}
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
         {% endfor %}

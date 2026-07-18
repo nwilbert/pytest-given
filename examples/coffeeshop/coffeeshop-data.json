@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-18T06:41:44.095073+00:00",
+    "timestamp": "2026-07-18T06:47:25.767248+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "12e0cd3ebcdef9fb028788928ec70817a968cbab"
+    "commit_sha": "dc337afa9343f97194fcb6058814de9a0bd8e5ec"
   },
   "scenarios": [
     {
@@ -728,6 +728,99 @@
       "activity_ids": []
     },
     {
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase",
+      "narration": {
+        "text": "Many tags (the report collapses them behind a +N pill)",
+        "parts": []
+      },
+      "module": "test_coffeeshop",
+      "tags": [
+        "billing",
+        "loyalty",
+        "discounts",
+        "happy-path",
+        "regression"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a loyalty card good for a $1 discount",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I buy a coffee with the discount",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "I pay $1",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a coffee is dispensed",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
+        "line": 185
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_failing",
       "narration": {
         "text": "Failure rendering (intentionally failing)",
@@ -736,7 +829,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 85,
+      "duration_ms": 84,
       "steps": [
         {
           "phase": "given",
@@ -862,7 +955,7 @@
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 188,
+            "lineno": 204,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
             "is_internal": false
@@ -873,7 +966,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 185
+        "line": 201
       },
       "story_id": null,
       "activity_ids": []
@@ -894,7 +987,7 @@
       "skip_reason": "demonstrates skipped status",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 191
+        "line": 207
       },
       "story_id": null,
       "activity_ids": []
@@ -1262,7 +1355,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 198
+        "line": 214
       },
       "story_id": null,
       "activity_ids": []

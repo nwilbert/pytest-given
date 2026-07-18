@@ -98,14 +98,23 @@
 - **when** a customer tries to buy a coffee
 - **then** the machine reports it is sold out
 
+## ✓ Many tags (the report collapses them behind a +N pill)
+`examples/coffeeshop/test_coffeeshop.py:185::test_discounted_purchase` · billing, loyalty, discounts, happy-path, regression
+
+- **given** a coffee machine
+- **given** a loyalty card good for a $1 discount
+- **when** I buy a coffee with the discount
+- **then** I pay $1
+- **then** a coffee is dispensed
+
 ## ✗ Failure rendering (intentionally failing)
-`examples/coffeeshop/test_coffeeshop.py:185::test_failing`
+`examples/coffeeshop/test_coffeeshop.py:201::test_failing`
 
 - **given** a coffee machine
 - **then** the machine has 20 coffees
 
 ## ⤼ Skipped scenario rendering · skipped
-`examples/coffeeshop/test_coffeeshop.py:191::test_skipped` — reason: demonstrates skipped status
+`examples/coffeeshop/test_coffeeshop.py:207::test_skipped` — reason: demonstrates skipped status
 
 
 ## ✓ Parametrized test (renders as a parameter table) · 3 cases
@@ -147,7 +156,7 @@
 | 300 | ✓ |
 
 ## ⤼ All cases skipped · skipped
-`examples/coffeeshop/test_coffeeshop.py:198::test_parametrized_all_skipped`
+`examples/coffeeshop/test_coffeeshop.py:214::test_parametrized_all_skipped`
 
 
 | n | |

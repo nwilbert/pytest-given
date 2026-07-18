@@ -182,6 +182,22 @@ def test_sold_out_is_rejected(machine):
         buy_coffee(machine)
 
 
+@scenario(
+    'Many tags (the report collapses them behind a +N pill)',
+    tags=['billing', 'loyalty', 'discounts', 'happy-path', 'regression'],
+)
+def test_discounted_purchase(machine):
+    with given('a loyalty card good for a $1 discount'):
+        discount = 1
+    with when('I buy a coffee with the discount'):
+        price_paid = machine['price'] - discount
+        machine['coffees'] -= 1
+    with then('I pay $1'):
+        assert price_paid == 1
+    with then('a coffee is dispensed'):
+        assert machine['coffees'] == 9
+
+
 @scenario('Failure rendering (intentionally failing)')
 def test_failing(machine):
     with then('the machine has 20 coffees'):
