@@ -48,6 +48,7 @@ function reportApp() {
     expandedSteps: {},
     expandedAttachments: {},
     expandedScenarios: {},
+    expandedTags: {},
     activeTag: null,
     termFilter: null,
     _suppressHashWrite: false,

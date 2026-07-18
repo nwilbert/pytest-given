@@ -339,10 +339,20 @@ body {
   border-radius: var(--radius-pill);
   cursor: pointer;
   border: 1px solid transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .scenario-tag:hover { border-color: var(--color-accent); }
 .scenario-tag.active-tag { background: var(--color-accent); color: #fff; border-color: var(--color-accent); font-weight: 600; }
-.scenario-meta { display: flex; align-items: center; gap: var(--space-sm); }
+.scenario-tag-more { background: transparent; border: 1px dashed var(--color-accent); }
+.scenario-tag-more:hover { background: var(--color-accent-bg); border-style: solid; }
+.scenario-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
 .scenario-status { font-size: var(--font-size-sm); font-weight: 500; }
 .scenario-duration { font-size: var(--font-size-sm); color: var(--text-muted); }
 .scenario-status.passed { color: var(--color-passed); }

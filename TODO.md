@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] UI scenario cards: move tags away from the title (so that they are not confused with term chips)
 - [ ] CLI option to generate a shortened MD glossary (only the terms and optionally kinds)
   - this could be used by agents to quickly lookup terms, without needed to load the whole glossary?
   - maybe even a command line option to find terms & their descriptions?

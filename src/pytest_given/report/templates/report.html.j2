@@ -196,9 +196,22 @@
         {{ anchor_link('scenario=' ~ scenario_slugs[scenario.id]) }}
       </div>
       <span class="scenario-meta">
-        {% for tag in scenario.tags %}
+        {#- Cap visible tags so a long tag list can't crowd out the title:
+            beyond 3 tags, show the first 2 plus a "+N" pill that reveals the
+            rest. A hidden tag still surfaces while it is the active filter. -#}
+        {%- set scenario_idx = loop.index0 -%}
+        {%- set collapse_tags = scenario.tags | length > 3 -%}
+        {%- set visible_tags = scenario.tags[:2] if collapse_tags else scenario.tags -%}
+        {%- set overflow_tags = scenario.tags[2:] if collapse_tags else [] -%}
+        {% for tag in visible_tags %}
         <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
         {% endfor %}
+        {% for tag in overflow_tags %}
+        <span class="scenario-tag" x-cloak x-show="expandedTags[{{ scenario_idx }}] || activeTag === '{{ tag }}'" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
+        {% endfor %}
+        {% if overflow_tags %}
+        <span class="scenario-tag scenario-tag-more" x-show="!expandedTags[{{ scenario_idx }}]" @click.stop="expandedTags[{{ scenario_idx }}] = true">+{{ overflow_tags | length }}</span>
+        {% endif %}
         <span class="scenario-status {{ scenario.status }}">
           {% if scenario.status == 'passed' %}✓ passed{% elif scenario.status == 'failed' %}✗ failed{% else %}○ skipped{% endif %}
         </span>
