@@ -9,8 +9,9 @@ length IDEAL_EDGE) plus pairwise repulsion below MIN_NODE_DIST.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 
-from .graph import DiagramGraph
+from .graph import DiagramEdge, DiagramGraph, DiagramNode
 
 MARGIN = 90.0
 BAND_X_LEFT = 150.0
@@ -19,6 +20,51 @@ BAND_ROW_SPACING = 230.0  # must stay > MIN_NODE_DIST
 IDEAL_EDGE = 265.0
 MIN_NODE_DIST = 215.0
 ITERATIONS = 140
+
+NODE_HALF_W = 62.0
+NODE_HALF_H = 58.0
+TRIM_SOURCE = 52.0
+TRIM_TARGET = 60.0
+LABEL_CHAR_W = 7.0
+LABEL_H = 20.0
+BADGE_W = 30.0
+LABEL_OFFSET = 120.0
+LOOP_RADIUS = 46.0
+
+
+@dataclass(frozen=True, kw_only=True)
+class PlacedNode:
+    node: DiagramNode
+    x: float
+    y: float
+
+
+@dataclass(frozen=True, kw_only=True)
+class LabelBox:
+    x: float
+    y: float
+    width: float
+    height: float
+
+
+@dataclass(frozen=True, kw_only=True)
+class PlacedEdge:
+    edge: DiagramEdge
+    x1: float
+    y1: float
+    x2: float
+    y2: float
+    loop: bool
+    label: LabelBox
+
+
+@dataclass(frozen=True, kw_only=True)
+class DiagramLayout:
+    graph: DiagramGraph
+    nodes: tuple[PlacedNode, ...]
+    edges: tuple[PlacedEdge, ...]
+    width: float
+    height: float
 
 
 def position_nodes(
@@ -162,3 +208,110 @@ def _relax(
                 min(max(new_x, MARGIN), width - MARGIN),
                 min(max(new_y, MARGIN), height - MARGIN),
             )
+
+
+def layout_graph(graph: DiagramGraph) -> DiagramLayout:
+    positions, width, height = position_nodes(graph)
+    placed_nodes = tuple(
+        PlacedNode(node=node, x=positions[node.id][0], y=positions[node.id][1])
+        for node in graph.nodes
+    )
+    node_boxes_by_id = {
+        p.node.id: LabelBox(
+            x=p.x - NODE_HALF_W, y=p.y - NODE_HALF_H,
+            width=2 * NODE_HALF_W, height=2 * NODE_HALF_H,
+        )
+        for p in placed_nodes
+    }
+    placed_edges: list[PlacedEdge] = []
+    for edge in graph.edges:
+        source_x, source_y = positions[edge.source]
+        target_x, target_y = positions[edge.target]
+        if edge.source == edge.target:
+            label = _label_box(
+                edge, source_x, source_y - NODE_HALF_H - LABEL_H - 8.0
+            )
+            placed_edges.append(
+                PlacedEdge(
+                    edge=edge, x1=source_x, y1=source_y,
+                    x2=target_x, y2=target_y, loop=True, label=label,
+                )
+            )
+            continue
+        # Obstacles: other nodes (not source/target) and previously placed labels
+        obstacles = [
+            box for node_id, box in node_boxes_by_id.items()
+            if node_id != edge.source and node_id != edge.target
+        ]
+        obstacles.extend(e.label for e in placed_edges)
+
+        dx, dy = target_x - source_x, target_y - source_y
+        dist = math.hypot(dx, dy) or 1.0
+        ux, uy = dx / dist, dy / dist
+        # Ensure trimmed edge is at least 40.0: scale down trims if needed
+        # Use 40.1 to account for floating-point precision
+        total_desired_trim = TRIM_SOURCE + TRIM_TARGET
+        total_available_trim = max(0.0, dist - 40.1)
+        scale = min(1.0, total_available_trim / total_desired_trim)
+        trim_source = TRIM_SOURCE * scale
+        trim_target = TRIM_TARGET * scale
+        x1, y1 = source_x + ux * trim_source, source_y + uy * trim_source
+        x2, y2 = target_x - ux * trim_target, target_y - uy * trim_target
+        label = _slide_label(edge, x1, y1, x2, y2, ux, uy, obstacles)
+        placed_edges.append(
+            PlacedEdge(edge=edge, x1=x1, y1=y1, x2=x2, y2=y2, loop=False, label=label)
+        )
+    return DiagramLayout(
+        graph=graph, nodes=placed_nodes, edges=tuple(placed_edges),
+        width=width, height=height,
+    )
+
+
+def _label_size(edge: DiagramEdge) -> tuple[float, float]:
+    width = len(edge.label) * LABEL_CHAR_W + 8.0
+    if edge.number is not None:
+        width += BADGE_W
+    return width, LABEL_H
+
+
+def _label_box(edge: DiagramEdge, centre_x: float, centre_y: float) -> LabelBox:
+    width, height = _label_size(edge)
+    return LabelBox(
+        x=centre_x - width / 2, y=centre_y - height / 2, width=width, height=height
+    )
+
+
+def _slide_label(
+    edge: DiagramEdge,
+    x1: float, y1: float, x2: float, y2: float,
+    ux: float, uy: float,
+    obstacles: list[LabelBox],
+) -> LabelBox:
+    """Place the label near the edge midpoint, offset perpendicular; slide it
+    along the edge (alternating around the midpoint) until it clears all
+    obstacle boxes. Falls back to the least-overlapping candidate."""
+    best: LabelBox | None = None
+    best_overlap = math.inf
+    for attempt in range(51):
+        step = (attempt + 1) // 2 * 0.02
+        fraction = 0.5 + (step if attempt % 2 == 1 else -step)
+        centre_x = x1 + (x2 - x1) * fraction - uy * LABEL_OFFSET
+        centre_y = y1 + (y2 - y1) * fraction + ux * LABEL_OFFSET
+        candidate = _label_box(edge, centre_x, centre_y)
+        overlap = sum(_overlap_area(candidate, box) for box in obstacles)
+        if overlap == 0.0:
+            return candidate
+        if overlap < best_overlap:
+            best, best_overlap = candidate, overlap
+    assert best is not None
+    return best
+
+
+def _overlap_area(box_a: LabelBox, box_b: LabelBox) -> float:
+    overlap_w = (
+        min(box_a.x + box_a.width, box_b.x + box_b.width) - max(box_a.x, box_b.x)
+    )
+    overlap_h = (
+        min(box_a.y + box_a.height, box_b.y + box_b.height) - max(box_a.y, box_b.y)
+    )
+    return max(overlap_w, 0.0) * max(overlap_h, 0.0)

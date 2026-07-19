@@ -1,15 +1,28 @@
-from pytest_given.model import ActivityId, Glossary, Story, StoryId
+from pytest_given.model import (
+    Activity,
+    ActivityId,
+    ActivityPath,
+    ActivityTermRef,
+    Glossary,
+    Story,
+    StoryId,
+    TermId,
+)
 from pytest_given.report.diagram import (
     DiagramEdge,
     DiagramGraph,
     DiagramNode,
     build_graph,
+    layout_graph,
 )
 from pytest_given.report.diagram.layout import (
     BAND_X_LEFT,
     BAND_X_RIGHT_INSET,
     MARGIN,
     MIN_NODE_DIST,
+    NODE_HALF_H,
+    NODE_HALF_W,
+    LabelBox,
     position_nodes,
 )
 
@@ -130,3 +143,71 @@ def test_self_loop_exerts_no_force_and_stays_deterministic() -> None:
     )
     graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
     assert position_nodes(graph) == position_nodes(graph)
+
+
+def _boxes_overlap(a: LabelBox, b: LabelBox) -> bool:
+    return not (
+        a.x + a.width <= b.x or b.x + b.width <= a.x
+        or a.y + a.height <= b.y or b.y + b.height <= a.y
+    )
+
+
+def test_layout_graph_deterministic(
+    trip_story: Story, trip_glossary: Glossary
+) -> None:
+    graph = build_graph(trip_story, trip_glossary)
+    assert layout_graph(graph) == layout_graph(graph)
+
+
+def test_labels_do_not_overlap_labels_or_nodes(
+    trip_story: Story, trip_glossary: Glossary
+) -> None:
+    graph = build_graph(trip_story, trip_glossary)
+    layout = layout_graph(graph)
+    node_boxes = [
+        LabelBox(x=p.x - NODE_HALF_W, y=p.y - NODE_HALF_H,
+                 width=2 * NODE_HALF_W, height=2 * NODE_HALF_H)
+        for p in layout.nodes
+    ]
+    label_boxes = [e.label for e in layout.edges]
+    for i, box in enumerate(label_boxes):
+        for other in label_boxes[i + 1 :]:
+            assert not _boxes_overlap(box, other)
+        for node_box in node_boxes:
+            assert not _boxes_overlap(box, node_box)
+
+
+def test_trimmed_endpoints_leave_visible_edges(
+    trip_story: Story, trip_glossary: Glossary
+) -> None:
+    import math
+
+    graph = build_graph(trip_story, trip_glossary)
+    layout = layout_graph(graph)
+    for placed in layout.edges:
+        if not placed.loop:
+            assert math.hypot(placed.x2 - placed.x1, placed.y2 - placed.y1) >= 40.0
+
+
+def test_self_loop_marked_and_label_above_node(trip_glossary: Glossary) -> None:
+    def term_ref(term_id: str, display: str) -> ActivityTermRef:
+        return ActivityTermRef(term_id=TermId(term_id), display=display)
+
+    story = Story(
+        id=StoryId('loop'), title='Loop',
+        activities=(
+            Activity(id=ActivityId(1), paths=(
+                ActivityPath(parts=(
+                    term_ref('organizer', 'Carol'), term_ref('add', 'checks'),
+                    term_ref('organizer', 'Carol'),
+                )),
+            )),
+        ),
+    )
+    graph = build_graph(story, trip_glossary)
+    layout = layout_graph(graph)
+    assert len(layout.nodes) == 1
+    placed = layout.edges[0]
+    node = layout.nodes[0]
+    assert placed.loop is True
+    assert placed.label.y + placed.label.height <= node.y - NODE_HALF_H
