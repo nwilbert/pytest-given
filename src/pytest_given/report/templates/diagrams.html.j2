@@ -2,6 +2,10 @@
 <g transform="translate({{ placed.x | round }},{{ placed.y | round }})"
    @mouseenter='showTip($event, {{ placed.node.label | tojson }}, {{ (placed.node.term_id or "") | tojson }})'
    @mouseleave="tooltip = null">
+  {# Invisible hit-area: the actor stick figure is drawn with fill:none (only
+     its ~2px stroke would otherwise catch hover), so without this a user
+     pointing at the icon's centre -- the natural target -- gets nothing. #}
+  <rect x="-40" y="-40" width="80" height="110" class="hit-area"/>
   {% if placed.node.glyph == 'actor' %}
   <circle cx="0" cy="-16" r="9" class="glyph"/>
   <path d="M 0 -7 L 0 12 M -14 2 L 14 2 M 0 12 L -11 30 M 0 12 L 11 30" class="glyph"/>
@@ -40,6 +44,12 @@
 <header class="topbar">
   <span class="project">{{ metadata.project }}</span> · story diagrams
 </header>
+{% if not views %}
+<div class="no-stories">
+  <p>No stories were recorded for this run.</p>
+  <p class="no-stories-hint">Wrap steps in <code>story(...)</code> to see them here.</p>
+</div>
+{% else %}
 <div class="layout">
   <nav class="sidebar">
     {% for view in views %}
@@ -85,10 +95,17 @@
            @mouseenter="hoverActivity = {{ activity }}" @mouseleave="hoverActivity = null">
           {% for placed in view.layout.edges if placed.edge.activity_id == activity %}
           {% if placed.loop %}
-          <path class="edge" marker-end="url(#arrow-{{ story.story_id }})"
-                d="M {{ (placed.x1 - 18) | round }} {{ (placed.y1 - 40) | round }}
-                   A 46 46 0 1 1 {{ (placed.x1 + 18) | round }} {{ (placed.y1 - 40) | round }}"/>
+          {% set loop_d %}M {{ (placed.x1 - 18) | round }} {{ (placed.y1 - 40) | round }}
+                   A 46 46 0 1 1 {{ (placed.x1 + 18) | round }} {{ (placed.y1 - 40) | round }}{% endset %}
+          {# Invisible wide-stroke twin: a 1.6px line is a hard target for a
+             real pointer, so hovering to dim other activities needs a fatter
+             (but invisible) hit-strip along the same path. #}
+          <path class="edge-hit" d="{{ loop_d }}"/>
+          <path class="edge" marker-end="url(#arrow-{{ story.story_id }})" d="{{ loop_d }}"/>
           {% else %}
+          <line class="edge-hit"
+                x1="{{ placed.x1 | round }}" y1="{{ placed.y1 | round }}"
+                x2="{{ placed.x2 | round }}" y2="{{ placed.y2 | round }}"/>
           <line class="edge {{ 'connective' if placed.edge.connective }}"
                 x1="{{ placed.x1 | round }}" y1="{{ placed.y1 | round }}"
                 x2="{{ placed.x2 | round }}" y2="{{ placed.y2 | round }}"
@@ -114,6 +131,7 @@
     {% endfor %}
   </main>
 </div>
+{% endif %}
 <div class="tooltip" x-show="tooltip !== null" x-cloak
      :style="tooltip && ('left:' + (tooltip.x + 14) + 'px; top:' + (tooltip.y + 14) + 'px')">
   <template x-if="tooltip">
@@ -124,7 +142,6 @@
     </div>
   </template>
 </div>
-<script>{{ alpine_js }}</script>
 <script>
 const STORY_IDS = {{ story_ids_json }};
 const MAX_STEPS = {{ max_steps_json }};
@@ -165,5 +182,6 @@ function diagramsApp() {
   };
 }
 </script>
+<script>{{ alpine_js }}</script>
 </body>
 </html>

@@ -16,17 +16,17 @@ from .graph import DiagramEdge, DiagramGraph, DiagramNode
 MARGIN = 90.0
 BAND_X_LEFT = 150.0
 BAND_X_RIGHT_INSET = 170.0  # right band sits at width - this
-BAND_ROW_SPACING = 230.0  # must stay > MIN_NODE_DIST
-IDEAL_EDGE = 265.0
-MIN_NODE_DIST = 215.0
+BAND_ROW_SPACING = 270.0  # must stay > MIN_NODE_DIST
+IDEAL_EDGE = 260.0
+MIN_NODE_DIST = 250.0
 ITERATIONS = 140
 SEPARATION_ROUNDS = 60
 SEPARATION_RING_CANDIDATES = 24
 
 NODE_HALF_W = 62.0
 NODE_HALF_H = 58.0
-TRIM_SOURCE = 52.0
-TRIM_TARGET = 60.0
+TRIM_SOURCE = 56.0
+TRIM_TARGET = 64.0
 LABEL_CHAR_W = 7.0
 LABEL_H = 20.0
 BADGE_W = 30.0
@@ -235,12 +235,18 @@ def _separate(
     between two movable work nodes, applied wholly to the movable side
     against a pinned actor. For each movable node still in violation, that
     direct correction is then compared against SEPARATION_RING_CANDIDATES
-    points spaced evenly around a circle of radius MIN_NODE_DIST centred on
-    the mean position of its conflicting neighbours; whichever candidate
-    leaves the smallest total remaining violation (summed squared deficit
-    against every other node) is kept. The ring lets a node walk around a
-    pinned anchor instead of stalling against a corner. Runs up to
-    SEPARATION_ROUNDS rounds, stopping as soon as a round finds no
+    points spaced evenly around a circle of radius MIN_NODE_DIST, tried
+    centred on each distinct conflicting neighbour's own position as well as
+    their mean; whichever candidate leaves the smallest total remaining
+    violation (summed squared deficit against every other node) is kept. A
+    ring centred on a single neighbour is guaranteed clear of that neighbour
+    specifically -- needed when a node's conflicts are two unrelated nodes
+    that only happen to be near each other (the mean of their positions can
+    sit somewhere that clears neither); the mean-centred ring stays useful
+    for the genuinely shared-anchor case (two actors on the same axis) a
+    single neighbour's ring can't distinguish from. The ring lets a node
+    walk around a pinned anchor instead of stalling against a corner. Runs
+    up to SEPARATION_ROUNDS rounds, stopping as soon as a round finds no
     violation.
     """
     movable = {n.id for n in graph.nodes if n.glyph == 'work'}
@@ -297,24 +303,33 @@ def _separate(
                 min(max(old_y + push_y, MARGIN), height - MARGIN),
             )
             best_score = remaining_violation(best, node_id)
-            centre_x = sum(point[0] for point in neighbours) / len(neighbours)
-            centre_y = sum(point[1] for point in neighbours) / len(neighbours)
-            for ring_index in range(SEPARATION_RING_CANDIDATES):
-                angle = 2 * math.pi * ring_index / SEPARATION_RING_CANDIDATES
-                candidate = (
-                    min(
-                        max(centre_x + MIN_NODE_DIST * math.cos(angle), MARGIN),
-                        width - MARGIN,
-                    ),
-                    min(
-                        max(centre_y + MIN_NODE_DIST * math.sin(angle), MARGIN),
-                        height - MARGIN,
-                    ),
-                )
-                score = remaining_violation(candidate, node_id)
-                if score < best_score:
-                    best_score = score
-                    best = candidate
+            # Ring centres: each distinct conflicting neighbour's own position
+            # (a ring here is guaranteed clear of *that* neighbour, which
+            # matters when the conflicts are unrelated nodes that happen to
+            # be near each other only by coincidence) plus their average
+            # (which is the useful centre for the shared-anchor case the
+            # single-neighbour ring can't distinguish from). Deduplicated so
+            # a lone conflict doesn't evaluate the same ring twice.
+            mean_x = sum(point[0] for point in neighbours) / len(neighbours)
+            mean_y = sum(point[1] for point in neighbours) / len(neighbours)
+            ring_centres = {(mean_x, mean_y), *neighbours}
+            for centre_x, centre_y in ring_centres:
+                for ring_index in range(SEPARATION_RING_CANDIDATES):
+                    angle = 2 * math.pi * ring_index / SEPARATION_RING_CANDIDATES
+                    candidate = (
+                        min(
+                            max(centre_x + MIN_NODE_DIST * math.cos(angle), MARGIN),
+                            width - MARGIN,
+                        ),
+                        min(
+                            max(centre_y + MIN_NODE_DIST * math.sin(angle), MARGIN),
+                            height - MARGIN,
+                        ),
+                    )
+                    score = remaining_violation(candidate, node_id)
+                    if score < best_score:
+                        best_score = score
+                        best = candidate
             positions[node_id] = best
 
 
@@ -326,8 +341,10 @@ def layout_graph(graph: DiagramGraph) -> DiagramLayout:
     )
     node_boxes_by_id = {
         p.node.id: LabelBox(
-            x=p.x - NODE_HALF_W, y=p.y - NODE_HALF_H,
-            width=2 * NODE_HALF_W, height=2 * NODE_HALF_H,
+            x=p.x - NODE_HALF_W,
+            y=p.y - NODE_HALF_H,
+            width=2 * NODE_HALF_W,
+            height=2 * NODE_HALF_H,
         )
         for p in placed_nodes
     }
@@ -336,13 +353,16 @@ def layout_graph(graph: DiagramGraph) -> DiagramLayout:
         source_x, source_y = positions[edge.source]
         target_x, target_y = positions[edge.target]
         if edge.source == edge.target:
-            label = _label_box(
-                edge, source_x, source_y - NODE_HALF_H - LABEL_H - 8.0
-            )
+            label = _label_box(edge, source_x, source_y - NODE_HALF_H - LABEL_H - 8.0)
             placed_edges.append(
                 PlacedEdge(
-                    edge=edge, x1=source_x, y1=source_y,
-                    x2=target_x, y2=target_y, loop=True, label=label,
+                    edge=edge,
+                    x1=source_x,
+                    y1=source_y,
+                    x2=target_x,
+                    y2=target_y,
+                    loop=True,
+                    label=label,
                 )
             )
             continue
@@ -373,8 +393,11 @@ def layout_graph(graph: DiagramGraph) -> DiagramLayout:
             PlacedEdge(edge=edge, x1=x1, y1=y1, x2=x2, y2=y2, loop=False, label=label)
         )
     return DiagramLayout(
-        graph=graph, nodes=placed_nodes, edges=tuple(placed_edges),
-        width=width, height=height,
+        graph=graph,
+        nodes=placed_nodes,
+        edges=tuple(placed_edges),
+        width=width,
+        height=height,
     )
 
 
@@ -394,35 +417,49 @@ def _label_box(edge: DiagramEdge, centre_x: float, centre_y: float) -> LabelBox:
 
 def _slide_label(
     edge: DiagramEdge,
-    x1: float, y1: float, x2: float, y2: float,
-    ux: float, uy: float,
+    x1: float,
+    y1: float,
+    x2: float,
+    y2: float,
+    ux: float,
+    uy: float,
     obstacles: list[LabelBox],
 ) -> LabelBox:
     """Place the label near the edge midpoint, offset perpendicular; slide it
     along the edge (alternating around the midpoint) until it clears all
-    obstacle boxes. Falls back to the least-overlapping candidate."""
+    obstacle boxes. A short edge between two crowded nodes can leave every
+    in-line slide position clipping one of its own endpoints' boxes (the
+    perpendicular offset is much smaller than a node's radius), so the
+    search retries the same slide fractions at a larger perpendicular
+    offset -- still within LABEL_OFFSET + LABEL_H, the "stays near its edge"
+    bound other code relies on -- and on the opposite side of the line too
+    (the crowded node is often on just one side; the fixed offset direction
+    used by a single-sided search can point straight at it) before falling
+    back to the least-overlapping candidate seen across every combination."""
     best: LabelBox | None = None
     best_overlap = math.inf
-    for attempt in range(13):
-        step = (attempt + 1) // 2 * 0.08
-        fraction = 0.5 + (step if attempt % 2 == 1 else -step)
-        centre_x = x1 + (x2 - x1) * fraction - uy * LABEL_OFFSET
-        centre_y = y1 + (y2 - y1) * fraction + ux * LABEL_OFFSET
-        candidate = _label_box(edge, centre_x, centre_y)
-        overlap = sum(_overlap_area(candidate, box) for box in obstacles)
-        if overlap == 0.0:
-            return candidate
-        if overlap < best_overlap:
-            best, best_overlap = candidate, overlap
+    for side in (1.0, -1.0):
+        for offset in (LABEL_OFFSET, LABEL_OFFSET + LABEL_H - 1.0):
+            for attempt in range(13):
+                step = (attempt + 1) // 2 * 0.08
+                fraction = 0.5 + (step if attempt % 2 == 1 else -step)
+                centre_x = x1 + (x2 - x1) * fraction - uy * offset * side
+                centre_y = y1 + (y2 - y1) * fraction + ux * offset * side
+                candidate = _label_box(edge, centre_x, centre_y)
+                overlap = sum(_overlap_area(candidate, box) for box in obstacles)
+                if overlap == 0.0:
+                    return candidate
+                if overlap < best_overlap:
+                    best, best_overlap = candidate, overlap
     assert best is not None
     return best
 
 
 def _overlap_area(box_a: LabelBox, box_b: LabelBox) -> float:
-    overlap_w = (
-        min(box_a.x + box_a.width, box_b.x + box_b.width) - max(box_a.x, box_b.x)
+    overlap_w = min(box_a.x + box_a.width, box_b.x + box_b.width) - max(
+        box_a.x, box_b.x
     )
-    overlap_h = (
-        min(box_a.y + box_a.height, box_b.y + box_b.height) - max(box_a.y, box_b.y)
+    overlap_h = min(box_a.y + box_a.height, box_b.y + box_b.height) - max(
+        box_a.y, box_b.y
     )
     return max(overlap_w, 0.0) * max(overlap_h, 0.0)

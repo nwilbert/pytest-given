@@ -18,8 +18,14 @@ main { flex: 1; padding: 14px 18px; overflow-x: auto; }
 .replay button:disabled { opacity: .4; cursor: default; }
 .replay button:focus-visible { outline: 2px solid #e07a2f; }
 .empty-note { color: #6b6b7a; font-style: italic; }
+.no-stories { padding: 48px 24px; text-align: center; color: #6b6b7a; }
+.no-stories p { margin: 4px 0; }
+.no-stories-hint { font-size: 13px; }
+.no-stories-hint code { background: #efeee8; border-radius: 4px; padding: 1px 5px; }
+.hit-area { fill: none; pointer-events: all; }
 .glyph { fill: none; stroke: #1a1a2e; stroke-width: 2.2; }
 .doc { fill: #fff; }
+.edge-hit { stroke: transparent; stroke-width: 12; fill: none; pointer-events: stroke; }
 .edge { stroke: #5b5b6e; stroke-width: 1.6; fill: none; }
 .edge.connective { stroke-dasharray: none; stroke: #8a8a98; }
 .arrowhead { fill: #5b5b6e; }
