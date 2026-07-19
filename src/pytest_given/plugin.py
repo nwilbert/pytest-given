@@ -5,6 +5,7 @@ import dataclasses
 import functools
 import inspect
 import json
+import os
 import time
 from collections.abc import Callable, Generator
 from datetime import UTC, datetime
@@ -718,13 +719,24 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         json_path.parent.mkdir(parents=True, exist_ok=True)
         json_path.write_text(json.dumps(report_dict, indent=2), encoding='utf-8')
 
+    diagrams_opt = session.config.getoption('given_diagrams')
+
     html_opt = session.config.getoption('given_html')
     if html_opt is not None:
         raw_link = session.config.getoption(
             'given_source_link'
         ) or session.config.getini('given_source_link')
         template = resolve_template(raw_link)
-        render_html(report, Path(html_opt), source_link_template=template)
+        diagrams_href = None
+        if diagrams_opt is not None:
+            relative = os.path.relpath(Path(diagrams_opt), Path(html_opt).parent)
+            diagrams_href = Path(relative).as_posix()
+        render_html(
+            report,
+            Path(html_opt),
+            source_link_template=template,
+            diagrams_href=diagrams_href,
+        )
 
     md_opt = session.config.getoption('given_md')
     if md_opt is not None:
@@ -736,7 +748,6 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             md_path.parent.mkdir(parents=True, exist_ok=True)
             md_path.write_text(md, encoding='utf-8')
 
-    diagrams_opt = session.config.getoption('given_diagrams')
     if diagrams_opt is not None:
         render_diagrams(report, Path(diagrams_opt))
 

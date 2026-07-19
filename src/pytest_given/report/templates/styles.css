@@ -747,6 +747,8 @@ span.param-highlight {
 }
 .story-sidebar-title { font-weight: 600; font-size: var(--font-size-md); }
 .story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
+.story-diagram-link { font-size: var(--font-size-sm); color: var(--text-muted); text-decoration: none; }
+.story-diagram-link:hover { color: var(--color-accent); text-decoration: underline; }
 
 /* === Activity timeline === */
 .activity-timeline { display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-xl); }

@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -69,7 +70,16 @@ def run_report(args: argparse.Namespace) -> int:
     else:
         template = resolve_template(args.source_link)
         output = args.output or Path('given-report/report.html')
-        render_html(report, output, source_link_template=template)
+        diagrams_href = None
+        if args.diagrams is not None:
+            relative = os.path.relpath(args.diagrams, output.parent)
+            diagrams_href = Path(relative).as_posix()
+        render_html(
+            report,
+            output,
+            source_link_template=template,
+            diagrams_href=diagrams_href,
+        )
         print(f'Report generated: {output}')
 
     if args.diagrams is not None:

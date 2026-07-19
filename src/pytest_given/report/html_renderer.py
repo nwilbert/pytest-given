@@ -55,11 +55,17 @@ def render_html(
     report: ReportData,
     html_path: Path,
     source_link_template: str | None = None,
+    *,
+    diagrams_href: str | None = None,
 ) -> None:
     """Render a report model to a self-contained HTML file.
 
     `source_link_template` is the already-resolved template string (preset
     expansion happens before this point). None disables source linking.
+
+    `diagrams_href` is a POSIX-style relative path from `html_path`'s
+    directory to the diagrams HTML file; None hides the per-story diagram
+    links (e.g. when `--given-diagrams` wasn't requested for this run).
     """
     raw_json = json.dumps(report_to_dict(report), indent=2)
     # JSON doesn't escape `</` inside string literals, but we embed `raw_json`
@@ -135,6 +141,7 @@ def render_html(
         alpine_js=Markup(alpine_js),
         param_color_map=param_color_map,
         num_param_colors=_NUM_PARAM_COLORS,
+        diagrams_href=diagrams_href,
     )
     html_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.write_text(html, encoding='utf-8')

@@ -1676,3 +1676,40 @@ def test_render_html_accepts_report_data(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report, html_path)
     assert 'from-model' in html_path.read_text(encoding='utf-8')
+
+
+# ---------------------------------------------------------------------------
+# Task 6 — report -> diagram link
+# ---------------------------------------------------------------------------
+
+
+def test_diagram_link_present_only_with_href(tmp_path: Path) -> None:
+    """Each story in the stories view links to the diagrams artifact when
+    diagrams_href is given; omitting it hides the link entirely."""
+    report = report_from_dict(
+        {
+            'metadata': {
+                'project': 'p',
+                'timestamp': 't',
+                'pytest_version': '9',
+                'plugin_version': '0.1',
+            },
+            'stories': [
+                {
+                    'id': 'book-a-room',
+                    'title': 'Book a Room',
+                    'activities': [],
+                }
+            ],
+            'scenarios': [],
+        }
+    )
+    html_path = tmp_path / 'report.html'
+    story_id = report.stories[0].id
+
+    render_html(report, html_path, diagrams_href='diagrams.html')
+    content = html_path.read_text(encoding='utf-8')
+    assert f'diagrams.html#{story_id}' in content
+
+    render_html(report, html_path)
+    assert 'diagrams.html#' not in html_path.read_text(encoding='utf-8')

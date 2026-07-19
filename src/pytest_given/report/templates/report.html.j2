@@ -319,6 +319,9 @@
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
             <div class="header-title">{{ story.title }}{{ anchor_link('view=stories&story=' ~ story.id) }}</div>
+            {% if diagrams_href %}
+            <a class="story-diagram-link" href="{{ diagrams_href }}#{{ story.id }}">diagram ↗</a>
+            {% endif %}
             <div class="header-context">{{ story.activities | length }} activities · {{ total_scns }} scenario{{ 's' if total_scns != 1 else '' }}</div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
                     @click="clearActivityHighlights()">Deselect</button>
