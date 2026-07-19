@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 from ..model import report_from_dict
+from .diagram import render_diagrams
 from .html_renderer import render_html
 from .md_renderer import render_md
 from .source_link import resolve_template
@@ -37,6 +38,17 @@ def add_report_parser(
         default=None,
         help='Output format. Inferred from -o extension when omitted (default: html).',
     )
+    report_parser.add_argument(
+        '--diagrams',
+        type=Path,
+        nargs='?',
+        const=Path('given-report/diagrams.html'),
+        default=None,
+        help=(
+            'Also write the story diagrams HTML. Bare uses the default path; '
+            'a value overrides.'
+        ),
+    )
 
 
 def run_report(args: argparse.Namespace) -> int:
@@ -59,6 +71,10 @@ def run_report(args: argparse.Namespace) -> int:
         output = args.output or Path('given-report/report.html')
         render_html(report, output, source_link_template=template)
         print(f'Report generated: {output}')
+
+    if args.diagrams is not None:
+        render_diagrams(report, args.diagrams)
+        print(f'Diagrams generated: {args.diagrams}')
     return 0
 
 

@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from pytest_given.cli import main
 
 
@@ -176,3 +178,31 @@ def test_cli_md_creates_missing_parent_dirs(tmp_path) -> None:
     rc = main(['report', str(json_path), '--format', 'md', '-o', str(out)])
     assert rc == 0
     assert out.read_text(encoding='utf-8').startswith('# pytest-given — cli')
+
+
+def test_cli_diagrams_generates_artifact(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(
+        """
+        from pytest_given import Glossary, activity, given, scenario, story
+
+        g = Glossary()
+        barista = g.actor('Barista')
+        brew = g.verb('brew')
+        coffee = g.work_object('Coffee')
+
+        serve_coffee = story('Serve Coffee', [activity(barista, brew('brews'), coffee)])
+
+        @scenario('Barista brews', story=serve_coffee)
+        def test_brew():
+            with given('a bean'):
+                pass
+        """
+    )
+    json_path = pytester.path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    diagrams_path = pytester.path / 'out' / 'diagrams.html'
+    rc = main(['report', str(json_path), '--diagrams', str(diagrams_path)])
+    assert rc == 0
+    assert diagrams_path.exists()
+    assert 'Serve Coffee' in diagrams_path.read_text(encoding='utf-8')

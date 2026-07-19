@@ -1867,3 +1867,28 @@ def test_given_json_alone_writes_json(pytester: pytest.Pytester) -> None:
     json_path = pytester.path / 'r.json'
     pytester.runpytest(f'--given-json={json_path}')
     assert json_path.exists()
+
+
+def test_given_diagrams_writes_artifact(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(
+        """
+        from pytest_given import Glossary, activity, given, scenario, story
+
+        g = Glossary()
+        barista = g.actor('Barista')
+        brew = g.verb('brew')
+        coffee = g.work_object('Coffee')
+
+        serve_coffee = story('Serve Coffee', [activity(barista, brew('brews'), coffee)])
+
+        @scenario('Barista brews', story=serve_coffee)
+        def test_brew():
+            with given('a bean'):
+                pass
+        """
+    )
+    result = pytester.runpytest('--given-diagrams=out/diagrams.html')
+    result.assert_outcomes(passed=1)
+    html = (pytester.path / 'out' / 'diagrams.html').read_text(encoding='utf-8')
+    assert 'serve-coffee' in html
+    assert 'Serve Coffee' in html

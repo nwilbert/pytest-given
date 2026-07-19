@@ -76,7 +76,13 @@ from .model import (
     report_from_dict,
     report_to_dict,
 )
-from .report import detect_commit_sha, render_html, render_md, resolve_template
+from .report import (
+    detect_commit_sha,
+    render_diagrams,
+    render_html,
+    render_md,
+    resolve_template,
+)
 
 _collector_key: pytest.StashKey[Collector] = pytest.StashKey()
 
@@ -134,6 +140,16 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         help=(
             'Write the Markdown report. Bare renders to stdout (fenced); '
             '=PATH writes a file. Off when absent.'
+        ),
+    )
+    group.addoption(
+        '--given-diagrams',
+        nargs='?',
+        const='given-report/diagrams.html',
+        default=None,
+        help=(
+            'Write the story diagrams HTML (Domain Storytelling view). Bare '
+            'uses the default path; =PATH overrides. Off when absent.'
         ),
     )
     group.addoption(
@@ -719,6 +735,10 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             md_path = Path(md_opt)
             md_path.parent.mkdir(parents=True, exist_ok=True)
             md_path.write_text(md, encoding='utf-8')
+
+    diagrams_opt = session.config.getoption('given_diagrams')
+    if diagrams_opt is not None:
+        render_diagrams(report, Path(diagrams_opt))
 
     _run_lint(session, scenarios, collector.scenarios, glossary, stories)
 
