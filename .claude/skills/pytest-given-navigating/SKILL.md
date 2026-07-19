@@ -11,7 +11,7 @@ The test suite narrates itself: rendered scenarios are a behavioural spec, the g
 
 1. **Glossary first.** Read `GLOSSARY.md` (or the `Glossary()` / `FileGlossary` declaration reachable from a `conftest.py`): the domain vocabulary, with definitions.
 2. **Render the spec.** `pytest <selection> --given-md` runs the selected tests and prints a Markdown spec of every scenario to stdout between `<!-- pytest-given:md:start -->` / `:end` fences — narration with `«term»` markers, tags after each node id, ✓/✗ status. Select with pytest's own args (`-k`, node ids, `--lf`); the renderer narrates whatever ran.
-3. **Stories.** Read the `story(...)` definitions — actor-level flows the scenarios implement; `story=` on a `@scenario` links them.
+3. **Stories.** Read the `story(...)` definitions — actor-level flows the scenarios implement; `story=` on a `@scenario` links them. `pytest --given-diagrams` renders every story as a Domain Storytelling diagram — actors and work objects as icons, verbs as numbered arrows, with step-through replay — a faster way to see a flow than reading `activity(...)` calls one by one.
 
 ## Structured questions — JSON + jq
 
@@ -30,8 +30,8 @@ jq -r '.scenarios[] | select(.tags | index("validation"))
 ## Traps
 
 - **Scenario tags are report metadata, not pytest marks.** `pytest -m <tag>` selects nothing — that is expected, not a broken suite. Filter tags via the JSON report or read them in the Markdown output.
-- **Put a bare `--given-md` / `--given-json` last on the command line** (or use the `=PATH` form): a path-like token right after the bare flag is parsed as its output path, silently changing what runs.
-- **The Markdown report contains scenarios only.** Glossary and stories render in the HTML report (`--given-html`) and live in the JSON (`.glossary.terms[]`, `.stories[]`).
+- **Put a bare `--given-md` / `--given-json` / `--given-diagrams` last on the command line** (or use the `=PATH` form): a path-like token right after the bare flag is parsed as its output path, silently changing what runs.
+- **The Markdown report contains scenarios only.** Glossary and stories render in the HTML report (`--given-html`) and live in the JSON (`.glossary.terms[]`, `.stories[]`); the story diagrams (`--given-diagrams`) render into their own separate HTML file.
 - A ✗ scenario in the Markdown shows the steps that ran, not the traceback — read `.error` in the JSON or rerun that node id with plain pytest.
 - Re-render a saved run without rerunning tests: `pytest-given report <data.json> --format md`.
 

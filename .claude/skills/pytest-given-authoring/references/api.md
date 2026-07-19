@@ -9,7 +9,7 @@ from pytest_given import (
 )
 ```
 
-This is the authoring-relevant surface, version-matched to the installed package. Installation, report flags (`--given-html` / `--given-json` / `--given-md`), source-link presets, and lint configuration (`given_lint_rules`, `given_lint_ignore`) are setup concerns — see the project README.
+This is the authoring-relevant surface, version-matched to the installed package. Installation, report flags (`--given-html` / `--given-json` / `--given-md` / `--given-diagrams`), source-link presets, and lint configuration (`given_lint_rules`, `given_lint_ignore`) are setup concerns — see the project README.
 
 ## Core
 

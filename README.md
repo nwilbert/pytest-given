@@ -315,11 +315,23 @@ All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-
 | `--given-json[=PATH]` | off | Write JSON report data (bare → `given-report/report-data.json`). |
 | `--given-html[=PATH]` | off | Write the HTML report (bare → `given-report/report.html`). |
 | `--given-md[=PATH]` | off | Write the Markdown report; **bare renders to stdout** (fenced). |
+| `--given-diagrams[=PATH]` | off | Write the story diagrams HTML (bare → `given-report/diagrams.html`). See [Story diagrams](#story-diagrams). |
 | `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. See [Source links](#source-links). |
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
 | `--given-lint=BOOL` | `false` | Run the narration lint (`true` \| `false`); an error-level finding fails the run. See [Narration lint](#narration-lint). |
 
-Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection.
+Put a bare `--given-json` / `--given-html` / `--given-md` / `--given-diagrams` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection.
+
+### Story diagrams
+
+`--given-diagrams[=PATH]` writes a separate self-contained HTML file (default
+`given-report/diagrams.html`) rendering every story in Domain Storytelling
+notation — actors and work objects as icons, verbs as numbered arrows — with a
+story switcher, step-through replay, and glossary tooltips. When the HTML
+report is generated in the same run, its Stories view links each story to its
+diagram. `pytest-given report data.json --diagrams` re-renders diagrams from
+saved JSON; `--diagrams` is additive on top of the report's normal HTML or
+Markdown output, not a replacement for it.
 
 ## Narration lint
 
@@ -427,6 +439,8 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
 `--source-link` accepts the same presets and raw templates as `--given-source-link` (see [Source links](#source-links)). Omit it (or pass `--source-link=none`) to render plain file:line text without an anchor.
 
 Pass `--format md` to render Markdown instead of HTML; the format is also inferred from the `-o` extension, so `-o report.md` renders Markdown without needing `--format` explicitly. Omit `-o` with `--format md` to print to stdout.
+
+Add `--diagrams[=PATH]` to also render the [story diagrams](#story-diagrams) HTML (bare → `given-report/diagrams.html`) — it composes with the HTML or Markdown output above rather than replacing it.
 
 Install the bundled [agent skills](#agent-skills) into a project:
 
