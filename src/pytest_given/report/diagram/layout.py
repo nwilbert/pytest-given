@@ -20,6 +20,8 @@ BAND_ROW_SPACING = 230.0  # must stay > MIN_NODE_DIST
 IDEAL_EDGE = 265.0
 MIN_NODE_DIST = 215.0
 ITERATIONS = 140
+SEPARATION_ROUNDS = 60
+SEPARATION_RING_CANDIDATES = 24
 
 NODE_HALF_W = 62.0
 NODE_HALF_H = 58.0
@@ -28,7 +30,7 @@ TRIM_TARGET = 60.0
 LABEL_CHAR_W = 7.0
 LABEL_H = 20.0
 BADGE_W = 30.0
-LABEL_OFFSET = 120.0
+LABEL_OFFSET = 18.0
 LOOP_RADIUS = 46.0
 
 
@@ -77,6 +79,7 @@ def position_nodes(
     _place_band(positions, recipients, width - BAND_X_RIGHT_INSET, height)
     _seed_work_objects(graph, positions, width, height)
     _relax(graph, positions, width, height)
+    _separate(graph, positions, width, height)
     return positions, width, height
 
 
@@ -210,6 +213,111 @@ def _relax(
             )
 
 
+def _separate(
+    graph: DiagramGraph,
+    positions: dict[str, tuple[float, float]],
+    width: float,
+    height: float,
+) -> None:
+    """Deterministic post-relaxation pass enforcing pairwise MIN_NODE_DIST.
+
+    Spring/repulsion equilibria can leave pairs closer than MIN_NODE_DIST in
+    ways a naive "push straight along the connecting line" cannot resolve on
+    its own: a work node pulled toward two actors that happen to share an
+    axis settles on a symmetric saddle point equidistant from both (pushing
+    away from either one pushes it toward the other); and a satellite work
+    node seeded near a canvas corner can find its only "away from the
+    anchor" direction runs straight into the margin, so it presses into the
+    corner every round without ever gaining distance.
+
+    Each round first computes, in graph.nodes order, the axis-aligned
+    full-deficit correction for every violating pair -- split evenly
+    between two movable work nodes, applied wholly to the movable side
+    against a pinned actor. For each movable node still in violation, that
+    direct correction is then compared against SEPARATION_RING_CANDIDATES
+    points spaced evenly around a circle of radius MIN_NODE_DIST centred on
+    the mean position of its conflicting neighbours; whichever candidate
+    leaves the smallest total remaining violation (summed squared deficit
+    against every other node) is kept. The ring lets a node walk around a
+    pinned anchor instead of stalling against a corner. Runs up to
+    SEPARATION_ROUNDS rounds, stopping as soon as a round finds no
+    violation.
+    """
+    movable = {n.id for n in graph.nodes if n.glyph == 'work'}
+    node_ids = [n.id for n in graph.nodes]
+
+    def remaining_violation(candidate: tuple[float, float], excluded_id: str) -> float:
+        total = 0.0
+        for other_id in node_ids:
+            if other_id == excluded_id:
+                continue
+            other_x, other_y = positions[other_id]
+            dist = math.hypot(candidate[0] - other_x, candidate[1] - other_y)
+            if dist < MIN_NODE_DIST:
+                total += (MIN_NODE_DIST - dist) ** 2
+        return total
+
+    for _ in range(SEPARATION_ROUNDS):
+        push: dict[str, list[float]] = {node_id: [0.0, 0.0] for node_id in node_ids}
+        conflicts: dict[str, list[tuple[float, float]]] = {}
+        any_violation = False
+        for index, id_a in enumerate(node_ids):
+            for id_b in node_ids[index + 1 :]:
+                a_movable = id_a in movable
+                b_movable = id_b in movable
+                if not a_movable and not b_movable:
+                    continue
+                dx = positions[id_b][0] - positions[id_a][0]
+                dy = positions[id_b][1] - positions[id_a][1]
+                dist = math.hypot(dx, dy) or 1.0
+                if dist >= MIN_NODE_DIST:
+                    continue
+                any_violation = True
+                deficit = MIN_NODE_DIST - dist
+                ux, uy = dx / dist, dy / dist
+                share = deficit / 2 if (a_movable and b_movable) else deficit
+                if a_movable:
+                    push[id_a][0] -= ux * share
+                    push[id_a][1] -= uy * share
+                    conflicts.setdefault(id_a, []).append(positions[id_b])
+                if b_movable:
+                    push[id_b][0] += ux * share
+                    push[id_b][1] += uy * share
+                    conflicts.setdefault(id_b, []).append(positions[id_a])
+        if not any_violation:
+            break
+        for node_id in node_ids:
+            neighbours = conflicts.get(node_id)
+            if neighbours is None:
+                continue
+            old_x, old_y = positions[node_id]
+            push_x, push_y = push[node_id]
+            best = (
+                min(max(old_x + push_x, MARGIN), width - MARGIN),
+                min(max(old_y + push_y, MARGIN), height - MARGIN),
+            )
+            best_score = remaining_violation(best, node_id)
+            centre_x = sum(point[0] for point in neighbours) / len(neighbours)
+            centre_y = sum(point[1] for point in neighbours) / len(neighbours)
+            for ring_index in range(SEPARATION_RING_CANDIDATES):
+                angle = 2 * math.pi * ring_index / SEPARATION_RING_CANDIDATES
+                candidate = (
+                    min(
+                        max(centre_x + MIN_NODE_DIST * math.cos(angle), MARGIN),
+                        width - MARGIN,
+                    ),
+                    min(
+                        max(centre_y + MIN_NODE_DIST * math.sin(angle), MARGIN),
+                        height - MARGIN,
+                    ),
+                )
+                score = remaining_violation(candidate, node_id)
+                if score < best_score:
+                    best_score = score
+                    best = candidate
+            positions[node_id] = best
+
+
 def layout_graph(graph: DiagramGraph) -> DiagramLayout:
     positions, width, height = position_nodes(graph)
     placed_nodes = tuple(
@@ -238,21 +346,24 @@ def layout_graph(graph: DiagramGraph) -> DiagramLayout:
                 )
             )
             continue
-        # Obstacles: other nodes (not source/target) and previously placed labels
-        obstacles = [
-            box for node_id, box in node_boxes_by_id.items()
-            if node_id != edge.source and node_id != edge.target
-        ]
+        # Obstacles: all node boxes (including this edge's own source/target
+        # -- a label sliding along a short edge can still collide with the
+        # boxes it connects) and previously placed labels.
+        obstacles = list(node_boxes_by_id.values())
         obstacles.extend(e.label for e in placed_edges)
 
         dx, dy = target_x - source_x, target_y - source_y
-        dist = math.hypot(dx, dy) or 1.0
+        dist = math.hypot(dx, dy)
+        # Distinct connected nodes should never coincide once _separate has
+        # run; a zero distance here means two placed nodes with an edge
+        # between them landed on the same point, which is a layout bug.
+        assert dist > 0.0, f'coincident nodes {edge.source!r} and {edge.target!r}'
         ux, uy = dx / dist, dy / dist
         # Ensure trimmed edge is at least 40.0: scale down trims if needed
         # Use 40.1 to account for floating-point precision
         total_desired_trim = TRIM_SOURCE + TRIM_TARGET
         total_available_trim = max(0.0, dist - 40.1)
-        scale = min(1.0, total_available_trim / total_desired_trim)
+        scale = max(0.0, min(1.0, total_available_trim / total_desired_trim))
         trim_source = TRIM_SOURCE * scale
         trim_target = TRIM_TARGET * scale
         x1, y1 = source_x + ux * trim_source, source_y + uy * trim_source
@@ -292,8 +403,8 @@ def _slide_label(
     obstacle boxes. Falls back to the least-overlapping candidate."""
     best: LabelBox | None = None
     best_overlap = math.inf
-    for attempt in range(51):
-        step = (attempt + 1) // 2 * 0.02
+    for attempt in range(13):
+        step = (attempt + 1) // 2 * 0.08
         fraction = 0.5 + (step if attempt % 2 == 1 else -step)
         centre_x = x1 + (x2 - x1) * fraction - uy * LABEL_OFFSET
         centre_y = y1 + (y2 - y1) * fraction + ux * LABEL_OFFSET

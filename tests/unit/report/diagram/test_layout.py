@@ -18,6 +18,8 @@ from pytest_given.report.diagram import (
 from pytest_given.report.diagram.layout import (
     BAND_X_LEFT,
     BAND_X_RIGHT_INSET,
+    LABEL_H,
+    LABEL_OFFSET,
     MARGIN,
     MIN_NODE_DIST,
     NODE_HALF_H,
@@ -68,9 +70,13 @@ def test_minimum_pairwise_distance(
     coords = list(positions.values())
     for index, (first_x, first_y) in enumerate(coords):
         for second_x, second_y in coords[index + 1 :]:
-            # Looser floor than MIN_NODE_DIST: clamping at the margins may
-            # legitimately compress below the relaxation target.
-            assert math.hypot(second_x - first_x, second_y - first_y) >= 100.0
+            # The post-relaxation separation pass guarantees MIN_NODE_DIST
+            # for every pair (a tiny floating-point epsilon covers the ring
+            # search's trig rounding, not a loosened invariant).
+            assert (
+                math.hypot(second_x - first_x, second_y - first_y)
+                >= MIN_NODE_DIST - 1e-6
+            )
 
 
 def _actor(node_id: str) -> DiagramNode:
@@ -152,6 +158,20 @@ def _boxes_overlap(a: LabelBox, b: LabelBox) -> bool:
     )
 
 
+def _perpendicular_distance(
+    point_x: float, point_y: float, x1: float, y1: float, x2: float, y2: float
+) -> float:
+    """Distance from a point to the infinite line through (x1, y1) and
+    (x2, y2). Trimming an edge only moves its endpoints along the same
+    line, so the trimmed segment's line is also the untrimmed edge's line."""
+    import math
+
+    dx, dy = x2 - x1, y2 - y1
+    length = math.hypot(dx, dy)
+    assert length > 0.0, 'coincident edge endpoints have no defined line'
+    return abs((point_x - x1) * dy - (point_y - y1) * dx) / length
+
+
 def test_layout_graph_deterministic(
     trip_story: Story, trip_glossary: Glossary
 ) -> None:
@@ -187,6 +207,25 @@ def test_trimmed_endpoints_leave_visible_edges(
     for placed in layout.edges:
         if not placed.loop:
             assert math.hypot(placed.x2 - placed.x1, placed.y2 - placed.y1) >= 40.0
+
+
+def test_labels_sit_near_their_edges(
+    trip_story: Story, trip_glossary: Glossary
+) -> None:
+    """Regression test for the 120px brute-force LABEL_OFFSET: a label must
+    sit close to the edge it names, not off in space avoiding collisions at
+    any cost."""
+    graph = build_graph(trip_story, trip_glossary)
+    layout = layout_graph(graph)
+    for placed in layout.edges:
+        if placed.loop:
+            continue
+        centre_x = placed.label.x + placed.label.width / 2
+        centre_y = placed.label.y + placed.label.height / 2
+        distance = _perpendicular_distance(
+            centre_x, centre_y, placed.x1, placed.y1, placed.x2, placed.y2
+        )
+        assert distance <= LABEL_OFFSET + LABEL_H
 
 
 def test_self_loop_marked_and_label_above_node(trip_glossary: Glossary) -> None:
