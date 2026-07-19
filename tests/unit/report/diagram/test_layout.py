@@ -25,6 +25,7 @@ from pytest_given.report.diagram.layout import (
     NODE_HALF_H,
     NODE_HALF_W,
     LabelBox,
+    _slide_label,
     position_nodes,
 )
 
@@ -60,9 +61,7 @@ def test_all_nodes_inside_canvas(trip_story: Story, trip_glossary: Glossary) -> 
         assert MARGIN <= y_pos <= height - MARGIN
 
 
-def test_minimum_pairwise_distance(
-    trip_story: Story, trip_glossary: Glossary
-) -> None:
+def test_minimum_pairwise_distance(trip_story: Story, trip_glossary: Glossary) -> None:
     import math
 
     graph = build_graph(trip_story, trip_glossary)
@@ -93,8 +92,12 @@ def _work(node_id: str) -> DiagramNode:
 
 def _edge(source: str, target: str, number: int | None = 1) -> DiagramEdge:
     return DiagramEdge(
-        source=source, target=target, label='does',
-        activity_id=ActivityId(number or 1), number=number, connective=False,
+        source=source,
+        target=target,
+        label='does',
+        activity_id=ActivityId(number or 1),
+        number=number,
+        connective=False,
     )
 
 
@@ -106,8 +109,7 @@ def test_three_initiators_keep_min_distance_and_canvas_grows() -> None:
         + [_work(f'work:{index}') for index in range(3)]
     )
     edges = tuple(
-        _edge(f'actor:{index}', f'work:{index}', number=index + 1)
-        for index in range(3)
+        _edge(f'actor:{index}', f'work:{index}', number=index + 1) for index in range(3)
     )
     graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
     positions, _width, height = position_nodes(graph)
@@ -153,8 +155,10 @@ def test_self_loop_exerts_no_force_and_stays_deterministic() -> None:
 
 def _boxes_overlap(a: LabelBox, b: LabelBox) -> bool:
     return not (
-        a.x + a.width <= b.x or b.x + b.width <= a.x
-        or a.y + a.height <= b.y or b.y + b.height <= a.y
+        a.x + a.width <= b.x
+        or b.x + b.width <= a.x
+        or a.y + a.height <= b.y
+        or b.y + b.height <= a.y
     )
 
 
@@ -172,9 +176,7 @@ def _perpendicular_distance(
     return abs((point_x - x1) * dy - (point_y - y1) * dx) / length
 
 
-def test_layout_graph_deterministic(
-    trip_story: Story, trip_glossary: Glossary
-) -> None:
+def test_layout_graph_deterministic(trip_story: Story, trip_glossary: Glossary) -> None:
     graph = build_graph(trip_story, trip_glossary)
     assert layout_graph(graph) == layout_graph(graph)
 
@@ -185,8 +187,12 @@ def test_labels_do_not_overlap_labels_or_nodes(
     graph = build_graph(trip_story, trip_glossary)
     layout = layout_graph(graph)
     node_boxes = [
-        LabelBox(x=p.x - NODE_HALF_W, y=p.y - NODE_HALF_H,
-                 width=2 * NODE_HALF_W, height=2 * NODE_HALF_H)
+        LabelBox(
+            x=p.x - NODE_HALF_W,
+            y=p.y - NODE_HALF_H,
+            width=2 * NODE_HALF_W,
+            height=2 * NODE_HALF_H,
+        )
         for p in layout.nodes
     ]
     label_boxes = [e.label for e in layout.edges]
@@ -233,14 +239,21 @@ def test_self_loop_marked_and_label_above_node(trip_glossary: Glossary) -> None:
         return ActivityTermRef(term_id=TermId(term_id), display=display)
 
     story = Story(
-        id=StoryId('loop'), title='Loop',
+        id=StoryId('loop'),
+        title='Loop',
         activities=(
-            Activity(id=ActivityId(1), paths=(
-                ActivityPath(parts=(
-                    term_ref('organizer', 'Carol'), term_ref('add', 'checks'),
-                    term_ref('organizer', 'Carol'),
-                )),
-            )),
+            Activity(
+                id=ActivityId(1),
+                paths=(
+                    ActivityPath(
+                        parts=(
+                            term_ref('organizer', 'Carol'),
+                            term_ref('add', 'checks'),
+                            term_ref('organizer', 'Carol'),
+                        )
+                    ),
+                ),
+            ),
         ),
     )
     graph = build_graph(story, trip_glossary)
@@ -250,3 +263,26 @@ def test_self_loop_marked_and_label_above_node(trip_glossary: Glossary) -> None:
     node = layout.nodes[0]
     assert placed.loop is True
     assert placed.label.y + placed.label.height <= node.y - NODE_HALF_H
+
+
+def test_isolated_work_object_seeds_at_canvas_centre() -> None:
+    """A work node with no placed neighbour (no edges at all) falls back to
+    the canvas centre in `_seed_work_objects`, rather than crashing on an
+    empty mean over `placed_ids`."""
+    graph = DiagramGraph(
+        story_id=StoryId('s'), title='S', nodes=(_work('work:solo'),), edges=()
+    )
+    positions, width, height = position_nodes(graph)
+    assert positions['work:solo'] == (width / 2, height / 2)
+
+
+def test_slide_label_falls_back_to_least_overlapping_candidate() -> None:
+    """When every slide/offset/side combination still overlaps an obstacle
+    (here, one the size of the whole canvas), `_slide_label` must fall back
+    to the best candidate seen rather than returning None."""
+    edge = _edge('a', 'b')
+    unavoidable_obstacle = LabelBox(
+        x=-1_000_000.0, y=-1_000_000.0, width=2_000_000.0, height=2_000_000.0
+    )
+    label = _slide_label(edge, 0.0, 0.0, 100.0, 0.0, 1.0, 0.0, [unavoidable_obstacle])
+    assert isinstance(label, LabelBox)

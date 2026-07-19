@@ -1892,3 +1892,34 @@ def test_given_diagrams_writes_artifact(pytester: pytest.Pytester) -> None:
     html = (pytester.path / 'out' / 'diagrams.html').read_text(encoding='utf-8')
     assert 'serve-coffee' in html
     assert 'Serve Coffee' in html
+
+
+def test_given_html_and_diagrams_links_with_relative_path(
+    pytester: pytest.Pytester,
+) -> None:
+    """When both --given-html and --given-diagrams are set, the report links
+    to the diagrams artifact using a path relative to the html file's own
+    directory, even when the two artifacts live in different directories."""
+    pytester.makepyfile(
+        """
+        from pytest_given import Glossary, activity, given, scenario, story
+
+        g = Glossary()
+        barista = g.actor('Barista')
+        brew = g.verb('brew')
+        coffee = g.work_object('Coffee')
+
+        serve_coffee = story('Serve Coffee', [activity(barista, brew('brews'), coffee)])
+
+        @scenario('Barista brews', story=serve_coffee)
+        def test_brew():
+            with given('a bean'):
+                pass
+        """
+    )
+    result = pytester.runpytest(
+        '--given-html=report/out.html', '--given-diagrams=artifacts/diagrams.html'
+    )
+    result.assert_outcomes(passed=1)
+    html = (pytester.path / 'report' / 'out.html').read_text(encoding='utf-8')
+    assert '../artifacts/diagrams.html#serve-coffee' in html
