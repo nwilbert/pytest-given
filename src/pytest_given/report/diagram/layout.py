@@ -15,6 +15,7 @@ from .graph import DiagramGraph
 MARGIN = 90.0
 BAND_X_LEFT = 150.0
 BAND_X_RIGHT_INSET = 170.0  # right band sits at width - this
+BAND_ROW_SPACING = 230.0  # must stay > MIN_NODE_DIST
 IDEAL_EDGE = 265.0
 MIN_NODE_DIST = 215.0
 ITERATIONS = 140
@@ -58,7 +59,7 @@ def _canvas_size(
     initiator_count: int, recipient_count: int, node_count: int
 ) -> tuple[float, float]:
     rows = max(initiator_count, recipient_count, 1)
-    height = max(620.0, 2 * MARGIN + 205.0 * rows)
+    height = max(620.0, 2 * (MARGIN + 110.0) + BAND_ROW_SPACING * (rows - 1))
     width = max(1080.0, 640.0 + 55.0 * node_count)
     return width, height
 
@@ -76,6 +77,7 @@ def _place_band(
         return
     top = MARGIN + 110.0
     step = (height - 2 * (MARGIN + 110.0)) / (len(band) - 1)
+    assert len(band) == 1 or step >= MIN_NODE_DIST
     for index, node_id in enumerate(band):
         positions[node_id] = (band_x, top + index * step)
 
