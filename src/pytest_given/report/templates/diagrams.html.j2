@@ -1,0 +1,169 @@
+{%- macro node_icon(placed) %}
+<g transform="translate({{ placed.x | round }},{{ placed.y | round }})"
+   @mouseenter='showTip($event, {{ placed.node.label | tojson }}, {{ (placed.node.term_id or "") | tojson }})'
+   @mouseleave="tooltip = null">
+  {% if placed.node.glyph == 'actor' %}
+  <circle cx="0" cy="-16" r="9" class="glyph"/>
+  <path d="M 0 -7 L 0 12 M -14 2 L 14 2 M 0 12 L -11 30 M 0 12 L 11 30" class="glyph"/>
+  {% else %}
+  <path d="M -16 -22 L 8 -22 L 16 -14 L 16 22 L -16 22 Z" class="glyph doc"/>
+  <path d="M 8 -22 L 8 -14 L 16 -14" class="glyph"/>
+  {% endif %}
+  {% set lines = placed.node.label | label_lines %}
+  <text x="0" y="50" class="label">
+    {%- for line in lines %}<tspan x="0" dy="{{ 0 if loop.first else 15 }}">{{ line }}</tspan>{% endfor -%}
+  </text>
+  {% if placed.node.sublabel %}<text x="0" y="{{ 66 + (lines | length - 1) * 15 }}" class="sublabel">{{ placed.node.sublabel }}</text>{% endif %}
+</g>
+{% endmacro -%}
+
+{%- macro edge_label(placed) %}
+{% set cx = placed.label.x %}
+{% set cy = placed.label.y + placed.label.height - 6 %}
+{% if placed.edge.number is not none %}
+<circle cx="{{ (cx + 11) | round }}" cy="{{ (cy - 5) | round }}" r="11" class="numbg"/>
+<text x="{{ (cx + 11) | round }}" y="{{ (cy - 1) | round }}" class="num">{{ placed.edge.number }}</text>
+<text x="{{ (cx + 27) | round }}" y="{{ (cy - 1) | round }}" class="verb">{{ placed.edge.label }}</text>
+{% else %}
+<text x="{{ cx | round }}" y="{{ (cy - 1) | round }}"
+      class="verb {{ 'conn' if placed.edge.connective }}">{{ placed.edge.label }}</text>
+{% endif %}
+{% endmacro -%}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ metadata.project }} — story diagrams</title>
+<style>{{ css }}</style>
+</head>
+<body x-data="diagramsApp()" x-cloak>
+<header class="topbar">
+  <span class="project">{{ metadata.project }}</span> · story diagrams
+</header>
+<div class="layout">
+  <nav class="sidebar">
+    {% for view in views %}
+    {% set story = view.layout.graph %}
+    <div class="story-item" :class="{ active: selectedStory === '{{ story.story_id }}' }"
+         @click="selectedStory = '{{ story.story_id }}'">
+      <div class="story-title">{{ story.title }}</div>
+      <div class="story-meta">{{ view.max_step }} activities</div>
+    </div>
+    {% endfor %}
+  </nav>
+  <main>
+    {% for view in views %}
+    {% set story = view.layout.graph %}
+    <section id="{{ story.story_id }}" x-show="selectedStory === '{{ story.story_id }}'">
+      <div class="story-header">
+        <h1>{{ story.title }}</h1>
+        {% if view.max_step > 0 %}
+        <div class="replay">
+          <button @click="prevStep()" :disabled="step === null">‹</button>
+          <span x-text="step === null ? 'all' : 'step ' + step + ' / ' + maxSteps['{{ story.story_id }}']"></span>
+          <button @click="nextStep()" :disabled="step === maxSteps['{{ story.story_id }}']">›</button>
+        </div>
+        {% endif %}
+      </div>
+      {% if view.max_step == 0 %}
+      <p class="empty-note">This story has no activities yet.</p>
+      {% else %}
+      <svg width="{{ view.layout.width | round | int }}" height="{{ view.layout.height | round | int }}"
+           viewBox="0 0 {{ view.layout.width | round | int }} {{ view.layout.height | round | int }}">
+        <defs>
+          {# marker id keyed by story id: inner loops rebind `loop`, and ids
+             must be unique across the page's per-story SVGs #}
+          <marker id="arrow-{{ story.story_id }}" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead"/>
+          </marker>
+        </defs>
+        {# per-activity groups: edges + this activity's work-object nodes #}
+        {% for activity in view.layout.graph.edges | map(attribute='activity_id') | unique %}
+        <g class="activity"
+           :class="{ faded: faded({{ activity }}), dimmed: hoverActivity !== null && hoverActivity !== {{ activity }} }"
+           @mouseenter="hoverActivity = {{ activity }}" @mouseleave="hoverActivity = null">
+          {% for placed in view.layout.edges if placed.edge.activity_id == activity %}
+          {% if placed.loop %}
+          <path class="edge" marker-end="url(#arrow-{{ story.story_id }})"
+                d="M {{ (placed.x1 - 18) | round }} {{ (placed.y1 - 40) | round }}
+                   A 46 46 0 1 1 {{ (placed.x1 + 18) | round }} {{ (placed.y1 - 40) | round }}"/>
+          {% else %}
+          <line class="edge {{ 'connective' if placed.edge.connective }}"
+                x1="{{ placed.x1 | round }}" y1="{{ placed.y1 | round }}"
+                x2="{{ placed.x2 | round }}" y2="{{ placed.y2 | round }}"
+                marker-end="url(#arrow-{{ story.story_id }})"/>
+          {% endif %}
+          {{ edge_label(placed) }}
+          {% endfor %}
+          {% for placed in view.layout.nodes if placed.node.glyph == 'work'
+                and placed.node.id.startswith('work:' ~ activity ~ ':') %}
+          {{ node_icon(placed) }}
+          {% endfor %}
+        </g>
+        {% endfor %}
+        {# actors last: always visible, on top #}
+        <g class="actors">
+          {% for placed in view.layout.nodes if placed.node.glyph == 'actor' %}
+          {{ node_icon(placed) }}
+          {% endfor %}
+        </g>
+      </svg>
+      {% endif %}
+    </section>
+    {% endfor %}
+  </main>
+</div>
+<div class="tooltip" x-show="tooltip !== null" x-cloak
+     :style="tooltip && ('left:' + (tooltip.x + 14) + 'px; top:' + (tooltip.y + 14) + 'px')">
+  <template x-if="tooltip">
+    <div>
+      <div class="tooltip-title" x-text="tooltip.title"></div>
+      <div class="tooltip-kind" x-text="tooltip.kind || 'unclassified'"></div>
+      <div class="tooltip-def" x-text="tooltip.definition || 'No definition yet.'"></div>
+    </div>
+  </template>
+</div>
+<script>{{ alpine_js }}</script>
+<script>
+const STORY_IDS = {{ story_ids_json }};
+const MAX_STEPS = {{ max_steps_json }};
+const TERM_INFO = {{ term_info_json }};
+function diagramsApp() {
+  return {
+    selectedStory: null, step: null, hoverActivity: null, tooltip: null,
+    maxSteps: MAX_STEPS,
+    init() {
+      const hash = decodeURIComponent(location.hash.slice(1));
+      this.selectedStory = STORY_IDS.includes(hash) ? hash : STORY_IDS[0];
+      this.$watch('selectedStory', (id) => {
+        history.replaceState(null, '', '#' + encodeURIComponent(id));
+        this.step = null; this.hoverActivity = null;
+      });
+      window.addEventListener('hashchange', () => {
+        const next = decodeURIComponent(location.hash.slice(1));
+        if (STORY_IDS.includes(next)) this.selectedStory = next;
+      });
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') this.nextStep();
+        if (e.key === 'ArrowLeft') this.prevStep();
+      });
+    },
+    nextStep() {
+      const max = this.maxSteps[this.selectedStory];
+      if (max > 0) this.step = this.step === null ? 1 : Math.min(this.step + 1, max);
+    },
+    prevStep() {
+      if (this.step !== null) this.step = this.step <= 1 ? null : this.step - 1;
+    },
+    faded(n) { return this.step !== null && n > this.step; },
+    showTip(event, title, termId) {
+      const info = TERM_INFO[termId] || {};
+      this.tooltip = { x: event.clientX, y: event.clientY,
+                       title: title, kind: info.kind, definition: info.definition };
+    },
+  };
+}
+</script>
+</body>
+</html>
