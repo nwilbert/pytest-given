@@ -33,9 +33,7 @@ def render_diagrams(report: ReportData, output_path: Path) -> None:
     views: list[StoryView] = []
     for story in report.stories:
         layout = layout_graph(build_graph(story, report.glossary))
-        max_step = max(
-            (placed.edge.number or 0 for placed in layout.edges), default=0
-        )
+        max_step = max((placed.edge.number or 0 for placed in layout.edges), default=0)
         views.append(StoryView(layout=layout, max_step=max_step))
     term_info: dict[str, dict[str, str | None]] = {}
     if report.glossary is not None:

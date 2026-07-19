@@ -127,9 +127,7 @@ def _node_for(
     )
 
 
-def _is_actor(
-    part: ActivityPart, position: int, glossary: Glossary | None
-) -> bool:
+def _is_actor(part: ActivityPart, position: int, glossary: Glossary | None) -> bool:
     """Kind-known terms follow their glossary kind anywhere; kind-unknown
     parts count as actors only at position 0 (the path's actor slot)."""
     if isinstance(part, ActivityTermRef) and glossary is not None:

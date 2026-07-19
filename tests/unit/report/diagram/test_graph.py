@@ -60,14 +60,21 @@ def test_no_glossary_position_zero_word_is_actor() -> None:
     from pytest_given.model import ActivityWord
 
     story = Story(
-        id=StoryId('s'), title='S',
+        id=StoryId('s'),
+        title='S',
         activities=(
-            Activity(id=ActivityId(1), paths=(
-                ActivityPath(parts=(
-                    ActivityWord(text='someone'), ActivityWord(text='does'),
-                    ActivityWord(text='something'),
-                )),
-            )),
+            Activity(
+                id=ActivityId(1),
+                paths=(
+                    ActivityPath(
+                        parts=(
+                            ActivityWord(text='someone'),
+                            ActivityWord(text='does'),
+                            ActivityWord(text='something'),
+                        )
+                    ),
+                ),
+            ),
         ),
     )
     graph = build_graph(story, None)
