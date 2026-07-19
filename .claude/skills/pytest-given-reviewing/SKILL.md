@@ -38,9 +38,10 @@ For a large suite, fan the audit out: one reviewer per test file — a subagent 
 
 - A **dead term** (layer 1, opt-in rule) that describes unimplemented behaviour is misleading domain documentation — flag it. The fix is as often deleting the term as adding a reference; don't accept references manufactured to appease the rule.
 - **Dilution** is the inverse finding: a row nothing would miss — a generic verb minted to fill a story slot (a bare word belongs there), a concept duplicated under a second name, a term added only to render as a pill. A sharp, lean glossary outranks an impressive-looking one.
+- An **oversized glossary** is a structural finding: a glossary only works read whole, so one grown past a single comfortable reading likely spans more than one bounded context. Recommend splitting it per context; don't fix size by trimming healthy terms.
 - `tag-shadows-term` is linted; the fix is dropping the tag, **not spreading tags wider**. Tags stay orthogonal to the glossary (behaviour, mechanism), so sparse tagging is usually correct — don't report it as a finding.
 - A story activity no scenario covers is a gap worth noting: check scenarios' `story_id` bindings and term coverage (the HTML report's Stories tab shows a coverage chip per activity).
 
 ## Findings are advisory review comments
 
-For each finding: file:line, what the narration claims, what the body actually does, why it matters. A false spec misleads every future reader — rate truthfulness findings accordingly; language drift rates below truthfulness (a false spec misleads now, a drifted vocabulary erodes slowly). Style preferences the authoring rules don't state are not findings.
+For each finding: file:line, what the narration claims, what the body actually does, why it matters. Rate truthfulness findings highest — a false spec misleads every future reader; language drift rates below that, because a drifted vocabulary erodes slowly rather than lying outright. Style preferences the authoring rules don't state are not findings.

@@ -13,11 +13,10 @@ from pytest_given import FileGlossary
 g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')
 ```
 
-The file needs at least one GFM pipe table. By default the first column is the term and the second its description; override with `term_column`, `description_column`, and `kind_column` (0-based index or case-insensitive header name):
+The file needs at least one GFM pipe table. By default the first column is the term and the second its description; each override takes a 0-based index or case-insensitive header name:
 
 ```python
-g = FileGlossary('GLOSSARY.md', kind_column='Kind')
-g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning')
+g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning', kind_column='Kind')
 ```
 
 **Code-defined `Glossary`** — declare terms where the tests live:
@@ -31,11 +30,11 @@ room = g.work_object('Room', definition='A bookable hotel room.')
 search = g.verb('search', definition='Look up available options.')
 ```
 
-Either way, **give the language a public home**: define the glossary — and the stories, once there are some — in one dedicated, publicly named module, e.g. `tests/ubiquitous_language.py`, imported from `conftest.py` so the plugin discovers it. The module *is* the suite's ubiquitous language, not a private helper — don't underscore-prefix it; test modules import their handles from it (`from tests.ubiquitous_language import pg`). Glossary-only mode is fine — you get the Glossary tab without writing any stories.
+Either way, **give the language a public home**: define the glossary — and the stories, once there are some — in one dedicated, publicly named module, e.g. `tests/ubiquitous_language.py`, imported from `conftest.py` so the plugin discovers it. The module *is* the suite's ubiquitous language, not a private helper — don't underscore-prefix it; test modules import their handles from it. Glossary-only mode is fine — you get the Glossary tab without writing any stories.
 
 ## Using terms in narration
 
-Look up handles by name — `g['Room']` (case-insensitive) — or use the captured variables from a code-defined glossary. Both work in t-string steps, `@scenario(...)` titles, and story activities; the callable form supplies the inflection an activity or sentence needs:
+Look up handles by name — `g['Room']` (case-insensitive) — or use the captured variables from a code-defined glossary. Both work in t-string steps, `@scenario(...)` titles, and story activities:
 
 ```python
 with when(t'a {g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
@@ -44,7 +43,7 @@ with when(t'a {g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
 
 Pick the lightest surface form for the word you need — the same three forms on every handle, captured (`guest = g.actor(...)`) or looked up (`g['Guest']`):
 
-- **Bare handle** — `g['Room']` renders the term's canonical text. Use it whenever the word appears as-is; restating it as `g['Room']('Room')` is redundant noise — drop the call.
+- **Bare handle** — `g['Room']` renders the term's canonical text. Use it whenever the word appears as-is — restating it as `g['Room']('Room')` is redundant noise.
 - **`.low`** — `g['Attachment'].low` (or `guest.low`) renders the canonical lowercased, the usual mid-sentence form. Prefer it over the equivalent `g['Attachment']('attachment')`.
 - **Callable override** — `g['book']('books')` supplies any *other* surface: a verb inflection, a plural (`g['Term']('terms')`), or a concrete instance (`organizer('Carol')`).
 
@@ -64,5 +63,6 @@ Terms are actors, verbs, or work objects. Three ways a term gets its kind:
 ## Keeping the glossary honest
 
 - **Don't dilute the glossary — keep it sharp.** A term earns its row by being vocabulary the team actually speaks: something someone would look up, with a meaning specific to the domain. Never add terms to make activities render more pills or to improve lint metrics; a generic word in an activity is better left a bare string, and the honest fix for a dead term is as often deleting it as manufacturing a reference.
+- **Watch the size — a glossary is read whole, never sampled.** Authors and reviewers absorb every term in one pass; that is how a near-duplicate term gets caught before it is coined. A glossary that outgrows one comfortable reading is speaking for more than one bounded context: alert the user and propose one glossary per context, rather than starting to read it piecemeal.
 - **Tags never duplicate terms** — filter a feature area via its term, and keep tags for what the glossary can't carry (behaviour, mechanism). The `tag-shadows-term` lint rule enforces this.
 - **Every file term appears in the report**, even one no step or story references. On suites whose glossary should be fully exercised, opt into the `dead-term` lint rule to flag unreferenced terms.
