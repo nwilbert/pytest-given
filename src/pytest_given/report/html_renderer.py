@@ -31,6 +31,7 @@ from .aggregations import (
     build_term_scenario_index,
     tab_visibility,
 )
+from .embed import neutralize_script_close, script_json
 from .inline_markdown import render_inline_markdown
 from .source_link import compile_source_link
 
@@ -38,21 +39,6 @@ _NUM_PARAM_COLORS = 6
 
 # Maps parameter name to its color index (0-based, wraps at _NUM_PARAM_COLORS)
 type ParamColorMap = dict[str, int]
-
-
-def _neutralize_script_close(text: str) -> str:
-    """Replace `</` with `<\\/` so text embedded in an inline `<script>` can't
-    close the tag. `\\/` is a valid JS/JSON escape for `/`, so the parsed value
-    is unchanged while the HTML parser no longer sees a closing tag."""
-    return text.replace('</', '<\\/')
-
-
-def _script_json(value: object) -> Markup:
-    """Serialize `value` to JSON for embedding in an inline `<script>`, with
-    `</` neutralized. `json.dumps` does not escape `</` inside string literals,
-    and these blobs carry user-controlled node ids — so a parametrize id
-    containing `</script>` would otherwise break out of the tag (stored XSS)."""
-    return Markup(_neutralize_script_close(json.dumps(value)))
 
 
 def _inline_md(text: str | None) -> Markup:
@@ -80,7 +66,7 @@ def render_html(
     # inside an inline <script>; an attachment containing `</script>` would
     # close the tag and yield stored XSS. `\/` is a valid JSON/JS escape for
     # `/`, so this preserves the parsed value while neutering the HTML parser.
-    safe_report_json = _neutralize_script_close(raw_json)
+    safe_report_json = neutralize_script_close(raw_json)
 
     templates_dir = Path(__file__).parent / 'templates'
     css = (templates_dir / 'styles.css').read_text(encoding='utf-8')
@@ -107,16 +93,16 @@ def render_html(
     scn_covers = build_scenario_activity_index(coverage_maps)
     visibility = tab_visibility(report)
 
-    story_ids_json = _script_json([story.id for story in report.stories])
-    term_ids_json = _script_json(
+    story_ids_json = script_json([story.id for story in report.stories])
+    term_ids_json = script_json(
         [term.id for term in report.glossary.terms]
         if report.glossary is not None
         else []
     )
     term_scenario_index = build_term_scenario_index(report)
-    term_scenarios_json = _script_json(term_scenario_index)
+    term_scenarios_json = script_json(term_scenario_index)
     scenario_slugs = build_scenario_slug_index(report)
-    scenario_slugs_json = _script_json(
+    scenario_slugs_json = script_json(
         {slug: node_id for node_id, slug in scenario_slugs.items()}
     )
 
