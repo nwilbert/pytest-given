@@ -209,7 +209,7 @@ def test_cli_diagrams_generates_artifact(pytester: pytest.Pytester) -> None:
 
 
 def test_cli_format_md_to_stdout_with_diagrams_keeps_stdout_clean(
-    tmp_path: Path, capsys
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """--format md with no -o writes the markdown payload to stdout; the
     'Diagrams generated: ...' status line must not join it there, or piping
