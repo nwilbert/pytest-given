@@ -77,8 +77,8 @@ from .model import (
     report_to_dict,
 )
 from .report import (
+    compute_diagrams_href,
     detect_commit_sha,
-    diagrams_href,
     render_diagrams,
     render_html,
     render_md,
@@ -727,14 +727,14 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             'given_source_link'
         ) or session.config.getini('given_source_link')
         template = resolve_template(raw_link)
-        diagrams_href_value = None
+        diagrams_href = None
         if diagrams_opt is not None:
-            diagrams_href_value = diagrams_href(Path(html_opt), Path(diagrams_opt))
+            diagrams_href = compute_diagrams_href(Path(html_opt), Path(diagrams_opt))
         render_html(
             report,
             Path(html_opt),
             source_link_template=template,
-            diagrams_href=diagrams_href_value,
+            diagrams_href=diagrams_href,
         )
 
     md_opt = session.config.getoption('given_md')

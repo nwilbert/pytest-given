@@ -5,7 +5,7 @@ from pathlib import Path
 
 from ..model import report_from_dict
 from .diagram import render_diagrams
-from .html_renderer import diagrams_href, render_html
+from .html_renderer import compute_diagrams_href, render_html
 from .md_renderer import render_md
 from .source_link import resolve_template
 
@@ -69,14 +69,14 @@ def run_report(args: argparse.Namespace) -> int:
     else:
         template = resolve_template(args.source_link)
         output = args.output or Path('given-report/report.html')
-        diagrams_href_value = None
+        diagrams_href = None
         if args.diagrams is not None:
-            diagrams_href_value = diagrams_href(output, args.diagrams)
+            diagrams_href = compute_diagrams_href(output, args.diagrams)
         render_html(
             report,
             output,
             source_link_template=template,
-            diagrams_href=diagrams_href_value,
+            diagrams_href=diagrams_href,
         )
         print(f'Report generated: {output}')
 

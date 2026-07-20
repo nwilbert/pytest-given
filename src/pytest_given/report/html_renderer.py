@@ -52,7 +52,7 @@ def _inline_md(text: str | None) -> Markup:
     return Markup(render_inline_markdown(text))
 
 
-def diagrams_href(html_path: Path, diagrams_path: Path) -> str | None:
+def compute_diagrams_href(html_path: Path, diagrams_path: Path) -> str | None:
     """POSIX-style relative path from `html_path`'s directory to
     `diagrams_path`, for linking a report page to its diagrams artifact.
 
