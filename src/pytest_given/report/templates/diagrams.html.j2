@@ -78,6 +78,7 @@
       {% if view.max_step == 0 %}
       <p class="empty-note">This story has no activities yet.</p>
       {% else %}
+      <div class="canvas">
       <svg width="{{ view.layout.width | round | int }}" height="{{ view.layout.height | round | int }}"
            viewBox="0 0 {{ view.layout.width | round | int }} {{ view.layout.height | round | int }}">
         <defs>
@@ -127,6 +128,7 @@
           {% endfor %}
         </g>
       </svg>
+      </div>
       {% endif %}
     </section>
     {% endfor %}
