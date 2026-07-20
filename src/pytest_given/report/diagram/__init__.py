@@ -1,5 +1,12 @@
 from .graph import DiagramEdge, DiagramGraph, DiagramNode, build_graph
-from .layout import DiagramLayout, LabelBox, PlacedEdge, PlacedNode, layout_graph
+from .layout import (
+    DiagramLayout,
+    LabelBox,
+    PlacedEdge,
+    PlacedNode,
+    count_crossings,
+    layout_graph,
+)
 from .renderer import render_diagrams
 
 __all__ = [
@@ -11,6 +18,7 @@ __all__ = [
     'PlacedEdge',
     'PlacedNode',
     'build_graph',
+    'count_crossings',
     'layout_graph',
     'render_diagrams',
 ]

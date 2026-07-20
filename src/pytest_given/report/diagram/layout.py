@@ -1,33 +1,39 @@
-"""Deterministic Domain-Storytelling-aware layout. Pure Python, no RNG.
+"""Deterministic crossing-minimizing layout. Pure Python, no RNG.
 
-Actors are pinned anchors: initiators (sources of numbered edges) on the left
-band, pure recipients on the right, ordered by first appearance. Per-activity
-work objects are seeded around their anchors and relaxed with springs (rest
-length IDEAL_EDGE) plus pairwise repulsion below MIN_NODE_DIST. A
-deterministic separation post-pass then enforces MIN_NODE_DIST exactly on any
-pair the relaxation's spring equilibrium left too close, and a label slide
-pass places each edge's label near its midpoint, sliding it along the edge
-until it clears every node and previously placed label box.
+The overriding rule is that drawn arrows must not overlap: no edge may cross
+another edge, and (best effort) no edge may run over an unrelated node. Nodes
+are placed on a column/row grid whose spacing is >= MIN_NODE_DIST, so nodes can
+never overlap by construction. Columns come from a longest-path layering of the
+activity flow (sources -- the actors and objects that start a path -- on the
+left, each step one column further right); within a column the row order is
+first seeded by the barycentre heuristic and then polished by a local search
+that directly minimizes the true straight-line crossing count. Edge endpoints
+are trimmed back to the node rims and each edge's label is slid along it until
+it clears every node and previously placed label.
 """
 
 from __future__ import annotations
 
 import math
+from collections import deque
+from collections.abc import Iterator
 from dataclasses import dataclass
 
 from .graph import DiagramEdge, DiagramGraph, DiagramNode
 
 MARGIN = 90.0
-BAND_X_LEFT = 150.0
-BAND_X_RIGHT_INSET = 170.0  # right band sits at width - this
-BAND_ROW_SPACING = 270.0  # must stay > MIN_NODE_DIST
-IDEAL_EDGE = 260.0
+COL_SPACING = 320.0  # horizontal gap between layers; must stay > MIN_NODE_DIST
+ROW_SPACING = 260.0  # vertical gap between rows;    must stay > MIN_NODE_DIST
 MIN_NODE_DIST = 250.0
-ITERATIONS = 140
-SEPARATION_ROUNDS = 60
-SEPARATION_RING_CANDIDATES = 24
+PAD = 180.0  # canvas padding around the outermost node centres
+MIN_CANVAS_W = 1080.0
+MIN_CANVAS_H = 620.0
+BARYCENTRE_SWEEPS = 6
+SEARCH_ROUNDS = 40
+SLOT_MARGIN = 2  # empty slots to probe above/below a layer during local search
 
-assert BAND_ROW_SPACING >= MIN_NODE_DIST  # actor-actor pairs skip _separate
+assert COL_SPACING >= MIN_NODE_DIST
+assert ROW_SPACING >= MIN_NODE_DIST
 
 NODE_HALF_W = 62.0
 NODE_HALF_H = 58.0
@@ -38,6 +44,15 @@ LABEL_H = 20.0
 BADGE_W = 30.0
 LABEL_OFFSET = 18.0
 LOOP_RADIUS = 46.0
+
+# Local-search cost weights: a single crossing outweighs any number of
+# edge-over-node grazes, which in turn outweigh any amount of edge length.
+CROSSING_COST = 1_000_000.0
+NODE_ON_EDGE_COST = 1_000.0
+HEIGHT_COST = 5.0  # per row of total vertical span: flattens hub columns
+LENGTH_COST = 0.001
+COLLINEAR_DEG = 8.0  # two edges from a shared node this close in angle overlap
+NODE_ON_EDGE_CLEARANCE = 70.0  # how near a segment a foreign node may sit
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -78,265 +93,376 @@ class DiagramLayout:
 def position_nodes(
     graph: DiagramGraph,
 ) -> tuple[dict[str, tuple[float, float]], float, float]:
-    initiators, recipients = _band_actors(graph)
-    width, height = _canvas_size(len(initiators), len(recipients), len(graph.nodes))
-    positions: dict[str, tuple[float, float]] = {}
-    _place_band(positions, initiators, BAND_X_LEFT, height)
-    _place_band(positions, recipients, width - BAND_X_RIGHT_INSET, height)
-    _seed_work_objects(graph, positions, width, height)
-    _relax(graph, positions, width, height)
-    _separate(graph, positions, width, height)
-    return positions, width, height
-
-
-def _band_actors(graph: DiagramGraph) -> tuple[list[str], list[str]]:
-    """Split actor node ids into initiators / pure recipients, each ordered by
-    first appearance in the edge list (== first activity number, since
-    activities are walked in order)."""
-    actor_ids = {n.id for n in graph.nodes if n.glyph == 'actor'}
-    initiator_set = {
-        e.source for e in graph.edges if e.number is not None and e.source in actor_ids
+    node_ids = [node.id for node in graph.nodes]
+    if not node_ids:
+        return {}, MIN_CANVAS_W, MIN_CANVAS_H
+    index_of = {node_id: i for i, node_id in enumerate(node_ids)}
+    directed = _directed_edges(graph)
+    undirected = _undirected_adjacency(node_ids, directed)
+    layer_of = _assign_layers(node_ids, directed)
+    layer_nodes = _order_within_layers(node_ids, index_of, undirected, layer_of)
+    cell_of = _seed_cells(layer_nodes)
+    cell_of = _local_search(node_ids, index_of, directed, cell_of)
+    grid = {
+        node_id: (column * COL_SPACING, row * ROW_SPACING)
+        for node_id, (column, row) in cell_of.items()
     }
-    ordered: list[str] = []
+    return _framed(grid)
+
+
+def _directed_edges(graph: DiagramGraph) -> list[tuple[str, str]]:
+    """Distinct non-self edges in first-appearance order (parallel duplicates
+    collapse, self-loops exert no layout force)."""
+    seen: set[tuple[str, str]] = set()
+    directed: list[tuple[str, str]] = []
     for edge in graph.edges:
-        for node_id in (edge.source, edge.target):
-            if node_id in actor_ids and node_id not in ordered:
-                ordered.append(node_id)
-    for node in graph.nodes:  # actors never touched by an edge (defensive)
-        if node.id in actor_ids and node.id not in ordered:
-            ordered.append(node.id)
-    initiators = [a for a in ordered if a in initiator_set]
-    recipients = [a for a in ordered if a not in initiator_set]
-    return initiators, recipients
-
-
-def _canvas_size(
-    initiator_count: int, recipient_count: int, node_count: int
-) -> tuple[float, float]:
-    rows = max(initiator_count, recipient_count, 1)
-    height = max(620.0, 2 * (MARGIN + 110.0) + BAND_ROW_SPACING * (rows - 1))
-    width = max(1080.0, 640.0 + 55.0 * node_count)
-    return width, height
-
-
-def _place_band(
-    positions: dict[str, tuple[float, float]],
-    band: list[str],
-    band_x: float,
-    height: float,
-) -> None:
-    if not band:
-        return
-    if len(band) == 1:
-        positions[band[0]] = (band_x, height / 2)
-        return
-    top = MARGIN + 110.0
-    step = (height - 2 * (MARGIN + 110.0)) / (len(band) - 1)
-    assert step >= MIN_NODE_DIST
-    for index, node_id in enumerate(band):
-        positions[node_id] = (band_x, top + index * step)
-
-
-def _neighbours(graph: DiagramGraph) -> dict[str, list[str]]:
-    out: dict[str, list[str]] = {n.id: [] for n in graph.nodes}
-    for edge in graph.edges:
-        if edge.source == edge.target:
-            continue  # self-loops exert no layout force
-        out[edge.source].append(edge.target)
-        out[edge.target].append(edge.source)
-    return out
-
-
-def _seed_work_objects(
-    graph: DiagramGraph,
-    positions: dict[str, tuple[float, float]],
-    width: float,
-    height: float,
-) -> None:
-    """Seed in node insertion order (== path order), so a chained work object's
-    predecessor is always placed first. Satellites (one placed neighbour) fan
-    around their anchor at IDEAL_EDGE, biased toward the canvas centre."""
-    nbrs = _neighbours(graph)
-    satellite_count: dict[str, int] = {}
-    for node in graph.nodes:
-        if node.glyph != 'work':
+        pair = (edge.source, edge.target)
+        if edge.source == edge.target or pair in seen:
             continue
-        placed_ids = [m for m in nbrs[node.id] if m in positions]
-        if placed_ids:
-            cx = sum(positions[m][0] for m in placed_ids) / len(placed_ids)
-            cy = sum(positions[m][1] for m in placed_ids) / len(placed_ids)
-        else:
-            cx, cy = width / 2, height / 2
-        if len(placed_ids) == 1:
-            anchor = placed_ids[0]
-            fan_index = satellite_count.get(anchor, 0)
-            satellite_count[anchor] = fan_index + 1
-            toward_centre = math.atan2(height / 2 - cy, width / 2 - cx)
-            angle = toward_centre + math.radians(-115.0 + fan_index * 68.0)
-            cx += IDEAL_EDGE * math.cos(angle)
-            cy += IDEAL_EDGE * math.sin(angle)
-        positions[node.id] = (cx, cy)
+        seen.add(pair)
+        directed.append(pair)
+    return directed
 
 
-def _relax(
-    graph: DiagramGraph,
-    positions: dict[str, tuple[float, float]],
-    width: float,
-    height: float,
-) -> None:
-    nbrs = _neighbours(graph)
-    movable = {n.id for n in graph.nodes if n.glyph == 'work'}
-    node_ids = [n.id for n in graph.nodes]
-    for _ in range(ITERATIONS):
-        force: dict[str, list[float]] = {i: [0.0, 0.0] for i in node_ids}
-        for node_id in movable:
-            for other in nbrs[node_id]:
-                dx = positions[other][0] - positions[node_id][0]
-                dy = positions[other][1] - positions[node_id][1]
-                dist = math.hypot(dx, dy) or 1.0
-                pull = (dist - IDEAL_EDGE) / dist * 0.08
-                force[node_id][0] += dx * pull
-                force[node_id][1] += dy * pull
-        for index, id_a in enumerate(node_ids):
-            for id_b in node_ids[index + 1 :]:
-                dx = positions[id_b][0] - positions[id_a][0]
-                dy = positions[id_b][1] - positions[id_a][1]
-                dist = math.hypot(dx, dy) or 1.0
-                if dist < MIN_NODE_DIST:
-                    push = (MIN_NODE_DIST - dist) / dist * 0.45
-                    if id_a in movable:
-                        force[id_a][0] -= dx * push
-                        force[id_a][1] -= dy * push
-                    if id_b in movable:
-                        force[id_b][0] += dx * push
-                        force[id_b][1] += dy * push
-        for node_id in movable:
-            new_x = positions[node_id][0] + force[node_id][0]
-            new_y = positions[node_id][1] + force[node_id][1]
-            positions[node_id] = (
-                min(max(new_x, MARGIN), width - MARGIN),
-                min(max(new_y, MARGIN), height - MARGIN),
+def _undirected_adjacency(
+    node_ids: list[str], directed: list[tuple[str, str]]
+) -> dict[str, list[str]]:
+    adjacency: dict[str, list[str]] = {node_id: [] for node_id in node_ids}
+    for source, target in directed:
+        adjacency[source].append(target)
+        adjacency[target].append(source)
+    return adjacency
+
+
+def _assign_layers(
+    node_ids: list[str], directed: list[tuple[str, str]]
+) -> dict[str, int]:
+    """Longest-path layering. Back edges (found by DFS) are dropped so the
+    layering runs on a DAG even when activities form a directed cycle across
+    work objects; the dropped edges still count for crossings, just not for
+    the column each node lands in."""
+    out_adjacency: dict[str, list[str]] = {node_id: [] for node_id in node_ids}
+    for source, target in directed:
+        out_adjacency[source].append(target)
+
+    colour = dict.fromkeys(node_ids, 0)  # 0 white, 1 grey, 2 black
+    forward: list[tuple[str, str]] = []
+    for start in node_ids:
+        if colour[start] != 0:
+            continue
+        colour[start] = 1
+        stack: list[tuple[str, Iterator[str]]] = [
+            (start, iter(out_adjacency[start]))
+        ]
+        while stack:
+            node, neighbours = stack[-1]
+            advanced = False
+            for nxt in neighbours:
+                if colour[nxt] == 0:
+                    forward.append((node, nxt))
+                    colour[nxt] = 1
+                    stack.append((nxt, iter(out_adjacency[nxt])))
+                    advanced = True
+                    break
+                if colour[nxt] == 2:  # forward/cross edge: keeps the DAG acyclic
+                    forward.append((node, nxt))
+                # grey neighbour == back edge, drop it
+            if not advanced:
+                colour[node] = 2
+                stack.pop()
+
+    forward_adjacency: dict[str, list[str]] = {node_id: [] for node_id in node_ids}
+    indegree = dict.fromkeys(node_ids, 0)
+    for source, target in forward:
+        forward_adjacency[source].append(target)
+        indegree[target] += 1
+    queue = deque(node_id for node_id in node_ids if indegree[node_id] == 0)
+    layer = dict.fromkeys(node_ids, 0)
+    while queue:
+        node = queue.popleft()
+        for target in forward_adjacency[node]:
+            layer[target] = max(layer[target], layer[node] + 1)
+            indegree[target] -= 1
+            if indegree[target] == 0:
+                queue.append(target)
+    return layer
+
+
+def _order_within_layers(
+    node_ids: list[str],
+    index_of: dict[str, int],
+    undirected: dict[str, list[str]],
+    layer_of: dict[str, int],
+) -> dict[int, list[str]]:
+    """Seed each layer's row order by node insertion order, then run
+    alternating barycentre sweeps to line neighbours up across columns."""
+    max_layer = max(layer_of.values())
+    layer_nodes: dict[int, list[str]] = {index: [] for index in range(max_layer + 1)}
+    for node_id in node_ids:
+        layer_nodes[layer_of[node_id]].append(node_id)
+    order_index = dict.fromkeys(node_ids, 0)
+
+    def reindex(layer: int) -> None:
+        for position, node_id in enumerate(layer_nodes[layer]):
+            order_index[node_id] = position
+
+    for layer in layer_nodes:
+        reindex(layer)
+
+    for sweep in range(BARYCENTRE_SWEEPS):
+        downward = sweep % 2 == 0
+        layers = range(1, max_layer + 1) if downward else range(max_layer - 1, -1, -1)
+        neighbour_layer_delta = -1 if downward else 1
+        for layer in layers:
+
+            def barycentre(node_id: str, delta: int = neighbour_layer_delta) -> float:
+                neighbours = [
+                    other
+                    for other in undirected[node_id]
+                    if layer_of[other] == layer_of[node_id] + delta
+                ]
+                if not neighbours:
+                    return float(order_index[node_id])
+                return sum(order_index[other] for other in neighbours) / len(neighbours)
+
+            layer_nodes[layer].sort(
+                key=lambda node_id: (barycentre(node_id), index_of[node_id])
             )
+            reindex(layer)
+    return layer_nodes
 
 
-def _separate(
-    graph: DiagramGraph,
-    positions: dict[str, tuple[float, float]],
-    width: float,
-    height: float,
-) -> None:
-    """Deterministic post-relaxation pass enforcing pairwise MIN_NODE_DIST.
+def _seed_cells(layer_nodes: dict[int, list[str]]) -> dict[str, tuple[int, int]]:
+    """Turn the ordered layers into integer (column, row) grid cells, each
+    layer vertically centred on row 0."""
+    cell_of: dict[str, tuple[int, int]] = {}
+    for column, nodes in layer_nodes.items():
+        count = len(nodes)
+        for position, node_id in enumerate(nodes):
+            cell_of[node_id] = (column, position - (count - 1) // 2)
+    return cell_of
 
-    Spring/repulsion equilibria can leave pairs closer than MIN_NODE_DIST in
-    ways a naive "push straight along the connecting line" cannot resolve on
-    its own: a work node pulled toward two actors that happen to share an
-    axis settles on a symmetric saddle point equidistant from both (pushing
-    away from either one pushes it toward the other); and a satellite work
-    node seeded near a canvas corner can find its only "away from the
-    anchor" direction runs straight into the margin, so it presses into the
-    corner every round without ever gaining distance.
 
-    Each round first computes, in graph.nodes order, the axis-aligned
-    full-deficit correction for every violating pair -- split evenly
-    between two movable work nodes, applied wholly to the movable side
-    against a pinned actor. For each movable node still in violation, that
-    direct correction is then compared against SEPARATION_RING_CANDIDATES
-    points spaced evenly around a circle of radius MIN_NODE_DIST, tried
-    centred on each distinct conflicting neighbour's own position as well as
-    their mean; whichever candidate leaves the smallest total remaining
-    violation (summed squared deficit against every other node) is kept. A
-    ring centred on a single neighbour is guaranteed clear of that neighbour
-    specifically -- needed when a node's conflicts are two unrelated nodes
-    that only happen to be near each other (the mean of their positions can
-    sit somewhere that clears neither); the mean-centred ring stays useful
-    for the genuinely shared-anchor case (two actors on the same axis) a
-    single neighbour's ring can't distinguish from. The ring lets a node
-    walk around a pinned anchor instead of stalling against a corner. Runs
-    up to SEPARATION_ROUNDS rounds, stopping as soon as a round finds no
-    violation.
-    """
-    movable = {n.id for n in graph.nodes if n.glyph == 'work'}
-    node_ids = [n.id for n in graph.nodes]
+def _local_search(
+    node_ids: list[str],
+    index_of: dict[str, int],
+    directed: list[tuple[str, str]],
+    cell_of: dict[str, tuple[int, int]],
+) -> dict[str, tuple[int, int]]:
+    """Polish the barycentre seed by directly minimizing the true straight-line
+    crossing cost. Nodes live on distinct integer grid cells; moves are a swap
+    of any two nodes' cells and a relocation into a free cell in an adjacent
+    column. Both are accepted only when they strictly lower the cost, so the
+    search is a deterministic monotone descent -- every candidate is tried in a
+    fixed order and ties never displace the incumbent."""
+    ordered = sorted(node_ids, key=lambda node_id: index_of[node_id])
 
-    def remaining_violation(candidate: tuple[float, float], excluded_id: str) -> float:
-        total = 0.0
-        for other_id in node_ids:
-            if other_id == excluded_id:
-                continue
-            other_x, other_y = positions[other_id]
-            dist = math.hypot(candidate[0] - other_x, candidate[1] - other_y)
-            if dist < MIN_NODE_DIST:
-                total += (MIN_NODE_DIST - dist) ** 2
-        return total
+    def cost() -> float:
+        return _layout_cost(node_ids, directed, cell_of)
 
-    for _ in range(SEPARATION_ROUNDS):
-        push: dict[str, list[float]] = {node_id: [0.0, 0.0] for node_id in node_ids}
-        conflicts: dict[str, list[tuple[float, float]]] = {}
-        any_violation = False
-        for index, id_a in enumerate(node_ids):
-            for id_b in node_ids[index + 1 :]:
-                a_movable = id_a in movable
-                b_movable = id_b in movable
-                if not a_movable and not b_movable:
-                    continue
-                dx = positions[id_b][0] - positions[id_a][0]
-                dy = positions[id_b][1] - positions[id_a][1]
-                dist = math.hypot(dx, dy) or 1.0
-                if dist >= MIN_NODE_DIST:
-                    continue
-                any_violation = True
-                deficit = MIN_NODE_DIST - dist
-                ux, uy = dx / dist, dy / dist
-                share = deficit / 2 if (a_movable and b_movable) else deficit
-                if a_movable:
-                    push[id_a][0] -= ux * share
-                    push[id_a][1] -= uy * share
-                    conflicts.setdefault(id_a, []).append(positions[id_b])
-                if b_movable:
-                    push[id_b][0] += ux * share
-                    push[id_b][1] += uy * share
-                    conflicts.setdefault(id_b, []).append(positions[id_a])
-        if not any_violation:
+    current = cost()
+    for _ in range(SEARCH_ROUNDS):
+        improved = False
+        for first in range(len(ordered)):
+            for second in range(first + 1, len(ordered)):
+                node_a, node_b = ordered[first], ordered[second]
+                cell_of[node_a], cell_of[node_b] = cell_of[node_b], cell_of[node_a]
+                candidate = cost()
+                if candidate < current - 1e-6:
+                    current = candidate
+                    improved = True
+                else:
+                    cell_of[node_a], cell_of[node_b] = cell_of[node_b], cell_of[node_a]
+        occupied = set(cell_of.values())
+        rows = [row for _, row in cell_of.values()]
+        low, high = min(rows) - SLOT_MARGIN, max(rows) + SLOT_MARGIN
+        for node_id in ordered:
+            origin = cell_of[node_id]
+            column, _row = origin
+            for target in _candidate_cells(column, low, high, occupied):
+                cell_of[node_id] = target
+                candidate = cost()
+                if candidate < current - 1e-6:
+                    current = candidate
+                    improved = True
+                    occupied.discard(origin)
+                    occupied.add(target)
+                    break
+                cell_of[node_id] = origin
+        if not improved:
             break
+    return cell_of
+
+
+def _candidate_cells(
+    column: int, low: int, high: int, occupied: set[tuple[int, int]]
+) -> list[tuple[int, int]]:
+    return [
+        (candidate_column, row)
+        for candidate_column in (column - 1, column, column + 1)
+        for row in range(low, high + 1)
+        if (candidate_column, row) not in occupied
+    ]
+
+
+def _layout_cost(
+    node_ids: list[str],
+    directed: list[tuple[str, str]],
+    cell_of: dict[str, tuple[int, int]],
+) -> float:
+    position = {
+        node_id: (column * COL_SPACING, row * ROW_SPACING)
+        for node_id, (column, row) in cell_of.items()
+    }
+    segments = [
+        (position[source], position[target], source, target)
+        for source, target in directed
+    ]
+    crossings = _count_overlaps(segments)
+    grazes = 0
+    total_length = 0.0
+    for start, end, source, target in segments:
+        total_length += math.hypot(end[0] - start[0], end[1] - start[1])
         for node_id in node_ids:
-            neighbours = conflicts.get(node_id)
-            if neighbours is None:
+            if node_id in (source, target):
                 continue
-            old_x, old_y = positions[node_id]
-            push_x, push_y = push[node_id]
-            best = (
-                min(max(old_x + push_x, MARGIN), width - MARGIN),
-                min(max(old_y + push_y, MARGIN), height - MARGIN),
-            )
-            best_score = remaining_violation(best, node_id)
-            # Ring centres: each distinct conflicting neighbour's own position
-            # (a ring here is guaranteed clear of *that* neighbour, which
-            # matters when the conflicts are unrelated nodes that happen to
-            # be near each other only by coincidence) plus their average
-            # (which is the useful centre for the shared-anchor case the
-            # single-neighbour ring can't distinguish from). Deduplicated so
-            # a lone conflict doesn't evaluate the same ring twice.
-            mean_x = sum(point[0] for point in neighbours) / len(neighbours)
-            mean_y = sum(point[1] for point in neighbours) / len(neighbours)
-            ring_centres = {(mean_x, mean_y), *neighbours}
-            for centre_x, centre_y in ring_centres:
-                for ring_index in range(SEPARATION_RING_CANDIDATES):
-                    angle = 2 * math.pi * ring_index / SEPARATION_RING_CANDIDATES
-                    candidate = (
-                        min(
-                            max(centre_x + MIN_NODE_DIST * math.cos(angle), MARGIN),
-                            width - MARGIN,
-                        ),
-                        min(
-                            max(centre_y + MIN_NODE_DIST * math.sin(angle), MARGIN),
-                            height - MARGIN,
-                        ),
-                    )
-                    score = remaining_violation(candidate, node_id)
-                    if score < best_score:
-                        best_score = score
-                        best = candidate
-            positions[node_id] = best
+            if _point_near_segment(
+                position[node_id], start, end, NODE_ON_EDGE_CLEARANCE
+            ):
+                grazes += 1
+    rows = [row for _, row in cell_of.values()]
+    row_span = max(rows) - min(rows)
+    return (
+        crossings * CROSSING_COST
+        + grazes * NODE_ON_EDGE_COST
+        + row_span * HEIGHT_COST
+        + total_length * LENGTH_COST
+    )
+
+
+def _count_overlaps(
+    segments: list[tuple[tuple[float, float], tuple[float, float], str, str]],
+) -> int:
+    """Count visually overlapping edge pairs: proper crossings and collinear
+    overlaps between edges that share no node, plus near-parallel fans out of a
+    shared node (two arrows drawn on top of each other)."""
+    overlaps = 0
+    cos_limit = math.cos(math.radians(COLLINEAR_DEG))
+    for first in range(len(segments)):
+        start_a, end_a, source_a, target_a = segments[first]
+        for second in range(first + 1, len(segments)):
+            start_b, end_b, source_b, target_b = segments[second]
+            shared = {source_a, target_a} & {source_b, target_b}
+            if shared:
+                if len({source_a, target_a} | {source_b, target_b}) == 2:
+                    # Same pair of nodes: a duplicate edge (e.g. one activity's
+                    # multi-path first step) drawn on the identical line. No
+                    # placement can separate two edges between the same two
+                    # nodes, so this is not a resolvable crossing.
+                    continue
+                pivot = next(iter(shared))
+                if _fan_overlaps(
+                    pivot, start_a, end_a, source_a, start_b, end_b, source_b, cos_limit
+                ):
+                    overlaps += 1
+                continue
+            if _segments_cross(start_a, end_a, start_b, end_b):
+                overlaps += 1
+    return overlaps
+
+
+def _fan_overlaps(
+    pivot: str,
+    start_a: tuple[float, float],
+    end_a: tuple[float, float],
+    source_a: str,
+    start_b: tuple[float, float],
+    end_b: tuple[float, float],
+    source_b: str,
+    cos_limit: float,
+) -> bool:
+    tail_a, head_a = (start_a, end_a) if source_a == pivot else (end_a, start_a)
+    tail_b, head_b = (start_b, end_b) if source_b == pivot else (end_b, start_b)
+    ax, ay = head_a[0] - tail_a[0], head_a[1] - tail_a[1]
+    bx, by = head_b[0] - tail_b[0], head_b[1] - tail_b[1]
+    length_a = math.hypot(ax, ay) or 1.0
+    length_b = math.hypot(bx, by) or 1.0
+    cosine = (ax * bx + ay * by) / (length_a * length_b)
+    return cosine >= cos_limit
+
+
+def _segments_cross(
+    start_a: tuple[float, float],
+    end_a: tuple[float, float],
+    start_b: tuple[float, float],
+    end_b: tuple[float, float],
+) -> bool:
+    def orientation(
+        p: tuple[float, float], q: tuple[float, float], r: tuple[float, float]
+    ) -> float:
+        return (r[1] - p[1]) * (q[0] - p[0]) - (q[1] - p[1]) * (r[0] - p[0])
+
+    d1 = orientation(start_b, end_b, start_a)
+    d2 = orientation(start_b, end_b, end_a)
+    d3 = orientation(start_a, end_a, start_b)
+    d4 = orientation(start_a, end_a, end_b)
+    if ((d1 > 0) != (d2 > 0)) and ((d3 > 0) != (d4 > 0)):
+        return True
+    # Collinear overlap: any endpoint of one lying on the other's span.
+    for point, seg_start, seg_end in (
+        (start_a, start_b, end_b),
+        (end_a, start_b, end_b),
+        (start_b, start_a, end_a),
+        (end_b, start_a, end_a),
+    ):
+        if abs(orientation(seg_start, seg_end, point)) < 1e-6 and _point_near_segment(
+            point, seg_start, seg_end, 1e-6
+        ):
+            return True
+    return False
+
+
+def _point_near_segment(
+    point: tuple[float, float],
+    start: tuple[float, float],
+    end: tuple[float, float],
+    clearance: float,
+) -> bool:
+    seg_x, seg_y = end[0] - start[0], end[1] - start[1]
+    length_sq = seg_x * seg_x + seg_y * seg_y
+    if length_sq == 0.0:
+        return math.hypot(point[0] - start[0], point[1] - start[1]) <= clearance
+    t = ((point[0] - start[0]) * seg_x + (point[1] - start[1]) * seg_y) / length_sq
+    if t <= 0.0 or t >= 1.0:  # nearest point is an endpoint (a shared node) -> fine
+        return False
+    proj_x, proj_y = start[0] + t * seg_x, start[1] + t * seg_y
+    return math.hypot(point[0] - proj_x, point[1] - proj_y) <= clearance
+
+
+def _framed(
+    grid: dict[str, tuple[float, float]],
+) -> tuple[dict[str, tuple[float, float]], float, float]:
+    """Shift the grid so its top-left node sits at (PAD, PAD) and size the
+    canvas to enclose every node with PAD to spare, growing to the minimum
+    canvas and re-centring smaller diagrams within it."""
+    xs = [x for x, _ in grid.values()]
+    ys = [y for _, y in grid.values()]
+    min_x, max_x = min(xs), max(xs)
+    min_y, max_y = min(ys), max(ys)
+    positions = {
+        node_id: (x - min_x + PAD, y - min_y + PAD) for node_id, (x, y) in grid.items()
+    }
+    width = max(max_x - min_x + 2 * PAD, MIN_CANVAS_W)
+    height = max(max_y - min_y + 2 * PAD, MIN_CANVAS_H)
+    used_w = max_x - min_x + 2 * PAD
+    used_h = max_y - min_y + 2 * PAD
+    shift_x = (width - used_w) / 2
+    shift_y = (height - used_h) / 2
+    if shift_x or shift_y:
+        positions = {
+            node_id: (x + shift_x, y + shift_y) for node_id, (x, y) in positions.items()
+        }
+    return positions, width, height
 
 
 def layout_graph(graph: DiagramGraph) -> DiagramLayout:
@@ -355,7 +481,16 @@ def layout_graph(graph: DiagramGraph) -> DiagramLayout:
         for p in placed_nodes
     }
     placed_edges: list[PlacedEdge] = []
+    drawn: set[tuple[str, str, str, int | None]] = set()
     for edge in graph.edges:
+        # One activity with several paths repeats its shared first step as
+        # identical edges (e.g. "sends" toward the same object for each
+        # recipient). Those draw on the exact same line, so only place the
+        # first; the diverging connectives ("to Alice", "to Bob") still differ.
+        signature = (edge.source, edge.target, edge.label, edge.number)
+        if edge.source != edge.target and signature in drawn:
+            continue
+        drawn.add(signature)
         source_x, source_y = positions[edge.source]
         target_x, target_y = positions[edge.target]
         if edge.source == edge.target:
@@ -380,8 +515,8 @@ def layout_graph(graph: DiagramGraph) -> DiagramLayout:
 
         dx, dy = target_x - source_x, target_y - source_y
         dist = math.hypot(dx, dy)
-        # Distinct connected nodes should never coincide once _separate has
-        # run; a zero distance here means two placed nodes with an edge
+        # Distinct connected nodes should never coincide once the grid has been
+        # placed; a zero distance here means two placed nodes with an edge
         # between them landed on the same point, which is a layout bug.
         assert dist > 0.0, f'coincident nodes {edge.source!r} and {edge.target!r}'
         ux, uy = dx / dist, dy / dist
@@ -405,6 +540,22 @@ def layout_graph(graph: DiagramGraph) -> DiagramLayout:
         width=width,
         height=height,
     )
+
+
+def count_crossings(edges: tuple[PlacedEdge, ...]) -> int:
+    """Number of overlapping drawn-edge pairs (self-loops excluded). The layout
+    is built to drive this to zero; tests assert on it."""
+    segments = [
+        (
+            (placed.x1, placed.y1),
+            (placed.x2, placed.y2),
+            placed.edge.source,
+            placed.edge.target,
+        )
+        for placed in edges
+        if not placed.loop
+    ]
+    return _count_overlaps(segments)
 
 
 def _label_size(edge: DiagramEdge) -> tuple[float, float]:
