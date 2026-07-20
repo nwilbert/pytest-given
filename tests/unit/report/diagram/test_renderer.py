@@ -29,6 +29,7 @@ def test_writes_self_contained_file_with_story_data(
     assert trip_story.title in html
     assert 'Individual traveler.' in html  # tooltip definition payload
     assert 'src=' not in html  # self-contained: no external refs
+    assert f'{len(trip_story.activities)} activities' in html  # sidebar count
 
 
 def test_no_glossary_and_empty_story(tmp_path: Path, trip_story: Story) -> None:
@@ -41,6 +42,7 @@ def test_no_glossary_and_empty_story(tmp_path: Path, trip_story: Story) -> None:
     render_diagrams(report, output)
     html = output.read_text(encoding='utf-8')
     assert 'Empty Story' in html  # renders with empty-state note
+    assert 'This story has no activities yet.' in html
 
 
 def test_no_stories_at_all_renders_empty_state(tmp_path: Path) -> None:

@@ -1,12 +1,11 @@
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
 
 from ..model import report_from_dict
 from .diagram import render_diagrams
-from .html_renderer import render_html
+from .html_renderer import diagrams_href, render_html
 from .md_renderer import render_md
 from .source_link import resolve_template
 
@@ -70,21 +69,24 @@ def run_report(args: argparse.Namespace) -> int:
     else:
         template = resolve_template(args.source_link)
         output = args.output or Path('given-report/report.html')
-        diagrams_href = None
+        diagrams_href_value = None
         if args.diagrams is not None:
-            relative = os.path.relpath(args.diagrams, output.parent)
-            diagrams_href = Path(relative).as_posix()
+            diagrams_href_value = diagrams_href(output, args.diagrams)
         render_html(
             report,
             output,
             source_link_template=template,
-            diagrams_href=diagrams_href,
+            diagrams_href=diagrams_href_value,
         )
         print(f'Report generated: {output}')
 
     if args.diagrams is not None:
         render_diagrams(report, args.diagrams)
-        print(f'Diagrams generated: {args.diagrams}')
+        diagrams_message = f'Diagrams generated: {args.diagrams}'
+        if fmt == 'md' and args.output is None:
+            print(diagrams_message, file=sys.stderr)
+        else:
+            print(diagrams_message)
     return 0
 
 

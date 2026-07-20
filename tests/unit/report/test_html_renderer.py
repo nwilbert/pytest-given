@@ -9,6 +9,7 @@ from pytest_given import given, scenario, then, when
 from pytest_given.report.html_renderer import (
     _inline_md,
     _render_narration_part,
+    diagrams_href,
     render_html,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
@@ -1713,3 +1714,25 @@ def test_diagram_link_present_only_with_href(tmp_path: Path) -> None:
 
     render_html(report, html_path)
     assert 'diagrams.html#' not in html_path.read_text(encoding='utf-8')
+
+
+def test_diagrams_href_computes_relative_posix_path(tmp_path: Path) -> None:
+    html_path = tmp_path / 'out' / 'report.html'
+    diagrams_path = tmp_path / 'out' / 'diagrams.html'
+    assert diagrams_href(html_path, diagrams_path) == 'diagrams.html'
+
+
+def test_diagrams_href_returns_none_on_cross_drive_value_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """os.path.relpath raises ValueError when the two paths are on different
+    drives (Windows only); that's not reproducible in CI, so the crash path
+    is exercised by monkeypatching relpath directly."""
+
+    def _raise(*_args: object, **_kwargs: object) -> str:
+        raise ValueError('path is on mount .., start on mount ..')
+
+    monkeypatch.setattr('pytest_given.report.html_renderer.os.path.relpath', _raise)
+    html_path = tmp_path / 'report.html'
+    diagrams_path = tmp_path / 'diagrams.html'
+    assert diagrams_href(html_path, diagrams_path) is None

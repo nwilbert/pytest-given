@@ -5,7 +5,6 @@ import dataclasses
 import functools
 import inspect
 import json
-import os
 import time
 from collections.abc import Callable, Generator
 from datetime import UTC, datetime
@@ -79,6 +78,7 @@ from .model import (
 )
 from .report import (
     detect_commit_sha,
+    diagrams_href,
     render_diagrams,
     render_html,
     render_md,
@@ -727,15 +727,14 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             'given_source_link'
         ) or session.config.getini('given_source_link')
         template = resolve_template(raw_link)
-        diagrams_href = None
+        diagrams_href_value = None
         if diagrams_opt is not None:
-            relative = os.path.relpath(Path(diagrams_opt), Path(html_opt).parent)
-            diagrams_href = Path(relative).as_posix()
+            diagrams_href_value = diagrams_href(Path(html_opt), Path(diagrams_opt))
         render_html(
             report,
             Path(html_opt),
             source_link_template=template,
-            diagrams_href=diagrams_href,
+            diagrams_href=diagrams_href_value,
         )
 
     md_opt = session.config.getoption('given_md')

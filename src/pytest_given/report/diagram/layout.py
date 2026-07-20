@@ -3,7 +3,11 @@
 Actors are pinned anchors: initiators (sources of numbered edges) on the left
 band, pure recipients on the right, ordered by first appearance. Per-activity
 work objects are seeded around their anchors and relaxed with springs (rest
-length IDEAL_EDGE) plus pairwise repulsion below MIN_NODE_DIST.
+length IDEAL_EDGE) plus pairwise repulsion below MIN_NODE_DIST. A
+deterministic separation post-pass then enforces MIN_NODE_DIST exactly on any
+pair the relaxation's spring equilibrium left too close, and a label slide
+pass places each edge's label near its midpoint, sliding it along the edge
+until it clears every node and previously placed label box.
 """
 
 from __future__ import annotations
@@ -22,6 +26,8 @@ MIN_NODE_DIST = 250.0
 ITERATIONS = 140
 SEPARATION_ROUNDS = 60
 SEPARATION_RING_CANDIDATES = 24
+
+assert BAND_ROW_SPACING >= MIN_NODE_DIST  # actor-actor pairs skip _separate
 
 NODE_HALF_W = 62.0
 NODE_HALF_H = 58.0
@@ -126,7 +132,7 @@ def _place_band(
         return
     top = MARGIN + 110.0
     step = (height - 2 * (MARGIN + 110.0)) / (len(band) - 1)
-    assert len(band) == 1 or step >= MIN_NODE_DIST
+    assert step >= MIN_NODE_DIST
     for index, node_id in enumerate(band):
         positions[node_id] = (band_x, top + index * step)
 

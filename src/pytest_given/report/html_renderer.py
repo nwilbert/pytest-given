@@ -1,4 +1,5 @@
 import json
+import os
 from collections.abc import Callable
 from pathlib import Path
 from typing import assert_never
@@ -49,6 +50,21 @@ def _inline_md(text: str | None) -> Markup:
     if not text:
         return Markup('')
     return Markup(render_inline_markdown(text))
+
+
+def diagrams_href(html_path: Path, diagrams_path: Path) -> str | None:
+    """POSIX-style relative path from `html_path`'s directory to
+    `diagrams_path`, for linking a report page to its diagrams artifact.
+
+    `os.path.relpath` raises ValueError when the two paths are on different
+    drives (Windows only); that's not a bug in the caller, just two artifacts
+    that happen to live on separate drives, so this reports "no link"
+    instead of propagating the crash."""
+    try:
+        relative = os.path.relpath(diagrams_path, html_path.parent)
+    except ValueError:
+        return None
+    return Path(relative).as_posix()
 
 
 def render_html(

@@ -206,3 +206,36 @@ def test_cli_diagrams_generates_artifact(pytester: pytest.Pytester) -> None:
     assert rc == 0
     assert diagrams_path.exists()
     assert 'Serve Coffee' in diagrams_path.read_text(encoding='utf-8')
+
+
+def test_cli_format_md_to_stdout_with_diagrams_keeps_stdout_clean(
+    tmp_path: Path, capsys
+) -> None:
+    """--format md with no -o writes the markdown payload to stdout; the
+    'Diagrams generated: ...' status line must not join it there, or piping
+    the CLI's stdout to a file corrupts the markdown."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'cli',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [],
+                'stories': [{'id': 'empty', 'title': 'Empty', 'activities': []}],
+            }
+        )
+    )
+    diagrams_path = tmp_path / 'diagrams.html'
+    rc = main(
+        ['report', str(json_path), '--format', 'md', '--diagrams', str(diagrams_path)]
+    )
+    assert rc == 0
+    assert diagrams_path.exists()
+    captured = capsys.readouterr()
+    assert captured.out == '# pytest-given — cli\n\n'
+    assert 'Diagrams generated' in captured.err
+    assert 'Diagrams generated' not in captured.out

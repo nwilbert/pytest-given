@@ -20,6 +20,7 @@ class StoryView:
 
     layout: DiagramLayout
     max_step: int  # highest activity number; 0 for an empty story
+    activity_count: int  # number of activities in the story (ids may have gaps)
 
 
 def render_diagrams(report: ReportData, output_path: Path) -> None:
@@ -34,7 +35,11 @@ def render_diagrams(report: ReportData, output_path: Path) -> None:
     for story in report.stories:
         layout = layout_graph(build_graph(story, report.glossary))
         max_step = max((placed.edge.number or 0 for placed in layout.edges), default=0)
-        views.append(StoryView(layout=layout, max_step=max_step))
+        views.append(
+            StoryView(
+                layout=layout, max_step=max_step, activity_count=len(story.activities)
+            )
+        )
     term_info: dict[str, dict[str, str | None]] = {}
     if report.glossary is not None:
         term_info = {

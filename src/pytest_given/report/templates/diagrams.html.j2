@@ -27,7 +27,7 @@
 {% if placed.edge.number is not none %}
 <circle cx="{{ (cx + 11) | round }}" cy="{{ (cy - 5) | round }}" r="11" class="numbg"/>
 <text x="{{ (cx + 11) | round }}" y="{{ (cy - 1) | round }}" class="num">{{ placed.edge.number }}</text>
-<text x="{{ (cx + 27) | round }}" y="{{ (cy - 1) | round }}" class="verb">{{ placed.edge.label }}</text>
+<text x="{{ (cx + 27) | round }}" y="{{ (cy - 1) | round }}" class="verb{{ ' conn' if placed.edge.connective }}">{{ placed.edge.label }}</text>
 {% else %}
 <text x="{{ cx | round }}" y="{{ (cy - 1) | round }}"
       class="verb {{ 'conn' if placed.edge.connective }}">{{ placed.edge.label }}</text>
@@ -57,7 +57,7 @@
     <div class="story-item" :class="{ active: selectedStory === '{{ story.story_id }}' }"
          @click="selectedStory = '{{ story.story_id }}'">
       <div class="story-title">{{ story.title }}</div>
-      <div class="story-meta">{{ view.max_step }} activities</div>
+      <div class="story-meta">{{ view.activity_count }} activities</div>
     </div>
     {% endfor %}
   </nav>
@@ -101,7 +101,8 @@
              real pointer, so hovering to dim other activities needs a fatter
              (but invisible) hit-strip along the same path. #}
           <path class="edge-hit" d="{{ loop_d }}"/>
-          <path class="edge" marker-end="url(#arrow-{{ story.story_id }})" d="{{ loop_d }}"/>
+          <path class="edge {{ 'connective' if placed.edge.connective }}"
+                marker-end="url(#arrow-{{ story.story_id }})" d="{{ loop_d }}"/>
           {% else %}
           <line class="edge-hit"
                 x1="{{ placed.x1 | round }}" y1="{{ placed.y1 | round }}"
@@ -151,14 +152,16 @@ function diagramsApp() {
     selectedStory: null, step: null, hoverActivity: null, tooltip: null,
     maxSteps: MAX_STEPS,
     init() {
-      const hash = decodeURIComponent(location.hash.slice(1));
+      let hash;
+      try { hash = decodeURIComponent(location.hash.slice(1)); } catch { hash = ''; }
       this.selectedStory = STORY_IDS.includes(hash) ? hash : STORY_IDS[0];
       this.$watch('selectedStory', (id) => {
         history.replaceState(null, '', '#' + encodeURIComponent(id));
         this.step = null; this.hoverActivity = null;
       });
       window.addEventListener('hashchange', () => {
-        const next = decodeURIComponent(location.hash.slice(1));
+        let next;
+        try { next = decodeURIComponent(location.hash.slice(1)); } catch { next = ''; }
         if (STORY_IDS.includes(next)) this.selectedStory = next;
       });
       window.addEventListener('keydown', (e) => {

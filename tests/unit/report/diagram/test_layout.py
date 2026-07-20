@@ -196,8 +196,8 @@ def test_labels_do_not_overlap_labels_or_nodes(
         for p in layout.nodes
     ]
     label_boxes = [e.label for e in layout.edges]
-    for i, box in enumerate(label_boxes):
-        for other in label_boxes[i + 1 :]:
+    for index, box in enumerate(label_boxes):
+        for other in label_boxes[index + 1 :]:
             assert not _boxes_overlap(box, other)
         for node_box in node_boxes:
             assert not _boxes_overlap(box, node_box)
