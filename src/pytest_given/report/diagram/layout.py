@@ -10,9 +10,11 @@ first seeded by the barycentre heuristic and then polished by a local search
 that directly minimizes the true straight-line crossing count. A second search
 pass then reorders rows (never columns, so the diagram stays as compact) to
 pull consecutively numbered activities together -- a strict secondary goal that
-can never cost a crossing. Edge endpoints are trimmed back to the node rims and
-each edge's label is slid along it until it clears every node and previously
-placed label.
+can never cost a crossing. Finally the whole diagram is reflected (an isometry,
+so crossings and step spacing are untouched) to seat the story's start node in
+the top-left corner -- the third priority. Edge endpoints are trimmed back to
+the node rims and each edge's label is slid along it until it clears every node
+and previously placed label.
 """
 
 from __future__ import annotations
@@ -115,7 +117,47 @@ def position_nodes(
         node_id: (column * COL_SPACING, row * ROW_SPACING)
         for node_id, (column, row) in cell_of.items()
     }
-    return _framed(grid)
+    positions, width, height = _framed(grid)
+    start = sequence[0][0] if sequence else None
+    positions = _orient_start_top_left(positions, width, height, start)
+    return positions, width, height
+
+
+def _orient_start_top_left(
+    positions: dict[str, tuple[float, float]],
+    width: float,
+    height: float,
+    start: str | None,
+) -> dict[str, tuple[float, float]]:
+    """Third priority: the story should read from the top-left. Reflecting the
+    whole diagram horizontally and/or vertically is an isometry -- it preserves
+    every edge crossing and every distance between numbered steps -- so among
+    the four axis-aligned reflections we simply keep the one that lands the
+    story's start node (activity 1's initiator) nearest the top-left corner.
+    This never costs a crossing or loosens the sequence grouping."""
+    if start is None or start not in positions:
+        return positions
+    start_x, start_y = positions[start]
+    flips = [(False, False), (True, False), (False, True), (True, True)]
+
+    def corner_distance(flip: tuple[bool, bool]) -> float:
+        flip_x, flip_y = flip
+        return (width - start_x if flip_x else start_x) + (
+            height - start_y if flip_y else start_y
+        )
+
+    flip_x, flip_y = min(
+        flips, key=lambda flip: (corner_distance(flip), flips.index(flip))
+    )
+    if not flip_x and not flip_y:
+        return positions
+    return {
+        node_id: (
+            width - x if flip_x else x,
+            height - y if flip_y else y,
+        )
+        for node_id, (x, y) in positions.items()
+    }
 
 
 def _directed_edges(graph: DiagramGraph) -> list[tuple[str, str]]:

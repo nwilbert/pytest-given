@@ -137,6 +137,28 @@ def test_sequence_term_pulls_numbered_steps_together(
     assert count_crossings(with_sequence.edges) == 0
 
 
+def test_story_start_seated_top_left(
+    trip_story: Story, trip_glossary: Glossary
+) -> None:
+    """Third priority: the story's start node (activity 1's initiator) is seated
+    as near the top-left as an axis-aligned reflection can put it -- and that
+    reflection, being an isometry, leaves the diagram crossing-free."""
+    graph = build_graph(trip_story, trip_glossary)
+    layout = layout_graph(graph)
+    positions = {placed.node.id: (placed.x, placed.y) for placed in layout.nodes}
+    start = _numbered_sequence(graph)[0][0]
+    start_x, start_y = positions[start]
+    width, height = layout.width, layout.height
+    corner_distance = start_x + start_y
+    for reflected_x, reflected_y in (
+        (width - start_x, start_y),
+        (start_x, height - start_y),
+        (width - start_x, height - start_y),
+    ):
+        assert corner_distance <= reflected_x + reflected_y + 1e-6
+    assert count_crossings(layout.edges) == 0
+
+
 def test_hub_fan_has_no_crossings() -> None:
     """A single actor connected to many work objects (a star) is always
     planar; every fan edge must stay clear of the others."""
