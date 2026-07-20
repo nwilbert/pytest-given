@@ -1,5 +1,7 @@
 import math
 
+import pytest
+
 from pytest_given.model import (
     Activity,
     ActivityId,
@@ -13,6 +15,7 @@ from pytest_given.model import (
 from pytest_given.report.diagram import (
     DiagramEdge,
     DiagramGraph,
+    DiagramLayout,
     DiagramNode,
     build_graph,
     count_crossings,
@@ -26,6 +29,8 @@ from pytest_given.report.diagram.layout import (
     NODE_HALF_H,
     NODE_HALF_W,
     LabelBox,
+    _numbered_sequence,
+    _sequence_spread,
     _slide_label,
     position_nodes,
 )
@@ -107,6 +112,29 @@ def test_disjoint_stars_do_not_cross_and_keep_min_distance() -> None:
         for second_x, second_y in coords[index + 1 :]:
             assert math.hypot(second_x - first_x, second_y - first_y) >= MIN_NODE_DIST
     assert count_crossings(layout_graph(graph).edges) == 0
+
+
+def _sequence_spread_of(layout: DiagramLayout) -> float:
+    positions = {placed.node.id: (placed.x, placed.y) for placed in layout.nodes}
+    return _sequence_spread(_numbered_sequence(layout.graph), positions)
+
+
+def test_sequence_term_pulls_numbered_steps_together(
+    trip_story: Story, trip_glossary: Glossary, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The secondary goal: consecutively numbered activities sit near each
+    other. Turning the sequence weight off must not produce a tighter reading
+    order than leaving it on -- and it must never cost a crossing."""
+    from pytest_given.report.diagram import layout as layout_module
+
+    graph = build_graph(trip_story, trip_glossary)
+    with_sequence = layout_graph(graph)
+
+    monkeypatch.setattr(layout_module, 'SEQUENCE_COST', 0.0)
+    without_sequence = layout_graph(graph)
+
+    assert _sequence_spread_of(with_sequence) <= _sequence_spread_of(without_sequence)
+    assert count_crossings(with_sequence.edges) == 0
 
 
 def test_hub_fan_has_no_crossings() -> None:

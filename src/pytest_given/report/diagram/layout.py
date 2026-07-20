@@ -7,13 +7,17 @@ never overlap by construction. Columns come from a longest-path layering of the
 activity flow (sources -- the actors and objects that start a path -- on the
 left, each step one column further right); within a column the row order is
 first seeded by the barycentre heuristic and then polished by a local search
-that directly minimizes the true straight-line crossing count. Edge endpoints
-are trimmed back to the node rims and each edge's label is slid along it until
-it clears every node and previously placed label.
+that directly minimizes the true straight-line crossing count. A second search
+pass then reorders rows (never columns, so the diagram stays as compact) to
+pull consecutively numbered activities together -- a strict secondary goal that
+can never cost a crossing. Edge endpoints are trimmed back to the node rims and
+each edge's label is slid along it until it clears every node and previously
+placed label.
 """
 
 from __future__ import annotations
 
+import itertools
 import math
 from collections import deque
 from collections.abc import Iterator
@@ -45,11 +49,14 @@ BADGE_W = 30.0
 LABEL_OFFSET = 18.0
 LOOP_RADIUS = 46.0
 
-# Local-search cost weights: a single crossing outweighs any number of
-# edge-over-node grazes, which in turn outweigh any amount of edge length.
-CROSSING_COST = 1_000_000.0
-NODE_ON_EDGE_COST = 1_000.0
-HEIGHT_COST = 5.0  # per row of total vertical span: flattens hub columns
+# Local-search cost weights, strictly ranked by magnitude so each objective
+# only ever breaks ties left by the one above it: avoid crossings first, then
+# edges running over nodes, then keep consecutively numbered steps near each
+# other (so the eye follows 1 -> 2 -> 3), then stay compact, then short.
+CROSSING_COST = 1_000_000_000.0
+NODE_ON_EDGE_COST = 1_000_000.0
+SEQUENCE_COST = 5.0  # per column-width between consecutive numbered edges
+HEIGHT_COST = 1.0  # per row of total vertical span: flattens hub columns
 LENGTH_COST = 0.001
 COLLINEAR_DEG = 8.0  # two edges from a shared node this close in angle overlap
 NODE_ON_EDGE_CLEARANCE = 70.0  # how near a segment a foreign node may sit
@@ -98,11 +105,12 @@ def position_nodes(
         return {}, MIN_CANVAS_W, MIN_CANVAS_H
     index_of = {node_id: i for i, node_id in enumerate(node_ids)}
     directed = _directed_edges(graph)
+    sequence = _numbered_sequence(graph)
     undirected = _undirected_adjacency(node_ids, directed)
     layer_of = _assign_layers(node_ids, directed)
     layer_nodes = _order_within_layers(node_ids, index_of, undirected, layer_of)
     cell_of = _seed_cells(layer_nodes)
-    cell_of = _local_search(node_ids, index_of, directed, cell_of)
+    cell_of = _local_search(node_ids, index_of, directed, sequence, cell_of)
     grid = {
         node_id: (column * COL_SPACING, row * ROW_SPACING)
         for node_id, (column, row) in cell_of.items()
@@ -122,6 +130,22 @@ def _directed_edges(graph: DiagramGraph) -> list[tuple[str, str]]:
         seen.add(pair)
         directed.append(pair)
     return directed
+
+
+def _numbered_sequence(graph: DiagramGraph) -> list[tuple[str, str]]:
+    """The (source, target) of each activity's first edge, ordered by the
+    sequence badge. One representative per number -- a multi-path activity
+    repeats its number, but a single anchor point is enough to chain the
+    reading order 1 -> 2 -> 3 across the diagram."""
+    seen: set[int] = set()
+    numbered: list[tuple[int, str, str]] = []
+    for edge in graph.edges:
+        if edge.number is None or edge.number in seen:
+            continue
+        seen.add(edge.number)
+        numbered.append((edge.number, edge.source, edge.target))
+    numbered.sort(key=lambda item: item[0])
+    return [(source, target) for _number, source, target in numbered]
 
 
 def _undirected_adjacency(
@@ -151,9 +175,7 @@ def _assign_layers(
         if colour[start] != 0:
             continue
         colour[start] = 1
-        stack: list[tuple[str, Iterator[str]]] = [
-            (start, iter(out_adjacency[start]))
-        ]
+        stack: list[tuple[str, Iterator[str]]] = [(start, iter(out_adjacency[start]))]
         while stack:
             node, neighbours = stack[-1]
             advanced = False
@@ -247,6 +269,7 @@ def _local_search(
     node_ids: list[str],
     index_of: dict[str, int],
     directed: list[tuple[str, str]],
+    sequence: list[tuple[str, str]],
     cell_of: dict[str, tuple[int, int]],
 ) -> dict[str, tuple[int, int]]:
     """Polish the barycentre seed by directly minimizing the true straight-line
@@ -254,52 +277,79 @@ def _local_search(
     of any two nodes' cells and a relocation into a free cell in an adjacent
     column. Both are accepted only when they strictly lower the cost, so the
     search is a deterministic monotone descent -- every candidate is tried in a
-    fixed order and ties never displace the incumbent."""
+    fixed order and ties never displace the incumbent.
+
+    Two phases: the first ignores the sequence term and drives crossings and
+    grazes to their minimum; the second adds the sequence term to line the
+    numbered steps up in reading order. Because a crossing outweighs every
+    sequence gain, the second phase can never trade a crossing away -- it only
+    improves the ordering within the crossing-free arrangement phase one found.
+    """
     ordered = sorted(node_ids, key=lambda node_id: index_of[node_id])
 
-    def cost() -> float:
-        return _layout_cost(node_ids, directed, cell_of)
+    def descend(with_sequence: bool, allow_column_moves: bool) -> None:
+        chain = sequence if with_sequence else []
 
-    current = cost()
-    for _ in range(SEARCH_ROUNDS):
-        improved = False
-        for first in range(len(ordered)):
-            for second in range(first + 1, len(ordered)):
-                node_a, node_b = ordered[first], ordered[second]
-                cell_of[node_a], cell_of[node_b] = cell_of[node_b], cell_of[node_a]
-                candidate = cost()
-                if candidate < current - 1e-6:
-                    current = candidate
-                    improved = True
-                else:
-                    cell_of[node_a], cell_of[node_b] = cell_of[node_b], cell_of[node_a]
-        occupied = set(cell_of.values())
-        rows = [row for _, row in cell_of.values()]
-        low, high = min(rows) - SLOT_MARGIN, max(rows) + SLOT_MARGIN
-        for node_id in ordered:
-            origin = cell_of[node_id]
-            column, _row = origin
-            for target in _candidate_cells(column, low, high, occupied):
-                cell_of[node_id] = target
-                candidate = cost()
-                if candidate < current - 1e-6:
-                    current = candidate
-                    improved = True
-                    occupied.discard(origin)
-                    occupied.add(target)
-                    break
-                cell_of[node_id] = origin
-        if not improved:
-            break
+        def cost() -> float:
+            return _layout_cost(node_ids, directed, chain, cell_of)
+
+        current = cost()
+        for _ in range(SEARCH_ROUNDS):
+            improved = False
+            for first in range(len(ordered)):
+                for second in range(first + 1, len(ordered)):
+                    node_a, node_b = ordered[first], ordered[second]
+                    cell_of[node_a], cell_of[node_b] = (
+                        cell_of[node_b],
+                        cell_of[node_a],
+                    )
+                    candidate = cost()
+                    if candidate < current - 1e-6:
+                        current = candidate
+                        improved = True
+                    else:
+                        cell_of[node_a], cell_of[node_b] = (
+                            cell_of[node_b],
+                            cell_of[node_a],
+                        )
+            occupied = set(cell_of.values())
+            rows = [row for _, row in cell_of.values()]
+            low, high = min(rows) - SLOT_MARGIN, max(rows) + SLOT_MARGIN
+            for node_id in ordered:
+                origin = cell_of[node_id]
+                column, _row = origin
+                columns = (
+                    (column - 1, column, column + 1)
+                    if allow_column_moves
+                    else (column,)
+                )
+                for target in _candidate_cells(columns, low, high, occupied):
+                    cell_of[node_id] = target
+                    candidate = cost()
+                    if candidate < current - 1e-6:
+                        current = candidate
+                        improved = True
+                        occupied.discard(origin)
+                        occupied.add(target)
+                        break
+                    cell_of[node_id] = origin
+            if not improved:
+                break
+
+    # Phase 1 minimizes crossings/grazes with full freedom; phase 2 layers in
+    # the sequence term but only reorders rows within phase 1's columns, so it
+    # tidies the reading order without widening the diagram.
+    descend(with_sequence=False, allow_column_moves=True)
+    descend(with_sequence=True, allow_column_moves=False)
     return cell_of
 
 
 def _candidate_cells(
-    column: int, low: int, high: int, occupied: set[tuple[int, int]]
+    columns: tuple[int, ...], low: int, high: int, occupied: set[tuple[int, int]]
 ) -> list[tuple[int, int]]:
     return [
         (candidate_column, row)
-        for candidate_column in (column - 1, column, column + 1)
+        for candidate_column in columns
         for row in range(low, high + 1)
         if (candidate_column, row) not in occupied
     ]
@@ -308,6 +358,7 @@ def _candidate_cells(
 def _layout_cost(
     node_ids: list[str],
     directed: list[tuple[str, str]],
+    sequence: list[tuple[str, str]],
     cell_of: dict[str, tuple[int, int]],
 ) -> float:
     position = {
@@ -335,8 +386,28 @@ def _layout_cost(
     return (
         crossings * CROSSING_COST
         + grazes * NODE_ON_EDGE_COST
+        + _sequence_spread(sequence, position) * SEQUENCE_COST
         + row_span * HEIGHT_COST
         + total_length * LENGTH_COST
+    )
+
+
+def _sequence_spread(
+    sequence: list[tuple[str, str]], position: dict[str, tuple[float, float]]
+) -> float:
+    """Total gap, in column-widths, between the midpoints of consecutively
+    numbered activity edges. Minimizing it lines the numbered steps up in
+    reading order."""
+    midpoints = [
+        (
+            (position[source][0] + position[target][0]) / 2,
+            (position[source][1] + position[target][1]) / 2,
+        )
+        for source, target in sequence
+    ]
+    return sum(
+        math.hypot(later[0] - earlier[0], later[1] - earlier[1]) / COL_SPACING
+        for earlier, later in itertools.pairwise(midpoints)
     )
 
 
