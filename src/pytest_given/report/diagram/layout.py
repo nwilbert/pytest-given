@@ -9,12 +9,15 @@ left, each step one column further right); within a column the row order is
 first seeded by the barycentre heuristic and then polished by a local search
 that directly minimizes the true straight-line crossing count. A second search
 pass then reorders rows (never columns, so the diagram stays as compact) to
-pull consecutively numbered activities together -- a strict secondary goal that
-can never cost a crossing. Finally the whole diagram is reflected (an isometry,
-so crossings and step spacing are untouched) to seat the story's start node in
-the top-left corner -- the third priority. Edge endpoints are trimmed back to
-the node rims and each edge's label is slid along it until it clears every node
-and previously placed label.
+pull consecutively numbered activities together and to sweep each actor's
+numbered spokes clockwise (low number to high) -- strict secondary goals that
+can never cost a crossing. Vertical compactness is not weighted: the diagrams
+page owns "fit to screen" through zoom, so a wider or taller diagram is fine.
+Finally the whole diagram is reflected (an isometry, so crossings and step
+spacing are untouched) to seat the story's start node in the top-left corner
+-- the third priority. Edge endpoints are trimmed back to the node rims and
+each edge's label is slid along it until it clears every node and previously
+placed label.
 """
 
 from __future__ import annotations
@@ -51,14 +54,21 @@ BADGE_W = 30.0
 LABEL_OFFSET = 18.0
 LOOP_RADIUS = 46.0
 
-# Local-search cost weights, strictly ranked by magnitude so each objective
-# only ever breaks ties left by the one above it: avoid crossings first, then
-# edges running over nodes, then keep consecutively numbered steps near each
-# other (so the eye follows 1 -> 2 -> 3), then stay compact, then short.
+# Local-search cost weights, ranked by magnitude so each objective only ever
+# breaks ties left by the one above it: avoid crossings first, then edges
+# running over nodes, then keep consecutively numbered steps near each other
+# (so the eye follows 1 -> 2 -> 3), then sweep each actor's numbered spokes
+# clockwise, then stay short. Compactness is intentionally disabled -- zoom
+# owns "fit to screen".
 CROSSING_COST = 1_000_000_000.0
 NODE_ON_EDGE_COST = 1_000_000.0
 SEQUENCE_COST = 5.0  # per column-width between consecutive numbered edges
-HEIGHT_COST = 1.0  # per row of total vertical span: flattens hub columns
+CLOCKWISE_COST = 2.0  # per counter-clockwise turn within an actor's fan
+# Compactness is deliberately unweighted: "fit to screen" is owned by the
+# diagrams page's zoom controls, not the layout, so a readability objective
+# (clockwise fans) is never vetoed to keep a diagram short. Kept as a named
+# zero so the ranking comment and any future re-enable stay legible.
+HEIGHT_COST = 0.0  # per row of total vertical span (disabled; see above)
 LENGTH_COST = 0.001
 COLLINEAR_DEG = 8.0  # two edges from a shared node this close in angle overlap
 NODE_ON_EDGE_CLEARANCE = 70.0  # how near a segment a foreign node may sit
@@ -108,11 +118,12 @@ def position_nodes(
     index_of = {node_id: i for i, node_id in enumerate(node_ids)}
     directed = _directed_edges(graph)
     sequence = _numbered_sequence(graph)
+    fans = _actor_fans(graph)
     undirected = _undirected_adjacency(node_ids, directed)
     layer_of = _assign_layers(node_ids, directed)
     layer_nodes = _order_within_layers(node_ids, index_of, undirected, layer_of)
     cell_of = _seed_cells(layer_nodes)
-    cell_of = _local_search(node_ids, index_of, directed, sequence, cell_of)
+    cell_of = _local_search(node_ids, index_of, directed, sequence, fans, cell_of)
     grid = {
         node_id: (column * COL_SPACING, row * ROW_SPACING)
         for node_id, (column, row) in cell_of.items()
@@ -342,6 +353,7 @@ def _local_search(
     index_of: dict[str, int],
     directed: list[tuple[str, str]],
     sequence: list[tuple[str, str]],
+    fans: list[tuple[str, tuple[str, ...]]],
     cell_of: dict[str, tuple[int, int]],
 ) -> dict[str, tuple[int, int]]:
     """Polish the barycentre seed by directly minimizing the true straight-line
@@ -361,9 +373,10 @@ def _local_search(
 
     def descend(with_sequence: bool, allow_column_moves: bool) -> None:
         chain = sequence if with_sequence else []
+        active_fans = fans if with_sequence else []
 
         def cost() -> float:
-            return _layout_cost(node_ids, directed, chain, cell_of)
+            return _layout_cost(node_ids, directed, chain, active_fans, cell_of)
 
         current = cost()
         for _ in range(SEARCH_ROUNDS):
@@ -431,6 +444,7 @@ def _layout_cost(
     node_ids: list[str],
     directed: list[tuple[str, str]],
     sequence: list[tuple[str, str]],
+    fans: list[tuple[str, tuple[str, ...]]],
     cell_of: dict[str, tuple[int, int]],
 ) -> float:
     position = {
@@ -459,6 +473,7 @@ def _layout_cost(
         crossings * CROSSING_COST
         + grazes * NODE_ON_EDGE_COST
         + _sequence_spread(sequence, position) * SEQUENCE_COST
+        + _clockwise_disorder(fans, position) * CLOCKWISE_COST
         + row_span * HEIGHT_COST
         + total_length * LENGTH_COST
     )

@@ -174,6 +174,23 @@ def test_hub_fan_has_no_crossings() -> None:
     assert count_crossings(layout_graph(graph).edges) == 0
 
 
+def test_hub_fan_lays_out_clockwise() -> None:
+    # One actor initiating three single-step activities toward three work
+    # objects. All arrangements are crossing-free; the clockwise term should
+    # settle the fan into clockwise number order.
+    nodes = (_actor('a:hub'), _work('w:1'), _work('w:2'), _work('w:3'))
+    edges = (
+        _edge('a:hub', 'w:1', number=1),
+        _edge('a:hub', 'w:2', number=2),
+        _edge('a:hub', 'w:3', number=3),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    layout = layout_graph(graph)
+    assert count_crossings(layout.edges) == 0
+    positions = {placed.node.id: (placed.x, placed.y) for placed in layout.nodes}
+    assert _clockwise_disorder(_actor_fans(graph), positions) == 0.0
+
+
 def test_single_actor_no_edges_lands_on_canvas_centre() -> None:
     graph = DiagramGraph(
         story_id=StoryId('s'), title='S', nodes=(_actor('actor:only'),), edges=()
