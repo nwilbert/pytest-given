@@ -195,18 +195,24 @@ def _actor_fans(graph: DiagramGraph) -> list[tuple[str, tuple[str, ...]]]:
     each number's first edge) into fans of target ids in ascending number
     order. Only actors owning >= 2 numbers form a fan. One representative
     target per number (a multi-path activity repeats its number); actors are
-    ordered by their lowest number so the result is deterministic."""
+    ordered by their lowest number so the result is deterministic. Like
+    _numbered_sequence, sort explicitly by number rather than trusting edge
+    order -- activities with explicit out-of-order ids are a valid input."""
     seen: set[int] = set()
-    order: list[str] = []
-    targets_by_actor: dict[str, list[str]] = {}
+    numbered: list[tuple[int, str, str]] = []
     for edge in graph.edges:
         if edge.number is None or edge.number in seen:
             continue
         seen.add(edge.number)
-        if edge.source not in targets_by_actor:
-            targets_by_actor[edge.source] = []
-            order.append(edge.source)
-        targets_by_actor[edge.source].append(edge.target)
+        numbered.append((edge.number, edge.source, edge.target))
+    numbered.sort(key=lambda item: item[0])
+    order: list[str] = []
+    targets_by_actor: dict[str, list[str]] = {}
+    for _number, source, target in numbered:
+        if source not in targets_by_actor:
+            targets_by_actor[source] = []
+            order.append(source)
+        targets_by_actor[source].append(target)
     return [
         (actor, tuple(targets_by_actor[actor]))
         for actor in order

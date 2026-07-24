@@ -411,3 +411,29 @@ def test_actor_fans_group_numbered_spokes_by_initiating_actor() -> None:
     )
     graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
     assert _actor_fans(graph) == [('a:carol', ('w:1', 'w:2'))]
+
+
+def test_actor_fans_sort_by_number_regardless_of_edge_order() -> None:
+    # Edges arrive out of numeric order (explicit ids); the fan must still be
+    # in ascending-number order, and actors ordered by their lowest number.
+    nodes = (
+        _actor('a:x'),
+        _actor('a:y'),
+        _work('w:5'),
+        _work('w:2'),
+        _work('w:8'),
+        _work('w:1'),
+    )
+    edges = (
+        _edge('a:x', 'w:5', number=5),
+        _edge('a:y', 'w:1', number=1),
+        _edge('a:x', 'w:2', number=2),
+        _edge('a:x', 'w:8', number=8),
+        _edge('a:y', 'w:1', number=3),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    # a:y owns numbers 1 and 3 (lowest = 1) -> comes first; a:x owns 2,5,8.
+    assert _actor_fans(graph) == [
+        ('a:y', ('w:1', 'w:1')),
+        ('a:x', ('w:2', 'w:5', 'w:8')),
+    ]
