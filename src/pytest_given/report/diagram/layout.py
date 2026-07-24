@@ -131,8 +131,21 @@ def position_nodes(
     }
     positions, width, height = _framed(grid)
     start = sequence[0][0] if sequence else None
-    positions = _orient_start_top_left(positions, width, height, start)
+    positions = _orient_start_top_left(positions, width, height, start, fans)
     return positions, width, height
+
+
+def _reflect(
+    positions: dict[str, tuple[float, float]],
+    width: float,
+    height: float,
+    flip: tuple[bool, bool],
+) -> dict[str, tuple[float, float]]:
+    flip_x, flip_y = flip
+    return {
+        node_id: (width - x if flip_x else x, height - y if flip_y else y)
+        for node_id, (x, y) in positions.items()
+    }
 
 
 def _orient_start_top_left(
@@ -140,13 +153,21 @@ def _orient_start_top_left(
     width: float,
     height: float,
     start: str | None,
+    fans: list[tuple[str, tuple[str, ...]]],
 ) -> dict[str, tuple[float, float]]:
     """Third priority: the story should read from the top-left. Reflecting the
     whole diagram horizontally and/or vertically is an isometry -- it preserves
     every edge crossing and every distance between numbered steps -- so among
-    the four axis-aligned reflections we simply keep the one that lands the
-    story's start node (activity 1's initiator) nearest the top-left corner.
-    This never costs a crossing or loosens the sequence grouping."""
+    the four axis-aligned reflections we keep the one that lands the story's
+    start node (activity 1's initiator) nearest the top-left corner.
+
+    A reflection is also the *only* transform here that flips handedness: a
+    single-axis flip turns a clockwise fan counter-clockwise. So the reflection
+    is chosen clockwise-aware -- start-corner distance decides first (third
+    priority), and the post-reflection clockwise disorder breaks any tie
+    (fourth priority) -- to keep a handedness-reversing flip from silently
+    undoing the clockwise arrangement the local search found. This never costs
+    a crossing or loosens the sequence grouping."""
     if start is None or start not in positions:
         return positions
     start_x, start_y = positions[start]
@@ -158,18 +179,16 @@ def _orient_start_top_left(
             height - start_y if flip_y else start_y
         )
 
-    flip_x, flip_y = min(
-        flips, key=lambda flip: (corner_distance(flip), flips.index(flip))
+    def disorder(flip: tuple[bool, bool]) -> float:
+        return _clockwise_disorder(fans, _reflect(positions, width, height, flip))
+
+    flip = min(
+        flips,
+        key=lambda flip: (corner_distance(flip), disorder(flip), flips.index(flip)),
     )
-    if not flip_x and not flip_y:
+    if flip == (False, False):
         return positions
-    return {
-        node_id: (
-            width - x if flip_x else x,
-            height - y if flip_y else y,
-        )
-        for node_id, (x, y) in positions.items()
-    }
+    return _reflect(positions, width, height, flip)
 
 
 def _directed_edges(graph: DiagramGraph) -> list[tuple[str, str]]:

@@ -34,6 +34,7 @@ from pytest_given.report.diagram.layout import (
     _actor_fans,
     _clockwise_disorder,
     _numbered_sequence,
+    _orient_start_top_left,
     _sequence_spread,
     _slide_label,
     position_nodes,
@@ -163,6 +164,27 @@ def test_story_start_seated_top_left(
     assert count_crossings(layout.edges) == 0
 
 
+def test_reflection_prefers_clockwise_when_start_corner_ties() -> None:
+    """A single-axis reflection flips handedness, so seating the start top-left
+    could silently turn a clockwise fan counter-clockwise. When the start node
+    is centred (all four reflections tie on start-corner distance), the
+    clockwise-aware choice must break the tie toward the clockwise arrangement.
+    """
+    width = height = 800.0
+    # Hub at the exact centre; its fan reads counter-clockwise as laid out
+    # (north -> west -> south), so the identity frame has disorder 2.
+    positions = {
+        'h': (400.0, 400.0),
+        't1': (400.0, 200.0),
+        't2': (200.0, 400.0),
+        't3': (400.0, 600.0),
+    }
+    fans = [('h', ('t1', 't2', 't3'))]
+    assert _clockwise_disorder(fans, positions) == 2.0
+    oriented = _orient_start_top_left(positions, width, height, 'h', fans)
+    assert _clockwise_disorder(fans, oriented) == 0.0
+
+
 def test_hub_fan_has_no_crossings() -> None:
     """A single actor connected to many work objects (a star) is always
     planar; every fan edge must stay clear of the others."""
@@ -196,22 +218,28 @@ def test_hub_fan_lays_out_clockwise() -> None:
 def test_clockwise_term_drives_fan_into_clockwise_order(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """The clockwise objective must actually change the placement: on this hub
-    the proximity term alone leaves the fan counter-clockwise (disorder > 0);
-    enabling the term drives it to a crossing-free clockwise fan (disorder 0)."""
-    # A single hub whose three equidistant spokes are numbered out of insertion
-    # order (nodes seed as w:0, w:1, w:2 but the numbers land 1->w:1, 2->w:2,
-    # 3->w:0). The seed row order (and thus the sequence-only local search,
-    # which has no opinion on sweep direction) follows insertion order, so
-    # disabling the clockwise term genuinely leaves this fan counter-clockwise.
-    # The three spokes are the same length in every arrangement, so the
-    # length-uniformity term is neutral here -- this isolates the clockwise
-    # term as the only thing that can drive the fan to order.
-    nodes = (_actor('a:hub'), _work('w:0'), _work('w:1'), _work('w:2'))
+    """The clockwise objective in the local search must actually change the
+    placement: with it off the fans are left counter-clockwise (disorder > 0);
+    with it on they settle into crossing-free clockwise fans (disorder 0)."""
+    # Two hubs, each initiating three interleaved-by-number spokes. A single
+    # hub would not prove the search term, because the clockwise-aware
+    # reflection can flip one fan's handedness on its own -- so this uses TWO
+    # fans whose spokes want independent ordering. The reflection flips both
+    # together and cannot satisfy both, so only the search's clockwise term can
+    # drive the total disorder to zero. The spokes are equal length in every
+    # arrangement, keeping the length-uniformity term neutral.
+    nodes = (
+        _actor('a:0'), _actor('a:1'),
+        _work('w:0'), _work('w:1'), _work('w:2'),
+        _work('w:3'), _work('w:4'), _work('w:5'),
+    )
     edges = (
-        _edge('a:hub', 'w:1', number=1),
-        _edge('a:hub', 'w:2', number=2),
-        _edge('a:hub', 'w:0', number=3),
+        _edge('a:0', 'w:1', number=1),
+        _edge('a:1', 'w:0', number=2),
+        _edge('a:0', 'w:5', number=3),
+        _edge('a:1', 'w:2', number=4),
+        _edge('a:0', 'w:4', number=5),
+        _edge('a:1', 'w:3', number=6),
     )
     graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
 
