@@ -54,6 +54,15 @@ def render_diagrams(report: ReportData, output_path: Path) -> None:
         max_steps_json=script_json(
             {v.layout.graph.story_id: v.max_step for v in views}
         ),
+        diagram_sizes_json=script_json(
+            {
+                v.layout.graph.story_id: [
+                    round(v.layout.width),
+                    round(v.layout.height),
+                ]
+                for v in views
+            }
+        ),
         term_info_json=script_json(term_info),
         css=Markup(css),
         alpine_js=Markup(alpine_js),
