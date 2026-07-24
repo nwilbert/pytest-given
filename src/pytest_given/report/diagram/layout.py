@@ -53,6 +53,9 @@ LABEL_H = 20.0
 BADGE_W = 30.0
 LABEL_OFFSET = 18.0
 LOOP_RADIUS = 46.0
+# A label should sit clearly nearer its own arrow than any other, or it is
+# ambiguous which step it names. This is how much closer (px) is "clearly".
+LABEL_ASSOC_MARGIN = 46.0
 
 # Local-search cost weights, ranked by magnitude so each objective only ever
 # breaks ties left by the one above it: avoid crossings first, then edges
@@ -655,6 +658,22 @@ def _point_near_segment(
     return math.hypot(point[0] - proj_x, point[1] - proj_y) <= clearance
 
 
+def _segment_distance(
+    point: tuple[float, float],
+    start: tuple[float, float],
+    end: tuple[float, float],
+) -> float:
+    """Euclidean distance from a point to a line segment (clamped to the ends)."""
+    seg_x, seg_y = end[0] - start[0], end[1] - start[1]
+    length_sq = seg_x * seg_x + seg_y * seg_y
+    if length_sq == 0.0:
+        return math.hypot(point[0] - start[0], point[1] - start[1])
+    t = ((point[0] - start[0]) * seg_x + (point[1] - start[1]) * seg_y) / length_sq
+    t = max(0.0, min(1.0, t))
+    proj_x, proj_y = start[0] + t * seg_x, start[1] + t * seg_y
+    return math.hypot(point[0] - proj_x, point[1] - proj_y)
+
+
 def _framed(
     grid: dict[str, tuple[float, float]],
 ) -> tuple[dict[str, tuple[float, float]], float, float]:
@@ -696,6 +715,17 @@ def layout_graph(graph: DiagramGraph) -> DiagramLayout:
         )
         for p in placed_nodes
     }
+    # One node-centre line per distinct connected pair, so a label can prefer a
+    # spot distinctly nearer its own arrow than any other (association clarity).
+    segment_by_pair: dict[frozenset[str], tuple[tuple[float, float], tuple[float, float]]] = {}
+    for edge in graph.edges:
+        if edge.source == edge.target:
+            continue
+        pair = frozenset((edge.source, edge.target))
+        segment_by_pair.setdefault(
+            pair, (positions[edge.source], positions[edge.target])
+        )
+
     placed_edges: list[PlacedEdge] = []
     drawn: set[tuple[str, str, str, int | None]] = set()
     for edge in graph.edges:
@@ -745,7 +775,13 @@ def layout_graph(graph: DiagramGraph) -> DiagramLayout:
         trim_target = TRIM_TARGET * scale
         x1, y1 = source_x + ux * trim_source, source_y + uy * trim_source
         x2, y2 = target_x - ux * trim_target, target_y - uy * trim_target
-        label = _slide_label(edge, x1, y1, x2, y2, ux, uy, obstacles)
+        own_pair = frozenset((edge.source, edge.target))
+        foreign_segments = tuple(
+            segment for pair, segment in segment_by_pair.items() if pair != own_pair
+        )
+        label = _slide_label(
+            edge, x1, y1, x2, y2, ux, uy, obstacles, foreign_segments
+        )
         placed_edges.append(
             PlacedEdge(edge=edge, x1=x1, y1=y1, x2=x2, y2=y2, loop=False, label=label)
         )
@@ -797,20 +833,26 @@ def _slide_label(
     ux: float,
     uy: float,
     obstacles: list[LabelBox],
+    foreign_segments: tuple[tuple[tuple[float, float], tuple[float, float]], ...] = (),
 ) -> LabelBox:
     """Place the label near the edge midpoint, offset perpendicular; slide it
-    along the edge (alternating around the midpoint) until it clears all
-    obstacle boxes. A short edge between two crowded nodes can leave every
-    in-line slide position clipping one of its own endpoints' boxes (the
-    perpendicular offset is much smaller than a node's radius), so the
-    search retries the same slide fractions at a larger perpendicular
-    offset -- still within LABEL_OFFSET + LABEL_H, the "stays near its edge"
-    bound other code relies on -- and on the opposite side of the line too
-    (the crowded node is often on just one side; the fixed offset direction
-    used by a single-sided search can point straight at it) before falling
-    back to the least-overlapping candidate seen across every combination."""
+    along the edge (alternating around the midpoint) and try both sides and a
+    larger offset until it clears all obstacle boxes -- still within
+    LABEL_OFFSET + LABEL_H, the "stays near its edge" bound other code relies
+    on. A short edge between two crowded nodes can leave every in-line slide
+    position clipping one of its own endpoints' boxes (the perpendicular
+    offset is much smaller than a node's radius), hence the extra offset/side
+    attempts.
+
+    Candidates are scored by (obstacle overlap, association ambiguity, how far
+    the label slid from the midpoint). Overlap dominates -- a label never
+    overlaps a node or another label to look tidier. Among clear positions it
+    then prefers one that sits distinctly nearer its own arrow than any other
+    (foreign_segments), so which step a number+verb names is unambiguous even
+    where spokes fan close together, and finally one near the edge midpoint."""
+    own_start, own_end = (x1, y1), (x2, y2)
     best: LabelBox | None = None
-    best_overlap = math.inf
+    best_key: tuple[float, float, float] | None = None
     for side in (1.0, -1.0):
         for offset in (LABEL_OFFSET, LABEL_OFFSET + LABEL_H - 1.0):
             for attempt in range(13):
@@ -820,10 +862,22 @@ def _slide_label(
                 centre_y = y1 + (y2 - y1) * fraction + ux * offset * side
                 candidate = _label_box(edge, centre_x, centre_y)
                 overlap = sum(_overlap_area(candidate, box) for box in obstacles)
-                if overlap == 0.0:
+                centre = (centre_x, centre_y)
+                own_distance = _segment_distance(centre, own_start, own_end)
+                foreign_distance = min(
+                    (_segment_distance(centre, start, end)
+                     for start, end in foreign_segments),
+                    default=math.inf,
+                )
+                ambiguity = max(
+                    0.0, LABEL_ASSOC_MARGIN - (foreign_distance - own_distance)
+                )
+                slid = abs(fraction - 0.5) + (offset - LABEL_OFFSET) * 0.001
+                key = (overlap, ambiguity, slid)
+                if best_key is None or key < best_key:
+                    best, best_key = candidate, key
+                if overlap == 0.0 and ambiguity == 0.0:
                     return candidate
-                if overlap < best_overlap:
-                    best, best_overlap = candidate, overlap
     assert best is not None
     return best
 
