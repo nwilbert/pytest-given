@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pytest-given — a loop between people, agents &amp; artifacts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+  </style>
+</head>
+<body>
+
+<div style="min-height:100vh; width:100%; background:oklch(0.98 0.008 85); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:30px; padding:48px 24px; font-family:'Plus Jakarta Sans',system-ui,sans-serif;">
+
+  <div style="display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center; max-width:640px;">
+    <div style="font-size:13px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:oklch(0.55 0.09 270);">How it works</div>
+    <h1 style="margin:0; font-size:34px; line-height:1.18; font-weight:800; color:oklch(0.32 0.02 275); text-wrap:balance;">A loop between people, agents &amp; artifacts</h1>
+  </div>
+
+  <div style="container-type:size; position:relative; width:min(88vmin,860px); aspect-ratio:1;">
+    <div style="position:absolute; inset:0;">
+
+      <!-- group panel (bottom layer) -->
+      <div style="position:absolute; left:30.5%; top:28%; width:44%; height:40%; background:oklch(0.965 0.013 280); border:1.5px solid oklch(0.9 0.02 280); border-radius:3.4cqw; box-shadow:inset 0 1px 3px oklch(0.6 0.03 280 / 0.08);">
+        <div style="position:absolute; top:1.7cqw; left:0; right:0; text-align:center; font-size:1.45cqw; font-weight:700; letter-spacing:0.28cqw; text-transform:uppercase; color:oklch(0.58 0.05 280);">Artifacts</div>
+      </div>
+
+      <!-- connector layer -->
+      <svg viewBox="0 0 1000 1000" style="position:absolute; inset:0; width:100%; height:100%; overflow:visible;">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="oklch(0.64 0.035 270)"></path>
+          </marker>
+        </defs>
+        <g fill="none" stroke="oklch(0.64 0.035 270)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M130,806 L130,137 Q130,121 146,121 L364,121" marker-end="url(#arrow)"></path>
+          <path d="M510,159 L510,277" marker-end="url(#arrow)"></path>
+          <path d="M430,439 L430,163" marker-end="url(#arrow)"></path>
+          <path d="M210,806 L210,496 Q210,480 226,480 L301,480" marker-end="url(#arrow)"></path>
+          <path d="M485,455 L500,455 Q515,455 515,440 L515,388 Q515,372 531,372 L575,372" marker-end="url(#arrow)"></path>
+          <path d="M485,509 L500,509 Q515,509 515,524 L515,579 Q515,595 531,595 L575,595" marker-end="url(#arrow)"></path>
+          <path d="M820,806 L820,611 Q820,595 804,595 L730,595" marker-end="url(#arrow)"></path>
+          <path d="M715,850 L274,850" marker-end="url(#arrow)"></path>
+        </g>
+      </svg>
+
+      <!-- label layer -->
+      <div style="position:absolute; inset:0; pointer-events:none;">
+        <div style="position:absolute; left:13%; top:47%; transform:translate(-50%,-50%); background:oklch(0.99 0.004 85); border:1px solid oklch(0.9 0.012 270); border-radius:3cqw; padding:0.55cqw 1.25cqw; font-size:1.5cqw; font-weight:600; color:oklch(0.46 0.02 270); white-space:nowrap; box-shadow:0 1px 4px oklch(0.5 0.02 270 / 0.09);">instruct</div>
+        <div style="position:absolute; left:54.8%; top:22.2%; transform:translate(-50%,-50%); background:oklch(0.99 0.004 85); border:1px solid oklch(0.9 0.012 270); border-radius:3cqw; padding:0.55cqw 1.25cqw; font-size:1.5cqw; font-weight:600; color:oklch(0.46 0.02 270); white-space:nowrap; box-shadow:0 1px 4px oklch(0.5 0.02 270 / 0.09);">write</div>
+        <div style="position:absolute; left:43%; top:22.2%; transform:translate(-50%,-50%); background:oklch(0.99 0.004 85); border:1px solid oklch(0.9 0.012 270); border-radius:3cqw; padding:0.55cqw 1.25cqw; font-size:1.5cqw; font-weight:600; color:oklch(0.46 0.02 270); white-space:nowrap; box-shadow:0 1px 4px oklch(0.5 0.02 270 / 0.09);">give context</div>
+        <div style="position:absolute; left:21%; top:69%; transform:translate(-50%,-50%); background:oklch(0.99 0.004 85); border:1px solid oklch(0.9 0.012 270); border-radius:3cqw; padding:0.55cqw 1.25cqw; font-size:1.5cqw; font-weight:600; color:oklch(0.46 0.02 270); white-space:nowrap; box-shadow:0 1px 4px oklch(0.5 0.02 270 / 0.09);">review</div>
+        <div style="position:absolute; left:51.5%; top:41.3%; transform:translate(-50%,-50%); background:oklch(0.99 0.004 85); border:1px solid oklch(0.9 0.012 270); border-radius:3cqw; padding:0.55cqw 1.25cqw; font-size:1.5cqw; font-weight:600; color:oklch(0.46 0.02 270); white-space:nowrap; box-shadow:0 1px 4px oklch(0.5 0.02 270 / 0.09);">verify</div>
+        <div style="position:absolute; left:51.5%; top:55.2%; transform:translate(-50%,-50%); background:oklch(0.99 0.004 85); border:1px solid oklch(0.9 0.012 270); border-radius:3cqw; padding:0.55cqw 1.25cqw; font-size:1.5cqw; font-weight:600; color:oklch(0.46 0.02 270); white-space:nowrap; box-shadow:0 1px 4px oklch(0.5 0.02 270 / 0.09);">generate</div>
+        <div style="position:absolute; left:82%; top:69%; transform:translate(-50%,-50%); background:oklch(0.99 0.004 85); border:1px solid oklch(0.9 0.012 270); border-radius:3cqw; padding:0.55cqw 1.25cqw; font-size:1.5cqw; font-weight:600; color:oklch(0.46 0.02 270); white-space:nowrap; box-shadow:0 1px 4px oklch(0.5 0.02 270 / 0.09);">validate</div>
+        <div style="position:absolute; left:49.4%; top:85%; transform:translate(-50%,-50%); background:oklch(0.99 0.004 85); border:1px solid oklch(0.9 0.012 270); border-radius:3cqw; padding:0.55cqw 1.25cqw; font-size:1.5cqw; font-weight:600; color:oklch(0.46 0.02 270); white-space:nowrap; box-shadow:0 1px 4px oklch(0.5 0.02 270 / 0.09);">give feedback</div>
+      </div>
+
+      <!-- entity layer -->
+      <div style="position:absolute; inset:0;">
+
+        <!-- AI Agents -->
+        <div style="position:absolute; left:47%; top:11.5%; transform:translate(-50%,-50%); width:21cqw; height:8.8cqw; display:flex; align-items:center; justify-content:center; gap:1.1cqw; padding:0 1.4cqw; color:oklch(0.34 0.06 265); background:oklch(0.94 0.04 265); border:1.5px solid oklch(0.86 0.055 265); border-radius:2.6cqw; box-shadow:0 4px 16px oklch(0.5 0.05 265 / 0.12);">
+          <svg viewBox="0 0 24 24" width="3.1cqw" height="3.1cqw" style="flex:none; overflow:visible;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4.5" y="8" width="15" height="10.5" rx="3.2"></rect>
+            <line x1="12" y1="3.4" x2="12" y2="8"></line>
+            <circle cx="12" cy="2.6" r="1.3" fill="currentColor" stroke="none"></circle>
+            <circle cx="9.3" cy="13" r="1.25" fill="currentColor" stroke="none"></circle>
+            <circle cx="14.7" cy="13" r="1.25" fill="currentColor" stroke="none"></circle>
+            <line x1="2.6" y1="12" x2="2.6" y2="14.8"></line>
+            <line x1="21.4" y1="12" x2="21.4" y2="14.8"></line>
+          </svg>
+          <span style="font-size:2.5cqw; font-weight:700; line-height:1.1;">AI Agents</span>
+        </div>
+
+        <!-- Developers (person in front of a screen) -->
+        <div style="position:absolute; left:16.5%; top:85%; transform:translate(-50%,-50%); width:21cqw; height:8.8cqw; display:flex; align-items:center; justify-content:center; gap:1.1cqw; padding:0 1.4cqw; color:oklch(0.4 0.08 40); background:oklch(0.93 0.046 45); border:1.5px solid oklch(0.86 0.06 45); border-radius:2.6cqw; box-shadow:0 4px 16px oklch(0.5 0.06 45 / 0.12);">
+          <svg viewBox="0 0 24 24" width="3.1cqw" height="3.1cqw" style="flex:none; overflow:visible;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2.5" width="16" height="10" rx="2"></rect>
+            <path d="M5 22v-1c0-2.9 3.1-4.6 7-4.6s7 1.7 7 4.6v1z" fill="oklch(0.93 0.046 45)"></path>
+            <circle cx="12" cy="13.4" r="2.9" fill="oklch(0.93 0.046 45)"></circle>
+          </svg>
+          <span style="font-size:2.5cqw; font-weight:700; line-height:1.1;">Developers</span>
+        </div>
+
+        <!-- Domain Experts -->
+        <div style="position:absolute; left:84.5%; top:85%; transform:translate(-50%,-50%); width:26cqw; height:8.8cqw; display:flex; align-items:center; justify-content:center; gap:1.1cqw; padding:0 1.4cqw; color:oklch(0.4 0.08 40); background:oklch(0.93 0.046 45); border:1.5px solid oklch(0.86 0.06 45); border-radius:2.6cqw; box-shadow:0 4px 16px oklch(0.5 0.06 45 / 0.12);">
+          <svg viewBox="0 0 24 24" width="3.4cqw" height="3.4cqw" style="flex:none;" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="8.6" r="3"></circle>
+            <path d="M3.4 19c0-3.1 2.5-5.4 5.6-5.4s5.6 2.3 5.6 5.4"></path>
+            <path d="M16.2 6.1a3 3 0 0 1 0 5.7"></path>
+            <path d="M17.4 14c2.4.5 4.2 2.4 4.2 5"></path>
+          </svg>
+          <span style="font-size:2.5cqw; font-weight:700; line-height:1.1; white-space:nowrap;">Domain Experts</span>
+        </div>
+
+        <!-- Annotated Tests -->
+        <div style="position:absolute; left:40%; top:48.2%; transform:translate(-50%,-50%); width:17cqw; height:8.6cqw; display:flex; align-items:center; justify-content:center; padding:0 1cqw; background:oklch(0.33 0.03 275); border-radius:2.2cqw; box-shadow:0 5px 16px oklch(0.3 0.04 275 / 0.26);">
+          <span style="font-size:2cqw; font-weight:700; color:oklch(0.97 0.01 275); line-height:1.12; text-align:center;">Annotated Tests</span>
+        </div>
+
+        <!-- Code -->
+        <div style="position:absolute; left:65%; top:37%; transform:translate(-50%,-50%); width:15cqw; height:8.6cqw; display:flex; align-items:center; justify-content:center; padding:0 1cqw; background:oklch(0.33 0.03 275); border-radius:2.2cqw; box-shadow:0 5px 16px oklch(0.3 0.04 275 / 0.26);">
+          <span style="font-size:2.3cqw; font-weight:700; color:oklch(0.97 0.01 275); line-height:1.1;">Code</span>
+        </div>
+
+        <!-- Report -->
+        <div style="position:absolute; left:65%; top:59.5%; transform:translate(-50%,-50%); width:15cqw; height:8.6cqw; display:flex; align-items:center; justify-content:center; padding:0 1cqw; background:oklch(0.33 0.03 275); border-radius:2.2cqw; box-shadow:0 5px 16px oklch(0.3 0.04 275 / 0.26);">
+          <span style="font-size:2.3cqw; font-weight:700; color:oklch(0.97 0.01 275); line-height:1.1;">Report</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
