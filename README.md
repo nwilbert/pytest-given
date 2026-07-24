@@ -2,10 +2,6 @@
 
 A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests. Inspired by [JGiven](https://jgiven.org/) (Java). The code is the single source of truth — no separate Gherkin DSL.
 
-<p align="center">
-  <img src="docs/pytest-given-diagram.png" alt="How it works: developers and domain experts instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report that domain experts validate and feed back to developers." width="720">
-</p>
-
 Live examples:
 - **[Coffeeshop report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop/coffeeshop.html)** — tour of the core features, including `Annotated` `given` labels.
 - **[Hotel-booking report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking/hotel-booking.html)** — Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
@@ -53,6 +49,12 @@ pytest-given is for the opposite case: **engineers write normal tests, and the p
 - Plain Python — no Gherkin, no `.feature` files, no parser.
 - Tests stay first-class pytest tests; the report is a by-product.
 - Self-contained HTML: open it locally or attach it to CI artifacts; no server, no external assets.
+
+Increasingly those tests aren't hand-written at all: a human describes a scenario in prose and an AI agent generates the test alongside the code it exercises, so the narrated report — not the raw test code — becomes the artifact humans review. The diagram below sketches that loop between people, agents, and artifacts; [Working with AI agents](#working-with-ai-agents) covers how to drive it.
+
+<p align="center">
+  <img src="docs/pytest-given-diagram.png" alt="A loop between people, agents, and artifacts: developers and domain experts instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report that domain experts validate and developers review, feeding back to the agents." width="720">
+</p>
 
 ## Public API
 
