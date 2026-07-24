@@ -2,6 +2,10 @@
 
 A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests. Inspired by [JGiven](https://jgiven.org/) (Java). The code is the single source of truth — no separate Gherkin DSL.
 
+<p align="center">
+  <img src="docs/pytest-given-diagram.png" alt="How it works: developers and domain experts instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report that domain experts validate and feed back to developers." width="720">
+</p>
+
 Live examples:
 - **[Coffeeshop report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop/coffeeshop.html)** — tour of the core features, including `Annotated` `given` labels.
 - **[Hotel-booking report →](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking/hotel-booking.html)** — Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
