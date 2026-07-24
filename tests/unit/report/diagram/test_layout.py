@@ -29,6 +29,8 @@ from pytest_given.report.diagram.layout import (
     NODE_HALF_H,
     NODE_HALF_W,
     LabelBox,
+    _actor_fans,
+    _clockwise_disorder,
     _numbered_sequence,
     _sequence_spread,
     _slide_label,
@@ -382,3 +384,30 @@ def test_slide_label_falls_back_to_least_overlapping_candidate() -> None:
     )
     label = _slide_label(edge, 0.0, 0.0, 100.0, 0.0, 1.0, 0.0, [unavoidable_obstacle])
     assert isinstance(label, LabelBox)
+
+
+def test_clockwise_disorder_scores_turn_direction() -> None:
+    # Actor at origin; spokes numbered 1,2,3 pointing E, S, W (screen coords,
+    # y down) -- that is a clockwise sweep, so disorder is zero.
+    fans = [('a', ('t1', 't2', 't3'))]
+    clockwise = {'a': (0.0, 0.0), 't1': (1.0, 0.0), 't2': (0.0, 1.0), 't3': (-1.0, 0.0)}
+    assert _clockwise_disorder(fans, clockwise) == 0.0
+
+    # Reverse the order (E, N, W) -> each turn is counter-clockwise: 2 bad turns.
+    counter = {'a': (0.0, 0.0), 't1': (1.0, 0.0), 't2': (0.0, -1.0), 't3': (-1.0, 0.0)}
+    assert _clockwise_disorder(fans, counter) == 2.0
+
+    # A fan with fewer than two spokes contributes nothing.
+    assert _clockwise_disorder([('a', ('t1',))], clockwise) == 0.0
+
+
+def test_actor_fans_group_numbered_spokes_by_initiating_actor() -> None:
+    # Carol initiates 1 and 2 (a fan); Dan initiates only 3 (no fan).
+    nodes = (_actor('a:carol'), _actor('a:dan'), _work('w:1'), _work('w:2'), _work('w:3'))
+    edges = (
+        _edge('a:carol', 'w:1', number=1),
+        _edge('a:carol', 'w:2', number=2),
+        _edge('a:dan', 'w:3', number=3),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    assert _actor_fans(graph) == [('a:carol', ('w:1', 'w:2'))]

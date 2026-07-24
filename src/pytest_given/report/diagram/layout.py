@@ -190,6 +190,30 @@ def _numbered_sequence(graph: DiagramGraph) -> list[tuple[str, str]]:
     return [(source, target) for _number, source, target in numbered]
 
 
+def _actor_fans(graph: DiagramGraph) -> list[tuple[str, tuple[str, ...]]]:
+    """Group the numbered activities by their initiating actor (the source of
+    each number's first edge) into fans of target ids in ascending number
+    order. Only actors owning >= 2 numbers form a fan. One representative
+    target per number (a multi-path activity repeats its number); actors are
+    ordered by their lowest number so the result is deterministic."""
+    seen: set[int] = set()
+    order: list[str] = []
+    targets_by_actor: dict[str, list[str]] = {}
+    for edge in graph.edges:
+        if edge.number is None or edge.number in seen:
+            continue
+        seen.add(edge.number)
+        if edge.source not in targets_by_actor:
+            targets_by_actor[edge.source] = []
+            order.append(edge.source)
+        targets_by_actor[edge.source].append(edge.target)
+    return [
+        (actor, tuple(targets_by_actor[actor]))
+        for actor in order
+        if len(targets_by_actor[actor]) >= 2
+    ]
+
+
 def _undirected_adjacency(
     node_ids: list[str], directed: list[tuple[str, str]]
 ) -> dict[str, list[str]]:
@@ -451,6 +475,35 @@ def _sequence_spread(
         math.hypot(later[0] - earlier[0], later[1] - earlier[1]) / COL_SPACING
         for earlier, later in itertools.pairwise(midpoints)
     )
+
+
+def _clockwise_disorder(
+    fans: list[tuple[str, tuple[str, ...]]],
+    position: dict[str, tuple[float, float]],
+) -> float:
+    """Fourth objective: within each actor's fan of numbered spokes, the
+    directions (actor -> target) should sweep clockwise as the number rises.
+    Screen coordinates are y-down, so the 2D cross product of consecutive
+    spokes is positive for a clockwise turn. Each adjacent pair costs 0 when
+    it turns clockwise, 0.5 when the spokes are collinear, and 1.0 when it
+    turns counter-clockwise. Only the relative order matters -- the absolute
+    orientation is fixed later by the top-left reflection."""
+    disorder = 0.0
+    for actor, targets in fans:
+        origin = position[actor]
+        spokes = [
+            (position[target][0] - origin[0], position[target][1] - origin[1])
+            for target in targets
+        ]
+        for (ax, ay), (bx, by) in itertools.pairwise(spokes):
+            cross = ax * by - ay * bx
+            if cross > 1e-9:
+                disorder += 0.0
+            elif cross < -1e-9:
+                disorder += 1.0
+            else:
+                disorder += 0.5
+    return disorder
 
 
 def _count_overlaps(
