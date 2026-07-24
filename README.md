@@ -38,7 +38,7 @@ Run it:
 pytest --given-html
 ```
 
-This produces `given-report/report.html` — a single self-contained HTML file with all assets inlined.
+This produces `given-report/report.html` — one file you can open directly in a browser.
 
 ## Why pytest-given?
 
@@ -213,7 +213,7 @@ Three things worth knowing:
 
 1. **`pytest_given.Template` only accepts bare identifiers** — `{name}`, `{name:spec}`, `{name!conv}`. Attribute access (`{obj.attr}`), indexing (`{d[key]}`), and arbitrary expressions (`{x + 1}`) raise `PytestGivenError` at construction. Workaround: parametrize by the attributes directly, or move the step into a test-body t-string (which supports full expression syntax).
 
-2. **`Template` is for deferred substitution.** It works on `@scenario(...)` (against parametrize columns) and on helper-function decorators like `@when(Template(...))` (against the helper's bound arguments). It is **not** allowed in a test body — values are in scope there, so use a t-string. `with given(Template(...))` / `when(Template(...))` / `then(Template(...))` raise `PytestGivenError` at entry. A t-string on a fixture/helper decorator is rejected for the symmetric reason: the values aren't in scope at decoration time. A t-string in `@scenario(...)` is allowed **only** when every interpolation is a glossary handle — a term reference *is* in scope at import and renders as a title pill; any value/expression interpolation is rejected the same way.
+2. **`Template` vs. t-string is about scope.** `Template` defers substitution, so it belongs where values aren't yet bound — `@scenario(...)` and helper decorators (the table above). A t-string evaluates eagerly, so it belongs where values *are* bound: the test body. Each is rejected in the other's place — `with given(Template(...))` raises `PytestGivenError` at entry, as does a t-string on a fixture/helper decorator. The one exception: a t-string in `@scenario(...)` is allowed when every interpolation is a glossary handle, since terms are in scope at import.
 
 3. **Parametrized scenarios use the first case's steps as the template.** All rows of the parameter table share the step structure recorded by case 1, with values substituted per row. That's the right behaviour when every case runs the same code with different values — and misleading when the steps themselves vary, e.g. a conditional `with given(t'...')` will only show case 1's branch. If steps diverge per case, split into separate `@scenario` tests.
 
@@ -366,7 +366,7 @@ The lint is zero-cost when off: nothing extra is captured, and report artifacts 
 
 ## Traceback frames
 
-When a scenario fails, its traceback is captured into the report. By default only your own frames are kept — the `pluggy` dispatcher, `_pytest` runner, and pytest-given's own `@scenario` wrapper frames are dropped, since they're implementation noise you rarely need. This also keeps failing suites fast: pytest's per-frame source analysis is the dominant cost on a run with many failures, so filtering those frames out before they're formatted is what stops a suite with thousands of failing scenarios from slowing to a crawl.
+When a scenario fails, its traceback is captured into the report. By default only your own frames are kept — the `pluggy` dispatcher, `_pytest` runner, and pytest-given's own `@scenario` wrapper frames are dropped, since they're implementation noise you rarely need. This also keeps failing suites fast: pytest's per-frame source analysis is the dominant cost when many scenarios fail, so dropping those frames before they're formatted keeps large failing suites from crawling.
 
 Pass `--given-all-frames` to retain every frame (each stored with an `is_internal` flag; the HTML report then shows a **"Show internal frames"** toggle on each failure). It's a debugging escape hatch for when you're troubleshooting the plugin or pytest itself — it re-introduces the per-frame cost, so leave it off for normal runs on large failing suites.
 
