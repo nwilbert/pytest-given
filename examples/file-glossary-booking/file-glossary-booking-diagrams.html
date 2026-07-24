@@ -338,6 +338,14 @@ function diagramsApp() {
       const el = this._canvasEl();
       const size = DIAGRAM_SIZES[this.selectedStory];
       if (!el || !size) { this.resetZoom(); return; }
+      // A section that just became visible (story switch) may not be
+      // measurable yet in this frame; fitting now would divide into a 0-sized
+      // box and collapse the diagram to scale 0 (invisible). Retry next frame
+      // instead of committing a bad fit.
+      if (!el.clientWidth || !el.clientHeight) {
+        requestAnimationFrame(() => this.fitDiagram());
+        return;
+      }
       const [w, h] = size;
       const scale = Math.min(el.clientWidth / w, el.clientHeight / h, 1) * 0.95;
       this.zoom = scale;
