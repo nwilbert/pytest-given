@@ -199,18 +199,19 @@ def test_clockwise_term_drives_fan_into_clockwise_order(
     """The clockwise objective must actually change the placement: on this hub
     the proximity term alone leaves the fan counter-clockwise (disorder > 0);
     enabling the term drives it to a crossing-free clockwise fan (disorder 0)."""
-    # Same single-hub, 3-spoke shape as test_hub_fan_lays_out_clockwise, but
-    # the work nodes are listed out of number order (2, 3, 1). The seed row
-    # order (and thus the barycentre/sequence-only local search, which has no
-    # opinion on sweep direction, only on keeping numbered steps close) comes
-    # from this insertion order, not the edge numbers -- so unlike the other
-    # test's in-order nodes, disabling the clockwise term genuinely leaves
-    # this fan counter-clockwise.
-    nodes = (_actor('a:hub'), _work('w:2'), _work('w:3'), _work('w:1'))
+    # A single hub whose three equidistant spokes are numbered out of insertion
+    # order (nodes seed as w:0, w:1, w:2 but the numbers land 1->w:1, 2->w:2,
+    # 3->w:0). The seed row order (and thus the sequence-only local search,
+    # which has no opinion on sweep direction) follows insertion order, so
+    # disabling the clockwise term genuinely leaves this fan counter-clockwise.
+    # The three spokes are the same length in every arrangement, so the
+    # length-uniformity term is neutral here -- this isolates the clockwise
+    # term as the only thing that can drive the fan to order.
+    nodes = (_actor('a:hub'), _work('w:0'), _work('w:1'), _work('w:2'))
     edges = (
         _edge('a:hub', 'w:1', number=1),
         _edge('a:hub', 'w:2', number=2),
-        _edge('a:hub', 'w:3', number=3),
+        _edge('a:hub', 'w:0', number=3),
     )
     graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
 

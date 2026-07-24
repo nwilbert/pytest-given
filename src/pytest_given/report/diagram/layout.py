@@ -58,16 +58,17 @@ LOOP_RADIUS = 46.0
 # breaks ties left by the one above it: avoid crossings first, then edges
 # running over nodes, then keep consecutively numbered steps near each other
 # (so the eye follows 1 -> 2 -> 3), then sweep each actor's numbered spokes
-# clockwise, then stay short. Compactness is intentionally disabled -- zoom
-# owns "fit to screen".
+# clockwise, then keep arrow lengths uniform (short, low variance). Overall
+# compactness is intentionally disabled -- zoom owns "fit to screen".
 CROSSING_COST = 1_000_000_000.0
 NODE_ON_EDGE_COST = 1_000_000.0
 SEQUENCE_COST = 5.0  # per column-width between consecutive numbered edges
 CLOCKWISE_COST = 2.0  # per counter-clockwise turn within an actor's fan
-# Compactness is deliberately unweighted: "fit to screen" is owned by the
-# diagrams page's zoom controls, not the layout, so a readability objective
-# (clockwise fans) is never vetoed to keep a diagram short. Kept as a named
-# zero so the ranking comment and any future re-enable stay legible.
+LENGTH_SPREAD_COST = 1.0  # per (edge length / column-width)^2: low length variance
+# Vertical span (overall compactness) is deliberately unweighted: "fit to
+# screen" is owned by the diagrams page's zoom controls, not the layout. Arrow
+# length uniformity (LENGTH_SPREAD_COST above) is a separate, wanted objective
+# -- it curbs lone over-long spokes without forcing the whole diagram compact.
 HEIGHT_COST = 0.0  # per row of total vertical span (disabled; see above)
 LENGTH_COST = 0.001
 COLLINEAR_DEG = 8.0  # two edges from a shared node this close in angle overlap
@@ -422,10 +423,12 @@ def _local_search(
                 break
 
     # Phase 1 minimizes crossings/grazes with full freedom; phase 2 layers in
-    # the sequence term but only reorders rows within phase 1's columns, so it
-    # tidies the reading order without widening the diagram.
+    # the sequence and clockwise terms. Both phases allow column moves: overall
+    # width is no longer a goal (zoom owns fit-to-screen), and the freedom lets
+    # the length-uniformity term pull a stray far-flung leaf into a nearer
+    # column instead of leaving one lone over-long spoke.
     descend(with_sequence=False, allow_column_moves=True)
-    descend(with_sequence=True, allow_column_moves=False)
+    descend(with_sequence=True, allow_column_moves=True)
     return cell_of
 
 
@@ -458,8 +461,14 @@ def _layout_cost(
     crossings = _count_overlaps(segments)
     grazes = 0
     total_length = 0.0
+    length_spread = 0.0
     for start, end, source, target in segments:
-        total_length += math.hypot(end[0] - start[0], end[1] - start[1])
+        seg_len = math.hypot(end[0] - start[0], end[1] - start[1])
+        total_length += seg_len
+        # Squared length in column-widths: penalizes long edges far more than
+        # short ones, so the minimum pulls stray leaves back in and keeps the
+        # spread of arrow lengths low (a lone long spoke costs its square).
+        length_spread += (seg_len / COL_SPACING) ** 2
         for node_id in node_ids:
             if node_id in (source, target):
                 continue
@@ -474,6 +483,7 @@ def _layout_cost(
         + grazes * NODE_ON_EDGE_COST
         + _sequence_spread(sequence, position) * SEQUENCE_COST
         + _clockwise_disorder(fans, position) * CLOCKWISE_COST
+        + length_spread * LENGTH_SPREAD_COST
         + row_span * HEIGHT_COST
         + total_length * LENGTH_COST
     )
