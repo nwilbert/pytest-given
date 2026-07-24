@@ -21,6 +21,7 @@ from pytest_given.report.diagram import (
     count_crossings,
     layout_graph,
 )
+from pytest_given.report.diagram import layout as diagram_layout
 from pytest_given.report.diagram.layout import (
     LABEL_H,
     LABEL_OFFSET,
@@ -189,6 +190,39 @@ def test_hub_fan_lays_out_clockwise() -> None:
     assert count_crossings(layout.edges) == 0
     positions = {placed.node.id: (placed.x, placed.y) for placed in layout.nodes}
     assert _clockwise_disorder(_actor_fans(graph), positions) == 0.0
+
+
+def test_clockwise_term_drives_fan_into_clockwise_order(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The clockwise objective must actually change the placement: on this hub
+    the proximity term alone leaves the fan counter-clockwise (disorder > 0);
+    enabling the term drives it to a crossing-free clockwise fan (disorder 0)."""
+    # Same single-hub, 3-spoke shape as test_hub_fan_lays_out_clockwise, but
+    # the work nodes are listed out of number order (2, 3, 1). The seed row
+    # order (and thus the barycentre/sequence-only local search, which has no
+    # opinion on sweep direction, only on keeping numbered steps close) comes
+    # from this insertion order, not the edge numbers -- so unlike the other
+    # test's in-order nodes, disabling the clockwise term genuinely leaves
+    # this fan counter-clockwise.
+    nodes = (_actor('a:hub'), _work('w:2'), _work('w:3'), _work('w:1'))
+    edges = (
+        _edge('a:hub', 'w:1', number=1),
+        _edge('a:hub', 'w:2', number=2),
+        _edge('a:hub', 'w:3', number=3),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+
+    def disorder() -> float:
+        layout = layout_graph(graph)
+        positions = {p.node.id: (p.x, p.y) for p in layout.nodes}
+        return _clockwise_disorder(_actor_fans(graph), positions)
+
+    monkeypatch.setattr(diagram_layout, 'CLOCKWISE_COST', 0.0)
+    assert disorder() > 0.0  # proves this graph is a real discriminator
+    monkeypatch.undo()
+    assert disorder() == 0.0  # the clockwise term fixes it
+    assert count_crossings(layout_graph(graph).edges) == 0
 
 
 def test_single_actor_no_edges_lands_on_canvas_centre() -> None:
