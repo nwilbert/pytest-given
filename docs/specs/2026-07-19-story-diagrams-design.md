@@ -99,8 +99,8 @@ away:
    cell swaps and relocations drives the true straight-line **crossing** count
    — plus edges **grazing** an unrelated node — to their minimum.
 2. **Numbered steps read in order** *(secondary)*. Once crossings are minimal,
-   a second pass adds two tie-breakers that reorder rows only (never columns,
-   so the crossing-free arrangement is preserved):
+   a second pass adds two tie-breakers (it may move nodes between columns too —
+   overall width is not a goal, only crossing-freeness is preserved):
    - **Proximity.** Pull consecutively numbered activities close together, so
      the eye follows 1 → 2 → 3 without long jumps.
    - **Clockwise fans.** Every numbered step's source is its initiating
@@ -110,14 +110,17 @@ away:
      cross-product sign of consecutive-by-number spokes *sharing an actor*;
      only relative order matters (absolute orientation is set in step 4).
      Ranked just under proximity, so it only settles arrangements proximity
-     leaves free — e.g. swapping two work objects in the same column so a
-     hub's `1 → 2` reads forward rather than backward. Independent actors form
-     independent fans (in the hotel story: Carol owns {1,2,3,4,7}, the Booking
-     System owns {5,6}) that never interfere. Never adds a crossing.
-3. **Short edges** *(lowest)*. A gentle length term keeps fans from
-   flying apart. There is deliberately **no strong height/compactness term**:
-   "fit to screen" is owned by the zoom controls (below), not the layout, so
-   readability objectives are never vetoed to keep a diagram short.
+     leaves free — e.g. swapping two work objects so a hub's `1 → 2` reads
+     forward rather than backward. Independent actors form independent fans
+     (in the hotel story: Carol owns {1,2,3,4,7}, the Booking System owns
+     {5,6}) that never interfere. Never adds a crossing.
+3. **Uniform arrow length** *(lowest)*. A squared-length term (per edge, in
+   column-widths) keeps arrow lengths short and low-variance — it pulls a
+   stray far-flung leaf into a nearer column instead of leaving one lone
+   over-long spoke. There is deliberately **no overall height/compactness
+   term**: total size is owned by the zoom controls (below), not the layout,
+   so readability objectives are never vetoed to keep the *whole diagram*
+   small. Uniform edge length is a separate, wanted goal from overall size.
 4. **Start reads from the top-left.** Finally the whole diagram is reflected
    (an axis-aligned isometry — it preserves every crossing, every step
    distance, and every clockwise fan) to seat the story's start node, activity
