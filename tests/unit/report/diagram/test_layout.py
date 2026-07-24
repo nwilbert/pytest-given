@@ -1,4 +1,5 @@
 import math
+import random
 
 import pytest
 
@@ -488,3 +489,76 @@ def test_actor_fans_sort_by_number_regardless_of_edge_order() -> None:
         ('a:y', ('w:1', 'w:1')),
         ('a:x', ('w:2', 'w:5', 'w:8')),
     ]
+
+
+def _random_story_graph(rng: random.Random) -> DiagramGraph:
+    """A domain-shaped random graph: a few actors, each initiating some
+    single-step activities toward activity-local work objects, plus the
+    occasional actor->actor handoff. Deterministic for a given rng."""
+    actor_count = rng.randint(1, 4)
+    actors = [_actor(f'a:{i}') for i in range(actor_count)]
+    nodes: list[DiagramNode] = list(actors)
+    edges: list[DiagramEdge] = []
+    number = 0
+    activity_count = rng.randint(1, 8)
+    for _ in range(activity_count):
+        number += 1
+        source = rng.choice(actors).id
+        if actor_count > 1 and rng.random() < 0.25:
+            target = rng.choice([a.id for a in actors if a.id != source])
+        else:
+            work = _work(f'w:{number}')
+            nodes.append(work)
+            target = work.id
+        edges.append(_edge(source, target, number=number))
+    return DiagramGraph(
+        story_id=StoryId('s'), title='S', nodes=tuple(nodes), edges=tuple(edges)
+    )
+
+
+def test_random_graphs_keep_layout_invariants() -> None:
+    """The layout must never crash, must stay deterministic, and must keep the
+    grid guarantees (min node distance, all nodes inside the canvas) on many
+    random domain-shaped graphs."""
+    for seed in range(100):
+        rng = random.Random(seed)
+        graph = _random_story_graph(rng)
+        positions, width, height = position_nodes(graph)
+        assert position_nodes(graph) == (positions, width, height)  # deterministic
+        coords = list(positions.values())
+        for index, (fx, fy) in enumerate(coords):
+            assert MARGIN <= fx <= width - MARGIN
+            assert MARGIN <= fy <= height - MARGIN
+            for sx, sy in coords[index + 1 :]:
+                assert math.hypot(sx - fx, sy - fy) >= MIN_NODE_DIST - 1e-6
+        # layout_graph exercises the edge/label passes too (must not raise).
+        layout_graph(graph)
+
+
+def _random_tree_graph(rng: random.Random) -> DiagramGraph:
+    """A random rooted tree: one actor root, each new work object attached to
+    an existing node. Trees are planar, so the layout must reach zero
+    crossings. Kept small so the heuristic reliably attains the minimum."""
+    root = _actor('a:root')
+    nodes: list[DiagramNode] = [root]
+    placed_ids = [root.id]
+    edges: list[DiagramEdge] = []
+    size = rng.randint(2, 7)
+    for number in range(1, size + 1):
+        parent = rng.choice(placed_ids)
+        work = _work(f'w:{number}')
+        nodes.append(work)
+        placed_ids.append(work.id)
+        edges.append(_edge(parent, work.id, number=number))
+    return DiagramGraph(
+        story_id=StoryId('s'), title='S', nodes=tuple(nodes), edges=tuple(edges)
+    )
+
+
+def test_random_trees_have_no_crossings() -> None:
+    """A tree is planar; the crossing-minimizing layout must draw it with no
+    overlapping edges."""
+    for seed in range(100):
+        rng = random.Random(seed)
+        graph = _random_tree_graph(rng)
+        assert count_crossings(layout_graph(graph).edges) == 0, f'seed {seed}'
