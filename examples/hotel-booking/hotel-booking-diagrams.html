@@ -21,7 +21,7 @@ body { margin: 0; height: 100vh; display: flex; flex-direction: column; overflow
 .story-meta { font-size: 12px; color: #6b6b7a; }
 main { flex: 1; min-width: 0; min-height: 0; padding: 14px 18px 0; display: flex; flex-direction: column; overflow: hidden; }
 main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.canvas { flex: 1; min-height: 0; overflow: auto; padding-bottom: 14px; }
+.canvas { flex: 1; min-height: 0; overflow: hidden; padding-bottom: 14px; position: relative; touch-action: none; }
 .story-header { flex: none; display: flex; align-items: center; gap: 18px; }
 .story-header h1 { font-size: 20px; margin: 4px 0; }
 .replay { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #6b6b7a; }
@@ -52,6 +52,12 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 .tooltip { position: fixed; z-index: 10; max-width: 280px; background: #1a1a2e; color: #fafaf7; border-radius: 6px; padding: 8px 11px; font-size: 12.5px; pointer-events: none; }
 .tooltip-title { font-weight: 600; }
 .tooltip-kind { color: #e8955a; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; margin: 2px 0; }
+.zoom-bar { flex: none; display: flex; align-items: center; gap: 6px; margin: 6px 0 0; }
+.zoom-bar button { border: 1px solid #e3e1da; background: #fff; border-radius: 4px; padding: 2px 10px; cursor: pointer; font-size: 14px; min-width: 30px; }
+.zoom-bar button:hover { background: #f4f2ec; }
+.zoom-bar button:focus-visible { outline: 2px solid #e07a2f; }
+.zoom-level { font-size: 13px; color: #6b6b7a; font-variant-numeric: tabular-nums; margin-left: 4px; }
+.zoom-surface { position: absolute; top: 0; left: 0; will-change: transform; }
 </style>
 </head>
 <body x-data="diagramsApp()" x-cloak>
@@ -92,9 +98,17 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
         
       </div>
       
-      <div class="canvas">
-      <svg width="1320" height="1400"
-           viewBox="0 0 1320 1400">
+      <div class="zoom-bar">
+        <button @click="zoomOut()" title="Zoom out">−</button>
+        <button @click="zoomIn()" title="Zoom in">+</button>
+        <button @click="fitDiagram()" title="Fit to view">Fit</button>
+        <button @click="resetZoom()" title="Reset to 100%">100%</button>
+        <span class="zoom-level" x-text="Math.round(zoom * 100) + '%'"></span>
+      </div>
+      <div class="canvas" x-ref="canvas_book-a-group-trip" @wheel.prevent="onWheel($event)">
+        <div class="zoom-surface" :style="surfaceStyle()">
+      <svg width="1320" height="1660"
+           viewBox="0 0 1320 1660">
         <defs>
           
           <marker id="arrow-book-a-group-trip" viewBox="0 0 10 10" refX="9" refY="5"
@@ -110,26 +124,26 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="543.0" y1="405.0"
-                x2="770.0" y2="220.0"/>
+                x1="500.0" y1="384.0"
+                x2="500.0" y2="244.0"/>
           <line class="edge "
-                x1="543.0" y1="405.0"
-                x2="770.0" y2="220.0"
+                x1="500.0" y1="384.0"
+                x2="500.0" y2="244.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
           
           
 
 
 
-<circle cx="618.0" cy="325.0" r="11" class="numbg"/>
-<text x="618.0" y="329.0" class="num">1</text>
-<text x="634.0" y="329.0" class="verb">searches for</text>
+<circle cx="468.0" cy="313.0" r="11" class="numbg"/>
+<text x="468.0" y="317.0" class="num">1</text>
+<text x="484.0" y="317.0" class="verb">searches for</text>
 
 
           
           
           
-<g transform="translate(820.0,180.0)"
+<g transform="translate(500.0,180.0)"
    @mouseenter='showTip($event, "Room", "room")'
    @mouseleave="tooltip = null">
   
@@ -152,26 +166,26 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="500.0" y1="384.0"
-                x2="500.0" y2="244.0"/>
+                x1="556.0" y1="440.0"
+                x2="756.0" y2="440.0"/>
           <line class="edge "
-                x1="500.0" y1="384.0"
-                x2="500.0" y2="244.0"
+                x1="556.0" y1="440.0"
+                x2="756.0" y2="440.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
           
           
 
 
 
-<circle cx="486.0" cy="313.0" r="11" class="numbg"/>
-<text x="486.0" y="317.0" class="num">2</text>
-<text x="502.0" y="317.0" class="verb">selects</text>
+<circle cx="624.0" cy="457.0" r="11" class="numbg"/>
+<text x="624.0" y="461.0" class="num">2</text>
+<text x="640.0" y="461.0" class="verb">selects</text>
 
 
           
           
           
-<g transform="translate(500.0,180.0)"
+<g transform="translate(820.0,440.0)"
    @mouseenter='showTip($event, "Deluxe Suite", "room")'
    @mouseleave="tooltip = null">
   
@@ -231,37 +245,37 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="479.0" y1="492.0"
-                x2="204.0" y2="1161.0"/>
+                x1="471.0" y1="488.0"
+                x2="214.0" y2="905.0"/>
           <line class="edge "
-                x1="479.0" y1="492.0"
-                x2="204.0" y2="1161.0"
+                x1="471.0" y1="488.0"
+                x2="214.0" y2="905.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
           
           
 
 
 
-<circle cx="303.0" cy="818.0" r="11" class="numbg"/>
-<text x="303.0" y="822.0" class="num">3</text>
-<text x="319.0" y="822.0" class="verb">adds</text>
+<circle cx="305.0" cy="686.0" r="11" class="numbg"/>
+<text x="305.0" y="690.0" class="num">3</text>
+<text x="321.0" y="690.0" class="verb">adds</text>
 
 
           
           
           <line class="edge-hit"
-                x1="223.0" y1="1185.0"
-                x2="450.0" y2="1000.0"/>
+                x1="236.0" y1="960.0"
+                x2="436.0" y2="960.0"/>
           <line class="edge connective"
-                x1="223.0" y1="1185.0"
-                x2="450.0" y2="1000.0"
+                x1="236.0" y1="960.0"
+                x2="436.0" y2="960.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
           
           
 
 
 
-<text x="337.0" y="1109.0"
+<text x="325.0" y="981.0"
       class="verb conn">to</text>
 
 
@@ -291,44 +305,44 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="556.0" y1="440.0"
-                x2="756.0" y2="440.0"/>
+                x1="543.0" y1="475.0"
+                x2="770.0" y2="660.0"/>
           <line class="edge "
-                x1="556.0" y1="440.0"
-                x2="756.0" y2="440.0"
+                x1="543.0" y1="475.0"
+                x2="770.0" y2="660.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
           
           
 
 
 
-<circle cx="624.0" cy="457.0" r="11" class="numbg"/>
-<text x="624.0" y="461.0" class="num">4</text>
-<text x="640.0" y="461.0" class="verb">submits</text>
+<circle cx="613.0" cy="580.0" r="11" class="numbg"/>
+<text x="613.0" y="584.0" class="num">4</text>
+<text x="629.0" y="584.0" class="verb">submits</text>
 
 
           
           
           <line class="edge-hit"
-                x1="876.0" y1="440.0"
-                x2="1076.0" y2="440.0"/>
+                x1="876.0" y1="700.0"
+                x2="1076.0" y2="700.0"/>
           <line class="edge connective"
-                x1="876.0" y1="440.0"
-                x2="1076.0" y2="440.0"
+                x1="876.0" y1="700.0"
+                x2="1076.0" y2="700.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
           
           
 
 
 
-<text x="962.0" y="461.0"
+<text x="962.0" y="721.0"
       class="verb conn">for</text>
 
 
           
           
           
-<g transform="translate(820.0,440.0)"
+<g transform="translate(820.0,700.0)"
    @mouseenter='showTip($event, "Payment", "payment")'
    @mouseleave="tooltip = null">
   
@@ -344,7 +358,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
           
           
-<g transform="translate(1140.0,440.0)"
+<g transform="translate(1140.0,700.0)"
    @mouseenter='showTip($event, "Booking", "booking")'
    @mouseleave="tooltip = null">
   
@@ -367,26 +381,26 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="863.0" y1="735.0"
-                x2="1090.0" y2="920.0"/>
+                x1="849.0" y1="1008.0"
+                x2="1106.0" y2="1425.0"/>
           <line class="edge "
-                x1="863.0" y1="735.0"
-                x2="1090.0" y2="920.0"
+                x1="849.0" y1="1008.0"
+                x2="1106.0" y2="1425.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
           
           
 
 
 
-<circle cx="930.0" cy="840.0" r="11" class="numbg"/>
-<text x="930.0" y="844.0" class="num">5</text>
-<text x="946.0" y="844.0" class="verb">confirms</text>
+<circle cx="927.0" cy="1225.0" r="11" class="numbg"/>
+<text x="927.0" y="1229.0" class="num">5</text>
+<text x="943.0" y="1229.0" class="verb">confirms</text>
 
 
           
           
           
-<g transform="translate(1140.0,960.0)"
+<g transform="translate(1140.0,1480.0)"
    @mouseenter='showTip($event, "Booking", "booking")'
    @mouseleave="tooltip = null">
   
@@ -409,62 +423,62 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="820.0" y1="756.0"
-                x2="820.0" y2="896.0"/>
+                x1="820.0" y1="1016.0"
+                x2="820.0" y2="1156.0"/>
           <line class="edge "
-                x1="820.0" y1="756.0"
-                x2="820.0" y2="896.0"
+                x1="820.0" y1="1016.0"
+                x2="820.0" y2="1156.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
           
           
 
 
 
-<circle cx="776.0" cy="825.0" r="11" class="numbg"/>
-<text x="776.0" y="829.0" class="num">6</text>
-<text x="792.0" y="829.0" class="verb">sends</text>
+<circle cx="776.0" cy="1085.0" r="11" class="numbg"/>
+<text x="776.0" y="1089.0" class="num">6</text>
+<text x="792.0" y="1089.0" class="verb">sends</text>
 
 
           
           
           <line class="edge-hit"
-                x1="777.0" y1="925.0"
-                x2="550.0" y2="740.0"/>
+                x1="791.0" y1="1172.0"
+                x2="534.0" y2="755.0"/>
           <line class="edge connective"
-                x1="777.0" y1="925.0"
-                x2="550.0" y2="740.0"
+                x1="791.0" y1="1172.0"
+                x2="534.0" y2="755.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
           
           
 
 
 
-<text x="663.0" y="822.0"
+<text x="666.0" y="957.0"
       class="verb conn">to</text>
 
 
           
           
           <line class="edge-hit"
-                x1="768.0" y1="981.0"
-                x2="239.0" y2="1196.0"/>
+                x1="768.0" y1="1199.0"
+                x2="239.0" y2="984.0"/>
           <line class="edge connective"
-                x1="768.0" y1="981.0"
-                x2="239.0" y2="1196.0"
+                x1="768.0" y1="1199.0"
+                x2="239.0" y2="984.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
           
           
 
 
 
-<text x="486.0" y="1075.0"
+<text x="499.0" y="1078.0"
       class="verb conn">to</text>
 
 
           
           
           
-<g transform="translate(820.0,960.0)"
+<g transform="translate(820.0,1220.0)"
    @mouseenter='showTip($event, "Confirmation", "confirmation")'
    @mouseleave="tooltip = null">
   
@@ -487,26 +501,26 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="552.0" y1="461.0"
-                x2="1081.0" y2="676.0"/>
+                x1="536.0" y1="483.0"
+                x2="1099.0" y2="1171.0"/>
           <line class="edge "
-                x1="552.0" y1="461.0"
-                x2="1081.0" y2="676.0"
+                x1="536.0" y1="483.0"
+                x2="1099.0" y2="1171.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
           
           
 
 
 
-<circle cx="777.0" cy="584.0" r="11" class="numbg"/>
-<text x="777.0" y="588.0" class="num">7</text>
-<text x="793.0" y="588.0" class="verb">redeems</text>
+<circle cx="771.0" cy="837.0" r="11" class="numbg"/>
+<text x="771.0" y="841.0" class="num">7</text>
+<text x="787.0" y="841.0" class="verb">redeems</text>
 
 
           
           
           
-<g transform="translate(1140.0,700.0)"
+<g transform="translate(1140.0,1220.0)"
    @mouseenter='showTip($event, "loyalty points", "loyalty-points")'
    @mouseleave="tooltip = null">
   
@@ -559,7 +573,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
           
           
-<g transform="translate(180.0,1220.0)"
+<g transform="translate(180.0,960.0)"
    @mouseenter='showTip($event, "Bob", "guest")'
    @mouseleave="tooltip = null">
   
@@ -575,7 +589,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
           
           
-<g transform="translate(820.0,700.0)"
+<g transform="translate(820.0,960.0)"
    @mouseenter='showTip($event, "Booking System", "booking-system")'
    @mouseleave="tooltip = null">
   
@@ -592,6 +606,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
         </g>
       </svg>
+        </div>
       </div>
       
     </section>
@@ -609,9 +624,17 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
         
       </div>
       
-      <div class="canvas">
-      <svg width="1320" height="620"
-           viewBox="0 0 1320 620">
+      <div class="zoom-bar">
+        <button @click="zoomOut()" title="Zoom out">−</button>
+        <button @click="zoomIn()" title="Zoom in">+</button>
+        <button @click="fitDiagram()" title="Fit to view">Fit</button>
+        <button @click="resetZoom()" title="Reset to 100%">100%</button>
+        <span class="zoom-level" x-text="Math.round(zoom * 100) + '%'"></span>
+      </div>
+      <div class="canvas" x-ref="canvas_cancel-a-booking" @wheel.prevent="onWheel($event)">
+        <div class="zoom-surface" :style="surfaceStyle()">
+      <svg width="1080" height="1140"
+           viewBox="0 0 1080 1140">
         <defs>
           
           <marker id="arrow-cancel-a-booking" viewBox="0 0 10 10" refX="9" refY="5"
@@ -627,26 +650,26 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="457.0" y1="215.0"
-                x2="230.0" y2="400.0"/>
+                x1="272.0" y1="419.0"
+                x2="801.0" y2="204.0"/>
           <line class="edge "
-                x1="457.0" y1="215.0"
-                x2="230.0" y2="400.0"
+                x1="272.0" y1="419.0"
+                x2="801.0" y2="204.0"
                 marker-end="url(#arrow-cancel-a-booking)"/>
           
           
 
 
 
-<circle cx="299.0" cy="293.0" r="11" class="numbg"/>
-<text x="299.0" y="297.0" class="num">1</text>
-<text x="315.0" y="297.0" class="verb">cancels</text>
+<circle cx="511.0" cy="327.0" r="11" class="numbg"/>
+<text x="511.0" y="331.0" class="num">1</text>
+<text x="527.0" y="331.0" class="verb">cancels</text>
 
 
           
           
           
-<g transform="translate(180.0,440.0)"
+<g transform="translate(860.0,180.0)"
    @mouseenter='showTip($event, "Booking", "booking")'
    @mouseleave="tooltip = null">
   
@@ -669,44 +692,44 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="556.0" y1="440.0"
-                x2="756.0" y2="440.0"/>
+                x1="817.0" y1="475.0"
+                x2="590.0" y2="660.0"/>
           <line class="edge "
-                x1="556.0" y1="440.0"
-                x2="756.0" y2="440.0"
+                x1="817.0" y1="475.0"
+                x2="590.0" y2="660.0"
                 marker-end="url(#arrow-cancel-a-booking)"/>
           
           
 
 
 
-<circle cx="624.0" cy="457.0" r="11" class="numbg"/>
-<text x="624.0" y="461.0" class="num">2</text>
-<text x="640.0" y="461.0" class="verb">refunds</text>
+<circle cx="659.0" cy="553.0" r="11" class="numbg"/>
+<text x="659.0" y="557.0" class="num">2</text>
+<text x="675.0" y="557.0" class="verb">refunds</text>
 
 
           
           
           <line class="edge-hit"
-                x1="876.0" y1="440.0"
-                x2="1076.0" y2="440.0"/>
+                x1="540.0" y1="756.0"
+                x2="540.0" y2="896.0"/>
           <line class="edge connective"
-                x1="876.0" y1="440.0"
-                x2="1076.0" y2="440.0"
+                x1="540.0" y1="756.0"
+                x2="540.0" y2="896.0"
                 marker-end="url(#arrow-cancel-a-booking)"/>
           
           
 
 
 
-<text x="962.0" y="461.0"
+<text x="508.0" y="829.0"
       class="verb conn">for</text>
 
 
           
           
           
-<g transform="translate(820.0,440.0)"
+<g transform="translate(540.0,700.0)"
    @mouseenter='showTip($event, "Payment", "payment")'
    @mouseleave="tooltip = null">
   
@@ -722,7 +745,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
           
           
-<g transform="translate(1140.0,440.0)"
+<g transform="translate(540.0,960.0)"
    @mouseenter='showTip($event, "Booking", "booking")'
    @mouseleave="tooltip = null">
   
@@ -745,44 +768,44 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="543.0" y1="405.0"
-                x2="770.0" y2="220.0"/>
+                x1="804.0" y1="440.0"
+                x2="604.0" y2="440.0"/>
           <line class="edge "
-                x1="543.0" y1="405.0"
-                x2="770.0" y2="220.0"
+                x1="804.0" y1="440.0"
+                x2="604.0" y2="440.0"
                 marker-end="url(#arrow-cancel-a-booking)"/>
           
           
 
 
 
-<circle cx="643.0" cy="325.0" r="11" class="numbg"/>
-<text x="643.0" y="329.0" class="num">3</text>
-<text x="659.0" y="329.0" class="verb">sends</text>
+<circle cx="678.0" cy="421.0" r="11" class="numbg"/>
+<text x="678.0" y="425.0" class="num">3</text>
+<text x="694.0" y="425.0" class="verb">sends</text>
 
 
           
           
           <line class="edge-hit"
-                x1="764.0" y1="180.0"
-                x2="564.0" y2="180.0"/>
+                x1="484.0" y1="440.0"
+                x2="284.0" y2="440.0"/>
           <line class="edge connective"
-                x1="764.0" y1="180.0"
-                x2="564.0" y2="180.0"
+                x1="484.0" y1="440.0"
+                x2="284.0" y2="440.0"
                 marker-end="url(#arrow-cancel-a-booking)"/>
           
           
 
 
 
-<text x="653.0" y="165.0"
+<text x="373.0" y="425.0"
       class="verb conn">to</text>
 
 
           
           
           
-<g transform="translate(820.0,180.0)"
+<g transform="translate(540.0,440.0)"
    @mouseenter='showTip($event, "Confirmation", "confirmation")'
    @mouseleave="tooltip = null">
   
@@ -803,7 +826,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
         <g class="actors">
           
           
-<g transform="translate(500.0,180.0)"
+<g transform="translate(220.0,440.0)"
    @mouseenter='showTip($event, "Alice", "guest")'
    @mouseleave="tooltip = null">
   
@@ -819,7 +842,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
           
           
-<g transform="translate(500.0,440.0)"
+<g transform="translate(860.0,440.0)"
    @mouseenter='showTip($event, "Booking System", "booking-system")'
    @mouseleave="tooltip = null">
   
@@ -836,6 +859,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
         </g>
       </svg>
+        </div>
       </div>
       
     </section>
@@ -856,10 +880,12 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 <script>
 const STORY_IDS = ["book-a-group-trip", "cancel-a-booking"];
 const MAX_STEPS = {"book-a-group-trip": 7, "cancel-a-booking": 3};
+const DIAGRAM_SIZES = {"book-a-group-trip": [1320, 1660], "cancel-a-booking": [1080, 1140]};
 const TERM_INFO = {"organizer": {"kind": "actor", "definition": "Person booking accommodation on behalf of a group."}, "guest": {"kind": "actor", "definition": "Individual traveler in the group."}, "booking-system": {"kind": "actor", "definition": "Automated reservation back-end."}, "room": {"kind": "object", "definition": "A bookable hotel room."}, "booking": {"kind": "object", "definition": "A reservation for one or more rooms."}, "payment": {"kind": "object", "definition": "Money transferred for a booking."}, "confirmation": {"kind": "object", "definition": "Notification of a successful booking."}, "search": {"kind": "verb", "definition": "Look up available options."}, "select": {"kind": "verb", "definition": "Choose one option from a set."}, "add": {"kind": "verb", "definition": "Attach a member to a collection."}, "submit": {"kind": "verb", "definition": "Send to the system for processing."}, "confirm": {"kind": "verb", "definition": "Finalize and acknowledge."}, "send": {"kind": "verb", "definition": "Deliver to a recipient."}, "reject": {"kind": "verb", "definition": "Refuse to process or accept."}, "cancel": {"kind": "verb", "definition": "Withdraw a booking before arrival."}, "refund": {"kind": "verb", "definition": "Return money for a cancelled booking."}, "redeems": {"kind": "verb", "definition": null}, "loyalty-points": {"kind": "object", "definition": null}};
 function diagramsApp() {
   return {
     selectedStory: null, step: null, hoverActivity: null, tooltip: null,
+    zoom: 1, panX: 0, panY: 0,
     maxSteps: MAX_STEPS,
     init() {
       let hash;
@@ -868,6 +894,7 @@ function diagramsApp() {
       this.$watch('selectedStory', (id) => {
         history.replaceState(null, '', '#' + encodeURIComponent(id));
         this.step = null; this.hoverActivity = null;
+        this.$nextTick(() => this.fitDiagram());
       });
       window.addEventListener('hashchange', () => {
         let next;
@@ -878,6 +905,7 @@ function diagramsApp() {
         if (e.key === 'ArrowRight') this.nextStep();
         if (e.key === 'ArrowLeft') this.prevStep();
       });
+      this.$nextTick(() => this.fitDiagram());
     },
     nextStep() {
       const max = this.maxSteps[this.selectedStory];
@@ -885,6 +913,53 @@ function diagramsApp() {
     },
     prevStep() {
       if (this.step !== null) this.step = this.step <= 1 ? null : this.step - 1;
+    },
+    surfaceStyle() {
+      return 'transform: translate(' + this.panX + 'px,' + this.panY +
+             'px) scale(' + this.zoom + '); transform-origin: 0 0;';
+    },
+    _canvasEl() { return this.$refs['canvas_' + this.selectedStory]; },
+    _setZoom(next, cx, cy) {
+      // Zoom toward (cx, cy) in canvas-viewport coordinates: keep that point
+      // fixed by adjusting the pan.
+      next = Math.min(4, Math.max(0.1, next));
+      const ratio = next / this.zoom;
+      this.panX = cx - (cx - this.panX) * ratio;
+      this.panY = cy - (cy - this.panY) * ratio;
+      this.zoom = next;
+    },
+    _viewportCenter() {
+      const el = this._canvasEl();
+      return el ? [el.clientWidth / 2, el.clientHeight / 2] : [0, 0];
+    },
+    zoomIn() { const [cx, cy] = this._viewportCenter(); this._setZoom(this.zoom * 1.2, cx, cy); },
+    zoomOut() { const [cx, cy] = this._viewportCenter(); this._setZoom(this.zoom / 1.2, cx, cy); },
+    resetZoom() { this.zoom = 1; this.panX = 0; this.panY = 0; },
+    fitDiagram() {
+      const el = this._canvasEl();
+      const size = DIAGRAM_SIZES[this.selectedStory];
+      if (!el || !size) { this.resetZoom(); return; }
+      const [w, h] = size;
+      const scale = Math.min(el.clientWidth / w, el.clientHeight / h, 1) * 0.95;
+      this.zoom = scale;
+      this.panX = (el.clientWidth - w * scale) / 2;
+      this.panY = (el.clientHeight - h * scale) / 2;
+    },
+    onWheel(event) {
+      const el = this._canvasEl();
+      const rect = el.getBoundingClientRect();
+      const cx = event.clientX - rect.left;
+      const cy = event.clientY - rect.top;
+      // Trackpad pinch and ctrl/cmd + wheel arrive as wheel events with
+      // ctrlKey/metaKey set -> zoom toward the cursor. A plain two-finger
+      // scroll (no modifier) pans.
+      if (event.ctrlKey || event.metaKey) {
+        const factor = Math.exp(-event.deltaY * 0.01);
+        this._setZoom(this.zoom * factor, cx, cy);
+      } else {
+        this.panX -= event.deltaX;
+        this.panY -= event.deltaY;
+      }
     },
     faded(n) { return this.step !== null && n > this.step; },
     showTip(event, title, termId) {

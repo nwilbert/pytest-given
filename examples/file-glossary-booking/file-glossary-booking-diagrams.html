@@ -21,7 +21,7 @@ body { margin: 0; height: 100vh; display: flex; flex-direction: column; overflow
 .story-meta { font-size: 12px; color: #6b6b7a; }
 main { flex: 1; min-width: 0; min-height: 0; padding: 14px 18px 0; display: flex; flex-direction: column; overflow: hidden; }
 main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.canvas { flex: 1; min-height: 0; overflow: auto; padding-bottom: 14px; }
+.canvas { flex: 1; min-height: 0; overflow: hidden; padding-bottom: 14px; position: relative; touch-action: none; }
 .story-header { flex: none; display: flex; align-items: center; gap: 18px; }
 .story-header h1 { font-size: 20px; margin: 4px 0; }
 .replay { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #6b6b7a; }
@@ -52,6 +52,12 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 .tooltip { position: fixed; z-index: 10; max-width: 280px; background: #1a1a2e; color: #fafaf7; border-radius: 6px; padding: 8px 11px; font-size: 12.5px; pointer-events: none; }
 .tooltip-title { font-weight: 600; }
 .tooltip-kind { color: #e8955a; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; margin: 2px 0; }
+.zoom-bar { flex: none; display: flex; align-items: center; gap: 6px; margin: 6px 0 0; }
+.zoom-bar button { border: 1px solid #e3e1da; background: #fff; border-radius: 4px; padding: 2px 10px; cursor: pointer; font-size: 14px; min-width: 30px; }
+.zoom-bar button:hover { background: #f4f2ec; }
+.zoom-bar button:focus-visible { outline: 2px solid #e07a2f; }
+.zoom-level { font-size: 13px; color: #6b6b7a; font-variant-numeric: tabular-nums; margin-left: 4px; }
+.zoom-surface { position: absolute; top: 0; left: 0; will-change: transform; }
 </style>
 </head>
 <body x-data="diagramsApp()" x-cloak>
@@ -85,9 +91,17 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
         
       </div>
       
-      <div class="canvas">
-      <svg width="1080" height="620"
-           viewBox="0 0 1080 620">
+      <div class="zoom-bar">
+        <button @click="zoomOut()" title="Zoom out">−</button>
+        <button @click="zoomIn()" title="Zoom in">+</button>
+        <button @click="fitDiagram()" title="Fit to view">Fit</button>
+        <button @click="resetZoom()" title="Reset to 100%">100%</button>
+        <span class="zoom-level" x-text="Math.round(zoom * 100) + '%'"></span>
+      </div>
+      <div class="canvas" x-ref="canvas_book-a-room" @wheel.prevent="onWheel($event)">
+        <div class="zoom-surface" :style="surfaceStyle()">
+      <svg width="1080" height="880"
+           viewBox="0 0 1080 880">
         <defs>
           
           <marker id="arrow-book-a-room" viewBox="0 0 10 10" refX="9" refY="5"
@@ -103,20 +117,20 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="436.0" y1="180.0"
-                x2="636.0" y2="180.0"/>
+                x1="423.0" y1="405.0"
+                x2="650.0" y2="220.0"/>
           <line class="edge connective"
-                x1="436.0" y1="180.0"
-                x2="636.0" y2="180.0"
+                x1="423.0" y1="405.0"
+                x2="650.0" y2="220.0"
                 marker-end="url(#arrow-book-a-room)"/>
           
           
 
 
 
-<circle cx="504.0" cy="197.0" r="11" class="numbg"/>
-<text x="504.0" y="201.0" class="num">1</text>
-<text x="520.0" y="201.0" class="verb conn">browses</text>
+<circle cx="516.0" cy="325.0" r="11" class="numbg"/>
+<text x="516.0" y="329.0" class="num">1</text>
+<text x="532.0" y="329.0" class="verb conn">browses</text>
 
 
           
@@ -145,20 +159,20 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="423.0" y1="215.0"
-                x2="650.0" y2="400.0"/>
+                x1="436.0" y1="440.0"
+                x2="636.0" y2="440.0"/>
           <line class="edge "
-                x1="423.0" y1="215.0"
-                x2="650.0" y2="400.0"
+                x1="436.0" y1="440.0"
+                x2="636.0" y2="440.0"
                 marker-end="url(#arrow-book-a-room)"/>
           
           
 
 
 
-<circle cx="500.0" cy="320.0" r="11" class="numbg"/>
-<text x="500.0" y="324.0" class="num">2</text>
-<text x="516.0" y="324.0" class="verb">books</text>
+<circle cx="510.0" cy="457.0" r="11" class="numbg"/>
+<text x="510.0" y="461.0" class="num">2</text>
+<text x="526.0" y="461.0" class="verb">books</text>
 
 
           
@@ -187,26 +201,26 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="380.0" y1="236.0"
-                x2="380.0" y2="376.0"/>
+                x1="423.0" y1="475.0"
+                x2="650.0" y2="660.0"/>
           <line class="edge connective"
-                x1="380.0" y1="236.0"
-                x2="380.0" y2="376.0"
+                x1="423.0" y1="475.0"
+                x2="650.0" y2="660.0"
                 marker-end="url(#arrow-book-a-room)"/>
           
           
 
 
 
-<circle cx="326.0" cy="305.0" r="11" class="numbg"/>
-<text x="326.0" y="309.0" class="num">3</text>
-<text x="342.0" y="309.0" class="verb conn">receives</text>
+<circle cx="490.0" cy="580.0" r="11" class="numbg"/>
+<text x="490.0" y="584.0" class="num">3</text>
+<text x="506.0" y="584.0" class="verb conn">receives</text>
 
 
           
           
           
-<g transform="translate(380.0,440.0)"
+<g transform="translate(700.0,700.0)"
    @mouseenter='showTip($event, "Confirmation", "confirmation")'
    @mouseleave="tooltip = null">
   
@@ -227,7 +241,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
         <g class="actors">
           
           
-<g transform="translate(380.0,180.0)"
+<g transform="translate(380.0,440.0)"
    @mouseenter='showTip($event, "Guest", "guest")'
    @mouseleave="tooltip = null">
   
@@ -244,6 +258,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
         </g>
       </svg>
+        </div>
       </div>
       
     </section>
@@ -264,10 +279,12 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 <script>
 const STORY_IDS = ["book-a-room"];
 const MAX_STEPS = {"book-a-room": 3};
+const DIAGRAM_SIZES = {"book-a-room": [1080, 880]};
 const TERM_INFO = {"guest": {"kind": "actor", "definition": "A person making a room reservation."}, "book": {"kind": "verb", "definition": "Reserve a room for a given stay."}, "room": {"kind": "object", "definition": "A bookable hotel room."}, "confirmation": {"kind": "object", "definition": "A notification acknowledging a successful reservation."}, "cancellation-policy": {"kind": null, "definition": "The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate."}, "overbooking": {"kind": null, "definition": "Accepting more reservations than there are rooms available."}};
 function diagramsApp() {
   return {
     selectedStory: null, step: null, hoverActivity: null, tooltip: null,
+    zoom: 1, panX: 0, panY: 0,
     maxSteps: MAX_STEPS,
     init() {
       let hash;
@@ -276,6 +293,7 @@ function diagramsApp() {
       this.$watch('selectedStory', (id) => {
         history.replaceState(null, '', '#' + encodeURIComponent(id));
         this.step = null; this.hoverActivity = null;
+        this.$nextTick(() => this.fitDiagram());
       });
       window.addEventListener('hashchange', () => {
         let next;
@@ -286,6 +304,7 @@ function diagramsApp() {
         if (e.key === 'ArrowRight') this.nextStep();
         if (e.key === 'ArrowLeft') this.prevStep();
       });
+      this.$nextTick(() => this.fitDiagram());
     },
     nextStep() {
       const max = this.maxSteps[this.selectedStory];
@@ -293,6 +312,53 @@ function diagramsApp() {
     },
     prevStep() {
       if (this.step !== null) this.step = this.step <= 1 ? null : this.step - 1;
+    },
+    surfaceStyle() {
+      return 'transform: translate(' + this.panX + 'px,' + this.panY +
+             'px) scale(' + this.zoom + '); transform-origin: 0 0;';
+    },
+    _canvasEl() { return this.$refs['canvas_' + this.selectedStory]; },
+    _setZoom(next, cx, cy) {
+      // Zoom toward (cx, cy) in canvas-viewport coordinates: keep that point
+      // fixed by adjusting the pan.
+      next = Math.min(4, Math.max(0.1, next));
+      const ratio = next / this.zoom;
+      this.panX = cx - (cx - this.panX) * ratio;
+      this.panY = cy - (cy - this.panY) * ratio;
+      this.zoom = next;
+    },
+    _viewportCenter() {
+      const el = this._canvasEl();
+      return el ? [el.clientWidth / 2, el.clientHeight / 2] : [0, 0];
+    },
+    zoomIn() { const [cx, cy] = this._viewportCenter(); this._setZoom(this.zoom * 1.2, cx, cy); },
+    zoomOut() { const [cx, cy] = this._viewportCenter(); this._setZoom(this.zoom / 1.2, cx, cy); },
+    resetZoom() { this.zoom = 1; this.panX = 0; this.panY = 0; },
+    fitDiagram() {
+      const el = this._canvasEl();
+      const size = DIAGRAM_SIZES[this.selectedStory];
+      if (!el || !size) { this.resetZoom(); return; }
+      const [w, h] = size;
+      const scale = Math.min(el.clientWidth / w, el.clientHeight / h, 1) * 0.95;
+      this.zoom = scale;
+      this.panX = (el.clientWidth - w * scale) / 2;
+      this.panY = (el.clientHeight - h * scale) / 2;
+    },
+    onWheel(event) {
+      const el = this._canvasEl();
+      const rect = el.getBoundingClientRect();
+      const cx = event.clientX - rect.left;
+      const cy = event.clientY - rect.top;
+      // Trackpad pinch and ctrl/cmd + wheel arrive as wheel events with
+      // ctrlKey/metaKey set -> zoom toward the cursor. A plain two-finger
+      // scroll (no modifier) pans.
+      if (event.ctrlKey || event.metaKey) {
+        const factor = Math.exp(-event.deltaY * 0.01);
+        this._setZoom(this.zoom * factor, cx, cy);
+      } else {
+        this.panX -= event.deltaX;
+        this.panY -= event.deltaY;
+      }
     },
     faded(n) { return this.step !== null && n > this.step; },
     showTip(event, title, termId) {
