@@ -85,7 +85,7 @@
         <button @click="resetZoom()" title="Reset to 100%">100%</button>
         <span class="zoom-level" x-text="Math.round(zoom * 100) + '%'"></span>
       </div>
-      <div class="canvas" x-ref="canvas_{{ story.story_id }}">
+      <div class="canvas" x-ref="canvas_{{ story.story_id }}" @wheel.prevent="onWheel($event)">
         <div class="zoom-surface" :style="surfaceStyle()">
       <svg width="{{ view.layout.width | round | int }}" height="{{ view.layout.height | round | int }}"
            viewBox="0 0 {{ view.layout.width | round | int }} {{ view.layout.height | round | int }}">
@@ -221,6 +221,22 @@ function diagramsApp() {
       this.zoom = scale;
       this.panX = (el.clientWidth - w * scale) / 2;
       this.panY = (el.clientHeight - h * scale) / 2;
+    },
+    onWheel(event) {
+      const el = this._canvasEl();
+      const rect = el.getBoundingClientRect();
+      const cx = event.clientX - rect.left;
+      const cy = event.clientY - rect.top;
+      // Trackpad pinch and ctrl/cmd + wheel arrive as wheel events with
+      // ctrlKey/metaKey set -> zoom toward the cursor. A plain two-finger
+      // scroll (no modifier) pans.
+      if (event.ctrlKey || event.metaKey) {
+        const factor = Math.exp(-event.deltaY * 0.01);
+        this._setZoom(this.zoom * factor, cx, cy);
+      } else {
+        this.panX -= event.deltaX;
+        this.panY -= event.deltaY;
+      }
     },
     faded(n) { return this.step !== null && n > this.step; },
     showTip(event, title, termId) {
