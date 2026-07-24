@@ -85,25 +85,50 @@ artifact leaves the other unchanged.
 
 ## Layout algorithm
 
-1. **Actor banding.** Actors initiating ≥ 1 activity (source of a numbered
-   edge) are pinned on the left band; pure recipients on the right band; both
-   ordered by first activity number and spread vertically. Initiating wins for
-   actors that both initiate and receive.
-2. **Work-object seeding.** In activity order: one placed neighbour → fan
-   around that anchor at ideal edge length, evenly spaced angles biased toward
-   the canvas centre; 2+ placed neighbours → centroid; chained work objects
-   (`payment → for → booking`) continue outward from the chain.
-3. **Relaxation.** Fixed iteration count; actors stay pinned; work objects
-   move under springs (rest length = ideal edge length) plus pairwise
-   repulsion below a minimum node distance; positions clamped to margins.
-   Deterministic by construction.
-4. **Label pass.** After positions settle: each edge label (number badge +
-   verb) starts at the edge midpoint, offset perpendicular; a collision pass
-   nudges overlapping label boxes along their edge until labels overlap
-   neither node icons (including node text) nor other labels. This is a
-   first-class layout step — it was the spike's visible weakness.
-5. **Canvas sizing.** Width and height grow with band occupancy and node
-   count, so large stories gain room instead of density.
+Nodes are placed on an integer column/row grid whose spacing exceeds the
+minimum node distance, so nodes can never overlap by construction. On that
+grid a deterministic local search (no RNG) minimizes a single cost made of
+**strictly-ranked objectives** — each weight so much larger than the next that
+an objective can only ever break ties the one above it leaves, never trade one
+away:
+
+1. **No overlapping edges** *(dominant)*. Columns come from a longest-path
+   layering of the directed activity flow (sources on the left, each step one
+   column further right; back edges are dropped for layering only). Row order
+   within a column is seeded by barycentre sweeps, then a local search of
+   cell swaps and relocations drives the true straight-line **crossing** count
+   — plus edges **grazing** an unrelated node — to their minimum.
+2. **Numbered steps read in order** *(secondary)*. Once crossings are minimal,
+   a second pass adds two tie-breakers that reorder rows only (never columns,
+   so the crossing-free arrangement is preserved):
+   - **Proximity.** Pull consecutively numbered activities close together, so
+     the eye follows 1 → 2 → 3 without long jumps.
+   - **Clockwise fans.** Every numbered step's source is its initiating
+     **actor** (path position 0). Grouped by initiating actor, each actor's
+     outgoing spokes (actor → target) — taken in ascending number order —
+     should advance **clockwise** around that actor. Scored by the
+     cross-product sign of consecutive-by-number spokes *sharing an actor*;
+     only relative order matters (absolute orientation is set in step 4).
+     Ranked just under proximity, so it only settles arrangements proximity
+     leaves free — e.g. swapping two work objects in the same column so a
+     hub's `1 → 2` reads forward rather than backward. Independent actors form
+     independent fans (in the hotel story: Carol owns {1,2,3,4,7}, the Booking
+     System owns {5,6}) that never interfere. Never adds a crossing.
+3. **Short edges** *(lowest)*. A gentle length term keeps fans from
+   flying apart. There is deliberately **no strong height/compactness term**:
+   "fit to screen" is owned by the zoom controls (below), not the layout, so
+   readability objectives are never vetoed to keep a diagram short.
+4. **Start reads from the top-left.** Finally the whole diagram is reflected
+   (an axis-aligned isometry — it preserves every crossing, every step
+   distance, and every clockwise fan) to seat the story's start node, activity
+   1's initiator, nearest the top-left corner.
+5. **Label pass.** Each edge label (number badge + verb) starts at the edge
+   midpoint, offset perpendicular, and slides along its edge until it overlaps
+   neither node icons (including node text) nor previously placed labels.
+6. **Canvas sizing.** The canvas is framed to enclose every node with padding
+   to spare and grows freely with the diagram; small diagrams re-centre within
+   a minimum canvas. Since compactness is no longer forced, a large story may
+   exceed the viewport — the zoom controls handle that.
 
 ## Interactivity (Alpine)
 
@@ -115,6 +140,13 @@ artifact leaves the other unchanged.
 - **Hover, node:** tooltip with the term's kind and glossary definition.
 - **Hover, activity:** hovering any edge or work object of an activity
   highlights the whole activity (all its paths).
+- **Zoom:** the diagram viewport zooms in/out and pans, so a diagram that
+  outgrows the viewport (compactness is no longer forced — see step 3 above)
+  stays usable. Explicit **zoom-in / zoom-out / fit / reset** buttons, and
+  **trackpad and mouse-wheel** support: pinch-to-zoom and ctrl/⌘+wheel zoom
+  toward the cursor, two-finger scroll pans. Zoom is per-diagram view state and
+  resets to "fit" when switching stories; the app-shell nav stays pinned while
+  only the diagram surface transforms.
 
 ## Edge cases
 
@@ -132,10 +164,14 @@ Per the project's testing split:
 - **Python unit tests** on graph extraction (dedupe rules, numbering,
   connective edges) and on layout **invariants**: determinism (two runs, equal
   output), minimum pairwise node distance, all nodes within canvas, every
-  activity's edges present, label boxes non-overlapping. Positions are data —
-  this is the data-shaped contract.
+  activity's edges present, label boxes non-overlapping, zero edge crossings,
+  the start node seated top-left, and — for a hub whose numbered spokes can be
+  freely reordered — each actor's fan ending up in **clockwise** number order
+  without costing a crossing. Positions are data — this is the data-shaped
+  contract.
 - **No markup-pinning tests.** The rendered page is Playwright-verified
-  (console clean, switcher, replay, hovers, hash deep link) before commit.
+  (console clean, switcher, replay, hovers, hash deep link, zoom in/out/fit
+  buttons and wheel/trackpad zoom) before commit.
 - `nox -s examples` regenerates diagrams for the example projects alongside
   the existing artifacts; `nox -s self_report` is unaffected unless the
   self-report opts in.
