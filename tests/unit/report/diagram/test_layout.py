@@ -760,6 +760,93 @@ def test_candidate_is_valid_rejects_a_seat_grazing_a_drawn_edge() -> None:
     )
 
 
+def test_candidate_is_valid_matches_move_is_valid_over_random_layouts() -> None:
+    """`_candidate_is_valid` is the incremental gate the backtracking seed trusts
+    for its zero-crossing guarantee: seating one new node keeps the layout valid
+    exactly when re-running the full `_move_is_valid` over the whole layout would
+    accept it. Pin that equivalence so a future edit to either check cannot
+    silently start accepting a crossing/graze/overlap.
+
+    Under the precondition every placement maintains -- all placed nodes already
+    at least MIN_NODE_DIST apart -- adding a node can only *increase* crossing and
+    graze counts, so the incremental "no new violation" check must agree with the
+    full "no worse than baseline" check on every candidate. Bases are generated
+    PROPERLY SPACED (respecting that precondition); the search is deterministic
+    (fixed seed, bounded sample count)."""
+    from pytest_given.report.diagram.layout import (
+        COLLINEAR_DEG,
+        _candidate_is_valid,
+        _count_overlaps,
+        _grazes,
+        _move_is_valid,
+    )
+
+    cos_limit = math.cos(math.radians(COLLINEAR_DEG))
+    rng = random.Random(20240725)
+
+    def spaced_base(count: int) -> dict[str, tuple[float, float]]:
+        """`count` node positions, each at least MIN_NODE_DIST from the others."""
+        placed: dict[str, tuple[float, float]] = {}
+        attempts = 0
+        while len(placed) < count and attempts < 10000:
+            attempts += 1
+            point = (rng.uniform(0.0, 2000.0), rng.uniform(0.0, 2000.0))
+            if all(
+                math.hypot(point[0] - other_x, point[1] - other_y) >= MIN_NODE_DIST
+                for other_x, other_y in placed.values()
+            ):
+                placed[f'p{len(placed)}'] = point
+        return placed
+
+    mismatches = 0
+    exercised_accept = False
+    exercised_reject = False
+    for _ in range(400):
+        positions = spaced_base(rng.randint(2, 6))
+        ids = list(positions)
+        drawn: list[tuple[str, str]] = []
+        for _ in range(rng.randint(0, 5)):
+            source, target = rng.sample(ids, 2)
+            if (source, target) not in drawn and (target, source) not in drawn:
+                drawn.append((source, target))
+
+        new_id = 'NEW'
+        candidate = (rng.uniform(0.0, 2000.0), rng.uniform(0.0, 2000.0))
+        anchor = rng.choice(ids)
+        others = rng.sample(
+            [node_id for node_id in ids if node_id != anchor],
+            rng.randint(0, min(2, len(ids) - 1)),
+        )
+        new_pairs = [(anchor, new_id), *((new_id, other) for other in others)]
+
+        drawn_segments = [(positions[s], positions[t], s, t) for s, t in drawn]
+        incremental = _candidate_is_valid(
+            new_id, candidate, new_pairs, drawn, drawn_segments, positions, cos_limit
+        )
+
+        # Reference: the full gate with the baseline the construction code uses --
+        # the current crossing/graze count of `drawn` (before the new edges).
+        base_crossings = _count_overlaps(drawn_segments)
+        base_grazes = _grazes(positions, drawn)
+        full = _move_is_valid(
+            {**positions, new_id: candidate},
+            [*drawn, *new_pairs],
+            base_crossings,
+            base_grazes,
+        )
+
+        if incremental != full:
+            mismatches += 1
+        exercised_accept = exercised_accept or incremental
+        exercised_reject = exercised_reject or not incremental
+
+    assert mismatches == 0
+    # The sweep must actually exercise both outcomes, else the equivalence is
+    # only pinned on a trivial (all-accept or all-reject) sample.
+    assert exercised_accept
+    assert exercised_reject
+
+
 def test_point_near_segment_handles_a_degenerate_segment() -> None:
     from pytest_given.report.diagram.layout import _point_near_segment
 
@@ -912,6 +999,28 @@ def test_seed_falls_back_to_greedy_when_placement_budget_exhausts(
         warnings.simplefilter('ignore')  # greedy fallback may surface the crossing
         seed = _construct_seed(graph)
     assert set(seed) == {node.id for node in nodes}
+    assert _min_pair_distance(seed) >= MIN_NODE_DIST - 1e-6
+
+
+def test_dfs_seed_places_an_isolated_node() -> None:
+    """A node with no edges never enters the construction walk, so the DFS seats
+    it in a trailing pass after the search completes (distinct from the greedy
+    fallback's own isolated pass). On a small planar story the DFS solves well
+    within budget, so this exercises that trailing pass on the DFS path: the
+    isolated node must still be placed, at least MIN_NODE_DIST from every other."""
+    from pytest_given.report.diagram.layout import _construct_seed
+
+    nodes = (
+        _actor('a:host'), _work('w:a'), _work('w:b'), _work('w:lonely'),
+    )
+    edges = (
+        _edge('a:host', 'w:a', number=1),
+        _edge('a:host', 'w:b', number=2),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    seed = _construct_seed(graph)
+    assert set(seed) == {node.id for node in nodes}
+    assert 'w:lonely' in seed
     assert _min_pair_distance(seed) >= MIN_NODE_DIST - 1e-6
 
 
