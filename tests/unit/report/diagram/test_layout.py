@@ -165,6 +165,32 @@ def test_construction_seats_a_closing_triangle_crossing_free() -> None:
     assert _min_pair_distance(seed) >= MIN_NODE_DIST - 1e-6
 
 
+def test_construction_seats_a_node_reaching_two_prior_anchors_crossing_free() -> None:
+    """A multi-path activity whose object fans out to several already-placed
+    recipients: a:root reaches a:one (activity 1) and a:two (activity 2), then
+    w:hub is placed (activity 3, anchored to a:root) but *also* closes back to
+    both a:one (activity 4) and a:two (activity 5) -- two closing edges onto
+    two nodes that are already fixed when w:hub is seated. The generalized
+    lookahead must fold *both* into w:hub's placement so neither closing edge
+    forces a crossing (the single-partner lookahead would only guard one)."""
+    from pytest_given.report.diagram.layout import _construct_seed, _count_overlaps
+
+    nodes = (_actor('a:root'), _actor('a:one'), _actor('a:two'), _work('w:hub'))
+    edges = (
+        _edge('a:root', 'a:one', number=1),
+        _edge('a:root', 'a:two', number=2),
+        _edge('a:root', 'w:hub', number=3),
+        _edge('w:hub', 'a:one', number=4),
+        _edge('w:hub', 'a:two', number=5),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    seed = _construct_seed(graph)
+    directed = [(e.source, e.target) for e in edges]
+    segments = [(seed[s], seed[t], s, t) for s, t in directed]
+    assert _count_overlaps(segments) == 0
+    assert _min_pair_distance(seed) >= MIN_NODE_DIST - 1e-6
+
+
 def test_disjoint_stars_do_not_cross_and_keep_min_distance() -> None:
     """Three independent actor->work pairs: a planar graph the layout must
     place with neither crossings nor overlapping nodes, growing the canvas

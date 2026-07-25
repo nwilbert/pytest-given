@@ -206,7 +206,7 @@ def _place_new_node(
     prev_angle: float | None,
     positions: dict[str, tuple[float, float]],
     drawn: list[tuple[str, str]],
-    other_anchor_id: str | None = None,
+    other_anchor_ids: tuple[str, ...] = (),
 ) -> tuple[float, float]:
     """Seat new_id around its placed anchor. Candidates are swept by angle at a
     preferred radius that grows until at least one is crossing-free (there is
@@ -222,14 +222,28 @@ def _place_new_node(
     `_place_free_node` for why an unavoidable baseline graze can already
     exist by the time a later node is placed.
 
-    `other_anchor_id`, when given, is a second already-placed node that
-    new_id will also connect to later in the walk (a path's middle node with
-    both a predecessor and a successor, e.g. "sends -> Confirmation -> to").
-    Without accounting for it here, that second edge would land as a
-    "closing" edge between two fixed nodes with no placement freedom left --
-    the design spec's non-planar guard -- even on a genuinely planar story.
-    Folding the second edge into this search keeps both crossing-free at
-    once, so the later closing edge is safe by construction."""
+    `other_anchor_ids` are every *already-placed* node that new_id will also
+    connect to later in the walk (a path's middle node with both a
+    predecessor and a successor, e.g. "sends -> Confirmation -> to", or a
+    multi-path activity whose object fans out to several already-seated
+    recipients -- "sends Confirmation to Alice *and* Bob"). Without
+    accounting for them here, each such edge would land as a "closing" edge
+    between two fixed nodes with no placement freedom left -- the design
+    spec's non-planar guard -- even on a genuinely planar story. Folding
+    them all into this search keeps every one crossing-free at once, so the
+    later closing edges are safe by construction. With `other_anchor_ids=()`
+    this is exactly the plain single-anchor placement.
+
+    A point that satisfies *every* closing edge at once need not exist even
+    when the graph is planar: earlier greedy placements can box the anchors
+    in so no single seat reaches them all crossing-free (e.g. a confirmation
+    fanning back to two guests already seated far apart). Rather than fail,
+    the closing set is relaxed one edge at a time (dropping the
+    latest-numbered partner first) until a seat is found; the anchor-only
+    case always succeeds, so the trailing assert stays an unreachable
+    invariant guard. Any closing edge dropped here is drawn later as a plain
+    closing edge, where the non-planar guard surfaces the residual crossing
+    -- correct behaviour for a genuinely over-constrained seed."""
     anchor_x, anchor_y = positions[anchor_id]
     base_segments = [
         (positions[source], positions[target], source, target)
@@ -237,35 +251,40 @@ def _place_new_node(
     ]
     base_crossings = _count_overlaps(base_segments)
     base_grazes = _grazes(positions, drawn)
-    edges_with_new = [*drawn, (anchor_id, new_id)]
-    if other_anchor_id is not None:
-        edges_with_new = [*edges_with_new, (new_id, other_anchor_id)]
     reference = DEFAULT_DIRECTION if prev_angle is None else prev_angle
-    radius = CONSTRUCT_RADIUS
     best: tuple[float, float] | None = None
-    for _ in range(MAX_RADIUS_STEPS):
-        best_key: tuple[float, float] | None = None
-        for step in range(CONSTRUCT_ANGLE_STEPS):
-            angle = 2.0 * math.pi * step / CONSTRUCT_ANGLE_STEPS
-            candidate = (
-                anchor_x + radius * math.cos(angle),
-                anchor_y + radius * math.sin(angle),
-            )
-            trial = {**positions, new_id: candidate}
-            if not _move_is_valid(
-                trial,
-                edges_with_new,
-                base_crossings=base_crossings,
-                base_grazes=base_grazes,
-            ):
-                continue
-            clockwise_turn = (angle - reference) % (2.0 * math.pi)
-            key = (clockwise_turn, float(step))
-            if best_key is None or key < best_key:
-                best, best_key = candidate, key
+    for keep in range(len(other_anchor_ids), -1, -1):
+        edges_with_new = [
+            *drawn,
+            (anchor_id, new_id),
+            *((new_id, other) for other in other_anchor_ids[:keep]),
+        ]
+        radius = CONSTRUCT_RADIUS
+        for _ in range(MAX_RADIUS_STEPS):
+            best_key: tuple[float, float] | None = None
+            for step in range(CONSTRUCT_ANGLE_STEPS):
+                angle = 2.0 * math.pi * step / CONSTRUCT_ANGLE_STEPS
+                candidate = (
+                    anchor_x + radius * math.cos(angle),
+                    anchor_y + radius * math.sin(angle),
+                )
+                trial = {**positions, new_id: candidate}
+                if not _move_is_valid(
+                    trial,
+                    edges_with_new,
+                    base_crossings=base_crossings,
+                    base_grazes=base_grazes,
+                ):
+                    continue
+                clockwise_turn = (angle - reference) % (2.0 * math.pi)
+                key = (clockwise_turn, float(step))
+                if best_key is None or key < best_key:
+                    best, best_key = candidate, key
+            if best is not None:
+                break
+            radius *= RADIUS_GROWTH
         if best is not None:
             break
-        radius *= RADIUS_GROWTH
     assert best is not None, f'no crossing-free placement for {new_id!r}'
     return best
 
@@ -286,25 +305,33 @@ def _construct_seed(graph: DiagramGraph) -> dict[str, tuple[float, float]]:
         node_x, node_y = positions[node_id]
         return math.atan2(node_y - anchor_y, node_x - anchor_x)
 
-    def closing_partner(node_id: str, after_index: int, exclude_id: str) -> str | None:
-        """If node_id (about to be placed) reconnects later in the walk to a
-        node that is already placed, return that node -- so _place_new_node
-        can satisfy both edges at once instead of leaving the later one a
-        closing edge with no placement freedom (see _place_new_node)."""
+    def closing_partners(
+        node_id: str, after_index: int, exclude_id: str
+    ) -> tuple[str, ...]:
+        """Every already-placed node that node_id (about to be placed)
+        reconnects to later in the walk -- so _place_new_node can satisfy all
+        those edges at once instead of leaving each a closing edge with no
+        placement freedom (see _place_new_node). A later edge whose other
+        endpoint is not placed yet is *not* a closing constraint now: that
+        endpoint gets its own placement freedom when its turn comes, so it is
+        excluded here."""
+        partners: list[str] = []
         for later_source, later_target, _numbered in order[after_index + 1 :]:
             if (
                 later_source == node_id
                 and later_target != exclude_id
                 and later_target in positions
+                and later_target not in partners
             ):
-                return later_target
-            if (
+                partners.append(later_target)
+            elif (
                 later_target == node_id
                 and later_source != exclude_id
                 and later_source in positions
+                and later_source not in partners
             ):
-                return later_source
-        return None
+                partners.append(later_source)
+        return tuple(partners)
 
     for index, (source, target, numbered) in enumerate(order):
         both_placed = source in positions and target in positions
@@ -312,15 +339,15 @@ def _construct_seed(graph: DiagramGraph) -> dict[str, tuple[float, float]]:
             positions[source] = _place_free_node(source, positions, drawn)
         if source not in positions:
             prev = last_spoke_angle.get(target) if numbered else None
-            other = closing_partner(source, index, target)
+            others = closing_partners(source, index, target)
             positions[source] = _place_new_node(
-                source, target, prev, positions, drawn, other
+                source, target, prev, positions, drawn, others
             )
         if target not in positions:
             prev = last_spoke_angle.get(source) if numbered else None
-            other = closing_partner(target, index, source)
+            others = closing_partners(target, index, source)
             positions[target] = _place_new_node(
-                target, source, prev, positions, drawn, other
+                target, source, prev, positions, drawn, others
             )
         drawn.append((source, target))
         if both_placed and not forced:
