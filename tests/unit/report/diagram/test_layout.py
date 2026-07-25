@@ -87,12 +87,19 @@ def _work(node_id: str) -> DiagramNode:
     )
 
 
-def _edge(source: str, target: str, number: int | None = 1) -> DiagramEdge:
+def _edge(
+    source: str,
+    target: str,
+    number: int | None = 1,
+    activity_id: int | None = None,
+) -> DiagramEdge:
     return DiagramEdge(
         source=source,
         target=target,
         label='does',
-        activity_id=ActivityId(number or 1),
+        activity_id=ActivityId(
+            activity_id if activity_id is not None else (number or 1)
+        ),
         number=number,
         connective=False,
     )
@@ -727,6 +734,32 @@ def test_move_is_valid_gates_on_crossings_grazes_and_distance() -> None:
     assert _move_is_valid(crossed, crossed_directed, base_crossings=1, base_grazes=0)
 
 
+def test_candidate_is_valid_rejects_a_seat_grazing_a_drawn_edge() -> None:
+    """The incremental placement check rejects a seat that would run the new
+    node over an existing edge, even when the seat clears every node: the new
+    node itself grazes a drawn edge it is not an endpoint of."""
+    import math
+
+    from pytest_given.report.diagram.layout import COLLINEAR_DEG, _candidate_is_valid
+
+    positions = {'p': (0.0, 0.0), 'q': (600.0, 0.0), 'anchor': (300.0, 500.0)}
+    drawn = [('p', 'q')]
+    drawn_segments = [(positions['p'], positions['q'], 'p', 'q')]
+    cos_limit = math.cos(math.radians(COLLINEAR_DEG))
+    # 'new' sits 30px above the middle of p->q (a graze, < NODE_ON_EDGE_CLEARANCE)
+    # yet more than MIN_NODE_DIST from every node, and its own anchor edge does
+    # not reach the drawn edge -- only the graze rule can reject it.
+    grazing = (300.0, 30.0)
+    assert not _candidate_is_valid(
+        'new', grazing, [('anchor', 'new')], drawn, drawn_segments, positions, cos_limit
+    )
+    # Lifted clear of the edge, the same seat is accepted.
+    clear = (300.0, 200.0)
+    assert _candidate_is_valid(
+        'new', clear, [('anchor', 'new')], drawn, drawn_segments, positions, cos_limit
+    )
+
+
 def test_point_near_segment_handles_a_degenerate_segment() -> None:
     from pytest_given.report.diagram.layout import _point_near_segment
 
@@ -781,6 +814,105 @@ def test_forced_crossing_on_a_nonplanar_closing_edge_is_surfaced() -> None:
     graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
     with pytest.warns(UserWarning, match='non-planar'):
         position_nodes(graph)
+
+
+def test_backtracking_seats_a_boxed_in_fan_crossing_free() -> None:
+    """A guest fan seated wide apart with filler spokes boxing the canvas
+    middle, then a work object anchored to a *separate* system node that fans
+    back to BOTH guests -- the 'Book a Group Trip' shape. No single seat for
+    the fanning object reaches both guests crossing-free, so the forward greedy
+    walk relaxes one closing edge and draws a crossing; the backtracking seed
+    re-seats the earlier nodes and reaches both. The seed must be crossing-free
+    (no non-planar warning) and the full layout must have zero crossings."""
+    import warnings
+
+    nodes = (
+        _actor('a:host'), _actor('a:alice'), _actor('a:bob'),
+        _work('w:booking'), _actor('a:sys'), _work('w:notice'),
+        _work('w:g0'), _work('w:g1'), _work('w:g2'),
+    )
+    edges = (
+        _edge('a:host', 'a:alice', number=1),
+        _edge('a:host', 'w:g0', number=2),
+        _edge('a:host', 'w:g1', number=3),
+        _edge('a:host', 'w:g2', number=4),
+        _edge('a:host', 'a:bob', number=5),
+        _edge('a:host', 'w:booking', number=6),
+        _edge('a:sys', 'w:booking', number=7),
+        _edge('a:sys', 'w:notice', number=8),
+        _edge('w:notice', 'a:alice', number=None, activity_id=8),
+        _edge('w:notice', 'a:bob', number=None, activity_id=8),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    with warnings.catch_warnings():
+        warnings.simplefilter('error')  # backtracking must find zero crossings
+        layout = layout_graph(graph)
+    assert count_crossings(layout.edges) == 0
+
+
+def test_backtracking_seed_is_deterministic() -> None:
+    """The backtracking DFS is a fixed-order search with no RNG: the same graph
+    must yield the identical seed on every call."""
+    from pytest_given.report.diagram.layout import _construct_seed
+
+    nodes = (
+        _actor('a:host'), _actor('a:alice'), _actor('a:bob'),
+        _work('w:booking'), _actor('a:sys'), _work('w:notice'),
+        _work('w:g0'), _work('w:g1'), _work('w:g2'),
+    )
+    edges = (
+        _edge('a:host', 'a:alice', number=1),
+        _edge('a:host', 'w:g0', number=2),
+        _edge('a:host', 'w:g1', number=3),
+        _edge('a:host', 'w:g2', number=4),
+        _edge('a:host', 'a:bob', number=5),
+        _edge('a:host', 'w:booking', number=6),
+        _edge('a:sys', 'w:booking', number=7),
+        _edge('a:sys', 'w:notice', number=8),
+        _edge('w:notice', 'a:alice', number=None, activity_id=8),
+        _edge('w:notice', 'a:bob', number=None, activity_id=8),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    assert _construct_seed(graph) == _construct_seed(graph)
+
+
+def test_seed_falls_back_to_greedy_when_placement_budget_exhausts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """With the placement budget forced to zero the DFS gives up immediately and
+    returns the greedy fallback -- still a complete, valid layout (every node
+    seated at least MIN_NODE_DIST from the others)."""
+    from pytest_given.report.diagram import layout as layout_module
+    from pytest_given.report.diagram.layout import _construct_seed
+
+    monkeypatch.setattr(layout_module, 'MAX_SEED_PLACEMENTS', 0)
+    # An extra edgeless node ('w:lonely') exercises the greedy fallback's
+    # isolated-node placement, which never entered the construction walk.
+    nodes = (
+        _actor('a:host'), _actor('a:alice'), _actor('a:bob'),
+        _work('w:booking'), _actor('a:sys'), _work('w:notice'),
+        _work('w:g0'), _work('w:g1'), _work('w:g2'), _work('w:lonely'),
+    )
+    edges = (
+        _edge('a:host', 'a:alice', number=1),
+        _edge('a:host', 'w:g0', number=2),
+        _edge('a:host', 'w:g1', number=3),
+        _edge('a:host', 'w:g2', number=4),
+        _edge('a:host', 'a:bob', number=5),
+        _edge('a:host', 'w:booking', number=6),
+        _edge('a:sys', 'w:booking', number=7),
+        _edge('a:sys', 'w:notice', number=8),
+        _edge('w:notice', 'a:alice', number=None, activity_id=8),
+        _edge('w:notice', 'a:bob', number=None, activity_id=8),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')  # greedy fallback may surface the crossing
+        seed = _construct_seed(graph)
+    assert set(seed) == {node.id for node in nodes}
+    assert _min_pair_distance(seed) >= MIN_NODE_DIST - 1e-6
 
 
 def test_planar_story_never_warns(trip_story: Story, trip_glossary: Glossary) -> None:

@@ -6,14 +6,22 @@ live at continuous (x, y) coordinates, never closer than MIN_NODE_DIST apart.
 The seed is built by walking activities in ascending sequence-number order
 (`_construction_order`) and seating each newly introduced node only at a
 crossing-free position near its already-placed neighbour (`_construct_seed`,
-`_place_new_node`, `_place_free_node`) -- a tree is planar, so this alone
+`_candidate_positions`, `_place_free_node`) -- a tree is planar, so this alone
 reaches zero crossings on tree-shaped stories, and each actor's numbered
 spokes are swept clockwise as they are added. A node that will later close
 back onto an already-placed node (both its edges known at construction time,
 e.g. a path's middle step) is seated with that future edge in mind too, so a
 "closing" edge between two already-fixed nodes -- which would otherwise have
 no placement freedom left -- stays crossing-free on real, planar stories.
-Finally the whole diagram is
+Placement is a bounded, deterministic depth-first search: each node offers its
+crossing-free seats best-first (`_candidate_positions`), and when a later fan
+is over-constrained (no seat reaches all its already-placed partners) the DFS
+backtracks and re-seats the earlier nodes that boxed it in. Taking the first
+candidate at every step reproduces the plain greedy walk, so tree-shaped and
+uncrowded stories are unchanged; only over-constrained fans are re-seated. A
+genuinely non-planar story exhausts the search budget and falls back to the
+greedy walk (`_construct_seed_greedy`), whose closing-edge guard surfaces the
+unavoidable crossing rather than hanging. Finally the whole diagram is
 reflected (an isometry, so crossings and step spacing are untouched) to seat
 the story's start node in the top-left corner -- the third priority. Edge
 endpoints are trimmed back to the node rims and each edge's label is slid
@@ -45,6 +53,8 @@ CONSTRUCT_ANGLE_STEPS = 72  # candidate directions swept per radius (every 5deg)
 RADIUS_GROWTH = 1.25  # radius multiplier when no direction is crossing-free
 MAX_RADIUS_STEPS = 24  # growth attempts before the (near-unreachable) fallback
 DEFAULT_DIRECTION = 0.0  # preferred first-spoke angle (east; y-down screen)
+MAX_SEED_CANDIDATES = 8  # best-first seats kept per node for the backtracking DFS
+MAX_SEED_PLACEMENTS = 8000  # total DFS placements before the greedy fallback
 
 # Force refinement (Phase 2)
 FORCE_ITERATIONS = 400
@@ -200,6 +210,137 @@ def _place_free_node(
     return placement
 
 
+def _candidate_positions(
+    new_id: str,
+    anchor_id: str,
+    prev_angle: float | None,
+    positions: dict[str, tuple[float, float]],
+    drawn: list[tuple[str, str]],
+    other_anchor_ids: tuple[str, ...] = (),
+) -> list[tuple[float, float]]:
+    """The crossing-free seats for new_id around its placed anchor that satisfy
+    the (anchor, new) edge AND *every* (new, other) closing edge at once.
+    Candidates are swept by angle at a preferred radius that grows until at
+    least one is valid; all valid seats at that first successful radius are
+    returned, ordered best-first by (clockwise turn from prev_angle, else the
+    default reading direction; then angle index for determinism) and capped at
+    MAX_SEED_CANDIDATES. Screen coords are y-down, so an increasing angle sweeps
+    clockwise, and candidates[0] is exactly the single seat the plain greedy
+    walk would have taken.
+
+    `other_anchor_ids` are every *already-placed* node that new_id will also
+    connect to later in the walk (a path's middle node with both a predecessor
+    and a successor, e.g. "sends -> Confirmation -> to", or a multi-path
+    activity whose object fans out to several already-seated recipients --
+    "sends Confirmation to Alice *and* Bob"). Folding them all into this search
+    keeps every closing edge crossing-free at once, so the later closing edges
+    are safe by construction. With `other_anchor_ids=()` this is the plain
+    single-anchor placement.
+
+    There is **no relaxation** here: a point that satisfies every closing edge
+    at once need not exist even when the graph is planar (earlier placements can
+    box the anchors in), and dropping a closing edge is exactly what draws a
+    crossing. An empty list means "new_id cannot be seated given the current
+    earlier placements" -- the caller (`_construct_seed`'s DFS) backtracks and
+    re-seats the nodes that boxed it in rather than accepting a crossing.
+
+    A candidate is accepted by `_candidate_is_valid`, an incremental form of
+    `_move_is_valid`: since only new_id moves, the drawn edges' mutual crossings
+    and the placed nodes' spacing are unchanged, so it suffices to check new_id
+    and its new edges against everything already placed. This is exactly
+    equivalent to re-running `_move_is_valid` over the whole layout (the earlier
+    layout already satisfies the invariants), but avoids the full O(edges^2)
+    re-count per candidate -- the difference between a snappy backtracking search
+    and one that stalls on crowded fans."""
+    anchor_x, anchor_y = positions[anchor_id]
+    reference = DEFAULT_DIRECTION if prev_angle is None else prev_angle
+    new_pairs = [
+        (anchor_id, new_id),
+        *((new_id, other) for other in other_anchor_ids),
+    ]
+    drawn_segments = [(positions[s], positions[t], s, t) for s, t in drawn]
+    cos_limit = math.cos(math.radians(COLLINEAR_DEG))
+    radius = CONSTRUCT_RADIUS
+    for _ in range(MAX_RADIUS_STEPS):
+        scored: list[tuple[tuple[float, float], tuple[float, float]]] = []
+        for step in range(CONSTRUCT_ANGLE_STEPS):
+            angle = 2.0 * math.pi * step / CONSTRUCT_ANGLE_STEPS
+            candidate = (
+                anchor_x + radius * math.cos(angle),
+                anchor_y + radius * math.sin(angle),
+            )
+            if _candidate_is_valid(
+                new_id,
+                candidate,
+                new_pairs,
+                drawn,
+                drawn_segments,
+                positions,
+                cos_limit,
+            ):
+                clockwise_turn = (angle - reference) % (2.0 * math.pi)
+                scored.append(((clockwise_turn, float(step)), candidate))
+        if scored:
+            scored.sort(key=lambda item: item[0])
+            return [candidate for _key, candidate in scored[:MAX_SEED_CANDIDATES]]
+        radius *= RADIUS_GROWTH
+    return []
+
+
+def _candidate_is_valid(
+    new_id: str,
+    candidate: tuple[float, float],
+    new_pairs: list[tuple[str, str]],
+    drawn: list[tuple[str, str]],
+    drawn_segments: list[tuple[tuple[float, float], tuple[float, float], str, str]],
+    positions: dict[str, tuple[float, float]],
+    cos_limit: float,
+) -> bool:
+    """Whether seating new_id at `candidate` keeps the layout valid, checked
+    incrementally (see `_candidate_positions`). `positions` holds the already
+    placed nodes (without new_id); `new_pairs` are new_id's edges. Equivalent to
+    `_move_is_valid({**positions, new_id: candidate}, drawn + new_pairs, base
+    crossings, base grazes)` because the pre-existing layout already meets every
+    invariant, so only new_id's contribution can newly violate one."""
+    # No placed node closer than MIN_NODE_DIST to the new seat.
+    for other_x, other_y in positions.values():
+        if math.hypot(candidate[0] - other_x, candidate[1] - other_y) < (
+            MIN_NODE_DIST - 1e-6
+        ):
+            return False
+    new_segments = [
+        (
+            candidate if source == new_id else positions[source],
+            candidate if target == new_id else positions[target],
+            source,
+            target,
+        )
+        for source, target in new_pairs
+    ]
+    # No new edge may overlap a drawn edge or another new edge.
+    for index, new_segment in enumerate(new_segments):
+        for drawn_segment in drawn_segments:
+            if _segments_overlap(new_segment, drawn_segment, cos_limit):
+                return False
+        for other_new in new_segments[index + 1 :]:
+            if _segments_overlap(new_segment, other_new, cos_limit):
+                return False
+    # No new graze: new_id must clear every drawn edge, and every new edge must
+    # clear every foreign placed node.
+    for source, target in drawn:
+        if _point_near_segment(
+            candidate, positions[source], positions[target], NODE_ON_EDGE_CLEARANCE
+        ):
+            return False
+    for start, end, source, target in new_segments:
+        for other_id, point in positions.items():
+            if other_id in (source, target):
+                continue
+            if _point_near_segment(point, start, end, NODE_ON_EDGE_CLEARANCE):
+                return False
+    return True
+
+
 def _place_new_node(
     new_id: str,
     anchor_id: str,
@@ -208,92 +349,346 @@ def _place_new_node(
     drawn: list[tuple[str, str]],
     other_anchor_ids: tuple[str, ...] = (),
 ) -> tuple[float, float]:
-    """Seat new_id around its placed anchor. Candidates are swept by angle at a
-    preferred radius that grows until at least one is crossing-free (there is
-    always a free direction in open space, so this terminates -- the trailing
-    assert is an invariant guard, not a reachable fallback). Among the
-    crossing-free candidates at the first successful radius, prefer the smallest
-    clockwise turn from the anchor's previous numbered spoke (prev_angle), else
-    the default reading direction; break ties by angle index for determinism.
-    Screen coords are y-down, so an increasing angle sweeps clockwise.
-
-    The baseline passed to `_move_is_valid` is the *current* crossing/graze
-    count of `drawn` (before this edge), not always zero -- see
-    `_place_free_node` for why an unavoidable baseline graze can already
-    exist by the time a later node is placed.
-
-    `other_anchor_ids` are every *already-placed* node that new_id will also
-    connect to later in the walk (a path's middle node with both a
-    predecessor and a successor, e.g. "sends -> Confirmation -> to", or a
-    multi-path activity whose object fans out to several already-seated
-    recipients -- "sends Confirmation to Alice *and* Bob"). Without
-    accounting for them here, each such edge would land as a "closing" edge
-    between two fixed nodes with no placement freedom left -- the design
-    spec's non-planar guard -- even on a genuinely planar story. Folding
-    them all into this search keeps every one crossing-free at once, so the
-    later closing edges are safe by construction. With `other_anchor_ids=()`
-    this is exactly the plain single-anchor placement.
+    """Greedy single seat for new_id: the best crossing-free candidate that
+    satisfies as many closing edges as possible. Used only by the greedy
+    fallback (`_construct_seed_greedy`); the backtracking seed calls
+    `_candidate_positions` directly.
 
     A point that satisfies *every* closing edge at once need not exist even
-    when the graph is planar: earlier greedy placements can box the anchors
-    in so no single seat reaches them all crossing-free (e.g. a confirmation
-    fanning back to two guests already seated far apart). Rather than fail,
-    the closing set is relaxed one edge at a time (dropping the
-    latest-numbered partner first) until a seat is found; the anchor-only
-    case always succeeds, so the trailing assert stays an unreachable
-    invariant guard. Any closing edge dropped here is drawn later as a plain
-    closing edge, where the non-planar guard surfaces the residual crossing
-    -- correct behaviour for a genuinely over-constrained seed."""
-    anchor_x, anchor_y = positions[anchor_id]
-    base_segments = [
-        (positions[source], positions[target], source, target)
-        for source, target in drawn
-    ]
-    base_crossings = _count_overlaps(base_segments)
-    base_grazes = _grazes(positions, drawn)
-    reference = DEFAULT_DIRECTION if prev_angle is None else prev_angle
+    when the graph is planar: earlier greedy placements can box the anchors in
+    so no single seat reaches them all crossing-free (e.g. a confirmation
+    fanning back to two guests already seated far apart). Rather than fail, the
+    closing set is relaxed one edge at a time (dropping the latest-numbered
+    partner first) until a seat is found; the anchor-only case always succeeds,
+    so the trailing assert stays an unreachable invariant guard. Any closing
+    edge dropped here is drawn later as a plain closing edge, where the
+    non-planar guard surfaces the residual crossing -- correct behaviour for a
+    genuinely over-constrained greedy seed."""
     best: tuple[float, float] | None = None
     for keep in range(len(other_anchor_ids), -1, -1):
-        edges_with_new = [
-            *drawn,
-            (anchor_id, new_id),
-            *((new_id, other) for other in other_anchor_ids[:keep]),
-        ]
-        radius = CONSTRUCT_RADIUS
-        for _ in range(MAX_RADIUS_STEPS):
-            best_key: tuple[float, float] | None = None
-            for step in range(CONSTRUCT_ANGLE_STEPS):
-                angle = 2.0 * math.pi * step / CONSTRUCT_ANGLE_STEPS
-                candidate = (
-                    anchor_x + radius * math.cos(angle),
-                    anchor_y + radius * math.sin(angle),
-                )
-                trial = {**positions, new_id: candidate}
-                if not _move_is_valid(
-                    trial,
-                    edges_with_new,
-                    base_crossings=base_crossings,
-                    base_grazes=base_grazes,
-                ):
-                    continue
-                clockwise_turn = (angle - reference) % (2.0 * math.pi)
-                key = (clockwise_turn, float(step))
-                if best_key is None or key < best_key:
-                    best, best_key = candidate, key
-            if best is not None:
-                break
-            radius *= RADIUS_GROWTH
-        if best is not None:
+        candidates = _candidate_positions(
+            new_id, anchor_id, prev_angle, positions, drawn, other_anchor_ids[:keep]
+        )
+        if candidates:
+            best = candidates[0]
             break
     assert best is not None, f'no crossing-free placement for {new_id!r}'
     return best
 
 
+@dataclass(frozen=True, kw_only=True)
+class _SeedStep:
+    """One decision in the construction walk the backtracking DFS drives.
+
+    kind 'free': seat node_id with no placed neighbour yet (`_place_free_node`);
+        a single, always-available candidate.
+    kind 'node': seat node_id around the placed anchor_id
+        (`_candidate_positions`), reading the anchor's last numbered spoke when
+        `numbered`, and satisfying every `others` closing edge at once.
+    kind 'close': record the edge (source, target) as drawn and, when
+        `numbered`, set source's last spoke angle. When `both_placed` both
+        endpoints were fixed by earlier steps, so this closing edge had no
+        placement freedom: it is a checkpoint that dead-ends if it crosses."""
+
+    kind: str
+    node_id: str = ''
+    anchor_id: str = ''
+    numbered: bool = False
+    others: tuple[str, ...] = ()
+    source: str = ''
+    target: str = ''
+    both_placed: bool = False
+
+
+@dataclass(frozen=True, kw_only=True)
+class _SeedUndo:
+    """How to revert one applied `_SeedStep` when the DFS backtracks."""
+
+    placed_id: str | None  # a node to remove from positions ('free'/'node')
+    popped_drawn: bool  # whether to pop the last appended drawn edge ('close')
+    spoke_key: str | None  # actor whose last spoke angle was set ('close')
+    spoke_prev: float  # its previous value, restored only when spoke_existed
+    spoke_existed: bool
+
+
+# A "close" step places nothing; this sentinel stands in for its single
+# candidate so the DFS drives every decision uniformly.
+_SEED_PROCEED: tuple[float, float] = (0.0, 0.0)
+
+
+def _seed_steps(order: list[tuple[str, str, bool]]) -> list[_SeedStep]:
+    """Flatten the construction walk into the ordered placement decisions the
+    DFS drives. Which nodes are newly placed at each entry -- and therefore each
+    entry's closing partners -- depends only on the walk order, not on where the
+    nodes land, so the whole decision sequence is static and precomputable."""
+    placed: set[str] = set()
+    steps: list[_SeedStep] = []
+
+    def closing_partners(
+        node_id: str, after_index: int, exclude_id: str
+    ) -> tuple[str, ...]:
+        """Every already-placed node that node_id reconnects to later in the
+        walk -- so `_candidate_positions` can satisfy all those edges at once
+        instead of leaving each a closing edge with no placement freedom. A
+        later edge whose other endpoint is not placed yet is not a closing
+        constraint now: that endpoint gets its own freedom when its turn comes."""
+        partners: list[str] = []
+        for later_source, later_target, _numbered in order[after_index + 1 :]:
+            if (
+                later_source == node_id
+                and later_target != exclude_id
+                and later_target in placed
+                and later_target not in partners
+            ):
+                partners.append(later_target)
+            elif (
+                later_target == node_id
+                and later_source != exclude_id
+                and later_source in placed
+                and later_source not in partners
+            ):
+                partners.append(later_source)
+        return tuple(partners)
+
+    for index, (source, target, numbered) in enumerate(order):
+        both_placed = source in placed and target in placed
+        if source not in placed and target not in placed:
+            steps.append(_SeedStep(kind='free', node_id=source))
+            placed.add(source)
+        if source not in placed:
+            steps.append(
+                _SeedStep(
+                    kind='node',
+                    node_id=source,
+                    anchor_id=target,
+                    numbered=numbered,
+                    others=closing_partners(source, index, target),
+                )
+            )
+            placed.add(source)
+        if target not in placed:
+            steps.append(
+                _SeedStep(
+                    kind='node',
+                    node_id=target,
+                    anchor_id=source,
+                    numbered=numbered,
+                    others=closing_partners(target, index, source),
+                )
+            )
+            placed.add(target)
+        steps.append(
+            _SeedStep(
+                kind='close',
+                source=source,
+                target=target,
+                numbered=numbered,
+                both_placed=both_placed,
+            )
+        )
+    return steps
+
+
+def _step_candidates(
+    step: _SeedStep,
+    positions: dict[str, tuple[float, float]],
+    drawn: list[tuple[str, str]],
+    last_spoke_angle: dict[str, float],
+) -> list[tuple[float, float]]:
+    """The candidates the DFS may try for `step` given the current state,
+    best-first. A 'free' step has one seat; a 'node' step has its best-first
+    crossing-free seats; a 'close' step yields the proceed sentinel unless it is
+    a both-placed checkpoint whose edge would cross (then an empty list, a dead
+    end that makes the DFS re-seat the nodes that boxed the edge in)."""
+    if step.kind == 'free':
+        return [_place_free_node(step.node_id, positions, drawn)]
+    if step.kind == 'node':
+        prev = last_spoke_angle.get(step.anchor_id) if step.numbered else None
+        return _candidate_positions(
+            step.node_id, step.anchor_id, prev, positions, drawn, step.others
+        )
+    if not step.both_placed:
+        return [_SEED_PROCEED]
+    base_segments = [(positions[a], positions[b], a, b) for a, b in drawn]
+    base_crossings = _count_overlaps(base_segments)
+    base_grazes = _grazes(positions, drawn)
+    trial = [*drawn, (step.source, step.target)]
+    if _move_is_valid(positions, trial, base_crossings, base_grazes):
+        return [_SEED_PROCEED]
+    return []
+
+
+def _apply_step(
+    step: _SeedStep,
+    candidate: tuple[float, float],
+    positions: dict[str, tuple[float, float]],
+    drawn: list[tuple[str, str]],
+    last_spoke_angle: dict[str, float],
+) -> _SeedUndo:
+    """Apply `step`'s chosen candidate, mutating the DFS state and returning how
+    to revert it."""
+    if step.kind in ('free', 'node'):
+        positions[step.node_id] = candidate
+        return _SeedUndo(
+            placed_id=step.node_id,
+            popped_drawn=False,
+            spoke_key=None,
+            spoke_prev=0.0,
+            spoke_existed=False,
+        )
+    drawn.append((step.source, step.target))
+    spoke_key: str | None = None
+    spoke_prev = 0.0
+    spoke_existed = False
+    if step.numbered:
+        spoke_key = step.source
+        spoke_existed = step.source in last_spoke_angle
+        spoke_prev = last_spoke_angle[step.source] if spoke_existed else 0.0
+        anchor_x, anchor_y = positions[step.source]
+        node_x, node_y = positions[step.target]
+        last_spoke_angle[step.source] = math.atan2(
+            node_y - anchor_y, node_x - anchor_x
+        )
+    return _SeedUndo(
+        placed_id=None,
+        popped_drawn=True,
+        spoke_key=spoke_key,
+        spoke_prev=spoke_prev,
+        spoke_existed=spoke_existed,
+    )
+
+
+def _undo_step(
+    undo: _SeedUndo,
+    positions: dict[str, tuple[float, float]],
+    drawn: list[tuple[str, str]],
+    last_spoke_angle: dict[str, float],
+) -> None:
+    if undo.placed_id is not None:
+        del positions[undo.placed_id]
+    if undo.popped_drawn:
+        drawn.pop()
+    if undo.spoke_key is not None:
+        if undo.spoke_existed:
+            last_spoke_angle[undo.spoke_key] = undo.spoke_prev
+        else:
+            del last_spoke_angle[undo.spoke_key]
+
+
+def _blame_depth(steps: list[_SeedStep], dead_depth: int) -> int:
+    """Where to backtrack after a *dead end* -- a step whose candidate list came
+    back empty (a node with no crossing-free seat, or a both-placed closing edge
+    that crosses). The blame is the already-placed nodes that over-constrained
+    it: a node step's anchor and closing partners, a closing edge's two
+    endpoints. Jumping straight back to the deepest re-seatable ('node') blamer
+    -- skipping the independent nodes seated in between, which cannot relieve the
+    conflict -- is what keeps the search from exploding when the culprit sits far
+    upstream (e.g. a confirmation fanning back to guests seated many steps
+    earlier). With no re-seatable blamer, fall back to the previous decision."""
+    step = steps[dead_depth]
+    if step.kind == 'node':
+        blamed = (step.anchor_id, *step.others)
+    else:  # a both-placed closing-edge checkpoint
+        blamed = (step.source, step.target)
+    placer_by_node = {
+        placed.node_id: earlier
+        for earlier in range(dead_depth)
+        if (placed := steps[earlier]).kind == 'node'
+    }
+    depths = [
+        placer_by_node[node_id] for node_id in blamed if node_id in placer_by_node
+    ]
+    return max(depths) if depths else dead_depth - 1
+
+
 def _construct_seed(graph: DiagramGraph) -> dict[str, tuple[float, float]]:
-    """Phase 1: place nodes by adding activities in numbered order. Each new
-    node is seated only at a crossing-free position; every node therefore
-    starts at zero crossings. Actor fans are grown clockwise by tracking the
-    angle of each actor's last placed numbered spoke."""
+    """Phase 1: seat nodes by adding activities in numbered order via a bounded,
+    deterministic depth-first search (see the module docstring). Each decision
+    offers its crossing-free seats best-first; a dead end -- a node with no seat,
+    or a both-placed closing edge that would cross -- backtracks (jumping to the
+    deepest node that over-constrained it, `_blame_depth`) and advances that
+    decision. Taking the first seat at every decision reproduces
+    `_construct_seed_greedy`, so tree-shaped and uncrowded stories are seated
+    identically; only over-constrained fans are re-seated. If the search exceeds
+    MAX_SEED_PLACEMENTS attempts, or exhausts every branch (a genuinely
+    non-planar story), it abandons the DFS and returns the greedy walk, whose
+    guard surfaces the unavoidable crossing rather than the build hanging."""
+    steps = _seed_steps(_construction_order(graph))
+    positions: dict[str, tuple[float, float]] = {}
+    drawn: list[tuple[str, str]] = []
+    last_spoke_angle: dict[str, float] = {}
+
+    candidates_stack: list[list[tuple[float, float]]] = []
+    cursor_stack: list[int] = []
+    undo_stack: list[_SeedUndo] = []
+
+    def backtrack_to(target: int) -> int:
+        # Undo and drop every applied frame above `target`, then undo target's
+        # own placement and advance it to its next candidate; returns the new
+        # depth (target). The frame at `target` is kept: its candidates were
+        # computed from the now-restored earlier state and stay valid.
+        while len(cursor_stack) - 1 > target:
+            candidates_stack.pop()
+            cursor_stack.pop()
+            _undo_step(undo_stack.pop(), positions, drawn, last_spoke_angle)
+        _undo_step(undo_stack.pop(), positions, drawn, last_spoke_angle)
+        cursor_stack[target] += 1
+        return target
+
+    attempts = 0
+    depth = 0
+    while depth < len(steps):
+        if attempts > MAX_SEED_PLACEMENTS:
+            return _construct_seed_greedy(graph)
+        step = steps[depth]
+        if depth == len(candidates_stack):
+            candidates_stack.append(
+                _step_candidates(step, positions, drawn, last_spoke_angle)
+            )
+            cursor_stack.append(0)
+        cursor = cursor_stack[depth]
+        if cursor < len(candidates_stack[depth]):
+            attempts += 1
+            undo_stack.append(
+                _apply_step(
+                    step,
+                    candidates_stack[depth][cursor],
+                    positions,
+                    drawn,
+                    last_spoke_angle,
+                )
+            )
+            depth += 1
+            continue
+        # No candidate left at this decision. An empty list is a dead end (this
+        # step cannot be satisfied): jump back to the deepest node that
+        # over-constrained it. An *exhausted* non-empty list means every seat
+        # here led downstream to failure: step back chronologically.
+        if not candidates_stack[depth]:
+            target = _blame_depth(steps, depth)
+        else:
+            target = depth - 1
+        candidates_stack.pop()
+        cursor_stack.pop()
+        if target < 0:
+            return _construct_seed_greedy(graph)
+        depth = backtrack_to(target)
+
+    # Any node with no non-self edge (isolated) never entered the walk.
+    for node in graph.nodes:
+        if node.id not in positions:
+            positions[node.id] = _place_free_node(node.id, positions, drawn)
+    return positions
+
+
+def _construct_seed_greedy(graph: DiagramGraph) -> dict[str, tuple[float, float]]:
+    """Bounded fallback for `_construct_seed`: the plain forward greedy walk.
+    Places nodes by adding activities in numbered order, each new node seated at
+    the single best crossing-free position near its anchor (`_place_new_node`,
+    which relaxes an over-constrained closing set rather than backtracking).
+    Used when the backtracking DFS exhausts its placement budget -- on a
+    genuinely non-planar story, so the closing-edge guard below still surfaces
+    the unavoidable crossing rather than the build hanging."""
     order = _construction_order(graph)
     positions: dict[str, tuple[float, float]] = {}
     drawn: list[tuple[str, str]] = []
@@ -645,6 +1040,29 @@ def _clockwise_disorder(
     return disorder
 
 
+def _segments_overlap(
+    segment_a: tuple[tuple[float, float], tuple[float, float], str, str],
+    segment_b: tuple[tuple[float, float], tuple[float, float], str, str],
+    cos_limit: float,
+) -> bool:
+    """Whether two drawn edges visually overlap: a near-parallel fan when they
+    share a node, else a proper crossing or collinear overlap. Two edges between
+    the *same* pair of nodes (a duplicate first step) never overlap-resolvably.
+    The single source of truth for both the full `_count_overlaps` sweep and the
+    incremental per-candidate check in `_candidate_positions`."""
+    start_a, end_a, source_a, target_a = segment_a
+    start_b, end_b, source_b, target_b = segment_b
+    shared = {source_a, target_a} & {source_b, target_b}
+    if shared:
+        if len({source_a, target_a} | {source_b, target_b}) == 2:
+            return False
+        pivot = next(iter(shared))
+        return _fan_overlaps(
+            pivot, start_a, end_a, source_a, start_b, end_b, source_b, cos_limit
+        )
+    return _segments_cross(start_a, end_a, start_b, end_b)
+
+
 def _count_overlaps(
     segments: list[tuple[tuple[float, float], tuple[float, float], str, str]],
 ) -> int:
@@ -654,24 +1072,8 @@ def _count_overlaps(
     overlaps = 0
     cos_limit = math.cos(math.radians(COLLINEAR_DEG))
     for first in range(len(segments)):
-        start_a, end_a, source_a, target_a = segments[first]
         for second in range(first + 1, len(segments)):
-            start_b, end_b, source_b, target_b = segments[second]
-            shared = {source_a, target_a} & {source_b, target_b}
-            if shared:
-                if len({source_a, target_a} | {source_b, target_b}) == 2:
-                    # Same pair of nodes: a duplicate edge (e.g. one activity's
-                    # multi-path first step) drawn on the identical line. No
-                    # placement can separate two edges between the same two
-                    # nodes, so this is not a resolvable crossing.
-                    continue
-                pivot = next(iter(shared))
-                if _fan_overlaps(
-                    pivot, start_a, end_a, source_a, start_b, end_b, source_b, cos_limit
-                ):
-                    overlaps += 1
-                continue
-            if _segments_cross(start_a, end_a, start_b, end_b):
+            if _segments_overlap(segments[first], segments[second], cos_limit):
                 overlaps += 1
     return overlaps
 
