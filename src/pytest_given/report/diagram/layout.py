@@ -2,30 +2,28 @@
 
 The overriding rule is that drawn arrows must not overlap: no edge may cross
 another edge, and (best effort) no edge may run over an unrelated node. Nodes
-are placed on a column/row grid whose spacing is >= MIN_NODE_DIST, so nodes can
-never overlap by construction. Columns come from a longest-path layering of the
-activity flow (sources -- the actors and objects that start a path -- on the
-left, each step one column further right); within a column the row order is
-first seeded by the barycentre heuristic and then polished by a local search
-that directly minimizes the true straight-line crossing count. A second search
-pass then reorders rows (never columns, so the diagram stays as compact) to
-pull consecutively numbered activities together and to sweep each actor's
-numbered spokes clockwise (low number to high) -- strict secondary goals that
-can never cost a crossing. Vertical compactness is not weighted: the diagrams
-page owns "fit to screen" through zoom, so a wider or taller diagram is fine.
-Finally the whole diagram is reflected (an isometry, so crossings and step
-spacing are untouched) to seat the story's start node in the top-left corner
--- the third priority. Edge endpoints are trimmed back to the node rims and
-each edge's label is slid along it until it clears every node and previously
-placed label.
+live at continuous (x, y) coordinates, never closer than MIN_NODE_DIST apart.
+The seed is built by walking activities in ascending sequence-number order
+(`_construction_order`) and seating each newly introduced node only at a
+crossing-free position near its already-placed neighbour (`_construct_seed`,
+`_place_new_node`, `_place_free_node`) -- a tree is planar, so this alone
+reaches zero crossings on tree-shaped stories, and each actor's numbered
+spokes are swept clockwise as they are added. A node that will later close
+back onto an already-placed node (both its edges known at construction time,
+e.g. a path's middle step) is seated with that future edge in mind too, so a
+"closing" edge between two already-fixed nodes -- which would otherwise have
+no placement freedom left -- stays crossing-free on real, planar stories.
+Finally the whole diagram is
+reflected (an isometry, so crossings and step spacing are untouched) to seat
+the story's start node in the top-left corner -- the third priority. Edge
+endpoints are trimmed back to the node rims and each edge's label is slid
+along it until it clears every node and previously placed label.
 """
 
 from __future__ import annotations
 
 import itertools
 import math
-from collections import deque
-from collections.abc import Iterator
 from dataclasses import dataclass
 
 from .graph import DiagramEdge, DiagramGraph, DiagramNode
@@ -55,17 +53,6 @@ REPULSION_K = 0.60  # short-range push below PREFERRED_DIST
 ATTRACT_K = 0.02  # bounded long-range pull toward PREFERRED_DIST
 SEQUENCE_K = 0.03  # gentle pull between consecutive numbered targets
 
-# --- Old grid-layout constants below, still used by the grid code that Task 2
-# removes; kept here for now so the still-present grid functions keep working.
-COL_SPACING = 320.0  # horizontal gap between layers; must stay > MIN_NODE_DIST
-ROW_SPACING = 260.0  # vertical gap between rows;    must stay > MIN_NODE_DIST
-BARYCENTRE_SWEEPS = 6
-SEARCH_ROUNDS = 40
-SLOT_MARGIN = 2  # empty slots to probe above/below a layer during local search
-
-assert COL_SPACING >= MIN_NODE_DIST
-assert ROW_SPACING >= MIN_NODE_DIST
-
 NODE_HALF_W = 62.0
 NODE_HALF_H = 58.0
 TRIM_SOURCE = 56.0
@@ -79,23 +66,6 @@ LOOP_RADIUS = 46.0
 # ambiguous which step it names. This is how much closer (px) is "clearly".
 LABEL_ASSOC_MARGIN = 46.0
 
-# Local-search cost weights, ranked by magnitude so each objective only ever
-# breaks ties left by the one above it: avoid crossings first, then edges
-# running over nodes, then keep consecutively numbered steps near each other
-# (so the eye follows 1 -> 2 -> 3), then sweep each actor's numbered spokes
-# clockwise, then keep arrow lengths uniform (short, low variance). Overall
-# compactness is intentionally disabled -- zoom owns "fit to screen".
-CROSSING_COST = 1_000_000_000.0
-NODE_ON_EDGE_COST = 1_000_000.0
-SEQUENCE_COST = 5.0  # per column-width between consecutive numbered edges
-CLOCKWISE_COST = 2.0  # per counter-clockwise turn within an actor's fan
-LENGTH_SPREAD_COST = 1.0  # per (edge length / column-width)^2: low length variance
-# Vertical span (overall compactness) is deliberately unweighted: "fit to
-# screen" is owned by the diagrams page's zoom controls, not the layout. Arrow
-# length uniformity (LENGTH_SPREAD_COST above) is a separate, wanted objective
-# -- it curbs lone over-long spokes without forcing the whole diagram compact.
-HEIGHT_COST = 0.0  # per row of total vertical span (disabled; see above)
-LENGTH_COST = 0.001
 COLLINEAR_DEG = 8.0  # two edges from a shared node this close in angle overlap
 
 
@@ -140,23 +110,223 @@ def position_nodes(
     node_ids = [node.id for node in graph.nodes]
     if not node_ids:
         return {}, MIN_CANVAS_W, MIN_CANVAS_H
-    index_of = {node_id: i for i, node_id in enumerate(node_ids)}
-    directed = _directed_edges(graph)
     sequence = _numbered_sequence(graph)
     fans = _actor_fans(graph)
-    undirected = _undirected_adjacency(node_ids, directed)
-    layer_of = _assign_layers(node_ids, directed)
-    layer_nodes = _order_within_layers(node_ids, index_of, undirected, layer_of)
-    cell_of = _seed_cells(layer_nodes)
-    cell_of = _local_search(node_ids, index_of, directed, sequence, fans, cell_of)
-    grid = {
-        node_id: (column * COL_SPACING, row * ROW_SPACING)
-        for node_id, (column, row) in cell_of.items()
-    }
+    grid = _construct_seed(graph)
     positions, width, height = _framed(grid)
     start = sequence[0][0] if sequence else None
     positions = _orient_start_top_left(positions, width, height, start, fans)
     return positions, width, height
+
+
+def _construction_order(graph: DiagramGraph) -> list[tuple[str, str, bool]]:
+    """Distinct non-self edges as (source, target, numbered), ordered so
+    activities appear in ascending sequence number (path order within an
+    activity, first appearance breaking ties). Walking this order lets the
+    seed grow the diagram in reading order 1 -> 2 -> 3."""
+    activity_number: dict[object, int] = {}
+    for edge in graph.edges:
+        if edge.number is not None:
+            activity_number.setdefault(edge.activity_id, edge.number)
+
+    ordered: list[tuple[float, int, str, str, bool]] = []
+    seen: set[tuple[str, str]] = set()
+    for appearance, edge in enumerate(graph.edges):
+        if edge.source == edge.target:
+            continue
+        key = (edge.source, edge.target)
+        if key in seen:
+            continue
+        seen.add(key)
+        rank = activity_number.get(edge.activity_id, math.inf)
+        ordered.append(
+            (rank, appearance, edge.source, edge.target, edge.number is not None)
+        )
+    ordered.sort(key=lambda item: (item[0], item[1]))
+    return [
+        (source, target, numbered) for _rank, _app, source, target, numbered in ordered
+    ]
+
+
+def _place_free_node(
+    new_id: str,
+    positions: dict[str, tuple[float, float]],
+    drawn: list[tuple[str, str]],
+) -> tuple[float, float]:
+    """Seat a node that has no placed neighbour yet. The very first node lands
+    at the origin; a later rootless node spirals outward from the centroid
+    until it clears every node and drawn edge. A clear seat always exists once
+    the radius exceeds every placed node, so the trailing assert is an
+    invariant guard (mirrors `_slide_label`), never a reachable fallback.
+
+    The baseline is the *current* crossing/graze count of `drawn`, not always
+    zero: an edge between two nodes that were both already placed (e.g. an
+    actor-to-actor handoff) is appended without a placement step of its own,
+    and can leave an unavoidable graze the earlier nodes could not have
+    foreseen. Requiring literal zero from then on would make every later
+    placement impossible; requiring "no worse than the existing baseline"
+    (`_move_is_valid`'s actual contract) keeps the search always solvable."""
+    if not positions:
+        return (0.0, 0.0)
+    base_segments = [
+        (positions[source], positions[target], source, target)
+        for source, target in drawn
+    ]
+    base_crossings = _count_overlaps(base_segments)
+    base_grazes = _grazes(positions, drawn)
+    centre_x = sum(x for x, _ in positions.values()) / len(positions)
+    centre_y = sum(y for _, y in positions.values()) / len(positions)
+    radius = CONSTRUCT_RADIUS
+    placement: tuple[float, float] | None = None
+    for _ in range(MAX_RADIUS_STEPS):
+        for step in range(CONSTRUCT_ANGLE_STEPS):
+            angle = 2.0 * math.pi * step / CONSTRUCT_ANGLE_STEPS
+            candidate = (
+                centre_x + radius * math.cos(angle),
+                centre_y + radius * math.sin(angle),
+            )
+            trial = {**positions, new_id: candidate}
+            if _move_is_valid(
+                trial, drawn, base_crossings=base_crossings, base_grazes=base_grazes
+            ):
+                placement = candidate
+                break
+        if placement is not None:
+            break
+        radius *= RADIUS_GROWTH
+    assert placement is not None, f'no clear seat for {new_id!r}'
+    return placement
+
+
+def _place_new_node(
+    new_id: str,
+    anchor_id: str,
+    prev_angle: float | None,
+    positions: dict[str, tuple[float, float]],
+    drawn: list[tuple[str, str]],
+    other_anchor_id: str | None = None,
+) -> tuple[float, float]:
+    """Seat new_id around its placed anchor. Candidates are swept by angle at a
+    preferred radius that grows until at least one is crossing-free (there is
+    always a free direction in open space, so this terminates -- the trailing
+    assert is an invariant guard, not a reachable fallback). Among the
+    crossing-free candidates at the first successful radius, prefer the smallest
+    clockwise turn from the anchor's previous numbered spoke (prev_angle), else
+    the default reading direction; break ties by angle index for determinism.
+    Screen coords are y-down, so an increasing angle sweeps clockwise.
+
+    The baseline passed to `_move_is_valid` is the *current* crossing/graze
+    count of `drawn` (before this edge), not always zero -- see
+    `_place_free_node` for why an unavoidable baseline graze can already
+    exist by the time a later node is placed.
+
+    `other_anchor_id`, when given, is a second already-placed node that
+    new_id will also connect to later in the walk (a path's middle node with
+    both a predecessor and a successor, e.g. "sends -> Confirmation -> to").
+    Without accounting for it here, that second edge would land as a
+    "closing" edge between two fixed nodes with no placement freedom left --
+    the design spec's non-planar guard -- even on a genuinely planar story.
+    Folding the second edge into this search keeps both crossing-free at
+    once, so the later closing edge is safe by construction."""
+    anchor_x, anchor_y = positions[anchor_id]
+    base_segments = [
+        (positions[source], positions[target], source, target)
+        for source, target in drawn
+    ]
+    base_crossings = _count_overlaps(base_segments)
+    base_grazes = _grazes(positions, drawn)
+    edges_with_new = [*drawn, (anchor_id, new_id)]
+    if other_anchor_id is not None:
+        edges_with_new = [*edges_with_new, (new_id, other_anchor_id)]
+    reference = DEFAULT_DIRECTION if prev_angle is None else prev_angle
+    radius = CONSTRUCT_RADIUS
+    best: tuple[float, float] | None = None
+    for _ in range(MAX_RADIUS_STEPS):
+        best_key: tuple[float, float] | None = None
+        for step in range(CONSTRUCT_ANGLE_STEPS):
+            angle = 2.0 * math.pi * step / CONSTRUCT_ANGLE_STEPS
+            candidate = (
+                anchor_x + radius * math.cos(angle),
+                anchor_y + radius * math.sin(angle),
+            )
+            trial = {**positions, new_id: candidate}
+            if not _move_is_valid(
+                trial,
+                edges_with_new,
+                base_crossings=base_crossings,
+                base_grazes=base_grazes,
+            ):
+                continue
+            clockwise_turn = (angle - reference) % (2.0 * math.pi)
+            key = (clockwise_turn, float(step))
+            if best_key is None or key < best_key:
+                best, best_key = candidate, key
+        if best is not None:
+            break
+        radius *= RADIUS_GROWTH
+    assert best is not None, f'no crossing-free placement for {new_id!r}'
+    return best
+
+
+def _construct_seed(graph: DiagramGraph) -> dict[str, tuple[float, float]]:
+    """Phase 1: place nodes by adding activities in numbered order. Each new
+    node is seated only at a crossing-free position; every node therefore
+    starts at zero crossings. Actor fans are grown clockwise by tracking the
+    angle of each actor's last placed numbered spoke."""
+    order = _construction_order(graph)
+    positions: dict[str, tuple[float, float]] = {}
+    drawn: list[tuple[str, str]] = []
+    last_spoke_angle: dict[str, float] = {}
+
+    def angle_from(anchor_id: str, node_id: str) -> float:
+        anchor_x, anchor_y = positions[anchor_id]
+        node_x, node_y = positions[node_id]
+        return math.atan2(node_y - anchor_y, node_x - anchor_x)
+
+    def closing_partner(node_id: str, after_index: int, exclude_id: str) -> str | None:
+        """If node_id (about to be placed) reconnects later in the walk to a
+        node that is already placed, return that node -- so _place_new_node
+        can satisfy both edges at once instead of leaving the later one a
+        closing edge with no placement freedom (see _place_new_node)."""
+        for later_source, later_target, _numbered in order[after_index + 1 :]:
+            if (
+                later_source == node_id
+                and later_target != exclude_id
+                and later_target in positions
+            ):
+                return later_target
+            if (
+                later_target == node_id
+                and later_source != exclude_id
+                and later_source in positions
+            ):
+                return later_source
+        return None
+
+    for index, (source, target, numbered) in enumerate(order):
+        if source not in positions and target not in positions:
+            positions[source] = _place_free_node(source, positions, drawn)
+        if source not in positions:
+            prev = last_spoke_angle.get(target) if numbered else None
+            other = closing_partner(source, index, target)
+            positions[source] = _place_new_node(
+                source, target, prev, positions, drawn, other
+            )
+        if target not in positions:
+            prev = last_spoke_angle.get(source) if numbered else None
+            other = closing_partner(target, index, source)
+            positions[target] = _place_new_node(
+                target, source, prev, positions, drawn, other
+            )
+        drawn.append((source, target))
+        if numbered:
+            last_spoke_angle[source] = angle_from(source, target)
+
+    # Any node with no non-self edge (isolated) never entered the walk.
+    for node in graph.nodes:
+        if node.id not in positions:
+            positions[node.id] = _place_free_node(node.id, positions, drawn)
+    return positions
 
 
 def _reflect(
@@ -215,20 +385,6 @@ def _orient_start_top_left(
     return _reflect(positions, width, height, flip)
 
 
-def _directed_edges(graph: DiagramGraph) -> list[tuple[str, str]]:
-    """Distinct non-self edges in first-appearance order (parallel duplicates
-    collapse, self-loops exert no layout force)."""
-    seen: set[tuple[str, str]] = set()
-    directed: list[tuple[str, str]] = []
-    for edge in graph.edges:
-        pair = (edge.source, edge.target)
-        if edge.source == edge.target or pair in seen:
-            continue
-        seen.add(pair)
-        directed.append(pair)
-    return directed
-
-
 def _numbered_sequence(graph: DiagramGraph) -> list[tuple[str, str]]:
     """The (source, target) of each activity's first edge, ordered by the
     sequence badge. One representative per number -- a multi-path activity
@@ -275,269 +431,12 @@ def _actor_fans(graph: DiagramGraph) -> list[tuple[str, tuple[str, ...]]]:
     ]
 
 
-def _undirected_adjacency(
-    node_ids: list[str], directed: list[tuple[str, str]]
-) -> dict[str, list[str]]:
-    adjacency: dict[str, list[str]] = {node_id: [] for node_id in node_ids}
-    for source, target in directed:
-        adjacency[source].append(target)
-        adjacency[target].append(source)
-    return adjacency
-
-
-def _assign_layers(
-    node_ids: list[str], directed: list[tuple[str, str]]
-) -> dict[str, int]:
-    """Longest-path layering. Back edges (found by DFS) are dropped so the
-    layering runs on a DAG even when activities form a directed cycle across
-    work objects; the dropped edges still count for crossings, just not for
-    the column each node lands in."""
-    out_adjacency: dict[str, list[str]] = {node_id: [] for node_id in node_ids}
-    for source, target in directed:
-        out_adjacency[source].append(target)
-
-    colour = dict.fromkeys(node_ids, 0)  # 0 white, 1 grey, 2 black
-    forward: list[tuple[str, str]] = []
-    for start in node_ids:
-        if colour[start] != 0:
-            continue
-        colour[start] = 1
-        stack: list[tuple[str, Iterator[str]]] = [(start, iter(out_adjacency[start]))]
-        while stack:
-            node, neighbours = stack[-1]
-            advanced = False
-            for nxt in neighbours:
-                if colour[nxt] == 0:
-                    forward.append((node, nxt))
-                    colour[nxt] = 1
-                    stack.append((nxt, iter(out_adjacency[nxt])))
-                    advanced = True
-                    break
-                if colour[nxt] == 2:  # forward/cross edge: keeps the DAG acyclic
-                    forward.append((node, nxt))
-                # grey neighbour == back edge, drop it
-            if not advanced:
-                colour[node] = 2
-                stack.pop()
-
-    forward_adjacency: dict[str, list[str]] = {node_id: [] for node_id in node_ids}
-    indegree = dict.fromkeys(node_ids, 0)
-    for source, target in forward:
-        forward_adjacency[source].append(target)
-        indegree[target] += 1
-    queue = deque(node_id for node_id in node_ids if indegree[node_id] == 0)
-    layer = dict.fromkeys(node_ids, 0)
-    while queue:
-        node = queue.popleft()
-        for target in forward_adjacency[node]:
-            layer[target] = max(layer[target], layer[node] + 1)
-            indegree[target] -= 1
-            if indegree[target] == 0:
-                queue.append(target)
-    return layer
-
-
-def _order_within_layers(
-    node_ids: list[str],
-    index_of: dict[str, int],
-    undirected: dict[str, list[str]],
-    layer_of: dict[str, int],
-) -> dict[int, list[str]]:
-    """Seed each layer's row order by node insertion order, then run
-    alternating barycentre sweeps to line neighbours up across columns."""
-    max_layer = max(layer_of.values())
-    layer_nodes: dict[int, list[str]] = {index: [] for index in range(max_layer + 1)}
-    for node_id in node_ids:
-        layer_nodes[layer_of[node_id]].append(node_id)
-    order_index = dict.fromkeys(node_ids, 0)
-
-    def reindex(layer: int) -> None:
-        for position, node_id in enumerate(layer_nodes[layer]):
-            order_index[node_id] = position
-
-    for layer in layer_nodes:
-        reindex(layer)
-
-    for sweep in range(BARYCENTRE_SWEEPS):
-        downward = sweep % 2 == 0
-        layers = range(1, max_layer + 1) if downward else range(max_layer - 1, -1, -1)
-        neighbour_layer_delta = -1 if downward else 1
-        for layer in layers:
-
-            def barycentre(node_id: str, delta: int = neighbour_layer_delta) -> float:
-                neighbours = [
-                    other
-                    for other in undirected[node_id]
-                    if layer_of[other] == layer_of[node_id] + delta
-                ]
-                if not neighbours:
-                    return float(order_index[node_id])
-                return sum(order_index[other] for other in neighbours) / len(neighbours)
-
-            layer_nodes[layer].sort(
-                key=lambda node_id: (barycentre(node_id), index_of[node_id])
-            )
-            reindex(layer)
-    return layer_nodes
-
-
-def _seed_cells(layer_nodes: dict[int, list[str]]) -> dict[str, tuple[int, int]]:
-    """Turn the ordered layers into integer (column, row) grid cells, each
-    layer vertically centred on row 0."""
-    cell_of: dict[str, tuple[int, int]] = {}
-    for column, nodes in layer_nodes.items():
-        count = len(nodes)
-        for position, node_id in enumerate(nodes):
-            cell_of[node_id] = (column, position - (count - 1) // 2)
-    return cell_of
-
-
-def _local_search(
-    node_ids: list[str],
-    index_of: dict[str, int],
-    directed: list[tuple[str, str]],
-    sequence: list[tuple[str, str]],
-    fans: list[tuple[str, tuple[str, ...]]],
-    cell_of: dict[str, tuple[int, int]],
-) -> dict[str, tuple[int, int]]:
-    """Polish the barycentre seed by directly minimizing the true straight-line
-    crossing cost. Nodes live on distinct integer grid cells; moves are a swap
-    of any two nodes' cells and a relocation into a free cell in an adjacent
-    column. Both are accepted only when they strictly lower the cost, so the
-    search is a deterministic monotone descent -- every candidate is tried in a
-    fixed order and ties never displace the incumbent.
-
-    Two phases: the first ignores the sequence term and drives crossings and
-    grazes to their minimum; the second adds the sequence term to line the
-    numbered steps up in reading order. Because a crossing outweighs every
-    sequence gain, the second phase can never trade a crossing away -- it only
-    improves the ordering within the crossing-free arrangement phase one found.
-    """
-    ordered = sorted(node_ids, key=lambda node_id: index_of[node_id])
-
-    def descend(with_sequence: bool, allow_column_moves: bool) -> None:
-        chain = sequence if with_sequence else []
-        active_fans = fans if with_sequence else []
-
-        def cost() -> float:
-            return _layout_cost(node_ids, directed, chain, active_fans, cell_of)
-
-        current = cost()
-        for _ in range(SEARCH_ROUNDS):
-            improved = False
-            for first in range(len(ordered)):
-                for second in range(first + 1, len(ordered)):
-                    node_a, node_b = ordered[first], ordered[second]
-                    cell_of[node_a], cell_of[node_b] = (
-                        cell_of[node_b],
-                        cell_of[node_a],
-                    )
-                    candidate = cost()
-                    if candidate < current - 1e-6:
-                        current = candidate
-                        improved = True
-                    else:
-                        cell_of[node_a], cell_of[node_b] = (
-                            cell_of[node_b],
-                            cell_of[node_a],
-                        )
-            occupied = set(cell_of.values())
-            rows = [row for _, row in cell_of.values()]
-            low, high = min(rows) - SLOT_MARGIN, max(rows) + SLOT_MARGIN
-            for node_id in ordered:
-                origin = cell_of[node_id]
-                column, _row = origin
-                columns = (
-                    (column - 1, column, column + 1)
-                    if allow_column_moves
-                    else (column,)
-                )
-                for target in _candidate_cells(columns, low, high, occupied):
-                    cell_of[node_id] = target
-                    candidate = cost()
-                    if candidate < current - 1e-6:
-                        current = candidate
-                        improved = True
-                        occupied.discard(origin)
-                        occupied.add(target)
-                        break
-                    cell_of[node_id] = origin
-            if not improved:
-                break
-
-    # Phase 1 minimizes crossings/grazes with full freedom; phase 2 layers in
-    # the sequence and clockwise terms. Both phases allow column moves: overall
-    # width is no longer a goal (zoom owns fit-to-screen), and the freedom lets
-    # the length-uniformity term pull a stray far-flung leaf into a nearer
-    # column instead of leaving one lone over-long spoke.
-    descend(with_sequence=False, allow_column_moves=True)
-    descend(with_sequence=True, allow_column_moves=True)
-    return cell_of
-
-
-def _candidate_cells(
-    columns: tuple[int, ...], low: int, high: int, occupied: set[tuple[int, int]]
-) -> list[tuple[int, int]]:
-    return [
-        (candidate_column, row)
-        for candidate_column in columns
-        for row in range(low, high + 1)
-        if (candidate_column, row) not in occupied
-    ]
-
-
-def _layout_cost(
-    node_ids: list[str],
-    directed: list[tuple[str, str]],
-    sequence: list[tuple[str, str]],
-    fans: list[tuple[str, tuple[str, ...]]],
-    cell_of: dict[str, tuple[int, int]],
-) -> float:
-    position = {
-        node_id: (column * COL_SPACING, row * ROW_SPACING)
-        for node_id, (column, row) in cell_of.items()
-    }
-    segments = [
-        (position[source], position[target], source, target)
-        for source, target in directed
-    ]
-    crossings = _count_overlaps(segments)
-    grazes = 0
-    total_length = 0.0
-    length_spread = 0.0
-    for start, end, source, target in segments:
-        seg_len = math.hypot(end[0] - start[0], end[1] - start[1])
-        total_length += seg_len
-        # Squared length in column-widths: penalizes long edges far more than
-        # short ones, so the minimum pulls stray leaves back in and keeps the
-        # spread of arrow lengths low (a lone long spoke costs its square).
-        length_spread += (seg_len / COL_SPACING) ** 2
-        for node_id in node_ids:
-            if node_id in (source, target):
-                continue
-            if _point_near_segment(
-                position[node_id], start, end, NODE_ON_EDGE_CLEARANCE
-            ):
-                grazes += 1
-    rows = [row for _, row in cell_of.values()]
-    row_span = max(rows) - min(rows)
-    return (
-        crossings * CROSSING_COST
-        + grazes * NODE_ON_EDGE_COST
-        + _sequence_spread(sequence, position) * SEQUENCE_COST
-        + _clockwise_disorder(fans, position) * CLOCKWISE_COST
-        + length_spread * LENGTH_SPREAD_COST
-        + row_span * HEIGHT_COST
-        + total_length * LENGTH_COST
-    )
-
-
 def _sequence_spread(
     sequence: list[tuple[str, str]], position: dict[str, tuple[float, float]]
 ) -> float:
-    """Total gap, in column-widths, between the midpoints of consecutively
-    numbered activity edges. Minimizing it lines the numbered steps up in
-    reading order."""
+    """Total gap, in PREFERRED_DIST-widths, between the midpoints of
+    consecutively numbered activity edges. Minimizing it lines the numbered
+    steps up in reading order."""
     midpoints = [
         (
             (position[source][0] + position[target][0]) / 2,
@@ -546,7 +445,7 @@ def _sequence_spread(
         for source, target in sequence
     ]
     return sum(
-        math.hypot(later[0] - earlier[0], later[1] - earlier[1]) / COL_SPACING
+        math.hypot(later[0] - earlier[0], later[1] - earlier[1]) / PREFERRED_DIST
         for earlier, later in itertools.pairwise(midpoints)
     )
 

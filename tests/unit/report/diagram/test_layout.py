@@ -22,7 +22,6 @@ from pytest_given.report.diagram import (
     count_crossings,
     layout_graph,
 )
-from pytest_given.report.diagram import layout as diagram_layout
 from pytest_given.report.diagram.layout import (
     LABEL_H,
     LABEL_OFFSET,
@@ -33,6 +32,7 @@ from pytest_given.report.diagram.layout import (
     LabelBox,
     _actor_fans,
     _clockwise_disorder,
+    _min_pair_distance,
     _numbered_sequence,
     _orient_start_top_left,
     _sequence_spread,
@@ -60,8 +60,7 @@ def test_minimum_pairwise_distance(trip_story: Story, trip_glossary: Glossary) -
     coords = list(positions.values())
     for index, (first_x, first_y) in enumerate(coords):
         for second_x, second_y in coords[index + 1 :]:
-            # The grid places every node on a distinct column/row cell whose
-            # spacing is >= MIN_NODE_DIST, so no two nodes can overlap.
+            # Construction seats every node at least MIN_NODE_DIST from all others.
             assert (
                 math.hypot(second_x - first_x, second_y - first_y)
                 >= MIN_NODE_DIST - 1e-6
@@ -97,6 +96,73 @@ def _edge(source: str, target: str, number: int | None = 1) -> DiagramEdge:
         number=number,
         connective=False,
     )
+
+
+def test_construction_adds_activities_in_numbered_order() -> None:
+    """The seed walks activities 1..N: an earlier activity's newly introduced
+    node is placed before a later activity's, so the reading order structures
+    the layout instead of being recovered afterwards."""
+    from pytest_given.report.diagram.layout import _construction_order
+
+    nodes = (_actor('a:hub'), _work('w:1'), _work('w:2'), _work('w:3'))
+    edges = (
+        _edge('a:hub', 'w:3', number=3),
+        _edge('a:hub', 'w:1', number=1),
+        _edge('a:hub', 'w:2', number=2),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    order = _construction_order(graph)
+    # Edges come out in ascending activity number regardless of edge order.
+    assert order == [
+        ('a:hub', 'w:1', True),
+        ('a:hub', 'w:2', True),
+        ('a:hub', 'w:3', True),
+    ]
+
+
+def test_seed_is_crossing_free_and_spaced_on_a_tree() -> None:
+    from pytest_given.report.diagram.layout import _construct_seed, _count_overlaps
+
+    nodes = tuple(
+        [_actor('a:root')] + [_work(f'w:{index}') for index in range(1, 6)]
+    )
+    edges = (
+        _edge('a:root', 'w:1', number=1),
+        _edge('w:1', 'w:2', number=2),
+        _edge('a:root', 'w:3', number=3),
+        _edge('w:3', 'w:4', number=4),
+        _edge('a:root', 'w:5', number=5),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    seed = _construct_seed(graph)
+    directed = [(e.source, e.target) for e in edges]
+    segments = [(seed[s], seed[t], s, t) for s, t in directed]
+    assert _count_overlaps(segments) == 0
+    assert _min_pair_distance(seed) >= MIN_NODE_DIST - 1e-6
+
+
+def test_construction_seats_a_closing_triangle_crossing_free() -> None:
+    """a:helper is placed anchored to a:root (activity 1); w:mid is placed
+    anchored to a:root (activity 2), but w:mid *also* closes back to
+    a:helper (activity 3) -- an edge between two nodes that, without the
+    lookahead in _place_new_node, would already both be fixed by the time
+    that third edge is drawn. This exercises the branch of the lookahead
+    where the not-yet-placed node is the *target* of the later closing edge
+    (a:helper is the later edge's source, w:mid its target)."""
+    from pytest_given.report.diagram.layout import _construct_seed, _count_overlaps
+
+    nodes = (_actor('a:root'), _actor('a:helper'), _work('w:mid'))
+    edges = (
+        _edge('a:root', 'a:helper', number=1),
+        _edge('a:root', 'w:mid', number=2),
+        _edge('a:helper', 'w:mid', number=3),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    seed = _construct_seed(graph)
+    directed = [(e.source, e.target) for e in edges]
+    segments = [(seed[s], seed[t], s, t) for s, t in directed]
+    assert _count_overlaps(segments) == 0
+    assert _min_pair_distance(seed) >= MIN_NODE_DIST - 1e-6
 
 
 def test_disjoint_stars_do_not_cross_and_keep_min_distance() -> None:
@@ -135,7 +201,7 @@ def test_sequence_term_pulls_numbered_steps_together(
     graph = build_graph(trip_story, trip_glossary)
     with_sequence = layout_graph(graph)
 
-    monkeypatch.setattr(layout_module, 'SEQUENCE_COST', 0.0)
+    monkeypatch.setattr(layout_module, 'SEQUENCE_K', 0.0)
     without_sequence = layout_graph(graph)
 
     assert _sequence_spread_of(with_sequence) <= _sequence_spread_of(without_sequence)
@@ -215,19 +281,10 @@ def test_hub_fan_lays_out_clockwise() -> None:
     assert _clockwise_disorder(_actor_fans(graph), positions) == 0.0
 
 
-def test_clockwise_term_drives_fan_into_clockwise_order(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """The clockwise objective in the local search must actually change the
-    placement: with it off the fans are left counter-clockwise (disorder > 0);
-    with it on they settle into crossing-free clockwise fans (disorder 0)."""
-    # Two hubs, each initiating three interleaved-by-number spokes. A single
-    # hub would not prove the search term, because the clockwise-aware
-    # reflection can flip one fan's handedness on its own -- so this uses TWO
-    # fans whose spokes want independent ordering. The reflection flips both
-    # together and cannot satisfy both, so only the search's clockwise term can
-    # drive the total disorder to zero. The spokes are equal length in every
-    # arrangement, keeping the length-uniformity term neutral.
+def test_construction_lays_two_fans_out_clockwise() -> None:
+    """Clockwise ordering is enforced during construction, not by a tunable
+    cost. Two hubs with interleaved-by-number spokes: the seed must grow both
+    fans clockwise, so the total disorder is zero and nothing crosses."""
     nodes = (
         _actor('a:0'), _actor('a:1'),
         _work('w:0'), _work('w:1'), _work('w:2'),
@@ -242,17 +299,10 @@ def test_clockwise_term_drives_fan_into_clockwise_order(
         _edge('a:1', 'w:3', number=6),
     )
     graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
-
-    def disorder() -> float:
-        layout = layout_graph(graph)
-        positions = {p.node.id: (p.x, p.y) for p in layout.nodes}
-        return _clockwise_disorder(_actor_fans(graph), positions)
-
-    monkeypatch.setattr(diagram_layout, 'CLOCKWISE_COST', 0.0)
-    assert disorder() > 0.0  # proves this graph is a real discriminator
-    monkeypatch.undo()
-    assert disorder() == 0.0  # the clockwise term fixes it
-    assert count_crossings(layout_graph(graph).edges) == 0
+    layout = layout_graph(graph)
+    positions = {p.node.id: (p.x, p.y) for p in layout.nodes}
+    assert _clockwise_disorder(_actor_fans(graph), positions) == 0.0
+    assert count_crossings(layout.edges) == 0
 
 
 def test_single_actor_no_edges_lands_on_canvas_centre() -> None:
@@ -551,7 +601,7 @@ def _random_story_graph(rng: random.Random) -> DiagramGraph:
 
 def test_random_graphs_keep_layout_invariants() -> None:
     """The layout must never crash, must stay deterministic, and must keep the
-    grid guarantees (min node distance, all nodes inside the canvas) on many
+    invariants (min node distance, all nodes inside the canvas) on many
     random domain-shaped graphs."""
     for seed in range(100):
         rng = random.Random(seed)
