@@ -705,3 +705,52 @@ def test_segment_distance_handles_a_degenerate_segment() -> None:
     from pytest_given.report.diagram.layout import _segment_distance
 
     assert _segment_distance((0.0, 0.0), (3.0, 4.0), (3.0, 4.0)) == 5.0
+
+
+def test_refinement_never_increases_crossings_or_overlaps(
+    trip_story: Story, trip_glossary: Glossary
+) -> None:
+    from pytest_given.report.diagram.layout import (
+        MIN_NODE_DIST,
+        _construct_seed,
+        _count_overlaps,
+        _directed_edges,
+        _min_pair_distance,
+        _refine_forces,
+    )
+
+    graph = build_graph(trip_story, trip_glossary)
+    seed = _construct_seed(graph)
+    directed = _directed_edges(graph)
+    seed_crossings = _count_overlaps([(seed[s], seed[t], s, t) for s, t in directed])
+    refined = _refine_forces(seed, graph)
+    refined_crossings = _count_overlaps(
+        [(refined[s], refined[t], s, t) for s, t in directed]
+    )
+    assert refined_crossings <= seed_crossings
+    assert _min_pair_distance(refined) >= MIN_NODE_DIST - 1e-6
+    assert _refine_forces(seed, graph) == refined  # deterministic
+
+
+def test_refinement_tightens_a_three_spoke_fan_below_a_splay() -> None:
+    """A preferred-distance potential settles a 3-spoke fan close together, not
+    splayed to the maximum angle: the average spoke length stays near the
+    preferred distance rather than blowing out."""
+    from pytest_given.report.diagram.layout import (
+        EDGE_REST_LENGTH,
+        _construct_seed,
+        _refine_forces,
+    )
+
+    nodes = (_actor('a:hub'), _work('w:1'), _work('w:2'), _work('w:3'))
+    edges = (
+        _edge('a:hub', 'w:1', number=1),
+        _edge('a:hub', 'w:2', number=2),
+        _edge('a:hub', 'w:3', number=3),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    refined = _refine_forces(_construct_seed(graph), graph)
+    hub = refined['a:hub']
+    for target in ('w:1', 'w:2', 'w:3'):
+        length = math.hypot(refined[target][0] - hub[0], refined[target][1] - hub[1])
+        assert length <= EDGE_REST_LENGTH * 1.6

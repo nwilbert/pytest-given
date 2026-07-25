@@ -113,6 +113,7 @@ def position_nodes(
     sequence = _numbered_sequence(graph)
     fans = _actor_fans(graph)
     grid = _construct_seed(graph)
+    grid = _refine_forces(grid, graph)
     positions, width, height = _framed(grid)
     start = sequence[0][0] if sequence else None
     positions = _orient_start_top_left(positions, width, height, start, fans)
@@ -326,6 +327,127 @@ def _construct_seed(graph: DiagramGraph) -> dict[str, tuple[float, float]]:
     for node in graph.nodes:
         if node.id not in positions:
             positions[node.id] = _place_free_node(node.id, positions, drawn)
+    return positions
+
+
+def _directed_edges(graph: DiagramGraph) -> list[tuple[str, str]]:
+    """Distinct non-self (source, target) pairs in first-appearance order:
+    parallel duplicates (a multi-path activity's shared first step) collapse
+    to one, and self-loops are dropped -- the same edge set every crossing
+    and graze check in this module is defined over."""
+    seen: set[tuple[str, str]] = set()
+    directed: list[tuple[str, str]] = []
+    for edge in graph.edges:
+        pair = (edge.source, edge.target)
+        if edge.source == edge.target or pair in seen:
+            continue
+        seen.add(pair)
+        directed.append(pair)
+    return directed
+
+
+def _net_force(
+    node_id: str,
+    positions: dict[str, tuple[float, float]],
+    adjacency: dict[str, list[str]],
+    seq_partners: dict[str, list[str]],
+) -> tuple[float, float]:
+    """Force on node_id: edge springs toward EDGE_REST_LENGTH, a
+    preferred-distance pair potential against every other node (repel below
+    PREFERRED_DIST, gently attract out to INFLUENCE_RADIUS), and a weak sequence
+    spring toward the targets of adjacent-numbered activities."""
+    node_x, node_y = positions[node_id]
+    force_x = force_y = 0.0
+
+    for other_id, (other_x, other_y) in positions.items():
+        if other_id == node_id:
+            continue
+        dx, dy = node_x - other_x, node_y - other_y
+        dist = math.hypot(dx, dy) or 1e-6
+        unit_x, unit_y = dx / dist, dy / dist
+        if dist < PREFERRED_DIST:
+            magnitude = REPULSION_K * (PREFERRED_DIST - dist)
+        elif dist < INFLUENCE_RADIUS:
+            magnitude = -ATTRACT_K * (dist - PREFERRED_DIST)
+        else:
+            magnitude = 0.0
+        force_x += unit_x * magnitude
+        force_y += unit_y * magnitude
+
+    for neighbour_id in adjacency[node_id]:
+        other_x, other_y = positions[neighbour_id]
+        dx, dy = other_x - node_x, other_y - node_y
+        dist = math.hypot(dx, dy) or 1e-6
+        pull = SPRING_K * (dist - EDGE_REST_LENGTH)
+        force_x += (dx / dist) * pull
+        force_y += (dy / dist) * pull
+
+    for partner_id in seq_partners[node_id]:
+        other_x, other_y = positions[partner_id]
+        dx, dy = other_x - node_x, other_y - node_y
+        dist = math.hypot(dx, dy) or 1e-6
+        force_x += (dx / dist) * SEQUENCE_K * dist
+        force_y += (dy / dist) * SEQUENCE_K * dist
+
+    return force_x, force_y
+
+
+def _refine_forces(
+    seed: dict[str, tuple[float, float]],
+    graph: DiagramGraph,
+) -> dict[str, tuple[float, float]]:
+    """Phase 2: deterministic Gauss-Seidel relaxation. Nodes are visited in a
+    fixed (sorted) order; each proposed displacement is capped at MAX_STEP and
+    accepted only if the whole layout stays crossing-free, overlap-free and
+    graze-free (an unsafe step is binary-searched back to the largest safe
+    fraction). Cooling shrinks the cap linearly to zero."""
+    positions = dict(seed)
+    directed = _directed_edges(graph)
+    ordered = sorted(positions)
+
+    adjacency: dict[str, list[str]] = {node_id: [] for node_id in positions}
+    for source, target in directed:
+        adjacency[source].append(target)
+        adjacency[target].append(source)
+
+    sequence = _numbered_sequence(graph)
+    seq_partners: dict[str, list[str]] = {node_id: [] for node_id in positions}
+    targets = [target for _source, target in sequence]
+    for earlier, later in itertools.pairwise(targets):
+        if earlier != later:
+            seq_partners[earlier].append(later)
+            seq_partners[later].append(earlier)
+
+    base_crossings = _count_overlaps(
+        [(positions[s], positions[t], s, t) for s, t in directed]
+    )
+    base_grazes = _grazes(positions, directed)
+
+    for iteration in range(FORCE_ITERATIONS):
+        cap = MAX_STEP * (1.0 - iteration / FORCE_ITERATIONS)
+        moved = False
+        for node_id in ordered:
+            force_x, force_y = _net_force(node_id, positions, adjacency, seq_partners)
+            magnitude = math.hypot(force_x, force_y)
+            if magnitude < 1e-9:
+                continue
+            scale = min(cap, magnitude) / magnitude
+            origin = positions[node_id]
+            move_target = (origin[0] + force_x * scale, origin[1] + force_y * scale)
+            fraction = 1.0
+            for _ in range(6):  # binary search back to the largest safe step
+                candidate = (
+                    origin[0] + (move_target[0] - origin[0]) * fraction,
+                    origin[1] + (move_target[1] - origin[1]) * fraction,
+                )
+                positions[node_id] = candidate
+                if _move_is_valid(positions, directed, base_crossings, base_grazes):
+                    moved = True
+                    break
+                positions[node_id] = origin
+                fraction *= 0.5
+        if not moved:
+            break
     return positions
 
 
