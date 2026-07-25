@@ -2,10 +2,6 @@
 
 ## Now
 
-- [ ] improve mouse navigation (zoom with scroll wheel, pan with hold)
-- [ ] improve hover effect on activity (thicken line)
-- [ ] remove OBJECT/ACTOR from description (redundant, is obvious from diagram)
-- [ ] does the glossary work for the verbs as well?
 - [ ] add skill to support Domain Storytelling session (update & regenerate diagram continously, update glossary)
 
 ## Next
