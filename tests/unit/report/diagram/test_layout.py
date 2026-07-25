@@ -603,19 +603,27 @@ def test_random_graphs_keep_layout_invariants() -> None:
     """The layout must never crash, must stay deterministic, and must keep the
     invariants (min node distance, all nodes inside the canvas) on many
     random domain-shaped graphs."""
-    for seed in range(100):
-        rng = random.Random(seed)
-        graph = _random_story_graph(rng)
-        positions, width, height = position_nodes(graph)
-        assert position_nodes(graph) == (positions, width, height)  # deterministic
-        coords = list(positions.values())
-        for index, (fx, fy) in enumerate(coords):
-            assert MARGIN <= fx <= width - MARGIN
-            assert MARGIN <= fy <= height - MARGIN
-            for sx, sy in coords[index + 1 :]:
-                assert math.hypot(sx - fx, sy - fy) >= MIN_NODE_DIST - 1e-6
-        # layout_graph exercises the edge/label passes too (must not raise).
-        layout_graph(graph)
+    import warnings
+
+    # These graphs are arbitrary (including actor->actor handoffs), so some
+    # seeds are genuinely non-planar; a forced-crossing warning is expected
+    # here and is not the property under test (the dedicated K5 test above
+    # asserts the warning itself). Silence it so it doesn't pollute the run.
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        for seed in range(100):
+            rng = random.Random(seed)
+            graph = _random_story_graph(rng)
+            positions, width, height = position_nodes(graph)
+            assert position_nodes(graph) == (positions, width, height)  # deterministic
+            coords = list(positions.values())
+            for index, (fx, fy) in enumerate(coords):
+                assert MARGIN <= fx <= width - MARGIN
+                assert MARGIN <= fy <= height - MARGIN
+                for sx, sy in coords[index + 1 :]:
+                    assert math.hypot(sx - fx, sy - fy) >= MIN_NODE_DIST - 1e-6
+            # layout_graph exercises the edge/label passes too (must not raise).
+            layout_graph(graph)
 
 
 def _random_tree_graph(rng: random.Random) -> DiagramGraph:
@@ -730,6 +738,32 @@ def test_refinement_never_increases_crossings_or_overlaps(
     assert refined_crossings <= seed_crossings
     assert _min_pair_distance(refined) >= MIN_NODE_DIST - 1e-6
     assert _refine_forces(seed, graph) == refined  # deterministic
+
+
+def test_forced_crossing_on_a_nonplanar_closing_edge_is_surfaced() -> None:
+    """K5 is non-planar: it has no crossing-free straight-line drawing at all.
+    Every new-node edge is placed crossing-free, so a crossing can only come
+    from a closing edge (both endpoints already placed). The layout surfaces
+    that with a warning rather than silently claiming zero crossings."""
+    nodes = tuple(_actor(f'n:{i}') for i in range(5))
+    # All ten pairs among five nodes, numbered so construction closes the graph.
+    pairs = [(a, b) for a in range(5) for b in range(a + 1, 5)]
+    edges = tuple(
+        _edge(f'n:{a}', f'n:{b}', number=index + 1)
+        for index, (a, b) in enumerate(pairs)
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    with pytest.warns(UserWarning, match='non-planar'):
+        position_nodes(graph)
+
+
+def test_planar_story_never_warns(trip_story: Story, trip_glossary: Glossary) -> None:
+    import warnings
+
+    graph = build_graph(trip_story, trip_glossary)
+    with warnings.catch_warnings():
+        warnings.simplefilter('error')
+        position_nodes(graph)  # must not raise a warning-as-error
 
 
 def test_refinement_tightens_a_three_spoke_fan_below_a_splay() -> None:

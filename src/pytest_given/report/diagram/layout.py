@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import warnings
 from dataclasses import dataclass
 
 from .graph import DiagramEdge, DiagramGraph, DiagramNode
@@ -278,6 +279,7 @@ def _construct_seed(graph: DiagramGraph) -> dict[str, tuple[float, float]]:
     positions: dict[str, tuple[float, float]] = {}
     drawn: list[tuple[str, str]] = []
     last_spoke_angle: dict[str, float] = {}
+    forced = False
 
     def angle_from(anchor_id: str, node_id: str) -> float:
         anchor_x, anchor_y = positions[anchor_id]
@@ -305,6 +307,7 @@ def _construct_seed(graph: DiagramGraph) -> dict[str, tuple[float, float]]:
         return None
 
     for index, (source, target, numbered) in enumerate(order):
+        both_placed = source in positions and target in positions
         if source not in positions and target not in positions:
             positions[source] = _place_free_node(source, positions, drawn)
         if source not in positions:
@@ -320,6 +323,20 @@ def _construct_seed(graph: DiagramGraph) -> dict[str, tuple[float, float]]:
                 target, source, prev, positions, drawn, other
             )
         drawn.append((source, target))
+        if both_placed and not forced:
+            # Both endpoints were already fixed by earlier steps, so this
+            # closing edge had no placement freedom left. On a genuinely
+            # non-planar story (e.g. K5) that can force a crossing no
+            # placement could have avoided -- surface it once rather than
+            # silently drawing over it.
+            segments = [(positions[a], positions[b], a, b) for a, b in drawn]
+            if _count_overlaps(segments) > 0:
+                warnings.warn(
+                    f'non-planar story {graph.title!r}: a step connecting two '
+                    f'already-placed nodes forced an edge crossing',
+                    stacklevel=2,
+                )
+                forced = True
         if numbered:
             last_spoke_angle[source] = angle_from(source, target)
 

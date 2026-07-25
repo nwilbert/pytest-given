@@ -100,8 +100,8 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
       </div>
       <div class="canvas" x-ref="canvas_book-a-room" @wheel.prevent="onWheel($event)">
         <div class="zoom-surface" :style="surfaceStyle()">
-      <svg width="1080" height="880"
-           viewBox="0 0 1080 880">
+      <svg width="1080" height="688"
+           viewBox="0 0 1080 688">
         <defs>
           
           <marker id="arrow-book-a-room" viewBox="0 0 10 10" refX="9" refY="5"
@@ -117,26 +117,26 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="423.0" y1="405.0"
-                x2="650.0" y2="220.0"/>
+                x1="487.0" y1="214.0"
+                x2="662.0" y2="189.0"/>
           <line class="edge connective"
-                x1="423.0" y1="405.0"
-                x2="650.0" y2="220.0"
+                x1="487.0" y1="214.0"
+                x2="662.0" y2="189.0"
                 marker-end="url(#arrow-book-a-room)"/>
           
           
 
 
 
-<circle cx="516.0" cy="325.0" r="11" class="numbg"/>
-<text x="516.0" y="329.0" class="num">1</text>
-<text x="532.0" y="329.0" class="verb conn">browses</text>
+<circle cx="545.0" cy="218.0" r="11" class="numbg"/>
+<text x="545.0" y="222.0" class="num">1</text>
+<text x="561.0" y="222.0" class="verb conn">browses</text>
 
 
           
           
           
-<g transform="translate(700.0,180.0)"
+<g transform="translate(726.0,180.0)"
    @mouseenter='showTip($event, "listings", "")'
    @mouseleave="tooltip = null">
   
@@ -159,26 +159,26 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="436.0" y1="440.0"
-                x2="636.0" y2="440.0"/>
+                x1="469.0" y1="263.0"
+                x2="602.0" y2="414.0"/>
           <line class="edge "
-                x1="436.0" y1="440.0"
-                x2="636.0" y2="440.0"
+                x1="469.0" y1="263.0"
+                x2="602.0" y2="414.0"
                 marker-end="url(#arrow-book-a-room)"/>
           
           
 
 
 
-<circle cx="510.0" cy="457.0" r="11" class="numbg"/>
-<text x="510.0" y="461.0" class="num">2</text>
-<text x="526.0" y="461.0" class="verb">books</text>
+<circle cx="496.0" cy="350.0" r="11" class="numbg"/>
+<text x="496.0" y="354.0" class="num">2</text>
+<text x="512.0" y="354.0" class="verb">books</text>
 
 
           
           
           
-<g transform="translate(700.0,440.0)"
+<g transform="translate(644.0,462.0)"
    @mouseenter='showTip($event, "Room", "room")'
    @mouseleave="tooltip = null">
   
@@ -201,26 +201,26 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           
           
           <line class="edge-hit"
-                x1="423.0" y1="475.0"
-                x2="650.0" y2="660.0"/>
+                x1="417.0" y1="275.0"
+                x2="371.0" y2="446.0"/>
           <line class="edge connective"
-                x1="423.0" y1="475.0"
-                x2="650.0" y2="660.0"
+                x1="417.0" y1="275.0"
+                x2="371.0" y2="446.0"
                 marker-end="url(#arrow-book-a-room)"/>
           
           
 
 
 
-<circle cx="490.0" cy="580.0" r="11" class="numbg"/>
-<text x="490.0" y="584.0" class="num">3</text>
-<text x="506.0" y="584.0" class="verb conn">receives</text>
+<circle cx="341.0" cy="355.0" r="11" class="numbg"/>
+<text x="341.0" y="359.0" class="num">3</text>
+<text x="357.0" y="359.0" class="verb conn">receives</text>
 
 
           
           
           
-<g transform="translate(700.0,700.0)"
+<g transform="translate(354.0,508.0)"
    @mouseenter='showTip($event, "Confirmation", "confirmation")'
    @mouseleave="tooltip = null">
   
@@ -241,7 +241,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
         <g class="actors">
           
           
-<g transform="translate(380.0,440.0)"
+<g transform="translate(432.0,221.0)"
    @mouseenter='showTip($event, "Guest", "guest")'
    @mouseleave="tooltip = null">
   
@@ -279,7 +279,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 <script>
 const STORY_IDS = ["book-a-room"];
 const MAX_STEPS = {"book-a-room": 3};
-const DIAGRAM_SIZES = {"book-a-room": [1080, 880]};
+const DIAGRAM_SIZES = {"book-a-room": [1080, 688]};
 const TERM_INFO = {"guest": {"kind": "actor", "definition": "A person making a room reservation."}, "book": {"kind": "verb", "definition": "Reserve a room for a given stay."}, "room": {"kind": "object", "definition": "A bookable hotel room."}, "confirmation": {"kind": "object", "definition": "A notification acknowledging a successful reservation."}, "cancellation-policy": {"kind": null, "definition": "The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate."}, "overbooking": {"kind": null, "definition": "Accepting more reservations than there are rooms available."}};
 function diagramsApp() {
   return {
