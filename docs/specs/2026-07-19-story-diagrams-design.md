@@ -109,6 +109,22 @@ crossing-free region the invariant permits.
    sweep** of the anchor's fan — each actor's spokes advancing clockwise as the
    number rises, so the fan reads 1 → 2 → 3 in order — and then to the shortest
    arrow. Every node therefore *starts* at zero crossings.
+
+   A purely forward, greedy walk cannot always reach a crossing-free seed even
+   when one exists: a later multi-path step (a work object fanning back to
+   several already-seated actors) can be boxed in by the earlier greedy
+   placements, so no single seat reaches all of its partners. The seed therefore
+   runs as a **bounded, deterministic backtracking search** rather than a
+   one-shot greedy pass. Each node placement yields its crossing-free candidate
+   positions best-first (clockwise, then shortest arrow); taking the first
+   candidate at every step reproduces the plain greedy layout, so ordinary
+   stories are unchanged. When a node has *no* candidate that keeps every one of
+   its (current and closing) edges crossing-free, the search backtracks and
+   re-seats an earlier node, trying its next candidate — so an over-constrained
+   fan is resolved by moving the anchors that boxed it in. The search is bounded
+   (a capped number of placements tried) and deterministic; if the bound is
+   exhausted the seed falls back to the best-effort greedy placement and the
+   non-planar guard (below) surfaces any residual crossing.
 2. **Planarity-preserving force refinement.** A deterministic spring embedder
    (no RNG; fixed iteration count and cooling schedule) then relaxes the seed:
    edges pull toward a rest length; every node pair interacts through a
