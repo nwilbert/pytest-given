@@ -51,7 +51,7 @@ MAX_STEP = 60.0  # displacement cap per node per iteration (px)
 SPRING_K = 0.10  # edge spring stiffness
 REPULSION_K = 0.60  # short-range push below PREFERRED_DIST
 ATTRACT_K = 0.02  # bounded long-range pull toward PREFERRED_DIST
-SEQUENCE_K = 0.03  # gentle pull between consecutive numbered targets
+SEQUENCE_K = 0.005  # gentle pull between consecutive numbered targets
 
 NODE_HALF_W = 62.0
 NODE_HALF_H = 58.0
