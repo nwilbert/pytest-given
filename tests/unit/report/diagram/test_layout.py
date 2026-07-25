@@ -484,7 +484,13 @@ def test_clockwise_disorder_scores_turn_direction() -> None:
 
 def test_actor_fans_group_numbered_spokes_by_initiating_actor() -> None:
     # Carol initiates 1 and 2 (a fan); Dan initiates only 3 (no fan).
-    nodes = (_actor('a:carol'), _actor('a:dan'), _work('w:1'), _work('w:2'), _work('w:3'))
+    nodes = (
+        _actor('a:carol'),
+        _actor('a:dan'),
+        _work('w:1'),
+        _work('w:2'),
+        _work('w:3'),
+    )
     edges = (
         _edge('a:carol', 'w:1', number=1),
         _edge('a:carol', 'w:2', number=2),
@@ -528,10 +534,8 @@ def _random_story_graph(rng: random.Random) -> DiagramGraph:
     actors = [_actor(f'a:{i}') for i in range(actor_count)]
     nodes: list[DiagramNode] = list(actors)
     edges: list[DiagramEdge] = []
-    number = 0
     activity_count = rng.randint(1, 8)
-    for _ in range(activity_count):
-        number += 1
+    for number in range(1, activity_count + 1):
         source = rng.choice(actors).id
         if actor_count > 1 and rng.random() < 0.25:
             target = rng.choice([a.id for a in actors if a.id != source])
@@ -637,3 +641,17 @@ def test_move_is_valid_gates_on_crossings_grazes_and_distance() -> None:
         crossed, crossed_directed, base_crossings=0, base_grazes=0
     )
     assert _move_is_valid(crossed, crossed_directed, base_crossings=1, base_grazes=0)
+
+
+def test_point_near_segment_handles_a_degenerate_segment() -> None:
+    from pytest_given.report.diagram.layout import _point_near_segment
+
+    # start == end: the "segment" is a point; distance is point-to-that-point.
+    assert _point_near_segment((0.0, 0.0), (5.0, 5.0), (5.0, 5.0), 10.0) is True
+    assert _point_near_segment((0.0, 0.0), (50.0, 50.0), (50.0, 50.0), 10.0) is False
+
+
+def test_segment_distance_handles_a_degenerate_segment() -> None:
+    from pytest_given.report.diagram.layout import _segment_distance
+
+    assert _segment_distance((0.0, 0.0), (3.0, 4.0), (3.0, 4.0)) == 5.0

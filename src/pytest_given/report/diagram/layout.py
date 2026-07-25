@@ -785,7 +785,9 @@ def layout_graph(graph: DiagramGraph) -> DiagramLayout:
     }
     # One node-centre line per distinct connected pair, so a label can prefer a
     # spot distinctly nearer its own arrow than any other (association clarity).
-    segment_by_pair: dict[frozenset[str], tuple[tuple[float, float], tuple[float, float]]] = {}
+    segment_by_pair: dict[
+        frozenset[str], tuple[tuple[float, float], tuple[float, float]]
+    ] = {}
     for edge in graph.edges:
         if edge.source == edge.target:
             continue
