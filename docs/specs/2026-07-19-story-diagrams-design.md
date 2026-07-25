@@ -69,8 +69,9 @@ Same shape as the existing renderers: JSON → `report_from_dict` → typed
   dataclasses for nodes (id, label, sublabel, glyph kind, term id) and edges
   (source, target, verb label, activity number or `None`). Encodes all
   notation rules above. Pure and independent of layout.
-- **`layout.py` — deterministic layout.** `DiagramGraph` → node positions,
-  edge endpoints, label boxes, canvas size. Pure Python, no RNG, no I/O.
+- **`layout.py` — deterministic force-based layout.** `DiagramGraph` → node
+  positions, edge endpoints, label boxes, canvas size. Pure Python, no RNG,
+  no I/O.
 - **`renderer.py` — HTML emission.** Walks `report.stories`, runs extraction +
   layout per story, renders one Jinja2 template to the diagrams HTML (inline
   SVG per story, Alpine.js for interactivity). Registered in `plugin.py`
@@ -85,53 +86,58 @@ artifact leaves the other unchanged.
 
 ## Layout algorithm
 
-Nodes are placed on an integer column/row grid whose spacing exceeds the
-minimum node distance, so nodes can never overlap by construction. On that
-grid a deterministic local search (no RNG) minimizes a single cost made of
-**strictly-ranked objectives** — each weight so much larger than the next that
-an objective can only ever break ties the one above it leaves, never trade one
-away:
+Nodes are placed at **continuous (x, y) positions** by a two-phase force-based
+method. Its overriding, **hard invariant is zero overlapping edges**: no drawn
+edge may cross another edge or run over an unrelated node, and no two nodes may
+sit closer than the minimum node distance. The invariant holds from the very
+first placement onward and is *never* traded away for any other goal — every
+other objective (short arrows, reading order) only shapes the layout within the
+crossing-free region the invariant permits.
 
-1. **No overlapping edges** *(dominant)*. Columns come from a longest-path
-   layering of the directed activity flow (sources on the left, each step one
-   column further right; back edges are dropped for layering only). Row order
-   within a column is seeded by barycentre sweeps, then a local search of
-   cell swaps and relocations drives the true straight-line **crossing** count
-   — plus edges **grazing** an unrelated node — to their minimum.
-2. **Numbered steps read in order** *(secondary)*. Once crossings are minimal,
-   a second pass adds two tie-breakers (it may move nodes between columns too —
-   overall width is not a goal, only crossing-freeness is preserved):
-   - **Proximity.** Pull consecutively numbered activities close together, so
-     the eye follows 1 → 2 → 3 without long jumps.
-   - **Clockwise fans.** Every numbered step's source is its initiating
-     **actor** (path position 0). Grouped by initiating actor, each actor's
-     outgoing spokes (actor → target) — taken in ascending number order —
-     should advance **clockwise** around that actor. Scored by the
-     cross-product sign of consecutive-by-number spokes *sharing an actor*;
-     only relative order matters (absolute orientation is set in step 4).
-     Ranked just under proximity, so it only settles arrangements proximity
-     leaves free — e.g. swapping two work objects so a hub's `1 → 2` reads
-     forward rather than backward. Independent actors form independent fans
-     (in the hotel story: Carol owns {1,2,3,4,7}, the Booking System owns
-     {5,6}) that never interfere. Never adds a crossing.
-3. **Uniform arrow length** *(lowest)*. A squared-length term (per edge, in
-   column-widths) keeps arrow lengths short and low-variance — it pulls a
-   stray far-flung leaf into a nearer column instead of leaving one lone
-   over-long spoke. There is deliberately **no overall height/compactness
-   term**: total size is owned by the zoom controls (below), not the layout,
-   so readability objectives are never vetoed to keep the *whole diagram*
-   small. Uniform edge length is a separate, wanted goal from overall size.
-4. **Start reads from the top-left.** Finally the whole diagram is reflected
-   (an axis-aligned isometry — it preserves every crossing, every step
-   distance, and every clockwise fan) to seat the story's start node, activity
-   1's initiator, nearest the top-left corner.
+1. **Constructive seed in numbered order.** The layout is built by adding
+   activities in ascending sequence number, so the reading order 1 → 2 → 3 is
+   the *primary* structuring force rather than an afterthought a search tries to
+   recover. Activity 1's initiator is placed first; thereafter each activity's
+   not-yet-placed nodes are seated to continue the flow from the previously
+   placed frontier. A candidate position is accepted only if it is
+   **crossing-free** against the edges drawn so far and at least the minimum node
+   distance from every placed node — candidates are swept by angle around the
+   node's anchor at a preferred edge-length radius, and the radius grows outward
+   until a crossing-free one exists (for a node joining through tree edges there
+   is always a free direction in open space, so this terminates). Among the
+   crossing-free candidates the shortest-arrow one wins. Every node therefore
+   *starts* at zero crossings.
+2. **Planarity-preserving force refinement.** A deterministic spring embedder
+   (no RNG; fixed iteration count and cooling schedule) then relaxes the seed:
+   edges pull toward a rest length, node pairs repel below the minimum distance,
+   and a gentle **sequence spring** pulls consecutively numbered activities
+   together. Each iteration proposes a per-node displacement but **accepts it
+   only if the whole layout stays crossing-free, overlap-free, and free of any
+   edge running over a foreign node**; an unsafe displacement is binary-searched
+   back to the largest safe step. Because the layout starts crossing-free and no
+   invariant-breaking move is ever accepted, zero crossings holds throughout —
+   the forces only shorten and organic-ise the drawing. This is the "much better
+   arrangement a human would find" that the previous grid local-search, trapped
+   in local minima, could not reach. There is deliberately **no overall
+   compactness term**: total size is owned by the zoom controls (below), so
+   readability is never vetoed to keep the whole diagram small.
+3. **Non-planar guard.** An activity whose step connects two *already-placed*
+   nodes adds an edge with no placement freedom, so it cannot always be kept
+   crossing-free by positioning alone — a genuinely non-planar situation for
+   that construction order. Rather than silently draw a crossing (violating the
+   invariant), the layout detects this and surfaces it. The real example stories
+   admit a crossing-free embedding, so this is a guard, not an expected path.
+4. **Start reads from the top-left.** The whole diagram is then reflected (an
+   axis-aligned isometry — it preserves every crossing and every distance, so
+   arrow lengths and sequence spacing are untouched) to seat the story's start
+   node, activity 1's initiator, nearest the top-left corner.
 5. **Label pass.** Each edge label (number badge + verb) starts at the edge
    midpoint, offset perpendicular, and slides along its edge until it overlaps
    neither node icons (including node text) nor previously placed labels.
 6. **Canvas sizing.** The canvas is framed to enclose every node with padding
    to spare and grows freely with the diagram; small diagrams re-centre within
-   a minimum canvas. Since compactness is no longer forced, a large story may
-   exceed the viewport — the zoom controls handle that.
+   a minimum canvas. Since compactness is not forced, a large story may exceed
+   the viewport — the zoom controls handle that.
 
 ## Interactivity (Alpine)
 
@@ -144,7 +150,7 @@ away:
 - **Hover, activity:** hovering any edge or work object of an activity
   highlights the whole activity (all its paths).
 - **Zoom:** the diagram viewport zooms in/out and pans, so a diagram that
-  outgrows the viewport (compactness is no longer forced — see step 3 above)
+  outgrows the viewport (compactness is not forced — see the layout algorithm)
   stays usable. Explicit **zoom-in / zoom-out / fit / reset** buttons, and
   **trackpad and mouse-wheel** support: pinch-to-zoom and ctrl/⌘+wheel zoom
   toward the cursor, two-finger scroll pans. Zoom is per-diagram view state and
@@ -167,11 +173,13 @@ Per the project's testing split:
 - **Python unit tests** on graph extraction (dedupe rules, numbering,
   connective edges) and on layout **invariants**: determinism (two runs, equal
   output), minimum pairwise node distance, all nodes within canvas, every
-  activity's edges present, label boxes non-overlapping, zero edge crossings,
-  the start node seated top-left, and — for a hub whose numbered spokes can be
-  freely reordered — each actor's fan ending up in **clockwise** number order
-  without costing a crossing. Positions are data — this is the data-shaped
-  contract.
+  activity's edges present, label boxes non-overlapping, **zero edge crossings
+  maintained through both construction and force refinement**, no edge running
+  over a foreign node, and the start node seated top-left. Plus the two
+  properties that make the force method work: construction adds activities in
+  numbered order (an earlier activity's new node placed before a later one's),
+  and the force phase never increases the crossing count. Positions are data —
+  this is the data-shaped contract.
 - **No markup-pinning tests.** The rendered page is Playwright-verified
   (console clean, switcher, replay, hovers, hash deep link, zoom in/out/fit
   buttons and wheel/trackpad zoom) before commit.
