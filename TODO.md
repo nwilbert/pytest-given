@@ -2,13 +2,19 @@
 
 ## Now
 
+- [ ] improve mouse navigation (zoom with scroll wheel, pan with hold)
+- [ ] improve hover effect on activity (thicken line)
+- [ ] remove OBJECT/ACTOR from description (redundant, is obvious from diagram)
+- [ ] does the glossary work for the verbs as well?
+- [ ] add skill to support Domain Storytelling session (update & regenerate diagram continously, update glossary)
+
 ## Next
 
+- [ ] update README with section on glossary
 - [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
 - [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
-- [ ] add the prepared diagram to the readme with Agent <-> Dev <-> Domain Expert
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
 - [ ] Narrate more backend tests into scenarios — continue the dogfood conversion, converting behaviour, not plumbing (leave schema/serde round-trips, metadata/protocol checks, and config parsing plain). In priority order:

@@ -123,9 +123,9 @@ def position_nodes(
         return {}, MIN_CANVAS_W, MIN_CANVAS_H
     sequence = _numbered_sequence(graph)
     fans = _actor_fans(graph)
-    grid = _construct_seed(graph)
-    grid = _refine_forces(grid, graph)
-    positions, width, height = _framed(grid)
+    placed = _construct_seed(graph)
+    placed = _refine_forces(placed, graph)
+    positions, width, height = _framed(placed)
     start = sequence[0][0] if sequence else None
     positions = _orient_start_top_left(positions, width, height, start, fans)
     return positions, width, height
@@ -992,25 +992,6 @@ def _actor_fans(graph: DiagramGraph) -> list[tuple[str, tuple[str, ...]]]:
     ]
 
 
-def _sequence_spread(
-    sequence: list[tuple[str, str]], position: dict[str, tuple[float, float]]
-) -> float:
-    """Total gap, in PREFERRED_DIST-widths, between the midpoints of
-    consecutively numbered activity edges. Minimizing it lines the numbered
-    steps up in reading order."""
-    midpoints = [
-        (
-            (position[source][0] + position[target][0]) / 2,
-            (position[source][1] + position[target][1]) / 2,
-        )
-        for source, target in sequence
-    ]
-    return sum(
-        math.hypot(later[0] - earlier[0], later[1] - earlier[1]) / PREFERRED_DIST
-        for earlier, later in itertools.pairwise(midpoints)
-    )
-
-
 def _clockwise_disorder(
     fans: list[tuple[str, tuple[str, ...]]],
     position: dict[str, tuple[float, float]],
@@ -1210,17 +1191,18 @@ def _segment_distance(
 
 
 def _framed(
-    grid: dict[str, tuple[float, float]],
+    placed: dict[str, tuple[float, float]],
 ) -> tuple[dict[str, tuple[float, float]], float, float]:
-    """Shift the grid so its top-left node sits at (PAD, PAD) and size the
-    canvas to enclose every node with PAD to spare, growing to the minimum
+    """Shift the placed layout so its top-left node sits at (PAD, PAD) and size
+    the canvas to enclose every node with PAD to spare, growing to the minimum
     canvas and re-centring smaller diagrams within it."""
-    xs = [x for x, _ in grid.values()]
-    ys = [y for _, y in grid.values()]
+    xs = [x for x, _ in placed.values()]
+    ys = [y for _, y in placed.values()]
     min_x, max_x = min(xs), max(xs)
     min_y, max_y = min(ys), max(ys)
     positions = {
-        node_id: (x - min_x + PAD, y - min_y + PAD) for node_id, (x, y) in grid.items()
+        node_id: (x - min_x + PAD, y - min_y + PAD)
+        for node_id, (x, y) in placed.items()
     }
     width = max(max_x - min_x + 2 * PAD, MIN_CANVAS_W)
     height = max(max_y - min_y + 2 * PAD, MIN_CANVAS_H)

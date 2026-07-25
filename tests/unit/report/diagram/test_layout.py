@@ -1,3 +1,4 @@
+import itertools
 import math
 import random
 
@@ -29,13 +30,13 @@ from pytest_given.report.diagram.layout import (
     MIN_NODE_DIST,
     NODE_HALF_H,
     NODE_HALF_W,
+    PREFERRED_DIST,
     LabelBox,
     _actor_fans,
     _clockwise_disorder,
     _min_pair_distance,
     _numbered_sequence,
     _orient_start_top_left,
-    _sequence_spread,
     _slide_label,
     position_nodes,
 )
@@ -219,8 +220,21 @@ def test_disjoint_stars_do_not_cross_and_keep_min_distance() -> None:
 
 
 def _sequence_spread_of(layout: DiagramLayout) -> float:
+    """Total gap, in PREFERRED_DIST-widths, between the midpoints of
+    consecutively numbered activity edges -- lower means the numbered steps line
+    up tighter in reading order. A test-only readability metric."""
     positions = {placed.node.id: (placed.x, placed.y) for placed in layout.nodes}
-    return _sequence_spread(_numbered_sequence(layout.graph), positions)
+    midpoints = [
+        (
+            (positions[source][0] + positions[target][0]) / 2,
+            (positions[source][1] + positions[target][1]) / 2,
+        )
+        for source, target in _numbered_sequence(layout.graph)
+    ]
+    return sum(
+        math.hypot(later[0] - earlier[0], later[1] - earlier[1]) / PREFERRED_DIST
+        for earlier, later in itertools.pairwise(midpoints)
+    )
 
 
 def test_sequence_term_pulls_numbered_steps_together(
@@ -639,14 +653,18 @@ def test_random_graphs_keep_layout_invariants() -> None:
     import warnings
 
     # These graphs are arbitrary (including actor->actor handoffs), so some
-    # seeds are genuinely non-planar; a forced-crossing warning is expected
-    # here and is not the property under test (the dedicated K5 test above
-    # asserts the warning itself). Silence it so it doesn't pollute the run.
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
+    # seeds are genuinely non-planar; a forced-crossing warning is expected on
+    # those and is not the property under test (the dedicated K5 test above
+    # asserts the warning itself). Rather than blanket-silence it, we record
+    # warnings and assert the sharper property: a graph that drew *no* warning
+    # must be perfectly crossing-free -- the invariant is only ever relaxed on a
+    # genuinely non-planar seed, never silently.
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
         for seed in range(100):
             rng = random.Random(seed)
             graph = _random_story_graph(rng)
+            warned_before = len(caught)
             positions, width, height = position_nodes(graph)
             assert position_nodes(graph) == (positions, width, height)  # deterministic
             coords = list(positions.values())
@@ -656,7 +674,9 @@ def test_random_graphs_keep_layout_invariants() -> None:
                 for sx, sy in coords[index + 1 :]:
                     assert math.hypot(sx - fx, sy - fy) >= MIN_NODE_DIST - 1e-6
             # layout_graph exercises the edge/label passes too (must not raise).
-            layout_graph(graph)
+            layout = layout_graph(graph)
+            if len(caught) == warned_before:  # this graph warned nowhere
+                assert count_crossings(layout.edges) == 0
 
 
 def _random_tree_graph(rng: random.Random) -> DiagramGraph:
