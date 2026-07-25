@@ -591,3 +591,49 @@ def test_random_trees_have_no_crossings() -> None:
         rng = random.Random(seed)
         graph = _random_tree_graph(rng)
         assert count_crossings(layout_graph(graph).edges) == 0, f'seed {seed}'
+
+
+def test_move_is_valid_gates_on_crossings_grazes_and_distance() -> None:
+    from pytest_given.report.diagram.layout import (
+        MIN_NODE_DIST,
+        _grazes,
+        _min_pair_distance,
+        _move_is_valid,
+    )
+
+    # A clean two-edge fan: no crossings, no grazes, nodes far apart.
+    positions = {
+        'a': (0.0, 0.0),
+        'b': (400.0, -100.0),
+        'c': (400.0, 160.0),
+    }
+    directed = [('a', 'b'), ('a', 'c')]
+    assert _min_pair_distance(positions) >= MIN_NODE_DIST
+    assert _grazes(positions, directed) == 0
+    assert _move_is_valid(positions, directed, base_crossings=0, base_grazes=0)
+
+    # Push c onto the a->b segment: now a graze appears, so the gate rejects.
+    grazed = {**positions, 'c': (200.0, 5.0)}
+    assert _grazes(grazed, directed) >= 1
+    assert not _move_is_valid(grazed, directed, base_crossings=0, base_grazes=0)
+
+    # Two nodes closer than MIN_NODE_DIST: rejected on distance alone.
+    close = {'a': (0.0, 0.0), 'b': (10.0, 0.0)}
+    assert not _move_is_valid(close, [], base_crossings=0, base_grazes=0)
+
+    # An X of two edges sharing no node: one crossing, no grazes, nodes far
+    # apart. Rejected when the baseline tolerates none; accepted once the
+    # baseline already allows that one crossing.
+    crossed = {
+        'p1': (0.0, 0.0),
+        'p2': (400.0, 300.0),
+        'p3': (0.0, 300.0),
+        'p4': (400.0, 0.0),
+    }
+    crossed_directed = [('p1', 'p2'), ('p3', 'p4')]
+    assert _min_pair_distance(crossed) >= MIN_NODE_DIST
+    assert _grazes(crossed, crossed_directed) == 0
+    assert not _move_is_valid(
+        crossed, crossed_directed, base_crossings=0, base_grazes=0
+    )
+    assert _move_is_valid(crossed, crossed_directed, base_crossings=1, base_grazes=0)

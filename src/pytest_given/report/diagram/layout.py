@@ -31,12 +31,34 @@ from dataclasses import dataclass
 from .graph import DiagramEdge, DiagramGraph, DiagramNode
 
 MARGIN = 90.0
-COL_SPACING = 320.0  # horizontal gap between layers; must stay > MIN_NODE_DIST
-ROW_SPACING = 260.0  # vertical gap between rows;    must stay > MIN_NODE_DIST
-MIN_NODE_DIST = 250.0
 PAD = 180.0  # canvas padding around the outermost node centres
 MIN_CANVAS_W = 1080.0
 MIN_CANVAS_H = 620.0
+MIN_NODE_DIST = 250.0  # hard floor: nodes never closer than this
+PREFERRED_DIST = 300.0  # equilibrium spacing of the node pair-potential
+EDGE_REST_LENGTH = 300.0  # spring rest length for a connected pair
+INFLUENCE_RADIUS = 900.0  # beyond this, the pair-potential exerts no force
+NODE_ON_EDGE_CLEARANCE = 70.0  # how near a segment a foreign node may sit
+
+# Construction (Phase 1)
+CONSTRUCT_RADIUS = 300.0  # first radius tried when seating a new node
+CONSTRUCT_ANGLE_STEPS = 72  # candidate directions swept per radius (every 5deg)
+RADIUS_GROWTH = 1.25  # radius multiplier when no direction is crossing-free
+MAX_RADIUS_STEPS = 24  # growth attempts before the (near-unreachable) fallback
+DEFAULT_DIRECTION = 0.0  # preferred first-spoke angle (east; y-down screen)
+
+# Force refinement (Phase 2)
+FORCE_ITERATIONS = 400
+MAX_STEP = 60.0  # displacement cap per node per iteration (px)
+SPRING_K = 0.10  # edge spring stiffness
+REPULSION_K = 0.60  # short-range push below PREFERRED_DIST
+ATTRACT_K = 0.02  # bounded long-range pull toward PREFERRED_DIST
+SEQUENCE_K = 0.03  # gentle pull between consecutive numbered targets
+
+# --- Old grid-layout constants below, still used by the grid code that Task 2
+# removes; kept here for now so the still-present grid functions keep working.
+COL_SPACING = 320.0  # horizontal gap between layers; must stay > MIN_NODE_DIST
+ROW_SPACING = 260.0  # vertical gap between rows;    must stay > MIN_NODE_DIST
 BARYCENTRE_SWEEPS = 6
 SEARCH_ROUNDS = 40
 SLOT_MARGIN = 2  # empty slots to probe above/below a layer during local search
@@ -75,7 +97,6 @@ LENGTH_SPREAD_COST = 1.0  # per (edge length / column-width)^2: low length varia
 HEIGHT_COST = 0.0  # per row of total vertical span (disabled; see above)
 LENGTH_COST = 0.001
 COLLINEAR_DEG = 8.0  # two edges from a shared node this close in angle overlap
-NODE_ON_EDGE_CLEARANCE = 70.0  # how near a segment a foreign node may sit
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -656,6 +677,53 @@ def _point_near_segment(
         return False
     proj_x, proj_y = start[0] + t * seg_x, start[1] + t * seg_y
     return math.hypot(point[0] - proj_x, point[1] - proj_y) <= clearance
+
+
+def _grazes(
+    positions: dict[str, tuple[float, float]],
+    directed: list[tuple[str, str]],
+) -> int:
+    """(edge, foreign-node) pairs where the node sits within
+    NODE_ON_EDGE_CLEARANCE of the edge -- an arrow running over an unrelated
+    node, which the hard invariant forbids."""
+    count = 0
+    for source, target in directed:
+        start, end = positions[source], positions[target]
+        for node_id, point in positions.items():
+            if node_id in (source, target):
+                continue
+            if _point_near_segment(point, start, end, NODE_ON_EDGE_CLEARANCE):
+                count += 1
+    return count
+
+
+def _min_pair_distance(positions: dict[str, tuple[float, float]]) -> float:
+    coords = list(positions.values())
+    smallest = math.inf
+    for index, (first_x, first_y) in enumerate(coords):
+        for second_x, second_y in coords[index + 1 :]:
+            smallest = min(smallest, math.hypot(second_x - first_x, second_y - first_y))
+    return smallest
+
+
+def _move_is_valid(
+    positions: dict[str, tuple[float, float]],
+    directed: list[tuple[str, str]],
+    base_crossings: int,
+    base_grazes: int,
+) -> bool:
+    """The hard-invariant gate: a candidate arrangement is accepted only when it
+    keeps edge crossings and node grazes no worse than the baseline and no two
+    nodes are closer than MIN_NODE_DIST."""
+    segments = [
+        (positions[source], positions[target], source, target)
+        for source, target in directed
+    ]
+    if _count_overlaps(segments) > base_crossings:
+        return False
+    if _grazes(positions, directed) > base_grazes:
+        return False
+    return _min_pair_distance(positions) >= MIN_NODE_DIST - 1e-6
 
 
 def _segment_distance(
