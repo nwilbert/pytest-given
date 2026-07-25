@@ -42,6 +42,7 @@ class DiagramEdge:
     activity_id: ActivityId
     number: int | None  # sequence badge: set on each path's first edge
     connective: bool  # True when the part was a bare-string ActivityWord
+    term_id: TermId | None = None  # the verb's glossary term (None for connectives)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -70,6 +71,11 @@ def build_graph(story: Story, glossary: Glossary | None) -> DiagramGraph:
                         activity_id=activity.id,
                         number=int(activity.id) if position == 1 else None,
                         connective=isinstance(part, ActivityWord),
+                        term_id=(
+                            part.term_id
+                            if isinstance(part, ActivityTermRef)
+                            else None
+                        ),
                     )
                 )
     return DiagramGraph(

@@ -5,6 +5,7 @@ from pytest_given.model import (
     Glossary,
     Story,
     StoryId,
+    TermId,
 )
 from pytest_given.report.diagram import build_graph
 
@@ -35,6 +36,23 @@ def test_edge_numbering_first_edge_of_each_path(
     connectives = [e for e in graph.edges if e.connective]
     assert {e.label for e in connectives} == {'to', 'redeems'}
     assert all(e.number is None for e in connectives if e.label == 'to')
+
+
+def test_verb_edges_carry_their_glossary_term(
+    trip_story: Story, trip_glossary: Glossary
+) -> None:
+    graph = build_graph(trip_story, trip_glossary)
+    by_label = {}
+    for edge in graph.edges:
+        by_label.setdefault(edge.label, edge)
+    # A glossary verb carries its term id, so the diagram can surface its
+    # definition on hover -- the glossary reaches the verbs, not just the nodes.
+    assert by_label['adds'].term_id == TermId('add')
+    assert by_label['confirms'].term_id == TermId('confirm')
+    assert by_label['sends'].term_id == TermId('send')
+    # Bare-word connectives are not glossary terms: no term id, no tooltip.
+    assert by_label['to'].term_id is None
+    assert by_label['redeems'].term_id is None
 
 
 def test_kindless_term_is_work_object_off_position_zero(

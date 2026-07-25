@@ -24,13 +24,18 @@
 {%- macro edge_label(placed) %}
 {% set cx = placed.label.x %}
 {% set cy = placed.label.y + placed.label.height - 6 %}
+{# A verb that is a glossary term (has term_id) shows its definition on hover,
+   just like the actor/object nodes -- so the glossary reaches the verbs too.
+   Bare connectives ("to", "for") carry no term_id and stay inert. #}
+{% set verb_class = 'verb' + (' conn' if placed.edge.connective else '') + (' has-def' if placed.edge.term_id else '') %}
 {% if placed.edge.number is not none %}
 <circle cx="{{ (cx + 11) | round }}" cy="{{ (cy - 5) | round }}" r="11" class="numbg"/>
 <text x="{{ (cx + 11) | round }}" y="{{ (cy - 1) | round }}" class="num">{{ placed.edge.number }}</text>
-<text x="{{ (cx + 27) | round }}" y="{{ (cy - 1) | round }}" class="verb{{ ' conn' if placed.edge.connective }}">{{ placed.edge.label }}</text>
+<text x="{{ (cx + 27) | round }}" y="{{ (cy - 1) | round }}" class="{{ verb_class }}"
+      {% if placed.edge.term_id %}@mouseenter='showTip($event, {{ placed.edge.label | tojson }}, {{ placed.edge.term_id | tojson }})' @mouseleave="tooltip = null"{% endif %}>{{ placed.edge.label }}</text>
 {% else %}
-<text x="{{ cx | round }}" y="{{ (cy - 1) | round }}"
-      class="verb {{ 'conn' if placed.edge.connective }}">{{ placed.edge.label }}</text>
+<text x="{{ cx | round }}" y="{{ (cy - 1) | round }}" class="{{ verb_class }}"
+      {% if placed.edge.term_id %}@mouseenter='showTip($event, {{ placed.edge.label | tojson }}, {{ placed.edge.term_id | tojson }})' @mouseleave="tooltip = null"{% endif %}>{{ placed.edge.label }}</text>
 {% endif %}
 {% endmacro -%}
 <!doctype html>
@@ -85,7 +90,13 @@
         <button @click="resetZoom()" title="Reset to 100%">100%</button>
         <span class="zoom-level" x-text="Math.round(zoom * 100) + '%'"></span>
       </div>
-      <div class="canvas" x-ref="canvas_{{ story.story_id }}" @wheel.prevent="onWheel($event)">
+      <div class="canvas" x-ref="canvas_{{ story.story_id }}"
+           :class="{ grabbing: dragging }"
+           @wheel.prevent="onWheel($event)"
+           @pointerdown="onPointerDown($event)"
+           @pointermove="onPointerMove($event)"
+           @pointerup="onPointerUp($event)"
+           @pointercancel="onPointerUp($event)">
         <div class="zoom-surface" :style="surfaceStyle()">
       <svg width="{{ view.layout.width | round | int }}" height="{{ view.layout.height | round | int }}"
            viewBox="0 0 {{ view.layout.width | round | int }} {{ view.layout.height | round | int }}">
@@ -100,7 +111,7 @@
         {# per-activity groups: edges + this activity's work-object nodes #}
         {% for activity in view.layout.graph.edges | map(attribute='activity_id') | unique %}
         <g class="activity"
-           :class="{ faded: faded({{ activity }}), dimmed: hoverActivity !== null && hoverActivity !== {{ activity }} }"
+           :class="{ faded: faded({{ activity }}), hovered: hoverActivity === {{ activity }} }"
            @mouseenter="hoverActivity = {{ activity }}" @mouseleave="hoverActivity = null">
           {% for placed in view.layout.edges if placed.edge.activity_id == activity %}
           {% if placed.loop %}
@@ -149,7 +160,6 @@
   <template x-if="tooltip">
     <div>
       <div class="tooltip-title" x-text="tooltip.title"></div>
-      <div class="tooltip-kind" x-text="tooltip.kind || 'unclassified'"></div>
       <div class="tooltip-def" x-text="tooltip.definition || 'No definition yet.'"></div>
     </div>
   </template>
@@ -163,6 +173,7 @@ function diagramsApp() {
   return {
     selectedStory: null, step: null, hoverActivity: null, tooltip: null,
     zoom: 1, panX: 0, panY: 0,
+    dragging: false, _lastX: 0, _lastY: 0,
     maxSteps: MAX_STEPS,
     init() {
       let hash;
@@ -235,22 +246,43 @@ function diagramsApp() {
       const rect = el.getBoundingClientRect();
       const cx = event.clientX - rect.left;
       const cy = event.clientY - rect.top;
-      // Trackpad pinch and ctrl/cmd + wheel arrive as wheel events with
-      // ctrlKey/metaKey set -> zoom toward the cursor. A plain two-finger
-      // scroll (no modifier) pans.
-      if (event.ctrlKey || event.metaKey) {
-        const factor = Math.exp(-event.deltaY * 0.01);
-        this._setZoom(this.zoom * factor, cx, cy);
-      } else {
-        this.panX -= event.deltaX;
-        this.panY -= event.deltaY;
+      // The scroll wheel zooms toward the cursor. Trackpad pinch and ctrl/cmd +
+      // wheel arrive with ctrlKey/metaKey set and much smaller deltas, so they
+      // get a finer per-tick factor for the same smooth feel. Panning is by
+      // click-and-drag (onPointerDown), not by scrolling.
+      const rate = (event.ctrlKey || event.metaKey) ? 0.01 : 0.0015;
+      this._setZoom(this.zoom * Math.exp(-event.deltaY * rate), cx, cy);
+    },
+    onPointerDown(event) {
+      // Primary-button press starts a pan-drag. Pointer capture keeps the drag
+      // alive even when the cursor leaves the canvas mid-drag.
+      if (event.button !== 0) return;
+      this.dragging = true;
+      this._lastX = event.clientX;
+      this._lastY = event.clientY;
+      const el = this._canvasEl();
+      if (el && el.setPointerCapture) el.setPointerCapture(event.pointerId);
+    },
+    onPointerMove(event) {
+      if (!this.dragging) return;
+      this.panX += event.clientX - this._lastX;
+      this.panY += event.clientY - this._lastY;
+      this._lastX = event.clientX;
+      this._lastY = event.clientY;
+    },
+    onPointerUp(event) {
+      if (!this.dragging) return;
+      this.dragging = false;
+      const el = this._canvasEl();
+      if (el && el.releasePointerCapture) {
+        try { el.releasePointerCapture(event.pointerId); } catch (err) { /* not captured */ }
       }
     },
     faded(n) { return this.step !== null && n > this.step; },
     showTip(event, title, termId) {
       const info = TERM_INFO[termId] || {};
       this.tooltip = { x: event.clientX, y: event.clientY,
-                       title: title, kind: info.kind, definition: info.definition };
+                       title: title, definition: info.definition };
     },
   };
 }
