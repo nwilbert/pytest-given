@@ -105,13 +105,22 @@ crossing-free region the invariant permits.
    node's anchor at a preferred edge-length radius, and the radius grows outward
    until a crossing-free one exists (for a node joining through tree edges there
    is always a free direction in open space, so this terminates). Among the
-   crossing-free candidates the shortest-arrow one wins. Every node therefore
-   *starts* at zero crossings.
+   crossing-free candidates, preference goes first to **continuing the clockwise
+   sweep** of the anchor's fan — each actor's spokes advancing clockwise as the
+   number rises, so the fan reads 1 → 2 → 3 in order — and then to the shortest
+   arrow. Every node therefore *starts* at zero crossings.
 2. **Planarity-preserving force refinement.** A deterministic spring embedder
    (no RNG; fixed iteration count and cooling schedule) then relaxes the seed:
-   edges pull toward a rest length, node pairs repel below the minimum distance,
-   and a gentle **sequence spring** pulls consecutively numbered activities
-   together. Each iteration proposes a per-node displacement but **accepts it
+   edges pull toward a rest length; every node pair interacts through a
+   **preferred-distance potential** — repelling when closer than a comfortable
+   spacing but gently *attracting* when farther apart, so nodes settle close
+   together without overlapping rather than splaying to the maximum angle (a
+   three-spoke fan stays tight, not spread to 120°). The hard minimum node
+   distance remains an absolute floor beneath that preferred spacing, and the
+   long-range attraction is bounded so it tightens fans without hard-forcing
+   overall compactness (zoom still owns fit-to-screen). A gentle **sequence
+   spring** also pulls consecutively numbered activities together. Each
+   iteration proposes a per-node displacement but **accepts it
    only if the whole layout stays crossing-free, overlap-free, and free of any
    edge running over a foreign node**; an unsafe displacement is binary-searched
    back to the largest safe step. Because the layout starts crossing-free and no
@@ -130,7 +139,10 @@ crossing-free region the invariant permits.
 4. **Start reads from the top-left.** The whole diagram is then reflected (an
    axis-aligned isometry — it preserves every crossing and every distance, so
    arrow lengths and sequence spacing are untouched) to seat the story's start
-   node, activity 1's initiator, nearest the top-left corner.
+   node, activity 1's initiator, nearest the top-left corner. The reflection is
+   chosen clockwise-aware: a single-axis flip reverses handedness, so the flip
+   that best seats the start is picked so it cannot silently undo the fans'
+   clockwise order.
 5. **Label pass.** Each edge label (number badge + verb) starts at the edge
    midpoint, offset perpendicular, and slides along its edge until it overlaps
    neither node icons (including node text) nor previously placed labels.
@@ -175,11 +187,12 @@ Per the project's testing split:
   output), minimum pairwise node distance, all nodes within canvas, every
   activity's edges present, label boxes non-overlapping, **zero edge crossings
   maintained through both construction and force refinement**, no edge running
-  over a foreign node, and the start node seated top-left. Plus the two
-  properties that make the force method work: construction adds activities in
-  numbered order (an earlier activity's new node placed before a later one's),
-  and the force phase never increases the crossing count. Positions are data —
-  this is the data-shaped contract.
+  over a foreign node, and the start node seated top-left. Plus the properties
+  that make the force method work: construction adds activities in numbered
+  order (an earlier activity's new node placed before a later one's), the force
+  phase never increases the crossing count, and — for a hub whose numbered
+  spokes can be freely placed — each actor's fan reads in **clockwise** number
+  order. Positions are data — this is the data-shaped contract.
 - **No markup-pinning tests.** The rendered page is Playwright-verified
   (console clean, switcher, replay, hovers, hash deep link, zoom in/out/fit
   buttons and wheel/trackpad zoom) before commit.
