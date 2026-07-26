@@ -33,10 +33,12 @@ Storytelling*):
   it leaves room for the "different instances involved" reading.
 - **Verbs are labeled arrows.** The first edge of each path carries the
   activity's sequence number in a badge; bare-string connectives (`'to'`,
-  `'for'`) at later positions are unnumbered edges with the connective as a
-  muted label. A bare word sitting at a path's *first* edge position still
-  carries the number badge — every activity stays readable by number — with
-  the muted styling alone signalling that it is not a glossary verb.
+  `'for'`) at later positions are unnumbered edges. Connectives are drawn
+  exactly like glossary verbs — same arrow, same label — so every arrow in an
+  activity matches; only the number badge (present on each path's first edge)
+  and the glossary tooltip (verbs only) tell them apart. A bare word sitting at
+  a path's *first* edge position still carries the number badge, so every
+  activity stays readable by number.
 - **Icons (v1):** one glyph for actors (person), one for work objects
   (document). A term that is still kindless after kind inference gets the
   work-object glyph when it sits in a node position.

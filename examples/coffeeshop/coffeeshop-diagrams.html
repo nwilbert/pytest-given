@@ -38,20 +38,18 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 .glyph { fill: none; stroke: #1a1a2e; stroke-width: 2.2; }
 .doc { fill: #fff; }
 .edge-hit { stroke: transparent; stroke-width: 12; fill: none; pointer-events: stroke; }
-.edge { stroke: #5b5b6e; stroke-width: 1.6; fill: none; transition: stroke-width .12s ease, stroke .12s ease, filter .12s ease; }
-.edge.connective { stroke-dasharray: none; stroke: #8a8a98; }
+.edge { stroke: #5b5b6e; stroke-width: 1.6; fill: none; transition: stroke-width .12s ease, filter .12s ease; }
 /* Hovering an activity emphasises its own arrows so the whole activity (all its
    paths) reads as one: a modest thickening plus an orange glow (a drop-shadow
    halo, not a stroke recolour -- an orange stroke blends into the orange step
-   badges). Connective segments unify to the primary grey on hover so a
-   multi-arrow path reads as a single continuous line. Nothing else in the
-   diagram changes; the other activities keep their exact appearance. */
-.activity.hovered .edge { stroke-width: 2.4; stroke: #5b5b6e; filter: drop-shadow(0 0 2.5px #e07a2f) drop-shadow(0 0 1.5px #e07a2f); }
+   badges). Nothing else in the diagram changes; the other activities keep their
+   exact appearance. Connectives are drawn exactly like verbs -- same line, same
+   label -- so every arrow in an activity matches. */
+.activity.hovered .edge { stroke-width: 2.4; filter: drop-shadow(0 0 2.5px #e07a2f) drop-shadow(0 0 1.5px #e07a2f); }
 .arrowhead { fill: #5b5b6e; }
 .label { text-anchor: middle; font-size: 14px; font-weight: 600; fill: #1a1a2e; }
 .sublabel { text-anchor: middle; font-size: 11px; fill: #6b6b7a; }
 .verb { font-size: 12.5px; fill: #333; font-style: italic; }
-.verb.conn { fill: #8a8a98; }
 .verb.has-def { cursor: help; }
 .num { text-anchor: middle; font-size: 11px; font-weight: 700; fill: #fff; }
 .numbg { fill: #e07a2f; }

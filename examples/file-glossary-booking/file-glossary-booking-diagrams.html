@@ -38,20 +38,18 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 .glyph { fill: none; stroke: #1a1a2e; stroke-width: 2.2; }
 .doc { fill: #fff; }
 .edge-hit { stroke: transparent; stroke-width: 12; fill: none; pointer-events: stroke; }
-.edge { stroke: #5b5b6e; stroke-width: 1.6; fill: none; transition: stroke-width .12s ease, stroke .12s ease, filter .12s ease; }
-.edge.connective { stroke-dasharray: none; stroke: #8a8a98; }
+.edge { stroke: #5b5b6e; stroke-width: 1.6; fill: none; transition: stroke-width .12s ease, filter .12s ease; }
 /* Hovering an activity emphasises its own arrows so the whole activity (all its
    paths) reads as one: a modest thickening plus an orange glow (a drop-shadow
    halo, not a stroke recolour -- an orange stroke blends into the orange step
-   badges). Connective segments unify to the primary grey on hover so a
-   multi-arrow path reads as a single continuous line. Nothing else in the
-   diagram changes; the other activities keep their exact appearance. */
-.activity.hovered .edge { stroke-width: 2.4; stroke: #5b5b6e; filter: drop-shadow(0 0 2.5px #e07a2f) drop-shadow(0 0 1.5px #e07a2f); }
+   badges). Nothing else in the diagram changes; the other activities keep their
+   exact appearance. Connectives are drawn exactly like verbs -- same line, same
+   label -- so every arrow in an activity matches. */
+.activity.hovered .edge { stroke-width: 2.4; filter: drop-shadow(0 0 2.5px #e07a2f) drop-shadow(0 0 1.5px #e07a2f); }
 .arrowhead { fill: #5b5b6e; }
 .label { text-anchor: middle; font-size: 14px; font-weight: 600; fill: #1a1a2e; }
 .sublabel { text-anchor: middle; font-size: 11px; fill: #6b6b7a; }
 .verb { font-size: 12.5px; fill: #333; font-style: italic; }
-.verb.conn { fill: #8a8a98; }
 .verb.has-def { cursor: help; }
 .num { text-anchor: middle; font-size: 11px; font-weight: 700; fill: #fff; }
 .numbg { fill: #e07a2f; }
@@ -133,7 +131,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="487.0" y1="214.0"
                 x2="662.0" y2="189.0"/>
-          <line class="edge connective"
+          <line class="edge"
                 x1="487.0" y1="214.0"
                 x2="662.0" y2="189.0"
                 marker-end="url(#arrow-book-a-room)"/>
@@ -146,7 +144,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
 <circle cx="545.0" cy="218.0" r="11" class="numbg"/>
 <text x="545.0" y="222.0" class="num">1</text>
-<text x="561.0" y="222.0" class="verb conn"
+<text x="561.0" y="222.0" class="verb"
       >browses</text>
 
 
@@ -178,7 +176,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="469.0" y1="263.0"
                 x2="602.0" y2="414.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="469.0" y1="263.0"
                 x2="602.0" y2="414.0"
                 marker-end="url(#arrow-book-a-room)"/>
@@ -223,7 +221,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="417.0" y1="275.0"
                 x2="371.0" y2="446.0"/>
-          <line class="edge connective"
+          <line class="edge"
                 x1="417.0" y1="275.0"
                 x2="371.0" y2="446.0"
                 marker-end="url(#arrow-book-a-room)"/>
@@ -236,7 +234,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
 <circle cx="341.0" cy="355.0" r="11" class="numbg"/>
 <text x="341.0" y="359.0" class="num">3</text>
-<text x="357.0" y="359.0" class="verb conn"
+<text x="357.0" y="359.0" class="verb"
       >receives</text>
 
 

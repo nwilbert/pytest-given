@@ -38,20 +38,18 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 .glyph { fill: none; stroke: #1a1a2e; stroke-width: 2.2; }
 .doc { fill: #fff; }
 .edge-hit { stroke: transparent; stroke-width: 12; fill: none; pointer-events: stroke; }
-.edge { stroke: #5b5b6e; stroke-width: 1.6; fill: none; transition: stroke-width .12s ease, stroke .12s ease, filter .12s ease; }
-.edge.connective { stroke-dasharray: none; stroke: #8a8a98; }
+.edge { stroke: #5b5b6e; stroke-width: 1.6; fill: none; transition: stroke-width .12s ease, filter .12s ease; }
 /* Hovering an activity emphasises its own arrows so the whole activity (all its
    paths) reads as one: a modest thickening plus an orange glow (a drop-shadow
    halo, not a stroke recolour -- an orange stroke blends into the orange step
-   badges). Connective segments unify to the primary grey on hover so a
-   multi-arrow path reads as a single continuous line. Nothing else in the
-   diagram changes; the other activities keep their exact appearance. */
-.activity.hovered .edge { stroke-width: 2.4; stroke: #5b5b6e; filter: drop-shadow(0 0 2.5px #e07a2f) drop-shadow(0 0 1.5px #e07a2f); }
+   badges). Nothing else in the diagram changes; the other activities keep their
+   exact appearance. Connectives are drawn exactly like verbs -- same line, same
+   label -- so every arrow in an activity matches. */
+.activity.hovered .edge { stroke-width: 2.4; filter: drop-shadow(0 0 2.5px #e07a2f) drop-shadow(0 0 1.5px #e07a2f); }
 .arrowhead { fill: #5b5b6e; }
 .label { text-anchor: middle; font-size: 14px; font-weight: 600; fill: #1a1a2e; }
 .sublabel { text-anchor: middle; font-size: 11px; fill: #6b6b7a; }
 .verb { font-size: 12.5px; fill: #333; font-style: italic; }
-.verb.conn { fill: #8a8a98; }
 .verb.has-def { cursor: help; }
 .num { text-anchor: middle; font-size: 11px; font-weight: 700; fill: #fff; }
 .numbg { fill: #e07a2f; }
@@ -140,7 +138,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="663.0" y1="391.0"
                 x2="793.0" y2="347.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="663.0" y1="391.0"
                 x2="793.0" y2="347.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -185,7 +183,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="645.0" y1="453.0"
                 x2="726.0" y2="555.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="645.0" y1="453.0"
                 x2="726.0" y2="555.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -230,7 +228,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="573.0" y1="452.0"
                 x2="472.0" y2="570.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="573.0" y1="452.0"
                 x2="472.0" y2="570.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -252,7 +250,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="469.0" y1="659.0"
                 x2="560.0" y2="752.0"/>
-          <line class="edge connective"
+          <line class="edge"
                 x1="469.0" y1="659.0"
                 x2="560.0" y2="752.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -263,7 +261,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
 
 
-<text x="513.0" y="743.0" class="verb conn"
+<text x="513.0" y="743.0" class="verb"
       >to</text>
 
 
@@ -272,7 +270,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="663.0" y1="428.0"
                 x2="949.0" y2="529.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="663.0" y1="428.0"
                 x2="949.0" y2="529.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -294,7 +292,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="962.0" y1="579.0"
                 x2="660.0" y2="764.0"/>
-          <line class="edge connective"
+          <line class="edge"
                 x1="962.0" y1="579.0"
                 x2="660.0" y2="764.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -305,7 +303,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
 
 
-<text x="742.0" y="689.0" class="verb conn"
+<text x="742.0" y="689.0" class="verb"
       >to</text>
 
 
@@ -337,7 +335,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="554.0" y1="404.0"
                 x2="397.0" y2="387.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="554.0" y1="404.0"
                 x2="397.0" y2="387.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -359,7 +357,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="303.0" y1="428.0"
                 x2="215.0" y2="564.0"/>
-          <line class="edge connective"
+          <line class="edge"
                 x1="303.0" y1="428.0"
                 x2="215.0" y2="564.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -370,7 +368,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
 
 
-<text x="229.0" y="489.0" class="verb conn"
+<text x="229.0" y="489.0" class="verb"
       >for</text>
 
 
@@ -418,7 +416,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="983.0" y1="784.0"
                 x2="1113.0" y2="758.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="983.0" y1="784.0"
                 x2="1113.0" y2="758.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -463,7 +461,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="879.0" y1="824.0"
                 x2="575.0" y2="1000.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="879.0" y1="824.0"
                 x2="575.0" y2="1000.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -485,7 +483,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="507.0" y1="977.0"
                 x2="443.0" y2="681.0"/>
-          <line class="edge connective"
+          <line class="edge"
                 x1="507.0" y1="977.0"
                 x2="443.0" y2="681.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -496,7 +494,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
 
 
-<text x="482.0" y="828.0" class="verb conn"
+<text x="482.0" y="828.0" class="verb"
       >to</text>
 
 
@@ -505,7 +503,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="559.0" y1="993.0"
                 x2="964.0" y2="595.0"/>
-          <line class="edge connective"
+          <line class="edge"
                 x1="559.0" y1="993.0"
                 x2="964.0" y2="595.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -516,7 +514,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
 
 
-<text x="763.0" y="810.0" class="verb conn"
+<text x="763.0" y="810.0" class="verb"
       >to</text>
 
 
@@ -548,7 +546,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="588.0" y1="358.0"
                 x2="535.0" y2="239.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="588.0" y1="358.0"
                 x2="535.0" y2="239.0"
                 marker-end="url(#arrow-book-a-group-trip)"/>
@@ -706,7 +704,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="295.0" y1="377.0"
                 x2="399.0" y2="232.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="295.0" y1="377.0"
                 x2="399.0" y2="232.0"
                 marker-end="url(#arrow-cancel-a-booking)"/>
@@ -751,7 +749,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="582.0" y1="405.0"
                 x2="687.0" y2="279.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="582.0" y1="405.0"
                 x2="687.0" y2="279.0"
                 marker-end="url(#arrow-cancel-a-booking)"/>
@@ -773,7 +771,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="745.0" y1="283.0"
                 x2="799.0" y2="458.0"/>
-          <line class="edge connective"
+          <line class="edge"
                 x1="745.0" y1="283.0"
                 x2="799.0" y2="458.0"
                 marker-end="url(#arrow-cancel-a-booking)"/>
@@ -784,7 +782,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
 
 
-<text x="740.0" y="379.0" class="verb conn"
+<text x="740.0" y="379.0" class="verb"
       >for</text>
 
 
@@ -832,7 +830,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="519.0" y1="496.0"
                 x2="440.0" y2="635.0"/>
-          <line class="edge "
+          <line class="edge"
                 x1="519.0" y1="496.0"
                 x2="440.0" y2="635.0"
                 marker-end="url(#arrow-cancel-a-booking)"/>
@@ -854,7 +852,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
           <line class="edge-hit"
                 x1="382.0" y1="642.0"
                 x2="293.0" y2="478.0"/>
-          <line class="edge connective"
+          <line class="edge"
                 x1="382.0" y1="642.0"
                 x2="293.0" y2="478.0"
                 marker-end="url(#arrow-cancel-a-booking)"/>
@@ -865,7 +863,7 @@ main > section { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 
 
 
-<text x="342.0" y="554.0" class="verb conn"
+<text x="342.0" y="554.0" class="verb"
       >to</text>
 
 

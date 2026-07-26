@@ -27,7 +27,7 @@
 {# A verb that is a glossary term (has term_id) shows its definition on hover,
    just like the actor/object nodes -- so the glossary reaches the verbs too.
    Bare connectives ("to", "for") carry no term_id and stay inert. #}
-{% set verb_class = 'verb' + (' conn' if placed.edge.connective else '') + (' has-def' if placed.edge.term_id else '') %}
+{% set verb_class = 'verb' + (' has-def' if placed.edge.term_id else '') %}
 {% if placed.edge.number is not none %}
 <circle cx="{{ (cx + 11) | round }}" cy="{{ (cy - 5) | round }}" r="11" class="numbg"/>
 <text x="{{ (cx + 11) | round }}" y="{{ (cy - 1) | round }}" class="num">{{ placed.edge.number }}</text>
@@ -121,13 +121,13 @@
              real pointer, so hovering to dim other activities needs a fatter
              (but invisible) hit-strip along the same path. #}
           <path class="edge-hit" d="{{ loop_d }}"/>
-          <path class="edge {{ 'connective' if placed.edge.connective }}"
+          <path class="edge"
                 marker-end="url(#arrow-{{ story.story_id }})" d="{{ loop_d }}"/>
           {% else %}
           <line class="edge-hit"
                 x1="{{ placed.x1 | round }}" y1="{{ placed.y1 | round }}"
                 x2="{{ placed.x2 | round }}" y2="{{ placed.y2 | round }}"/>
-          <line class="edge {{ 'connective' if placed.edge.connective }}"
+          <line class="edge"
                 x1="{{ placed.x1 | round }}" y1="{{ placed.y1 | round }}"
                 x2="{{ placed.x2 | round }}" y2="{{ placed.y2 | round }}"
                 marker-end="url(#arrow-{{ story.story_id }})"/>
