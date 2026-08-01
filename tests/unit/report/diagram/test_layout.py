@@ -149,6 +149,38 @@ def test_seed_is_crossing_free_and_spaced_on_a_tree() -> None:
     assert _min_pair_distance(seed) >= MIN_NODE_DIST - 1e-6
 
 
+def test_snap_alignment_pulls_near_coordinates_onto_a_shared_line() -> None:
+    """Two connected nodes whose y-coordinates already nearly agree are pulled
+    onto one horizontal line, so the edge reads as an intentional straight run."""
+    from pytest_given.report.diagram.layout import _snap_alignment
+
+    nodes = (_actor('a'), _work('b'))
+    edges = (_edge('a', 'b', number=1),)
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    refined = {'a': (0.0, 0.0), 'b': (300.0, 20.0)}
+    snapped = _snap_alignment(refined, graph)
+    assert snapped['a'][1] == snapped['b'][1]  # shared row
+    # x is untouched: the two nodes are far apart on that axis, no cluster.
+    assert snapped['a'][0] == 0.0
+    assert snapped['b'][0] == 300.0
+
+
+def test_snap_alignment_rejects_a_snap_that_would_crowd_nodes() -> None:
+    """A snap is applied only when it keeps the hard invariant. Here b and c have
+    almost-equal x but sit only just past the minimum node distance apart, so
+    folding either onto their shared column would pull them below it -- the snap
+    is refused and both keep their solved positions."""
+    from pytest_given.report.diagram.layout import _snap_alignment
+
+    nodes = (_actor('a'), _work('b'), _work('c'))
+    edges = (_edge('a', 'b', number=1),)
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    refined = {'a': (0.0, 0.0), 'b': (300.0, 0.0), 'c': (322.0, 249.5)}
+    snapped = _snap_alignment(refined, graph)
+    assert snapped['b'] == (300.0, 0.0)
+    assert snapped['c'] == (322.0, 249.5)
+
+
 def test_construction_seats_a_closing_triangle_crossing_free() -> None:
     """a:helper is placed anchored to a:root (activity 1); w:mid is placed
     anchored to a:root (activity 2), but w:mid *also* closes back to

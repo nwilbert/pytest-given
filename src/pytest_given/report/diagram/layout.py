@@ -21,10 +21,15 @@ candidate at every step reproduces the plain greedy walk, so tree-shaped and
 uncrowded stories are unchanged; only over-constrained fans are re-seated. A
 genuinely non-planar story exhausts the search budget and falls back to the
 greedy walk (`_construct_seed_greedy`), whose closing-edge guard surfaces the
-unavoidable crossing rather than hanging. Finally the whole diagram is
-reflected (an isometry, so crossings and step spacing are untouched) to seat
-the story's start node in the top-left corner -- the third priority. Edge
-endpoints are trimmed back to the node rims and each edge's label is slid
+unavoidable crossing rather than hanging. The seed is then relaxed by a
+force pass (`_refine_forces`) that, alongside its springs, eases each edge
+toward the nearer axis so arrows settle onto clean horizontal/vertical runs,
+and a final snap pass (`_snap_alignment`) pulls nodes whose coordinates already
+nearly agree onto shared rows and columns -- the deliberate, hand-placed look.
+Both only ever accept a move that keeps the hard invariant. Finally the whole
+diagram is reflected (an isometry, so crossings and step spacing are untouched)
+to seat the story's start node in the top-left corner -- the third priority.
+Edge endpoints are trimmed back to the node rims and each edge's label is slid
 along it until it clears every node and previously placed label.
 """
 
@@ -63,6 +68,8 @@ SPRING_K = 0.10  # edge spring stiffness
 REPULSION_K = 0.60  # short-range push below PREFERRED_DIST
 ATTRACT_K = 0.02  # bounded long-range pull toward PREFERRED_DIST
 SEQUENCE_K = 0.005  # gentle pull between consecutive numbered targets
+ALIGN_K = 0.15  # pull easing each edge toward its nearer axis (h/v alignment)
+SNAP_TOLERANCE = 34.0  # nodes within this on an axis snap onto a shared line
 
 NODE_HALF_W = 62.0
 NODE_HALF_H = 58.0
@@ -125,6 +132,7 @@ def position_nodes(
     fans = _actor_fans(graph)
     placed = _construct_seed(graph)
     placed = _refine_forces(placed, graph)
+    placed = _snap_alignment(placed, graph)
     positions, width, height = _framed(placed)
     start = sequence[0][0] if sequence else None
     positions = _orient_start_top_left(positions, width, height, start, fans)
@@ -793,8 +801,11 @@ def _net_force(
 ) -> tuple[float, float]:
     """Force on node_id: edge springs toward EDGE_REST_LENGTH, a
     preferred-distance pair potential against every other node (repel below
-    PREFERRED_DIST, gently attract out to INFLUENCE_RADIUS), and a weak sequence
-    spring toward the targets of adjacent-numbered activities."""
+    PREFERRED_DIST, gently attract out to INFLUENCE_RADIUS), a weak sequence
+    spring toward the targets of adjacent-numbered activities, and a gentle
+    alignment pull that eases each edge toward the nearer axis (horizontal or
+    vertical) so arrows settle onto clean runs instead of random diagonals --
+    the deliberate, hand-placed look."""
     node_x, node_y = positions[node_id]
     force_x = force_y = 0.0
 
@@ -820,6 +831,14 @@ def _net_force(
         pull = SPRING_K * (dist - EDGE_REST_LENGTH)
         force_x += (dx / dist) * pull
         force_y += (dy / dist) * pull
+        # Alignment: nudge toward the axis this edge is already closer to, so a
+        # near-horizontal edge flattens to horizontal and a near-vertical one to
+        # vertical (the minor offset is pulled to zero, the major axis is left
+        # to the springs above).
+        if abs(dx) < abs(dy):
+            force_x += ALIGN_K * dx
+        else:
+            force_y += ALIGN_K * dy
 
     for partner_id in seq_partners[node_id]:
         other_x, other_y = positions[partner_id]
@@ -887,6 +906,53 @@ def _refine_forces(
                 fraction *= 0.5
         if not moved:
             break
+    return positions
+
+
+def _snap_alignment(
+    refined: dict[str, tuple[float, float]],
+    graph: DiagramGraph,
+) -> dict[str, tuple[float, float]]:
+    """Final tidy pass: pull nodes whose x (or y) already nearly agree onto a
+    single shared line, so related nodes sit in true columns and rows -- the
+    strongest signal that a person, not a spring solver, placed them. Each axis
+    is handled independently: coordinates within SNAP_TOLERANCE are clustered and
+    every node in a cluster is nudged to the cluster's mean, but only when the
+    move keeps the layout crossing-free, graze-free and properly spaced (the same
+    gate the force pass uses). A rejected snap simply leaves that node where the
+    solver left it, so alignment never costs the hard invariant. Deterministic:
+    fixed axis order, clusters and nodes visited in sorted order."""
+    positions = dict(refined)
+    directed = _directed_edges(graph)
+    base_crossings = _count_overlaps(
+        [(positions[s], positions[t], s, t) for s, t in directed]
+    )
+    base_grazes = _grazes(positions, directed)
+    for axis in (0, 1):
+        ordered = sorted(positions, key=lambda node_id: positions[node_id][axis])
+        cluster: list[str] = []
+        for node_id in [*ordered, None]:
+            if (
+                node_id is not None
+                and cluster
+                and positions[node_id][axis] - positions[cluster[-1]][axis]
+                <= SNAP_TOLERANCE
+            ):
+                cluster.append(node_id)
+                continue
+            if len(cluster) >= 2:
+                target = sum(positions[member][axis] for member in cluster) / len(
+                    cluster
+                )
+                for member in sorted(cluster):
+                    origin = positions[member]
+                    moved = (target, origin[1]) if axis == 0 else (origin[0], target)
+                    positions[member] = moved
+                    if not _move_is_valid(
+                        positions, directed, base_crossings, base_grazes
+                    ):
+                        positions[member] = origin
+            cluster = [] if node_id is None else [node_id]
     return positions
 
 
