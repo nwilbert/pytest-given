@@ -181,6 +181,46 @@ def test_snap_alignment_rejects_a_snap_that_would_crowd_nodes() -> None:
     assert snapped['c'] == (322.0, 249.5)
 
 
+def test_partner_centroid_is_none_for_a_plain_spoke() -> None:
+    """A fan spoke (no closing partners) has no centroid preference — it keeps
+    the clockwise sweep; only a shared work object is drawn toward its partners'
+    centroid."""
+    from pytest_given.report.diagram.layout import _partner_centroid
+
+    positions = {'a': (0.0, 0.0), 'b': (300.0, 0.0), 'c': (300.0, 400.0)}
+    assert _partner_centroid('a', (), positions) is None
+    # anchor a plus partners b, c -> mean of the three.
+    assert _partner_centroid('a', ('b', 'c'), positions) == (200.0, 400.0 / 3)
+
+
+def test_shared_object_is_seated_between_its_partners() -> None:
+    """A work object that closes back onto two already-seated actors is placed
+    nearer the midpoint of those actors than a clockwise spoke would land it, so
+    a shared object reads as sitting between the nodes that use it."""
+    from pytest_given.report.diagram.layout import _construct_seed
+
+    # a:host seats two guests (activities 1, 2), then work object w:shared closes
+    # back onto BOTH guests (activity 3's connectives), i.e. it is shared.
+    nodes = (_actor('a:host'), _actor('a:g1'), _actor('a:g2'), _work('w:shared'))
+    edges = (
+        _edge('a:host', 'a:g1', number=1),
+        _edge('a:host', 'a:g2', number=2),
+        _edge('a:g1', 'w:shared', number=3),
+        _edge('a:g2', 'w:shared', number=None),
+    )
+    graph = DiagramGraph(story_id=StoryId('s'), title='S', nodes=nodes, edges=edges)
+    seed = _construct_seed(graph)
+    midpoint = (
+        (seed['a:g1'][0] + seed['a:g2'][0]) / 2,
+        (seed['a:g1'][1] + seed['a:g2'][1]) / 2,
+    )
+    distance = math.hypot(
+        seed['w:shared'][0] - midpoint[0], seed['w:shared'][1] - midpoint[1]
+    )
+    # It lands within a node-spacing of the two guests' midpoint.
+    assert distance <= MIN_NODE_DIST
+
+
 def test_construction_seats_a_closing_triangle_crossing_free() -> None:
     """a:helper is placed anchored to a:root (activity 1); w:mid is placed
     anchored to a:root (activity 2), but w:mid *also* closes back to

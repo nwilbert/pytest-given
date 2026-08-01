@@ -267,6 +267,11 @@ def _candidate_positions(
         (anchor_id, new_id),
         *((new_id, other) for other in other_anchor_ids),
     ]
+    # A node that also closes back onto already-placed partners (a work object
+    # shared by several nodes) reads best seated *between* them, so score its
+    # seats by nearness to the centroid of all its partners. A plain fan spoke
+    # (no closing partners) keeps the clockwise sweep, so fans are unchanged.
+    centre = _partner_centroid(anchor_id, other_anchor_ids, positions)
     drawn_segments = [(positions[s], positions[t], s, t) for s, t in drawn]
     cos_limit = math.cos(math.radians(COLLINEAR_DEG))
     radius = CONSTRUCT_RADIUS
@@ -287,13 +292,34 @@ def _candidate_positions(
                 positions,
                 cos_limit,
             ):
-                clockwise_turn = (angle - reference) % (2.0 * math.pi)
-                scored.append(((clockwise_turn, float(step)), candidate))
+                if centre is None:
+                    key = ((angle - reference) % (2.0 * math.pi), float(step))
+                else:
+                    key = (math.hypot(candidate[0] - centre[0],
+                                      candidate[1] - centre[1]), float(step))
+                scored.append((key, candidate))
         if scored:
             scored.sort(key=lambda item: item[0])
             return [candidate for _key, candidate in scored[:MAX_SEED_CANDIDATES]]
         radius *= RADIUS_GROWTH
     return []
+
+
+def _partner_centroid(
+    anchor_id: str,
+    other_anchor_ids: tuple[str, ...],
+    positions: dict[str, tuple[float, float]],
+) -> tuple[float, float] | None:
+    """The centroid of a node's anchor and its already-placed closing partners,
+    or None when it has none (a plain fan spoke, seated by the clockwise sweep
+    instead)."""
+    if not other_anchor_ids:
+        return None
+    partners = [anchor_id, *other_anchor_ids]
+    return (
+        sum(positions[partner][0] for partner in partners) / len(partners),
+        sum(positions[partner][1] for partner in partners) / len(partners),
+    )
 
 
 def _candidate_is_valid(
