@@ -68,8 +68,9 @@ SPRING_K = 0.10  # edge spring stiffness
 REPULSION_K = 0.60  # short-range push below PREFERRED_DIST
 ATTRACT_K = 0.02  # bounded long-range pull toward PREFERRED_DIST
 SEQUENCE_K = 0.005  # gentle pull between consecutive numbered targets
-ALIGN_K = 0.15  # pull easing each edge toward its nearer axis (h/v alignment)
+ALIGN_K = 0.15  # pull easing each edge toward the nearest 45-degree direction
 SNAP_TOLERANCE = 34.0  # nodes within this on an axis snap onto a shared line
+_ALIGN_STEP = math.pi / 4  # alignment snaps edge angles to 45-degree multiples
 
 NODE_HALF_W = 62.0
 NODE_HALF_H = 58.0
@@ -831,14 +832,17 @@ def _net_force(
         pull = SPRING_K * (dist - EDGE_REST_LENGTH)
         force_x += (dx / dist) * pull
         force_y += (dy / dist) * pull
-        # Alignment: nudge toward the axis this edge is already closer to, so a
-        # near-horizontal edge flattens to horizontal and a near-vertical one to
-        # vertical (the minor offset is pulled to zero, the major axis is left
-        # to the springs above).
-        if abs(dx) < abs(dy):
-            force_x += ALIGN_K * dx
-        else:
-            force_y += ALIGN_K * dy
+        # Alignment: nudge this edge toward the nearest 45-degree direction
+        # (horizontal, vertical, or a clean diagonal), so arrows settle onto the
+        # deliberate angles a person draws instead of organic ones. Snap the
+        # edge's angle to the nearest multiple of 45 degrees and push the node to
+        # cancel the perpendicular offset from that snapped ray; the springs
+        # above own the along-edge length.
+        snapped = round(math.atan2(dy, dx) / _ALIGN_STEP) * _ALIGN_STEP
+        perp_x, perp_y = -math.sin(snapped), math.cos(snapped)
+        error = dx * perp_x + dy * perp_y
+        force_x += ALIGN_K * error * perp_x
+        force_y += ALIGN_K * error * perp_y
 
     for partner_id in seq_partners[node_id]:
         other_x, other_y = positions[partner_id]
