@@ -72,9 +72,7 @@ def build_graph(story: Story, glossary: Glossary | None) -> DiagramGraph:
                         number=int(activity.id) if position == 1 else None,
                         connective=isinstance(part, ActivityWord),
                         term_id=(
-                            part.term_id
-                            if isinstance(part, ActivityTermRef)
-                            else None
+                            part.term_id if isinstance(part, ActivityTermRef) else None
                         ),
                     )
                 )

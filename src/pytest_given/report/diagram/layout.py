@@ -554,9 +554,7 @@ def _apply_step(
         spoke_prev = last_spoke_angle[step.source] if spoke_existed else 0.0
         anchor_x, anchor_y = positions[step.source]
         node_x, node_y = positions[step.target]
-        last_spoke_angle[step.source] = math.atan2(
-            node_y - anchor_y, node_x - anchor_x
-        )
+        last_spoke_angle[step.source] = math.atan2(node_y - anchor_y, node_x - anchor_x)
     return _SeedUndo(
         placed_id=None,
         popped_drawn=True,
@@ -1364,9 +1362,7 @@ def layout_graph(graph: DiagramGraph) -> DiagramLayout:
         foreign_segments = tuple(
             segment for pair, segment in segment_by_pair.items() if pair != own_pair
         )
-        label = _slide_label(
-            edge, x1, y1, x2, y2, ux, uy, obstacles, foreign_segments
-        )
+        label = _slide_label(edge, x1, y1, x2, y2, ux, uy, obstacles, foreign_segments)
         placed_edges.append(
             PlacedEdge(edge=edge, x1=x1, y1=y1, x2=x2, y2=y2, loop=False, label=label)
         )
@@ -1450,8 +1446,10 @@ def _slide_label(
                 centre = (centre_x, centre_y)
                 own_distance = _segment_distance(centre, own_start, own_end)
                 foreign_distance = min(
-                    (_segment_distance(centre, start, end)
-                     for start, end in foreign_segments),
+                    (
+                        _segment_distance(centre, start, end)
+                        for start, end in foreign_segments
+                    ),
                     default=math.inf,
                 )
                 ambiguity = max(

@@ -208,6 +208,67 @@ def test_cli_diagrams_generates_artifact(pytester: pytest.Pytester) -> None:
     assert 'Serve Coffee' in diagrams_path.read_text(encoding='utf-8')
 
 
+def test_cli_egn_generates_one_file_per_story(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(
+        """
+        from pytest_given import Glossary, activity, given, scenario, story
+
+        g = Glossary()
+        barista = g.actor('Barista')
+        brew = g.verb('brew')
+        coffee = g.work_object('Coffee')
+
+        serve_coffee = story('Serve Coffee', [activity(barista, brew('brews'), coffee)])
+
+        @scenario('Barista brews', story=serve_coffee)
+        def test_brew():
+            with given('a bean'):
+                pass
+        """
+    )
+    json_path = pytester.path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1)
+    egn_dir = pytester.path / 'out' / 'egn'
+    rc = main(['report', str(json_path), '--egn', str(egn_dir)])
+    assert rc == 0
+    egn_file = egn_dir / 'serve-coffee.egn'
+    assert egn_file.exists()
+    egn = json.loads(egn_file.read_text(encoding='utf-8'))
+    assert egn['dst'][-1] == {'version': '2.0.1'}
+    assert egn['domain']['actors']['Person'].startswith('<svg')
+
+
+def test_cli_format_md_to_stdout_with_egn_keeps_stdout_clean(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """As with --diagrams, the 'egon.io files generated' status line must go to
+    stderr when the markdown payload owns stdout."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'cli',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [],
+                'stories': [{'id': 'empty', 'title': 'Empty', 'activities': []}],
+            }
+        )
+    )
+    rc = main(
+        ['report', str(json_path), '--format', 'md', '--egn', str(tmp_path / 'e')]
+    )
+    assert rc == 0
+    captured = capsys.readouterr()
+    assert captured.out == '# pytest-given — cli\n\n'
+    assert 'egon.io files generated' in captured.err
+    assert 'egon.io files generated' not in captured.out
+
+
 def test_cli_format_md_to_stdout_with_diagrams_keeps_stdout_clean(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

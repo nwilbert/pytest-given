@@ -80,6 +80,7 @@ from .report import (
     compute_diagrams_href,
     detect_commit_sha,
     render_diagrams,
+    render_egn,
     render_html,
     render_md,
     resolve_template,
@@ -151,6 +152,17 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         help=(
             'Write the story diagrams HTML (Domain Storytelling view). Bare '
             'uses the default path; =PATH overrides. Off when absent.'
+        ),
+    )
+    group.addoption(
+        '--given-egn',
+        nargs='?',
+        const='given-report/egn',
+        default=None,
+        help=(
+            'Write one egon.io .egn file per story into this directory (for '
+            'hand-editing at https://egon.io/). Bare uses the default dir; '
+            '=DIR overrides. Off when absent.'
         ),
     )
     group.addoption(
@@ -749,6 +761,10 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
 
     if diagrams_opt is not None:
         render_diagrams(report, Path(diagrams_opt))
+
+    egn_opt = session.config.getoption('given_egn')
+    if egn_opt is not None:
+        render_egn(report, Path(egn_opt))
 
     _run_lint(session, scenarios, collector.scenarios, glossary, stories)
 

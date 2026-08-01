@@ -1,3 +1,4 @@
+from .egon import layout_to_egn, render_egn
 from .graph import DiagramEdge, DiagramGraph, DiagramNode, build_graph
 from .layout import (
     DiagramLayout,
@@ -20,5 +21,7 @@ __all__ = [
     'build_graph',
     'count_crossings',
     'layout_graph',
+    'layout_to_egn',
     'render_diagrams',
+    'render_egn',
 ]

@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 from ..model import report_from_dict
-from .diagram import render_diagrams
+from .diagram import render_diagrams, render_egn
 from .html_renderer import compute_diagrams_href, render_html
 from .md_renderer import render_md
 from .source_link import resolve_template
@@ -49,6 +49,17 @@ def add_report_parser(
             'a value overrides.'
         ),
     )
+    report_parser.add_argument(
+        '--egn',
+        type=Path,
+        nargs='?',
+        const=Path('given-report/egn'),
+        default=None,
+        help=(
+            'Also write one egon.io .egn file per story into this directory '
+            '(for hand-editing at https://egon.io/). Bare uses the default dir.'
+        ),
+    )
 
 
 def run_report(args: argparse.Namespace) -> int:
@@ -80,14 +91,20 @@ def run_report(args: argparse.Namespace) -> int:
         )
         print(f'Report generated: {output}')
 
+    to_stderr = fmt == 'md' and args.output is None
     if args.diagrams is not None:
         render_diagrams(report, args.diagrams)
-        diagrams_message = f'Diagrams generated: {args.diagrams}'
-        if fmt == 'md' and args.output is None:
-            print(diagrams_message, file=sys.stderr)
-        else:
-            print(diagrams_message)
+        _report_line(f'Diagrams generated: {args.diagrams}', to_stderr)
+    if args.egn is not None:
+        written = render_egn(report, args.egn)
+        _report_line(
+            f'egon.io files generated: {len(written)} in {args.egn}', to_stderr
+        )
     return 0
+
+
+def _report_line(message: str, to_stderr: bool) -> None:
+    print(message, file=sys.stderr if to_stderr else None)
 
 
 def _infer_format(output: Path | None) -> str:

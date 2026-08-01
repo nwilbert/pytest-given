@@ -1894,6 +1894,31 @@ def test_given_diagrams_writes_artifact(pytester: pytest.Pytester) -> None:
     assert 'Serve Coffee' in html
 
 
+def test_given_egn_writes_one_file_per_story(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(
+        """
+        from pytest_given import Glossary, activity, given, scenario, story
+
+        g = Glossary()
+        barista = g.actor('Barista')
+        brew = g.verb('brew')
+        coffee = g.work_object('Coffee')
+
+        serve_coffee = story('Serve Coffee', [activity(barista, brew('brews'), coffee)])
+
+        @scenario('Barista brews', story=serve_coffee)
+        def test_brew():
+            with given('a bean'):
+                pass
+        """
+    )
+    result = pytester.runpytest('--given-egn=out/egn')
+    result.assert_outcomes(passed=1)
+    egn_file = pytester.path / 'out' / 'egn' / 'serve-coffee.egn'
+    assert egn_file.exists()
+    assert 'domainStory:workObjectDocument' in egn_file.read_text(encoding='utf-8')
+
+
 def test_given_html_and_diagrams_links_with_relative_path(
     pytester: pytest.Pytester,
 ) -> None:

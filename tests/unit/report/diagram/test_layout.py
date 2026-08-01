@@ -131,9 +131,7 @@ def test_construction_adds_activities_in_numbered_order() -> None:
 def test_seed_is_crossing_free_and_spaced_on_a_tree() -> None:
     from pytest_given.report.diagram.layout import _construct_seed, _count_overlaps
 
-    nodes = tuple(
-        [_actor('a:root')] + [_work(f'w:{index}') for index in range(1, 6)]
-    )
+    nodes = tuple([_actor('a:root')] + [_work(f'w:{index}') for index in range(1, 6)])
     edges = (
         _edge('a:root', 'w:1', number=1),
         _edge('w:1', 'w:2', number=2),
@@ -365,9 +363,14 @@ def test_construction_lays_two_fans_out_clockwise() -> None:
     cost. Two hubs with interleaved-by-number spokes: the seed must grow both
     fans clockwise, so the total disorder is zero and nothing crosses."""
     nodes = (
-        _actor('a:0'), _actor('a:1'),
-        _work('w:0'), _work('w:1'), _work('w:2'),
-        _work('w:3'), _work('w:4'), _work('w:5'),
+        _actor('a:0'),
+        _actor('a:1'),
+        _work('w:0'),
+        _work('w:1'),
+        _work('w:2'),
+        _work('w:3'),
+        _work('w:4'),
+        _work('w:5'),
     )
     edges = (
         _edge('a:0', 'w:1', number=1),
@@ -966,9 +969,15 @@ def test_backtracking_seats_a_boxed_in_fan_crossing_free() -> None:
     import warnings
 
     nodes = (
-        _actor('a:host'), _actor('a:alice'), _actor('a:bob'),
-        _work('w:booking'), _actor('a:sys'), _work('w:notice'),
-        _work('w:g0'), _work('w:g1'), _work('w:g2'),
+        _actor('a:host'),
+        _actor('a:alice'),
+        _actor('a:bob'),
+        _work('w:booking'),
+        _actor('a:sys'),
+        _work('w:notice'),
+        _work('w:g0'),
+        _work('w:g1'),
+        _work('w:g2'),
     )
     edges = (
         _edge('a:host', 'a:alice', number=1),
@@ -995,9 +1004,15 @@ def test_backtracking_seed_is_deterministic() -> None:
     from pytest_given.report.diagram.layout import _construct_seed
 
     nodes = (
-        _actor('a:host'), _actor('a:alice'), _actor('a:bob'),
-        _work('w:booking'), _actor('a:sys'), _work('w:notice'),
-        _work('w:g0'), _work('w:g1'), _work('w:g2'),
+        _actor('a:host'),
+        _actor('a:alice'),
+        _actor('a:bob'),
+        _work('w:booking'),
+        _actor('a:sys'),
+        _work('w:notice'),
+        _work('w:g0'),
+        _work('w:g1'),
+        _work('w:g2'),
     )
     edges = (
         _edge('a:host', 'a:alice', number=1),
@@ -1028,9 +1043,16 @@ def test_seed_falls_back_to_greedy_when_placement_budget_exhausts(
     # An extra edgeless node ('w:lonely') exercises the greedy fallback's
     # isolated-node placement, which never entered the construction walk.
     nodes = (
-        _actor('a:host'), _actor('a:alice'), _actor('a:bob'),
-        _work('w:booking'), _actor('a:sys'), _work('w:notice'),
-        _work('w:g0'), _work('w:g1'), _work('w:g2'), _work('w:lonely'),
+        _actor('a:host'),
+        _actor('a:alice'),
+        _actor('a:bob'),
+        _work('w:booking'),
+        _actor('a:sys'),
+        _work('w:notice'),
+        _work('w:g0'),
+        _work('w:g1'),
+        _work('w:g2'),
+        _work('w:lonely'),
     )
     edges = (
         _edge('a:host', 'a:alice', number=1),
@@ -1063,7 +1085,10 @@ def test_dfs_seed_places_an_isolated_node() -> None:
     from pytest_given.report.diagram.layout import _construct_seed
 
     nodes = (
-        _actor('a:host'), _work('w:a'), _work('w:b'), _work('w:lonely'),
+        _actor('a:host'),
+        _work('w:a'),
+        _work('w:b'),
+        _work('w:lonely'),
     )
     edges = (
         _edge('a:host', 'w:a', number=1),

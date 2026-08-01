@@ -142,6 +142,7 @@ def examples(session: nox.Session) -> None:
             f'--given-html=examples/{slug}/{slug}.html',
             f'--given-md=examples/{slug}/{slug}.md',
             f'--given-diagrams=examples/{slug}/{slug}-diagrams.html',
+            f'--given-egn=examples/{slug}/egn',
             '--given-source-link=github',
             # These suites have intentional failures, so the run already
             # returns a tolerated exit 1 (success_codes below), which masks

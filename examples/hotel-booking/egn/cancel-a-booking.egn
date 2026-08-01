@@ -1,0 +1,238 @@
+{
+  "domain": {
+    "name": "default",
+    "actors": {
+      "Person": "<svg viewBox=\"0 0 24 26\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z\"/><path d=\"M0 0h24v24H0z\" fill=\"none\"/></svg>"
+    },
+    "workObjects": {
+      "Document": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 26\"><path fill=\"none\" d=\"M0 0h24v24H0V0z\"/><path d=\"M8 16h8v2H8zm0-4h8v2H8zm6-10H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z\"/></svg>"
+    }
+  },
+  "dst": [
+    {
+      "type": "domainStory:actorPerson",
+      "name": "Alice",
+      "id": "shape_0001",
+      "pickedColor": "black",
+      "x": 168,
+      "y": 142,
+      "$type": "Element",
+      "di": {},
+      "$descriptor": {}
+    },
+    {
+      "type": "domainStory:workObjectDocument",
+      "name": "Booking",
+      "id": "shape_0002",
+      "pickedColor": "black",
+      "x": 486,
+      "y": 142,
+      "$type": "Element",
+      "di": {},
+      "$descriptor": {}
+    },
+    {
+      "type": "domainStory:actorPerson",
+      "name": "Booking System",
+      "id": "shape_0003",
+      "pickedColor": "black",
+      "x": 308,
+      "y": 360,
+      "$type": "Element",
+      "di": {},
+      "$descriptor": {}
+    },
+    {
+      "type": "domainStory:workObjectDocument",
+      "name": "Payment",
+      "id": "shape_0004",
+      "pickedColor": "black",
+      "x": 567,
+      "y": 384,
+      "$type": "Element",
+      "di": {},
+      "$descriptor": {}
+    },
+    {
+      "type": "domainStory:workObjectDocument",
+      "name": "Booking",
+      "id": "shape_0005",
+      "pickedColor": "black",
+      "x": 836,
+      "y": 384,
+      "$type": "Element",
+      "di": {},
+      "$descriptor": {}
+    },
+    {
+      "type": "domainStory:workObjectDocument",
+      "name": "Confirmation",
+      "id": "shape_0006",
+      "pickedColor": "black",
+      "x": 241,
+      "y": 610,
+      "$type": "Element",
+      "di": {},
+      "$descriptor": {}
+    },
+    {
+      "type": "domainStory:activity",
+      "name": "cancels",
+      "id": "connection_0001",
+      "pickedColor": "black",
+      "number": 1,
+      "waypoints": [
+        {
+          "original": {
+            "x": 262,
+            "y": 180
+          },
+          "x": 262,
+          "y": 180
+        },
+        {
+          "original": {
+            "x": 460,
+            "y": 180
+          },
+          "x": 460,
+          "y": 180
+        }
+      ],
+      "source": "shape_0001",
+      "target": "shape_0002",
+      "$type": "Element",
+      "di": {},
+      "$descriptor": {},
+      "multipleNumberAllowed": false
+    },
+    {
+      "type": "domainStory:activity",
+      "name": "refunds",
+      "id": "connection_0002",
+      "pickedColor": "black",
+      "number": 2,
+      "waypoints": [
+        {
+          "original": {
+            "x": 402,
+            "y": 403
+          },
+          "x": 402,
+          "y": 403
+        },
+        {
+          "original": {
+            "x": 541,
+            "y": 416
+          },
+          "x": 541,
+          "y": 416
+        }
+      ],
+      "source": "shape_0003",
+      "target": "shape_0004",
+      "$type": "Element",
+      "di": {},
+      "$descriptor": {},
+      "multipleNumberAllowed": false
+    },
+    {
+      "type": "domainStory:activity",
+      "name": "for",
+      "id": "connection_0003",
+      "pickedColor": "black",
+      "number": null,
+      "waypoints": [
+        {
+          "original": {
+            "x": 661,
+            "y": 422
+          },
+          "x": 661,
+          "y": 422
+        },
+        {
+          "original": {
+            "x": 810,
+            "y": 422
+          },
+          "x": 810,
+          "y": 422
+        }
+      ],
+      "source": "shape_0004",
+      "target": "shape_0005",
+      "$type": "Element",
+      "di": {},
+      "$descriptor": {}
+    },
+    {
+      "type": "domainStory:activity",
+      "name": "sends",
+      "id": "connection_0004",
+      "pickedColor": "black",
+      "number": 3,
+      "waypoints": [
+        {
+          "original": {
+            "x": 332,
+            "y": 452
+          },
+          "x": 332,
+          "y": 452
+        },
+        {
+          "original": {
+            "x": 296,
+            "y": 586
+          },
+          "x": 296,
+          "y": 586
+        }
+      ],
+      "source": "shape_0003",
+      "target": "shape_0006",
+      "$type": "Element",
+      "di": {},
+      "$descriptor": {},
+      "multipleNumberAllowed": false
+    },
+    {
+      "type": "domainStory:activity",
+      "name": "to",
+      "id": "connection_0005",
+      "pickedColor": "black",
+      "number": null,
+      "waypoints": [
+        {
+          "original": {
+            "x": 271,
+            "y": 593
+          },
+          "x": 271,
+          "y": 593
+        },
+        {
+          "original": {
+            "x": 216,
+            "y": 243
+          },
+          "x": 216,
+          "y": 243
+        }
+      ],
+      "source": "shape_0006",
+      "target": "shape_0001",
+      "$type": "Element",
+      "di": {},
+      "$descriptor": {}
+    },
+    {
+      "info": ""
+    },
+    {
+      "version": "2.0.1"
+    }
+  ]
+}
