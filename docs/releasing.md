@@ -39,38 +39,20 @@ Linux-only.
 ### 2. Rehearse on TestPyPI
 
 - [ ] Actions → **Release** → Run workflow → target **`testpypi`**.
-- [ ] Install the published wheel with the script below and open the report it
-      writes to `given-report/report.html`.
+- [ ] `uv run nox -s check_release -- testpypi`
 - [ ] Open <https://test.pypi.org/project/pytest-given/> and check the README
       renders, the diagram image loads, the links resolve, and the sidebar shows
       the four project URLs, the MIT license, and the right classifiers. This is
       the only place the rendered page can be checked before it is permanent.
 
-```bash
-mkdir -p /tmp/pg-smoke && cd /tmp/pg-smoke
-cat > test_smoke.py <<'EOF'
-from pytest_given import given, scenario, then, when
-
-@scenario('Installing from TestPyPI works')
-def test_smoke():
-    with given('the published wheel'):
-        installed = True
-    with then('narration is captured'):
-        assert installed
-EOF
-uv run --isolated --no-project \
-  --index https://test.pypi.org/simple/ \
-  --index-strategy unsafe-best-match \
-  --prerelease allow \
-  --with pytest-given pytest test_smoke.py --given-html
-```
-
-Three details in that command are load-bearing. The empty directory matters — run
-it inside a tree containing other projects and pytest will try to collect them.
-`--index-strategy unsafe-best-match` is needed because `pytest` and `jinja2` must
-still come from real PyPI while `pytest-given` comes from TestPyPI. And
-`--prerelease allow` is needed because rehearsals publish `.dev` versions, which
-are not installed by default.
+`check_release` installs what the index actually serves into a throwaway
+environment, runs a real scenario through it, and asserts the reports come out.
+It deliberately runs from a temporary directory outside the project, so what it
+imports is the published distribution and not `src/`. The awkward parts of doing
+this by hand — resolving `pytest` and `jinja2` from real PyPI while
+`pytest-given` comes from TestPyPI, allowing the `.dev` prerelease, and bypassing
+uv's index cache so a rehearsal published moments ago is visible — are handled in
+the session.
 
 Rehearsals publish as `<version>.dev<run number>`, never the bare version, so the
 same version can be re-rehearsed as many times as needed. The dev suffix sorts
@@ -84,8 +66,9 @@ thing. Nothing is tagged.
       `pypi` environment, not a hang.
 - [ ] Confirm the run created the `v<version>` tag and a GitHub Release carrying
       the changelog section and both artifacts.
-- [ ] Install from real PyPI and smoke it, same as step 2 without the `--index`,
-      `--index-strategy` and `--prerelease` flags.
+- [ ] `uv run nox -s check_release` — the same check as step 2, against real
+      PyPI. Give the index a moment; a just-uploaded version can take a little
+      while to appear.
 
 ### 4. After
 
@@ -98,7 +81,7 @@ thing. Nothing is tagged.
 | `verify` | `nox -s lint format mypy test coverage audit` | Re-run rather than trusted from CI, because dispatch can target any ref. |
 | `build` | guards, then `nox -s build` | Uploads `dist/` as a workflow artifact. |
 | `publish` | `pypa/gh-action-pypi-publish` | Environment-scoped, `id-token: write`. |
-| `release` | `gh release create` | Skipped for rehearsals. Creates the tag. |
+| `github-release` | `gh release create` | Creates the `v<version>` tag and the GitHub Release. Skipped for rehearsals. |
 
 The `build` job refuses to proceed if the tag already exists, if the version is
 already on the target index, if `CHANGELOG.md` has no section for it, or — for
@@ -121,7 +104,7 @@ dependency tree beside it.
 | `pypi releases must be dispatched from main` | Re-dispatch from `main`. |
 | `403` from the index in `publish` | The trusted publisher's fields do not match reality. All four must agree: owner `nwilbert`, repo `pytest-given`, workflow `release.yml`, environment `pypi` / `testpypi`. |
 | `publish` sits idle for a minute | The wait timer on the `pypi` environment. |
-| Rehearsal install resolves nothing | Rehearsals are `.dev` versions; add `--prerelease allow` or pin the exact version. |
+| `check_release` cannot resolve the package | The upload has not propagated yet, or you checked the wrong index — rehearsals only exist on `testpypi`. |
 
 ## One-time setup (already done)
 

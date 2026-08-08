@@ -118,14 +118,15 @@ def audit(session: nox.Session) -> None:
     session.run('pip-audit', '--local')
 
 
-# Exercised by `build` from a throwaway directory against the installed wheel.
+# Run from a throwaway directory against an installed pytest-given, by `build`
+# (the freshly built wheel) and `check_release` (whatever an index serves).
 # Kept inline rather than as a file under the project so the run cannot pick up
 # the repo's rootdir conftest and silently fall back to importing `src/`.
 _SMOKE_TEST = """\
 from pytest_given import given, scenario, then, when
 
 
-@scenario('A consumer installs the wheel')
+@scenario('An installed pytest-given records narration')
 def test_smoke():
     with given('a freshly installed pytest-given'):
         installed = True
@@ -178,9 +179,20 @@ def build(session: nox.Session) -> None:
     if missing:
         session.error(f'{wheel.name} is missing {", ".join(missing)}')
 
-    # Drive the built wheel from outside the project: `--isolated --no-project`
-    # keeps uv from resolving this repo, so the import under test is the
-    # installed distribution rather than `src/`.
+    _smoke_test_install(session, '--with', str(wheel), described_as=wheel.name)
+    session.log(f'{wheel.name} passed packaging checks and a live smoke run')
+
+
+def _smoke_test_install(
+    session: nox.Session, *install_args: str, described_as: str
+) -> None:
+    """Run the smoke scenario against a pytest-given installed by `install_args`.
+
+    Runs from a throwaway directory: `--isolated --no-project` keeps uv from
+    resolving this repo, and being outside the project keeps pytest from finding
+    the rootdir conftest — together they guarantee the import under test is the
+    installed distribution rather than `src/`.
+    """
     project_root = Path.cwd()
     with tempfile.TemporaryDirectory() as tmp:
         workdir = Path(tmp)
@@ -192,8 +204,7 @@ def build(session: nox.Session) -> None:
                 'run',
                 '--isolated',
                 '--no-project',
-                '--with',
-                str(wheel),
+                *install_args,
                 'pytest',
                 'test_smoke.py',
                 '--given-md=smoke.md',
@@ -203,14 +214,46 @@ def build(session: nox.Session) -> None:
             )
             narration = (workdir / 'smoke.md').read_text(encoding='utf-8')
             if 'narration is captured' not in narration:
-                session.error('installed wheel produced a report without narration')
+                session.error(f'{described_as} produced a report without narration')
             if (workdir / 'smoke.html').stat().st_size < 10_000:
-                session.error('installed wheel produced a suspiciously small report')
+                session.error(f'{described_as} produced a suspiciously small report')
         finally:
             # Windows cannot remove a directory that is still the cwd.
             session.chdir(project_root)
 
-    session.log(f'{wheel.name} passed packaging checks and a live smoke run')
+
+@nox.session
+def check_release(session: nox.Session) -> None:
+    """Install pytest-given from an index and smoke-test what it serves.
+
+    `uv run nox -s check_release` checks PyPI; `-- testpypi` checks TestPyPI.
+    Verifies a release after the fact, so it is not in the default session list.
+    """
+    target = session.posargs[0] if session.posargs else 'pypi'
+    if target not in ('pypi', 'testpypi'):
+        session.error(f"unknown index {target!r}; expected 'pypi' or 'testpypi'")
+
+    # uv caches index responses, so a rehearsal published moments ago can be
+    # invisible without forcing a re-read.
+    install_args = ['--refresh-package', 'pytest-given']
+    if target == 'testpypi':
+        install_args += [
+            '--index',
+            'https://test.pypi.org/simple/',
+            # pytest and jinja2 are not on TestPyPI and must still resolve
+            # against real PyPI.
+            '--index-strategy',
+            'unsafe-best-match',
+            # Rehearsals publish `.devN` versions, which are excluded by default.
+            '--prerelease',
+            'allow',
+        ]
+    install_args += ['--with', 'pytest-given']
+
+    _smoke_test_install(
+        session, *install_args, described_as=f'pytest-given from {target}'
+    )
+    session.log(f'the {target} release of pytest-given passed a live smoke run')
 
 
 @nox.session

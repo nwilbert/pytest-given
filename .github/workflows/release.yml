@@ -163,7 +163,9 @@ jobs:
         if: inputs.target == 'pypi'
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
 
-  release:
+  # Named for what it produces — the GitHub Release — to keep it distinct from
+  # the PyPI release that `publish` just made, and from the workflow itself.
+  github-release:
     # TestPyPI runs are rehearsals: no tag, no GitHub Release.
     if: inputs.target == 'pypi'
     needs: [build, publish]
