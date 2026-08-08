@@ -29,7 +29,7 @@ Run all checks: `uv run nox`. List individual sessions with `uv run nox -l`.
 
 Releases go to PyPI via a manually dispatched [Release workflow](.github/workflows/release.yml), authenticated with Trusted Publishing (no tokens anywhere) and always rehearsed on TestPyPI first. The step-by-step checklist, the troubleshooting table, and the one-time index/environment setup live in [docs/releasing.md](docs/releasing.md).
 
-The short version: bump `version` in `pyproject.toml` and add a matching `## [x.y.z]` section to `CHANGELOG.md` in a PR, merge to `main`, dispatch with `testpypi`, run `uv run nox -s check_release -- testpypi`, then dispatch with `pypi` and re-check with `uv run nox -s check_release`.
+The short version: bump `version` in `pyproject.toml` and add a matching `## [x.y.z]` section to `CHANGELOG.md`, land it on `main` (a PR is optional — CI gates direct pushes too), dispatch with `testpypi`, run `uv run nox -s check_release -- testpypi`, then dispatch with `pypi` and re-check with `uv run nox -s check_release`.
 
 `check_release` installs pytest-given from an index into a throwaway environment and runs a real scenario through it — the same smoke test `nox -s build` runs against a locally built wheel, pointed at what an index actually serves.
 

@@ -11,7 +11,7 @@ mistake shipped to PyPI is permanent.
 
 ## Checklist
 
-### 1. Prepare the bump (in a PR)
+### 1. Prepare the bump
 
 - [ ] Bump `version` in `pyproject.toml`.
 - [ ] Add a `## [x.y.z] - YYYY-MM-DD` section to `CHANGELOG.md`. The workflow
@@ -19,13 +19,20 @@ mistake shipped to PyPI is permanent.
       if it is missing.
 - [ ] Update the link references at the bottom of `CHANGELOG.md`: point
       `[Unreleased]` at the new tag, and add a line for the new version.
-- [ ] Merge to `main` once CI is green. Releases can only be dispatched from
-      `main`.
+- [ ] Land it on `main` and wait for CI to go green. Releases can only be
+      dispatched from `main`.
 
-No local `nox` run is listed here, on purpose. The bump PR is already gated by
-CI, whose `quality`, `test`, `package` and `audit` jobs cover the full six-session
-gate plus `nox -s build`; the release workflow then runs the same set again in
-`verify` and `build` before anything is published. A local run before dispatching
+A PR is not required. `main` carries no branch protection, and CI runs on direct
+pushes to `main` as well as on pull requests, so committing the bump straight to
+`main` is gated either way. The only thing a PR adds is that CI runs *before* the
+commit lands, so `main` is never briefly red — worth it for substantive changes,
+thin for a version bump. Either way, a red `main` cannot produce a bad release:
+the release workflow re-runs the whole gate in `verify` and `build` before
+anything is published.
+
+No local `nox` run is listed here, on purpose. CI's `quality`, `test`, `package`
+and `audit` jobs already cover the full six-session gate plus `nox -s build`, and
+the release workflow then runs the same set again. A local run before dispatching
 would be the third. The usual "run `uv run nox` before committing" rule from
 [AGENTS.md](../AGENTS.md) applies to the bump commit like any other — it just
 isn't a release-specific step.
