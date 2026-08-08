@@ -883,8 +883,8 @@
 - **given** a Guest actor
 - **given** a search verb
 - **given** a Room work object
-- **when** an «Activity» is built with explicit id=0
-- **then** a PytestGivenError says id=0 is reserved
+- **when** an «Activity» is built with explicit activity_id=0
+- **then** a PytestGivenError says activity_id=0 is reserved
 
 ## ✓ A «story» auto-numbers its «activities» from one
 `tests/unit/capture/test_story.py:385::test_story_auto_numbers_activities_from_one` · story-grammar, happy-path
@@ -1285,7 +1285,7 @@
 - **then** eligibility gates the binding, so «Coverage» stays empty
 
 ## ✓ «Parameter coloring» marks placeholders and table headers
-`tests/unit/report/test_html_renderer.py:166::test_render_parametrized_step_with_structured_narration` · happy-path
+`tests/unit/report/test_html_renderer.py:167::test_render_parametrized_step_with_structured_narration` · happy-path
 
 - **given** a «Report» holding a «Parametrized scenario» with a «Parameter table»
 - **when** the «Renderer» renders the HTML page

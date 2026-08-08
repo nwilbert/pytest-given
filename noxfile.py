@@ -10,16 +10,17 @@ import nox
 _proc_version = Path('/proc/version')
 if (
     _proc_version.exists()
-    and 'microsoft' in _proc_version.read_text().lower()
+    and 'microsoft' in _proc_version.read_text(encoding='utf-8').lower()
     and Path.cwd().is_relative_to('/mnt')
 ):
     nox.options.envdir = str(
         Path.home() / '.local' / 'share' / 'nox-envs' / 'pytest-given'
     )
 
-# Linted and formatted everywhere; `tests` and `examples` are test code and are
-# deliberately not type-checked (heavy fixtures and loose dicts).
-code_paths = ['src', 'tests', 'examples', 'noxfile.py']
+# Linted and formatted everywhere; only `src` and this file are type-checked.
+# `tests` and `examples` are test code (heavy fixtures and loose dicts),
+# `benchmarks` is throwaway scripting, and `conftest.py` is a one-liner.
+code_paths = ['src', 'tests', 'examples', 'benchmarks', 'noxfile.py', 'conftest.py']
 mypy_paths = ['src', 'noxfile.py']
 
 nox.options.default_venv_backend = 'uv'
@@ -59,8 +60,8 @@ def _sync(session: nox.Session, *groups: str, include_project: bool = False) -> 
         )
 
 
-@nox.session
-def format(session: nox.Session) -> None:
+@nox.session(name='format')
+def format_code(session: nox.Session) -> None:
     _sync(session, 'lint')
     session.run('ruff', 'check', '--select', 'I', '--fix', *code_paths)
     session.run('ruff', 'format', *session.posargs, *code_paths)

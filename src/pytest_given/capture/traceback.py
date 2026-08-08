@@ -109,7 +109,7 @@ def parse_short_repr(text: str) -> tuple[list[TracebackFrame], str | None]:
                 func=match.group('func'),
             )
             continue
-        if line.startswith('E   ') or line.startswith('E\t'):
+        if line.startswith(('E   ', 'E\t')):
             if pending is not None:
                 _flush(pending)
                 pending = None

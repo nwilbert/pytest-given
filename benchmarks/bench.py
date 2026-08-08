@@ -69,6 +69,7 @@ def run_phase(args: list[str]) -> float:
         ],
         capture_output=True,
         text=True,
+        check=False,
     )
     t1 = time.perf_counter()
     if r.returncode not in (0, 1):

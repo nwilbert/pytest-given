@@ -42,8 +42,7 @@ def _scenario_md(scenario: Scenario) -> str:
         subtitle += f' — reason: {scenario.skip_reason}'
     lines.append(subtitle)
     lines.append('')
-    for step in scenario.steps:
-        lines.append(_step_md(step, depth=0))
+    lines.extend(_step_md(step, depth=0) for step in scenario.steps)
     if scenario.parameters is not None:
         lines.append('')
         lines.append(_param_table_md(scenario.parameters))
@@ -110,8 +109,7 @@ def _step_md(step: Step, depth: int) -> str:
         lines.extend(_error_lines(step.error, indent))
     for attachment in step.attachments:
         lines.extend(_attachment_lines(attachment, indent))
-    for child in step.children:
-        lines.append(_step_md(child, depth + 1))
+    lines.extend(_step_md(child, depth + 1) for child in step.children)
     return '\n'.join(lines)
 
 

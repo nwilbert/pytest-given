@@ -481,9 +481,7 @@ def _extract_skip_reason(longrepr: object) -> str | None:
     message = longrepr[2]
     if not isinstance(message, str):
         return None
-    if message.startswith('Skipped: '):
-        message = message[len('Skipped: ') :]
-    message = message.strip()
+    message = message.removeprefix('Skipped: ').strip()
     if not message or message in ('<Skipped instance>', 'unconditional skip'):
         return None
     return message
@@ -502,7 +500,7 @@ def _annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
     target = inspect.unwrap(cast(Any, func))
     try:
         hints = get_type_hints(target, include_extras=True)
-    except Exception:
+    except Exception:  # noqa: BLE001 — annotations are arbitrary user code; see the docstring
         return {}
     out: dict[str, StepDescriptor] = {}
     for name, hint in hints.items():

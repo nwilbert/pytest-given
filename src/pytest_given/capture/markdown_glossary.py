@@ -121,9 +121,7 @@ def _is_separator_row(line: str) -> bool:
 
 
 def _split_row(line: str) -> list[str]:
-    stripped = line.strip()
-    if stripped.startswith('|'):
-        stripped = stripped[1:]
+    stripped = line.strip().removeprefix('|')
     if stripped.endswith('|') and not stripped.endswith('\\|'):
         stripped = stripped[:-1]
     cells = _SPLIT_ON_UNESCAPED_PIPE.split(stripped)

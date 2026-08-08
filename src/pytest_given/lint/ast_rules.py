@@ -41,13 +41,15 @@ def run_ast_rules(scenarios: list[Scenario], rootdir: Path) -> list[Finding]:
                 resolved.append((anchored, node))
                 node_by_step[id(anchored.step)] = node
         for anchored, node in resolved:
-            for finding in (
-                _empty_step_finding(anchored, node),
-                _then_without_check_finding(anchored, node),
-                _check_outside_then_finding(anchored, node, node_by_step),
-            ):
-                if finding is not None:
-                    findings.append(finding)
+            findings.extend(
+                finding
+                for finding in (
+                    _empty_step_finding(anchored, node),
+                    _then_without_check_finding(anchored, node),
+                    _check_outside_then_finding(anchored, node, node_by_step),
+                )
+                if finding is not None
+            )
             findings.extend(_unused_interpolation_findings(anchored, node))
         scenario_finding = _action_in_then_finding(scenario, resolved)
         if scenario_finding is not None:

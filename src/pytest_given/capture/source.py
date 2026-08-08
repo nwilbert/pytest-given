@@ -28,7 +28,7 @@ _MNT_PATH_RE = re.compile(r'^[\\/]mnt[\\/]([A-Za-z])(?=[\\/]|$)')
 _IS_WSL = (
     sys.platform == 'linux'
     and Path('/proc/version').exists()
-    and 'microsoft' in Path('/proc/version').read_text().lower()
+    and 'microsoft' in Path('/proc/version').read_text(encoding='utf-8').lower()
 )
 _IS_WINDOWS = sys.platform == 'win32'
 

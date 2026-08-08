@@ -911,8 +911,8 @@ def test_push_step_rejects_activity_id_outside_scenario_scope() -> None:
     s = story_fn(
         'Scoped',
         [
-            activity_fn(guest, search, room, id=1),
-            activity_fn(guest('Alice'), search, room, id=2),
+            activity_fn(guest, search, room, activity_id=1),
+            activity_fn(guest('Alice'), search, room, activity_id=2),
         ],
     )
     collector.start_scenario(

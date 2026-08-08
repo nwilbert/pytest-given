@@ -371,12 +371,12 @@ def test_activity_mixing_parts_and_paths_raises(guest, search, room):
 def test_activity_explicit_id_zero_raises(guest, search, room):
     with (
         when_then(
-            t'an {pg["Activity"]} is built with explicit id=0',
-            'a PytestGivenError says id=0 is reserved',
+            t'an {pg["Activity"]} is built with explicit activity_id=0',
+            'a PytestGivenError says activity_id=0 is reserved',
         ),
-        pytest.raises(PytestGivenError, match=r'id=0.*reserved'),
+        pytest.raises(PytestGivenError, match=r'activity_id=0.*reserved'),
     ):
-        activity(guest, search, room, id=0)
+        activity(guest, search, room, activity_id=0)
 
 
 # --- Task 4.4: story() constructor ---
@@ -405,9 +405,9 @@ def test_story_auto_numbers_activities_from_one(guest, search, room):
 def test_story_auto_numbering_skips_taken_explicit_ids(guest, search, room):
     with given(t'a mix of explicit and auto {pg["Activity"]} ids'):
         activities = [
-            activity(guest, search, room, id=1),
+            activity(guest, search, room, activity_id=1),
             activity(guest('Alice'), search, room),
-            activity(guest('Bob'), search, room, id=3),
+            activity(guest('Bob'), search, room, activity_id=3),
             activity(guest('Cara'), search, room),
         ]
     with when(t'they are assembled into a {pg["Story"]}'):
@@ -423,8 +423,8 @@ def test_story_auto_numbering_skips_taken_explicit_ids(guest, search, room):
 def test_story_rejects_duplicate_activity_ids(guest, search, room):
     with given(t'two {pg["Activity"]} rows sharing an explicit id'):
         rows = [
-            activity(guest, search, room, id=1),
-            activity(guest('Alice'), search, room, id=1),
+            activity(guest, search, room, activity_id=1),
+            activity(guest('Alice'), search, room, activity_id=1),
         ]
     with (
         when_then(
@@ -597,14 +597,14 @@ def test_activity_id_defaults_to_zero_when_unspecified(guest, search, room):
 
 
 def test_activity_explicit_id_overrides_default(guest, search, room):
-    a = activity(guest, search, room, id=7)
+    a = activity(guest, search, room, activity_id=7)
     assert a.id == 7
 
 
 def test_activity_explicit_id_with_multipath(guest, search, room):
     p1 = path(guest, search, room)
     p2 = path(guest('Bob'), search, room)
-    a = activity(p1, p2, id=3)
+    a = activity(p1, p2, activity_id=3)
     assert a.id == 3
     assert a.paths == (p1, p2)
 
@@ -612,7 +612,10 @@ def test_activity_explicit_id_with_multipath(guest, search, room):
 def test_story_keeps_explicit_activity_ids(guest, search, room):
     s = story(
         'Book a Room',
-        [activity(guest, search, room, id=10), activity(guest('Alice'), search, room)],
+        [
+            activity(guest, search, room, activity_id=10),
+            activity(guest('Alice'), search, room),
+        ],
     )
     assert s.activities[0].id == 10
     assert s.activities[1].id == 1
@@ -621,12 +624,12 @@ def test_story_keeps_explicit_activity_ids(guest, search, room):
 def test_story_auto_numbering_skips_taken_ids_even_when_earlier_auto(
     guest, search, room
 ):
-    """Explicit id=1 anywhere takes precedence over the auto counter."""
+    """Explicit activity_id=1 anywhere takes precedence over the auto counter."""
     s = story(
         'Book a Room',
         [
             activity(guest('Alice'), search, room),
-            activity(guest, search, room, id=1),
+            activity(guest, search, room, activity_id=1),
         ],
     )
     assert [a.id for a in s.activities] == [2, 1]

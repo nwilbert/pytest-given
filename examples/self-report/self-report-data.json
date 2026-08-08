@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-08T10:31:34.513779+00:00",
+    "timestamp": "2026-08-08T20:40:15.455814+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "e98e43d3bfd997ced56539948ac625e05c560011"
+    "commit_sha": "2f8067109c8e1fcffb8dbe57dadf00c73d5f4986"
   },
   "scenarios": [
     {
@@ -1414,7 +1414,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1739,7 +1739,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -2216,7 +2216,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -9435,7 +9435,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "an Activity is built with explicit id=0",
+            "text": "an Activity is built with explicit activity_id=0",
             "parts": [
               {
                 "value": "an "
@@ -9447,7 +9447,7 @@
                 "param_column": null
               },
               {
-                "value": " is built with explicit id=0"
+                "value": " is built with explicit activity_id=0"
               }
             ]
           },
@@ -9461,7 +9461,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a PytestGivenError says id=0 is reserved",
+            "text": "a PytestGivenError says activity_id=0 is reserved",
             "parts": []
           },
           "status": "passed",
@@ -14213,7 +14213,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -14313,7 +14313,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 166
+        "line": 167
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []

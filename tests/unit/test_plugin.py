@@ -478,7 +478,7 @@ def test_resolve_glossary_raises_with_two_distinct_glossaries_via_stories() -> N
     s2 = story_fn('Coverage Story B', [activity_fn(guest2, search2, room2)])
 
     fake_session = SimpleNamespace(
-        config=SimpleNamespace(pluginmanager=SimpleNamespace(get_plugins=lambda: []))
+        config=SimpleNamespace(pluginmanager=SimpleNamespace(get_plugins=list))
     )
     with pytest.raises(PytestGivenError, match='distinct Glossary'):
         plugin._resolve_glossary([s1, s2], cast(pytest.Session, fake_session))

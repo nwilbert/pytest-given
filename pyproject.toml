@@ -100,7 +100,46 @@ exclude-newer = "7d"
 quote-style = "single"
 
 [tool.ruff.lint]
-select = ["B", "C4", "E", "F", "I", "PT", "RUF", "SIM", "UP", "W", "PYI"]
+# `explicit-preview-rules` keeps preview mode from pulling in every preview rule
+# of a selected family: a preview rule is active only when named by its exact
+# code below. PLW1514 is the only one that qualifies today.
+preview = true
+explicit-preview-rules = true
+select = [
+    "B",       # flake8-bugbear — likely bugs and design problems
+    "C4",      # flake8-comprehensions — needless list/dict/set round-trips
+    "E",       # pycodestyle errors
+    "F",       # Pyflakes — undefined names, unused imports
+    "I",       # isort — import ordering
+    "PT",      # flake8-pytest-style — fixture and parametrize idioms
+    "RUF",     # Ruff-specific rules
+    "SIM",     # flake8-simplify
+    "UP",      # pyupgrade — syntax modernization for the target version
+    "W",       # pycodestyle warnings
+    "PYI",     # flake8-pyi — stub and typing-construct conventions
+    "N",       # pep8-naming — PEP 8 naming for classes, functions, args, modules
+    "PTH",     # flake8-use-pathlib — os.path / open where pathlib fits
+    "PLE",     # Pylint "error" category — genuine bugs, no style opinions
+    "RET",     # flake8-return — needless else-after-return, redundant `return None`
+    "PGH",     # pygrep-hooks — bans bare `# noqa` / `# type: ignore`
+    "DTZ",     # flake8-datetimez — datetime constructors without an explicit tzinfo
+    "ISC",     # flake8-implicit-str-concat — adjacent literals, usually a missing comma
+    "FLY",     # flynt — static `str.join` that should be an f-string
+    "RSE",     # flake8-raise — needless parens when re-raising a class
+    "SLOT",    # flake8-slots — str/tuple/namedtuple subclasses missing __slots__
+    "EXE",     # flake8-executable — shebang without the exec bit, and the reverse
+    "T10",     # flake8-debugger — a forgotten breakpoint() or `import pdb`
+    "INT",     # flake8-gettext — f-strings passed to _(), which breaks extraction
+    "G",       # flake8-logging-format — f-strings in log calls instead of %s + args
+    "LOG",     # flake8-logging — logging misuse (.exception() outside a handler)
+    "FURB",    # refurb — modernizations beyond what UP covers
+    "PERF",    # Perflint — loops with a faster comprehension/extend form
+    "PIE",     # flake8-pie — assorted unnecessary code
+    "A",       # flake8-builtins — names shadowing a builtin
+    "BLE",     # flake8-blind-except — `except Exception` that swallows everything
+    "PLW1510", # subprocess.run without an explicit check= argument
+    "PLW1514", # open/read_text without encoding=; the locale default is cp1252 on Windows
+]
 
 [tool.ruff.lint.per-file-ignores]
 # Scenario tests deliberately nest a vanilla `with pytest.raises(...):` inside a

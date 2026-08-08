@@ -286,7 +286,7 @@ class Collector:
                 f'(phase={phase!r}, ids={list(activity_ids)}).'
             )
         scope = self.active_scenario_activity_ids
-        valid = scope if scope else tuple(a.id for a in story.activities)
+        valid = scope or tuple(a.id for a in story.activities)
         valid_set = set(valid)
         for aid in activity_ids:
             if aid in valid_set:

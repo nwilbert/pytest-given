@@ -30,9 +30,6 @@ from .glossary import (
 )
 from .source import capture_caller_source
 
-# Capture the built-in id() before it can be shadowed by local parameters.
-_obj_id = id
-
 type _PathArg = (
     Actor
     | WorkObject
@@ -94,7 +91,7 @@ def path(*parts: _PathArg) -> ActivityPath:
     # consulting any session-global. Keying by id() dedups by identity (Glossary
     # is unhashable) while keeping the object. Not serialized.
     glossaries: dict[int, Glossary] = {
-        _obj_id(owner): owner
+        id(owner): owner
         for owner in (_glossary_of(part) for part in parts)
         if owner is not None
     }
@@ -122,13 +119,13 @@ def _glossary_of(value: object) -> Glossary | None:
 
 def activity(
     *parts_or_paths: _PathArg | ActivityPath,
-    id: int | None = None,
+    activity_id: int | None = None,
 ) -> Activity:
     """Build an Activity from either positional parts (single path) or
     positional ActivityPath instances (multi-path). Mixing raises.
 
-    `id=` overrides the default sequence number (0). `story(...)` reassigns
-    sequence numbers when activities are passed without explicit ids.
+    `activity_id=` overrides the default sequence number (0). `story(...)`
+    reassigns sequence numbers when activities are passed without explicit ids.
     """
     has_paths = any(isinstance(p, ActivityPath) for p in parts_or_paths)
     has_parts = any(not isinstance(p, ActivityPath) for p in parts_or_paths)
@@ -143,12 +140,15 @@ def activity(
     else:
         paths = (path(*parts_or_paths),)  # type: ignore[arg-type]
     glossaries = _merge_glossaries(getattr(p, '_glossaries', {}) for p in paths)
-    if id == 0:
+    if activity_id == 0:
         raise PytestGivenError(
-            'activity(id=0) is reserved as the unset sentinel; '
-            'use id=1.. or omit to take the auto-assigned sequence number.'
+            'activity(activity_id=0) is reserved as the unset sentinel; '
+            'use activity_id=1.. or omit to take the auto-assigned sequence '
+            'number.'
         )
-    a = Activity(id=ActivityId(id if id is not None else 0), paths=paths)
+    a = Activity(
+        id=ActivityId(activity_id if activity_id is not None else 0), paths=paths
+    )
     object.__setattr__(a, '_glossaries', glossaries)
     return a
 

@@ -11,6 +11,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Changed
+
+- `activity(..., id=N)` is now `activity(..., activity_id=N)`. The keyword
+  shadowed the `id` builtin; the `Activity.id` field itself is unchanged.
+
 ## [0.1.0] - 2026-08-08
 
 First public release.
