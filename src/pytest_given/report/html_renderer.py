@@ -40,19 +40,29 @@ _NUM_PARAM_COLORS = 6
 type ParamColorMap = dict[str, int]
 
 
-def _neutralize_script_close(text: str) -> str:
-    """Replace `</` with `<\\/` so text embedded in an inline `<script>` can't
-    close the tag. `\\/` is a valid JS/JSON escape for `/`, so the parsed value
-    is unchanged while the HTML parser no longer sees a closing tag."""
-    return text.replace('</', '<\\/')
+def _neutralize_script_data(text: str) -> str:
+    """Escape the two sequences that let text embedded in an inline `<script>`
+    steer the HTML tokenizer out of plain script-data state.
+
+    - `</` closes the tag outright.
+    - `<!--` opens script-data-*escaped* state; a `<script` after it reaches
+      double-escaped state, where the template's own `</script>` no longer
+      terminates the element and the rest of the document — the Alpine bundle
+      included — is swallowed as script text.
+
+    `\\/` and `\\u003C` are both valid JSON *and* JS escapes, so the blob stays
+    parseable and the parsed value is unchanged, while the HTML parser sees
+    neither sequence."""
+    return text.replace('</', '<\\/').replace('<!--', '\\u003C!--')
 
 
 def _script_json(value: object) -> Markup:
-    """Serialize `value` to JSON for embedding in an inline `<script>`, with
-    `</` neutralized. `json.dumps` does not escape `</` inside string literals,
-    and these blobs carry user-controlled node ids — so a parametrize id
-    containing `</script>` would otherwise break out of the tag (stored XSS)."""
-    return Markup(_neutralize_script_close(json.dumps(value)))
+    """Serialize `value` to JSON for embedding in an inline `<script>`, with the
+    tokenizer-steering sequences neutralized. `json.dumps` escapes neither `</`
+    nor `<!--` inside string literals, and these blobs carry user-controlled
+    node ids — so a parametrize id containing `</script>` would otherwise break
+    out of the tag (stored XSS)."""
+    return Markup(_neutralize_script_data(json.dumps(value)))
 
 
 def _inline_md(text: str | None) -> Markup:
@@ -76,11 +86,11 @@ def render_html(
     expansion happens before this point). None disables source linking.
     """
     raw_json = json.dumps(report_to_dict(report), indent=2)
-    # JSON doesn't escape `</` inside string literals, but we embed `raw_json`
-    # inside an inline <script>; an attachment containing `</script>` would
-    # close the tag and yield stored XSS. `\/` is a valid JSON/JS escape for
-    # `/`, so this preserves the parsed value while neutering the HTML parser.
-    safe_report_json = _neutralize_script_close(raw_json)
+    # JSON escapes neither `</` nor `<!--` inside string literals, but we embed
+    # `raw_json` inside an inline <script>; an attachment containing `</script>`
+    # would close the tag and yield stored XSS, and one containing `<!--<script`
+    # would swallow the rest of the document. See `_neutralize_script_data`.
+    safe_report_json = _neutralize_script_data(raw_json)
 
     templates_dir = Path(__file__).parent / 'templates'
     css = (templates_dir / 'styles.css').read_text(encoding='utf-8')

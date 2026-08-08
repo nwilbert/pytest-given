@@ -9,6 +9,7 @@ import pytest
 from pytest_given import given, scenario, then, when
 from pytest_given.report.html_renderer import (
     _inline_md,
+    _neutralize_script_data,
     _render_narration_part,
     render_html,
 )
@@ -516,6 +517,61 @@ def test_render_escapes_script_close_in_node_id_blobs(tmp_path: Path) -> None:
     # Two literal `</script>` tags only (data block + alpine block); an
     # unescaped node id in any blob would add a third.
     assert content.count('</script>') == 2
+
+
+def test_render_escapes_comment_open_in_report_data(tmp_path: Path) -> None:
+    """`</` is not the only sequence that steers the HTML tokenizer out of the
+    inline `<script>`: `<!--` opens script-data-escaped state, and a `<script`
+    after it reaches double-escaped state, where the template's own `</script>`
+    stops terminating the element — swallowing the Alpine bundle and the rest of
+    the document. A narration of `<!--<script>` is enough to trigger it."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'i',
+                        'narration': _narration('<!--<script>'),
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'parameters': None,
+                        'error': None,
+                        'steps': [],
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    content = html_path.read_text(encoding='utf-8')
+    # No raw `<!--` survives into the data blob; the escaped form carries the
+    # same parsed value.
+    script_start = content.index('window.__REPORT_DATA__')
+    assert '<!--' not in content[script_start:]
+    assert '\\u003C!--' in content
+    # Both script blocks still close, so the document is not swallowed.
+    assert content.count('</script>') == 2
+    assert content.rstrip().endswith('</html>')
+
+
+def test_neutralized_script_data_stays_valid_json() -> None:
+    """The escapes must leave the blob parseable with the value unchanged —
+    `\\/` and `\\u003C` are chosen over e.g. `\\!` for exactly that reason."""
+    payload = {'a': '</script>', 'b': '<!--<script>'}
+    neutralized = _neutralize_script_data(json.dumps(payload))
+    assert '</' not in neutralized
+    assert '<!--' not in neutralized
+    assert json.loads(neutralized) == payload
 
 
 def test_render_narration_part_rejects_unknown_variant() -> None:
