@@ -345,8 +345,11 @@ function reportApp() {
         if (!pill) { return; }
         nameEl.textContent = pill.dataset.termName;
         const def = pill.dataset.termDef || '';
-        // def is markdown-rendered HTML (from data-term-def), generated from
-        // trusted test source, so innerHTML is safe here.
+        // innerHTML because a definition carries inline markup. Safe not
+        // because the source is trusted — a term definition is ordinary
+        // report data — but because render_inline_markdown escapes the text
+        // first and only re-admits <br>/<code>/<strong>/<em>, none of which
+        // take attributes. Keep that invariant if you extend the renderer.
         defEl.innerHTML = def;
         defEl.hidden = !def;
         tip.hidden = false;

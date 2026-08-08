@@ -1109,12 +1109,13 @@ span.param-highlight {
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span>
         <span class="scenario-name">Basic scenario with when/then and a JSON attachment</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/buy_coffee', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/buy_coffee"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'happy-path' }" @click.stop="filterByTag('happy-path')">happy-path</span>
+        <span class="scenario-tag" data-tag="happy-path" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">happy-path</span>
         
         
         
@@ -1151,7 +1152,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1166,10 +1167,11 @@ span.param-highlight {
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span>
         <span class="scenario-name">Plain text attachment</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/text_attachment', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/text_attachment"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -1207,7 +1209,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1222,7 +1224,8 @@ Total:        $2.00</pre></div>
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span>
         <span class="scenario-name">Generator fixture with teardown</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/generator_fixture', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/generator_fixture"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -1250,7 +1253,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1265,7 +1268,8 @@ Total:        $2.00</pre></div>
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span>
         <span class="scenario-name">T-string with a non-parametrize value (neutral highlight)</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/neutral_highlight', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/neutral_highlight"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -1295,7 +1299,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
       
     </div>
     </div>
@@ -1310,10 +1314,11 @@ Total:        $2.00</pre></div>
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[4] }"></span>
         <span class="scenario-name">Helper functions can record their own steps</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/buy_with_validation', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/buy_with_validation"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -1362,7 +1367,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L121">examples/coffeeshop/test_coffeeshop.py:121</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L121">examples/coffeeshop/test_coffeeshop.py:121</a></div>
       
     </div>
     </div>
@@ -1377,10 +1382,11 @@ Total:        $2.00</pre></div>
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[5] }"></span>
         <span class="scenario-name">Top-level `given` block and deeply nested steps</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/complex_order', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/complex_order"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -1450,7 +1456,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L134">examples/coffeeshop/test_coffeeshop.py:134</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L134">examples/coffeeshop/test_coffeeshop.py:134</a></div>
       
     </div>
     </div>
@@ -1465,12 +1471,13 @@ Total:        $2.00</pre></div>
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[6] }"></span>
         <span class="scenario-name">An expected error, narrated as when + then (when_then)</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/sold_out_is_rejected', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/sold_out_is_rejected"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'validation' }" @click.stop="filterByTag('validation')">validation</span>
+        <span class="scenario-tag" data-tag="validation" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">validation</span>
         
         
         
@@ -1499,7 +1506,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L168">examples/coffeeshop/test_coffeeshop.py:168</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L168">examples/coffeeshop/test_coffeeshop.py:168</a></div>
       
     </div>
     </div>
@@ -1514,19 +1521,20 @@ Total:        $2.00</pre></div>
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[7] }"></span>
         <span class="scenario-name">Many tags (the report collapses them behind a +N pill)</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/discounted_purchase', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/discounted_purchase"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'loyalty' }" @click.stop="filterByTag('loyalty')">loyalty</span>
+        <span class="scenario-tag" data-tag="loyalty" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">loyalty</span>
         
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'discounts' }" @click.stop="filterByTag('discounts')">discounts</span>
+        <span class="scenario-tag" data-tag="discounts" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">discounts</span>
         
         
-        <span class="scenario-tag" x-cloak x-show="expandedTags[7] || activeTag === 'happy-path'" :class="{ 'active-tag': activeTag === 'happy-path' }" @click.stop="filterByTag('happy-path')">happy-path</span>
+        <span class="scenario-tag" x-cloak data-tag="happy-path" x-show="expandedTags[7] || activeTag === $el.dataset.tag" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">happy-path</span>
         
-        <span class="scenario-tag" x-cloak x-show="expandedTags[7] || activeTag === 'regression'" :class="{ 'active-tag': activeTag === 'regression' }" @click.stop="filterByTag('regression')">regression</span>
+        <span class="scenario-tag" x-cloak data-tag="regression" x-show="expandedTags[7] || activeTag === $el.dataset.tag" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">regression</span>
         
         
         <span class="scenario-tag scenario-tag-more" x-show="!expandedTags[7]" @click.stop="expandedTags[7] = true">+2</span>
@@ -1558,7 +1566,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L185">examples/coffeeshop/test_coffeeshop.py:185</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L185">examples/coffeeshop/test_coffeeshop.py:185</a></div>
       
     </div>
     </div>
@@ -1573,7 +1581,8 @@ Total:        $2.00</pre></div>
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[8] }"></span>
         <span class="scenario-name">Failure rendering (intentionally failing)</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/failing', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/failing"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -1581,7 +1590,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">85ms</span>
+        <span class="scenario-duration">79ms</span>
       </span>
     </div>
 
@@ -1657,7 +1666,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L201">examples/coffeeshop/test_coffeeshop.py:201</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L201">examples/coffeeshop/test_coffeeshop.py:201</a></div>
       
     </div>
     </div>
@@ -1672,7 +1681,8 @@ Total:        $2.00</pre></div>
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[9] }"></span>
         <span class="scenario-name">Skipped scenario rendering</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/skipped', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/skipped"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -1699,7 +1709,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L207">examples/coffeeshop/test_coffeeshop.py:207</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L207">examples/coffeeshop/test_coffeeshop.py:207</a></div>
       
     </div>
     </div>
@@ -1714,10 +1724,11 @@ Total:        $2.00</pre></div>
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[10] }"></span>
         <span class="scenario-name">Parametrized test (renders as a parameter table)</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/pricing', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/pricing"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -1734,9 +1745,9 @@ Total:        $2.00</pre></div>
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I insert $<span class="param-color-0" data-param="euros" @mouseenter="setHoverParam('euros', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{euros}</span></div>
+            <div class="step-text">I insert $<span class="param-color-0" data-param="euros" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{euros}</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the purchase is allowed: <span class="param-color-1" data-param="expect" @mouseenter="setHoverParam('expect', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{expect}</span></div>
+            <div class="step-text">the purchase is allowed: <span class="param-color-1" data-param="expect" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{expect}</span></div>
           </div></div>
 
       
@@ -1745,11 +1756,11 @@ Total:        $2.00</pre></div>
           <tr>
             
             <th class="param-color-0" data-param="euros"
-                @mouseenter="setHoverParam('euros', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">euros</th>
             
             <th class="param-color-1" data-param="expect"
-                @mouseenter="setHoverParam('expect', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">expect</th>
             
             <th style="text-align:right">status</th>
@@ -1762,11 +1773,11 @@ Total:        $2.00</pre></div>
               @mouseleave="clearHoverRow($event.currentTarget)">
             
             <td data-param="euros"
-                @mouseenter="setHoverParam('euros', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">1</td>
             
             <td data-param="expect"
-                @mouseenter="setHoverParam('expect', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">False</td>
             
             <td style="text-align:right">
@@ -1780,11 +1791,11 @@ Total:        $2.00</pre></div>
               @mouseleave="clearHoverRow($event.currentTarget)">
             
             <td data-param="euros"
-                @mouseenter="setHoverParam('euros', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">2</td>
             
             <td data-param="expect"
-                @mouseenter="setHoverParam('expect', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">True</td>
             
             <td style="text-align:right">
@@ -1798,11 +1809,11 @@ Total:        $2.00</pre></div>
               @mouseleave="clearHoverRow($event.currentTarget)">
             
             <td data-param="euros"
-                @mouseenter="setHoverParam('euros', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">3</td>
             
             <td data-param="expect"
-                @mouseenter="setHoverParam('expect', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">True</td>
             
             <td style="text-align:right">
@@ -1818,7 +1829,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -1833,10 +1844,11 @@ Total:        $2.00</pre></div>
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[11] }"></span>
         <span class="scenario-name">Parametrize value surfaced as a given (Annotated)</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/annotated_given_label', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/annotated_given_label"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -1853,7 +1865,7 @@ Total:        $2.00</pre></div>
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
           </div><div class="phase-steps">
-            <div class="step-text">an order for a <span class="param-color-2" data-param="cup_size" @mouseenter="setHoverParam('cup_size', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{cup_size}</span> ml cup</div>
+            <div class="step-text">an order for a <span class="param-color-2" data-param="cup_size" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{cup_size}</span> ml cup</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
             <div class="step-text">I brew the cup</div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
@@ -1866,7 +1878,7 @@ Total:        $2.00</pre></div>
           <tr>
             
             <th class="param-color-2" data-param="cup_size"
-                @mouseenter="setHoverParam('cup_size', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">cup_size</th>
             
             <th style="text-align:right">status</th>
@@ -1879,7 +1891,7 @@ Total:        $2.00</pre></div>
               @mouseleave="clearHoverRow($event.currentTarget)">
             
             <td data-param="cup_size"
-                @mouseenter="setHoverParam('cup_size', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">200</td>
             
             <td style="text-align:right">
@@ -1893,7 +1905,7 @@ Total:        $2.00</pre></div>
               @mouseleave="clearHoverRow($event.currentTarget)">
             
             <td data-param="cup_size"
-                @mouseenter="setHoverParam('cup_size', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">350</td>
             
             <td style="text-align:right">
@@ -1909,7 +1921,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -1922,12 +1934,13 @@ Total:        $2.00</pre></div>
     <div class="scenario-header" @click="toggleScenario(12)">
       <div style="display:flex; align-items:center;">
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[12] }"></span>
-        <span class="scenario-name">Brew <span class="param-color-2" data-param="cup_size" @mouseenter="setHoverParam('cup_size', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{cup_size}</span> ml (templated scenario name)</span>
+        <span class="scenario-name">Brew <span class="param-color-2" data-param="cup_size" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{cup_size}</span> ml (templated scenario name)</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/brew', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/brew"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === 'billing' }" @click.stop="filterByTag('billing')">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -1944,7 +1957,7 @@ Total:        $2.00</pre></div>
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I brew a <span class="param-color-2" data-param="cup_size" @mouseenter="setHoverParam('cup_size', $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{cup_size}</span> ml cup</div>
+            <div class="step-text">I brew a <span class="param-color-2" data-param="cup_size" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{cup_size}</span> ml cup</div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text">the machine has one fewer coffee</div>
           </div></div>
@@ -1955,7 +1968,7 @@ Total:        $2.00</pre></div>
           <tr>
             
             <th class="param-color-2" data-param="cup_size"
-                @mouseenter="setHoverParam('cup_size', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">cup_size</th>
             
             <th style="text-align:right">status</th>
@@ -1968,7 +1981,7 @@ Total:        $2.00</pre></div>
               @mouseleave="clearHoverRow($event.currentTarget)">
             
             <td data-param="cup_size"
-                @mouseenter="setHoverParam('cup_size', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">200</td>
             
             <td style="text-align:right">
@@ -1982,7 +1995,7 @@ Total:        $2.00</pre></div>
               @mouseleave="clearHoverRow($event.currentTarget)">
             
             <td data-param="cup_size"
-                @mouseenter="setHoverParam('cup_size', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">300</td>
             
             <td style="text-align:right">
@@ -1998,7 +2011,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
       
     </div>
     </div>
@@ -2013,7 +2026,8 @@ Total:        $2.00</pre></div>
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[13] }"></span>
         <span class="scenario-name">All cases skipped</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=coffeeshop/parametrized_all_skipped', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=coffeeshop/parametrized_all_skipped"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -2036,7 +2050,7 @@ Total:        $2.00</pre></div>
           <tr>
             
             <th class="param-color-3" data-param="n"
-                @mouseenter="setHoverParam('n', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">n</th>
             
             <th style="text-align:right">status</th>
@@ -2049,7 +2063,7 @@ Total:        $2.00</pre></div>
               @mouseleave="clearHoverRow($event.currentTarget)">
             
             <td data-param="n"
-                @mouseenter="setHoverParam('n', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">1</td>
             
             <td style="text-align:right">
@@ -2063,7 +2077,7 @@ Total:        $2.00</pre></div>
               @mouseleave="clearHoverRow($event.currentTarget)">
             
             <td data-param="n"
-                @mouseenter="setHoverParam('n', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">2</td>
             
             <td style="text-align:right">
@@ -2079,7 +2093,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/coffeeshop/test_coffeeshop.py#L214">examples/coffeeshop/test_coffeeshop.py:214</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/coffeeshop/test_coffeeshop.py#L214">examples/coffeeshop/test_coffeeshop.py:214</a></div>
       
     </div>
     </div>
@@ -2110,10 +2124,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-18T06:55:46.981643+00:00",
+    "timestamp": "2026-08-08T10:31:30.610896+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "5e48f654b31d9300791f8c83e0ec2bc086603ab1"
+    "commit_sha": "e98e43d3bfd997ced56539948ac625e05c560011"
   },
   "scenarios": [
     {
@@ -2938,7 +2952,7 @@ window.__REPORT_DATA__ = {
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 85,
+      "duration_ms": 79,
       "steps": [
         {
           "phase": "given",
@@ -3824,8 +3838,11 @@ function reportApp() {
         if (!pill) { return; }
         nameEl.textContent = pill.dataset.termName;
         const def = pill.dataset.termDef || '';
-        // def is markdown-rendered HTML (from data-term-def), generated from
-        // trusted test source, so innerHTML is safe here.
+        // innerHTML because a definition carries inline markup. Safe not
+        // because the source is trusted — a term definition is ordinary
+        // report data — but because render_inline_markdown escapes the text
+        // first and only re-admits <br>/<code>/<strong>/<em>, none of which
+        // take attributes. Keep that invariant if you extend the renderer.
         defEl.innerHTML = def;
         defEl.hidden = !def;
         tip.hidden = false;

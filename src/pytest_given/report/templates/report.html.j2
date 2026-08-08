@@ -25,7 +25,8 @@
 
   {%- macro anchor_link(hash) -%}
     <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('{{ hash }}', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="{{ hash }}"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
   {%- endmacro -%}
 
   {%- macro render_error(error) -%}
@@ -53,6 +54,13 @@
     </div>
   {%- endmacro -%}
 
+  {#- `step_id` is interpolated straight into the Alpine expressions below,
+      which is only safe because every caller builds it from loop indices
+      ('s0_1_2') and never from report data. Alpine compiles a directive's
+      decoded attribute text as JS, so a value carrying a `'` would break out
+      of the string literal — HTML-escaping does not stop that. Anything
+      data-derived goes in a `data-*` attribute and is read via
+      `$el.dataset.*`, as `data-tag` and `data-term-id` do. -#}
   {%- macro render_step(step, step_id) -%}
   <div class="step-text">
     {%- if step.children and step.children | length > 0 -%}
@@ -205,10 +213,10 @@
         {%- set visible_tags = scenario.tags[:3] if collapse_tags else scenario.tags -%}
         {%- set overflow_tags = scenario.tags[3:] if collapse_tags else [] -%}
         {% for tag in visible_tags %}
-        <span class="scenario-tag" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
+        <span class="scenario-tag" data-tag="{{ tag }}" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">{{ tag }}</span>
         {% endfor %}
         {% for tag in overflow_tags %}
-        <span class="scenario-tag" x-cloak x-show="expandedTags[{{ scenario_idx }}] || activeTag === '{{ tag }}'" :class="{ 'active-tag': activeTag === '{{ tag }}' }" @click.stop="filterByTag('{{ tag }}')">{{ tag }}</span>
+        <span class="scenario-tag" x-cloak data-tag="{{ tag }}" x-show="expandedTags[{{ scenario_idx }}] || activeTag === $el.dataset.tag" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">{{ tag }}</span>
         {% endfor %}
         {% if overflow_tags %}
         <span class="scenario-tag scenario-tag-more" x-show="!expandedTags[{{ scenario_idx }}]" @click.stop="expandedTags[{{ scenario_idx }}] = true">+{{ overflow_tags | length }}</span>
@@ -248,7 +256,7 @@
           <tr>
             {% for name in scenario.parameters.names %}
             <th class="param-color-{{ param_color_map.get(name, 0) % num_param_colors }}" data-param="{{ name }}"
-                @mouseenter="setHoverParam('{{ name }}', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">{{ name }}</th>
             {% endfor %}
             <th style="text-align:right">status</th>
@@ -261,7 +269,7 @@
               @mouseleave="clearHoverRow($event.currentTarget)">
             {% for name, val in zip(scenario.parameters.names, case.values) %}
             <td data-param="{{ name }}"
-                @mouseenter="setHoverParam('{{ name }}', $event.currentTarget)"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">{{ val }}</td>
             {% endfor %}
             <td style="text-align:right">
@@ -303,8 +311,9 @@
       <div class="sidebar-label">Stories</div>
       {% for story in stories %}
       {% set scns = story_rollups[story.id].scenarios %}
-      <div class="story-sidebar-item" :class="{ active: selectedStory === '{{ story.id }}' }"
-           @click="selectedStory = '{{ story.id }}'">
+      <div class="story-sidebar-item" data-story-id="{{ story.id }}"
+           :class="{ active: selectedStory === $el.dataset.storyId }"
+           @click="selectedStory = $el.dataset.storyId">
         <div class="story-sidebar-title">{{ story.title }}</div>
         <div class="story-sidebar-meta">{{ story.activities | length }} activities · {{ scns | length }} scenario{{ 's' if scns | length != 1 else '' }}</div>
       </div>
@@ -312,7 +321,7 @@
     </div>
     <div class="view-main">
       {% for story in stories %}
-      <div x-show="selectedStory === '{{ story.id }}'">
+      <div data-story-id="{{ story.id }}" x-show="selectedStory === $el.dataset.storyId">
         {% set rollup = story_rollups[story.id] %}
         {% set story_scns = rollup.scenarios %}
         {% set total_scns = story_scns | length %}
@@ -329,9 +338,9 @@
           {% set cov = rollup.per_activity[activity.id] %}
           <div class="activity-row" id="activity-{{ story.id }}-{{ activity.id }}"
                data-activity-id="{{ activity.id }}"
-               :class="{ 'activity-row-highlight': highlightedActivities['{{ activity.id }}'] }">
-            <div class="activity-num"
-                 :class="{ 'activity-num-highlight': highlightedActivities['{{ activity.id }}'] }">{{ activity.id }}</div>
+               :class="{ 'activity-row-highlight': highlightedActivities[$el.dataset.activityId] }">
+            <div class="activity-num" data-activity-id="{{ activity.id }}"
+                 :class="{ 'activity-num-highlight': highlightedActivities[$el.dataset.activityId] }">{{ activity.id }}</div>
             <div class="activity-body">
               {% for path in activity.paths %}
               <div class="activity-path">
@@ -356,7 +365,10 @@
           <div class="story-section-heading">Scenarios</div>
           {% for scn in story_scns %}
           <div class="scenario {{ scn.status }}" style="margin-bottom: var(--space-sm);"
-               x-show="activitySelectionMatches({{ scn_covers.get(scn.id, []) }})">
+               {# Single-quoted: `tojson` escapes `<`, `>`, `&` and `'`, but not
+                  the `"` its own string literals need. #}
+               data-covers='{{ scn_covers.get(scn.id, []) | tojson }}'
+               x-show="activitySelectionMatches(JSON.parse($el.dataset.covers))">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <span class="scenario-name scenario-name--goto"
@@ -373,7 +385,7 @@
               <span class="scn-act-label">Covers:</span>
               {% for act_id in scn_covers.get(scn.id, []) %}
               <span class="use-chip" data-activity-id="{{ act_id }}"
-                    :class="{ 'use-chip-highlight': highlightedActivities['{{ act_id }}'] }">{{ act_id }}</span>
+                    :class="{ 'use-chip-highlight': highlightedActivities[$el.dataset.activityId] }">{{ act_id }}</span>
               {% endfor %}
             </div>
             {% endif %}
@@ -495,8 +507,8 @@
         <div class="entry" id="term-{{ term.id }}"
              data-search="{{ term.canonical | lower }}"
              x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" @click="expandedTerms['{{ term.id }}'] ? delete expandedTerms['{{ term.id }}'] : (expandedTerms['{{ term.id }}'] = true)">
-            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['{{ term.id }}'] }"></span>
+          <div class="entry-head" data-term-id="{{ term.id }}" @click="expandedTerms[$el.dataset.termId] ? delete expandedTerms[$el.dataset.termId] : (expandedTerms[$el.dataset.termId] = true)">
+            <span class="scenario-chevron" data-term-id="{{ term.id }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span>
             <span class="entry-name">
               <span class="term-pill {{ kind_cls }}">{{ term.canonical }}</span>
             </span>
@@ -521,14 +533,14 @@
             </div>
             {{ anchor_link('view=glossary&term=' ~ term.id) }}
           </div>
-          <div class="refs scenario-body" :class="{ expanded: expandedTerms['{{ term.id }}'] }">
+          <div class="refs scenario-body" data-term-id="{{ term.id }}" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
                 {% if agg and agg.stories %}
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   {% for sid in agg.stories %}
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = '{{ sid }}'">{{ sid }}</a>
+                  <a class="use-chip" href="#" data-story-id="{{ sid }}" @click.prevent="mainView = 'stories'; selectedStory = $el.dataset.storyId">{{ sid }}</a>
                   {% endfor %}
                 </div>
                 {% endif %}
@@ -550,8 +562,8 @@
                 {% endif %}
                 {% if scn_ids %}
                 <div class="refs-line">
-                  <a class="use-chip" href="#"
-                     @click.prevent="filterScenariosByTerm('{{ term.id }}')">
+                  <a class="use-chip" href="#" data-term-id="{{ term.id }}"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show {{ scn_ids | length }} scenario{{ 's' if scn_ids | length != 1 else '' }} using this term
                   </a>
                 </div>

@@ -1125,7 +1125,8 @@ span.param-highlight {
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span>
         <span class="scenario-name">Guest books an available room</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=file_glossary_booking/book_available_room', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=file_glossary_booking/book_available_room"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -1155,7 +1156,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
       
     </div>
     </div>
@@ -1170,7 +1171,8 @@ span.param-highlight {
         <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span>
         <span class="scenario-name">Guest cannot book an unavailable room</span>
         <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('scenario=file_glossary_booking/book_unavailable_room', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="scenario=file_glossary_booking/book_unavailable_room"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -1200,7 +1202,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
       
     </div>
     </div>
@@ -1218,8 +1220,9 @@ span.param-highlight {
       <div class="sidebar-label">Stories</div>
       
       
-      <div class="story-sidebar-item" :class="{ active: selectedStory === 'book-a-room' }"
-           @click="selectedStory = 'book-a-room'">
+      <div class="story-sidebar-item" data-story-id="book-a-room"
+           :class="{ active: selectedStory === $el.dataset.storyId }"
+           @click="selectedStory = $el.dataset.storyId">
         <div class="story-sidebar-title">Book a Room</div>
         <div class="story-sidebar-meta">3 activities · 2 scenarios</div>
       </div>
@@ -1227,14 +1230,15 @@ span.param-highlight {
     </div>
     <div class="view-main">
       
-      <div x-show="selectedStory === 'book-a-room'">
+      <div data-story-id="book-a-room" x-show="selectedStory === $el.dataset.storyId">
         
         
         
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
             <div class="header-title">Book a Room<button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('view=stories&amp;story=book-a-room', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></div>
+            data-anchor="view=stories&amp;story=book-a-room"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></div>
             <div class="header-context">3 activities · 2 scenarios</div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
                     @click="clearActivityHighlights()">Deselect</button>
@@ -1245,9 +1249,9 @@ span.param-highlight {
           
           <div class="activity-row" id="activity-book-a-room-1"
                data-activity-id="1"
-               :class="{ 'activity-row-highlight': highlightedActivities['1'] }">
-            <div class="activity-num"
-                 :class="{ 'activity-num-highlight': highlightedActivities['1'] }">1</div>
+               :class="{ 'activity-row-highlight': highlightedActivities[$el.dataset.activityId] }">
+            <div class="activity-num" data-activity-id="1"
+                 :class="{ 'activity-num-highlight': highlightedActivities[$el.dataset.activityId] }">1</div>
             <div class="activity-body">
               
               <div class="activity-path">
@@ -1265,9 +1269,9 @@ span.param-highlight {
           
           <div class="activity-row" id="activity-book-a-room-2"
                data-activity-id="2"
-               :class="{ 'activity-row-highlight': highlightedActivities['2'] }">
-            <div class="activity-num"
-                 :class="{ 'activity-num-highlight': highlightedActivities['2'] }">2</div>
+               :class="{ 'activity-row-highlight': highlightedActivities[$el.dataset.activityId] }">
+            <div class="activity-num" data-activity-id="2"
+                 :class="{ 'activity-num-highlight': highlightedActivities[$el.dataset.activityId] }">2</div>
             <div class="activity-body">
               
               <div class="activity-path">
@@ -1286,9 +1290,9 @@ span.param-highlight {
           
           <div class="activity-row" id="activity-book-a-room-3"
                data-activity-id="3"
-               :class="{ 'activity-row-highlight': highlightedActivities['3'] }">
-            <div class="activity-num"
-                 :class="{ 'activity-num-highlight': highlightedActivities['3'] }">3</div>
+               :class="{ 'activity-row-highlight': highlightedActivities[$el.dataset.activityId] }">
+            <div class="activity-num" data-activity-id="3"
+                 :class="{ 'activity-num-highlight': highlightedActivities[$el.dataset.activityId] }">3</div>
             <div class="activity-body">
               
               <div class="activity-path">
@@ -1309,7 +1313,9 @@ span.param-highlight {
           <div class="story-section-heading">Scenarios</div>
           
           <div class="scenario passed" style="margin-bottom: var(--space-sm);"
-               x-show="activitySelectionMatches([2, 3])">
+               
+               data-covers='[2, 3]'
+               x-show="activitySelectionMatches(JSON.parse($el.dataset.covers))">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <span class="scenario-name scenario-name--goto"
@@ -1326,17 +1332,19 @@ span.param-highlight {
               <span class="scn-act-label">Covers:</span>
               
               <span class="use-chip" data-activity-id="2"
-                    :class="{ 'use-chip-highlight': highlightedActivities['2'] }">2</span>
+                    :class="{ 'use-chip-highlight': highlightedActivities[$el.dataset.activityId] }">2</span>
               
               <span class="use-chip" data-activity-id="3"
-                    :class="{ 'use-chip-highlight': highlightedActivities['3'] }">3</span>
+                    :class="{ 'use-chip-highlight': highlightedActivities[$el.dataset.activityId] }">3</span>
               
             </div>
             
           </div>
           
           <div class="scenario passed" style="margin-bottom: var(--space-sm);"
-               x-show="activitySelectionMatches([2])">
+               
+               data-covers='[2]'
+               x-show="activitySelectionMatches(JSON.parse($el.dataset.covers))">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <span class="scenario-name scenario-name--goto"
@@ -1353,7 +1361,7 @@ span.param-highlight {
               <span class="scn-act-label">Covers:</span>
               
               <span class="use-chip" data-activity-id="2"
-                    :class="{ 'use-chip-highlight': highlightedActivities['2'] }">2</span>
+                    :class="{ 'use-chip-highlight': highlightedActivities[$el.dataset.activityId] }">2</span>
               
             </div>
             
@@ -1361,7 +1369,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -1462,8 +1470,8 @@ span.param-highlight {
         <div class="entry" id="term-guest"
              data-search="guest"
              x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" @click="expandedTerms['guest'] ? delete expandedTerms['guest'] : (expandedTerms['guest'] = true)">
-            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['guest'] }"></span>
+          <div class="entry-head" data-term-id="guest" @click="expandedTerms[$el.dataset.termId] ? delete expandedTerms[$el.dataset.termId] : (expandedTerms[$el.dataset.termId] = true)">
+            <span class="scenario-chevron" data-term-id="guest" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span>
             <span class="entry-name">
               <span class="term-pill term-actor">Guest</span>
             </span>
@@ -1484,16 +1492,17 @@ span.param-highlight {
               </div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('view=glossary&amp;term=guest', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="view=glossary&amp;term=guest"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
-          <div class="refs scenario-body" :class="{ expanded: expandedTerms['guest'] }">
+          <div class="refs scenario-body" data-term-id="guest" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
                 
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-room'">book-a-room</a>
+                  <a class="use-chip" href="#" data-story-id="book-a-room" @click.prevent="mainView = 'stories'; selectedStory = $el.dataset.storyId">book-a-room</a>
                   
                 </div>
                 
@@ -1501,14 +1510,14 @@ span.param-highlight {
                 
                 
                 <div class="refs-line">
-                  <a class="use-chip" href="#"
-                     @click.prevent="filterScenariosByTerm('guest')">
+                  <a class="use-chip" href="#" data-term-id="guest"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 2 scenarios using this term
                   </a>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
                 
               </div>
             </div>
@@ -1537,8 +1546,8 @@ span.param-highlight {
         <div class="entry" id="term-room"
              data-search="room"
              x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" @click="expandedTerms['room'] ? delete expandedTerms['room'] : (expandedTerms['room'] = true)">
-            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['room'] }"></span>
+          <div class="entry-head" data-term-id="room" @click="expandedTerms[$el.dataset.termId] ? delete expandedTerms[$el.dataset.termId] : (expandedTerms[$el.dataset.termId] = true)">
+            <span class="scenario-chevron" data-term-id="room" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span>
             <span class="entry-name">
               <span class="term-pill term-obj">Room</span>
             </span>
@@ -1559,16 +1568,17 @@ span.param-highlight {
               </div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('view=glossary&amp;term=room', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="view=glossary&amp;term=room"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
-          <div class="refs scenario-body" :class="{ expanded: expandedTerms['room'] }">
+          <div class="refs scenario-body" data-term-id="room" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
                 
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-room'">book-a-room</a>
+                  <a class="use-chip" href="#" data-story-id="book-a-room" @click.prevent="mainView = 'stories'; selectedStory = $el.dataset.storyId">book-a-room</a>
                   
                 </div>
                 
@@ -1576,14 +1586,14 @@ span.param-highlight {
                 
                 
                 <div class="refs-line">
-                  <a class="use-chip" href="#"
-                     @click.prevent="filterScenariosByTerm('room')">
+                  <a class="use-chip" href="#" data-term-id="room"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 2 scenarios using this term
                   </a>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
                 
               </div>
             </div>
@@ -1597,8 +1607,8 @@ span.param-highlight {
         <div class="entry" id="term-confirmation"
              data-search="confirmation"
              x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" @click="expandedTerms['confirmation'] ? delete expandedTerms['confirmation'] : (expandedTerms['confirmation'] = true)">
-            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['confirmation'] }"></span>
+          <div class="entry-head" data-term-id="confirmation" @click="expandedTerms[$el.dataset.termId] ? delete expandedTerms[$el.dataset.termId] : (expandedTerms[$el.dataset.termId] = true)">
+            <span class="scenario-chevron" data-term-id="confirmation" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span>
             <span class="entry-name">
               <span class="term-pill term-obj">Confirmation</span>
             </span>
@@ -1619,16 +1629,17 @@ span.param-highlight {
               </div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('view=glossary&amp;term=confirmation', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="view=glossary&amp;term=confirmation"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
-          <div class="refs scenario-body" :class="{ expanded: expandedTerms['confirmation'] }">
+          <div class="refs scenario-body" data-term-id="confirmation" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
                 
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-room'">book-a-room</a>
+                  <a class="use-chip" href="#" data-story-id="book-a-room" @click.prevent="mainView = 'stories'; selectedStory = $el.dataset.storyId">book-a-room</a>
                   
                 </div>
                 
@@ -1636,14 +1647,14 @@ span.param-highlight {
                 
                 
                 <div class="refs-line">
-                  <a class="use-chip" href="#"
-                     @click.prevent="filterScenariosByTerm('confirmation')">
+                  <a class="use-chip" href="#" data-term-id="confirmation"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 2 scenarios using this term
                   </a>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
                 
               </div>
             </div>
@@ -1672,8 +1683,8 @@ span.param-highlight {
         <div class="entry" id="term-book"
              data-search="book"
              x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" @click="expandedTerms['book'] ? delete expandedTerms['book'] : (expandedTerms['book'] = true)">
-            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['book'] }"></span>
+          <div class="entry-head" data-term-id="book" @click="expandedTerms[$el.dataset.termId] ? delete expandedTerms[$el.dataset.termId] : (expandedTerms[$el.dataset.termId] = true)">
+            <span class="scenario-chevron" data-term-id="book" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span>
             <span class="entry-name">
               <span class="term-pill term-verb">book</span>
             </span>
@@ -1694,16 +1705,17 @@ span.param-highlight {
               </div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('view=glossary&amp;term=book', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="view=glossary&amp;term=book"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
-          <div class="refs scenario-body" :class="{ expanded: expandedTerms['book'] }">
+          <div class="refs scenario-body" data-term-id="book" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
                 
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   
-                  <a class="use-chip" href="#" @click.prevent="mainView = 'stories'; selectedStory = 'book-a-room'">book-a-room</a>
+                  <a class="use-chip" href="#" data-story-id="book-a-room" @click.prevent="mainView = 'stories'; selectedStory = $el.dataset.storyId">book-a-room</a>
                   
                 </div>
                 
@@ -1718,14 +1730,14 @@ span.param-highlight {
                 
                 
                 <div class="refs-line">
-                  <a class="use-chip" href="#"
-                     @click.prevent="filterScenariosByTerm('book')">
+                  <a class="use-chip" href="#" data-term-id="book"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 2 scenarios using this term
                   </a>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
                 
               </div>
             </div>
@@ -1754,8 +1766,8 @@ span.param-highlight {
         <div class="entry" id="term-cancellation-policy"
              data-search="cancellation policy"
              x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" @click="expandedTerms['cancellation-policy'] ? delete expandedTerms['cancellation-policy'] : (expandedTerms['cancellation-policy'] = true)">
-            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['cancellation-policy'] }"></span>
+          <div class="entry-head" data-term-id="cancellation-policy" @click="expandedTerms[$el.dataset.termId] ? delete expandedTerms[$el.dataset.termId] : (expandedTerms[$el.dataset.termId] = true)">
+            <span class="scenario-chevron" data-term-id="cancellation-policy" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span>
             <span class="entry-name">
               <span class="term-pill term-kindless">Cancellation Policy</span>
             </span>
@@ -1773,9 +1785,10 @@ span.param-highlight {
               </div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('view=glossary&amp;term=cancellation-policy', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="view=glossary&amp;term=cancellation-policy"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
-          <div class="refs scenario-body" :class="{ expanded: expandedTerms['cancellation-policy'] }">
+          <div class="refs scenario-body" data-term-id="cancellation-policy" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
                 
@@ -1783,14 +1796,14 @@ span.param-highlight {
                 
                 
                 <div class="refs-line">
-                  <a class="use-chip" href="#"
-                     @click.prevent="filterScenariosByTerm('cancellation-policy')">
+                  <a class="use-chip" href="#" data-term-id="cancellation-policy"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 2 scenarios using this term
                   </a>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
                 
               </div>
             </div>
@@ -1804,8 +1817,8 @@ span.param-highlight {
         <div class="entry" id="term-overbooking"
              data-search="overbooking"
              x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" @click="expandedTerms['overbooking'] ? delete expandedTerms['overbooking'] : (expandedTerms['overbooking'] = true)">
-            <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedTerms['overbooking'] }"></span>
+          <div class="entry-head" data-term-id="overbooking" @click="expandedTerms[$el.dataset.termId] ? delete expandedTerms[$el.dataset.termId] : (expandedTerms[$el.dataset.termId] = true)">
+            <span class="scenario-chevron" data-term-id="overbooking" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span>
             <span class="entry-name">
               <span class="term-pill term-kindless">Overbooking</span>
             </span>
@@ -1820,9 +1833,10 @@ span.param-highlight {
               </div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
-            @click.stop="copyAnchor('view=glossary&amp;term=overbooking', $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+            data-anchor="view=glossary&amp;term=overbooking"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           </div>
-          <div class="refs scenario-body" :class="{ expanded: expandedTerms['overbooking'] }">
+          <div class="refs scenario-body" data-term-id="overbooking" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
                 
@@ -1830,7 +1844,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5e48f654b31d9300791f8c83e0ec2bc086603ab1/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
                 
               </div>
             </div>
@@ -1858,10 +1872,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-18T06:55:47.799739+00:00",
+    "timestamp": "2026-08-08T10:31:31.328584+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "5e48f654b31d9300791f8c83e0ec2bc086603ab1"
+    "commit_sha": "e98e43d3bfd997ced56539948ac625e05c560011"
   },
   "scenarios": [
     {
@@ -2641,8 +2655,11 @@ function reportApp() {
         if (!pill) { return; }
         nameEl.textContent = pill.dataset.termName;
         const def = pill.dataset.termDef || '';
-        // def is markdown-rendered HTML (from data-term-def), generated from
-        // trusted test source, so innerHTML is safe here.
+        // innerHTML because a definition carries inline markup. Safe not
+        // because the source is trusted — a term definition is ordinary
+        // report data — but because render_inline_markdown escapes the text
+        // first and only re-admits <br>/<code>/<strong>/<em>, none of which
+        // take attributes. Keep that invariant if you extend the renderer.
         defEl.innerHTML = def;
         defEl.hidden = !def;
         tip.hidden = false;

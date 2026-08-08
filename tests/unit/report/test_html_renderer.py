@@ -1,5 +1,6 @@
 import json
 import re
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, cast
 
@@ -580,8 +581,11 @@ def test_render_clickable_tag_badges(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
-    assert "filterByTag('billing')" in content
-    assert "filterByTag('happy-path')" in content
+    # The tag rides in `data-tag` rather than in the click expression; see
+    # test_report_data_never_lands_in_an_alpine_expression for why.
+    assert 'data-tag="billing"' in content
+    assert 'data-tag="happy-path"' in content
+    assert 'filterByTag($el.dataset.tag)' in content
     assert 'scenario-tag' in content
 
 
@@ -1676,3 +1680,104 @@ def test_render_html_accepts_report_data(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report, html_path)
     assert 'from-model' in html_path.read_text(encoding='utf-8')
+
+
+# ---------------------------------------------------------------------------
+# Alpine expression injection
+#
+# Alpine compiles a directive's *decoded* attribute text as JavaScript, so
+# HTML-escaping a `'` to `&#39;` does not keep it out of the expression -- the
+# parser hands the decoded `'` straight to `new Function`. Report data must
+# therefore never be interpolated into an Alpine expression; it goes in a
+# `data-*` attribute that the expression reads via `$el.dataset.*`.
+#
+# This asserts the property, not the markup: it names no element, class, or
+# attribute, so it survives template restructuring and only fails if a value
+# from the report reaches a directive as code.
+
+
+_BREAKOUT = "'),__pwned(),('"
+
+
+def _alpine_directive_values(html: str) -> list[tuple[str, str]]:
+    """Every (name, decoded value) pair for attributes Alpine evaluates as JS."""
+    found: list[tuple[str, str]] = []
+
+    class _Collect(HTMLParser):
+        def handle_starttag(
+            self, tag: str, attrs: list[tuple[str, str | None]]
+        ) -> None:
+            for name, value in attrs:
+                if value and name.startswith(('@', ':', 'x-')):
+                    found.append((name, value))
+
+    _Collect().feed(html)
+    return found
+
+
+def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None:
+    """Every string the report model carries into a directive-bearing element,
+    poisoned with a payload that closes a JS string literal and calls out."""
+    report = report_from_dict(
+        {
+            'metadata': {
+                'project': f'proj{_BREAKOUT}',
+                'timestamp': 't',
+                'pytest_version': '9',
+                'plugin_version': '0.1',
+            },
+            'scenarios': [
+                {
+                    'id': f'test_a.py::test_b[{_BREAKOUT}]',
+                    'narration': _narration('a scenario'),
+                    'module': 'test_a',
+                    'tags': [f'tag{_BREAKOUT}'],
+                    'status': 'passed',
+                    'steps': [],
+                    'parameters': {
+                        'names': [f'param{_BREAKOUT}'],
+                        'cases': [{'values': ['v'], 'status': 'passed'}],
+                    },
+                    'story_id': f'story{_BREAKOUT}',
+                    'activity_ids': [f'act{_BREAKOUT}'],
+                }
+            ],
+            'stories': [
+                {
+                    'id': f'story{_BREAKOUT}',
+                    'title': 'a story',
+                    'activities': [
+                        {
+                            'id': f'act{_BREAKOUT}',
+                            'paths': [{'parts': [{'text': 'does a thing'}]}],
+                        }
+                    ],
+                }
+            ],
+            'glossary': {
+                'terms': [
+                    {
+                        'id': f'term{_BREAKOUT}',
+                        'kind': 'actor',
+                        'canonical': 'A Term',
+                        'definition': 'a definition',
+                    }
+                ]
+            },
+        }
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(report, html_path)
+    html = html_path.read_text(encoding='utf-8')
+
+    # The payload must survive somewhere -- otherwise the poisoning silently
+    # missed and the assertion below would pass for the wrong reason.
+    assert '__pwned' in html
+    offenders = [
+        f'{name}="{value}"'
+        for name, value in _alpine_directive_values(html)
+        if '__pwned' in value
+    ]
+    assert not offenders, 'report data reached an Alpine expression: ' + '; '.join(
+        offenders
+    )

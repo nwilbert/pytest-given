@@ -240,10 +240,13 @@ def _render_narration_part(
         case NarrationPlaceholder(name=name):
             color_idx = param_color_map.get(name, 0) % _NUM_PARAM_COLORS
             label = _placeholder_token(part)
-            # Single-quote the JS arg because the HTML attribute is "..."
-            # and parametrize names are Python identifiers (no `'`).
+            # The name goes in `data-param` and the handler reads it back off
+            # the element. Interpolating it into the Alpine expression instead
+            # would be an injection: Alpine compiles a directive's *decoded*
+            # attribute text as JS, so HTML-escaping a `'` to `&#39;` does not
+            # keep it out of the expression. See `data-tag` in report.html.j2.
             safe_name = escape(name)
-            enter = f"setHoverParam('{safe_name}', $event.currentTarget)"
+            enter = 'setHoverParam($el.dataset.param, $event.currentTarget)'
             leave = 'setHoverParam(null, $event.currentTarget)'
             return (
                 f'<span class="param-color-{color_idx}" '
