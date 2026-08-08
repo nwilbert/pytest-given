@@ -9,6 +9,8 @@ Replace the AGENTS.md "convention, not lint-enforced" subpackage-boundary discla
 This is the third iteration of the same problem:
 
 1. **Ruff `TID251` + `TID253`** (commits `7c6da88` → `b3973c0`). Worked, but the config required two rules with mirrored ban lists and opposing per-file-ignores — `from` clauses prefix-match against banned-api entries, so the relative imports inside a subpackage would fire its own rule. Backed out in favor of convention.
+
+   *Note (2026-08-08).* One variant was not tried at the time: a per-directory `ruff.toml` inside each subpackage, each `extend`-ing the root `pyproject.toml` and declaring only its own **outgoing** bans. Verified against ruff 0.15.13 — `extend` inheritance works, `TID251` resolves relative imports (`from ..capture import x` is reported as `pytest_given.capture`), and banning a subpackage root also matches its submodules. Because each directory names only what *it* may not import, both the mirrored-ban-list and the opposing-per-file-ignore problems above disappear. Still not preferred: it reaches rules 1 and 2 only. Rule 3 would need `TID252`, which bans the very relative imports this project mandates, and rule 4 has no ruff equivalent — so the ruff route buys two of four rules at the cost of four extra config files.
 2. **`pytest-imports` initial sketch**. Cleanly expressed dependency direction and no-private-imports, but the submodule-boundary rule had to enumerate every submodule by name (silently stale on additions), and the intra-package relative-imports rule had to repeat per subpackage to dodge the `plugin.py` / `__init__.py` carve-out.
 3. **This spec**. Written initially against a forward-looking `pytest-imports` API; the relevant upstream additions have since landed (see [Upstream status](#upstream-status)), and the spec uses the `internal()` target helper now documented as the canonical idiom for the intra-package rule.
 
@@ -217,5 +219,5 @@ Comparison:
 ## Out of scope
 
 - Adopting `import-linter` or `pytest-archon`. `pytestarch` is covered above; `import-linter` and `pytest-archon` weren't evaluated in depth — `pytest-imports` already covers our four rules cleanly.
-- Enforcing the "module-level imports only — no inline/function-level imports" convention (see [Recommendations](#recommendations-for-pytest-imports)).
+- Enforcing the "module-level imports only — no inline/function-level imports" convention (see [Recommendations](#recommendations-for-pytest-imports)). Ruff's `PLC0415` (`import-outside-top-level`) already expresses exactly this rule, so it need not wait on a `pytest-imports` predicate: as of 2026-08-08 it reports 22 findings, all in `tests/` and none under `src/`, meaning it could be enabled today with a `tests/**` per-file-ignore.
 - Stricter rules on third-party imports (e.g. forbidding `pytest._pytest` reach-ins beyond what `must_not_import_private` already catches).
