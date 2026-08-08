@@ -4,6 +4,7 @@ __pycache__/
 .nox/
 .nox-tmp/
 .venv/
+.wsl-venv/
 .coverage
 /htmlcov
 .mypy_cache/

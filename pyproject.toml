@@ -2,14 +2,46 @@
 name = "pytest-given"
 version = "0.1.0"
 description = "A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests."
-license = { text = "MIT" }
+readme = "README.md"
+# PEP 639: an SPDX expression plus the files it refers to. Deliberately no
+# "License :: OSI Approved :: ..." classifier — combining the two is an error.
+# THIRD-PARTY-LICENSES is listed because the bundled Alpine.js ships in the wheel.
+license = "MIT"
+license-files = ["LICENSE.md", "THIRD-PARTY-LICENSES"]
 authors = [{ name = "Niko Wilbert", email = "mail@nikowilbert.de" }]
-classifiers = ["Framework :: Pytest"]
+keywords = [
+    "pytest",
+    "bdd",
+    "given-when-then",
+    "testing",
+    "report",
+    "living-documentation",
+    "domain-storytelling",
+    "ubiquitous-language",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
+]
 requires-python = ">=3.14"
 dependencies = [
     "pytest>=9.0",
     "jinja2>=3.1",
 ]
+
+[project.urls]
+Homepage = "https://github.com/nwilbert/pytest-given"
+Repository = "https://github.com/nwilbert/pytest-given"
+Issues = "https://github.com/nwilbert/pytest-given/issues"
+Changelog = "https://github.com/nwilbert/pytest-given/blob/main/CHANGELOG.md"
 
 [project.entry-points."pytest11"]
 given = "pytest_given.plugin"
@@ -37,6 +69,29 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pytest_given"]
+
+# An sdist should build the wheel and run the test suite — nothing more.
+# Hatchling's default is "every file not gitignored", which also sweeps in
+# untracked local directories, so this is an allowlist rather than a list of
+# exclusions. `pyproject.toml`, the readme, and the license files are always
+# included. GLOSSARY.md is load-bearing: tests/conftest.py loads it as a
+# FileGlossary. `examples/` is deliberately out — 2.6 MB of pre-rendered
+# reports that no test reads (the eight `examples/` mentions under tests/ are
+# all string literals), browsable on GitHub instead.
+[tool.hatch.build.targets.sdist]
+# Patterns are gitignore-style: a leading slash anchors to the project root.
+# Without it, "GLOSSARY.md" also matches examples/file-glossary-booking/GLOSSARY.md.
+include = [
+    "/src",
+    "/tests",
+    "/conftest.py",
+    "/noxfile.py",
+    "/uv.lock",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/GLOSSARY.md",
+    "/AGENTS.md",
+]
 
 [tool.uv]
 exclude-newer = "7d"
