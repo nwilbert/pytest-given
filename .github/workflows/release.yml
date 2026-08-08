@@ -1,0 +1,190 @@
+name: Release
+
+# Manual dispatch. The version comes from `pyproject.toml`, so the release flow
+# is: bump the version + add a CHANGELOG section in a PR, merge, dispatch with
+# `testpypi`, install and eyeball the result, then dispatch with `pypi`.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Which index to publish to
+        type: choice
+        options:
+          - testpypi
+          - pypi
+        default: testpypi
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+      # nox sessions inherit nox's own interpreter, so it must satisfy the
+      # project's requires-python (>=3.14).
+      - run: uv tool install --python 3.14 nox
+      - run: nox -s lint
+      - run: nox -s format -- --check
+      - run: nox -s mypy
+      - run: nox -s test
+      - run: nox -s coverage
+      - run: nox -s audit
+
+  build:
+    needs: verify
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          # The already-released guard below reads the full tag list.
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+      - run: uv tool install --python 3.14 nox
+
+      # Dispatch can target any ref, so pin the irreversible path to main.
+      - name: Require main for a real release
+        if: inputs.target == 'pypi'
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" != "refs/heads/main" ]; then
+            echo "::error::pypi releases must be dispatched from main (got ${REF})"
+            exit 1
+          fi
+
+      - id: version
+        run: |
+          version=$(uv run --no-project python -c "import pathlib, tomllib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "Releasing ${version} to ${TARGET}"
+        env:
+          TARGET: ${{ inputs.target }}
+
+      # Neither index lets a version be replaced, only yanked, so catch a stale
+      # version number here rather than after the upload.
+      - name: Refuse to re-release an existing version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          TARGET: ${{ inputs.target }}
+        run: |
+          set -euo pipefail
+          if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
+            echo "::error::tag v${VERSION} already exists — bump the version in pyproject.toml"
+            exit 1
+          fi
+          if [ "$TARGET" = "pypi" ]; then
+            url="https://pypi.org/pypi/pytest-given/${VERSION}/json"
+          else
+            url="https://test.pypi.org/pypi/pytest-given/${VERSION}/json"
+          fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' "$url")
+          if [ "$code" = "200" ]; then
+            echo "::error::pytest-given ${VERSION} is already on ${TARGET}"
+            exit 1
+          fi
+
+      # The release job turns this section into the GitHub Release body; failing
+      # here beats discovering it is missing after the upload has happened.
+      - name: Require a CHANGELOG section
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if ! grep -q "^## \[${VERSION}\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## [${VERSION}]' section"
+            exit 1
+          fi
+
+      # Builds both artifacts, asserts the wheel carries py.typed, the report
+      # templates and the bundled skills, then installs it into a throwaway
+      # environment and runs a real scenario through it.
+      - run: nox -s build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    # Must match the environment configured on the trusted publisher at
+    # (test.)pypi.org — the index verifies it as part of the OIDC claim.
+    environment: ${{ inputs.target }}
+    permissions:
+      id-token: write
+    steps:
+      # No checkout and no nox on purpose. This job holds a credential that can
+      # publish under your name, so no project or dependency code runs beside
+      # it, and it uploads the exact artifacts the build job already verified
+      # rather than rebuilding them.
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to TestPyPI
+        if: inputs.target == 'testpypi'
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+      - name: Publish to PyPI
+        if: inputs.target == 'pypi'
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+  release:
+    # TestPyPI runs are rehearsals: no tag, no GitHub Release.
+    if: inputs.target == 'pypi'
+    needs: [build, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Extract the changelog section
+        env:
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          # Stop at the next version heading, or at the link-reference block —
+          # the newest section is last in the file, so nothing else terminates it.
+          awk -v heading="## [${VERSION}]" '
+            found && /^## \[/ { exit }
+            found && /^\[[^]]+\]: / { exit }
+            /^## \[/ && index($0, heading) == 1 { found = 1; next }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "::error::extracted empty release notes for ${VERSION}"
+            exit 1
+          fi
+          cat release-notes.md
+
+      # `gh release create` creates the tag at the dispatched commit, so this is
+      # both the tagging and the announcement step.
+      - name: Tag and publish the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.build.outputs.version }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
+            --notes-file release-notes.md \
+            --target "${COMMIT}" \
+            dist/*

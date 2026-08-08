@@ -35,6 +35,19 @@ jobs:
       - run: nox -s test
       - run: nox -s coverage
 
+  # The suite imports from `src/`, so it cannot see a packaging regression. This
+  # builds the artifacts and drives the installed wheel from outside the project,
+  # catching a missing template or skill file here rather than at release time.
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+      - run: uv tool install --python 3.14 nox
+      - run: nox -s build
+
   audit:
     runs-on: ubuntu-latest
     steps:

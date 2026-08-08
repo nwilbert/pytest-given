@@ -1,4 +1,7 @@
+import shutil
+import tempfile
 import webbrowser
+import zipfile
 from pathlib import Path
 
 import nox
@@ -113,6 +116,101 @@ def audit(session: nox.Session) -> None:
         external=True,
     )
     session.run('pip-audit', '--local')
+
+
+# Exercised by `build` from a throwaway directory against the installed wheel.
+# Kept inline rather than as a file under the project so the run cannot pick up
+# the repo's rootdir conftest and silently fall back to importing `src/`.
+_SMOKE_TEST = """\
+from pytest_given import given, scenario, then, when
+
+
+@scenario('A consumer installs the wheel')
+def test_smoke():
+    with given('a freshly installed pytest-given'):
+        installed = True
+    with when('the plugin renders a report'):
+        rendered = installed
+    with then('narration is captured'):
+        assert rendered
+"""
+
+# Wheel paths that no in-repo test can vouch for: the suite imports from
+# `src/`, so a package-data file missing from the wheel passes every test here
+# and only fails on a user's first install. A trailing slash means "this
+# directory must contain something"; anything else must match a member exactly,
+# so a stray `py.typed.bak` cannot satisfy the `py.typed` requirement.
+_REQUIRED_WHEEL_PATHS = (
+    'pytest_given/py.typed',
+    'pytest_given/report/templates/',
+    'pytest_given/skills_data/',
+)
+
+
+def _wheel_is_missing(required: str, names: list[str]) -> bool:
+    if required.endswith('/'):
+        return not any(name.startswith(required) for name in names)
+    return required not in names
+
+
+@nox.session
+def build(session: nox.Session) -> None:
+    """Build the wheel + sdist, then verify them the way a consumer would.
+
+    Run before dispatching the release workflow; the workflow runs this same
+    session, so a green run here means the artifacts are release-shaped.
+    """
+    dist = Path('dist')
+    if dist.exists():
+        shutil.rmtree(dist)
+    session.run('uv', 'build', external=True)
+
+    wheels = sorted(dist.glob('*.whl'))
+    assert len(wheels) == 1, f'expected exactly one wheel, got {wheels}'
+    wheel = wheels[0].resolve()
+
+    names = zipfile.ZipFile(wheel).namelist()
+    missing = [
+        required
+        for required in _REQUIRED_WHEEL_PATHS
+        if _wheel_is_missing(required, names)
+    ]
+    if missing:
+        session.error(f'{wheel.name} is missing {", ".join(missing)}')
+
+    # Drive the built wheel from outside the project: `--isolated --no-project`
+    # keeps uv from resolving this repo, so the import under test is the
+    # installed distribution rather than `src/`.
+    project_root = Path.cwd()
+    with tempfile.TemporaryDirectory() as tmp:
+        workdir = Path(tmp)
+        (workdir / 'test_smoke.py').write_text(_SMOKE_TEST, encoding='utf-8')
+        session.chdir(workdir)
+        try:
+            session.run(
+                'uv',
+                'run',
+                '--isolated',
+                '--no-project',
+                '--with',
+                str(wheel),
+                'pytest',
+                'test_smoke.py',
+                '--given-md=smoke.md',
+                '--given-html=smoke.html',
+                '-q',
+                external=True,
+            )
+            narration = (workdir / 'smoke.md').read_text(encoding='utf-8')
+            if 'narration is captured' not in narration:
+                session.error('installed wheel produced a report without narration')
+            if (workdir / 'smoke.html').stat().st_size < 10_000:
+                session.error('installed wheel produced a suspiciously small report')
+        finally:
+            # Windows cannot remove a directory that is still the cwd.
+            session.chdir(project_root)
+
+    session.log(f'{wheel.name} passed packaging checks and a live smoke run')
 
 
 @nox.session
