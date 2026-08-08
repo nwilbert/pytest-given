@@ -72,6 +72,8 @@ Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filt
 - Never save Playwright screenshots into the project directory. Use `/tmp/` or omit the `filename` parameter.
 - If the Playwright MCP browser install hangs after the download reaches 100% (microsoft/playwright#40998 in alpha builds), switch `.mcp.json` from `--browser chromium` to `--browser chrome` to use system Chrome.
 
+**Setup:** copy `.mcp.json.example` to `.mcp.json` (gitignored) to enable the server. It is deliberately not committed: opening a report needs `--allow-unrestricted-file-access`, because Playwright MCP blocks `file://` navigation entirely by default and offers no narrower scope. That flag also lets the browser read any file the user can, so it stays opt-in per developer rather than arriving with a clone. Keep the version pinned — `@latest` would resolve fresh from npm on every launch.
+
 ## Writing self-report scenarios
 
 The narration rules live in the **`pytest-given-authoring` skill** — auto-discovered by contributor agents from [.claude/skills/pytest-given-authoring/](.claude/skills/pytest-given-authoring/SKILL.md) and shipped to downstream projects via `pytest-given skills install`. The canonical source is [src/pytest_given/skills_data/](src/pytest_given/skills_data/pytest-given-authoring/SKILL.md); after editing it, regenerate the committed copy with `uv run pytest-given skills install` and commit both (a sync test fails otherwise). The subsection below covers only what is specific to this repo's self-report.

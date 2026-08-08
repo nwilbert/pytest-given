@@ -4,8 +4,9 @@
       "type": "stdio",
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.79",
         "--allow-unrestricted-file-access",
+        "--isolated",
         "--headless",
         "--browser",
         "chromium"
