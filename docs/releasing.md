@@ -19,12 +19,22 @@ mistake shipped to PyPI is permanent.
       if it is missing.
 - [ ] Update the link references at the bottom of `CHANGELOG.md`: point
       `[Unreleased]` at the new tag, and add a line for the new version.
-- [ ] `uv run nox` — the full gate.
-- [ ] `uv run nox -s build` — builds both artifacts, checks the wheel carries
-      `py.typed`, the report templates and the bundled skills, then installs the
-      wheel into a throwaway environment and runs a real scenario through it.
-      This is the same session the workflow runs, so green here means green there.
-- [ ] Merge to `main`. Releases can only be dispatched from `main`.
+- [ ] Merge to `main` once CI is green. Releases can only be dispatched from
+      `main`.
+
+No local `nox` run is listed here, on purpose. The bump PR is already gated by
+CI, whose `quality`, `test`, `package` and `audit` jobs cover the full six-session
+gate plus `nox -s build`; the release workflow then runs the same set again in
+`verify` and `build` before anything is published. A local run before dispatching
+would be the third. The usual "run `uv run nox` before committing" rule from
+[AGENTS.md](../AGENTS.md) applies to the bump commit like any other — it just
+isn't a release-specific step.
+
+The exception is a change to packaging itself: build config in `pyproject.toml`,
+the hatch include lists, or anything affecting what lands in the wheel. There
+`uv run nox -s build` locally is worth it for the faster loop, and it is the only
+place a Windows-side packaging problem can surface at all, since CI is
+Linux-only.
 
 ### 2. Rehearse on TestPyPI
 
