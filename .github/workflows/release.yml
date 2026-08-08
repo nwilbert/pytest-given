@@ -39,7 +39,9 @@ jobs:
     needs: verify
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.version }}
+      # The release version, which is what gets tagged. A testpypi rehearsal
+      # publishes `<version>.dev<run number>` instead — see the version step.
+      version: ${{ steps.version.outputs.base }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -61,44 +63,64 @@ jobs:
           fi
 
       - id: version
-        run: |
-          version=$(uv run --no-project python -c "import pathlib, tomllib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
-          echo "Releasing ${version} to ${TARGET}"
         env:
           TARGET: ${{ inputs.target }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          base=$(uv version --short)
+          if [ "$TARGET" = "testpypi" ]; then
+            # An index never lets a version be replaced, so without a distinct
+            # number per rehearsal, any fix found *during* a rehearsal could not
+            # be re-rehearsed. `.dev<run number>` is a real PEP 440 version —
+            # local `+suffix` versions are rejected by both indexes — and sorts
+            # before the release, so a rehearsal can never shadow the real thing.
+            # `--frozen` patches pyproject.toml without re-locking; the checkout
+            # is throwaway, so nothing is committed back.
+            effective="${base}.dev${RUN_NUMBER}"
+            uv version --frozen "$effective"
+          else
+            effective="$base"
+          fi
+          echo "base=${base}" >> "$GITHUB_OUTPUT"
+          echo "effective=${effective}" >> "$GITHUB_OUTPUT"
+          echo "Publishing ${effective} to ${TARGET}"
 
       # Neither index lets a version be replaced, only yanked, so catch a stale
       # version number here rather than after the upload.
       - name: Refuse to re-release an existing version
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          BASE: ${{ steps.version.outputs.base }}
+          EFFECTIVE: ${{ steps.version.outputs.effective }}
           TARGET: ${{ inputs.target }}
         run: |
           set -euo pipefail
-          if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
-            echo "::error::tag v${VERSION} already exists — bump the version in pyproject.toml"
-            exit 1
-          fi
           if [ "$TARGET" = "pypi" ]; then
-            url="https://pypi.org/pypi/pytest-given/${VERSION}/json"
+            # Tags track releases only, so this is deliberately not checked for
+            # rehearsals — re-rehearsing a released version stays possible.
+            if git rev-parse -q --verify "refs/tags/v${BASE}" >/dev/null; then
+              echo "::error::tag v${BASE} already exists — bump the version in pyproject.toml"
+              exit 1
+            fi
+            url="https://pypi.org/pypi/pytest-given/${EFFECTIVE}/json"
           else
-            url="https://test.pypi.org/pypi/pytest-given/${VERSION}/json"
+            url="https://test.pypi.org/pypi/pytest-given/${EFFECTIVE}/json"
           fi
           code=$(curl -sS -o /dev/null -w '%{http_code}' "$url")
           if [ "$code" = "200" ]; then
-            echo "::error::pytest-given ${VERSION} is already on ${TARGET}"
+            echo "::error::pytest-given ${EFFECTIVE} is already on ${TARGET}"
             exit 1
           fi
 
       # The release job turns this section into the GitHub Release body; failing
-      # here beats discovering it is missing after the upload has happened.
+      # here beats discovering it is missing after the upload has happened. The
+      # changelog tracks the release version, not the per-rehearsal dev version.
       - name: Require a CHANGELOG section
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          BASE: ${{ steps.version.outputs.base }}
         run: |
-          if ! grep -q "^## \[${VERSION}\]" CHANGELOG.md; then
-            echo "::error::CHANGELOG.md has no '## [${VERSION}]' section"
+          if ! grep -q "^## \[${BASE}\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## [${BASE}]' section"
             exit 1
           fi
 
