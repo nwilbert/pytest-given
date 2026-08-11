@@ -35,6 +35,9 @@ nox.options.sessions = [
 ]
 
 
+_SYNC_FLAGS = ('--locked', '--active')
+
+
 def _sync(session: nox.Session, *groups: str, include_project: bool = False) -> None:
     if include_project:
         group_args = [arg for group in groups for arg in ('--group', group)]
@@ -43,8 +46,7 @@ def _sync(session: nox.Session, *groups: str, include_project: bool = False) -> 
             'sync',
             '--no-default-groups',
             *group_args,
-            '--exact',
-            '--active',
+            *_SYNC_FLAGS,
             external=True,
         )
     else:
@@ -53,8 +55,7 @@ def _sync(session: nox.Session, *groups: str, include_project: bool = False) -> 
             'uv',
             'sync',
             *group_args,
-            '--exact',
-            '--active',
+            *_SYNC_FLAGS,
             '--no-install-project',
             external=True,
         )
@@ -112,12 +113,12 @@ def coverage(session: nox.Session) -> None:
 
 @nox.session
 def audit(session: nox.Session) -> None:
+    # Not _sync: pip-audit needs every declared group plus the project.
     session.run(
         'uv',
         'sync',
         '--all-groups',
-        '--exact',
-        '--active',
+        *_SYNC_FLAGS,
         external=True,
     )
     session.run('pip-audit', '--local')
