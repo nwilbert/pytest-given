@@ -31,7 +31,7 @@ the release workflow re-runs the whole gate in `verify` and `build` before
 anything is published.
 
 No local `nox` run is listed here, on purpose. CI's `quality`, `test`, `package`
-and `audit` jobs already cover the full six-session gate plus `nox -s build`, and
+and `audit` jobs already cover the full five-session gate plus `nox -s build`, and
 the release workflow then runs the same set again. A local run before dispatching
 would be the third. The usual "run `uv run nox` before committing" rule from
 [AGENTS.md](../AGENTS.md) applies to the bump commit like any other — it just
@@ -85,7 +85,7 @@ thing. Nothing is tagged.
 
 | job | runs | notes |
 | --- | --- | --- |
-| `verify` | `nox -s lint format mypy test coverage audit` | Re-run rather than trusted from CI, because dispatch can target any ref. |
+| `verify` | `nox -s lint mypy test coverage audit` | Re-run rather than trusted from CI, because dispatch can target any ref. |
 | `build` | guards, then `nox -s build` | Uploads `dist/` as a workflow artifact. |
 | `publish` | `pypa/gh-action-pypi-publish` | Environment-scoped, `id-token: write`. |
 | `github-release` | `gh release create` | Creates the `v<version>` tag and the GitHub Release. Skipped for rehearsals. |

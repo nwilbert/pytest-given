@@ -62,15 +62,19 @@ def _sync(session: nox.Session, *groups: str, include_project: bool = False) -> 
 
 @nox.session(name='format')
 def format_code(session: nox.Session) -> None:
+    if session.posargs:
+        session.error('format takes no arguments; `lint` is the read-only check')
     _sync(session, 'lint')
     session.run('ruff', 'check', '--select', 'I', '--fix', *code_paths)
-    session.run('ruff', 'format', *session.posargs, *code_paths)
+    session.run('ruff', 'format', *code_paths)
 
 
 @nox.session
 def lint(session: nox.Session) -> None:
+    """The read-only gate: lint rules, then formatting drift. `format` fixes both."""
     _sync(session, 'lint')
-    session.run('ruff', 'check', *session.posargs, *code_paths)
+    session.run('ruff', 'check', *code_paths)
+    session.run('ruff', 'format', '--check', *code_paths)
 
 
 @nox.session
