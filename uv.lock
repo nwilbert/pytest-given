@@ -656,6 +656,7 @@ lint = [
 ]
 typecheck = [
     { name = "mypy" },
+    { name = "nox" },
 ]
 
 [package.metadata]
@@ -676,7 +677,10 @@ dev = [
 ]
 lint = [{ name = "ruff", specifier = ">=0.15.13" }]
 test = []
-typecheck = [{ name = "mypy", specifier = ">=2.1.0" }]
+typecheck = [
+    { name = "mypy", specifier = ">=2.1.0" },
+    { name = "nox", specifier = ">=2026.4.10" },
+]
 
 [[package]]
 name = "python-discovery"
