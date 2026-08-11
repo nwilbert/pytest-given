@@ -654,6 +654,9 @@ dev = [
 lint = [
     { name = "ruff" },
 ]
+nox = [
+    { name = "nox" },
+]
 typecheck = [
     { name = "mypy" },
     { name = "nox" },
@@ -676,6 +679,7 @@ dev = [
     { name = "ruff", specifier = ">=0.15.13" },
 ]
 lint = [{ name = "ruff", specifier = ">=0.15.13" }]
+nox = [{ name = "nox", specifier = ">=2026.4.10" }]
 test = []
 typecheck = [
     { name = "mypy", specifier = ">=2.1.0" },

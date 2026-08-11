@@ -51,12 +51,13 @@ pytest-given = "pytest_given.cli:main"
 
 [dependency-groups]
 lint = ["ruff>=0.15.13"]
-# nox is a typecheck dependency because noxfile.py is on the mypy path.
-typecheck = ["mypy>=2.1.0", "nox>=2026.4.10"]
+nox = ["nox>=2026.4.10"]
+typecheck = ["mypy>=2.1.0", { include-group = "nox" }]
 test = []
 coverage = [{ include-group = "test" }, "coverage>=7.14.0"]
 audit = ["pip-audit>=2.10.0"]
 dev = [
+    { include-group = "nox" },
     { include-group = "lint" },
     { include-group = "typecheck" },
     { include-group = "coverage" },
