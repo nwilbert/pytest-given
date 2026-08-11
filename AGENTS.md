@@ -99,6 +99,7 @@ The narration rules live in the **`pytest-given-authoring` skill** — auto-disc
 - TDD: write tests first
 - Commit messages: single line, no co-author trailers, no leading file/area labels like `TODO:` or `README:` — just describe the change ("note example cleanup as todo", not "TODO: note example cleanup"). Conventional-commit-style scope prefixes like `docs:` / `examples:` / `renderer:` are fine when they add information.
 - Keep commits coherent: each commit should represent one logical change. Don't split "do X", "tests for X", and "review-fixup for X" into separate commits — squash them before pushing. Don't bundle unrelated changes either.
+- **A user-facing change adds its `CHANGELOG.md` entry in the same commit**, under `## [Unreleased]`, in the fitting Keep a Changelog category. User-facing = public API, CLI flags, report output, lint rules, bundled skills; internal work (refactors, tests, CI, contributor docs) gets no entry. Write for someone upgrading the package: name the symbol or flag and what to do about it. Release-time version bumps live under [Releasing](#releasing).
 - Plan files under `docs/superpowers/plans/` are scratch artifacts — never commit them. Spec files under `docs/specs/` are committed.
 - New specs land under `docs/specs/proposed/`. When a spec's implementation lands, `git mv` it up one level into `docs/specs/` in the same commit. `ls docs/specs/proposed` is the canonical list of outstanding design work.
 - Always run `uv run nox` (or at minimum `uv run nox -s format lint mypy test`) before committing
