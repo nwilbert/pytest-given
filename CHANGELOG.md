@@ -18,6 +18,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled `pytest-given-authoring` skill now documents the report mechanics
   its rules depend on (story binding, coverage matching, lint severities), adds
   a symptom index, and groups the scenario rules under subheads.
+- The bundled `pytest-given-reviewing` skill gains a completeness audit (what
+  the report fails to say), a terminal-readable story-coverage check, and a
+  full-suite fallback for adoption branches with no base report to diff.
 
 ### Fixed
 

@@ -37,7 +37,7 @@ def test_every_skill_has_a_skill_md(skill: str) -> None:
     assert (files('pytest_given') / 'skills_data' / skill / 'SKILL.md').is_file()
 
 
-@pytest.mark.parametrize('skill', ['pytest-given-authoring', 'pytest-given-navigating'])
+@pytest.mark.parametrize('skill', BUNDLED_SKILLS)
 def test_reference_guides_are_bundled(skill: str) -> None:
     assert (files('pytest_given') / 'skills_data' / skill / 'references').is_dir()
 
@@ -46,6 +46,12 @@ def test_reviewing_skill_cross_reference_target_exists() -> None:
     """The reviewing skill links ../pytest-given-authoring/references/scenarios.md."""
     root = files('pytest_given') / 'skills_data'
     assert (root / 'pytest-given-authoring' / 'references' / 'scenarios.md').is_file()
+
+
+def test_reviewing_skill_story_coverage_reference_is_bundled() -> None:
+    """The reviewing skill links references/story-coverage.md for the JSON query."""
+    root = files('pytest_given') / 'skills_data' / 'pytest-given-reviewing'
+    assert (root / 'references' / 'story-coverage.md').is_file()
 
 
 def test_skill_frontmatter_names_match_directories() -> None:
