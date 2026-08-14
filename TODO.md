@@ -2,10 +2,13 @@
 
 ## Now
 
+- [ ] Bug: when the glossary term filter is active in the Scenarios tab, jumping to a scenario from the Stories tab doesn't reset this filter  
 - [ ] continue work on the story-diagrams branch
+- [ ] implement the parametrized-case-columns-design spec
 
 ## Next
 
+- [ ] check support for https://library-skills.io/
 - [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
 - [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
@@ -27,6 +30,6 @@
 - [ ] Add `@scenario(group_parametrized=False)` option to opt out of parametrize merging 
   - emit each case as its own scenario (named per case via Template substitution, or by appending the parametrize id to a `str` name).
   - Needed when narration structure genuinely varies per case; today's behavior silently shows case 1's structure for all rows. See caveat in `docs/specs/2026-05-23-structured-step-text-design.md`.
-  - Scope narrowed by the [per-case columns spec](docs/specs/proposed/2026-08-14-parametrized-case-columns-design.md): varying attachments and varying derived values become columns there, and the two unrenderable authoring forms raise. Structural divergence is all that is left for the opt-out.
-  - That spec's Open questions asks whether the opt-out should also apply *automatically* when structure diverges, rather than only on request — `divergent-case-structure` is lint-only and `given_lint` defaults off, so today that case still renders the baseline's structure silently.
+  - Scope narrowed by the [per-case columns spec](docs/specs/proposed/2026-08-14-parametrized-case-columns-design.md): varying attachments and varying derived values become columns there, and five unrenderable authoring forms raise. Structural divergence is all that is left for the opt-out.
+  - That spec defers one question to this item: whether the opt-out should also apply *automatically* when structure diverges, rather than only on request — `divergent-case-structure` is lint-only and `given_lint` defaults off, so today that case still renders the baseline's structure silently. Deciding that here retires the lint rule.
   - This is also where per-case substitution of `Template` scenario names and t-string step text (`step_text(case=...)` / `Template.substitute(...)`) becomes load-bearing. Today the substitution machinery is wired but unreachable — the merged view only shows `{name}` tokens, so `Template` for scenario names mostly just contributes the placeholder highlight in the merged title.
