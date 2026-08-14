@@ -72,29 +72,38 @@ values. Kinds 3 and 4 are the exceptions: a varying pill is rejected rather than
 |---|---|---|
 | `param` | column | unchanged |
 | `derived` — a `NarrationValue` whose rendered text varies across cases | frozen to case 1 | `NarrationPlaceholder` in the tree + column named for the expression |
-| `attachment` — an attachment whose content or content type varies (its label may not) | dropped | badge keeps its label on its step + column |
+| `attachment` — an attachment whose content or content type varies (its label may not) | dropped | `AttachmentRef` badge keeps its label on its step + column |
 
 An attachment that is byte-identical across every case is shared structure and stays inline
 on its step. Same for a `NarrationValue` whose rendered text is identical everywhere —
 today's behaviour, now verified instead of assumed.
 
-Attachments live inside steps, sometimes nested, and the badge keeps that position in the
-merged tree; the column is tied back to it by the existing `data-param` hover highlight,
-exactly as a `{cup_size}` placeholder is tied to its column. The tree says *where*, the table
-says *what*.
+Attachments live inside steps, sometimes nested; the badge keeps that position in the merged
+tree, tied to its column by the existing `data-param` hover highlight, exactly as a
+`{cup_size}` placeholder is. The tree says *where*, the table says *what* — and it says it
+only once, since a promoted badge carries no content of its own (see [Schema](#schema)).
 
 ### Column identity
 
 A column is identified by its **position in the step tree**, not by its name, and carries
 that identity as an `id`; the expression supplies the display `name` only. Two steps can
 interpolate the same expression — `{price}` in a `when` and again in a `then` — with
-different values, which would collide if the expression string were the key and would
-cross-wire the frontend, which matches on `data-param`.
+different values, which would collide if the expression were the key, cross-wiring a frontend
+that matches on `data-param`.
 
-A `param` column uses its parametrize name as both. Generated ids are `d0`, `d1`, … and
-`a0`, `a1`, … numbered per kind in emission order; a candidate that collides with a
-parametrize name takes a `_` suffix until it is free, since a parameter named `d0` is legal
-if unusual.
+A `param` column uses its parametrize name as both. Generated ids are `derived:0`,
+`derived:1`, … and `attachment:0`, `attachment:1`, … numbered per kind in emission order. The
+colon makes them **unable** to collide with a parametrize name rather than merely unlikely to:
+parametrize names are `callspec.params` keys, so they are always Python identifiers, and no
+identifier contains a colon. That is the whole collision story — no suffixing, no retry, no
+rule to test. The value only ever reaches JSON, an HTML attribute and `CSS.escape`
+(`app.js:263`), all of which take a colon; it is never compiled as an expression, since
+`setHoverParam` reads `$el.dataset.param` rather than being handed an interpolated string.
+
+The tree carries the id at both promotion sites: `NarrationPlaceholder.column_id` for a
+`derived` value, `AttachmentRef.column_id` for an attachment. Both are always populated —
+for a `param` column the id is the parametrize name, so the field restates it rather than
+going null and making every reader write `column_id or name`.
 
 The split runs through the whole design and is easy to unify by accident: **`data-param`
 keys on `id`, the colour palette keys on `name`** — so same-named columns stay separate while
@@ -121,10 +130,7 @@ recommending the form being removed.
 
 Labels must also **not vary across cases** ([rule 5](#rejected-authoring-forms)), so a
 column's header — and the badge on its step — is always the one label every case shares. A
-column exists because the *content* varies; the name of that payload does not. That keeps the
-whole surface named: no anonymous column, no nullable `name`, and no renderer needing a
-fallback token for a header with no text — a form that would occur in exactly one place in
-the design.
+column exists because the *content* varies; the name of that payload does not.
 
 The rejected alternative was to make labels narration, so `attach(t"{flavor} log", …)` could
 head a column with a live placeholder. It buys one nicer header for a `Narration` in the
@@ -168,7 +174,7 @@ more likely, so they are fixed here:
   — keeps the single-pass path.
 - **Glossary aggregation unions the same way.** `build_glossary_aggregations`
   (`report/aggregations.py`) collects one `TermInstance` per `(term_id, display)`, so without
-  this `Bob` never appears under `Guest` in the Glossary view.
+  it `Bob` never appears under `Guest` in the Glossary view.
 
 Activities anchored on a canonical term are unaffected: `s_for_step`'s canonical fallback
 already contributes `(term_id, None)` for every case.
@@ -190,18 +196,28 @@ Five forms are rejected. All raise `PytestGivenError` from `_group_parametrized`
 scenario's file and line and the fix. A step-level anchor is not available: `Step.source` is
 captured only when lint is enabled (`plugin.py:241`), and these rules must hold with lint off.
 
-Validation runs on **every** session, not only when a sink was requested. These are usage
-errors, and the plugin already treats malformed narration as one:
+**Which cases a rule sees.** Rules 1, 2, 4 and 5 compare cases against each other, and do so
+only across passed cases whose step structure matches the baseline's (see
+[Merge algorithm](#merge-algorithm)). A case that branched differently is positionally
+incomparable, so comparing it would report structural divergence as a narration defect —
+`[given, when, then]` against `[given, given, when, then]` lines a `when` up with a `given`
+and raises rule 1 about two unrelated steps. Divergence stays lint's business, and such a
+case is excluded from validation exactly as it is excluded from cell-filling. Rule 3 is the
+exception: it compares a case against its own parameter values rather than against another
+case, so structure is irrelevant and it applies to every passed case.
+
+Validation runs on **every** session, not only when a sink was requested: these are usage
+errors, and the plugin already treats malformed narration as one —
 `pytest_collection_modifyitems` raises for a bad `Template` placeholder whether or not a
-report was asked for (`plugin.py:289-295`). Gating the merge rules differently would make
-whether your suite is well-formed depend on which flags you passed. The existing
+report was asked for (`plugin.py:289-295`). Gating the merge rules on flags would make
+whether your suite is well-formed depend on which ones you passed. The existing
 unknown-placeholder guard in `_templatize_narration` (`plugin.py:943-949`) therefore stays
-where it is, and the merge stays a path that can raise.
+put, and the merge stays a path that can raise.
 
 Nothing may escape the hook, though: an exception leaving `pytest_sessionfinish` is neither a
 test failure nor an INTERNALERROR — on pytest 9.0.3 it propagates out of `console_main` as a
-bare traceback after the progress line, no summary at all and exit 1, indistinguishable from
-an ordinary failing run. So `pytest_sessionfinish` catches the raise, records the message for
+bare traceback after the progress line, no summary and exit 1, indistinguishable from an
+ordinary failing run. So `pytest_sessionfinish` catches the raise, records the message for
 `pytest_terminal_summary`, writes **no** sink, and sets
 `session.exitstatus = pytest.ExitCode.TESTS_FAILED` — the path `_run_lint` already uses. A
 report the plugin knows to be false is never emitted, and the run fails loudly enough to stop
@@ -240,26 +256,39 @@ CI.
    wrong for *every* case, not just the first. This match short-circuits before any
    cross-case comparison, so no other rule sees it.
 
-   The check has one source of truth, and it is the **cell**: for a param match `rendered` is
-   discarded, `_placeholder_token` renders the merged slot as a schematic `{cup_size}` with
+   The displayed value has one source of truth, the **cell**: `rendered` is discarded on a
+   param match, `_placeholder_token` renders the merged slot as a schematic `{cup_size}` with
    conversion and spec deliberately dropped, and row hover substitutes the cell's own text —
-   so `rendered` is never displayed for a param placeholder, only ever used as evidence. Per
-   case, then: apply the interpolation's own `conversion` and `format_spec` to that case's
+   so `rendered` is never displayed for a param placeholder, only used as evidence. Per case,
+   then: apply the interpolation's own `conversion` and `format_spec` to that case's
    parameter value and compare with `rendered`. Agreement keeps today's placeholder path;
    disagreement raises.
 
    > `PytestGivenError: 'cup_size' in 'test_brew' matches a parametrize column but narrates a different value (case [200] narrates '400') — rebinding a parameter name makes the narration ambiguous. Rename the local.`
 
-   That re-format runs on the **raw** parameter object, never on the cell, because
-   `_param_value` (`plugin.py:358-361`) has already coerced anything non-scalar to `str`: a
-   `datetime` under `t"{when:%Y}"` would compare the recorded `'2026'` against
-   `format('2026-01-01 00:00:00', '%Y')`, which raises `ValueError: Invalid format specifier`,
-   and under `t"{when!r}"` it would compare the datetime's repr against the *string's* and
-   accuse a faithful interpolation of rebinding. `ParamSpec` therefore carries the raw values
-   alongside the coerced ones — `param_info` is in-memory, cleared right after the merge and
-   never serialized, so this is one field and no JSON change. Re-formatting the raw object is
-   exactly what the t-string did at capture time, so a faithful interpolation agrees for every
-   type, `t"{cup_size!r:>8}"` included.
+   That re-format runs on the **raw** parameter object, never on a coerced one:
+   `t"{when:%Y}"` on a `datetime` compared against the string `'2026-01-01 00:00:00'` would
+   evaluate `format('2026-01-01 00:00:00', '%Y')` — `ValueError: Invalid format specifier` —
+   and `t"{when!r}"` would compare the datetime's repr against the *string's*, accusing a
+   faithful interpolation of rebinding. Re-formatting the raw object is exactly what the
+   t-string did at capture time, so a faithful interpolation agrees for every type,
+   `t"{cup_size!r:>8}"` included.
+
+   So **`_param_value` moves to where cells are built**, and `ParamSpec.values` holds what
+   `callspec.params` gave. Today the coercion runs at setup (`plugin.py:350`) and the raw
+   object is dropped on the spot, which would force `ParamSpec` to carry both forms; coercing
+   in `_group_parametrized` instead keeps one representation and puts the conversion at the
+   boundary that needs it — the serializable cell — beside the term-instance unwrap, which
+   has to happen there anyway. No new field, and nothing changes for the two sites that
+   unpack the `NamedTuple`. `ParamSpec.values` does weaken from `list[ParamValue]` to a
+   `RawParamValue` alias over `object`, which is the honest type for an arbitrary parametrize
+   argument. Nothing is retained that was not already: pytest holds `item.callspec.params` on
+   `session.items` until the session ends regardless.
+
+   Being a per-case check rather than a comparison, this rule fires where no other can: a
+   single passed case is enough, so `@pytest.mark.parametrize('cup_size', [200])` still
+   catches the rebinding. It runs on passed cases only, like every other rule — a failed
+   case's tree may be truncated mid-step, and the merge trusts nothing else from it either.
 
    A pre-existing defect, fixed here because the merged view has to tell the truth about every
    part kind it renders.
@@ -282,22 +311,29 @@ CI.
    only pattern that field exists for, and `param_column` would have to be retired from
    schema, serde, renderer and `report-json.md`.
 
-5. **An attachment label that varies across cases.** A label names its payload; the payload is
-   what varies, and the row already says which case it belongs to. `attach(f"{flavor} log", …)`
-   puts the parameter in the name instead of leaving it in the `flavor` column that is already
-   there, and leaves the merged tree with a badge that can only be one case's. The fix is a
-   constant label with the varying part in the content — which also yields a *named* column
-   instead of an anonymous one. Content and content type are exempt by design: varying those
-   is exactly what the `attachment` column is for.
+5. **A step whose set of attachment labels differs across cases.** A label names its payload;
+   the payload is what varies, and the row already says which case it belongs to.
+   `attach(f"{flavor} log", …)` puts the parameter in the name instead of leaving it in the
+   `flavor` column that is already there, and leaves the merged tree with a badge that can
+   only be one case's. The fix is a constant label with the varying part in the content.
+   Content and content type are exempt by design: varying those is exactly what the
+   `attachment` column is for.
 
-   > `PytestGivenError: attachment label in 'test_brew' varies across parametrize cases ('vanilla log' vs 'mocha log') — a label names the payload and must read the same in every case. Use a constant label and let the content vary: attach("brew log", …).`
+   The comparison is over the **distinct labels** at a step, because that is the key
+   attachments merge on (see [Merge algorithm](#merge-algorithm)). A label attached a
+   different *number* of times — a loop whose iteration count depends on the parameter —
+   therefore does not raise: the occurrences become columns and the short case's trailing
+   cells are blank. Matching by label rather than by position also means reordered `attach`
+   calls are merged, not rejected.
+
+   > `PytestGivenError: attachment label 'vanilla log' in 'test_brew' is attached in some parametrize cases but not others — a label names the payload and must read the same in every case. Use a constant label and let the content vary: attach("brew log", …).`
 
 An error means the author can do better: every rule above carries a one-line fix that yields
 a strictly better report. Where no such fix exists the merge copes instead of raising — a
 pill bound to a parametrize column, and divergent structure (see
 [Out of scope](#out-of-scope)). Together the rules also make promotion **total**: every
-column is named by an identifier or a shared label by construction, so no renderer ever has
-to display raw source text or invent a header.
+column is named by an identifier or a shared label by construction, so no `name` is nullable
+and no renderer ever has to display raw source text or invent a header.
 
 ### When each fires
 
@@ -323,7 +359,9 @@ classify.
 
 No rule bans a form outright — a constant compound interpolation still renders inline, and a
 varying bare-name t-string is the supported path. Variance is measured across **passed** cases
-only, so a group with fewer than two passed cases cannot raise.
+of matching structure only, so a group with fewer than two such cases cannot raise rules 1, 2,
+4 or 5. Rule 3 is not a variance rule and is not bounded that way: it checks each passed case
+against its own parameter values and fires on a single case.
 
 **Why not lint.** `given_lint` defaults to `False` (`plugin.py:172-177`), so an error-severity
 rule would enforce nothing for a default user and the report would go on lying quietly. The
@@ -333,10 +371,10 @@ check belongs where the merge already holds every case's tree.
 
 Rules 1 and 2 upgrade a documented caveat
 (`docs/specs/2026-05-23-structured-step-text-design.md:302`, "renders the first case's value
-across all cases. **Fix:** use a t-string") into a hard error. They fire only when the
-narration genuinely varies, so the affected suites are exactly those already getting a wrong
+across all cases. **Fix:** use a t-string") into a hard error, and fire only when the
+narration genuinely varies — so the affected suites are exactly those already getting a wrong
 report. Rules 3, 4 and 5 have the same character: a rebound parameter name, a per-case term
-pill and a per-case attachment label all render wrong today — the last worst of all, since
+pill and a per-case attachment label all render wrong today, the last worst of all since
 every non-baseline attachment is dropped outright. No rule here breaks code that produces a
 correct report.
 
@@ -348,9 +386,9 @@ on) as well as a display `name`; the two coincide for a `param` column (see
 [Column identity](#column-identity)).
 
 The widening is also the moment to stop `ParameterCase.values` being `list[Any]`
-(`schema.py:284`) — gratuitous even today, since `ParamSpec.values` is already typed. A named
-cell type states the heterogeneity instead of hiding it, per AGENTS.md's avoid-`Any`
-convention:
+(`schema.py:284`). A cell's range is small and knowable — that is the point of the column
+kinds — so a named type states the heterogeneity instead of hiding it, per AGENTS.md's
+avoid-`Any` convention:
 
 ```python
 type CellValue = ParamValue | Attachment   # ParamValue = str | int | float | bool | None
@@ -362,16 +400,15 @@ interpolation's conversion and format spec, and no renderer re-formats it — an
 `attachment` cell is an object, which is also how serde discriminates the two on read. `null`
 marks a case with no value for that column (see [Edge cases](#edge-cases)).
 
-`Attachment` itself is unchanged, so an attachment cell keeps the existing shape and `name`
-stays a plain `str` for every column kind: an attachment column's `name` is the label every
-case shares, never null.
+`Attachment` itself is unchanged, so an attachment cell keeps the existing shape, and `name`
+stays a plain `str` for every column kind.
 
 ```json
 "parameters": {
   "columns": [
     {"id": "cup_size", "name": "cup_size", "kind": "param"},
-    {"id": "d0", "name": "price", "kind": "derived"},
-    {"id": "a0", "name": "machine state", "kind": "attachment"}
+    {"id": "derived:0", "name": "price", "kind": "derived"},
+    {"id": "attachment:0", "name": "machine state", "kind": "attachment"}
   ],
   "cases": [
     {"values": [200, "2.0",
@@ -382,51 +419,124 @@ case shares, never null.
 ```
 
 One shape for all three kinds, so both renderers and downstream `jq` recipes loop a single
-list instead of branching per kind. This is a breaking change to the JSON report, riding along
-with the JSON-format polish already on the TODO; report versioning is that item's job, not
-this one's.
+list instead of branching per kind.
+
+The tree side gets three changes, all so a merged step stops speaking for a single case.
+
+**`NarrationPlaceholder` gains `column_id: str`**, always populated (see
+[Column identity](#column-identity)). `name` keeps supplying the `{price}` token and the
+palette entry; `column_id` is what `_render_part` puts in `data-param`.
+
+**A promoted attachment becomes an `AttachmentRef`**, and `Step.attachments` widens to
+`list[Attachment | AttachmentRef]`:
+
+```python
+@dataclass(frozen=True)
+class AttachmentRef:
+    label: str
+    content_type: ContentType   # describes the payload the badge points at
+    column_id: str
+```
+
+The ref has no `content` field, so the merged tree cannot carry the baseline's payload —
+without this the badge would still expand to case 1's blob, which is the defect this design
+opens with, and the column would duplicate the payload rather than replace it. Payloads live
+in cells; the tree holds pointers. Serde discriminates the two on the presence of `content`,
+and the union gives the renderers an exhaustive `match` the way `NarrationPart` already does.
+Only two sites read `step.attachments` (`md_renderer.py:110`, `report.html.j2:84`).
+
+**A merged step's `narration.text` is rebuilt from its merged parts**, so it reads `the drink
+costs {price} euros` rather than the baseline's `the drink costs 2.0 euros`. Today a merged
+step's `text` is case 1's rendering even for `param` placeholders — coffeeshop ships
+`"text": "I insert $1"` under parts that say `{euros}` — while a *scenario*'s `text` is
+already documented as "the merged template for parametrized scenarios" (`report-json.md:16`).
+Steps join scenarios. Both renderers prefer `parts` wherever they exist, so no HTML or
+Markdown output moves; what changes is the JSON field and the wording of the three
+`ast_rules` findings that interpolate it (`ast_rules.py:194,272,282`) — ignore entries match
+on `finding.subject`, not the message, so no `given_lint_ignore` list breaks.
+
+The step matching the table above reads:
+
+```json
+"steps": [{"narration": {"text": "the drink costs {price} euros",
+                         "parts": [{"value": "the drink costs "},
+                                   {"name": "price", "column_id": "derived:0"},
+                                   {"value": " euros"}]},
+           "attachments": [{"label": "machine state",
+                            "content_type": "json", "column_id": "attachment:0"}]}]
+```
+
+This is a breaking change to the JSON report, riding along with the JSON-format polish already
+on the TODO; report versioning is that item's job, not this one's.
 
 ## Merge algorithm
 
 1. Group cases as today. Pick the baseline: first passed case, else `group[0]`.
-2. Validate the rejected authoring forms across the group — including verifying that every
-   param-name-matching interpolation really renders its parameter's value — and raise on any.
-3. Walk the baseline step tree. At each position, compare against the same position in every
-   other passed case:
+2. Take the **comparable** cases: the passed ones whose structure signature equals the
+   baseline's. Everything from here on compares only those; the rest are carried for their
+   `param` cells alone.
+3. Validate the rejected authoring forms — rules 1, 2, 4 and 5 across the comparable cases,
+   rule 3 on each passed case against its own parameter values — and raise on any.
+4. Walk the baseline step tree. At each position, compare against the same position in every
+   other comparable case:
    - each `NarrationValue` whose `expression` is not a parametrize name — compare `rendered`;
    - each `NarrationTermRef` whose `expression` is not a parametrize name — compare
      `(term_id, display)`; any difference raises (rule 4) rather than promoting;
-   - each attachment — compare `(content, content_type)`; a differing label raises (rule 5).
-4. Identical everywhere → leave inline. Otherwise → emit a column; for a `derived` value,
-   replace the inline occurrence in the step narration with a placeholder. An attachment badge
-   stays where it is and keeps its label, which rule 5 guarantees every case shares.
-5. Fill each case's cells by reading the same positions out of that case's own tree.
+   - each attachment — paired **by label**, and by occurrence order among same-label ones —
+     compare `(content, content_type)`.
+5. Identical everywhere → leave inline. Otherwise → emit a column; a `derived` value's inline
+   occurrence becomes a `NarrationPlaceholder`, and an attachment badge becomes an
+   `AttachmentRef` in place, keeping the label that rule 5 guarantees every case shares. Any
+   step whose parts now hold a placeholder — `param` ones included — has its `narration.text`
+   rebuilt from those parts.
+6. Fill each case's cells by reading the same positions — and, for attachments, the same
+   labels — out of that case's own tree.
 
-Parametrize columns are emitted first, in their existing order, then `derived` and
-`attachment` columns in tree order — so the table still reads inputs-first.
+"The same position" is an index path, and the walk that produces one already exists twice:
+`walk_steps` (`report/coverage.py:168`) yields `(index_path, step)`, `iter_steps`
+(`lint/base.py:65`) yields the steps alone, and `report/` and `lint/` cannot import from each
+other, so neither copy can go. The merge would be the third. A new **`model/steps.py`** owns
+the walk instead — `model/` is the leaf all three already depend on, and `ids.py` is the
+precedent for small pure helpers over the schema living there:
+
+```python
+type StepPath = tuple[int, ...]                              # a position in a step tree
+def walk_steps(steps: list[Step]) -> Iterable[tuple[StepPath, Step]]: ...
+def iter_steps(steps: list[Step]) -> Iterator[Step]: ...     # walk_steps, paths discarded
+def structure_signature(steps: list[Step]) -> StepSignature: ...
+```
+
+`coverage.py` drops its copy, `lint/base.py` drops `iter_steps` and `runtime_rules.py` drops
+`_structure_signature` (`:122-123`), the two lint rule modules import both from `..model`
+instead of `.base`, and the merge indexes each case's tree into a `dict[StepPath, Step]` so
+"compare against the same position" is a lookup rather than a parallel descent. `StepPath`
+also gives the spec's positional language a name in the code.
+
+Attachments key on label rather than position because rule 5 already guarantees the label set
+is shared, which makes the key total, and because position does not survive a case attaching
+the same labels in a different order or a different number of times. Parametrize columns are
+emitted first, in their existing order, then `derived` and `attachment` columns in baseline
+tree order — so the table still reads inputs-first.
 
 ## Edge cases
 
 - **No case passed.** Nothing to compare; fall back to today's `group[0]` rendering.
-- **A skipped or failed case.** It records no tree, or an aborted one, so step 5 finds nothing
+- **A skipped or failed case.** It records no tree, or an aborted one, so step 6 finds nothing
   at those positions: its `derived` and `attachment` cells are `null` and render blank. Its
   `param` cells are unaffected.
-- **Structure diverges.** Positional matching is undefined for that case, so its cells are
-  `null` and render blank. `divergent-case-structure` already fires, so this introduces no new
-  lint rule.
-- **Attachment count differs at the same step** (a loop-driven `attach`). Positional matching
-  fails for that step, so all of its attachments become columns, blank where a case has none.
-- **Single-value parametrize.** Everything is trivially shared; no new columns.
+- **Structure diverges.** The case is not comparable (step 2), so it is excluded from
+  validation as well as from cell-filling: its `derived` and `attachment` cells are `null` and
+  render blank, and it cannot raise a rule about a step the baseline lines up differently.
+  `divergent-case-structure` already fires, so this introduces no new lint rule.
+- **The same label attached a different number of times** (a loop whose iteration count
+  depends on the parameter). Label sets still match, so rule 5 stays quiet; the occurrences
+  become columns and the short case's trailing cells are blank.
+- **Single-value parametrize.** Nothing to compare, so rules 1, 2, 4 and 5 cannot fire and no
+  `derived` or `attachment` column is emitted — but rule 3 still checks that case's
+  interpolations against its own parameter values.
 - **Module/session-scoped fixture that attaches.** Only the first consumer records the fixture
   subtree, so later cases read as structure divergence: blank cells plus the existing lint
   finding. Surfaced, not fixed — that belongs to the fixture-scope design.
-
-## Attachment icon
-
-Independent of the merge work, and touching the same surfaces. The HTML report's paperclip SVG
-and the Markdown renderer's `📎` are replaced by an icon chosen from `content_type`: a document
-glyph for `text`, braces for `json` — a branch in the macro plus a second inline SVG, no new
-data. The badge then says what it will expand into before it is clicked.
 
 ## Markdown rendering
 
@@ -447,12 +557,26 @@ below the table, keyed by the case's parametrize values.
   ```
 ````
 
+In the step tree, `_attachment_lines` gains a third branch: an `AttachmentRef` has no content
+to inline or fence, so it renders as badge and label alone, pointing at the table.
+
+```markdown
+- **when** the machine brews {flavor}
+  - 📎 machine state — *see case table*
+```
+
 ## HTML rendering
 
 The case row gains a cell per new column. Attachment cells render the badge with that case's
 label and expand their content in place, reusing the `expandedAttachments` Alpine state and the
 `grid-rows` expand already used by step attachments. `derived` columns are not visually
 distinguished from `param` columns in v1.
+
+In the step tree an `AttachmentRef` renders as badge, label and `data-param`, with **no
+expander and no `expandedAttachments` key** — there is nothing to expand, and the highlight it
+lights up is the column holding every case's payload. `expandedAttachments` stays the state of
+real `Attachment`s: the ones inline on a step because they were byte-identical everywhere, and
+the ones in case cells.
 
 The [row-hover value preview](../2026-06-28-row-hover-value-preview-design.md) is live, and this
 design silently extends it to two new column kinds. Three things need care:
@@ -462,16 +586,18 @@ design silently extends it to two new column kinds. Three things need care:
   (`app.js:267-282`) both match on the attribute value, so keying on `id` fixes the cross-wiring
   with no JS change — only the three emission sites (`report.html.j2:258` and `:271`,
   `html_renderer.py:263`) change.
-- **Row-hover substitution needs its own attribute at both ends.** `setHoverRow` reads every
+- **Row-hover substitution needs its own attribute.** `setHoverRow` reads every
   `td[data-param]` in the row and writes into every `span[data-param]` in the `.scenario` scope
   — the attribute the highlight also keys on, so neither end can be filtered by dropping it.
   Both over-reach as written: an attachment cell's `textContent` is its badge label plus any
   expanded content, and the badge is itself a `span[data-param]` whose `textContent` assignment
   would destroy the inline SVG irrecoverably (`clearHoverRow` restores text only). Give
-  substitution a dedicated pair — a value attribute on `param`/`derived` cells only, a slot
-  attribute on narration placeholders only — leaving `data-param` purely for the highlight. No
-  attachment cell then feeds a substitution and the badge is never a target, so its SVG is never
-  touched. (Headers stay out of it: labels are flat and shared, so no header is narrated.)
+  substitution one attribute of its own — `data-subst`, carrying the column id — on
+  `param`/`derived` cells and on narration placeholders, and nowhere else; `data-param` is then
+  purely the highlight's. One name suffices for both ends because `setHoverRow` already tells
+  source from target by element type, reading `td[…]` and writing `span[…]` (`app.js:271-274`):
+  the selectors change, the function's shape does not. No attachment cell feeds a substitution
+  and the badge is never a target, so its SVG is never in reach.
 - **Palette scope.** `_build_param_color_map` (`html_renderer.py:167-177`) assigns a colour per
   name across the report. `derived` columns join it; `attachment` columns do not — a badge needs
   no value colour.
@@ -480,45 +606,53 @@ design silently extends it to two new column kinds. Three things need care:
 
 | file | change |
 |---|---|
-| `src/pytest_given/model/schema.py` | `ParameterColumn` (`id`, `name`, `kind`); `ParameterTable.columns` replaces `names`; `CellValue = ParamValue \| Attachment` replaces `ParameterCase.values: list[Any]` |
-| `src/pytest_given/model/serde.py` | round-trip for the new shape, with object-vs-scalar cell discrimination |
+| `src/pytest_given/model/schema.py` | `ParameterColumn` (`id`, `name`, `kind`); `ParameterTable.columns` replaces `names`; `CellValue = ParamValue \| Attachment` replaces `ParameterCase.values: list[Any]`; `NarrationPlaceholder.column_id`; `AttachmentRef` and the `Step.attachments` widening |
+| `src/pytest_given/model/steps.py` (new) | `StepPath`, `walk_steps`, `iter_steps`, `structure_signature` — one depth-first walk for the three packages that each need one |
+| `src/pytest_given/model/serde.py` | round-trip for the new shapes: object-vs-scalar cell discrimination, `AttachmentRef` vs `Attachment` on the presence of `content`, `column_id` on placeholders |
 | `src/pytest_given/capture/decorators.py` | `attach(label: str, content)`; the `Template` rejection and the t-string flattening at `438-439` collapse into one non-`str` guard |
-| `src/pytest_given/plugin.py` | passed-case baseline; rejected-form validation on every session, caught in `pytest_sessionfinish` so a violation suppresses every sink and fails the run; cross-case comparison; column construction; `_templatize_narration` promotes varying `rendered` to placeholders; `ParamSpec` carries raw values for rule 3; `_param_value` unwraps a term instance to its display |
-| `src/pytest_given/report/coverage.py`, `report/aggregations.py` | a param-linked pill resolves per case from its column: match coverage once per case and union the matches; collect one `TermInstance` per case display |
-| `src/pytest_given/report/html_renderer.py`, `templates/report.html.j2`, `templates/styles.css`, `templates/app.js` | column loop, attachment cells, `content_type` icons, `data-param` keyed on column `id`, dedicated substitution attributes for cells and narration slots, palette excludes attachment columns |
-| `src/pytest_given/report/md_renderer.py` | column loop, attachment cells and below-table blocks, icon |
+| `src/pytest_given/plugin.py` | passed-case baseline; comparable-case filter on the structure signature; rejected-form validation on every session, caught in `pytest_sessionfinish` so a violation suppresses every sink and fails the run; cross-case comparison, label-keyed for attachments; column construction; `_templatize_narration` promotes varying `rendered` to placeholders and rebuilds `narration.text`; `_param_value` moves here from setup so `ParamSpec` keeps the raw parameter objects rule 3 needs, and unwraps a term instance to its display on the way into a cell |
+| `src/pytest_given/lint/base.py`, `lint/runtime_rules.py`, `lint/ast_rules.py` | `iter_steps` and `_structure_signature` deleted in favour of `model/steps.py`; the two rule modules import from `..model` instead of `.base` — no rule change |
+| `src/pytest_given/report/coverage.py`, `report/aggregations.py` | `walk_steps` deleted in favour of `model/steps.py`; a param-linked pill resolves per case from its column: match coverage once per case and union the matches; collect one `TermInstance` per case display |
+| `src/pytest_given/report/html_renderer.py`, `templates/report.html.j2`, `templates/styles.css`, `templates/app.js` | column loop, attachment cells, `data-param` keyed on column `id` (from `column_id` in the tree), `AttachmentRef` badges with no expander, `data-subst` on cells and narration slots, palette excludes attachment columns |
+| `src/pytest_given/report/md_renderer.py` | column loop, attachment cells and below-table blocks, `AttachmentRef` branch in `_attachment_lines` |
 | `examples/coffeeshop/test_coffeeshop.py` | a parametrized scenario that both attaches and narrates a derived local |
-| `src/pytest_given/skills_data/pytest-given-navigating/references/report-json.md` | new `parameters` shape and `jq` recipes |
+| `GLOSSARY.md` | *Parameter table* is defined as "column names + cases" and needs the column kinds; *Value highlight* is defined around interpolations that don't match a parametrize column, now true only when they are constant across cases. Per AGENTS.md a glossary edit pulls in `uv run nox -s self_report` |
+| `src/pytest_given/skills_data/pytest-given-navigating/references/report-json.md` | new `parameters` shape, placeholder and attachment part shapes, merged step `text`, and `jq` recipes |
 | `src/pytest_given/skills_data/pytest-given-authoring/references/scenarios.md`, `references/api.md` | in a parametrized scenario, a varying `str` narration (f-strings included), a varying compound interpolation and a varying `attach` label are now errors, not caveats; `attach` takes a `str` label |
 | `README.md` | `attach(label, content)` — the label is a plain `str`; t-strings are rejected |
 | `CHANGELOG.md` | seven `## [Unreleased]` entries (see below) |
 
-No lint changes. The rules this design displaces move into the merge rather than into the
-catalog; what that implies for `divergent-case-structure` is settled under
-[Out of scope](#out-of-scope).
+No lint rule changes: every rule keeps its behaviour and the catalog is untouched — the lint
+package only stops owning two tree helpers it was never the sole user of. The rules this
+design displaces move into the merge rather than into the catalog; what that implies for
+`divergent-case-structure` is settled under [Out of scope](#out-of-scope).
 
 This lands as seven user-facing changes, each needing its own `## [Unreleased]` entry in the
-commit that makes it (per AGENTS.md), four of them breaking:
+commit that makes it (per AGENTS.md), five of them breaking:
 
 - **Changed (breaking).** `parameters.names` becomes `parameters.columns` (each column an
-  `id`/`name`/`kind`) and cells widen to scalar-or-attachment. Affects anything reading the JSON
-  report, including the `jq` recipes in the navigating skill.
+  `id`/`name`/`kind`) and cells widen to scalar-or-attachment. Placeholder parts gain
+  `column_id`, and a promoted attachment appears in the step tree as a content-less reference
+  to its column. Affects anything reading the JSON report, including the `jq` recipes in the
+  navigating skill.
+- **Changed (breaking).** A merged parametrized scenario's step `narration.text` is now the
+  template (`the drink costs {price} euros`) rather than the first case's rendering (`the
+  drink costs 2.0 euros`), matching what the scenario's own `narration.text` has always done.
+  HTML and Markdown output is unchanged; this is visible to JSON readers only.
 - **Added.** Attachments and derived values that vary across parametrize cases now render as
   columns instead of being dropped or frozen to the first case.
 - **Changed (breaking).** In a parametrized scenario, a `str` narration whose value varies
   across cases (typically an f-string), a t-string interpolating anything but a bare name
   (`t"{cup_size * 0.01}"`, `t"{m.balance}"`) whose value varies, a glossary term ref whose pill
-  differs between cases (unless the pill is a parametrize value itself), and an `attach` label
-  that differs between cases now raise `PytestGivenError`; the run fails and writes no report.
-  Suites hitting any of them were already getting a wrong one.
+  differs between cases (unless the pill is a parametrize value itself), and a step whose set of
+  `attach` labels differs between cases now raise `PytestGivenError`; the run fails and writes
+  no report. Suites hitting any of them were already getting a wrong one.
 - **Fixed (breaking).** A t-string interpolating a rebound parametrize name rendered the
   *parameter's* value rather than the narrated one, wrong for every case. It now raises rather
   than rendering a false value.
 - **Changed (breaking).** `attach` takes a plain `str` label; a t-string label now raises
   instead of being silently flattened to the same text. Use an f-string —
   `attach(f"{flavor} log", …)`.
-- **Changed.** Attachment badges show an icon derived from the attachment's content type instead
-  of a paperclip, in both the HTML and Markdown reports.
 - **Fixed.** Parametrizing over a glossary term instance
   (`@pytest.mark.parametrize('guest', [pg['Guest']('Alice'), …])`) stored a dataclass repr of the
   whole glossary in the parameter table; the column now holds the display, and activity coverage
@@ -542,11 +676,21 @@ The project is pre-1.0, so these ride a minor bump rather than a major one.
   found; the Glossary view lists every case's instance; and an activity whose refs are satisfied
   only by mixing two cases' displays is **not** matched.
 - Unit: an attachment whose content varies but whose label is shared becomes a column headed by
-  that label, with the badge keeping it; a byte-identical attachment stays inline and makes no
-  column; `attach` rejects t-string and `Template` labels through the one guard (replacing
-  today's eager-render test).
-- Unit: two same-named `derived` columns in one scenario get distinct `id`s, and a generated id
-  never collides with a parametrize name.
+  that label; the badge left on the step is an `AttachmentRef` carrying **no content** — the
+  guard against re-introducing the defect this design opens with — and a byte-identical
+  attachment stays an inline `Attachment` and makes no column; `attach` rejects t-string and
+  `Template` labels through the one guard (replacing today's eager-render test).
+- Unit: label-keyed attachment merging — a step attaching the same labels in a different order
+  merges rather than raising; the same label attached a different number of times yields
+  columns with blank trailing cells and no error; a label present in one case only raises rule
+  5 naming that label.
+- Unit: a structurally divergent case raises nothing — in particular a shifted tree that lines
+  a `when` up against a `given` gets blank cells and the existing lint finding, not rule 1.
+- Unit: rule 3 fires on a single-case parametrize, where no comparison rule can.
+- Unit: a merged step's `narration.text` is the template, and matches what the parts render.
+- Unit: two same-named `derived` columns in one scenario get distinct `id`s and each
+  placeholder carries its own `column_id`, so hovering one row substitutes both independently.
+  (Nothing tests id collision — the colon makes it unreachable.)
 - Integration: a parametrized scenario with an attachment and a derived local, asserted through
   `--given-json`; and a violating suite that writes no JSON, HTML or Markdown sink, exits
   non-zero with the message in the terminal summary and no escaped traceback, and fails the same
@@ -555,8 +699,9 @@ The project is pre-1.0, so these ride a minor bump rather than a major one.
   scenarios that attach or narrate a varying value should move.
 - Playwright for the template work: console clean after init, then drive cell expand, the
   tree-badge → column hover highlight, and row hover — confirming that `param`/`derived` slots
-  fill from the hovered case and that attachment badges, icons included, are left alone. Per
-  AGENTS.md this is not TDD'd and gets no markup-pinning Python tests.
+  fill from the hovered case, that attachment badges are left alone, and that a promoted tree
+  badge highlights its column without offering an expander. Per AGENTS.md this is not TDD'd
+  and gets no markup-pinning Python tests.
 
 ## Out of scope
 
