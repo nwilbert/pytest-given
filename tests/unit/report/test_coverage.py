@@ -317,6 +317,55 @@ def test_compute_coverage_does_not_cover_instance_activity_with_canonical_step(g
 
 
 @scenario(
+    t'Promoting a bare word to a {pg["Verb"].low} ref drops '
+    t'{pg["Coverage"].low} from a {pg["Step"].low} that matched',
+    tags=['happy-path'],
+)
+def test_compute_coverage_lost_when_activity_gains_a_term(g):
+    """Widening an activity's identity set silently uncovers it: a step that
+    covered the activity before the edit no longer does."""
+    with given(t'a {pg["Step"]} naming two {pg["Term ref"]("term refs")}'):
+        scenario = _scenario_with_steps(
+            _step('when', _term_ref('guest', 'Guest'), _term_ref('room', 'Room'))
+        )
+    with given(
+        t'the same {pg["Activity"]} with that middle slot a bare word, '
+        t'then a {pg["Verb"]} ref'
+    ):
+        bare = Activity(
+            id=ActivityId(1),
+            paths=(
+                _path(
+                    _entity('guest', 'Guest'),
+                    ActivityWord(text='books'),
+                    _entity('room', 'Room'),
+                ),
+            ),
+        )
+        promoted = Activity(
+            id=ActivityId(1),
+            paths=(
+                _path(
+                    _entity('guest', 'Guest'),
+                    _term_part('search'),
+                    _entity('room', 'Room'),
+                ),
+            ),
+        )
+    with when(t'{pg["Coverage"]} is computed against each {pg["Story"]}'):
+        before = compute_coverage(
+            g, scenario, Story(id=StoryId('s'), title='S', activities=(bare,))
+        )
+        after = compute_coverage(
+            g, scenario, Story(id=StoryId('s'), title='S', activities=(promoted,))
+        )
+    with then(t'the two-ref {pg["Activity"]} is covered'):
+        assert ActivityId(1) in before
+    with then(t'the widened {pg["Activity"]} is no longer covered'):
+        assert ActivityId(1) not in after
+
+
+@scenario(
     t'A {pg["Scenario"].low} {pg["Activity"].low} binding '
     t'constrains {pg["Coverage"].low}',
     tags=['happy-path'],
