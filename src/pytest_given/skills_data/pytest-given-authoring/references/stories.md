@@ -27,7 +27,11 @@ activity(
 ),
 ```
 
+**A branched activity is expensive to cover.** Coverage unions the term refs of *all* paths, so covering it takes one step referencing every term in every branch — past two near-identical branches that step stops being writable and the activity is effectively uncoverable. Branch with `path(...)` only for strands you accept as uncovered; otherwise split them into separate activities, or pin a covering step (below).
+
 ## Binding scenarios to a story
+
+**A story reaches the report only through `@scenario(story=...)`.** Stories are discovered from the scenarios that bind them, so a defined-but-unbound story never appears however complete it is — an empty Stories tab means no scenario names it, not a broken definition.
 
 ```python
 @scenario('Carol selects a suite', story=book_a_group_trip)
@@ -37,6 +41,11 @@ def test_select_suite(carol):
 ```
 
 Coverage is matched **per step**: an activity is covered when a *single step's* term references include all of the activity's terms (an instance also counts for its canonical term) — references spread across several steps don't add up. The Stories tab shows a coverage chip per activity with the scenarios that touch it.
+
+Two corollaries of "per step":
+
+- **Only step narration counts.** Term refs in the `@scenario` name never contribute. A scenario titled with both actors stays uncovered until those refs also appear in a `given`/`when`/`then`.
+- **Growing an activity's terms raises its coverage bar.** Adding a term — or narrowing one to an instance (`room` → `room('Deluxe Suite')`) — makes every covering step carry the new identity too, so editing a story can silently uncover a scenario that used to cover it (a pinned step is immune). Re-render the Stories tab after touching an activity.
 
 A step can also **pin** an activity explicitly — `given(text, activity=3)`, taking the 1-based activity number in the story (or a sequence of numbers). A pinned step covers the activity regardless of what its narration references; use a pin when the activity is phrased above the vocabulary the step narrates (e.g. a process-level activity implemented by a technical test), and keep it on the one step that genuinely demonstrates the activity.
 

@@ -30,7 +30,16 @@ room = g.work_object('Room', definition='A bookable hotel room.')
 search = g.verb('search', definition='Look up available options.')
 ```
 
-Either way, **give the language a public home**: define the glossary — and the stories, once there are some — in one dedicated, publicly named module, e.g. `tests/ubiquitous_language.py`, imported from `conftest.py` so the plugin discovers it. The module *is* the suite's ubiquitous language, not a private helper — don't underscore-prefix it; test modules import their handles from it. Glossary-only mode is fine — you get the Glossary tab without writing any stories.
+Either way, **give the language a public home**: define the glossary — and the stories, once there are some — in one dedicated, publicly named module, e.g. `tests/ubiquitous_language.py`. The module *is* the suite's ubiquitous language, not a private helper — don't underscore-prefix it; test modules import their handles from it. Glossary-only mode is fine — you get the Glossary tab without writing any stories.
+
+**Discovery needs the glossary bound *by name* in `conftest.py`** — the plugin scans conftest module attributes for a `Glossary`/`FileGlossary` instance:
+
+```python
+# conftest.py
+from tests.ubiquitous_language import g  # noqa: F401 — plugin discovery
+```
+
+`import tests.ubiquitous_language` binds a module, not a glossary: the scan finds nothing and the Glossary tab renders empty.
 
 ## Using terms in narration
 

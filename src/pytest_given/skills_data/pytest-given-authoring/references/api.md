@@ -39,24 +39,24 @@ Hard rules (each raises `PytestGivenError`):
 ## Parametrized tests
 
 - All cases group into **one scenario with a parameter table**. T-string interpolations naming a parametrize column render as colored values per row.
-- **Case 1's steps are the template for every row** — narration that branches on a parameter value silently shows case 1's shape for all rows. If steps genuinely differ per case, split into separate `@scenario` tests.
+- **Case 1's steps are the template for every row** — narration that branches on a parameter value silently shows case 1's shape for all rows (see [scenarios.md](scenarios.md)).
 - Parametrized **scenario name**: `@scenario(Template('Brew {cup_size} ml'))`.
 - Surface a parametrize value as a `given`: `Annotated[int, given(Template('a {cup_size} ml cup'))]` on the parameter.
 
 ## Glossary
 
-- **Code-defined**: `g = Glossary()`, then `guest = g.actor('Guest', definition='…')`, `g.work_object('Room', …)`, `g.verb('search', …)`. Define `g` (and stories) in a dedicated public module — e.g. `tests/ubiquitous_language.py` — imported from `conftest.py` so the plugin discovers it.
+- **Code-defined**: `g = Glossary()`, then `guest = g.actor('Guest', definition='…')`, `g.work_object('Room', …)`, `g.verb('search', …)`. Where to define `g`, and how `conftest.py` must bind it for the plugin to find it: [glossaries.md](glossaries.md).
 - **File-backed**: `g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')` — needs at least one GFM pipe table; first column = term, second = description by default (`term_column=` / `description_column=` / `kind_column=` override, 0-based index or header name, case-insensitive).
-- **Handles in t-strings** render as kind-coloured pills with definition tooltips: `t'a {guest} {search("searches for")} a {room}'`. Surface forms, lightest first: **bare** handle `g['Room']` renders the canonical text (don't restate it as `g['Room']('Room')`); **`.low`** — `g['Room'].low` renders it lowercased, the common mid-sentence form (vs. the equivalent `g['Room']('room')`); **callable** override `g['borrow']('borrows')` supplies any other inflection, plural (`g['Term']('terms')`), or instance (`organizer('Carol')`).
+- **Handles in t-strings** render as kind-coloured pills with definition tooltips: `t'a {guest} {search("searches for")} a {room}'`. Three surface forms: **bare** `g['Room']` (the canonical text), **`.low`** `g['Room'].low` (lowercased), and a **callable** override `g['borrow']('borrows')` for any other inflection, plural (`g['Term']('terms')`), or instance (`organizer('Carol')`). Which to pick: [glossaries.md](glossaries.md).
 - **Lookup and deferral**: `g['Guest']` fetches a declared term (case-insensitive; raises if unknown). On a code-defined glossary, `g('foo')` declares an as-yet-unclassified term (lands in *Uncategorized*, shows *Undefined* until `definition=` is supplied); on a `FileGlossary` the vocabulary is closed — `g('foo')` only looks up, and new terms are added as rows in the file. Both forms return handles usable in t-strings and activities.
-- Without a `kind_column`, kinds are inferred from story activity-slot positions (position 0 → actor, odd → verb, even ≥ 2 → work object; actor + noun slots resolve to actor, a verb slot plus any other raises); a term used only in steps stays kindless.
+- Without a `kind_column`, kinds are inferred from story activity-slot positions (position 0 → actor, odd → verb, even ≥ 2 → work object); a term used only in steps stays kindless. Collision rules: [glossaries.md](glossaries.md).
 
 ## Stories
 
 - `story('Name', [activity(...), ...])` — a flow of `activity(actor, verb, work_object, ...)` rows, read left-to-right; parts may be bare strings, but an activity needs **two distinct glossary terms** to be coverage-tracked. `path(...)` branches alternate sequences off a shared prefix.
-- Bind a scenario with `@scenario(..., story=the_story)`; coverage matches per step — an activity is covered when a single step's term refs include all the activity's terms. A step can pin an activity explicitly with `given(text, activity=3)` (1-based activity number or sequence); a pinned step covers regardless of its narration.
+- Bind a scenario with `@scenario(..., story=the_story)` — the only way a story reaches the report. Coverage matches **per step**: an activity is covered when a single step's term refs include all the activity's terms. A step can pin an activity explicitly with `given(text, activity=3)` (1-based activity number or sequence); a pinned step covers regardless of its narration. What that costs you when authoring: [stories.md](stories.md).
 
 ## Verifying
 
-- `pytest <selection> --given-md` — render touched scenarios to stdout and read them as a spec.
-- `pytest <selection> --given-lint=true` — narration lint; error findings fail the run. Rule catalog and per-project config live in the README.
+- `pytest <selection> --given-md` — render touched scenarios to stdout.
+- `pytest <selection> --given-lint=true` — narration lint; only *error* findings fail the run. Rule catalog and per-project config live in the README.
