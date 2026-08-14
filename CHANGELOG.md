@@ -15,6 +15,15 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - `activity(..., id=N)` is now `activity(..., activity_id=N)`. The keyword
   shadowed the `id` builtin; the `Activity.id` field itself is unchanged.
+- The bundled `pytest-given-authoring` skill now documents the report mechanics
+  its rules depend on (story binding, coverage matching, lint severities), adds
+  a symptom index, and groups the scenario rules under subheads.
+
+### Fixed
+
+- The bundled authoring skill's glossary-discovery advice: `conftest.py` must
+  bind the `Glossary` / `FileGlossary` handle itself, not merely import the
+  module defining it, or the report's Glossary tab stays empty.
 
 ## [0.1.0] - 2026-08-08
 

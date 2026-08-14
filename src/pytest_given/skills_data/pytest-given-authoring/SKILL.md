@@ -25,6 +25,15 @@ Read the guide for the artifact you are about to touch — not all of them:
 
 `references/api.md` matches the installed package version — prefer it over external docs for syntax questions. Setup tasks (installing pytest-given, enabling report output or the narration lint in CI) are out of scope for these guides; see the project README at <https://github.com/nwilbert/pytest-given>.
 
+## When the report doesn't show what you expect
+
+| Symptom | Read |
+|---|---|
+| Glossary tab is empty | `references/glossaries.md` |
+| Stories tab is empty | `references/stories.md` |
+| An activity never turns covered | `references/stories.md` |
+| A file-scoped lint run fails where the whole suite passes | `references/scenarios.md` |
+
 ## Adoption levels
 
 Each artifact kind stands on its own — scenarios-only is a perfectly good adoption level. They compound when combined: scenarios narrate in glossary vocabulary (term refs render as pills and power per-term filtering), and stories give the actor-level view that scenarios link into for coverage.
