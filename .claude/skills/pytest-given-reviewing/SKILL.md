@@ -5,7 +5,7 @@ description: Use when reviewing pytest-given artifacts — checking @scenario na
 
 # Reviewing pytest-given artifacts
 
-Narration is **auditable, not verified**: nothing mechanical compares a step's text to its body, so a passing suite says nothing about the narration being true. Review in two layers — the lint decides what is mechanically decidable, then a semantic audit judges what it can't. Don't skip layer 1: it is cheaper and stricter than re-deriving the same findings by reading.
+Narration is **auditable, not verified**: nothing mechanical compares a step's text to its body, so a passing suite says nothing about the narration being true. Review in layers — the lint decides what is mechanically decidable, a semantic audit judges what it can't, then a completeness audit asks what the report leaves out entirely. Don't skip layer 1: it is cheaper and stricter than re-deriving the same findings by reading.
 
 ## 1. Structural gate — run the lint first
 
@@ -21,6 +21,8 @@ pytest <selection> --given-lint=true -o "given_lint_rules=dead-term=warn"
 
 **Reviewing a change rather than a whole suite? Diff the Markdown report first.** Render `pytest <selection> --given-md=<file>` at base and head and diff the two files (or diff the committed report, if the project checks one in). The Markdown sink is deterministic — no timestamps or commit SHAs, unlike the JSON/HTML sinks — so the diff *is* the behavioural delta in prose, and it scopes the audit to the scenarios whose narration actually changed. Read it in both directions: narration that changed needs its body re-checked, and a change to step *bodies* that leaves the narration diff empty is the drift signature — behaviour may have moved while the spec stood still.
 
+**No base report to diff against?** On an adoption branch the base has no scenarios, so the diff *is* the whole report — the normal case for a first-adoption review, not a reason to skip the layer. Drop the diff and audit the full suite, ordered by risk: scenarios whose bodies the branch touched first, then the rest file by file (fan out as below). `--given-md` is a plain pytest flag and needs no project wiring — run `pytest <selection> --given-md=<file>` yourself even when CI only configures the HTML/JSON sinks.
+
 For each scenario under review, read the step texts against their bodies (jump via the ``file.py:line`` anchor under each `--given-md` heading, or `.source` in the JSON report) and judge with one rubric:
 
 **Step text may abstract; it must never overstate.**
@@ -34,14 +36,25 @@ For each scenario under review, read the step texts against their bodies (jump v
 
 For a large suite, fan the audit out: one reviewer per test file — a subagent where the harness has them (a cheap, fast model suffices; the rubric is local to each file) — each returning findings; otherwise audit inline, file by file. Verify a sample of any fan-out findings yourself before reporting them.
 
-## 3. Glossary, tags, stories
+## 3. Completeness audit — what the report doesn't say
+
+Layers 1 and 2 start from the narration and ask whether it is true; neither catches a report that is truthful line by line and still misrepresents the system by omission. When the question is "does this capture the gist?" — an adoption branch, a feature's first scenarios — invert the direction: start from the implementation and ask what the report fails to say. Bound the sweep to the code the change touches.
+
+- **Unnarrated behaviour branches.** Walk the behaviour-bearing branches of the code under review — a scoping rule, a precedence decision, a fallback path — and check each has a scenario naming it. A branch covered only by an undecorated test is invisible in the report; one with no test at all rates higher, because an otherwise complete-looking spec now hides it.
+- **Glossary rows that assert behaviour.** A definition making a claim ("X takes precedence over Y", "must be unique") is a spec sentence in its own right. When no scenario demonstrates that claim, the glossary is unbacked documentation — flag the pair and prefer pinning the behaviour in a scenario over softening the definition.
+
+Rate an unnarrated branch below overstatement: silence understates, which misleads less than a false claim. A glossary row asserting untested behaviour is not silence — it rates with layer 2.
+
+## 4. Glossary, tags, stories
 
 - A **dead term** (layer 1, opt-in rule) that describes unimplemented behaviour is misleading domain documentation — flag it. The fix is as often deleting the term as adding a reference; don't accept references manufactured to appease the rule.
 - **Dilution** is the inverse finding: a row nothing would miss — a generic verb minted to fill a story slot (a bare word belongs there), a concept duplicated under a second name, a term added only to render as a pill. A sharp, lean glossary outranks an impressive-looking one.
 - An **oversized glossary** is a structural finding: a glossary only works read whole, so one grown past a single comfortable reading likely spans more than one bounded context. Recommend splitting it per context; don't fix size by trimming healthy terms.
 - `tag-shadows-term` is linted; the fix is dropping the tag, **not spreading tags wider**. Tags stay orthogonal to the glossary (behaviour, mechanism), so sparse tagging is usually correct — don't report it as a finding.
-- A story activity no scenario covers is a gap worth noting: check scenarios' `story_id` bindings and term coverage (the HTML report's Stories tab shows a coverage chip per activity).
+- An **uncovered story activity** is a gap worth noting. An activity is covered when **one single step's** term refs include **all** of its terms — refs spread across several steps never add up, and terms in the `@scenario` name don't count. The Stories tab shows this, but it is HTML and `--given-md` has no Stories section; for the full rule and a ready-to-run query over the JSON report, see [references/story-coverage.md](references/story-coverage.md).
 
 ## Findings are advisory review comments
 
-For each finding: file:line, what the narration claims, what the body actually does, why it matters. Rate truthfulness findings highest — a false spec misleads every future reader; language drift rates below that, because a drifted vocabulary erodes slowly rather than lying outright. Style preferences the authoring rules don't state are not findings.
+For each finding: file:line, what the narration claims, what the body actually does, why it matters. Rate truthfulness findings highest — a false spec misleads every future reader; language drift rates below that, because a drifted vocabulary erodes slowly rather than lying outright.
+
+**Report legibility is reviewable; taste is not.** The premise of the whole exercise is that the report is documentation, so how the document *reads* is in scope: inconsistent casing or phrasing of the same concept across step texts, a scenario name that doesn't parse as a sentence, two scenarios whose titles don't distinguish them. Rate these lowest and report them as one batched finding, not one per instance. Out of scope is what legibility doesn't reach — a wording you would simply have chosen differently.
