@@ -2,9 +2,7 @@
 
 ## Now
 
-- [ ] CLI option to generate a shortened MD glossary (only the terms and optionally kinds)
-  - this could be used by agents to quickly lookup terms, without needed to load the whole glossary?
-  - maybe even a command line option to find terms & their descriptions?
+- [ ] continue work on the story-diagrams branch
 
 ## Next
 
@@ -12,9 +10,7 @@
 - [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
-- [ ] add the prepared diagram to the readme with Agent <-> Dev <-> Domain Expert
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
-- [ ] add a graphical view for stories (e.g., with https://js.cytoscape.org/)
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
 - [ ] Narrate more backend tests into scenarios — continue the dogfood conversion, converting behaviour, not plumbing (leave schema/serde round-trips, metadata/protocol checks, and config parsing plain). In priority order:
   - lint rule tests (`tests/unit/lint/test_runtime_rules.py`, `test_ast_rules.py`, ~65) — each asserts a user-facing rule ("missing-phase fires on a two-phase scenario"); the report would document the lint's semantics
