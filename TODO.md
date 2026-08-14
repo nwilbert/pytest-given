@@ -12,6 +12,7 @@
 - [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
 - [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
+- [ ] Attachment badges: pick the icon from `content_type` instead of always a paperclip — a document glyph for `text`, braces for `json`. Replaces the HTML report's paperclip SVG and the Markdown renderer's `📎`: a branch in the badge macro plus a second inline SVG, no new data. Split out of the [per-case columns spec](docs/specs/proposed/2026-08-14-parametrized-case-columns-design.md), which touches the same badge macro but doesn't need this; `AttachmentRef` there carries `content_type` for it to read.
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
