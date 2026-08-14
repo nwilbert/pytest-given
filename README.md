@@ -10,7 +10,19 @@ Live examples:
 
 ## Quick start
 
+```bash
+pip install pytest-given
+```
+
 Requires **Python ≥ 3.14** (t-strings — [PEP 750](https://peps.python.org/pep-0750/) — are part of the step-text API) and **pytest ≥ 9.0**.
+
+If AI agents work in your repo, also install the bundled [agent skills](#agent-skills):
+
+```bash
+pytest-given skills install
+```
+
+Then narrate a test:
 
 ```python
 import pytest
@@ -434,12 +446,7 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
 
 Pass `--format md` to render Markdown instead of HTML; the format is also inferred from the `-o` extension, so `-o report.md` renders Markdown without needing `--format` explicitly. Omit `-o` with `--format md` to print to stdout.
 
-Install the bundled [agent skills](#agent-skills) into a project:
-
-```bash
-pytest-given skills install            # copies into ./.claude/skills/
-pytest-given skills install --check    # exit 1 if the installed files drifted from the bundled ones
-```
+The same script owns `skills install` — see [Agent skills](#agent-skills).
 
 ## Examples
 
@@ -472,6 +479,11 @@ Adopt selectively: decorate the tests that assert behavior, and leave plumbing (
 ### Agent skills
 
 `pytest-given skills install` copies the bundled [Agent Skills](https://agentskills.io) into your repo's `.claude/skills/`, where Claude Code (and other harnesses following the same format) auto-discover them. It ships three skills: **`pytest-given-authoring`** — a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories; **`pytest-given-navigating`** — how to explore a codebase through its rendered reports (`--given-md` for the prose spec, `--given-json` + `jq` for filtering by tag, term, or status) instead of grepping test bodies; and **`pytest-given-reviewing`** — a two-layer review of narrated tests (the narration lint as the structural gate, then a semantic audit of step text against step bodies: may abstract, never overstate). The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` detects drift in CI. Use `--dest` for a non-default skills directory.
+
+```bash
+pytest-given skills install            # copies into ./.claude/skills/
+pytest-given skills install --check    # exit 1 if the installed files drifted from the bundled ones
+```
 
 ## Development
 
