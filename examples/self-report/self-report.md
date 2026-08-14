@@ -1235,50 +1235,59 @@
 - **when** a «Scenario» step only names the canonical «Actor»
 - **then** «Coverage» leaves the more specific instance activity uncovered
 
+## ✓ Promoting a bare word to a «verb» ref drops «coverage» from a «step» that matched
+`tests/unit/report/test_coverage.py:319::test_compute_coverage_lost_when_activity_gains_a_term` · happy-path
+
+- **given** a «Step» naming two «term refs»
+- **given** the same «Activity» with that middle slot a bare word, then a «Verb» ref
+- **when** «Coverage» is computed against each «Story»
+- **then** the two-ref «Activity» is covered
+- **then** the widened «Activity» is no longer covered
+
 ## ✓ A «scenario» «activity» binding constrains «coverage»
-`tests/unit/report/test_coverage.py:319::test_compute_coverage_scenario_constrained_to_activity_ids` · happy-path
+`tests/unit/report/test_coverage.py:368::test_compute_coverage_scenario_constrained_to_activity_ids` · happy-path
 
 - **given** a «Story» with two matching activities
 - **when** the «Scenario» «binds» only to activity 1
 - **then** «Coverage» considers only the bound «Activity»
 
 ## ✓ An «activity» with two distinct «terms» is «coverage»-eligible
-`tests/unit/report/test_coverage.py:366::test_is_coverage_eligible_true_for_two_distinct_terms` · happy-path
+`tests/unit/report/test_coverage.py:415::test_is_coverage_eligible_true_for_two_distinct_terms` · happy-path
 
 - **given** an «Activity» anchored by two distinct «Term» refs
 - **when** its «Coverage» eligibility is checked
 - **then** it is eligible for «Coverage» tracking
 
 ## ✓ An under-anchored «activity» is not «coverage»-eligible
-`tests/unit/report/test_coverage.py:389::test_is_coverage_eligible_false_for_one_distinct_term` · happy-path
+`tests/unit/report/test_coverage.py:438::test_is_coverage_eligible_false_for_one_distinct_term` · happy-path
 
 - **given** an «Activity» that mentions only one distinct «Term»
 - **when** its «Coverage» eligibility is checked
 - **then** it is ineligible — «Coverage» needs at least two anchors
 
 ## ✓ An under-anchored «activity» is never reported as covered
-`tests/unit/report/test_coverage.py:420::test_compute_coverage_excludes_under_anchored_activity` · happy-path
+`tests/unit/report/test_coverage.py:469::test_compute_coverage_excludes_under_anchored_activity` · happy-path
 
 - **given** a «Story» whose «Activity» is all bare words
 - **when** coverage is computed against a scenario
 - **then** «Coverage» excludes the under-anchored «Activity»
 
 ## ✓ Nested «steps» are walked for «coverage»
-`tests/unit/report/test_coverage.py:444::test_compute_coverage_nested_steps_are_walked` · happy-path
+`tests/unit/report/test_coverage.py:493::test_compute_coverage_nested_steps_are_walked` · happy-path
 
 - **given** a «Story» with one canonical «Activity»
 - **when** the covering «Term ref»s live in a nested child «Step»
 - **then** the nested «Step» still counts and the «Activity» is covered
 
 ## ✓ An explicit «step» binding covers an eligible «activity»
-`tests/unit/report/test_coverage.py:480::test_compute_coverage_explicit_step_binding_covers_eligible_activity` · happy-path
+`tests/unit/report/test_coverage.py:529::test_compute_coverage_explicit_step_binding_covers_eligible_activity` · happy-path
 
 - **given** a «Story» with a coverage-eligible «Activity»
 - **when** a «Step» «binds» to it explicitly by id
 - **then** «Coverage» counts it directly, without identity matching
 
 ## ✓ An explicit binding still requires eligibility
-`tests/unit/report/test_coverage.py:509::test_compute_coverage_explicit_binding_ignored_for_ineligible_activity` · validation
+`tests/unit/report/test_coverage.py:558::test_compute_coverage_explicit_binding_ignored_for_ineligible_activity` · validation
 
 - **given** a «Story» whose «Activity» is under-anchored
 - **when** a «Step» «binds» to it explicitly by id

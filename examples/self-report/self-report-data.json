@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-08T20:40:15.455814+00:00",
+    "timestamp": "2026-08-14T13:15:31.771190+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "2f8067109c8e1fcffb8dbe57dadf00c73d5f4986"
+    "commit_sha": "4acdffea0a58b7a5e0c144f029408031b4bed682"
   },
   "scenarios": [
     {
@@ -1092,7 +1092,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1187,7 +1187,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1739,7 +1739,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1838,7 +1838,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -1933,7 +1933,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2032,7 +2032,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2311,7 +2311,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2416,7 +2416,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -2531,7 +2531,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -13270,6 +13270,209 @@
       "activity_ids": []
     },
     {
+      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_lost_when_activity_gains_a_term",
+      "narration": {
+        "text": "Promoting a bare word to a verb ref drops coverage from a step that matched",
+        "parts": [
+          {
+            "value": "Promoting a bare word to a "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " ref drops "
+          },
+          {
+            "term_id": "coverage",
+            "display": "coverage",
+            "expression": "pg[\"Coverage\"].low",
+            "param_column": null
+          },
+          {
+            "value": " from a "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " that matched"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_coverage",
+      "tags": [
+        "happy-path"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Step naming two term refs",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " naming two "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "term refs",
+                "expression": "pg[\"Term ref\"](\"term refs\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "the same Activity with that middle slot a bare word, then a Verb ref",
+            "parts": [
+              {
+                "value": "the same "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]",
+                "param_column": null
+              },
+              {
+                "value": " with that middle slot a bare word, then a "
+              },
+              {
+                "term_id": "verb",
+                "display": "Verb",
+                "expression": "pg[\"Verb\"]",
+                "param_column": null
+              },
+              {
+                "value": " ref"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage is computed against each Story",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]",
+                "param_column": null
+              },
+              {
+                "value": " is computed against each "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the two-ref Activity is covered",
+            "parts": [
+              {
+                "value": "the two-ref "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]",
+                "param_column": null
+              },
+              {
+                "value": " is covered"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the widened Activity is no longer covered",
+            "parts": [
+              {
+                "value": "the widened "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]",
+                "param_column": null
+              },
+              {
+                "value": " is no longer covered"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_coverage.py",
+        "line": 319
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "tests/unit/report/test_coverage.py::test_compute_coverage_scenario_constrained_to_activity_ids",
       "narration": {
         "text": "A scenario activity binding constrains coverage",
@@ -13406,7 +13609,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 319
+        "line": 368
       },
       "story_id": null,
       "activity_ids": []
@@ -13548,7 +13751,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 366
+        "line": 415
       },
       "story_id": null,
       "activity_ids": []
@@ -13678,7 +13881,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 389
+        "line": 438
       },
       "story_id": null,
       "activity_ids": []
@@ -13792,7 +13995,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 420
+        "line": 469
       },
       "story_id": null,
       "activity_ids": []
@@ -13934,7 +14137,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 444
+        "line": 493
       },
       "story_id": null,
       "activity_ids": []
@@ -14067,7 +14270,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 480
+        "line": 529
       },
       "story_id": null,
       "activity_ids": []
@@ -14187,7 +14390,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 509
+        "line": 558
       },
       "story_id": null,
       "activity_ids": []
@@ -14213,7 +14416,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
