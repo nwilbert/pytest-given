@@ -190,7 +190,12 @@ with which case happened to pass.
 ## Rejected authoring forms
 
 Five forms are rejected. All raise `PytestGivenError` from `_group_parametrized`, naming the
-scenario's file and line and the fix. A step-level anchor is not available: `Step.source` is
+scenario's file and line and the fix. The message quoted under each rule below is the **body**:
+the locator is appended by `location_suffix` (`lint/base.py:71-76`), the same
+` (test_brew.py:12)` suffix every lint finding already carries, so an error and a finding read
+alike and one formatter produces both. It stays in `lint/` — unlike the tree helpers, which
+`report/` and `lint/` both needed and neither could import, this one is wanted only by the
+merge, and `plugin.py` sits above both. A step-level anchor is not available: `Step.source` is
 captured only when lint is enabled (`plugin.py:241`), and these rules must hold with lint off.
 
 **Which cases a rule sees.** Rules 1, 2, 4 and 5 compare cases against each other, and only
@@ -201,6 +206,10 @@ line a `when` up with a `given` and raise rule 1 about two unrelated steps. Dive
 lint's business, and such a case drops out of validation exactly as it drops out of
 cell-filling. Rule 3 is the exception — it compares a case against its own parameter values,
 so structure is irrelevant and every passed case is checked.
+
+Comparability is *structural* only. Narration that changes shape underneath a matching
+structure is a known limitation, deferred with divergent structure itself (see
+[Out of scope](#out-of-scope)).
 
 Validation runs on **every** session, not only when a sink was requested: these are usage
 errors, and the plugin already treats malformed narration as one —
@@ -454,7 +463,10 @@ The step matching the table above reads:
 ```
 
 This is a breaking change to the JSON report, riding along with the JSON-format polish already
-on the TODO; report versioning is that item's job, not this one's.
+on the TODO; report versioning is that item's job, not this one's. There is no migration and
+no compatibility shim: a report saved before this change will not load in `pytest-given report`
+(`report/cli.py` reads it through `report_from_dict`). Pre-1.0, that is accepted rather than
+worked around — the fix for an old report is to re-run the suite.
 
 ## Merge algorithm
 
@@ -695,6 +707,18 @@ The project is pre-1.0, so these ride a minor bump rather than a major one.
   forms it has no one-line fix: the cases genuinely differ and no merged view can represent them.
   The graceful answer is to decline the merge and emit one scenario per case — the same opt-out,
   applied automatically — and that decision belongs with the opt-out.
+- **Narration that changes shape without changing structure**, which is the same problem one
+  level down. `structure_signature` compares `(phase, children)`, so a step narrated
+  `t"{n} items load" if n else "nothing loads"` leaves both cases comparable while their part
+  lists are laid out differently, and the merge walks parts by index into a sentence that is not
+  shaped the same way. Depending on the shapes it either raises rule 1 with the wrong diagnosis
+  or promotes a `derived` column named for the baseline's expression, standing in for a sentence
+  the other case never narrated. It needs a conditional narration under otherwise identical
+  structure, so it is rare — and like divergent structure it has no honest merged rendering and
+  no one-line fix. Both get **hard validation when the opt-out lands**, which is where declining
+  the merge becomes an available answer. Widening the comparability key here instead would only
+  trade a wrong sentence for a silent blank, since `divergent-case-structure` does not see
+  narration shape either.
 - Substituting a param-linked term pill on row hover.
 - Distinguishing `derived` from `param` columns visually.
 - Fixing session/module-scoped fixture attachment recording.
