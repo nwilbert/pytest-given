@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-17T07:09:04.224453+00:00",
+    "timestamp": "2026-08-17T17:32:58.411092+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "b7950cbb2dfccbd362a315d0fabf04a4bba91377"
+    "commit_sha": "cc8e99247aa2bb1a2d0c69e4a16b16947fa17ad7"
   },
   "scenarios": [
     {
@@ -14655,7 +14655,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 42
+        "line": 43
       },
       "story_id": null,
       "activity_ids": []
@@ -14766,7 +14766,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 142
+        "line": 143
       },
       "story_id": null,
       "activity_ids": []
@@ -14908,7 +14908,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 166
+        "line": 167
       },
       "story_id": null,
       "activity_ids": []
@@ -15044,7 +15044,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 221
+        "line": 222
       },
       "story_id": null,
       "activity_ids": []
@@ -15174,7 +15174,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 257
+        "line": 258
       },
       "story_id": null,
       "activity_ids": []
@@ -15295,7 +15295,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 329
+        "line": 330
       },
       "story_id": null,
       "activity_ids": []
@@ -15384,7 +15384,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 450
+        "line": 451
       },
       "story_id": null,
       "activity_ids": []
@@ -15519,7 +15519,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 71
+        "line": 73
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []

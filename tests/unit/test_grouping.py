@@ -8,6 +8,8 @@ import pytest
 from pytest_given import given, grouping, scenario, then, when
 from pytest_given.grouping import group_parametrized
 from pytest_given.model import (
+    Attachment,
+    AttachmentRef,
     Glossary,
     Narration,
     NarrationLiteral,
@@ -348,6 +350,34 @@ def _two_case_group(
     }
 
 
+def _three_case_group(
+    steps1: list[Step], steps2: list[Step], steps3: list[Step]
+) -> tuple[list[Scenario], ParamInfo]:
+    """`_two_case_group` with a middle case, for the several tests that must
+    distinguish "checks every case" from "checks only an end one"."""
+    nid1, nid2, nid3 = (
+        NodeId('t.py::test_brew[a]'),
+        NodeId('t.py::test_brew[b]'),
+        NodeId('t.py::test_brew[c]'),
+    )
+    scenarios = [
+        Scenario(
+            id=nid,
+            narration=Narration(text='brew'),
+            module='m',
+            status='passed',
+            steps=case_steps,
+            source=SourceLocation(relpath='tests/t.py', line=12),
+        )
+        for nid, case_steps in ((nid1, steps1), (nid2, steps2), (nid3, steps3))
+    ]
+    return scenarios, {
+        nid1: ParamSpec(names=['cup_size'], values=[200]),
+        nid2: ParamSpec(names=['cup_size'], values=[350]),
+        nid3: ParamSpec(names=['cup_size'], values=[500]),
+    }
+
+
 def test_a_varying_str_narration_raises_rule_one() -> None:
     scenarios, info = _two_case_group(
         [Step(phase='when', narration=Narration(text='the machine brews 200 ml'))],
@@ -604,10 +634,12 @@ def test_two_same_named_derived_columns_get_distinct_ids() -> None:
         'derived:0',
         'derived:1',
     ]
+    # Same expression, so the second column's *name* is disambiguated for the
+    # rendered table the way its id already is for the JSON.
     assert [c.name for c in grouped.parameters.columns] == [
         'cup_size',
         'price',
-        'price',
+        'price #2',
     ]
     ids: list[str] = []
     for s in grouped.steps:
@@ -1351,3 +1383,513 @@ def test_a_varying_pill_in_a_nested_step_raises_rule_four() -> None:
     scenarios, info = _two_case_group(steps('Coffee'), steps('Tea'))
     with pytest.raises(PytestGivenError, match='glossary term ref'):
         group_parametrized(scenarios, info)
+
+
+def _att_step(*attachments: Attachment) -> Step:
+    return Step(
+        phase='given',
+        narration=Narration(text='the machine is stocked'),
+        attachments=list(attachments),
+    )
+
+
+def test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge() -> (
+    None
+):
+    scenarios, info = _two_case_group(
+        [_att_step(Attachment(label='brew log', content='log-for-vanilla'))],
+        [_att_step(Attachment(label='brew log', content='log-for-mocha'))],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [(c.id, c.name, c.kind) for c in grouped.parameters.columns] == [
+        ('cup_size', 'cup_size', 'param'),
+        ('attachment:0', 'brew log', 'attachment'),
+    ]
+    badge = grouped.steps[0].attachments[0]
+    assert badge == AttachmentRef(
+        label='brew log', content_type='text', column_id='attachment:0'
+    )
+    assert not hasattr(badge, 'content')
+    assert [c.values[1] for c in grouped.parameters.cases] == [
+        Attachment(label='brew log', content='log-for-vanilla'),
+        Attachment(label='brew log', content='log-for-mocha'),
+    ]
+
+
+def test_a_byte_identical_attachment_stays_inline_and_makes_no_column() -> None:
+    scenarios, info = _two_case_group(
+        [_att_step(Attachment(label='brew log', content='same'))],
+        [_att_step(Attachment(label='brew log', content='same'))],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.steps[0].attachments == [
+        Attachment(label='brew log', content='same')
+    ]
+    assert grouped.parameters is not None
+    assert [c.kind for c in grouped.parameters.columns] == ['param']
+
+
+def test_a_varying_content_type_promotes_too() -> None:
+    scenarios, info = _two_case_group(
+        [_att_step(Attachment(label='state', content='{}', content_type='json'))],
+        [_att_step(Attachment(label='state', content='{}', content_type='text'))],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [c.kind for c in grouped.parameters.columns] == ['param', 'attachment']
+
+
+def test_a_label_present_in_one_case_only_raises_rule_five() -> None:
+    scenarios, info = _two_case_group(
+        [_att_step(Attachment(label='vanilla log', content='x'))],
+        [_att_step()],
+    )
+    with pytest.raises(PytestGivenError) as excinfo:
+        group_parametrized(scenarios, info)
+    message = str(excinfo.value)
+    assert (
+        "attachment label 'vanilla log' in 'test_brew' is attached in some" in message
+    )
+    assert 'attach("<constant>", …).' in message  # pins correction 4 — see Step 6
+    assert message.endswith('(t.py:12)')
+
+
+def test_rule_five_fires_when_the_extra_label_is_on_the_other_case() -> None:
+    """The comparison is a symmetric difference, so it must catch a label the
+    baseline lacks, not only one the baseline has."""
+    scenarios, info = _two_case_group(
+        [_att_step()],
+        [_att_step(Attachment(label='mocha log', content='x'))],
+    )
+    with pytest.raises(PytestGivenError, match='attachment label'):
+        group_parametrized(scenarios, info)
+
+
+def test_rule_five_checks_every_comparable_case_not_just_an_end_one() -> None:
+    """Both other rule-5 fixtures are two-case groups, where "checks all
+    cases" and "checks only the last one" are indistinguishable. Cases 1 and 3
+    share a label set and only case 2 carries the extra label, so a raise can
+    only come from actually checking the middle case. Without it the run
+    silently emits a column with a blank cell for the offending case."""
+    scenarios, info = _three_case_group(
+        [_att_step()],
+        [_att_step(Attachment(label='log', content='x'))],
+        [_att_step()],
+    )
+    with pytest.raises(PytestGivenError, match='attachment label'):
+        group_parametrized(scenarios, info)
+
+
+def test_reordered_attach_calls_pair_by_label_rather_than_raising() -> None:
+    a, b = Attachment(label='a', content='A'), Attachment(label='b', content='B')
+    scenarios, info = _two_case_group([_att_step(a, b)], [_att_step(b, a)])
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.steps[0].attachments == [a, b]
+    assert grouped.parameters is not None
+    assert [c.kind for c in grouped.parameters.columns] == ['param']
+
+
+def test_the_same_label_attached_fewer_times_blanks_the_short_case() -> None:
+    scenarios, info = _two_case_group(
+        [
+            _att_step(
+                Attachment(label='log', content='1'),
+                Attachment(label='log', content='2'),
+            )
+        ],
+        [_att_step(Attachment(label='log', content='1'))],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [c.id for c in grouped.parameters.columns] == ['cup_size', 'attachment:0']
+    assert [c.values[1] for c in grouped.parameters.cases] == [
+        Attachment(label='log', content='2'),
+        None,
+    ]
+    assert grouped.steps[0].attachments == [
+        Attachment(label='log', content='1'),
+        AttachmentRef(label='log', content_type='text', column_id='attachment:0'),
+    ]
+
+
+def test_the_same_label_attached_more_times_by_a_non_baseline_case_adds_a_column() -> (
+    None
+):
+    """I4/F1: a non-baseline case attaching a label *more* times than the
+    baseline must not silently drop the extra payloads. Rule 5 only checks
+    the label *set*, so this doesn't raise; occurrence 0 differs (baseline
+    'X' vs the other case's 'Y'), which is what makes a real badge — pinning
+    that the *extra* occurrence adds a column but no second badge."""
+    scenarios, info = _two_case_group(
+        [_att_step(Attachment(label='log', content='X'))],
+        [
+            _att_step(
+                Attachment(label='log', content='Y'),
+                Attachment(label='log', content='EXTRA-PAYLOAD'),
+            )
+        ],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [c.id for c in grouped.parameters.columns] == [
+        'cup_size',
+        'attachment:0',
+        'attachment:1',
+    ]
+    assert [c.values[1:] for c in grouped.parameters.cases] == [
+        [Attachment(label='log', content='X'), None],
+        [
+            Attachment(label='log', content='Y'),
+            Attachment(label='log', content='EXTRA-PAYLOAD'),
+        ],
+    ]
+    assert grouped.steps[0].attachments == [
+        AttachmentRef(label='log', content_type='text', column_id='attachment:0'),
+    ]
+
+
+def test_an_extra_occurrence_on_a_middle_case_is_carried_into_the_table() -> None:
+    """`_promote_extra_occurrences` sweeps `ctx.comparable` twice — once for
+    `max_count`, once to fill the cells — and the only other fixture for it is
+    a two-case group with the extra occurrence on the *last* case, where
+    "sweeps every case" and "sweeps the last one" are indistinguishable. Here
+    only the middle case attaches `log` twice: reading just the end case would
+    drop the column entirely (no error, payload silently lost) or emit it with
+    every cell blank."""
+    scenarios, info = _three_case_group(
+        [_att_step(Attachment(label='log', content='c1'))],
+        [
+            _att_step(
+                Attachment(label='log', content='c2'),
+                Attachment(label='log', content='MIDDLE-EXTRA'),
+            )
+        ],
+        [_att_step(Attachment(label='log', content='c3'))],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [(c.id, c.name) for c in grouped.parameters.columns] == [
+        ('cup_size', 'cup_size'),
+        ('attachment:0', 'log'),
+        ('attachment:1', 'log #2'),
+    ]
+    assert [c.values[1:] for c in grouped.parameters.cases] == [
+        [Attachment(label='log', content='c1'), None],
+        [
+            Attachment(label='log', content='c2'),
+            Attachment(label='log', content='MIDDLE-EXTRA'),
+        ],
+        [Attachment(label='log', content='c3'), None],
+    ]
+
+
+def test_the_extra_occurrence_trigger_fires_once_per_label() -> None:
+    """The baseline attaches `log` twice and the other case three times — the
+    only shape that separates "the extras trigger fires at the label's last
+    baseline occurrence" from "it fires on every occurrence". Firing on every
+    occurrence emits the third payload into two different columns and
+    re-points the second badge at the wrong one."""
+    scenarios, info = _two_case_group(
+        [
+            _att_step(
+                Attachment(label='log', content='b1'),
+                Attachment(label='log', content='b2'),
+            )
+        ],
+        [
+            _att_step(
+                Attachment(label='log', content='o1'),
+                Attachment(label='log', content='o2'),
+                Attachment(label='log', content='o3'),
+            )
+        ],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [(c.id, c.name) for c in grouped.parameters.columns] == [
+        ('cup_size', 'cup_size'),
+        ('attachment:0', 'log'),
+        ('attachment:1', 'log #2'),
+        ('attachment:2', 'log #3'),
+    ]
+    assert [c.values[1:] for c in grouped.parameters.cases] == [
+        [
+            Attachment(label='log', content='b1'),
+            Attachment(label='log', content='b2'),
+            None,
+        ],
+        [
+            Attachment(label='log', content='o1'),
+            Attachment(label='log', content='o2'),
+            Attachment(label='log', content='o3'),
+        ],
+    ]
+    assert grouped.steps[0].attachments == [
+        AttachmentRef(label='log', content_type='text', column_id='attachment:0'),
+        AttachmentRef(label='log', content_type='text', column_id='attachment:1'),
+    ]
+
+
+def test_an_extra_occurrence_beside_an_identical_one_makes_an_orphan_column() -> None:
+    """Deliberate shape, pinned so it is not mistaken for a regression: when
+    occurrence 0 is byte-identical across cases it stays inline and gets no
+    badge, yet the extra occurrence still emits a column — a case-table column
+    nothing in the grouped tree points at.
+
+    Promoting occurrence 0 just to manufacture a badge was considered and
+    rejected: the tree is not lying (every case does attach `log` with content
+    `SAME`) and a synthesized badge would have to claim an attach order no case
+    ever had. What is missing is only a pointer.
+    """
+    scenarios, info = _two_case_group(
+        [_att_step(Attachment(label='log', content='SAME'))],
+        [
+            _att_step(
+                Attachment(label='log', content='SAME'),
+                Attachment(label='log', content='EXTRA'),
+            )
+        ],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [(c.id, c.name) for c in grouped.parameters.columns] == [
+        ('cup_size', 'cup_size'),
+        ('attachment:0', 'log'),
+    ]
+    assert [c.values[1] for c in grouped.parameters.cases] == [
+        None,
+        Attachment(label='log', content='EXTRA'),
+    ]
+    # No badge anywhere: the inline attachment stands, so `attachment:0` is an
+    # orphan column.
+    assert grouped.steps[0].attachments == [Attachment(label='log', content='SAME')]
+
+
+def test_an_extra_column_lands_after_its_own_labels_baseline_occurrences() -> None:
+    """Interleaved labels: baseline `a b a`, the other case `a b a b a`. A
+    label's extra columns go immediately after *that label's* last baseline
+    occurrence, so `b`'s extra column sits between `a`'s two baseline columns
+    rather than after them. That is what keeps badge order in the tree matching
+    column order in the table — the only correlation a Markdown reader has,
+    since a badge carries no column id."""
+    scenarios, info = _two_case_group(
+        [
+            _att_step(
+                Attachment(label='a', content='a1'),
+                Attachment(label='b', content='b1'),
+                Attachment(label='a', content='a2'),
+            )
+        ],
+        [
+            _att_step(
+                Attachment(label='a', content='a1*'),
+                Attachment(label='b', content='b1'),
+                Attachment(label='a', content='a2*'),
+                Attachment(label='b', content='b2*'),
+                Attachment(label='a', content='a3*'),
+            )
+        ],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [(c.id, c.name) for c in grouped.parameters.columns] == [
+        ('cup_size', 'cup_size'),
+        ('attachment:0', 'a'),
+        ('attachment:1', 'b'),
+        ('attachment:2', 'a #2'),
+        ('attachment:3', 'a #3'),
+    ]
+    assert [c.values[1:] for c in grouped.parameters.cases] == [
+        [
+            Attachment(label='a', content='a1'),
+            None,
+            Attachment(label='a', content='a2'),
+            None,
+        ],
+        [
+            Attachment(label='a', content='a1*'),
+            Attachment(label='b', content='b2*'),
+            Attachment(label='a', content='a2*'),
+            Attachment(label='a', content='a3*'),
+        ],
+    ]
+    assert grouped.steps[0].attachments == [
+        AttachmentRef(label='a', content_type='text', column_id='attachment:0'),
+        Attachment(label='b', content='b1'),
+        AttachmentRef(label='a', content_type='text', column_id='attachment:2'),
+    ]
+
+
+def test_attachment_column_ids_are_assigned_pre_order_across_nesting() -> None:
+    """`_templatize_steps` builds a step's own attachments and its children's
+    in one `replace` call; swapping the `attachments=` and
+    `children=` keyword arguments would reorder evaluation (Python evaluates
+    keyword arguments left to right) and hand the child's promotion
+    `attachment:0` instead of the parent's. A promotion at both the parent and
+    a nested child pins pre-order id assignment."""
+
+    def steps(parent_content: str, child_content: str) -> list[Step]:
+        return [
+            Step(
+                phase='given',
+                narration=Narration(text='the machine is stocked'),
+                attachments=[Attachment(label='parent log', content=parent_content)],
+                children=[
+                    Step(
+                        phase='given',
+                        narration=Narration(text='the tank is filled'),
+                        attachments=[
+                            Attachment(label='child log', content=child_content)
+                        ],
+                    ),
+                ],
+            ),
+        ]
+
+    scenarios, info = _two_case_group(steps('p1', 'c1'), steps('p2', 'c2'))
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [(c.id, c.name) for c in grouped.parameters.columns] == [
+        ('cup_size', 'cup_size'),
+        ('attachment:0', 'parent log'),
+        ('attachment:1', 'child log'),
+    ]
+    parent_badge = grouped.steps[0].attachments[0]
+    child_badge = grouped.steps[0].children[0].attachments[0]
+    assert isinstance(parent_badge, AttachmentRef)
+    assert isinstance(child_badge, AttachmentRef)
+    assert (parent_badge.column_id, child_badge.column_id) == (
+        'attachment:0',
+        'attachment:1',
+    )
+    # The child's promotion must read each case's step *at the nested path*.
+    # Reading a fixed `(0,)` still emits the column — the parent's payload
+    # carries no `child log`, which reads as "differs" — but every cell comes
+    # out blank, leaving a badge that points at an empty column.
+    assert [c.values[2] for c in grouped.parameters.cases] == [
+        Attachment(label='child log', content='c1'),
+        Attachment(label='child log', content='c2'),
+    ]
+
+
+def test_a_nested_steps_extra_occurrence_reads_the_walked_step() -> None:
+    """`_promote_extra_occurrences` looks each case's step up by path twice —
+    once to count the label, once to read the occurrence — and both must use
+    the path being walked, not a fixed top-level one. The parent here attaches
+    `plog` and never `clog`, so reading `(0,)` instead of the child's `(0, 0)`
+    counts zero occurrences (the column vanishes, payload silently lost) or
+    finds no attachment to put in the cell (the column comes out blank)."""
+
+    def steps(*child_contents: str) -> list[Step]:
+        return [
+            Step(
+                phase='given',
+                narration=Narration(text='the machine is stocked'),
+                attachments=[Attachment(label='plog', content='p')],
+                children=[
+                    Step(
+                        phase='given',
+                        narration=Narration(text='the tank is filled'),
+                        attachments=[
+                            Attachment(label='clog', content=content)
+                            for content in child_contents
+                        ],
+                    ),
+                ],
+            ),
+        ]
+
+    scenarios, info = _two_case_group(steps('c1'), steps('c1', 'CHILD2'))
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [(c.id, c.name) for c in grouped.parameters.columns] == [
+        ('cup_size', 'cup_size'),
+        ('attachment:0', 'clog'),
+    ]
+    assert [c.values[1] for c in grouped.parameters.cases] == [
+        None,
+        Attachment(label='clog', content='CHILD2'),
+    ]
+    # The parent's `plog` and the child's first `clog` are both identical
+    # across cases, so neither promotes — `attachment:0` is the child's extra.
+    assert grouped.steps[0].attachments == [Attachment(label='plog', content='p')]
+    assert grouped.steps[0].children[0].attachments == [
+        Attachment(label='clog', content='c1')
+    ]
+
+
+def test_two_occurrences_of_one_label_get_distinct_column_names() -> None:
+    """A column id disambiguates two occurrences of a label in the JSON, but a
+    reader of the rendered table sees only the name — and a Markdown badge
+    carries no id at all. So the *name* has to be unique too: the first
+    occurrence stays bare and later ones take a ` #N` suffix."""
+    scenarios, info = _two_case_group(
+        [
+            _att_step(
+                Attachment(label='log', content='1'),
+                Attachment(label='log', content='2'),
+            )
+        ],
+        [
+            _att_step(
+                Attachment(label='log', content='1*'),
+                Attachment(label='log', content='2*'),
+            )
+        ],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [(c.id, c.name) for c in grouped.parameters.columns] == [
+        ('cup_size', 'cup_size'),
+        ('attachment:0', 'log'),
+        ('attachment:1', 'log #2'),
+    ]
+
+
+def test_a_generated_column_name_colliding_with_a_parametrize_name_is_suffixed() -> (
+    None
+):
+    """Disambiguation spans *all* columns, so the name registry has to be
+    seeded with the parametrize names — those columns are built inline rather
+    than through `new_column`. Without the seeding this table would head two
+    columns `cup_size`."""
+    scenarios, info = _two_case_group(
+        [_att_step(Attachment(label='cup_size', content='1'))],
+        [_att_step(Attachment(label='cup_size', content='2'))],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [(c.id, c.name, c.kind) for c in grouped.parameters.columns] == [
+        ('cup_size', 'cup_size', 'param'),
+        ('attachment:0', 'cup_size #2', 'attachment'),
+    ]
+
+
+def test_a_label_that_already_reads_as_a_suffixed_name_still_comes_out_distinct() -> (
+    None
+):
+    """An attachment label is arbitrary text, so a suffix can collide with a
+    *literal* label: `log`, `log #2`, `log` would hand the third column the
+    name the second already has. Counting occurrences per label is not enough
+    — the candidate has to be checked against the names already taken."""
+    scenarios, info = _two_case_group(
+        [
+            _att_step(
+                Attachment(label='log', content='1'),
+                Attachment(label='log #2', content='2'),
+                Attachment(label='log', content='3'),
+            )
+        ],
+        [
+            _att_step(
+                Attachment(label='log', content='1*'),
+                Attachment(label='log #2', content='2*'),
+                Attachment(label='log', content='3*'),
+            )
+        ],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    names = [c.name for c in grouped.parameters.columns]
+    assert names == ['cup_size', 'log', 'log #2', 'log #3']

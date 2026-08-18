@@ -16,6 +16,16 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A t-string interpolation whose value varies across parametrize cases is now a
   `derived` column in the case table, with a `{name}` placeholder left in the
   grouped step, instead of being frozen to the first case's value.
+- An attachment whose payload varies across parametrize cases is now an
+  `attachment` column in the case table, and the grouped step keeps a
+  content-less badge pointing at that column instead of showing one case's
+  payload as if it spoke for all of them. A case that attaches a label more
+  times than the baseline case gets a column per extra occurrence, which
+  carries no badge — the grouped step has no slot for an attachment the
+  baseline never recorded. In Markdown a short payload sits inline in the cell
+  and a long one is fenced below the table. No two columns share a header: a
+  label attached twice in one step, or one expression promoted in two steps,
+  gives the second and later columns a ` #2` / ` #3` suffix.
 
 ### Changed
 
@@ -49,6 +59,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** A varying t-string interpolation whose expression is not a bare
   name (`t"{cup_size * 0.01}"`, `t"{m.balance}"`) now raises
   `PytestGivenError`. Bind it to a local and narrate that.
+- **Breaking.** A step whose set of `attach` labels differs between parametrize
+  cases now raises `PytestGivenError`. Use a constant label and let the content
+  vary — the content is what the new `attachment` column is for.
 - **Breaking.** A glossary term ref whose pill differs between parametrize
   cases now raises `PytestGivenError` — unless the pill *is* a parametrize
   value, which stays supported. Split the pill from the value:
