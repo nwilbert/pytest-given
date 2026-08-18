@@ -1,6 +1,7 @@
 """pytest-given plugin entry point."""
 
 import contextlib
+import copy
 import functools
 import inspect
 import json
@@ -57,11 +58,13 @@ from .model import (
     NodeId,
     ParamSpec,
     PytestGivenError,
+    RawParamValue,
     ReportData,
     Scenario,
     Step,
     Story,
     StoryId,
+    placeholder_mismatch,
     report_from_dict,
     report_to_dict,
 )
@@ -279,10 +282,10 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
         param_names = list(callspec.params.keys())
         for placeholder in marker.name.get_identifiers():
             if placeholder not in param_names:
-                raise PytestGivenError(
-                    f"pytest_given.Template placeholder '{{{placeholder}}}' "
-                    f'in @scenario(...) on {item.nodeid!r} does not match '
-                    f'any parametrize column (have: {sorted(param_names)}).'
+                raise placeholder_mismatch(
+                    placeholder,
+                    param_names,
+                    where=f'in @scenario(...) on {item.nodeid!r}',
                 )
 
 
@@ -334,16 +337,48 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
         activity_ids=scenario_marker.activity_ids,
     )
     set_active_collector(collector)
-    callspec = getattr(item, 'callspec', None)
-    if callspec is not None:
-        names = list(callspec.params.keys())
-        collector.param_info[node_id] = ParamSpec(
-            names=names, values=[callspec.params[name] for name in names]
-        )
     # Pre-fixture-setup work done; let pytest run fixture setup here.
     yield
+    _capture_param_spec(item, collector, node_id)
     _graft_fixture_recordings(item, collector)
     collector.start_times[node_id] = time.monotonic()
+
+
+def _capture_param_spec(
+    item: pytest.Item, collector: Collector, node_id: NodeId
+) -> None:
+    """Snapshot the parametrize arguments as the test is about to see them.
+
+    Read from `item.funcargs` rather than `callspec.params`: under
+    `indirect=True` the argument is bound to whatever the fixture returned, and
+    that — not the parametrize input — is what the test narrates and what the
+    case cell has to show, since row hover substitutes a cell into the slot the
+    step rendered. `params` still supplies the names, and the value when a
+    fixture never got as far as binding one.
+
+    Snapshotted rather than kept live: these values are read again at session
+    finish, so a body that mutates one in place would otherwise put the
+    post-test state in the table and make the rebound-parameter rule compare
+    the narration against a value it never rendered.
+    """
+    callspec = getattr(item, 'callspec', None)
+    if callspec is None:
+        return
+    funcargs = getattr(item, 'funcargs', {})
+    names = list(callspec.params.keys())
+    collector.param_info[node_id] = ParamSpec(
+        names=names,
+        values=[_snapshot(funcargs.get(name, callspec.params[name])) for name in names],
+    )
+
+
+def _snapshot(value: RawParamValue) -> RawParamValue:
+    """A shallow copy of a parametrize value, or the value itself when its type
+    refuses to be copied — best effort by nature, since a value that cannot be
+    copied is one whose mutation cannot be guarded against either."""
+    with contextlib.suppress(Exception):
+        return copy.copy(value)
+    return value
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -665,11 +700,15 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         # INTERNALERROR — pytest lets it out of console_main as a bare
         # traceback. Record it for the terminal summary, write no sink (a
         # report we know to be false is never emitted), and fail the run.
-        session.config.stash[_grouping_error_message] = str(error)
+        session.config.stash[_grouping_error_message] = '\n'.join(
+            [str(error), *_discard_stale_sinks(session.config)]
+        )
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
-        collector.param_info.clear()
         return
-    collector.param_info.clear()
+    finally:
+        # Both ways out drop the captured parametrize values: they are read
+        # only here, and a nested in-process run must not inherit them.
+        collector.param_info.clear()
     stories = list(collector._discovered_stories.values())
     glossary = _resolve_glossary(stories, session)
     if glossary is not None:
@@ -714,6 +753,27 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             md_path.write_text(md, encoding='utf-8')
 
     _run_lint(session, scenarios, collector.scenarios, glossary, stories)
+
+
+def _discard_stale_sinks(config: pytest.Config) -> list[str]:
+    """Delete the sinks this run would have written, and say which.
+
+    Writing no report leaves the *previous* run's report in place, where it
+    reads as current — the one outcome worse than no report at all. Only the
+    paths this run was told to write are touched, and each was going to be
+    overwritten anyway.
+    """
+    removed = []
+    for option in ('given_json', 'given_html', 'given_md'):
+        value = config.getoption(option)
+        if value is None or value == '-':
+            continue
+        path = Path(value)
+        if not path.is_file():
+            continue
+        path.unlink()
+        removed.append(f'Removed the previous {path} — it would read as current.')
+    return removed
 
 
 def _run_lint(

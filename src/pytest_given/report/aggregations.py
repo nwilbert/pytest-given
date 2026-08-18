@@ -33,6 +33,7 @@ from .coverage import (
     compute_coverage,
     is_coverage_eligible,
     param_case_displays,
+    pill_display,
 )
 
 # ---------------------------------------------------------------------------
@@ -275,10 +276,16 @@ def build_glossary_aggregations(
 
 def _pill_displays(part: NarrationTermRef, cases: list[dict[str, str]]) -> list[str]:
     """Every display this pill takes: one per case when it is bound to a
-    parametrize column, otherwise just the one it carries."""
+    parametrize column, otherwise just the one it carries.
+
+    `pill_display` decides each of them, so the Glossary lists exactly the
+    instances coverage credits — the two views reading one case differently is
+    a report disagreeing with itself.
+    """
     if part.param_column is None or not cases:
         return [part.display]
-    return [case.get(part.param_column, part.display) for case in cases]
+    displays = (pill_display(part, case) for case in cases)
+    return [display for display in displays if display is not None]
 
 
 def _record_entity_observation(

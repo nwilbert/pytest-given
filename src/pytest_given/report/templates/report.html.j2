@@ -61,6 +61,22 @@
       of the string literal — HTML-escaping does not stop that. Anything
       data-derived goes in a `data-*` attribute and is read via
       `$el.dataset.*`, as `data-tag` and `data-term-id` do. -#}
+  {%- macro attachment_icon() -%}
+    <svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>
+  {%- endmacro -%}
+
+  {#- Badge plus the payload it expands, keyed on `cell_id`. The step tree and
+      the case table both attach this way; only a promoted attachment differs,
+      having no payload of its own to expand. -#}
+  {%- macro expandable_attachment(cell_id, label, content) -%}
+    <span class="attachment-badge" @click="toggleAttachment('{{ cell_id }}')">{{ attachment_icon() }}{{ label }}</span>
+    <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
+      <div class="attachment-expand-inner">
+        <div class="attachment-content"><pre>{{ content }}</pre></div>
+      </div>
+    </div>
+  {%- endmacro -%}
+
   {%- macro render_step(step, step_id) -%}
   <div class="step-text">
     {%- if step.children and step.children | length > 0 -%}
@@ -87,16 +103,11 @@
     <div>
       <span class="attachment-badge" data-param="{{ att.column_id }}"
             @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-            @mouseleave="setHoverParam(null, $event.currentTarget)"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>{{ att.label }}</span>
+            @mouseleave="setHoverParam(null, $event.currentTarget)">{{ attachment_icon() }}{{ att.label }}</span>
     </div>
     {%- else -%}
     <div>
-      <span class="attachment-badge" @click="toggleAttachment('{{ step_id }}_att_{{ loop.index0 }}')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>{{ att.label }}</span>
-      <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}'] }">
-        <div class="attachment-expand-inner">
-          <div class="attachment-content"><pre>{{ att.content }}</pre></div>
-        </div>
-      </div>
+      {{ expandable_attachment(step_id ~ '_att_' ~ loop.index0, att.label, att.content) }}
     </div>
     {%- endif -%}
     {%- endfor -%}
@@ -282,22 +293,24 @@
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">
               {% if val %}
-              {% set cell_id = 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_' ~ col.id %}
-              <span class="attachment-badge" @click="toggleAttachment('{{ cell_id }}')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>{{ col.name }}</span>
-              <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
-                <div class="attachment-expand-inner">
-                  <div class="attachment-content"><pre>{{ val.content }}</pre></div>
-                </div>
-              </div>
+              {# Keyed on the column's position, never on `col.id`: the id is report data and this lands inside an Alpine expression. #}
+              {% set cell_id = 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0 %}
+              {{ expandable_attachment(cell_id, col.name, val.content) }}
               {% endif %}
             </td>
             {% else %}
-            <td data-param="{{ col.id }}" data-subst="{{ col.id }}"
+            {# `data-subst` only where the cell has something to substitute: a
+               generated column is blank for a case that recorded no value, and
+               substituting that blank would erase the step's {token} instead of
+               replacing it. A `param` cell always substitutes — `None` there is
+               a real parametrize value. #}
+            <td data-param="{{ col.id }}"{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
             {% endif %}
             {% endfor %}
             <td style="text-align:right">
+              {% if case.divergent %}<span class="case-divergent" title="Steps differ from the other cases, so the grouped tree is not this one and its columns stay blank.">≠</span>{% endif %}
               {% if case.status == 'passed' %}<span class="dot-passed">✓</span>{% elif case.status == 'skipped' %}<span class="dot-skipped">○</span>{% else %}<span class="dot-failed">✗</span>{% endif %}
             </td>
           </tr>

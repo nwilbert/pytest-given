@@ -688,3 +688,59 @@ def test_param_case_displays_skips_non_param_unlinked_and_none_cells() -> None:
         ),
     )
     assert param_case_displays(scenario) == [{'guest': 'Alice'}, {}]
+
+
+def test_param_case_displays_drops_a_case_that_did_not_pass() -> None:
+    """A skipped case ran nothing, so its parametrize value must not stand in
+    for a pill: doing so lets it satisfy a story activity and lists it in the
+    Glossary as an observed instance of the term."""
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='Alice checks in',
+            parts=[
+                NarrationTermRef(
+                    term_id=TermId('guest'),
+                    display='Alice',
+                    expression='guest',
+                    param_column='guest',
+                ),
+            ],
+        ),
+    )
+    scenario = Scenario(
+        id=NodeId('t.py::test_check_in'),
+        narration=Narration(text='checks in'),
+        module='m',
+        steps=[step],
+        parameters=ParameterTable(
+            columns=[ParameterColumn(id='guest', name='guest', kind='param')],
+            cases=[
+                ParameterCase(values=['Alice'], status='passed'),
+                ParameterCase(values=['Bob'], status='skipped'),
+                ParameterCase(values=['Carol'], status='failed'),
+            ],
+        ),
+    )
+    assert param_case_displays(scenario) == [{'guest': 'Alice'}]
+
+
+def test_s_for_step_drops_a_pill_the_case_has_no_value_for(g) -> None:
+    """A pill bound to a parametrize column whose cell this case leaves empty
+    has no display *for this case*. Falling back to the one the grouped tree
+    carries would hand the case another case's guest, and let it satisfy an
+    activity naming that guest."""
+    step = _step(
+        'when',
+        NarrationTermRef(
+            term_id=TermId('guest'),
+            display='Alice',
+            expression='guest',
+            param_column='guest',
+        ),
+    )
+    assert s_for_step(g, step, {}) == set()
+    assert s_for_step(g, step, {'guest': 'Alice'}) == {
+        Identity('guest', 'alice'),
+        Identity('guest', None),
+    }

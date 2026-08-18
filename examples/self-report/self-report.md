@@ -1017,7 +1017,7 @@
 - **then** the step carries a single «Term ref» pill
 
 ## ✓ The «glossary» view aggregates «instances» and «verb» forms
-`tests/unit/report/test_aggregations.py:160::test_build_glossary_aggregations_collects_instances_and_forms` · happy-path
+`tests/unit/report/test_aggregations.py:163::test_build_glossary_aggregations_collects_instances_and_forms` · happy-path
 
 - **given** a «Report» whose «Story» and «Scenario» reference entity «Instance»s and an «Inflection»
   - 📎 Report data:
@@ -1145,42 +1145,42 @@
 - **then** the verb collects its «Inflection» but not its canonical form
 
 ## ✓ «Terms» referenced by an «activity» record the «story»
-`tests/unit/report/test_aggregations.py:265::test_build_glossary_aggregations_records_story_refs_via_activities` · happy-path
+`tests/unit/report/test_aggregations.py:268::test_build_glossary_aggregations_records_story_refs_via_activities` · happy-path
 
 - **given** a «Story» whose «Activity» references an actor and a verb
 - **when** the «Glossary» aggregations are built
 - **then** the actor and the verb each list that «Story»
 
 ## ✓ A canonical entity reference is not an «instance»
-`tests/unit/report/test_aggregations.py:336::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance` · happy-path
+`tests/unit/report/test_aggregations.py:339::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance` · happy-path
 
 - **given** a «Story» activity and a «Step» referencing entities by canonical name only
 - **when** the «Glossary» aggregations are built
 - **then** neither entity term records an «Instance»
 
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_aggregations.py:425::test_build_glossary_aggregations_kindless_term_records_only_story_ref` · happy-path
+`tests/unit/report/test_aggregations.py:428::test_build_glossary_aggregations_kindless_term_records_only_story_ref` · happy-path
 
 - **given** a «Kindless» «Term» referenced by a «Story» activity
 - **when** the «Glossary» aggregations are built
 - **then** the «Term» lists the «Story» but no «Instance» and no «Inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_aggregations.py:459::test_glossary_aggregations_annotates_fixture_provenance` · happy-path
+`tests/unit/report/test_aggregations.py:462::test_glossary_aggregations_annotates_fixture_provenance` · happy-path
 
 - **given** a «Scenario» whose fixture-sourced «Step» names an «Instance»
 - **when** the «Glossary» aggregations are built
 - **then** the «Instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_aggregations.py:553::test_build_term_scenario_index_dedups_and_includes_scenario_narration` · happy-path
+`tests/unit/report/test_aggregations.py:556::test_build_term_scenario_index_dedups_and_includes_scenario_narration` · happy-path
 
 - **given** a «Scenario» referencing one «Term» in two steps and another in its name
 - **when** the term-scenario index is built
 - **then** each «Term» maps to the scenario exactly once
 
 ## ✓ An under-anchored «activity» is flagged ineligible in rollups
-`tests/unit/report/test_aggregations.py:666::test_build_story_rollups_flags_under_anchored_activity_ineligible` · happy-path
+`tests/unit/report/test_aggregations.py:669::test_build_story_rollups_flags_under_anchored_activity_ineligible` · happy-path
 
 - **given** a «Story» with an anchored and an under-anchored «Activity»
 - **when** the story rollups are built

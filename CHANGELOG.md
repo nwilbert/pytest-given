@@ -25,7 +25,14 @@ form `## [x.y.z] - YYYY-MM-DD`.
   baseline never recorded. In Markdown a short payload sits inline in the cell
   and a long one is fenced below the table. No two columns share a header: a
   label attached twice in one step, or one expression promoted in two steps,
-  gives the second and later columns a ` #2` / ` #3` suffix.
+  gives the second and later columns a ` #2` / ` #3` suffix, and the step
+  tree's badge or `{name}` token carries the suffixed name too — a pointer
+  names the column it points at.
+
+- A parametrize case that passed while recording a different step structure
+  than the grouped tree is now marked as such — `≠` beside its status in HTML,
+  a note under the table in Markdown, `divergent: true` in JSON — so its blank
+  generated cells read as "took another path" rather than as missing data.
 
 ### Changed
 
@@ -36,7 +43,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
   parts gain `column_id`, and a step attachment may be a content-less
   `{label, content_type, column_id}` reference to a column. Update any `jq`
   reading `parameters`. There is no migration: re-run the suite to regenerate a
-  report saved before this change.
+  report saved before this change — `pytest-given report` on an older one says
+  so instead of failing with a bare `KeyError`.
 - `activity(..., id=N)` is now `activity(..., activity_id=N)`. The keyword
   shadowed the `id` builtin; the `Activity.id` field itself is unchanged.
 - The bundled `pytest-given-authoring` skill now documents the report mechanics
@@ -47,7 +55,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
   full-suite fallback for adoption branches with no base report to diff.
 - **Breaking.** `attach` takes a plain `str` label; a t-string or `Template`
   label now raises `PytestGivenError` instead of being silently flattened. Use
-  an f-string — `attach(f'{flavor} log', …)`.
+  an f-string — `attach(f'{kind} log', …)` — keeping the label identical across
+  parametrize cases, since a label that varies per case is itself rejected.
 - **Breaking.** A parametrized scenario whose step narration is a plain `str`
   (usually an f-string) that renders differently per case now raises
   `PytestGivenError`; the run fails and writes no report. Use a t-string so the
@@ -69,6 +78,18 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Fixed
 
+- A run that ends in a parametrize grouping error now deletes the report files
+  it was told to write instead of leaving the previous run's behind, where they
+  read as current and say nothing about the failure.
+- A parametrize case that did not pass no longer speaks for a glossary term
+  pill bound to a parametrize column: it can neither cover a story activity nor
+  be listed in the Glossary as an instance the suite exercised. A case with no
+  value for that column contributes nothing either, instead of falling back to
+  the display the grouped step tree happens to carry.
+- The `unused-interpolation` lint rule never fired on a parametrized scenario:
+  the lint reads the grouped scenario, where a varying interpolation is a
+  placeholder rather than a value, and the rule only scanned values.
+
 - The bundled authoring skill's glossary-discovery advice: `conftest.py` must
   bind the `Glossary` / `FileGlossary` handle itself, not merely import the
   module defining it, or the report's Glossary tab stays empty.
@@ -78,10 +99,14 @@ form `## [x.y.z] - YYYY-MM-DD`.
   rather than only the first's.
 - A grouped parametrized scenario whose first case was skipped rendered an empty
   step tree even though later cases ran. The grouped tree now comes from the
-  first case that passed.
+  first case that passed, or — when no case passed — from the first case that
+  recorded a tree at all, so a failure is no longer hidden behind a skip.
 - **Breaking.** A t-string interpolating a *rebound* parametrize name rendered
   the parameter's value rather than the narrated one — wrong for every case, not
-  just the first. It now raises `PytestGivenError`; rename the local.
+  just the first. It now raises `PytestGivenError`; rename the local. The
+  comparison is against the value the test argument was bound to, so an
+  `indirect=True` parameter is judged by what its fixture returned — which is
+  also what its case cell now holds.
 
 ## [0.1.0] - 2026-08-08
 

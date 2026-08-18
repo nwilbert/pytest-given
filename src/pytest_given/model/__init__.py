@@ -1,4 +1,4 @@
-from .errors import PytestGivenError
+from .errors import PytestGivenError, placeholder_mismatch
 from .ids import case_suffix, id_derive, node_base
 from .schema import (
     Activity,
@@ -42,6 +42,7 @@ from .schema import (
     StoryId,
     TermId,
     TracebackFrame,
+    location_suffix,
 )
 from .serde import report_from_dict, report_to_dict
 from .steps import StepPath, StepSignature, iter_steps, structure_signature, walk_steps
@@ -94,7 +95,9 @@ __all__ = [
     'case_suffix',
     'id_derive',
     'iter_steps',
+    'location_suffix',
     'node_base',
+    'placeholder_mismatch',
     'report_from_dict',
     'report_to_dict',
     'structure_signature',

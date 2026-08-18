@@ -20,7 +20,6 @@ from .base import (
     LintRule,
     RuleId,
     Surface,
-    location_suffix,
 )
 from .config import (
     IgnoreEntry,
@@ -41,7 +40,6 @@ __all__ = [
     'RuleId',
     'Surface',
     'apply_config',
-    'location_suffix',
     'parse_ignore_entries',
     'parse_rule_levels',
     'run_ast_rules',

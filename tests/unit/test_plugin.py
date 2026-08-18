@@ -475,3 +475,27 @@ def test_graft_phase2_skips_decorated_fixture_without_recording(
     plugin._graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
+
+
+class _Uncopyable:
+    """A parametrize value whose type refuses `copy.copy` — a lock, a live
+    connection, anything holding a resource."""
+
+    def __copy__(self) -> _Uncopyable:
+        raise TypeError('cannot copy this')
+
+
+def test_an_uncopyable_parametrize_value_is_kept_as_it_is() -> None:
+    """Snapshotting is best effort: a value that cannot be copied is one whose
+    mutation could not have been guarded against anyway, and refusing to copy
+    it must not take the run down with it."""
+    value = _Uncopyable()
+    assert plugin._snapshot(value) is value
+
+
+def test_a_copyable_parametrize_value_is_snapshotted() -> None:
+    """The copy is what keeps a later in-place mutation out of the table."""
+    value = ['latte']
+    snapshot = plugin._snapshot(value)
+    value.append('cup')
+    assert snapshot == ['latte']

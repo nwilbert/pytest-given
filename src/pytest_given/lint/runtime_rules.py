@@ -18,10 +18,11 @@ from ..model import (
     case_suffix,
     id_derive,
     iter_steps,
+    location_suffix,
     node_base,
     structure_signature,
 )
-from .base import RULES_BY_ID, Finding, RuleId, location_suffix
+from .base import RULES_BY_ID, Finding, RuleId
 
 
 def run_runtime_rules(

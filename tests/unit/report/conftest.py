@@ -27,10 +27,6 @@ from pytest_given.model import (
 def guest_scenario() -> tuple[Glossary, Story, Scenario]:
     """A grouped two-case scenario whose Guest pill is bound to the `guest`
     parametrize column — the shape the per-case columns design fixes."""
-    return _build_guest_scenario()
-
-
-def _build_guest_scenario() -> tuple[Glossary, Story, Scenario]:
     glossary = Glossary()
     glossary.actor('Guest')
     glossary.verb('Check in')

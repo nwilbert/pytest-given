@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-18T07:41:57.357508+00:00",
+    "timestamp": "2026-08-18T15:45:37.193534+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "c6310f45d77be02db44dbf8300c1f57456a9a5ba"
+    "commit_sha": "7a2f3bb3644ebbb6171d5c1458d3b9ad684c8cde"
   },
   "scenarios": [
     {
@@ -11546,7 +11546,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 160
+        "line": 163
       },
       "story_id": null,
       "activity_ids": []
@@ -11679,7 +11679,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 265
+        "line": 268
       },
       "story_id": null,
       "activity_ids": []
@@ -11797,7 +11797,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 336
+        "line": 339
       },
       "story_id": null,
       "activity_ids": []
@@ -11972,7 +11972,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 425
+        "line": 428
       },
       "story_id": null,
       "activity_ids": []
@@ -12111,7 +12111,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 459
+        "line": 462
       },
       "story_id": null,
       "activity_ids": []
@@ -12240,7 +12240,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 553
+        "line": 556
       },
       "story_id": null,
       "activity_ids": []
@@ -12357,7 +12357,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 666
+        "line": 669
       },
       "story_id": null,
       "activity_ids": []
@@ -15640,7 +15640,8 @@
               "guest"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -15648,7 +15649,8 @@
               "order-received"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -15656,7 +15658,8 @@
               "work-object"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -15664,7 +15667,8 @@
               "do-the-thing"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -15672,7 +15676,8 @@
               "buy-sell"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -15680,7 +15685,8 @@
               "guest-1"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -15688,7 +15694,8 @@
               "caf"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -15696,7 +15703,8 @@
               "booking-system"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           }
         ]
       },
@@ -15799,28 +15807,32 @@
               "---"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
               "   "
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
               ""
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
               "###"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           }
         ]
       },
@@ -15980,14 +15992,16 @@
               "given"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
               "then"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           }
         ]
       },
@@ -16091,21 +16105,24 @@
               "count={obj.attr}"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
               "{d[key]}"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
               "{x + 1}"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           }
         ]
       },

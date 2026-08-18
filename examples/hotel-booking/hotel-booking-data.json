@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-18T07:35:32.787590+00:00",
+    "timestamp": "2026-08-18T15:31:47.639198+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "70638ddee30e2b1194b6cdf986ebdc8b29f18d15"
+    "commit_sha": "4ed35fab4f7c978bca7500ae32553dbdbe1f2d09"
   },
   "scenarios": [
     {
@@ -1046,7 +1046,8 @@
               "insufficient funds"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -1054,7 +1055,8 @@
               "expired card"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -1062,7 +1064,8 @@
               "fraud check failed"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -1082,7 +1085,8 @@
                 }
               ],
               "error_tail": "E   AssertionError: assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}"
-            }
+            },
+            "divergent": false
           }
         ]
       },

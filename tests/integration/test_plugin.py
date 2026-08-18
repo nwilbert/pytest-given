@@ -256,6 +256,97 @@ def test_parametrized_non_json_values_are_captured_as_str(pytester, tmp_path):
     assert cases[0]['values'] == ['2026-03-15', 0]
 
 
+def test_indirect_parametrize_narrates_the_fixture_value(pytester, tmp_path):
+    """An `indirect=True` parameter reaches the test as whatever its fixture
+    returned, and that is what the narration renders. Comparing the narration
+    against `callspec.params` instead accuses a faithful interpolation of
+    rebinding the name and suppresses every sink in the session — with no local
+    to rename, since the name is the fixture's argname."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, when
+
+        @pytest.fixture
+        def cup_size(request):
+            return request.param * 2
+
+        @scenario("Brew indirectly")
+        @pytest.mark.parametrize("cup_size", [200, 350], indirect=True)
+        def test_brew(cup_size):
+            with when(t"it brews {cup_size} ml"):
+                assert cup_size > 0
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    assert 'grouping error' not in result.stdout.str()
+    data = json.loads(json_path.read_text())
+    cases = data['scenarios'][0]['parameters']['cases']
+    # The cell holds what the test argument held, so row hover substitutes the
+    # value the step actually narrated.
+    assert [c['values'] for c in cases] == [[400], [700]]
+
+
+def test_a_mutated_parametrize_value_is_captured_as_it_was_at_setup(pytester, tmp_path):
+    """Parametrize values are read again at session finish, so a test body that
+    mutates one in place would otherwise put the post-test state in the table —
+    and make rule 3 compare the narration against a value that no longer
+    matches what it rendered."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, when
+
+        @scenario("Fill a cart")
+        @pytest.mark.parametrize("cart", [['latte'], ['mocha']])
+        def test_cart(cart):
+            with given(t"a cart holding {cart}"):
+                pass
+            with when("a cup is added"):
+                cart.append('cup')
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    assert 'grouping error' not in result.stdout.str()
+    data = json.loads(json_path.read_text())
+    cases = data['scenarios'][0]['parameters']['cases']
+    assert [c['values'] for c in cases] == [["['latte']"], ["['mocha']"]]
+
+
+def test_a_grouping_error_discards_the_previous_report(pytester, tmp_path):
+    """The run writes no sink because the report would be false — but the sink
+    from the last run is still on disk, and a reader who opens it (or a CI step
+    that publishes it) gets a report that looks current and says nothing about
+    the failure."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, when
+
+        @scenario("Brew")
+        @pytest.mark.parametrize("cup_size", [200, 350])
+        def test_brew(cup_size):
+            with when(f"it brews {cup_size} ml"):
+                assert cup_size > 0
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    html_path = tmp_path / 'report.html'
+    json_path.write_text('{"stale": true}')
+    html_path.write_text('<html>stale</html>')
+    result = pytester.runpytest(
+        f'--given-json={json_path}', f'--given-html={html_path}'
+    )
+    assert 'grouping error' in result.stdout.str()
+    assert not json_path.exists()
+    assert not html_path.exists()
+    assert 'report.json' in result.stdout.str()
+
+
 def test_parametrized_with_failure(pytester, tmp_path):
     """A parametrized test with a failing case marks the scenario as failed."""
     pytester.makepyfile(

@@ -1856,9 +1856,32 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
                                 'id': f'param{_BREAKOUT}',
                                 'name': f'param{_BREAKOUT}',
                                 'kind': 'param',
+                            },
+                            {
+                                'id': f'derived{_BREAKOUT}',
+                                'name': f'derived{_BREAKOUT}',
+                                'kind': 'derived',
+                            },
+                            {
+                                'id': f'attachment{_BREAKOUT}',
+                                'name': f'attachment{_BREAKOUT}',
+                                'kind': 'attachment',
+                            },
+                        ],
+                        'cases': [
+                            {
+                                'values': [
+                                    'v',
+                                    'd',
+                                    {
+                                        'label': f'att{_BREAKOUT}',
+                                        'content': 'payload',
+                                        'content_type': 'text',
+                                    },
+                                ],
+                                'status': 'passed',
                             }
                         ],
-                        'cases': [{'values': ['v'], 'status': 'passed'}],
                     },
                     'story_id': f'story{_BREAKOUT}',
                     'activity_ids': [f'act{_BREAKOUT}'],
@@ -1937,3 +1960,59 @@ def test_param_color_map_skips_attachment_columns() -> None:
     )
     color_map = _build_param_color_map([scenario])
     assert color_map == {'cup_size': 0}
+
+
+def test_a_disambiguated_columns_token_takes_its_own_columns_colour(
+    tmp_path: Path,
+) -> None:
+    """The palette is keyed on the column *name*, so a token naming the column
+    it points at reads the header's colour. A token still carrying the bare
+    expression would take the first `price` column's colour while sitting under
+    the second one's header."""
+    report = report_from_dict(
+        {
+            'metadata': {
+                'project': 'p',
+                'timestamp': 't',
+                'pytest_version': '9',
+                'plugin_version': '0.1',
+            },
+            'scenarios': [
+                {
+                    'id': 't.py::test_brew',
+                    'narration': _narration('brew'),
+                    'module': 't',
+                    'status': 'passed',
+                    'steps': [
+                        {
+                            'phase': 'then',
+                            'narration': {
+                                'text': 'it costs {price #2}',
+                                'parts': [
+                                    {'value': 'it costs '},
+                                    {'name': 'price #2', 'column_id': 'derived:1'},
+                                ],
+                            },
+                        }
+                    ],
+                    'parameters': {
+                        'columns': [
+                            {'id': 'cup_size', 'name': 'cup_size', 'kind': 'param'},
+                            {'id': 'derived:0', 'name': 'price', 'kind': 'derived'},
+                            {'id': 'derived:1', 'name': 'price #2', 'kind': 'derived'},
+                        ],
+                        'cases': [{'values': [200, '2.0', '9.0'], 'status': 'passed'}],
+                    },
+                }
+            ],
+        }
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(report, html_path)
+    html = html_path.read_text(encoding='utf-8')
+
+    header = re.search(r'<th class="param-color-(\d+)" data-param="derived:1"', html)
+    token = re.search(r'<span class="param-color-(\d+)" data-param="derived:1"', html)
+    assert header is not None
+    assert token is not None
+    assert token.group(1) == header.group(1)
