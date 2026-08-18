@@ -3,7 +3,7 @@
 ## Now
 
 - [ ] Bug: when the glossary term filter is active in the Scenarios tab, jumping to a scenario from the Stories tab doesn't reset this filter
-- [ ] implement the parametrized-case-columns-design spec
+- [ ] continue work on the story-diagrams branch
 
 ## Next
 
