@@ -9,6 +9,7 @@ from pytest_given.model import (
     NarrationTermRef,
     NarrationValue,
     ParameterCase,
+    ParameterColumn,
     ParameterTable,
     ReportData,
     Scenario,
@@ -185,7 +186,7 @@ def test_narration_parts_resolve_terms_and_values() -> None:
                             NarrationLiteral(value='a '),
                             NarrationTermRef(term_id='guest', display='Guest'),
                             NarrationValue(rendered='42', expression='n'),
-                            NarrationPlaceholder(name='amount'),
+                            NarrationPlaceholder(name='amount', column_id='amount'),
                         ],
                     ),
                 )
@@ -232,7 +233,10 @@ def test_parametrized_scenario_renders_table() -> None:
             module='tests/t.py',
             steps=[Step(phase='when', narration=Narration(text='insert'))],
             parameters=ParameterTable(
-                names=['euros', 'expect'],
+                columns=[
+                    ParameterColumn(id='euros', name='euros', kind='param'),
+                    ParameterColumn(id='expect', name='expect', kind='param'),
+                ],
                 cases=[
                     ParameterCase(values=[1, False], status='passed'),
                     ParameterCase(values=[2, True], status='passed'),
@@ -397,7 +401,7 @@ def test_param_table_escapes_pipe_in_value() -> None:
         module='tests/t.py',
         steps=[Step(phase='when', narration=Narration(text='act'))],
         parameters=ParameterTable(
-            names=['label'],
+            columns=[ParameterColumn(id='label', name='label', kind='param')],
             cases=[ParameterCase(values=['a|b'], status='passed')],
         ),
     )
@@ -414,13 +418,33 @@ def test_param_table_escapes_newline_in_value() -> None:
         module='tests/t.py',
         steps=[Step(phase='when', narration=Narration(text='act'))],
         parameters=ParameterTable(
-            names=['label'],
+            columns=[ParameterColumn(id='label', name='label', kind='param')],
             cases=[ParameterCase(values=['a\nb'], status='passed')],
         ),
     )
     md = render_md(_report(scn))
     assert '| a<br>b |' in md
     assert 'a\nb' not in md
+
+
+def test_param_table_renders_none_value_as_text_not_blank() -> None:
+    """A `None` parametrize value is a legitimate value on a `param` column
+    (unlike a `derived`/`attachment` column, where `None` means "no value for
+    this case"), so it must render, not blank out. Regression guard for a
+    drift where the HTML renderer briefly blanked `None` cells while this
+    renderer kept printing the literal text."""
+    scn = Scenario(
+        id='tests/t.py::test_none',
+        narration=Narration(text='None param'),
+        module='tests/t.py',
+        steps=[Step(phase='when', narration=Narration(text='act'))],
+        parameters=ParameterTable(
+            columns=[ParameterColumn(id='label', name='label', kind='param')],
+            cases=[ParameterCase(values=[None], status='passed')],
+        ),
+    )
+    md = render_md(_report(scn))
+    assert '| None | ✓ |' in md
 
 
 @scenario('A skipped scenario shows its skip reason', tags=['happy-path'])

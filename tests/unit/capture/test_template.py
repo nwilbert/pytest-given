@@ -44,7 +44,9 @@ def test_template_parses_single_placeholder() -> None:
     with then(t'it splits into literal and placeholder {pg["Narration"]} parts'):
         assert t.parts == [
             NarrationLiteral(value='Brew '),
-            NarrationPlaceholder(name='cup_size', format_spec='', conversion=None),
+            NarrationPlaceholder(
+                name='cup_size', column_id='cup_size', format_spec='', conversion=None
+            ),
             NarrationLiteral(value=' ml'),
         ]
 
@@ -53,9 +55,13 @@ def test_template_parses_format_spec_and_conversion() -> None:
     t = Template('n={n:03d} r={obj!r}')
     assert t.parts == [
         NarrationLiteral(value='n='),
-        NarrationPlaceholder(name='n', format_spec='03d', conversion=None),
+        NarrationPlaceholder(
+            name='n', column_id='n', format_spec='03d', conversion=None
+        ),
         NarrationLiteral(value=' r='),
-        NarrationPlaceholder(name='obj', format_spec='', conversion='r'),
+        NarrationPlaceholder(
+            name='obj', column_id='obj', format_spec='', conversion='r'
+        ),
     ]
 
 

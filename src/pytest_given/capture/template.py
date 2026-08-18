@@ -66,6 +66,7 @@ class Template:
                 parts.append(
                     NarrationPlaceholder(
                         name=name,
+                        column_id=name,
                         format_spec=spec or '',
                         conversion=conversion,
                     )
@@ -114,7 +115,7 @@ def parse_tstring(
                 conversion=conversion,
                 format_spec=format_spec,
             ):
-                term_ref = _try_term_ref(
+                term_ref = try_term_ref(
                     value, expression, format_spec=format_spec, conversion=conversion
                 )
                 if term_ref is not None:
@@ -136,7 +137,7 @@ def parse_tstring(
     return ''.join(rendered_chunks), parts
 
 
-def _try_term_ref(
+def try_term_ref(
     value: object,
     expression: str = '',
     *,
@@ -144,7 +145,8 @@ def _try_term_ref(
     conversion: str | None = None,
 ) -> NarrationTermRef | None:
     """Return a NarrationTermRef if `value` is a glossary handle, instance, or
-    inflection — else None (fall back to NarrationValue).
+    inflection — else None (fall back to NarrationValue). Also used by
+    grouping to unwrap a parametrized term instance to its display.
 
     Glossary handles render as kind-coloured pills carrying the term's
     canonical or instance display; format_spec and conversion have no

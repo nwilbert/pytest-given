@@ -254,10 +254,10 @@
       <table class="param-table">
         <thead>
           <tr>
-            {% for name in scenario.parameters.names %}
-            <th class="param-color-{{ param_color_map.get(name, 0) % num_param_colors }}" data-param="{{ name }}"
+            {% for col in scenario.parameters.columns %}
+            <th {% if col.kind != 'attachment' %}class="param-color-{{ param_color_map.get(col.name, 0) % num_param_colors }}" {% endif %}data-param="{{ col.id }}"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">{{ name }}</th>
+                @mouseleave="setHoverParam(null, $event.currentTarget)">{{ col.name }}</th>
             {% endfor %}
             <th style="text-align:right">status</th>
           </tr>
@@ -267,8 +267,8 @@
           <tr class="{{ 'failed-row' if case.status == 'failed' else '' }}"
               @mouseenter="setHoverRow($event.currentTarget)"
               @mouseleave="clearHoverRow($event.currentTarget)">
-            {% for name, val in zip(scenario.parameters.names, case.values) %}
-            <td data-param="{{ name }}"
+            {% for col, val in zip(scenario.parameters.columns, case.values) %}
+            <td data-param="{{ col.id }}" data-subst="{{ col.id }}"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">{{ val }}</td>
             {% endfor %}
@@ -278,7 +278,7 @@
           </tr>
           {% if case.error %}
           <tr>
-            <td colspan="{{ scenario.parameters.names | length + 1 }}">
+            <td colspan="{{ scenario.parameters.columns | length + 1 }}">
               {{ render_error(case.error) }}
             </td>
           </tr>

@@ -14,6 +14,7 @@ from ..model import (
     ReportData,
     Scenario,
     Step,
+    StepAttachment,
     node_base,
 )
 
@@ -67,8 +68,8 @@ def _source_md(scenario: Scenario) -> str:
 
 
 def _param_table_md(table: ParameterTable) -> str:
-    header = '| ' + ' | '.join([*(_cell(n) for n in table.names), '']) + '|'
-    separator = '|' + '---|' * (len(table.names) + 1)
+    header = '| ' + ' | '.join([*(_cell(c.name) for c in table.columns), '']) + '|'
+    separator = '|' + '---|' * (len(table.columns) + 1)
     rows = [
         '| '
         + ' | '.join(
@@ -113,7 +114,11 @@ def _step_md(step: Step, depth: int) -> str:
     return '\n'.join(lines)
 
 
-def _attachment_lines(attachment: Attachment, indent: str) -> list[str]:
+def _attachment_lines(attachment: StepAttachment, indent: str) -> list[str]:
+    # Grouping only ever produces inline `Attachment`s in this task; a
+    # column-referencing `AttachmentRef` on a grouped step arrives in a later
+    # task, which will also teach this renderer to display its badge.
+    assert isinstance(attachment, Attachment)
     content = attachment.content
     label = _inline(attachment.label)
     is_multiline = any(nl in content for nl in ('\r\n', '\n', '\r'))

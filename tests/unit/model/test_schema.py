@@ -10,6 +10,7 @@ from pytest_given.model import (
     ActivityTermRef,
     ActivityWord,
     Attachment,
+    AttachmentRef,
     ErrorInfo,
     FixtureRecording,
     Glossary,
@@ -22,6 +23,7 @@ from pytest_given.model import (
     NarrationTermRef,
     NodeId,
     ParameterCase,
+    ParameterColumn,
     ParameterTable,
     RecordingState,
     ReportData,
@@ -114,8 +116,14 @@ def test_parameter_table() -> None:
     case2 = ParameterCase(
         values=[2, 1], status='failed', error=ErrorInfo(message='fail')
     )
-    table = ParameterTable(names=['euros', 'coffees'], cases=[case1, case2])
-    assert table.names == ['euros', 'coffees']
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='euros', name='euros', kind='param'),
+            ParameterColumn(id='coffees', name='coffees', kind='param'),
+        ],
+        cases=[case1, case2],
+    )
+    assert [c.name for c in table.columns] == ['euros', 'coffees']
     assert len(table.cases) == 2
     assert table.cases[1].error is not None
 
@@ -164,7 +172,7 @@ def test_step_narration_defaults_to_plain_text() -> None:
 def test_step_narration_accepts_parts() -> None:
     parts: list[NarrationPart] = [
         NarrationLiteral(value='Brew '),
-        NarrationPlaceholder(name='cup_size'),
+        NarrationPlaceholder(name='cup_size', column_id='cup_size'),
         NarrationLiteral(value=' ml'),
     ]
     step = Step(phase='given', narration=Narration(text='Brew 200 ml', parts=parts))
@@ -450,3 +458,35 @@ def test_step_accepts_activity_ids() -> None:
         activity_ids=(ActivityId(3),),
     )
     assert step.activity_ids == (3,)
+
+
+def test_parameter_table_carries_typed_columns() -> None:
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='derived:0', name='price', kind='derived'),
+            ParameterColumn(id='attachment:0', name='machine state', kind='attachment'),
+        ],
+        cases=[
+            ParameterCase(
+                values=[
+                    200,
+                    '2.0',
+                    Attachment(
+                        label='machine state', content='{}', content_type='json'
+                    ),
+                ],
+                status='passed',
+            )
+        ],
+    )
+    assert [c.kind for c in table.columns] == ['param', 'derived', 'attachment']
+    assert len(table.cases[0].values) == len(table.columns)
+
+
+def test_attachment_ref_has_no_content_field() -> None:
+    ref = AttachmentRef(
+        label='machine state', content_type='json', column_id='attachment:0'
+    )
+    assert not hasattr(ref, 'content')
+    assert ref.column_id == 'attachment:0'

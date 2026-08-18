@@ -424,19 +424,17 @@ def _resolve_template_parts(
     return out
 
 
-def attach(label: str | templatelib.Template, content: object) -> None:
+def attach(label: str, content: object) -> None:
     """Attach data to the current step.
 
-    If *content* is a ``str`` it is stored verbatim.  Any other type is
-    serialised as indented JSON.
+    *label* is plain text — an f-string is the way to vary it. If *content* is a
+    ``str`` it is stored verbatim; any other type is serialised as indented JSON.
     """
-    if isinstance(label, Template):
+    if not isinstance(label, str):
         raise PytestGivenError(
-            'attach(Template(...)) is not supported; use a t-string (eager) '
-            'or a plain string.'
+            'attachment labels are plain text; f-strings are fine — '
+            'attach(f"{flavor} log", …).'
         )
-    if isinstance(label, templatelib.Template):
-        label = narration_from(label).text
     collector = get_active_collector()
     if collector is None or collector.state == 'idle':
         if collector is not None and collector.inside_unannotated_test:

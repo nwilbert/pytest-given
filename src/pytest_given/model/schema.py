@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple, NewType
+from typing import TYPE_CHECKING, Literal, NamedTuple, NewType
 
 if TYPE_CHECKING:
     from ..capture.glossary import Actor, DeferredTermHandle, Verb, WorkObject
@@ -24,9 +24,16 @@ class NarrationValue:
 
 @dataclass(frozen=True, kw_only=True)
 class NarrationPlaceholder:
-    """A deferred placeholder — resolved at render time from a per-case mapping."""
+    """A deferred placeholder — resolved at render time from a per-case mapping.
+
+    `name` supplies the `{price}` token and the colour-palette entry; `column_id`
+    identifies the parameter-table column the DOM keys on. For a `param` column
+    the two coincide; a `derived` column's id is generated (`derived:0`), so the
+    field is always populated rather than falling back to `name`.
+    """
 
     name: str
+    column_id: str
     format_spec: str = ''
     conversion: str | None = None
 
@@ -179,16 +186,23 @@ type Phase = Literal['given', 'when', 'then']
 type RecordingState = Literal['idle', 'test', 'fixture_setup', 'fixture_teardown']
 
 # A @pytest.mark.parametrize value as captured for the report: JSON primitives
-# pass through; anything else (dates, objects) is captured as its str(), since
-# parametrize values only feed display and the JSON sink must serialize them.
+# pass through; anything else (dates, objects) is coerced to its str() when the
+# cell is built, since parametrize values only feed display and the JSON sink
+# must serialize them.
 type ParamValue = str | int | float | bool | None
+
+# A parametrize argument as pytest handed it over — an arbitrary object. Kept
+# raw on ParamSpec so grouping can re-apply an interpolation's conversion and
+# format spec to the value the t-string actually saw (see the rebound-parameter
+# rule in the per-case-columns design).
+type RawParamValue = object
 
 
 class ParamSpec(NamedTuple):
-    """Parameter names and values for a single parametrized test run."""
+    """Parameter names and raw values for a single parametrized test run."""
 
     names: list[str]
-    values: list[ParamValue]
+    values: list[RawParamValue]
 
 
 # Maps node IDs to their parameter specification
@@ -203,6 +217,24 @@ class Attachment:
     label: str
     content: str
     content_type: ContentType = 'text'
+
+
+@dataclass(frozen=True)
+class AttachmentRef:
+    """A badge pointing at the parameter-table column that holds the payload.
+
+    Emitted in a grouped parametrized scenario when an attachment's content
+    varies across cases. Carrying no `content` is the point: the grouped tree
+    then *cannot* speak for the baseline case.
+    """
+
+    label: str
+    content_type: ContentType
+    column_id: str
+
+
+# What may sit on a grouped step: a real payload, or a pointer to a column.
+type StepAttachment = Attachment | AttachmentRef
 
 
 @dataclass(frozen=True)
@@ -249,7 +281,7 @@ class Step:
     narration: Narration
     status: str = 'passed'
     children: list[Step] = field(default_factory=list)
-    attachments: list[Attachment] = field(default_factory=list)
+    attachments: list[StepAttachment] = field(default_factory=list)
     error: ErrorInfo | None = None
     activity_ids: tuple[ActivityId, ...] = ()
     fixture_name: str | None = None
@@ -279,16 +311,42 @@ class FixtureRecording:
             self.stack.append(self.root)
 
 
+# Which kind of variance a parameter-table column records.
+type ColumnKind = Literal['param', 'derived', 'attachment']
+
+
+@dataclass(frozen=True, kw_only=True)
+class ParameterColumn:
+    """One parameter-table column.
+
+    `id` is what the DOM keys on and what a tree placeholder or attachment
+    badge points at; `name` is the display header. They coincide for a `param`
+    column; generated ids (`derived:0`, `attachment:0`) cannot collide with a
+    parametrize name, which is always a Python identifier.
+    """
+
+    id: str
+    name: str
+    kind: ColumnKind
+
+
+# One table cell. A `param` cell holds the parametrize value as captured, a
+# `derived` cell the already-rendered string, an `attachment` cell the payload
+# object — which is also how serde tells the two apart on read. `None` marks a
+# case with no value for that column.
+type CellValue = ParamValue | Attachment
+
+
 @dataclass
 class ParameterCase:
-    values: list[Any]
+    values: list[CellValue | None]
     status: str = 'passed'
     error: ErrorInfo | None = None
 
 
 @dataclass
 class ParameterTable:
-    names: list[str]
+    columns: list[ParameterColumn]
     cases: list[ParameterCase] = field(default_factory=list)
 
 
