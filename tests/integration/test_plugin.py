@@ -222,7 +222,7 @@ def test_parametrized_test_as_table(pytester, tmp_path):
     assert s['parameters']['cases'][0]['values'] == [1, 2, 3]
     assert s['parameters']['cases'][0]['status'] == 'passed'
     assert s['parameters']['cases'][1]['values'] == [2, 3, 5]
-    # The merged step's narration parts carry placeholders for matching param names.
+    # The grouped step's narration parts carry placeholders for matching param names.
     given_parts = s['steps'][0]['narration']['parts']
     placeholder_names = [p['name'] for p in given_parts if 'name' in p]
     assert placeholder_names == ['a', 'b']
@@ -689,7 +689,36 @@ def test_tstring_in_non_parametrized_scenario_renders_value_with_no_placeholder(
     assert parts[1].get('expression') == 'cup_size'
 
 
-def test_tstring_expression_not_a_param_stays_as_value(pytester, tmp_path):
+def test_tstring_expression_not_a_param_but_constant_stays_as_value(pytester, tmp_path):
+    """An expression that doesn't match any param name renders as a plain value,
+    not a placeholder — as long as it doesn't vary across cases (see rule 2 for
+    the varying case, below)."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, when
+
+        @scenario('Cost')
+        @pytest.mark.parametrize('price', [10, 20])
+        def test_cost(price):
+            with when(t'cost: {1.2}'):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    data = json.loads(json_path.read_text())
+    parts = data['scenarios'][0]['steps'][0]['narration']['parts']
+    val_parts = [p for p in parts if 'rendered' in p]
+    assert len(val_parts) == 1
+    assert val_parts[0]['expression'] == '1.2'
+
+
+def test_tstring_varying_compound_expression_fails_the_run(pytester, tmp_path):
+    """A varying interpolation whose expression is not a bare parametrize name
+    cannot be honestly promoted to a column (there is no sensible name to give
+    it) — rule 2 rejects the run instead of silently freezing case 1's value."""
     pytester.makepyfile(
         """
         import pytest
@@ -704,13 +733,9 @@ def test_tstring_expression_not_a_param_stays_as_value(pytester, tmp_path):
     )
     json_path = tmp_path / 'report.json'
     result = pytester.runpytest(f'--given-json={json_path}')
-    result.assert_outcomes(passed=2)
-    data = json.loads(json_path.read_text())
-    parts = data['scenarios'][0]['steps'][0]['narration']['parts']
-    # Expression doesn't match any param name → stays as a value, not a placeholder
-    val_parts = [p for p in parts if 'rendered' in p]
-    assert len(val_parts) == 1
-    assert val_parts[0]['expression'] == 'price * 1.2'
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*varies across parametrize cases*'])
+    assert not json_path.exists()
 
 
 def test_tstring_same_value_different_names_disambiguates(pytester, tmp_path):
@@ -736,7 +761,7 @@ def test_tstring_same_value_different_names_disambiguates(pytester, tmp_path):
     assert placeholder_names == ['cup_size', 'beans_g']
 
 
-def test_scenario_with_template_name_merges_and_renders(pytester, tmp_path):
+def test_scenario_with_template_name_groups_and_renders(pytester, tmp_path):
     pytester.makepyfile(
         """
         import pytest
@@ -753,7 +778,7 @@ def test_scenario_with_template_name_merges_and_renders(pytester, tmp_path):
     result = pytester.runpytest(f'--given-json={json_path}')
     result.assert_outcomes(passed=2)
     data = json.loads(json_path.read_text())
-    # All cases share the Template's raw text as merge key → one scenario
+    # All cases share the Template's raw text as grouping key → one scenario
     assert len(data['scenarios']) == 1
     s = data['scenarios'][0]
     assert s['narration']['text'] == 'Brew {cup_size} ml'
@@ -926,8 +951,8 @@ def test_call_time_pytest_skip_captures_reason(pytester, tmp_path):
     assert data['scenarios'][0]['skip_reason'] == 'missing prerequisite'
 
 
-def test_parametrized_all_cases_skipped_merges_as_skipped(pytester, tmp_path):
-    """A parametrize where every case is skipped merges to status='skipped'."""
+def test_parametrized_all_cases_skipped_groups_as_skipped(pytester, tmp_path):
+    """A parametrize where every case is skipped groups to status='skipped'."""
     pytester.makepyfile(
         """
         import pytest
@@ -1572,7 +1597,7 @@ def test_multiple_glossaries_in_conftests_raises(pytester):
 
 def test_annotated_given_on_parametrize_value_synthesizes_leaf(pytester, tmp_path):
     """A parametrize column annotated with given(Template(...)) grows a leaf
-    given step; merged view carries a placeholder for the column."""
+    given step; grouped view carries a placeholder for the column."""
     pytester.makepyfile(
         """
         from typing import Annotated
@@ -1589,15 +1614,15 @@ def test_annotated_given_on_parametrize_value_synthesizes_leaf(pytester, tmp_pat
     json_path = tmp_path / 'out.json'
     pytester.runpytest(f'--given-json={json_path}')
     data = json.loads(json_path.read_text())
-    (merged,) = data['scenarios']
-    given_step = merged['steps'][0]
+    (grouped,) = data['scenarios']
+    given_step = grouped['steps'][0]
     assert given_step['phase'] == 'given'
     parts = given_step['narration']['parts']
     names = [p.get('name') for p in parts]
     assert 'text' in names
     placeholder = next(p for p in parts if p.get('name') == 'text')
     assert placeholder['column_id'] == 'text'
-    columns = merged['parameters']['columns']
+    columns = grouped['parameters']['columns']
     assert [c['name'] for c in columns] == ['text']
     assert all(c['kind'] == 'param' for c in columns)
     assert all(c['id'] == c['name'] for c in columns)
@@ -1624,9 +1649,9 @@ def test_annotated_given_on_multiple_param_columns(pytester, tmp_path):
     json_path = tmp_path / 'out.json'
     pytester.runpytest(f'--given-json={json_path}')
     data = json.loads(json_path.read_text())
-    (merged,) = data['scenarios']
+    (grouped,) = data['scenarios']
     given_texts = [
-        s['narration']['text'] for s in merged['steps'] if s['phase'] == 'given'
+        s['narration']['text'] for s in grouped['steps'] if s['phase'] == 'given'
     ]
     assert given_texts == ['a is {a}', 'b is {b}']
 
@@ -1648,8 +1673,8 @@ def test_annotated_given_plain_string_on_param_renders_verbatim(pytester, tmp_pa
     json_path = tmp_path / 'out.json'
     pytester.runpytest(f'--given-json={json_path}')
     data = json.loads(json_path.read_text())
-    (merged,) = data['scenarios']
-    assert merged['steps'][0]['narration']['text'] == 'a {cup} ml cup'
+    (grouped,) = data['scenarios']
+    assert grouped['steps'][0]['narration']['text'] == 'a {cup} ml cup'
 
 
 def test_annotated_given_on_builtin_fixture_synthesizes_leaf(pytester, tmp_path):
@@ -1789,8 +1814,8 @@ def test_param_without_annotated_stays_table_only(pytester, tmp_path):
     json_path = tmp_path / 'out.json'
     pytester.runpytest(f'--given-json={json_path}')
     data = json.loads(json_path.read_text())
-    (merged,) = data['scenarios']
-    assert [s['phase'] for s in merged['steps']] == ['when']
+    (grouped,) = data['scenarios']
+    assert [s['phase'] for s in grouped['steps']] == ['when']
 
 
 def test_mixed_fixture_and_param_annotated_order(pytester, tmp_path):
@@ -1820,9 +1845,9 @@ def test_mixed_fixture_and_param_annotated_order(pytester, tmp_path):
     json_path = tmp_path / 'out.json'
     pytester.runpytest(f'--given-json={json_path}')
     data = json.loads(json_path.read_text())
-    (merged,) = data['scenarios']
+    (grouped,) = data['scenarios']
     given_texts = [
-        s['narration']['text'] for s in merged['steps'] if s['phase'] == 'given'
+        s['narration']['text'] for s in grouped['steps'] if s['phase'] == 'given'
     ]
     assert given_texts == ['a machine', 'the name {text}']
 
@@ -1879,3 +1904,35 @@ def test_given_json_alone_writes_json(pytester: pytest.Pytester) -> None:
     json_path = pytester.path / 'r.json'
     pytester.runpytest(f'--given-json={json_path}')
     assert json_path.exists()
+
+
+_VIOLATING_SUITE = """
+import pytest
+from pytest_given import scenario, when
+
+@pytest.mark.parametrize('cup_size', [200, 350])
+@scenario('Brew')
+def test_brew(cup_size):
+    with when(f'the machine brews {cup_size} ml'):
+        pass
+"""
+
+
+def test_a_rejected_form_fails_the_run_and_writes_no_sink(pytester):
+    pytester.makepyfile(test_brew=_VIOLATING_SUITE)
+    result = pytester.runpytest(
+        '--given-json=out/report.json',
+        '--given-html=out/report.html',
+        '--given-md=out/report.md',
+    )
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*varies across parametrize cases*'])
+    assert not (pytester.path / 'out').exists()
+    assert 'Traceback (most recent call last)' not in result.stdout.str()
+
+
+def test_a_rejected_form_fails_the_run_with_no_sink_flag(pytester):
+    pytester.makepyfile(test_brew=_VIOLATING_SUITE)
+    result = pytester.runpytest()
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*varies across parametrize cases*'])

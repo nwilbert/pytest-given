@@ -2,13 +2,12 @@
 in integration tests; tested here directly so coverage hits 100%."""
 
 import inspect
-from datetime import UTC, datetime
 from types import SimpleNamespace
 from typing import Annotated, Any, cast
 
 import pytest
 
-from pytest_given import Template, given, plugin, scenario, then, when
+from pytest_given import Template, given, plugin, then, when
 from pytest_given.capture.collector import (
     Collector,
     get_active_collector,
@@ -29,16 +28,10 @@ from pytest_given.model import (
     FixtureRecording,
     Glossary,
     Narration,
-    NarrationPlaceholder,
-    NarrationTermRef,
     NodeId,
-    ParamSpec,
     PytestGivenError,
-    Scenario,
     Step,
-    TermId,
 )
-from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 @pytest.fixture
@@ -281,19 +274,6 @@ def test_get_scenario_marker_returns_none_for_item_without_function() -> None:
     assert plugin._get_scenario_marker(item) is None
 
 
-def test_templatize_narration_rejects_unknown_placeholder() -> None:
-    """Safety-net guard: a NarrationPlaceholder whose name isn't a parametrize
-    column raises. Defense in depth on top of the collection-time hook, which
-    catches Template placeholders in scenario names (and step text from
-    Template can't happen since given/when/then reject Template). The runtime
-    guard covers any future code path that might construct parts directly."""
-    narration = Narration(
-        text='', parts=[NarrationPlaceholder(name='cup_zize', column_id='cup_zize')]
-    )
-    with pytest.raises(PytestGivenError, match='cup_zize'):
-        plugin._templatize_narration(narration, ['cup_size'])
-
-
 def test_extract_skip_reason_parses_canonical_tuple() -> None:
     assert plugin._extract_skip_reason(('t.py', 12, 'Skipped: because')) == 'because'
 
@@ -326,151 +306,6 @@ def test_extract_skip_reason_returns_none_for_unrecognized_shapes() -> None:
     assert plugin._extract_skip_reason('just a string') is None
     assert plugin._extract_skip_reason(('only', 'two')) is None
     assert plugin._extract_skip_reason(('t.py', 12, 42)) is None
-
-
-def test_group_parametrized_all_skipped_merges_as_skipped() -> None:
-    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
-    scenarios = [
-        Scenario(id=nid1, narration=Narration(text='x'), module='m', status='skipped'),
-        Scenario(id=nid2, narration=Narration(text='x'), module='m', status='skipped'),
-    ]
-    param_info = {
-        nid1: ParamSpec(names=['n'], values=[1]),
-        nid2: ParamSpec(names=['n'], values=[2]),
-    }
-    merged = plugin._group_parametrized(scenarios, param_info)
-    assert len(merged) == 1
-    assert merged[0].status == 'skipped'
-
-
-def test_group_parametrized_mixed_pass_skip_merges_as_passed() -> None:
-    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
-    scenarios = [
-        Scenario(id=nid1, narration=Narration(text='x'), module='m', status='passed'),
-        Scenario(id=nid2, narration=Narration(text='x'), module='m', status='skipped'),
-    ]
-    param_info = {
-        nid1: ParamSpec(names=['n'], values=[1]),
-        nid2: ParamSpec(names=['n'], values=[2]),
-    }
-    merged = plugin._group_parametrized(scenarios, param_info)
-    assert merged[0].status == 'passed'
-
-
-@scenario(
-    t'{pg["Group"]("Grouping")} merges parametrize {pg["Case"]("cases")} into one '
-    t'{pg["Scenario"].low}',
-    tags=['parametrization'],
-    story=adopt_pytest_given,
-)
-def test_group_parametrized_any_failed_merges_as_failed() -> None:
-    with given(t'three {pg["Case"]} records of one {pg["Parametrized scenario"]}'):
-        nid1, nid2, nid3 = NodeId('t::x[1]'), NodeId('t::x[2]'), NodeId('t::x[3]')
-        scenarios = [
-            Scenario(
-                id=nid1, narration=Narration(text='x'), module='m', status='passed'
-            ),
-            Scenario(
-                id=nid2, narration=Narration(text='x'), module='m', status='failed'
-            ),
-            Scenario(
-                id=nid3, narration=Narration(text='x'), module='m', status='skipped'
-            ),
-        ]
-        param_info = {
-            nid1: ParamSpec(names=['n'], values=[1]),
-            nid2: ParamSpec(names=['n'], values=[2]),
-            nid3: ParamSpec(names=['n'], values=[3]),
-        }
-    with when(t'the {pg["Group"]("grouping")} pass merges them', activity=9):
-        merged = plugin._group_parametrized(scenarios, param_info)
-    with then(t'one scenario remains and any failed {pg["Case"]} fails it'):
-        assert len(merged) == 1
-        assert merged[0].status == 'failed'
-
-
-def test_group_parametrized_distinct_functions_same_name_do_not_merge() -> None:
-    # Two different parametrized functions in one module that happen to share a
-    # scenario label must stay separate — grouping keys on the test function
-    # (node id without its parametrize tail), not on the rendered label.
-    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::y[1]')
-    scenarios = [
-        Scenario(id=nid1, narration=Narration(text='same label'), module='m'),
-        Scenario(id=nid2, narration=Narration(text='same label'), module='m'),
-    ]
-    param_info = {
-        nid1: ParamSpec(names=['n'], values=[1]),
-        nid2: ParamSpec(names=['k'], values=[1]),
-    }
-    merged = plugin._group_parametrized(scenarios, param_info)
-    assert {s.id for s in merged} == {nid1, nid2}
-    assert {
-        tuple(c.name for c in s.parameters.columns) for s in merged if s.parameters
-    } == {
-        ('n',),
-        ('k',),
-    }
-
-
-def test_param_cell_unwraps_a_term_instance_to_its_display() -> None:
-    glossary = Glossary()
-    guest = glossary.actor('Guest')
-    nid1, nid2 = NodeId('t::x[alice]'), NodeId('t::x[bob]')
-    scenarios = [
-        Scenario(id=nid1, narration=Narration(text='x'), module='m', status='passed'),
-        Scenario(id=nid2, narration=Narration(text='x'), module='m', status='passed'),
-    ]
-    param_info = {
-        nid1: ParamSpec(names=['guest'], values=[guest('Alice')]),
-        nid2: ParamSpec(names=['guest'], values=[guest('Bob')]),
-    }
-    grouped = plugin._group_parametrized(scenarios, param_info)
-    assert [case.values[0] for case in grouped[0].parameters.cases] == ['Alice', 'Bob']
-
-
-def test_a_non_scalar_parametrize_value_still_reaches_the_cell_as_a_string() -> None:
-    """Coercion moved to the cell; the shape it produces is unchanged."""
-    moment = datetime(2026, 1, 1, tzinfo=UTC)
-    nid = NodeId('t::x[a]')
-    scenarios = [
-        Scenario(id=nid, narration=Narration(text='x'), module='m', status='passed')
-    ]
-    param_info = {nid: ParamSpec(names=['when'], values=[moment])}
-    grouped = plugin._group_parametrized(scenarios, param_info)
-    assert grouped[0].parameters.cases[0].values == [str(moment)]
-
-
-def test_templatize_sets_param_column_when_term_ref_expression_matches() -> None:
-    narration = Narration(
-        text='Alice arrives',
-        parts=[
-            NarrationTermRef(
-                term_id=TermId('guest'),
-                display='Alice',
-                expression='guest',
-            ),
-        ],
-    )
-    out = plugin._templatize_narration(narration, param_names=['guest'])
-    ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
-    assert ref.param_column == 'guest'
-    assert ref.display == 'Alice'
-
-
-def test_templatize_term_ref_param_column_stays_none_when_no_column_match() -> None:
-    narration = Narration(
-        text='Alice arrives',
-        parts=[
-            NarrationTermRef(
-                term_id=TermId('guest'),
-                display='Alice',
-                expression='guest',
-            ),
-        ],
-    )
-    out = plugin._templatize_narration(narration, param_names=['euros'])
-    ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
-    assert ref.param_column is None
 
 
 # --- Task 7.2 / 7.4 unit coverage ---

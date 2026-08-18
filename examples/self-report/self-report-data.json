@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-14T13:15:31.771190+00:00",
+    "timestamp": "2026-08-17T07:09:04.224453+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "4acdffea0a58b7a5e0c144f029408031b4bed682"
+    "commit_sha": "b7950cbb2dfccbd362a315d0fabf04a4bba91377"
   },
   "scenarios": [
     {
@@ -6729,7 +6729,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 53
+        "line": 54
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -6849,7 +6849,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 248
+        "line": 249
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -6954,7 +6954,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 277
+        "line": 278
       },
       "story_id": null,
       "activity_ids": []
@@ -7059,7 +7059,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 308
+        "line": 309
       },
       "story_id": null,
       "activity_ids": []
@@ -7169,7 +7169,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 388
+        "line": 389
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -10525,7 +10525,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 67
+        "line": 73
       },
       "story_id": null,
       "activity_ids": []
@@ -10602,7 +10602,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 135
+        "line": 141
       },
       "story_id": null,
       "activity_ids": []
@@ -10679,7 +10679,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 199
+        "line": 205
       },
       "story_id": null,
       "activity_ids": []
@@ -10793,7 +10793,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 239
+        "line": 245
       },
       "story_id": null,
       "activity_ids": []
@@ -10907,7 +10907,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 269
+        "line": 275
       },
       "story_id": null,
       "activity_ids": []
@@ -11015,7 +11015,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 291
+        "line": 297
       },
       "story_id": null,
       "activity_ids": []
@@ -11129,7 +11129,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 307
+        "line": 313
       },
       "story_id": null,
       "activity_ids": []
@@ -11232,7 +11232,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 348
+        "line": 354
       },
       "story_id": null,
       "activity_ids": []
@@ -11348,7 +11348,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 391
+        "line": 397
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -12486,7 +12486,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 66
+        "line": 70
       },
       "story_id": null,
       "activity_ids": []
@@ -12622,7 +12622,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 150
+        "line": 154
       },
       "story_id": null,
       "activity_ids": []
@@ -12755,7 +12755,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 202
+        "line": 206
       },
       "story_id": null,
       "activity_ids": []
@@ -12869,7 +12869,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 218
+        "line": 222
       },
       "story_id": null,
       "activity_ids": []
@@ -12977,7 +12977,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 231
+        "line": 235
       },
       "story_id": null,
       "activity_ids": []
@@ -13125,7 +13125,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 255
+        "line": 259
       },
       "story_id": null,
       "activity_ids": []
@@ -13264,7 +13264,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 287
+        "line": 291
       },
       "story_id": null,
       "activity_ids": []
@@ -13467,7 +13467,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 319
+        "line": 323
       },
       "story_id": null,
       "activity_ids": []
@@ -13609,7 +13609,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 368
+        "line": 372
       },
       "story_id": null,
       "activity_ids": []
@@ -13751,7 +13751,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 415
+        "line": 419
       },
       "story_id": null,
       "activity_ids": []
@@ -13881,7 +13881,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 438
+        "line": 442
       },
       "story_id": null,
       "activity_ids": []
@@ -13995,7 +13995,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 469
+        "line": 473
       },
       "story_id": null,
       "activity_ids": []
@@ -14137,7 +14137,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 493
+        "line": 497
       },
       "story_id": null,
       "activity_ids": []
@@ -14270,7 +14270,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 529
+        "line": 533
       },
       "story_id": null,
       "activity_ids": []
@@ -14390,7 +14390,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 558
+        "line": 562
       },
       "story_id": null,
       "activity_ids": []
@@ -14490,7 +14490,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "Parameter coloring classes mark the merged placeholder and the table headers",
+            "text": "Parameter coloring classes mark the grouped placeholder and the table headers",
             "parts": [
               {
                 "term_id": "parameter-coloring",
@@ -14499,7 +14499,7 @@
                 "param_column": null
               },
               {
-                "value": " classes mark the merged placeholder and the table headers"
+                "value": " classes mark the grouped placeholder and the table headers"
               }
             ]
           },
@@ -14655,7 +14655,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 41
+        "line": 42
       },
       "story_id": null,
       "activity_ids": []
@@ -14766,7 +14766,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 141
+        "line": 142
       },
       "story_id": null,
       "activity_ids": []
@@ -14908,7 +14908,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 165
+        "line": 166
       },
       "story_id": null,
       "activity_ids": []
@@ -15044,7 +15044,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 220
+        "line": 221
       },
       "story_id": null,
       "activity_ids": []
@@ -15174,7 +15174,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 253
+        "line": 257
       },
       "story_id": null,
       "activity_ids": []
@@ -15295,7 +15295,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 325
+        "line": 329
       },
       "story_id": null,
       "activity_ids": []
@@ -15384,15 +15384,15 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 426
+        "line": 450
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/test_plugin.py::test_group_parametrized_any_failed_merges_as_failed",
+      "id": "tests/unit/test_grouping.py::test_group_parametrized_any_failed_groups_as_failed",
       "narration": {
-        "text": "Grouping merges parametrize cases into one scenario",
+        "text": "Grouping collapses parametrize cases into one scenario",
         "parts": [
           {
             "term_id": "group",
@@ -15401,7 +15401,7 @@
             "param_column": null
           },
           {
-            "value": " merges parametrize "
+            "value": " collapses parametrize "
           },
           {
             "term_id": "case",
@@ -15420,7 +15420,7 @@
           }
         ]
       },
-      "module": "tests.unit.test_plugin",
+      "module": "tests.unit.test_grouping",
       "tags": [
         "parametrization"
       ],
@@ -15462,7 +15462,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the grouping pass merges them",
+            "text": "the grouping pass collapses them",
             "parts": [
               {
                 "value": "the "
@@ -15474,7 +15474,7 @@
                 "param_column": null
               },
               {
-                "value": " pass merges them"
+                "value": " pass collapses them"
               }
             ]
           },
@@ -15518,8 +15518,8 @@
       "error": null,
       "skip_reason": null,
       "source": {
-        "relpath": "tests/unit/test_plugin.py",
-        "line": 357
+        "relpath": "tests/unit/test_grouping.py",
+        "line": 71
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -15557,6 +15557,7 @@
               },
               {
                 "name": "text",
+                "column_id": "text",
                 "format_spec": "",
                 "conversion": null
               }
@@ -15598,13 +15599,14 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the id is the expected slug 'guest'",
+            "text": "the id is the expected slug {expected}",
             "parts": [
               {
                 "value": "the id is the expected slug "
               },
               {
                 "name": "expected",
+                "column_id": "expected",
                 "format_spec": "",
                 "conversion": "r"
               }
@@ -15619,9 +15621,17 @@
         }
       ],
       "parameters": {
-        "names": [
-          "text",
-          "expected"
+        "columns": [
+          {
+            "id": "text",
+            "name": "text",
+            "kind": "param"
+          },
+          {
+            "id": "expected",
+            "name": "expected",
+            "kind": "param"
+          }
         ],
         "cases": [
           {
@@ -15722,6 +15732,7 @@
               },
               {
                 "name": "text",
+                "column_id": "text",
                 "format_spec": "",
                 "conversion": null
               }
@@ -15775,8 +15786,12 @@
         }
       ],
       "parameters": {
-        "names": [
-          "text"
+        "columns": [
+          {
+            "id": "text",
+            "name": "text",
+            "kind": "param"
+          }
         ],
         "cases": [
           {
@@ -15952,8 +15967,12 @@
         }
       ],
       "parameters": {
-        "names": [
-          "phase_name"
+        "columns": [
+          {
+            "id": "phase_name",
+            "name": "phase_name",
+            "kind": "param"
+          }
         ],
         "cases": [
           {
@@ -15976,7 +15995,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 354
+        "line": 355
       },
       "story_id": null,
       "activity_ids": []
@@ -16005,6 +16024,7 @@
               },
               {
                 "name": "text",
+                "column_id": "text",
                 "format_spec": "",
                 "conversion": null
               }
@@ -16058,8 +16078,12 @@
         }
       ],
       "parameters": {
-        "names": [
-          "text"
+        "columns": [
+          {
+            "id": "text",
+            "name": "text",
+            "kind": "param"
+          }
         ],
         "cases": [
           {
@@ -16089,7 +16113,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 106
+        "line": 112
       },
       "story_id": null,
       "activity_ids": []

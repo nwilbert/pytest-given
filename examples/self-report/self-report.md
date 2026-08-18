@@ -701,34 +701,34 @@
 - **then** only the real pipe table produces rows
 
 ## ✓ A «step» pairs its «narration» with a «phase»
-`tests/unit/capture/test_step_descriptor.py:53::test_context_manager_basic` · happy-path
+`tests/unit/capture/test_step_descriptor.py:54::test_context_manager_basic` · happy-path
 
 - **when** a given «Step» descriptor is created
 - **then** it carries the given «Phase» and its «Narration»
 
 ## ✓ «when_then» records the action and its outcome as siblings
-`tests/unit/capture/test_step_descriptor.py:248::test_when_then_records_two_sibling_steps_on_clean_exit` · happy-path
+`tests/unit/capture/test_step_descriptor.py:249::test_when_then_records_two_sibling_steps_on_clean_exit` · happy-path
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a «when_then» block exits cleanly
 - **then** a when and a sibling then «Step» are recorded
 
 ## ✓ «when_then» pairs with an inner pytest.raises
-`tests/unit/capture/test_step_descriptor.py:277::test_when_then_pairs_with_inner_pytest_raises` · happy-path
+`tests/unit/capture/test_step_descriptor.py:278::test_when_then_pairs_with_inner_pytest_raises` · happy-path
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises and an inner pytest.raises swallows it
 - **then** both sibling steps are still recorded
 
 ## ✓ «when_then» omits the then when the body raises uncaught
-`tests/unit/capture/test_step_descriptor.py:308::test_when_then_omits_then_when_body_raises_uncaught` · validation
+`tests/unit/capture/test_step_descriptor.py:309::test_when_then_omits_then_when_body_raises_uncaught` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises with nothing catching inside
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ A nested when becomes a child of the «when_then» action
-`tests/unit/capture/test_step_descriptor.py:388::test_when_then_allows_nested_when_as_child_sub_step` · happy-path
+`tests/unit/capture/test_step_descriptor.py:389::test_when_then_allows_nested_when_as_child_sub_step` · happy-path
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a when opens inside the «when_then» body
@@ -954,63 +954,63 @@
 - **then** it splits into literal and placeholder «Narration» parts
 
 ## ✓ A Template substitutes parametrize values
-`tests/unit/capture/test_template.py:67::test_template_substitute_basic` · step-text, parametrization
+`tests/unit/capture/test_template.py:73::test_template_substitute_basic` · step-text, parametrization
 
 - **given** a «Templatize» template referencing a «Case» column
 - **when** a «Parameter table» value is substituted in
 - **then** the placeholder is filled with that value
 
 ## ✓ A t-string interpolation becomes a value part
-`tests/unit/capture/test_template.py:135::test_parse_tstring_single_interpolation` · step-text, happy-path
+`tests/unit/capture/test_template.py:141::test_parse_tstring_single_interpolation` · step-text, happy-path
 
 - **given** a t-string step with one interpolated value
 - **when** the t-string is parsed at runtime
 - **then** the interpolation becomes a «Narration» value part
 
 ## ✓ A t-string can interpolate an arbitrary expression
-`tests/unit/capture/test_template.py:199::test_parse_tstring_expression` · step-text, happy-path
+`tests/unit/capture/test_template.py:205::test_parse_tstring_expression` · step-text, happy-path
 
 - **given** a t-string step interpolating a computed expression
 - **when** the t-string is parsed
 - **then** the «Value highlight» part records the full expression
 
 ## ✓ A «glossary» handle in a t-string emits a «term ref»
-`tests/unit/capture/test_template.py:239::test_tstring_with_actor_emits_term_ref` · step-text
+`tests/unit/capture/test_template.py:245::test_tstring_with_actor_emits_term_ref` · step-text
 
 - **given** an «Actor» handle from the glossary
 - **when** the handle is interpolated into a t-string step
 - **then** the step carries a «Term ref» pill for that «Actor»
 
 ## ✓ A «work object» handle in a t-string emits a «term ref»
-`tests/unit/capture/test_template.py:269::test_tstring_with_work_object_emits_term_ref` · step-text
+`tests/unit/capture/test_template.py:275::test_tstring_with_work_object_emits_term_ref` · step-text
 
 - **given** a «Work Object» handle from the glossary
 - **when** it is interpolated into a t-string step
 - **then** the step carries a «Term ref» for that «Work Object»
 
 ## ✓ A bare «verb» handle keeps its canonical display
-`tests/unit/capture/test_template.py:291::test_tstring_with_verb_emits_term_ref_with_canonical_display` · step-text
+`tests/unit/capture/test_template.py:297::test_tstring_with_verb_emits_term_ref_with_canonical_display` · step-text
 
 - **given** a «Verb» handle used without an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the canonical verb
 
 ## ✓ An inflected «verb» in a t-string shows the «inflection»
-`tests/unit/capture/test_template.py:307::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display` · step-text
+`tests/unit/capture/test_template.py:313::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display` · step-text
 
 - **given** a «Verb» handle called with an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the inflection but keeps the verb id
 
 ## ✓ A «term ref» may not carry a format spec
-`tests/unit/capture/test_template.py:348::test_tstring_term_ref_with_format_spec_raises` · step-text, validation
+`tests/unit/capture/test_template.py:354::test_tstring_term_ref_with_format_spec_raises` · step-text, validation
 
 - **given** an «Actor» handle interpolated with a format spec
 - **when** the t-string is parsed
 - **then** a PytestGivenError says a «Term ref» takes no format spec
 
 ## ✓ A «FileGlossary» handle works in a t-string «step»
-`tests/unit/capture/test_template.py:391::test_tstring_with_file_term_handle_emits_term_ref` · step-text
+`tests/unit/capture/test_template.py:397::test_tstring_with_file_term_handle_emits_term_ref` · step-text
 
 - **given** a «Deferred term» from a «File glossary»
 - **when** it is interpolated into a t-string step
@@ -1187,56 +1187,56 @@
 - **then** only the anchored «Activity» is «Coverage»-eligible
 
 ## ✓ A «verb» «activity» ref has one identity regardless of «inflection»
-`tests/unit/report/test_coverage.py:66::test_identity_of_activity_term_ref_verb_ignores_display` · happy-path
+`tests/unit/report/test_coverage.py:70::test_identity_of_activity_term_ref_verb_ignores_display` · happy-path
 
 - **given** a «Verb» written canonically and as an «Inflection»
 - **when** «Coverage» derives each «Term ref» identity
 - **then** both collapse to the one canonical verb identity
 
 ## ✓ A branching «activity» unions references across its «paths»
-`tests/unit/report/test_coverage.py:150::test_a_refs_unions_across_multi_path_activity` · happy-path
+`tests/unit/report/test_coverage.py:154::test_a_refs_unions_across_multi_path_activity` · happy-path
 
 - **given** an «Activity» that branches into two «Path» alternatives
 - **when** «Coverage» collects the «Activity» references
 - **then** both «Instance» identities across the branches are present
 
 ## ✓ An «instance» «step» ref adds a canonical fallback
-`tests/unit/report/test_coverage.py:202::test_s_for_step_instance_entity_ref_adds_canonical_fallback` · happy-path
+`tests/unit/report/test_coverage.py:206::test_s_for_step_instance_entity_ref_adds_canonical_fallback` · happy-path
 
 - **given** a «Step» referring to a named «Instance»
 - **when** «Coverage» computes the identity set for the «Step»
 - **then** it includes the canonical «Term ref» fallback
 
 ## ✓ A «verb» ref always resolves to its canonical identity
-`tests/unit/report/test_coverage.py:218::test_s_for_step_verb_ref_always_canonical` · happy-path
+`tests/unit/report/test_coverage.py:222::test_s_for_step_verb_ref_always_canonical` · happy-path
 
 - **given** a «Step» using an «Inflection» of a «Verb»
 - **when** «Coverage» computes its identity set
 - **then** the identity ignores the surface form and stays canonical
 
 ## ✓ An unknown «term ref» is skipped
-`tests/unit/report/test_coverage.py:231::test_s_for_step_unknown_term_ref_skipped` · validation
+`tests/unit/report/test_coverage.py:235::test_s_for_step_unknown_term_ref_skipped` · validation
 
 - **given** a «Step» referencing a «Term» not in the glossary
 - **when** «Coverage» computes its identity set
 - **then** the unknown ref contributes nothing to the identity set
 
 ## ✓ An «instance» «step» covers a canonical «activity»
-`tests/unit/report/test_coverage.py:255::test_compute_coverage_covers_canonical_activity_via_instance_step` · happy-path
+`tests/unit/report/test_coverage.py:259::test_compute_coverage_covers_canonical_activity_via_instance_step` · happy-path
 
 - **given** a «Story» with a canonical «Activity»
 - **when** a «Scenario» step names a specific «Instance»
 - **then** «Coverage» reports the «Activity» as covered
 
 ## ✓ A canonical «step» does not cover an «instance» «activity»
-`tests/unit/report/test_coverage.py:287::test_compute_coverage_does_not_cover_instance_activity_with_canonical_step` · happy-path
+`tests/unit/report/test_coverage.py:291::test_compute_coverage_does_not_cover_instance_activity_with_canonical_step` · happy-path
 
 - **given** an «Activity» anchored to a named «Instance»
 - **when** a «Scenario» step only names the canonical «Actor»
 - **then** «Coverage» leaves the more specific instance activity uncovered
 
 ## ✓ Promoting a bare word to a «verb» ref drops «coverage» from a «step» that matched
-`tests/unit/report/test_coverage.py:319::test_compute_coverage_lost_when_activity_gains_a_term` · happy-path
+`tests/unit/report/test_coverage.py:323::test_compute_coverage_lost_when_activity_gains_a_term` · happy-path
 
 - **given** a «Step» naming two «term refs»
 - **given** the same «Activity» with that middle slot a bare word, then a «Verb» ref
@@ -1245,49 +1245,49 @@
 - **then** the widened «Activity» is no longer covered
 
 ## ✓ A «scenario» «activity» binding constrains «coverage»
-`tests/unit/report/test_coverage.py:368::test_compute_coverage_scenario_constrained_to_activity_ids` · happy-path
+`tests/unit/report/test_coverage.py:372::test_compute_coverage_scenario_constrained_to_activity_ids` · happy-path
 
 - **given** a «Story» with two matching activities
 - **when** the «Scenario» «binds» only to activity 1
 - **then** «Coverage» considers only the bound «Activity»
 
 ## ✓ An «activity» with two distinct «terms» is «coverage»-eligible
-`tests/unit/report/test_coverage.py:415::test_is_coverage_eligible_true_for_two_distinct_terms` · happy-path
+`tests/unit/report/test_coverage.py:419::test_is_coverage_eligible_true_for_two_distinct_terms` · happy-path
 
 - **given** an «Activity» anchored by two distinct «Term» refs
 - **when** its «Coverage» eligibility is checked
 - **then** it is eligible for «Coverage» tracking
 
 ## ✓ An under-anchored «activity» is not «coverage»-eligible
-`tests/unit/report/test_coverage.py:438::test_is_coverage_eligible_false_for_one_distinct_term` · happy-path
+`tests/unit/report/test_coverage.py:442::test_is_coverage_eligible_false_for_one_distinct_term` · happy-path
 
 - **given** an «Activity» that mentions only one distinct «Term»
 - **when** its «Coverage» eligibility is checked
 - **then** it is ineligible — «Coverage» needs at least two anchors
 
 ## ✓ An under-anchored «activity» is never reported as covered
-`tests/unit/report/test_coverage.py:469::test_compute_coverage_excludes_under_anchored_activity` · happy-path
+`tests/unit/report/test_coverage.py:473::test_compute_coverage_excludes_under_anchored_activity` · happy-path
 
 - **given** a «Story» whose «Activity» is all bare words
 - **when** coverage is computed against a scenario
 - **then** «Coverage» excludes the under-anchored «Activity»
 
 ## ✓ Nested «steps» are walked for «coverage»
-`tests/unit/report/test_coverage.py:493::test_compute_coverage_nested_steps_are_walked` · happy-path
+`tests/unit/report/test_coverage.py:497::test_compute_coverage_nested_steps_are_walked` · happy-path
 
 - **given** a «Story» with one canonical «Activity»
 - **when** the covering «Term ref»s live in a nested child «Step»
 - **then** the nested «Step» still counts and the «Activity» is covered
 
 ## ✓ An explicit «step» binding covers an eligible «activity»
-`tests/unit/report/test_coverage.py:529::test_compute_coverage_explicit_step_binding_covers_eligible_activity` · happy-path
+`tests/unit/report/test_coverage.py:533::test_compute_coverage_explicit_step_binding_covers_eligible_activity` · happy-path
 
 - **given** a «Story» with a coverage-eligible «Activity»
 - **when** a «Step» «binds» to it explicitly by id
 - **then** «Coverage» counts it directly, without identity matching
 
 ## ✓ An explicit binding still requires eligibility
-`tests/unit/report/test_coverage.py:558::test_compute_coverage_explicit_binding_ignored_for_ineligible_activity` · validation
+`tests/unit/report/test_coverage.py:562::test_compute_coverage_explicit_binding_ignored_for_ineligible_activity` · validation
 
 - **given** a «Story» whose «Activity» is under-anchored
 - **when** a «Step» «binds» to it explicitly by id
@@ -1298,10 +1298,10 @@
 
 - **given** a «Report» holding a «Parametrized scenario» with a «Parameter table»
 - **when** the «Renderer» renders the HTML page
-- **then** «Parameter coloring» classes mark the merged placeholder and the table headers
+- **then** «Parameter coloring» classes mark the grouped placeholder and the table headers
 
 ## ✓ A passed «scenario» renders as a checked heading with «step» bullets
-`tests/unit/report/test_md_renderer.py:41::test_passed_scenario_heading_and_steps` · happy-path
+`tests/unit/report/test_md_renderer.py:42::test_passed_scenario_heading_and_steps` · happy-path
 
 - **given** a «Report» holding a passed «Scenario» with three steps
   - 📎 Scenario record:
@@ -1372,28 +1372,28 @@
 - **then** the heading is checked and each «Step» is a phase bullet
 
 ## ✓ Nested «steps» indent under their parent
-`tests/unit/report/test_md_renderer.py:141::test_nested_steps_indent` · happy-path
+`tests/unit/report/test_md_renderer.py:142::test_nested_steps_indent` · happy-path
 
 - **given** a «Scenario» whose when «Step» has a nested child
 - **when** the Markdown «Report» is rendered
 - **then** the child bullet indents under its parent
 
 ## ✓ Structured «narration» renders «terms», values and placeholders
-`tests/unit/report/test_md_renderer.py:165::test_narration_parts_resolve_terms_and_values` · step-text
+`tests/unit/report/test_md_renderer.py:166::test_narration_parts_resolve_terms_and_values` · step-text
 
 - **given** a «Step» whose «Narration» carries a «Term ref», a value and a placeholder
 - **when** the Markdown «Report» is rendered
 - **then** the «Term ref» renders in guillemets, the value verbatim and the placeholder in braces
 
 ## ✓ A «parametrized scenario» renders its «parameter table»
-`tests/unit/report/test_md_renderer.py:220::test_parametrized_scenario_renders_table` · parametrization
+`tests/unit/report/test_md_renderer.py:221::test_parametrized_scenario_renders_table` · parametrization
 
 - **given** a «Parametrized scenario» with a two-«Case» «Parameter table»
 - **when** the Markdown «Report» is rendered
 - **then** the heading counts the cases and the «Parameter table» lists each row
 
 ## ✓ A failing «step» is marked with a minimal error digest
-`tests/unit/report/test_md_renderer.py:253::test_failing_step_is_marked_with_minimal_error` · happy-path
+`tests/unit/report/test_md_renderer.py:257::test_failing_step_is_marked_with_minimal_error` · happy-path
 
 - **given** a failed «Scenario» whose then «Step» carries a two-line error and an internal frame
   - 📎 Error record:
@@ -1424,24 +1424,24 @@
 - **then** only the first message line and the non-internal frame are quoted
 
 ## ✓ A multi-line «attachment» renders as a fenced block
-`tests/unit/report/test_md_renderer.py:325::test_multiline_attachment_renders_fenced_block` · happy-path
+`tests/unit/report/test_md_renderer.py:329::test_multiline_attachment_renders_fenced_block` · happy-path
 
 - **given** a «Step» carrying a multi-line «Attachment»
 - **when** the Markdown «Report» is rendered
 - **then** the «Attachment» content sits in an indented fence, not inline
 
 ## ✓ A skipped scenario shows its skip reason
-`tests/unit/report/test_md_renderer.py:426::test_skipped_scenario_shows_reason` · happy-path
+`tests/unit/report/test_md_renderer.py:450::test_skipped_scenario_shows_reason` · happy-path
 
 - **given** a skipped «Scenario» with a reason
 - **when** the Markdown «Report» is rendered
 - **then** the heading is marked skipped and the reason follows the node id
 
-## ✓ «Grouping» merges parametrize «cases» into one «scenario»
-`tests/unit/test_plugin.py:357::test_group_parametrized_any_failed_merges_as_failed` · parametrization
+## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
+`tests/unit/test_grouping.py:71::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
 - **given** three «Case» records of one «Parametrized scenario»
-- **when** the «grouping» pass merges them
+- **when** the «grouping» pass collapses them
 - **then** one scenario remains and any failed «Case» fails it
 
 ## ✓ «Term» ids are derived as URL-safe slugs · 8 cases
@@ -1477,7 +1477,7 @@
 | ### | ✓ |
 
 ## ✓ A cross-phase «step» cannot open inside a «when_then» body · 2 cases
-`tests/unit/capture/test_step_descriptor.py:354::test_when_then_rejects_cross_phase_nested_step` · validation
+`tests/unit/capture/test_step_descriptor.py:355::test_when_then_rejects_cross_phase_nested_step` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a given or then opens inside the «when_then» body
@@ -1490,7 +1490,7 @@
 | then | ✓ |
 
 ## ✓ A Template accepts bare identifiers only · 3 cases
-`tests/unit/capture/test_template.py:106::test_template_non_identifier_raises_pytest_given_error` · step-text, validation
+`tests/unit/capture/test_template.py:112::test_template_non_identifier_raises_pytest_given_error` · step-text, validation
 
 - **given** the placeholder {text}
 - **when** a «Templatize» template is built from it
