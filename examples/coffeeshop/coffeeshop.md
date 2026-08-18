@@ -44,7 +44,7 @@
 - **then** the machine has 9 coffees left
 
 ## ✓ Helper functions can record their own steps
-`examples/coffeeshop/test_coffeeshop.py:121::test_buy_with_validation` · billing
+`examples/coffeeshop/test_coffeeshop.py:136::test_buy_with_validation` · billing
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -62,7 +62,7 @@
       ```
 
 ## ✓ Top-level `given` block and deeply nested steps
-`examples/coffeeshop/test_coffeeshop.py:134::test_complex_order` · billing
+`examples/coffeeshop/test_coffeeshop.py:149::test_complex_order` · billing
 
 - **given** a coffee machine
 - **given** a loyalty card with 5 points
@@ -91,7 +91,7 @@
     ```
 
 ## ✓ An expected error, narrated as when + then (when_then)
-`examples/coffeeshop/test_coffeeshop.py:168::test_sold_out_is_rejected` · billing, validation
+`examples/coffeeshop/test_coffeeshop.py:183::test_sold_out_is_rejected` · billing, validation
 
 - **given** a coffee machine
 - **given** a machine that has sold its last coffee
@@ -99,7 +99,7 @@
 - **then** the machine reports it is sold out
 
 ## ✓ Many tags (the report collapses them behind a +N pill)
-`examples/coffeeshop/test_coffeeshop.py:185::test_discounted_purchase` · billing, loyalty, discounts, happy-path, regression
+`examples/coffeeshop/test_coffeeshop.py:200::test_discounted_purchase` · billing, loyalty, discounts, happy-path, regression
 
 - **given** a coffee machine
 - **given** a loyalty card good for a $1 discount
@@ -108,13 +108,13 @@
 - **then** a coffee is dispensed
 
 ## ✗ Failure rendering (intentionally failing)
-`examples/coffeeshop/test_coffeeshop.py:201::test_failing`
+`examples/coffeeshop/test_coffeeshop.py:216::test_failing`
 
 - **given** a coffee machine
 - **then** the machine has 20 coffees
 
 ## ⤼ Skipped scenario rendering · skipped
-`examples/coffeeshop/test_coffeeshop.py:207::test_skipped` — reason: demonstrates skipped status
+`examples/coffeeshop/test_coffeeshop.py:222::test_skipped` — reason: demonstrates skipped status
 
 
 ## ✓ Parametrized test (renders as a parameter table) · 3 cases
@@ -155,8 +155,34 @@
 | 200 | ✓ |
 | 300 | ✓ |
 
+## ✓ Brew a {flavor} coffee (per-case columns) · 2 cases
+`examples/coffeeshop/test_coffeeshop.py:104::test_flavor_columns` · billing
+
+- **given** a coffee machine
+- **given** the machine is primed for {flavor}
+  - 📎 brew log — *see case table*
+- **when** I brew a {flavor} coffee
+- **then** the drink costs {price} euros
+
+| flavor | brew log | price | |
+|---|---|---|---|
+| vanilla | brew log | 2 | ✓ |
+| mocha | brew log | 3 | ✓ |
+
+- **vanilla** — brew log:
+  ```
+  priming the vanilla line
+  heating to 93C
+  ```
+
+- **mocha** — brew log:
+  ```
+  priming the mocha line
+  heating to 93C
+  ```
+
 ## ⤼ All cases skipped · skipped
-`examples/coffeeshop/test_coffeeshop.py:214::test_parametrized_all_skipped`
+`examples/coffeeshop/test_coffeeshop.py:229::test_parametrized_all_skipped`
 
 
 | n | |

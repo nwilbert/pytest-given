@@ -2,7 +2,7 @@
 
 The rule: the grouped step tree shows only what every case shares; anything that
 varies becomes a column. See
-docs/specs/proposed/2026-08-14-parametrized-case-columns-design.md.
+docs/specs/2026-08-14-parametrized-case-columns-design.md.
 """
 
 from dataclasses import dataclass, field, replace

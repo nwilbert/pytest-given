@@ -584,7 +584,7 @@ lights up is the column holding every case's payload. `expandedAttachments` stay
 real `Attachment`s: the ones inline on a step because they were byte-identical everywhere, and
 the ones in case cells.
 
-The [row-hover value preview](../2026-06-28-row-hover-value-preview-design.md) is live, and this
+The [row-hover value preview](2026-06-28-row-hover-value-preview-design.md) is live, and this
 design silently extends it to two new column kinds. Three things need care:
 
 - **`data-param` carries the column `id`, not its name** (see

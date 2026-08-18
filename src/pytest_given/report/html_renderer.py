@@ -10,6 +10,7 @@ from ..model import (
     ActivityPart,
     ActivityTermRef,
     ActivityWord,
+    AttachmentRef,
     Glossary,
     Narration,
     NarrationLiteral,
@@ -102,6 +103,9 @@ def render_html(
         autoescape=True,
     )
     env.globals['zip'] = zip
+    # The step-tree macro branches on this: an AttachmentRef has no content to
+    # expand, only a column to point at.
+    env.tests['attachment_ref'] = lambda value: isinstance(value, AttachmentRef)
 
     param_color_map = _build_param_color_map(report.scenarios)
 

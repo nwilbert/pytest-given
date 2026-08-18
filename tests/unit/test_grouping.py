@@ -417,6 +417,45 @@ def test_a_constant_str_narration_does_not_raise() -> None:
     )
 
 
+def test_rule_one_checks_every_comparable_case_not_just_an_end_one() -> None:
+    """Rule 1 sweeps `comparable`, and a two-case fixture cannot tell "checks
+    every case" from "checks the last one". Here only the *middle* case renders
+    differently: sweeping an end case alone finds nothing and the group ships
+    the baseline's text as if it spoke for all three."""
+    scenarios, info = _three_case_group(
+        [Step(phase='when', narration=Narration(text='the machine brews 200 ml'))],
+        [Step(phase='when', narration=Narration(text='the machine brews 350 ml'))],
+        [Step(phase='when', narration=Narration(text='the machine brews 200 ml'))],
+    )
+    with pytest.raises(PytestGivenError) as excinfo:
+        group_parametrized(scenarios, info)
+    assert 'records no parts' in str(excinfo.value)
+
+
+def test_rule_one_reads_the_walked_step_in_a_nested_position() -> None:
+    """Rule 1 looks each case's step up by path, which must be the path being
+    walked and not a fixed top-level one. The parent here is constant *and*
+    reads exactly like the child's baseline text, so reading `(0,)` for the
+    child compares it against that constant parent, finds them equal, and lets
+    the varying child text ship as the baseline's."""
+
+    def steps(child_text: str) -> list[Step]:
+        return [
+            Step(
+                phase='given',
+                narration=Narration(text='the machine brews 200 ml'),
+                children=[Step(phase='when', narration=Narration(text=child_text))],
+            ),
+        ]
+
+    scenarios, info = _two_case_group(
+        steps('the machine brews 200 ml'), steps('the machine brews 350 ml')
+    )
+    with pytest.raises(PytestGivenError) as excinfo:
+        group_parametrized(scenarios, info)
+    assert 'records no parts' in str(excinfo.value)
+
+
 def test_a_structurally_divergent_case_raises_nothing() -> None:
     """A shifted tree lining a `when` up against a `given` gets blank cells and
     the existing lint finding, not rule 1."""
@@ -699,6 +738,33 @@ def test_derived_column_ids_are_assigned_pre_order_across_nesting() -> None:
     assert isinstance(parent_part, NarrationPlaceholder)
     assert isinstance(child_part, NarrationPlaceholder)
     assert (parent_part.column_id, child_part.column_id) == ('derived:0', 'derived:1')
+
+
+def test_a_nested_steps_varying_value_reads_the_walked_step() -> None:
+    """The derived comparison looks each case's step up by path too. The parent
+    here interpolates a *constant* value at the same part index as the child's
+    varying one, so reading `(0,)` instead of `(0, 0)` compares the child
+    against the parent's constant: no column, and the child's differing value
+    ships as the baseline's."""
+
+    def steps(child_rendered: str) -> list[Step]:
+        parent = _value_step('9.0', expression='fee')
+        child = _value_step(child_rendered, expression='price')
+        return [dataclasses.replace(parent, children=[child])]
+
+    scenarios, info = _two_case_group(steps('2.0'), steps('3.5'))
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [(c.id, c.name) for c in grouped.parameters.columns] == [
+        ('cup_size', 'cup_size'),
+        ('derived:0', 'price'),
+    ]
+    assert [c.values[1] for c in grouped.parameters.cases] == ['2.0', '3.5']
+    # The parent's own interpolation is constant, so it stays inline.
+    assert grouped.steps[0].narration.text == 'the drink costs 9.0 euros'
+    assert grouped.steps[0].children[0].narration.text == (
+        'the drink costs {price} euros'
+    )
 
 
 def test_a_skipped_case_gets_blank_derived_cells() -> None:

@@ -57,7 +57,7 @@ def _scenario_md(scenario: Scenario) -> str:
 def _source_md(scenario: Scenario) -> str:
     """The subtitle source pointer: `relpath:line::test_name`.
 
-    The parametrize suffix (`[case-id]`) is dropped — the merged scenario
+    The parametrize suffix (`[case-id]`) is dropped — the grouped scenario
     narrates every case, so the representative case id is noise. When a
     SourceLocation is present its `line` is spliced in after the file path
     (a terminal-clickable `file:line`); the test-name segment comes from the

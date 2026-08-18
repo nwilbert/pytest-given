@@ -268,11 +268,14 @@ function reportApp() {
       const scope = rowEl?.closest('.scenario');
       if (!scope) return;
       const values = {};
-      rowEl.querySelectorAll('td[data-param]').forEach(td => {
-        values[td.dataset.param] = td.textContent.trim();
+      // `data-subst` rather than `data-param`: the highlight keys on
+      // `data-param`, which attachment cells and tree badges also carry, and
+      // writing textContent into a badge would destroy its inline SVG.
+      rowEl.querySelectorAll('td[data-subst]').forEach(td => {
+        values[td.dataset.subst] = td.textContent.trim();
       });
-      scope.querySelectorAll('span[data-param]').forEach(span => {
-        const val = values[span.dataset.param];
+      scope.querySelectorAll('span[data-subst]').forEach(span => {
+        const val = values[span.dataset.subst];
         if (val === undefined) return;
         // Stash the original {token} once so re-entry stays idempotent.
         if (span.dataset.token === undefined) span.dataset.token = span.textContent;

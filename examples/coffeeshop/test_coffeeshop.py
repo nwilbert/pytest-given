@@ -101,6 +101,21 @@ def test_brew(machine, cup_size):
         assert machine['coffees'] < 10
 
 
+@scenario(
+    Template('Brew a {flavor} coffee (per-case columns)'),
+    tags=['billing'],
+)
+@pytest.mark.parametrize('flavor', ['vanilla', 'mocha'])
+def test_flavor_columns(machine, flavor):
+    with given(t'the machine is primed for {flavor}'):
+        attach('brew log', f'priming the {flavor} line\nheating to 93C\n')
+    with when(t'I brew a {flavor} coffee'):
+        price = machine['price'] + (1 if flavor == 'mocha' else 0)
+        machine['coffees'] -= 1
+    with then(t'the drink costs {price} euros'):
+        assert price >= machine['price']
+
+
 @when(Template('the coin is validated for ${amount}'))
 def validate_coin_step(machine, amount):
     return amount >= machine['price']
