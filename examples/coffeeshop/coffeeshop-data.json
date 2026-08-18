@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-18T15:31:47.416986+00:00",
+    "timestamp": "2026-08-18T21:10:46.782541+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "4ed35fab4f7c978bca7500ae32553dbdbe1f2d09"
+    "commit_sha": "a0bca854c447ef6e5616722d9142a4fe444dca05"
   },
   "scenarios": [
     {
@@ -449,7 +449,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 136
+        "line": 151
       },
       "story_id": null,
       "activity_ids": []
@@ -645,7 +645,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 149
+        "line": 164
       },
       "story_id": null,
       "activity_ids": []
@@ -722,7 +722,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 183
+        "line": 198
       },
       "story_id": null,
       "activity_ids": []
@@ -815,7 +815,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 200
+        "line": 215
       },
       "story_id": null,
       "activity_ids": []
@@ -829,7 +829,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 57,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -955,7 +955,7 @@
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 219,
+            "lineno": 234,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
             "is_internal": false
@@ -966,7 +966,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 216
+        "line": 231
       },
       "story_id": null,
       "activity_ids": []
@@ -987,7 +987,7 @@
       "skip_reason": "demonstrates skipped status",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 222
+        "line": 237
       },
       "story_id": null,
       "activity_ids": []
@@ -1492,7 +1492,7 @@
               "vanilla",
               {
                 "label": "brew log",
-                "content": "priming the vanilla line\nheating to 93C\n",
+                "content": "00:00  purge vanilla line, 40 ml at 92.8C\n00:04  dose 18.5 g, grind 12, hopper: vanilla\n00:09  pre-infuse at 3.0 bar for 4.0 s\n00:13  ramp to 9.0 bar\n00:27  stop at 36.0 g yield, ratio 1:1.95\n00:31  purge group head, vanilla residue cleared",
                 "content_type": "text"
               },
               "2"
@@ -1506,7 +1506,7 @@
               "mocha",
               {
                 "label": "brew log",
-                "content": "priming the mocha line\nheating to 93C\n",
+                "content": "00:00  purge mocha line, 40 ml at 92.8C\n00:04  dose 18.5 g, grind 12, hopper: mocha\n00:09  pre-infuse at 3.0 bar for 4.0 s\n00:13  ramp to 9.0 bar\n00:27  stop at 36.0 g yield, ratio 1:1.95\n00:31  purge group head, mocha residue cleared",
                 "content_type": "text"
               },
               "3"
@@ -1568,7 +1568,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 229
+        "line": 244
       },
       "story_id": null,
       "activity_ids": []

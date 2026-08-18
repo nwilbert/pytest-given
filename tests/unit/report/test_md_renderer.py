@@ -640,3 +640,23 @@ def test_a_divergent_case_says_why_its_cells_are_blank() -> None:
     assert '| 200 | 2.0 | ✓ |' in md
     assert '| 350 |  | ✓ |' in md
     assert '- **350** — steps differ from the other cases' in md
+
+
+def test_a_long_single_line_attachment_cell_fences_below_the_table() -> None:
+    """A payload with no newline still wrecks the table when it is long — a
+    300-character cell pushes every other column off the terminal. Length is
+    the same problem as a newline, so it takes the same route: the column name
+    in the cell, the payload fenced below."""
+    payload = '{"id": "ch_3PmZ", "amount": 250, ' + '"x": "y", ' * 30 + '"end": true}'
+    md = render_md(_report_with(_attachment_table(short=payload, long=None)))
+    assert '| 350 | machine state | ✓ |' in md
+    assert f'- **350** — machine state:\n  ```\n  {payload}\n  ```' in md
+
+
+def test_an_attachment_cell_at_the_inline_limit_still_sits_inline() -> None:
+    """The bound is on the payload itself, so a cell that fits stays inline —
+    pinning the boundary keeps the check from drifting into 'fence everything'.
+    """
+    payload = 'x' * 72
+    md = render_md(_report_with(_attachment_table(short=payload, long=None)))
+    assert f'| 350 | `{payload}` | ✓ |' in md

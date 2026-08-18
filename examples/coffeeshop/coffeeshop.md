@@ -44,7 +44,7 @@
 - **then** the machine has 9 coffees left
 
 ## ✓ Helper functions can record their own steps
-`examples/coffeeshop/test_coffeeshop.py:136::test_buy_with_validation` · billing
+`examples/coffeeshop/test_coffeeshop.py:151::test_buy_with_validation` · billing
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -62,7 +62,7 @@
       ```
 
 ## ✓ Top-level `given` block and deeply nested steps
-`examples/coffeeshop/test_coffeeshop.py:149::test_complex_order` · billing
+`examples/coffeeshop/test_coffeeshop.py:164::test_complex_order` · billing
 
 - **given** a coffee machine
 - **given** a loyalty card with 5 points
@@ -91,7 +91,7 @@
     ```
 
 ## ✓ An expected error, narrated as when + then (when_then)
-`examples/coffeeshop/test_coffeeshop.py:183::test_sold_out_is_rejected` · billing, validation
+`examples/coffeeshop/test_coffeeshop.py:198::test_sold_out_is_rejected` · billing, validation
 
 - **given** a coffee machine
 - **given** a machine that has sold its last coffee
@@ -99,7 +99,7 @@
 - **then** the machine reports it is sold out
 
 ## ✓ Many tags (the report collapses them behind a +N pill)
-`examples/coffeeshop/test_coffeeshop.py:200::test_discounted_purchase` · billing, loyalty, discounts, happy-path, regression
+`examples/coffeeshop/test_coffeeshop.py:215::test_discounted_purchase` · billing, loyalty, discounts, happy-path, regression
 
 - **given** a coffee machine
 - **given** a loyalty card good for a $1 discount
@@ -108,13 +108,13 @@
 - **then** a coffee is dispensed
 
 ## ✗ Failure rendering (intentionally failing)
-`examples/coffeeshop/test_coffeeshop.py:216::test_failing`
+`examples/coffeeshop/test_coffeeshop.py:231::test_failing`
 
 - **given** a coffee machine
 - **then** the machine has 20 coffees
 
 ## ⤼ Skipped scenario rendering · skipped
-`examples/coffeeshop/test_coffeeshop.py:222::test_skipped` — reason: demonstrates skipped status
+`examples/coffeeshop/test_coffeeshop.py:237::test_skipped` — reason: demonstrates skipped status
 
 
 ## ✓ Parametrized test (renders as a parameter table) · 3 cases
@@ -171,18 +171,26 @@
 
 - **vanilla** — brew log:
   ```
-  priming the vanilla line
-  heating to 93C
+  00:00  purge vanilla line, 40 ml at 92.8C
+  00:04  dose 18.5 g, grind 12, hopper: vanilla
+  00:09  pre-infuse at 3.0 bar for 4.0 s
+  00:13  ramp to 9.0 bar
+  00:27  stop at 36.0 g yield, ratio 1:1.95
+  00:31  purge group head, vanilla residue cleared
   ```
 
 - **mocha** — brew log:
   ```
-  priming the mocha line
-  heating to 93C
+  00:00  purge mocha line, 40 ml at 92.8C
+  00:04  dose 18.5 g, grind 12, hopper: mocha
+  00:09  pre-infuse at 3.0 bar for 4.0 s
+  00:13  ramp to 9.0 bar
+  00:27  stop at 36.0 g yield, ratio 1:1.95
+  00:31  purge group head, mocha residue cleared
   ```
 
 ## ⤼ All cases skipped · skipped
-`examples/coffeeshop/test_coffeeshop.py:229::test_parametrized_all_skipped`
+`examples/coffeeshop/test_coffeeshop.py:244::test_parametrized_all_skipped`
 
 
 | n | |

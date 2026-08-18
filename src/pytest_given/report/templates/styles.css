@@ -420,6 +420,7 @@ body {
   margin-top: var(--space-sm);
   margin-left: var(--space-xl);
 }
+.param-table--full { width: calc(100% - var(--space-xl)); }
 .param-table th {
   text-align: left;
   padding: var(--space-sm) var(--space-md);
@@ -559,6 +560,21 @@ span.param-highlight {
   margin-right: 4px;
   color: inherit;
 }
+.attachment-panel-row:hover { background: none; }
+.attachment-panel { padding: 0 !important; border: none !important; }
+/* The panel spans every column, so its payload would otherwise drive the whole
+   table's preferred width — a wide attachment stretching the table even while
+   collapsed. Zero intrinsic width plus `min-width: 100%` lets it fill the row
+   it is given and scroll past it, without ever widening the table. */
+.attachment-panel .attachment-content {
+  width: 0;
+  min-width: 100%;
+}
+.attachment-panel-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  padding: var(--space-xs) var(--space-md) 0;
+}
 .attachment-content {
   background: var(--bg-page);
   padding: var(--space-sm) var(--space-md);
@@ -566,6 +582,7 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
   white-space: pre-wrap;
+  overflow-x: auto;
   color: var(--text-secondary);
   margin-top: var(--space-xs);
 }

@@ -427,6 +427,7 @@ body {
   margin-top: var(--space-sm);
   margin-left: var(--space-xl);
 }
+.param-table--full { width: calc(100% - var(--space-xl)); }
 .param-table th {
   text-align: left;
   padding: var(--space-sm) var(--space-md);
@@ -566,6 +567,21 @@ span.param-highlight {
   margin-right: 4px;
   color: inherit;
 }
+.attachment-panel-row:hover { background: none; }
+.attachment-panel { padding: 0 !important; border: none !important; }
+/* The panel spans every column, so its payload would otherwise drive the whole
+   table's preferred width — a wide attachment stretching the table even while
+   collapsed. Zero intrinsic width plus `min-width: 100%` lets it fill the row
+   it is given and scroll past it, without ever widening the table. */
+.attachment-panel .attachment-content {
+  width: 0;
+  min-width: 100%;
+}
+.attachment-panel-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  padding: var(--space-xs) var(--space-md) 0;
+}
 .attachment-content {
   background: var(--bg-page);
   padding: var(--space-sm) var(--space-md);
@@ -573,6 +589,7 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
   white-space: pre-wrap;
+  overflow-x: auto;
   color: var(--text-secondary);
   margin-top: var(--space-xs);
 }
@@ -1153,7 +1170,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1210,7 +1227,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1254,7 +1271,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1300,7 +1317,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
       
     </div>
     </div>
@@ -1368,7 +1385,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L136">examples/coffeeshop/test_coffeeshop.py:136</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L151">examples/coffeeshop/test_coffeeshop.py:151</a></div>
       
     </div>
     </div>
@@ -1457,7 +1474,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L149">examples/coffeeshop/test_coffeeshop.py:149</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L164">examples/coffeeshop/test_coffeeshop.py:164</a></div>
       
     </div>
     </div>
@@ -1507,7 +1524,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L183">examples/coffeeshop/test_coffeeshop.py:183</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L198">examples/coffeeshop/test_coffeeshop.py:198</a></div>
       
     </div>
     </div>
@@ -1567,7 +1584,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L200">examples/coffeeshop/test_coffeeshop.py:200</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
@@ -1661,13 +1678,13 @@ Total:        $2.00</pre></div>
               <pre class="error-frame-code">    return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame">
-              <div class="error-frame-loc">examples/coffeeshop/test_coffeeshop.py:219: in test_failing</div>
+              <div class="error-frame-loc">examples/coffeeshop/test_coffeeshop.py:234: in test_failing</div>
               <pre class="error-frame-code">    assert machine[&#39;coffees&#39;] == 20</pre>
             </div></div><pre class="error-tail">E   assert 10 == 20</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L216">examples/coffeeshop/test_coffeeshop.py:216</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L231">examples/coffeeshop/test_coffeeshop.py:231</a></div>
       
     </div>
     </div>
@@ -1710,7 +1727,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L222">examples/coffeeshop/test_coffeeshop.py:222</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L237">examples/coffeeshop/test_coffeeshop.py:237</a></div>
       
     </div>
     </div>
@@ -1792,6 +1809,10 @@ Total:        $2.00</pre></div>
             </td>
           </tr>
           
+          
+          
+          
+          
           <tr class=""
               @mouseenter="setHoverRow($event.currentTarget)"
               @mouseleave="clearHoverRow($event.currentTarget)">
@@ -1815,6 +1836,10 @@ Total:        $2.00</pre></div>
               <span class="dot-passed">✓</span>
             </td>
           </tr>
+          
+          
+          
+          
           
           <tr class=""
               @mouseenter="setHoverRow($event.currentTarget)"
@@ -1841,6 +1866,10 @@ Total:        $2.00</pre></div>
           </tr>
           
           
+          
+          
+          
+          
         </tbody>
       </table>
       
@@ -1848,7 +1877,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -1921,6 +1950,8 @@ Total:        $2.00</pre></div>
             </td>
           </tr>
           
+          
+          
           <tr class=""
               @mouseenter="setHoverRow($event.currentTarget)"
               @mouseleave="clearHoverRow($event.currentTarget)">
@@ -1939,6 +1970,8 @@ Total:        $2.00</pre></div>
           </tr>
           
           
+          
+          
         </tbody>
       </table>
       
@@ -1946,7 +1979,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -2017,6 +2050,8 @@ Total:        $2.00</pre></div>
             </td>
           </tr>
           
+          
+          
           <tr class=""
               @mouseenter="setHoverRow($event.currentTarget)"
               @mouseleave="clearHoverRow($event.currentTarget)">
@@ -2035,6 +2070,8 @@ Total:        $2.00</pre></div>
           </tr>
           
           
+          
+          
         </tbody>
       </table>
       
@@ -2042,7 +2079,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
       
     </div>
     </div>
@@ -2090,7 +2127,7 @@ Total:        $2.00</pre></div>
           </div></div>
 
       
-      <table class="param-table">
+      <table class="param-table param-table--full">
         <thead>
           <tr>
             
@@ -2127,15 +2164,7 @@ Total:        $2.00</pre></div>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">
               
               
-              
               <span class="attachment-badge" @click="toggleAttachment('s13_case0_col1')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>brew log</span>
-    <div class="attachment-expand" :class="{ expanded: expandedAttachments['s13_case0_col1'] }">
-      <div class="attachment-expand-inner">
-        <div class="attachment-content"><pre>priming the vanilla line
-heating to 93C
-</pre></div>
-      </div>
-    </div>
               
             </td>
             
@@ -2152,6 +2181,29 @@ heating to 93C
               <span class="dot-passed">✓</span>
             </td>
           </tr>
+          
+          
+          
+          
+          <tr class="attachment-panel-row">
+            <td class="attachment-panel" colspan="4">
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['s13_case0_col1'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-panel-label">brew log</div>
+                  <div class="attachment-content"><pre>00:00  purge vanilla line, 40 ml at 92.8C
+00:04  dose 18.5 g, grind 12, hopper: vanilla
+00:09  pre-infuse at 3.0 bar for 4.0 s
+00:13  ramp to 9.0 bar
+00:27  stop at 36.0 g yield, ratio 1:1.95
+00:31  purge group head, vanilla residue cleared</pre></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          
+          
+          
           
           <tr class=""
               @mouseenter="setHoverRow($event.currentTarget)"
@@ -2170,15 +2222,7 @@ heating to 93C
                 @mouseleave="setHoverParam(null, $event.currentTarget)">
               
               
-              
               <span class="attachment-badge" @click="toggleAttachment('s13_case1_col1')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>brew log</span>
-    <div class="attachment-expand" :class="{ expanded: expandedAttachments['s13_case1_col1'] }">
-      <div class="attachment-expand-inner">
-        <div class="attachment-content"><pre>priming the mocha line
-heating to 93C
-</pre></div>
-      </div>
-    </div>
               
             </td>
             
@@ -2197,6 +2241,29 @@ heating to 93C
           </tr>
           
           
+          
+          
+          <tr class="attachment-panel-row">
+            <td class="attachment-panel" colspan="4">
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['s13_case1_col1'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-panel-label">brew log</div>
+                  <div class="attachment-content"><pre>00:00  purge mocha line, 40 ml at 92.8C
+00:04  dose 18.5 g, grind 12, hopper: mocha
+00:09  pre-infuse at 3.0 bar for 4.0 s
+00:13  ramp to 9.0 bar
+00:27  stop at 36.0 g yield, ratio 1:1.95
+00:31  purge group head, mocha residue cleared</pre></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          
+          
+          
+          
+          
         </tbody>
       </table>
       
@@ -2204,7 +2271,7 @@ heating to 93C
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L104">examples/coffeeshop/test_coffeeshop.py:104</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L104">examples/coffeeshop/test_coffeeshop.py:104</a></div>
       
     </div>
     </div>
@@ -2267,6 +2334,8 @@ heating to 93C
             </td>
           </tr>
           
+          
+          
           <tr class=""
               @mouseenter="setHoverRow($event.currentTarget)"
               @mouseleave="clearHoverRow($event.currentTarget)">
@@ -2285,6 +2354,8 @@ heating to 93C
           </tr>
           
           
+          
+          
         </tbody>
       </table>
       
@@ -2292,7 +2363,7 @@ heating to 93C
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e5ef3dfbd5c6678535504f85c189a403217151d8/examples/coffeeshop/test_coffeeshop.py#L229">examples/coffeeshop/test_coffeeshop.py:229</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
       
     </div>
     </div>
@@ -2323,10 +2394,10 @@ heating to 93C
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-18T16:02:20.065704+00:00",
+    "timestamp": "2026-08-18T21:10:46.782541+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "e5ef3dfbd5c6678535504f85c189a403217151d8"
+    "commit_sha": "a0bca854c447ef6e5616722d9142a4fe444dca05"
   },
   "scenarios": [
     {
@@ -2771,7 +2842,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 136
+        "line": 151
       },
       "story_id": null,
       "activity_ids": []
@@ -2967,7 +3038,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 149
+        "line": 164
       },
       "story_id": null,
       "activity_ids": []
@@ -3044,7 +3115,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 183
+        "line": 198
       },
       "story_id": null,
       "activity_ids": []
@@ -3137,7 +3208,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 200
+        "line": 215
       },
       "story_id": null,
       "activity_ids": []
@@ -3277,7 +3348,7 @@ window.__REPORT_DATA__ = {
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 219,
+            "lineno": 234,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
             "is_internal": false
@@ -3288,7 +3359,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 216
+        "line": 231
       },
       "story_id": null,
       "activity_ids": []
@@ -3309,7 +3380,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": "demonstrates skipped status",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 222
+        "line": 237
       },
       "story_id": null,
       "activity_ids": []
@@ -3814,7 +3885,7 @@ window.__REPORT_DATA__ = {
               "vanilla",
               {
                 "label": "brew log",
-                "content": "priming the vanilla line\nheating to 93C\n",
+                "content": "00:00  purge vanilla line, 40 ml at 92.8C\n00:04  dose 18.5 g, grind 12, hopper: vanilla\n00:09  pre-infuse at 3.0 bar for 4.0 s\n00:13  ramp to 9.0 bar\n00:27  stop at 36.0 g yield, ratio 1:1.95\n00:31  purge group head, vanilla residue cleared",
                 "content_type": "text"
               },
               "2"
@@ -3828,7 +3899,7 @@ window.__REPORT_DATA__ = {
               "mocha",
               {
                 "label": "brew log",
-                "content": "priming the mocha line\nheating to 93C\n",
+                "content": "00:00  purge mocha line, 40 ml at 92.8C\n00:04  dose 18.5 g, grind 12, hopper: mocha\n00:09  pre-infuse at 3.0 bar for 4.0 s\n00:13  ramp to 9.0 bar\n00:27  stop at 36.0 g yield, ratio 1:1.95\n00:31  purge group head, mocha residue cleared",
                 "content_type": "text"
               },
               "3"
@@ -3890,7 +3961,7 @@ window.__REPORT_DATA__ = {
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 229
+        "line": 244
       },
       "story_id": null,
       "activity_ids": []
