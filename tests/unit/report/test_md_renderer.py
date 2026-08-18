@@ -1,6 +1,7 @@
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import (
     Attachment,
+    AttachmentRef,
     ErrorInfo,
     Metadata,
     Narration,
@@ -463,3 +464,152 @@ def test_skipped_scenario_shows_reason() -> None:
     with then('the heading is marked skipped and the reason follows the node id'):
         assert '## ⤼ Later · skipped' in md
         assert '`tests/t.py::test_skip` — reason: needs fixture data' in md
+
+
+def _attachment_table(*, short: str | None, long: str | None) -> ParameterTable:
+    """A one-case table with one attachment cell.
+
+    The column's name and the attachment's label are deliberately *different*:
+    with both called `state`, a `'| state |'` needle is satisfied by the header
+    row, and the cell's label fallback ships unpinned.
+    """
+    content = short if short is not None else long
+    assert content is not None
+    return ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='attachment:0', name='machine state', kind='attachment'),
+        ],
+        cases=[
+            ParameterCase(
+                values=[350, Attachment(label='state', content=content)],
+                status='passed',
+            ),
+        ],
+    )
+
+
+def _report_with(table: ParameterTable) -> ReportData:
+    scn = Scenario(
+        id='tests/t.py::test_att',
+        narration=Narration(text='Att'),
+        module='tests/t.py',
+        steps=[Step(phase='when', narration=Narration(text='act'))],
+        parameters=table,
+    )
+    return _report(scn)
+
+
+def _report_with_step(step: Step) -> ReportData:
+    scn = Scenario(
+        id='tests/t.py::test_att',
+        narration=Narration(text='Att'),
+        module='tests/t.py',
+        steps=[step],
+    )
+    return _report(scn)
+
+
+def test_a_short_attachment_cell_sits_inline_in_backticks() -> None:
+    md = render_md(_report_with(_attachment_table(short='ok', long=None)))
+    assert '| `ok` |' in md
+    # …and is not *also* fenced below the table: inline and fenced are
+    # alternatives, not both.
+    assert '— state:' not in md
+
+
+def test_a_multiline_attachment_cell_shows_the_column_name_and_fences_below() -> None:
+    """Cell and block both name the *column*, not the attachment label: two
+    columns can share a label, and only the column name is disambiguated."""
+    md = render_md(
+        _report_with(_attachment_table(short=None, long='{"ml": 350,\n "full": true}'))
+    )
+    assert '| 350 | machine state | ✓ |' in md
+    assert '{"ml": 350,' in md
+    # The fenced block belongs *after* the table, separated from it by a blank
+    # line: emitted before the rows it leaves a header-only table followed by
+    # loose text, and without the blank line a GFM parser keeps the block
+    # header inside the table.
+    assert '| 350 | machine state | ✓ |\n\n- **350** — machine state:\n' in md
+
+
+def test_a_backtick_bearing_attachment_cell_also_fences_below_the_table() -> None:
+    """`_fits_inline` rejects backticks as well as newlines, and the cell path
+    is a new caller of it — the multiline test above pins only one of its two
+    conditions."""
+    md = render_md(
+        _report_with(_attachment_table(short=None, long='use `attach` here'))
+    )
+    assert '| 350 | machine state | ✓ |' in md
+    assert '- **350** — machine state:' in md
+
+
+def test_two_columns_sharing_a_label_get_distinct_block_headers() -> None:
+    """Two occurrences of one attachment label make two columns, whose names
+    grouping has already disambiguated. Keying the fenced blocks on the label
+    would emit two identical `- **350** — log:` headers, leaving the reader no
+    way to tell which column each payload belongs to."""
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='attachment:0', name='log', kind='attachment'),
+            ParameterColumn(id='attachment:1', name='log #2', kind='attachment'),
+        ],
+        cases=[
+            ParameterCase(
+                values=[
+                    350,
+                    Attachment(label='log', content='first\nline'),
+                    Attachment(label='log', content='second\nline'),
+                ],
+                status='passed',
+            ),
+        ],
+    )
+    md = render_md(_report_with(table))
+    assert '| 350 | log | log #2 | ✓ |' in md
+    assert '- **350** — log:' in md
+    assert '- **350** — log #2:' in md
+
+
+def test_an_attachment_ref_renders_as_badge_and_label_alone() -> None:
+    step = Step(
+        phase='when',
+        narration=Narration(text='the machine brews'),
+        attachments=[
+            AttachmentRef(
+                label='machine state', content_type='json', column_id='attachment:0'
+            )
+        ],
+    )
+    md = render_md(_report_with_step(step))
+    assert '- 📎 machine state — *see case table*' in md
+
+
+def test_a_generated_column_with_no_value_for_a_case_renders_blank() -> None:
+    """`None` in a generated column means the case has no value for it and
+    renders blank — unlike a `param` column, where `None` is a real
+    parametrize value and renders verbatim."""
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='attachment:0', name='state', kind='attachment'),
+        ],
+        cases=[ParameterCase(values=[350, None], status='passed')],
+    )
+    md = render_md(_report_with(table))
+    assert '| 350 |  | ✓ |' in md
+
+
+def test_a_derived_column_cell_renders_through_the_ordinary_cell_path() -> None:
+    """A derived cell holds a plain value rather than an attachment, so it
+    renders verbatim — no backticks, no fenced block below the table."""
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='derived:0', name='price', kind='derived'),
+        ],
+        cases=[ParameterCase(values=[350, '3.5'], status='passed')],
+    )
+    md = render_md(_report_with(table))
+    assert '| 350 | 3.5 | ✓ |' in md

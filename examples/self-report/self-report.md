@@ -1301,7 +1301,7 @@
 - **then** «Parameter coloring» classes mark the grouped placeholder and the table headers
 
 ## ✓ A passed «scenario» renders as a checked heading with «step» bullets
-`tests/unit/report/test_md_renderer.py:42::test_passed_scenario_heading_and_steps` · happy-path
+`tests/unit/report/test_md_renderer.py:43::test_passed_scenario_heading_and_steps` · happy-path
 
 - **given** a «Report» holding a passed «Scenario» with three steps
   - 📎 Scenario record:
@@ -1372,28 +1372,28 @@
 - **then** the heading is checked and each «Step» is a phase bullet
 
 ## ✓ Nested «steps» indent under their parent
-`tests/unit/report/test_md_renderer.py:142::test_nested_steps_indent` · happy-path
+`tests/unit/report/test_md_renderer.py:143::test_nested_steps_indent` · happy-path
 
 - **given** a «Scenario» whose when «Step» has a nested child
 - **when** the Markdown «Report» is rendered
 - **then** the child bullet indents under its parent
 
 ## ✓ Structured «narration» renders «terms», values and placeholders
-`tests/unit/report/test_md_renderer.py:166::test_narration_parts_resolve_terms_and_values` · step-text
+`tests/unit/report/test_md_renderer.py:167::test_narration_parts_resolve_terms_and_values` · step-text
 
 - **given** a «Step» whose «Narration» carries a «Term ref», a value and a placeholder
 - **when** the Markdown «Report» is rendered
 - **then** the «Term ref» renders in guillemets, the value verbatim and the placeholder in braces
 
 ## ✓ A «parametrized scenario» renders its «parameter table»
-`tests/unit/report/test_md_renderer.py:221::test_parametrized_scenario_renders_table` · parametrization
+`tests/unit/report/test_md_renderer.py:222::test_parametrized_scenario_renders_table` · parametrization
 
 - **given** a «Parametrized scenario» with a two-«Case» «Parameter table»
 - **when** the Markdown «Report» is rendered
 - **then** the heading counts the cases and the «Parameter table» lists each row
 
 ## ✓ A failing «step» is marked with a minimal error digest
-`tests/unit/report/test_md_renderer.py:257::test_failing_step_is_marked_with_minimal_error` · happy-path
+`tests/unit/report/test_md_renderer.py:258::test_failing_step_is_marked_with_minimal_error` · happy-path
 
 - **given** a failed «Scenario» whose then «Step» carries a two-line error and an internal frame
   - 📎 Error record:
@@ -1424,21 +1424,21 @@
 - **then** only the first message line and the non-internal frame are quoted
 
 ## ✓ A multi-line «attachment» renders as a fenced block
-`tests/unit/report/test_md_renderer.py:329::test_multiline_attachment_renders_fenced_block` · happy-path
+`tests/unit/report/test_md_renderer.py:330::test_multiline_attachment_renders_fenced_block` · happy-path
 
 - **given** a «Step» carrying a multi-line «Attachment»
 - **when** the Markdown «Report» is rendered
 - **then** the «Attachment» content sits in an indented fence, not inline
 
 ## ✓ A skipped scenario shows its skip reason
-`tests/unit/report/test_md_renderer.py:450::test_skipped_scenario_shows_reason` · happy-path
+`tests/unit/report/test_md_renderer.py:451::test_skipped_scenario_shows_reason` · happy-path
 
 - **given** a skipped «Scenario» with a reason
 - **when** the Markdown «Report» is rendered
 - **then** the heading is marked skipped and the reason follows the node id
 
 ## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
-`tests/unit/test_grouping.py:71::test_group_parametrized_any_failed_groups_as_failed` · parametrization
+`tests/unit/test_grouping.py:73::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
 - **given** three «Case» records of one «Parametrized scenario»
 - **when** the «grouping» pass collapses them

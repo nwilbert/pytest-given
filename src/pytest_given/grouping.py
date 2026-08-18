@@ -11,6 +11,8 @@ from string import Formatter
 from .capture import try_term_ref
 from .lint import location_suffix
 from .model import (
+    Attachment,
+    AttachmentRef,
     CellValue,
     ColumnKind,
     Narration,
@@ -31,6 +33,7 @@ from .model import (
     RawParamValue,
     Scenario,
     Step,
+    StepAttachment,
     StepPath,
     TermId,
     case_suffix,
@@ -135,6 +138,14 @@ class _GroupContext:
     columns: list[ParameterColumn] = field(default_factory=list)
     cells: dict[str, dict[NodeId, CellValue | None]] = field(default_factory=dict)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
+    _taken_names: set[str] = field(default_factory=set)
+
+    def __post_init__(self) -> None:
+        # The parametrize columns are built inline in `_grouped_scenario`
+        # rather than through `new_column`, so their names are seeded here:
+        # disambiguation spans the whole table, not the generated columns
+        # alone.
+        self._taken_names.update(self.param_names)
 
     def new_column(self, kind: ColumnKind, name: str) -> str:
         """Add a column and return its id.
@@ -147,7 +158,9 @@ class _GroupContext:
         index = self._counts.get(kind, 0)
         self._counts[kind] = index + 1
         column_id = f'{kind}:{index}'
-        self.columns.append(ParameterColumn(id=column_id, name=name, kind=kind))
+        self.columns.append(
+            ParameterColumn(id=column_id, name=self._unique_name(name), kind=kind)
+        )
         self.cells[column_id] = {}
         return column_id
 
@@ -155,6 +168,28 @@ class _GroupContext:
         self, column_id: str, node_id: NodeId, value: CellValue | None
     ) -> None:
         self.cells[column_id][node_id] = value
+
+    def _unique_name(self, name: str) -> str:
+        """`name`, or `name #2`, `name #3`, … once it is already taken.
+
+        An id disambiguates two columns in the JSON, but a rendered table shows
+        only the name and a Markdown badge carries no id at all — so two
+        occurrences of one attachment label, or one expression promoted in two
+        steps, need distinct names as well. The first stays bare: a single
+        column is the overwhelmingly common case, and suffixing it would churn
+        every existing report.
+
+        The candidate is checked against the names already taken rather than
+        counted per name, because a label is arbitrary text and can itself read
+        like a suffix — `log`, `log #2`, `log` must still come out distinct.
+        """
+        candidate = name
+        suffix = 1
+        while candidate in self._taken_names:
+            suffix += 1
+            candidate = f'{name} #{suffix}'
+        self._taken_names.add(candidate)
+        return candidate
 
 
 def _baseline(group: list[Scenario]) -> Scenario:
@@ -310,10 +345,155 @@ def _templatize_steps(
             replace(
                 step,
                 narration=_templatize_step_narration(step, path, ctx),
+                attachments=_templatize_attachments(step, path, ctx),
                 children=_templatize_steps(step.children, path, ctx),
             )
         )
     return out
+
+
+def _templatize_attachments(
+    step: Step, path: StepPath, ctx: _GroupContext
+) -> list[StepAttachment]:
+    """Baseline attachments, with any whose payload varies promoted to a column.
+
+    Paired **by label** — rule 5 guarantees the label set is shared, making the
+    key total, and position does not survive a case attaching the same labels in
+    a different order. Same-label attachments pair by occurrence order.
+
+    A non-baseline case may attach a label *more* times than the baseline does
+    — rule 5 only checks the label *set*, so a differing count does not raise.
+    Once the baseline's own occurrences of a label are exhausted, any further
+    occurrence in another case gets a column-only promotion (baseline cell
+    blank, no badge — the baseline tree has no slot for an occurrence it never
+    recorded), appended right after that label's baseline occurrences so
+    column ids keep following the walk.
+    """
+    _check_attachment_labels(step, path, ctx)
+    baseline_counts: dict[str, int] = {}
+    for a in step.attachments:
+        baseline_counts[a.label] = baseline_counts.get(a.label, 0) + 1
+
+    out: list[StepAttachment] = []
+    seen: dict[str, int] = {}
+    for attachment in step.attachments:
+        assert isinstance(attachment, Attachment), 'a recorded tree holds no refs'
+        occurrence = seen.get(attachment.label, 0)
+        seen[attachment.label] = occurrence + 1
+        out.append(_promote_occurrence(attachment, occurrence, path, ctx))
+        if occurrence + 1 == baseline_counts[attachment.label]:
+            _promote_extra_occurrences(
+                attachment.label, baseline_counts[attachment.label], path, ctx
+            )
+    return out
+
+
+def _check_attachment_labels(step: Step, path: StepPath, ctx: _GroupContext) -> None:
+    """Rule 5: a step whose set of attachment labels differs across cases.
+
+    A label names its payload; the payload is what varies, and the row already
+    says which case it belongs to. Content and content type are exempt by
+    design — varying those is what the `attachment` column is for. The
+    comparison is over the *distinct* labels, so a label attached a different
+    number of times does not raise.
+    """
+    labels = {a.label for a in step.attachments}
+    for case in ctx.comparable:
+        other_labels = {a.label for a in ctx.indexed[case.id][path].attachments}
+        missing = sorted(labels ^ other_labels)
+        if not missing:
+            continue
+        raise _grouping_error(
+            ctx.anchor,
+            f'attachment label {missing[0]!r} in {_test_name(ctx.anchor)!r} is '
+            f'attached in some parametrize cases but not others — a label names '
+            f'the payload and must read the same in every case. Use a constant '
+            f'label and let the content vary: attach("<constant>", …).',
+        )
+
+
+def _promote_occurrence(
+    attachment: Attachment, occurrence: int, path: StepPath, ctx: _GroupContext
+) -> StepAttachment:
+    """The baseline's `occurrence`-th attachment of `attachment.label`: stays
+    inline when every comparable case's occurrence matches it byte for byte,
+    otherwise promoted to a column with a content-less badge left in its place.
+    """
+    others = {
+        case.id: _occurrence(ctx.indexed[case.id][path], attachment.label, occurrence)
+        for case in ctx.comparable
+    }
+    if all(
+        other is not None
+        and (other.content, other.content_type)
+        == (attachment.content, attachment.content_type)
+        for other in others.values()
+    ):
+        return attachment
+    column_id = ctx.new_column('attachment', attachment.label)
+    for node_id, other in others.items():
+        ctx.set_cell(column_id, node_id, other)
+    return AttachmentRef(
+        label=attachment.label,
+        content_type=attachment.content_type,
+        column_id=column_id,
+    )
+
+
+def _promote_extra_occurrences(
+    label: str, baseline_count: int, path: StepPath, ctx: _GroupContext
+) -> None:
+    """Occurrences of `label` past the baseline's own count.
+
+    `max_count` is the greatest number of times any comparable case (including
+    the baseline) attaches `label`; each occurrence from `baseline_count` up to
+    it gets a column, with every case's occurrence in its own cell and the
+    baseline's left `None` — there is no baseline attachment for it, so nothing
+    is appended to the grouped step's attachments.
+
+    `max_count >= baseline_count` whenever `comparable` is non-empty, because
+    the baseline is itself a member of it — it passed, and trivially matches
+    its own structure signature. Without that the range could silently be
+    empty and the baseline's own occurrences would go missing.
+
+    `default=baseline_count` covers `comparable` being empty, which happens
+    exactly when no case passed: such a group still has a baseline with a
+    recorded tree, so this runs and a bare `max()` would raise `ValueError`.
+    The default's *value* is an equivalent mutant — `baseline_count >= 1`
+    always, so any default at or below it yields no columns — chosen to read
+    as "nothing beyond the baseline".
+    """
+    max_count = max(
+        (_label_count(ctx.indexed[case.id][path], label) for case in ctx.comparable),
+        default=baseline_count,
+    )
+    for occurrence in range(baseline_count, max_count):
+        column_id = ctx.new_column('attachment', label)
+        for case in ctx.comparable:
+            ctx.set_cell(
+                column_id,
+                case.id,
+                _occurrence(ctx.indexed[case.id][path], label, occurrence),
+            )
+
+
+def _label_count(step: Step, label: str) -> int:
+    """How many times `step` attaches `label`.
+
+    Every attachment of the label counts, ref or not: an `AttachmentRef` is
+    content-less but still an attachment of that label, so there is nothing to
+    filter out. (These are recorded trees, which hold no refs anyway.)
+    """
+    return sum(1 for a in step.attachments if a.label == label)
+
+
+def _occurrence(step: Step, label: str, index: int) -> Attachment | None:
+    """That case's `index`-th attachment carrying `label`, or None when the case
+    attached that label fewer times than `index` requires."""
+    matching = [
+        a for a in step.attachments if isinstance(a, Attachment) and a.label == label
+    ]
+    return matching[index] if index < len(matching) else None
 
 
 def _templatize_step_narration(
