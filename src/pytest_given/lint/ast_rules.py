@@ -9,8 +9,8 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..model import NarrationValue, NodeId, Scenario, SourceLocation, Step
-from .base import RULES_BY_ID, Finding, RuleId, iter_steps, location_suffix
+from ..model import NarrationValue, NodeId, Scenario, SourceLocation, Step, iter_steps
+from .base import RULES_BY_ID, Finding, RuleId, location_suffix
 
 # A step body's anchored AST node: the `with` statement of an inline step, or
 # the decorated helper function whose body is the step body.

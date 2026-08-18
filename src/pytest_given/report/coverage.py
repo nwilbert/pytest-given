@@ -1,6 +1,5 @@
 """Scenario ↔ story-activity coverage matching."""
 
-from collections.abc import Iterable
 from typing import NamedTuple
 
 from ..model import (
@@ -17,6 +16,7 @@ from ..model import (
     Story,
     TermId,
     id_derive,
+    walk_steps,
 )
 
 
@@ -163,13 +163,3 @@ def compute_coverage(
             if refs_by_activity[aid].issubset(s_cache):
                 result.setdefault(aid, set()).add(ref)
     return result
-
-
-def walk_steps(
-    steps: list[Step], prefix: tuple[int, ...] = ()
-) -> Iterable[tuple[tuple[int, ...], Step]]:
-    """Depth-first walk yielding (index_path, step) for every step in the tree."""
-    for index, step in enumerate(steps):
-        yield (*prefix, index), step
-        if step.children:
-            yield from walk_steps(step.children, (*prefix, index))
