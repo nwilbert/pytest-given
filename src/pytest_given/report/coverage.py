@@ -112,9 +112,9 @@ def s_for_step(
         if term.kind == 'verb':
             out.add(Identity(term_id=part.term_id, instance_id=None))
             continue
-        display = part.display
-        if substitutions is not None and part.param_column is not None:
-            display = substitutions.get(part.param_column, display)
+        display = pill_display(part, substitutions)
+        if display is None:
+            continue
         inst_id = instance_id_of(glossary, part.term_id, display)
         if inst_id is None:
             out.add(Identity(term_id=part.term_id, instance_id=None))
@@ -163,12 +163,11 @@ def compute_coverage(
         for ident in refs:
             identity_to_activities.setdefault(ident, set()).add(aid)
 
-    cases = param_case_displays(scenario)
-    # A single-element list carrying `None`, typed to match `cases` for the
-    # `cases or single_pass` fallback below — mypy's list invariance rejects
-    # a bare `[None]` literal there since it infers the literal's element
-    # type from `cases`'s `dict[str, str]`.
-    single_pass: list[Mapping[str, str] | None] = [None]
+    # `[None]` when no case speaks for itself: one pass over the grouped tree
+    # as it stands, which is what an unparametrized scenario gets.
+    passes: list[Mapping[str, str] | None] = list(param_case_displays(scenario)) or [
+        None
+    ]
     result: dict[ActivityId, set[StepRef]] = {}
     for path_index, step in walk_steps(scenario.steps):
         ref: StepRef = (scenario.id, path_index)
@@ -180,8 +179,8 @@ def compute_coverage(
         # Match once per case and union the *matches*, never the identity sets:
         # a grouped identity set would let a step satisfy an activity by
         # combining one case's Alice with another's latte, which no single case
-        # satisfies. `cases` is empty for a scenario with no param-linked pill.
-        for substitutions in cases or single_pass:
+        # satisfies.
+        for substitutions in passes:
             s_cache = s_for_step(glossary, step, substitutions)
             candidates: set[ActivityId] = set()
             for ident in s_cache:
@@ -192,12 +191,36 @@ def compute_coverage(
     return result
 
 
+def pill_display(
+    part: NarrationTermRef, substitutions: Mapping[str, str] | None
+) -> str | None:
+    """The display this pill reads for one case, or None when the case has
+    nothing to say about it.
+
+    A pill not bound to a parametrize column reads the same in every case. One
+    that is bound reads its column's cell — and when this case has no cell
+    there, the pill has no display at all: the grouped tree's belongs to
+    whichever case the tree came from, so lending it here would let this case
+    satisfy an activity naming a guest it never had, or file that guest in the
+    Glossary as one a passing case used.
+    """
+    if substitutions is None or part.param_column is None:
+        return part.display
+    return substitutions.get(part.param_column)
+
+
 def param_case_displays(scenario: Scenario) -> list[dict[str, str]]:
-    """One `{param column name: cell text}` mapping per case, or `[]`.
+    """One `{param column name: cell text}` mapping per *passed* case, or `[]`.
 
     Empty when the scenario has no term ref bound to a parametrize column —
     the grouped tree then already tells the whole truth and callers keep their
     single-pass path.
+
+    A case that did not pass exercised nothing, so its value must not stand in
+    for a pill: it would satisfy a story activity and be listed in the Glossary
+    as an observed instance. With no passed case at all the result is empty
+    too, which puts callers back on the baseline — the same single pass an
+    unparametrized failing scenario gets.
     """
     if scenario.parameters is None:
         return []
@@ -217,4 +240,5 @@ def param_case_displays(scenario: Scenario) -> list[dict[str, str]]:
             if column.kind == 'param' and column.name in linked and value is not None
         }
         for case in scenario.parameters.cases
+        if case.status == 'passed'
     ]

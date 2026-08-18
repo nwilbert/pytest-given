@@ -9,8 +9,17 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..model import NarrationValue, NodeId, Scenario, SourceLocation, Step, iter_steps
-from .base import RULES_BY_ID, Finding, RuleId, location_suffix
+from ..model import (
+    NarrationPlaceholder,
+    NarrationValue,
+    NodeId,
+    Scenario,
+    SourceLocation,
+    Step,
+    iter_steps,
+    location_suffix,
+)
+from .base import RULES_BY_ID, Finding, RuleId
 
 # A step body's anchored AST node: the `with` statement of an inline step, or
 # the decorated helper function whose body is the step body.
@@ -206,21 +215,28 @@ def _unused_interpolation_findings(
     and are out of scope in v1. Term refs are exempt by type; complex
     expressions are skipped entirely. For a `given`, a store (the step
     binding the name) also counts as use.
+
+    Placeholders count as interpolations too: the lint runs on *grouped*
+    scenarios, where grouping has already turned every varying interpolation
+    into one. Scanning values alone would leave the rule blind to parametrized
+    scenarios entirely. A placeholder names its column rather than its
+    expression, so a column whose name was disambiguated (`price #2`) is not a
+    bare identifier and drops out with the complex expressions.
     """
     if not isinstance(node, ast.With):
         return []
-    values = [
-        part
+    expressions = [
+        part.expression if isinstance(part, NarrationValue) else part.name
         for part in anchored.step.narration.parts
-        if isinstance(part, NarrationValue)
+        if isinstance(part, (NarrationValue, NarrationPlaceholder))
     ]
-    if not values:
+    if not expressions:
         return []
     used = _names_used(node, include_stores=anchored.step.phase == 'given')
     findings: list[Finding] = []
     seen: set[str] = set()
-    for part in values:
-        name = _bare_identifier(part.expression)
+    for expression in expressions:
+        name = _bare_identifier(expression)
         if name is None or name in seen:
             continue
         seen.add(name)

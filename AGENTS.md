@@ -35,9 +35,10 @@ The short version: bump `version` in `pyproject.toml` and add a matching `## [x.
 
 ## Architecture
 
-`src/pytest_given/` is four subpackages plus two top-level orchestrators, with a strict dependency direction (convention, not lint-enforced): `model/` is the leaf — dataclass schema, JSON serde, IDs, errors; `capture/` (records scenarios at runtime), `lint/` (checks them), and `report/` (renders HTML / Markdown / JSON) each depend on `model/` and never on each other. `plugin.py` and `cli.py` sit on top and may import from all four. Filenames carry the rest — what they don't:
+`src/pytest_given/` is four subpackages plus three top-level modules, with a strict dependency direction (convention, not lint-enforced): `model/` is the leaf — dataclass schema, JSON serde, IDs, errors; `capture/` (records scenarios at runtime), `lint/` (checks them), and `report/` (renders HTML / Markdown / JSON) each depend on `model/` and never on each other. `grouping.py`, `plugin.py`, and `cli.py` sit on top and may import from all four. Filenames carry the rest — what they don't:
 
-- `plugin.py` — the pytest-side orchestrator: hooks, parametrized test grouping, structural templatize, scenario-source capture from `item.location`, and where lint findings surface (terminal summary + exit code, never in report artifacts).
+- `grouping.py` — the parametrize pass: groups a scenario's cases into one narrated tree plus a case table, promotes what varies into `param` / `derived` / `attachment` columns, and raises `PytestGivenError` on the five authoring forms that would make the grouped tree lie.
+- `plugin.py` — the pytest-side orchestrator: hooks, parametrize-value capture, scenario-source capture from `item.location`, sink writing (and discarding a stale sink when grouping raises), and where lint findings surface (terminal summary + exit code, never in report artifacts).
 - `cli.py` — the `pytest-given` console entry point and argparse root; owns `skills install` (mirrors `skills_data/` into a project's `.claude/skills/`, `--check` for drift) and delegates `report` to `report/cli.py`.
 - `capture/source.py` — `capture_caller_source(skip=...)` walks `inspect.stack` to record a construction site for `story()` and glossary registration; also the one platform seam (see [Conventions](#conventions)).
 - `lint/` — pure, imports only `model/`: rule catalog as data (`base.py`), `given_lint_*` config (`config.py`), rules over the recorded model (`runtime_rules.py`) and over step-body ASTs (`ast_rules.py`).

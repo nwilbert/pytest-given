@@ -765,3 +765,22 @@ def test_round_trip_preserves_placeholder_column_id() -> None:
     scenario = Scenario(id=NodeId('t.py::t'), narration=narration, module='m')
     restored = _restored(scenario)
     assert restored.narration.parts[1] == narration.parts[1]
+
+
+def test_a_pre_columns_parameter_table_says_to_re_run_the_suite():
+    """`pytest-given report` on a report saved before `names` became `columns`
+    used to die with a bare `KeyError: 'columns'`. There is no migration — the
+    error has to say so."""
+    from pytest_given.model.serde import _param_table_from_dict
+
+    with pytest.raises(PytestGivenError, match='re-run the suite'):
+        _param_table_from_dict({'names': ['cup_size'], 'cases': []})
+
+
+def test_a_pre_columns_placeholder_says_to_re_run_the_suite():
+    """Same vintage of report, reached through a step's narration rather than
+    its parameter table: a placeholder gained `column_id` in the same change."""
+    from pytest_given.model.serde import _narration_part_from_dict
+
+    with pytest.raises(PytestGivenError, match='re-run the suite'):
+        _narration_part_from_dict({'name': 'cup_size'})

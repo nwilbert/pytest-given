@@ -82,12 +82,23 @@ class Template:
                 case NarrationPlaceholder(name=name, format_spec=spec, conversion=conv):
                     if name not in mapping:
                         raise KeyError(name)
-                    resolved = _FORMATTER.convert_field(mapping[name], conv)
-                    out.append(format(resolved, spec))
+                    out.append(render_interpolation(mapping[name], conv, spec))
         return ''.join(out)
 
     def get_identifiers(self) -> list[str]:
         return [p.name for p in self.parts if isinstance(p, NarrationPlaceholder)]
+
+
+def render_interpolation(value: Any, conversion: str | None, format_spec: str) -> str:
+    """One interpolation rendered the way an f-string renders it: `!conv`
+    first, then `:spec`.
+
+    The single definition of that rule. Grouping re-applies it to a raw
+    parametrize value to decide whether a narration that names a column really
+    narrates it (rule 3), and a second copy of the rule there would accuse a
+    faithful narration the moment the two drifted apart.
+    """
+    return format(_FORMATTER.convert_field(value, conversion), format_spec)
 
 
 def parse_tstring(
@@ -122,9 +133,7 @@ def parse_tstring(
                     parts.append(term_ref)
                     rendered_chunks.append(term_ref.display)
                     continue
-                rendered = format(
-                    _FORMATTER.convert_field(value, conversion), format_spec
-                )
+                rendered = render_interpolation(value, conversion, format_spec)
                 parts.append(
                     NarrationValue(
                         rendered=rendered,

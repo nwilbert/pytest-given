@@ -92,7 +92,24 @@ def _param_table_md(table: ParameterTable) -> str:
             '| ' + ' | '.join([*cells, _STATUS_GLYPH.get(case.status, '✗')]) + ' |'
         )
         blocks.extend(_case_attachment_blocks(table, case))
+        blocks.extend(_case_divergence_note(table, case))
     return '\n'.join([header, separator, *rows, *blocks])
+
+
+def _case_divergence_note(table: ParameterTable, case: ParameterCase) -> list[str]:
+    """A line saying why a divergent case's generated cells are blank.
+
+    Without it the blanks sit next to a ✓ and read as a recording failure; the
+    case simply took a different path, so the grouped step tree — another
+    case's — has no slot to fill them from.
+    """
+    if not case.divergent:
+        return []
+    return [
+        '',
+        f'- **{_case_key(table, case)}** — steps differ from the other cases, so '
+        f'the grouped tree is not this one and its columns stay blank.',
+    ]
 
 
 def _case_cell(column: ParameterColumn, value: CellValue | None) -> str:
@@ -127,11 +144,7 @@ def _case_attachment_blocks(table: ParameterTable, case: ParameterCase) -> list[
     The column name, not the attachment label: two columns can share a label,
     which would head both blocks identically.
     """
-    key = ', '.join(
-        _cell(value)
-        for column, value in zip(table.columns, case.values, strict=True)
-        if column.kind == 'param'
-    )
+    key = _case_key(table, case)
     lines: list[str] = []
     for column, value in zip(table.columns, case.values, strict=True):
         if not isinstance(value, Attachment) or _fits_inline(value.content):
@@ -140,6 +153,16 @@ def _case_attachment_blocks(table: ParameterTable, case: ParameterCase) -> list[
         lines.append(f'- **{key}** — {_inline(column.name)}:')
         lines.extend(f'  {line}' for line in _fenced(value.content))
     return lines
+
+
+def _case_key(table: ParameterTable, case: ParameterCase) -> str:
+    """A case's parametrize values, joined — how a note below the table names
+    the row it belongs to."""
+    return ', '.join(
+        _cell(value)
+        for column, value in zip(table.columns, case.values, strict=True)
+        if column.kind == 'param'
+    )
 
 
 def _fits_inline(content: str) -> bool:

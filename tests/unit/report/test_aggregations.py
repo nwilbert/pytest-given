@@ -13,6 +13,9 @@ from pytest_given.model import (
     Narration,
     NarrationTermRef,
     NodeId,
+    ParameterCase,
+    ParameterColumn,
+    ParameterTable,
     ReportData,
     Scenario,
     Step,
@@ -775,3 +778,41 @@ def test_glossary_view_lists_every_case_instance_of_a_param_linked_pill(
     )
     aggs = build_glossary_aggregations(report)
     assert {i.display for i in aggs[TermId('guest')].instances} == {'Alice', 'Bob'}
+
+
+def test_a_pill_is_not_listed_for_a_case_that_has_no_value_for_it() -> None:
+    """A pill bound to a parametrize column reads one display per passed case.
+    A case whose cell for that column is empty has no display of its own —
+    falling back to the grouped tree's puts a failed case's guest in the
+    Glossary as though a passing case had used it."""
+    g = _g()
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='Alice checks in',
+            parts=[
+                NarrationTermRef(
+                    term_id=TermId('guest'),
+                    display='Alice',
+                    expression='guest',
+                    param_column='guest',
+                )
+            ],
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('t.py::test_check_in'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[step],
+        parameters=ParameterTable(
+            columns=[ParameterColumn(id='guest', name='guest', kind='param')],
+            cases=[
+                ParameterCase(values=['Alice'], status='failed'),
+                ParameterCase(values=[None], status='passed'),
+            ],
+        ),
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    assert TermId('guest') not in aggs

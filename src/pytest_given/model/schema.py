@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import PurePosixPath
 from typing import TYPE_CHECKING, Literal, NamedTuple, NewType
 
 if TYPE_CHECKING:
@@ -250,6 +251,19 @@ class SourceLocation:
     line: int
 
 
+def location_suffix(location: SourceLocation | None) -> str:
+    """The `` (filename:line)`` locator appended to a message about a scenario,
+    or ``''`` when there is no source location.
+
+    Lives beside `SourceLocation` because both the lint (findings) and grouping
+    (rejected-form errors) end their messages with it, and neither of those
+    packages is the other's dependency.
+    """
+    if location is None:
+        return ''
+    return f' ({PurePosixPath(location.relpath).name}:{location.line})'
+
+
 @dataclass(frozen=True)
 class TracebackFrame:
     """One frame from a parsed pytest short-style traceback.
@@ -339,9 +353,19 @@ type CellValue = ParamValue | Attachment
 
 @dataclass
 class ParameterCase:
+    """One parametrize case: its cells, positionally aligned with the table's
+    columns.
+
+    `divergent` marks a case that passed while recording a different step
+    structure than the grouped tree. Such a case fills no generated cell, so
+    without the mark its blanks read as missing data next to a ✓. (A skipped or
+    failed case fills none either, but its status already says why.)
+    """
+
     values: list[CellValue | None]
     status: str = 'passed'
     error: ErrorInfo | None = None
+    divergent: bool = False
 
 
 @dataclass

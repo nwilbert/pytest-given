@@ -6,10 +6,8 @@ docs/specs/2026-08-14-parametrized-case-columns-design.md.
 """
 
 from dataclasses import dataclass, field, replace
-from string import Formatter
 
-from .capture import try_term_ref
-from .lint import location_suffix
+from .capture import render_interpolation, try_term_ref
 from .model import (
     Attachment,
     AttachmentRef,
@@ -37,12 +35,12 @@ from .model import (
     StepPath,
     TermId,
     case_suffix,
+    location_suffix,
     node_base,
+    placeholder_mismatch,
     structure_signature,
     walk_steps,
 )
-
-_FORMATTER = Formatter()
 
 
 def group_parametrized(
@@ -74,31 +72,34 @@ def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
     baseline = _baseline(group)
     comparable = _comparable(group, baseline)
     indexed = _indexed(comparable)
-    _check_varying_str_narration(baseline, comparable, indexed, first)
-    for scenario in group:
-        if scenario.status == 'passed':
-            _check_rebound_params(scenario, param_info[scenario.id], first)
     ctx = _GroupContext(
         param_names=param_names,
         comparable=comparable,
         indexed=indexed,
         anchor=first,
     )
+    _check_varying_str_narration(baseline, ctx)
+    for scenario in group:
+        if scenario.status == 'passed':
+            _check_rebound_params(scenario, param_info[scenario.id], ctx)
     template_steps = _templatize_steps(baseline.steps, (), ctx)
     grouped_narration = _templatize_narration(first.narration, param_names)
 
     cases: list[ParameterCase] = []
     total_duration = 0
+    comparable_ids = {s.id for s in comparable}
     for scenario in group:
-        param_cells: list[CellValue | None] = [
-            _param_value(v) for v in param_info[scenario.id].values
-        ]
-        generated = [ctx.cells[c.id].get(scenario.id) for c in ctx.columns]
+        spec = param_info[scenario.id]
+        for name, value in zip(spec.names, spec.values, strict=True):
+            ctx.set_cell(name, scenario.id, _param_value(value))
         cases.append(
             ParameterCase(
-                values=[*param_cells, *generated],
+                values=[ctx.cells[c.id].get(scenario.id) for c in ctx.columns],
                 status=scenario.status,
                 error=scenario.error,
+                divergent=(
+                    scenario.status == 'passed' and scenario.id not in comparable_ids
+                ),
             )
         )
         total_duration += scenario.duration_ms
@@ -111,16 +112,7 @@ def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
         status=_grouped_status(cases),
         duration_ms=total_duration,
         steps=template_steps,
-        parameters=ParameterTable(
-            columns=[
-                *(
-                    ParameterColumn(id=name, name=name, kind='param')
-                    for name in param_names
-                ),
-                *ctx.columns,
-            ],
-            cases=cases,
-        ),
+        parameters=ParameterTable(columns=ctx.columns, cases=cases),
         source=first.source,
         story_id=first.story_id,
         activity_ids=first.activity_ids,
@@ -141,28 +133,36 @@ class _GroupContext:
     _taken_names: set[str] = field(default_factory=set)
 
     def __post_init__(self) -> None:
-        # The parametrize columns are built inline in `_grouped_scenario`
-        # rather than through `new_column`, so their names are seeded here:
-        # disambiguation spans the whole table, not the generated columns
-        # alone.
-        self._taken_names.update(self.param_names)
+        # The parametrize columns come first and keep their argname as id: a
+        # step's placeholder points at them by name (`column_id=expression`),
+        # and every generated column is emitted after them by the baseline
+        # walk. Creating them here rather than in the caller keeps one column
+        # list, one cell store, and one name registry — disambiguation spans
+        # the whole table, not the generated columns alone.
+        for name in self.param_names:
+            self.new_column('param', name)
 
-    def new_column(self, kind: ColumnKind, name: str) -> str:
-        """Add a column and return its id.
+    def new_column(self, kind: ColumnKind, name: str) -> ParameterColumn:
+        """Add a column and return it.
 
-        Generated ids are `derived:0`, `attachment:0`, … numbered per kind in
-        emission order. The colon makes collision with a parametrize name
-        impossible — those are `callspec.params` keys, hence always Python
-        identifiers.
+        A `param` column is identified by its argname; generated ids are
+        `derived:0`, `attachment:0`, … numbered per kind in emission order. The
+        colon makes collision with an argname impossible — those are
+        `callspec.params` keys, hence always Python identifiers. The whole
+        column comes back rather than its id alone because the caller also
+        builds the step tree's pointer at it, which has to carry the
+        disambiguated `name` (see `_unique_name`).
         """
-        index = self._counts.get(kind, 0)
-        self._counts[kind] = index + 1
-        column_id = f'{kind}:{index}'
-        self.columns.append(
-            ParameterColumn(id=column_id, name=self._unique_name(name), kind=kind)
-        )
+        if kind == 'param':
+            column_id = name
+        else:
+            index = self._counts.get(kind, 0)
+            self._counts[kind] = index + 1
+            column_id = f'{kind}:{index}'
+        column = ParameterColumn(id=column_id, name=self._unique_name(name), kind=kind)
+        self.columns.append(column)
         self.cells[column_id] = {}
-        return column_id
+        return column
 
     def set_cell(
         self, column_id: str, node_id: NodeId, value: CellValue | None
@@ -193,13 +193,20 @@ class _GroupContext:
 
 
 def _baseline(group: list[Scenario]) -> Scenario:
-    """The first passed case, else `group[0]`.
+    """The first passed case; failing that, the first case that recorded a
+    tree; failing that, `group[0]`.
 
     A skipped case records no steps and a failed one may abort mid-tree, so
-    neither can define the shared structure. With no passed case there is
-    nothing to compare, and today's `group[0]` rendering stands.
+    neither can define the shared structure — with no passed case there is
+    nothing to compare and the grouped tree is one case's rendering either way.
+    Which one still matters: a skipped case has *no* steps, so preferring it
+    over a failed one renders the scenario step-less and hides the failure a
+    reader opened it for.
     """
-    return next((s for s in group if s.status == 'passed'), group[0])
+    passed = next((s for s in group if s.status == 'passed'), None)
+    if passed is not None:
+        return passed
+    return next((s for s in group if s.steps), group[0])
 
 
 def _comparable(group: list[Scenario], baseline: Scenario) -> list[Scenario]:
@@ -224,12 +231,7 @@ def _indexed(scenarios: list[Scenario]) -> dict[NodeId, dict[StepPath, Step]]:
     return {s.id: dict(walk_steps(s.steps)) for s in scenarios}
 
 
-def _check_varying_str_narration(
-    baseline: Scenario,
-    comparable: list[Scenario],
-    indexed: dict[NodeId, dict[StepPath, Step]],
-    anchor: Scenario,
-) -> None:
+def _check_varying_str_narration(baseline: Scenario, ctx: _GroupContext) -> None:
     """Rule 1: a `str` narration whose rendered value varies across cases.
 
     A `str` records `parts == []` however it was built, so there is nothing to
@@ -240,14 +242,14 @@ def _check_varying_str_narration(
     for path, step in walk_steps(baseline.steps):
         if step.narration.parts:
             continue
-        for case in comparable:
+        for case in ctx.comparable:
             # A comparable case has the baseline's exact structure, so every
             # baseline path exists in it — index, never `.get`.
-            if indexed[case.id][path].narration.text == step.narration.text:
+            if ctx.indexed[case.id][path].narration.text == step.narration.text:
                 continue
             raise _grouping_error(
-                anchor,
-                f'step narration in {_test_name(anchor)!r} varies across '
+                ctx.anchor,
+                f'step narration in {_test_name(ctx.anchor)!r} varies across '
                 f'parametrize cases but records no parts — a plain str bakes '
                 f"case 1's values (an f-string is the usual cause). Use a "
                 f't-string: {step.phase}(t"…").',
@@ -255,7 +257,7 @@ def _check_varying_str_narration(
 
 
 def _check_rebound_params(
-    scenario: Scenario, spec: ParamSpec, anchor: Scenario
+    scenario: Scenario, spec: ParamSpec, ctx: _GroupContext
 ) -> None:
     """Rule 3: an expression that matches a parametrize name but not its value.
 
@@ -272,11 +274,21 @@ def _check_rebound_params(
         for part in step.narration.parts:
             if not isinstance(part, NarrationValue) or part.expression not in params:
                 continue
-            if _reformat(params[part.expression], part) == part.rendered:
+            try:
+                reformatted = _reformat(params[part.expression], part)
+            except Exception:  # noqa: BLE001 — see _reformat's contract
+                # A value whose own `__format__`/`__str__` raises something
+                # other than the two errors below is broken, not evidence of a
+                # rebinding, and rule 3 cannot tell the difference. Skipping is
+                # the only safe reading: raising would abort every sink in the
+                # session, and letting it through would escape
+                # `pytest_sessionfinish` as a bare traceback.
+                continue
+            if reformatted == part.rendered:
                 continue
             raise _grouping_error(
-                anchor,
-                f'{part.expression!r} in {_test_name(anchor)!r} matches a '
+                ctx.anchor,
+                f'{part.expression!r} in {_test_name(ctx.anchor)!r} matches a '
                 f'parametrize column but narrates a different value '
                 f'(case {case_suffix(scenario.id)} narrates {part.rendered!r}) '
                 f'— rebinding a parameter name makes the narration ambiguous. '
@@ -286,11 +298,11 @@ def _check_rebound_params(
 
 def _reformat(value: RawParamValue, part: NarrationValue) -> str | None:
     """The interpolation re-applied to the raw parameter, or None when the raw
-    value cannot produce that rendering at all (itself evidence of a rebinding)."""
+    value cannot produce that rendering at all (itself evidence of a
+    rebinding). Any *other* exception belongs to the value itself and is left
+    to the caller, which skips the check rather than reading it as evidence."""
     try:
-        return format(
-            _FORMATTER.convert_field(value, part.conversion), part.format_spec
-        )
+        return render_interpolation(value, part.conversion, part.format_spec)
     except ValueError, TypeError:
         return None
 
@@ -370,9 +382,8 @@ def _templatize_attachments(
     column ids keep following the walk.
     """
     _check_attachment_labels(step, path, ctx)
-    baseline_counts: dict[str, int] = {}
-    for a in step.attachments:
-        baseline_counts[a.label] = baseline_counts.get(a.label, 0) + 1
+    baseline = _by_label(step)
+    others = {case.id: _by_label(ctx.indexed[case.id][path]) for case in ctx.comparable}
 
     out: list[StepAttachment] = []
     seen: dict[str, int] = {}
@@ -380,11 +391,23 @@ def _templatize_attachments(
         assert isinstance(attachment, Attachment), 'a recorded tree holds no refs'
         occurrence = seen.get(attachment.label, 0)
         seen[attachment.label] = occurrence + 1
-        out.append(_promote_occurrence(attachment, occurrence, path, ctx))
-        if occurrence + 1 == baseline_counts[attachment.label]:
-            _promote_extra_occurrences(
-                attachment.label, baseline_counts[attachment.label], path, ctx
-            )
+        out.append(_promote_occurrence(attachment, occurrence, others, ctx))
+        if occurrence == len(baseline[attachment.label]) - 1:
+            _promote_extra_occurrences(attachment.label, baseline, others, ctx)
+    return out
+
+
+def _by_label(step: Step) -> dict[str, list[Attachment]]:
+    """That step's attachments grouped by label, in the order it recorded them.
+
+    The one shape everything below reads: a count is a `len`, an occurrence is
+    an index, and a label the case never attached is a missing key. (A recorded
+    tree holds no `AttachmentRef`s, so nothing here is content-less.)
+    """
+    out: dict[str, list[Attachment]] = {}
+    for attachment in step.attachments:
+        assert isinstance(attachment, Attachment), 'a recorded tree holds no refs'
+        out.setdefault(attachment.label, []).append(attachment)
     return out
 
 
@@ -413,86 +436,79 @@ def _check_attachment_labels(step: Step, path: StepPath, ctx: _GroupContext) -> 
 
 
 def _promote_occurrence(
-    attachment: Attachment, occurrence: int, path: StepPath, ctx: _GroupContext
+    attachment: Attachment,
+    occurrence: int,
+    others: dict[NodeId, dict[str, list[Attachment]]],
+    ctx: _GroupContext,
 ) -> StepAttachment:
     """The baseline's `occurrence`-th attachment of `attachment.label`: stays
     inline when every comparable case's occurrence matches it byte for byte,
     otherwise promoted to a column with a content-less badge left in its place.
     """
-    others = {
-        case.id: _occurrence(ctx.indexed[case.id][path], attachment.label, occurrence)
-        for case in ctx.comparable
+    theirs = {
+        node_id: _occurrence(by_label, attachment.label, occurrence)
+        for node_id, by_label in others.items()
     }
     if all(
         other is not None
         and (other.content, other.content_type)
         == (attachment.content, attachment.content_type)
-        for other in others.values()
+        for other in theirs.values()
     ):
         return attachment
-    column_id = ctx.new_column('attachment', attachment.label)
-    for node_id, other in others.items():
-        ctx.set_cell(column_id, node_id, other)
+    column = ctx.new_column('attachment', attachment.label)
+    for node_id, other in theirs.items():
+        ctx.set_cell(column.id, node_id, other)
+    # The badge is labelled with the *column* name, not the attachment's own
+    # label: a label attached twice gives two columns, and a badge repeating
+    # the bare label points the reader at the wrong one.
     return AttachmentRef(
-        label=attachment.label,
+        label=column.name,
         content_type=attachment.content_type,
-        column_id=column_id,
+        column_id=column.id,
     )
 
 
 def _promote_extra_occurrences(
-    label: str, baseline_count: int, path: StepPath, ctx: _GroupContext
+    label: str,
+    baseline: dict[str, list[Attachment]],
+    others: dict[NodeId, dict[str, list[Attachment]]],
+    ctx: _GroupContext,
 ) -> None:
     """Occurrences of `label` past the baseline's own count.
 
-    `max_count` is the greatest number of times any comparable case (including
-    the baseline) attaches `label`; each occurrence from `baseline_count` up to
-    it gets a column, with every case's occurrence in its own cell and the
+    Every case's occurrences of `label` past the baseline's last one get a
+    column each, with every case's occurrence in its own cell and the
     baseline's left `None` — there is no baseline attachment for it, so nothing
     is appended to the grouped step's attachments.
 
-    `max_count >= baseline_count` whenever `comparable` is non-empty, because
-    the baseline is itself a member of it — it passed, and trivially matches
-    its own structure signature. Without that the range could silently be
-    empty and the baseline's own occurrences would go missing.
-
-    `default=baseline_count` covers `comparable` being empty, which happens
-    exactly when no case passed: such a group still has a baseline with a
-    recorded tree, so this runs and a bare `max()` would raise `ValueError`.
-    The default's *value* is an equivalent mutant — `baseline_count >= 1`
-    always, so any default at or below it yields no columns — chosen to read
-    as "nothing beyond the baseline".
+    The count comes from `baseline`, never from `others[first case]`: the
+    baseline is the first *passed* case, so a skipped first case would put the
+    range at 0 and re-promote occurrences the baseline already carries a badge
+    for. The baseline is itself one of `others` — it passed, and trivially
+    matches its own structure signature — so `max` never falls below its own
+    count. With no passed case at all `others` is empty and there is nothing
+    past a baseline nobody can be compared to.
     """
-    max_count = max(
-        (_label_count(ctx.indexed[case.id][path], label) for case in ctx.comparable),
-        default=baseline_count,
+    for occurrence in range(len(baseline.get(label, [])), _max_count(label, others)):
+        column = ctx.new_column('attachment', label)
+        for node_id, by_label in others.items():
+            ctx.set_cell(column.id, node_id, _occurrence(by_label, label, occurrence))
+
+
+def _max_count(label: str, others: dict[NodeId, dict[str, list[Attachment]]]) -> int:
+    """The greatest number of times any comparable case attaches `label`."""
+    return max(
+        (len(by_label.get(label, [])) for by_label in others.values()), default=0
     )
-    for occurrence in range(baseline_count, max_count):
-        column_id = ctx.new_column('attachment', label)
-        for case in ctx.comparable:
-            ctx.set_cell(
-                column_id,
-                case.id,
-                _occurrence(ctx.indexed[case.id][path], label, occurrence),
-            )
 
 
-def _label_count(step: Step, label: str) -> int:
-    """How many times `step` attaches `label`.
-
-    Every attachment of the label counts, ref or not: an `AttachmentRef` is
-    content-less but still an attachment of that label, so there is nothing to
-    filter out. (These are recorded trees, which hold no refs anyway.)
-    """
-    return sum(1 for a in step.attachments if a.label == label)
-
-
-def _occurrence(step: Step, label: str, index: int) -> Attachment | None:
+def _occurrence(
+    by_label: dict[str, list[Attachment]], label: str, index: int
+) -> Attachment | None:
     """That case's `index`-th attachment carrying `label`, or None when the case
     attached that label fewer times than `index` requires."""
-    matching = [
-        a for a in step.attachments if isinstance(a, Attachment) and a.label == label
-    ]
+    matching = by_label.get(label, [])
     return matching[index] if index < len(matching) else None
 
 
@@ -534,66 +550,116 @@ def _text_from_parts(parts: list[NarrationPart]) -> str:
 def _templatize_part(
     part: NarrationPart, index: int, path: StepPath, phase: Phase, ctx: _GroupContext
 ) -> NarrationPart:
+    independent = _case_independent_part(part, ctx.param_names)
+    if independent is not None:
+        return independent
+    if isinstance(part, NarrationValue):
+        return _templatize_value(part, index, path, phase, ctx)
+    assert isinstance(part, NarrationTermRef), (
+        'a literal or placeholder is case-independent by definition'
+    )
+    _check_constant_term_ref(part, index, path, phase, ctx)
+    return part
+
+
+def _templatize_value(
+    part: NarrationValue, index: int, path: StepPath, phase: Phase, ctx: _GroupContext
+) -> NarrationPart:
+    """An interpolation no parametrize column binds: kept as it is when every
+    case renders it the same, promoted to a `derived` column when they do not."""
+    if all(
+        _value_at(ctx.indexed[case.id][path], index) == part.rendered
+        for case in ctx.comparable
+    ):
+        # Checked before the cells are collected: nothing varies in the
+        # overwhelming majority of parts, and only a promotion needs every
+        # case's rendering kept.
+        return part
+    if not part.expression.isidentifier():
+        raise _grouping_error(
+            ctx.anchor,
+            f'{part.expression!r} in {_test_name(ctx.anchor)!r} varies across '
+            f'parametrize cases — bind it to a local and narrate that: '
+            f'value = {part.expression}; {phase}(t"… {{value}} …").',
+        )
+    column = ctx.new_column('derived', part.expression)
+    for case in ctx.comparable:
+        ctx.set_cell(column.id, case.id, _value_at(ctx.indexed[case.id][path], index))
+    # The token names the *column*, not the expression: one expression promoted
+    # in two steps gives two columns, and `{price}` in both tokens points the
+    # reader at the first one twice.
+    return NarrationPlaceholder(
+        name=column.name,
+        column_id=column.id,
+        format_spec=part.format_spec,
+        conversion=part.conversion,
+    )
+
+
+def _check_constant_term_ref(
+    part: NarrationTermRef,
+    index: int,
+    path: StepPath,
+    phase: Phase,
+    ctx: _GroupContext,
+) -> None:
+    """Rule 5: a pill no parametrize column binds must read the same in every
+    case.
+
+    Rejected rather than promoted: promotion would strip the pill out of the
+    grouped tree, and `compute_coverage` matches story activities on term-ref
+    identities.
+    """
+    identity = (part.term_id, part.display)
+    for case in ctx.comparable:
+        if _term_at(ctx.indexed[case.id][path], index) == identity:
+            continue
+        raise _grouping_error(
+            ctx.anchor,
+            f'glossary term ref {{{part.expression}}} in '
+            f'{_test_name(ctx.anchor)!r} varies across parametrize '
+            f'cases — a term pill must name the same term and read the '
+            f'same in every case. Split the pill from the value: '
+            f'{phase}(t"{{pg[\'Term\']}} {{value}} …").',
+        )
+
+
+def _case_independent_part(
+    part: NarrationPart, param_names: list[str]
+) -> NarrationPart | None:
+    """The part as it stands when no other case has a say in it, or None when
+    it has to be compared against them first.
+
+    A literal is one by definition, and so is anything a parametrize column
+    binds — the column already holds every case's value. That makes this the
+    whole of templatizing a *scenario* name, which is evaluated once at
+    decoration time and cannot vary; a step's narration reaches its own
+    comparison work only past it. One definition, so the placeholder contract
+    (`name` and `column_id` both the parametrize name) and the term-ref
+    exemption cannot drift between the two callers.
+    """
     match part:
         case NarrationLiteral():
             return part
         case NarrationValue(expression=expression, format_spec=fs, conversion=conv):
-            if expression in ctx.param_names:
-                return NarrationPlaceholder(
-                    name=expression,
-                    column_id=expression,
-                    format_spec=fs,
-                    conversion=conv,
-                )
-            rendered = {
-                case.id: _value_at(ctx.indexed[case.id][path], index)
-                for case in ctx.comparable
-            }
-            if all(value == part.rendered for value in rendered.values()):
-                return part
-            if not expression.isidentifier():
-                raise _grouping_error(
-                    ctx.anchor,
-                    f'{expression!r} in {_test_name(ctx.anchor)!r} varies across '
-                    f'parametrize cases — bind it to a local and narrate that: '
-                    f'value = {expression}; {phase}(t"… {{value}} …").',
-                )
-            column_id = ctx.new_column('derived', expression)
-            for node_id, value in rendered.items():
-                ctx.set_cell(column_id, node_id, value)
+            if expression not in param_names:
+                return None
             return NarrationPlaceholder(
-                name=expression, column_id=column_id, format_spec=fs, conversion=conv
+                name=expression,
+                column_id=expression,
+                format_spec=fs,
+                conversion=conv,
             )
         case NarrationPlaceholder(name=name):
-            if name not in ctx.param_names:
-                raise PytestGivenError(
-                    f"pytest_given.Template placeholder '{{{name}}}' does not "
-                    f'match any parametrize column (have: '
-                    f'{sorted(ctx.param_names)}).'
-                )
+            if name not in param_names:
+                raise placeholder_mismatch(name, param_names)
             return part
-        case NarrationTermRef(expression=expression):
-            if expression in ctx.param_names:
-                # Exempt: its display varies by construction and the `param`
-                # column already holds every case's value. This is what keeps
-                # `param_column` alive.
-                return replace(part, param_column=expression)
-            identity = (part.term_id, part.display)
-            for case in ctx.comparable:
-                if _term_at(ctx.indexed[case.id][path], index) == identity:
-                    continue
-                # Rejected rather than promoted: promotion would strip the pill
-                # out of the grouped tree, and `compute_coverage` matches story
-                # activities on term-ref identities.
-                raise _grouping_error(
-                    ctx.anchor,
-                    f'glossary term ref {{{expression}}} in '
-                    f'{_test_name(ctx.anchor)!r} varies across parametrize '
-                    f'cases — a term pill must name the same term and read the '
-                    f'same in every case. Split the pill from the value: '
-                    f'{phase}(t"{{pg[\'Term\']}} {{value}} …").',
-                )
-            return part
+        case NarrationTermRef(expression=expression) if expression in param_names:
+            # Exempt: its display varies by construction and the `param` column
+            # already holds every case's value. This is what keeps
+            # `param_column` alive.
+            return replace(part, param_column=expression)
+    return None
 
 
 def _value_at(step: Step, index: int) -> str | None:
@@ -630,42 +696,13 @@ def _templatize_narration(
 
     For the **scenario** narration only — a scenario name is evaluated once at
     decoration time, so it cannot vary across cases and there is nothing to
-    compare against other cases the way a step's narration is. NarrationLiteral
-    parts pass through unchanged. A NarrationValue whose `expression` matches a
-    parametrize column becomes a NarrationPlaceholder; otherwise it stays
-    verbatim (the rendered value is shared across cases). A NarrationPlaceholder
-    must reference a known parametrize column.
+    compare against other cases the way a step's narration is. That makes it
+    exactly `_param_bound_part` and nothing else: a part no parametrize column
+    binds stays verbatim, since its rendering is shared across cases.
     """
     if not narration.parts:
         return narration
-    out: list[NarrationPart] = []
-    for part in narration.parts:
-        match part:
-            case NarrationLiteral():
-                out.append(part)
-            case NarrationValue(expression=expression, format_spec=fs, conversion=conv):
-                if expression in param_names:
-                    out.append(
-                        NarrationPlaceholder(
-                            name=expression,
-                            column_id=expression,
-                            format_spec=fs,
-                            conversion=conv,
-                        )
-                    )
-                else:
-                    out.append(part)
-            case NarrationPlaceholder(name=name):
-                if name not in param_names:
-                    raise PytestGivenError(
-                        f"pytest_given.Template placeholder '{{{name}}}' does "
-                        f'not match any parametrize column (have: '
-                        f'{sorted(param_names)}).'
-                    )
-                out.append(part)
-            case NarrationTermRef(expression=expression):
-                if expression in param_names:
-                    out.append(replace(part, param_column=expression))
-                else:
-                    out.append(part)
+    out = [
+        _case_independent_part(part, param_names) or part for part in narration.parts
+    ]
     return replace(narration, parts=out)

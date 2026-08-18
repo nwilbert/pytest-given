@@ -621,3 +621,22 @@ def test_a_derived_column_cell_renders_through_the_ordinary_cell_path() -> None:
     )
     md = render_md(_report_with(table))
     assert '| 350 | 3.5 | ✓ |' in md
+
+
+def test_a_divergent_case_says_why_its_cells_are_blank() -> None:
+    """A case that passed on a different path fills no generated cell. Left
+    unexplained, the blanks beside its ✓ read as a recording failure."""
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='derived:0', name='price', kind='derived'),
+        ],
+        cases=[
+            ParameterCase(values=[200, '2.0'], status='passed'),
+            ParameterCase(values=[350, None], status='passed', divergent=True),
+        ],
+    )
+    md = render_md(_report_with(table))
+    assert '| 200 | 2.0 | ✓ |' in md
+    assert '| 350 |  | ✓ |' in md
+    assert '- **350** — steps differ from the other cases' in md

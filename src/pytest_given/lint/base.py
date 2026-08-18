@@ -7,7 +7,6 @@ docs stay in sync with one table.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import PurePosixPath
 from typing import Literal, NewType
 
 from ..model import NodeId, SourceLocation
@@ -59,11 +58,3 @@ RULES: tuple[LintRule, ...] = (
 )
 
 RULES_BY_ID: dict[RuleId, LintRule] = {rule.id: rule for rule in RULES}
-
-
-def location_suffix(location: SourceLocation | None) -> str:
-    """The `` (filename:line)`` locator appended to a finding message, or ``''``
-    when the finding carries no source location."""
-    if location is None:
-        return ''
-    return f' ({PurePosixPath(location.relpath).name}:{location.line})'

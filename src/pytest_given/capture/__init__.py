@@ -17,7 +17,12 @@ from .decorators import (
 from .file_glossary import FileGlossary
 from .glossary import DeferredTermHandle, DeferredTermInstance
 from .story import activity, path, story
-from .template import Template, narration_from, try_term_ref
+from .template import (
+    Template,
+    narration_from,
+    render_interpolation,
+    try_term_ref,
+)
 from .traceback import filter_internal_frames, parse_short_repr
 
 __all__ = [
@@ -37,6 +42,7 @@ __all__ = [
     'narration_from',
     'parse_short_repr',
     'path',
+    'render_interpolation',
     'scenario',
     'set_active_collector',
     'story',

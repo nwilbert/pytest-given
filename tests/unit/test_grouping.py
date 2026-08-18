@@ -270,6 +270,36 @@ def test_no_case_passed_falls_back_to_the_first_case() -> None:
     assert [s.narration.text for s in grouped[0].steps] == ['first']
 
 
+def test_with_no_passed_case_the_baseline_is_one_that_recorded_a_tree() -> None:
+    """A skipped case records no steps at all, so taking it as the baseline
+    just because it came first renders the whole scenario step-less — hiding
+    the failing case's steps and its error, which is the one thing a reader
+    opens a failed scenario for."""
+    nid1, nid2 = NodeId('t.py::test_brew[200]'), NodeId('t.py::test_brew[350]')
+    scenarios = [
+        Scenario(
+            id=nid1,
+            narration=Narration(text='brew'),
+            module='m',
+            status='skipped',
+            steps=[],
+        ),
+        Scenario(
+            id=nid2,
+            narration=Narration(text='brew'),
+            module='m',
+            status='failed',
+            steps=[Step(phase='when', narration=Narration(text='it brews'))],
+        ),
+    ]
+    param_info = {
+        nid1: ParamSpec(names=['cup_size'], values=[200]),
+        nid2: ParamSpec(names=['cup_size'], values=[350]),
+    }
+    grouped = group_parametrized(scenarios, param_info)[0]
+    assert [s.narration.text for s in grouped.steps] == ['it brews']
+
+
 def test_comparable_excludes_a_structurally_divergent_case() -> None:
     base = Scenario(
         id=NodeId('t.py::t[1]'),
@@ -1162,6 +1192,38 @@ def test_rule_three_treats_an_unformattable_type_as_a_rebinding() -> None:
         )
 
 
+class _Exploding:
+    """A raw value whose own `__format__` raises something rule 3 cannot read
+    as evidence — the shape a stateful parametrize object takes once the test
+    body has emptied it."""
+
+    def __format__(self, spec: str) -> str:
+        raise IndexError('list index out of range')
+
+
+def test_a_raw_value_whose_format_explodes_is_skipped_not_raised() -> None:
+    """A `ValueError`/`TypeError` from re-formatting is evidence of a
+    rebinding; anything else is a broken value, and rule 3 cannot tell. It has
+    to skip: raising would abort every sink in the session over an object the
+    author may not even narrate deliberately, and letting the exception through
+    escapes `pytest_sessionfinish` as a bare traceback."""
+    nid = NodeId('t.py::test_brew[200]')
+    scenarios = [
+        Scenario(
+            id=nid,
+            narration=Narration(text='brew'),
+            module='m',
+            status='passed',
+            steps=[_param_value_step('200')],
+            source=SourceLocation(relpath='tests/t.py', line=12),
+        ),
+    ]
+    grouped = group_parametrized(
+        scenarios, {nid: ParamSpec(names=['cup_size'], values=[_Exploding()])}
+    )[0]
+    assert grouped.parameters is not None
+
+
 def test_rule_three_skips_a_failed_case() -> None:
     """A failed case's tree may be truncated mid-step; grouping trusts nothing
     else from it either."""
@@ -1693,7 +1755,7 @@ def test_the_extra_occurrence_trigger_fires_once_per_label() -> None:
     ]
     assert grouped.steps[0].attachments == [
         AttachmentRef(label='log', content_type='text', column_id='attachment:0'),
-        AttachmentRef(label='log', content_type='text', column_id='attachment:1'),
+        AttachmentRef(label='log #2', content_type='text', column_id='attachment:1'),
     ]
 
 
@@ -1783,7 +1845,7 @@ def test_an_extra_column_lands_after_its_own_labels_baseline_occurrences() -> No
     assert grouped.steps[0].attachments == [
         AttachmentRef(label='a', content_type='text', column_id='attachment:0'),
         Attachment(label='b', content='b1'),
-        AttachmentRef(label='a', content_type='text', column_id='attachment:2'),
+        AttachmentRef(label='a #2', content_type='text', column_id='attachment:2'),
     ]
 
 
@@ -1913,6 +1975,49 @@ def test_two_occurrences_of_one_label_get_distinct_column_names() -> None:
     ]
 
 
+def test_the_step_tree_points_at_the_disambiguated_column_name() -> None:
+    """The tree's pointers are the reader's only way back to a column: a
+    `{name}` token for a derived column, a badge label for an attachment one.
+    Both have to name the column they point at, so the second occurrence of a
+    name reads ` #2` in the tree exactly as it does in the table header."""
+    scenarios, info = _two_case_group(
+        [_value_step('2.0'), _att_step(Attachment(label='price', content='1'))],
+        [_value_step('3.5'), _att_step(Attachment(label='price', content='2'))],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [c.name for c in grouped.parameters.columns] == [
+        'cup_size',
+        'price',
+        'price #2',
+    ]
+    placeholder = grouped.steps[0].narration.parts[1]
+    assert isinstance(placeholder, NarrationPlaceholder)
+    assert placeholder.name == 'price'
+    ref = grouped.steps[1].attachments[0]
+    assert isinstance(ref, AttachmentRef)
+    assert ref.label == 'price #2'
+
+
+def test_a_second_derived_column_of_one_expression_reads_its_suffixed_name() -> None:
+    """Two steps interpolating the same expression give two columns, and the
+    second step's token has to say which one it means — `{price}` in both steps
+    points the reader at the first column twice, and the HTML palette (keyed on
+    the column name) hands the token a colour belonging to the other column."""
+    scenarios, info = _two_case_group(
+        [_value_step('2.0'), _value_step('9.0')],
+        [_value_step('3.5'), _value_step('9.9')],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    names: list[str] = []
+    for step in grouped.steps:
+        part = step.narration.parts[1]
+        assert isinstance(part, NarrationPlaceholder)
+        names.append(part.name)
+    assert names == ['price', 'price #2']
+    assert grouped.steps[1].narration.text == 'the drink costs {price #2} euros'
+
+
 def test_a_generated_column_name_colliding_with_a_parametrize_name_is_suffixed() -> (
     None
 ):
@@ -1959,3 +2064,62 @@ def test_a_label_that_already_reads_as_a_suffixed_name_still_comes_out_distinct(
     assert grouped.parameters is not None
     names = [c.name for c in grouped.parameters.columns]
     assert names == ['cup_size', 'log', 'log #2', 'log #3']
+
+
+def test_a_divergent_case_is_marked_as_such() -> None:
+    """A case that passed but took a different path contributes no cells, so
+    its generated columns read blank next to a ✓ — indistinguishable from a
+    value the run failed to record. The case carries the reason instead."""
+    scenarios, info = _two_case_group(
+        [_value_step('2.0')],
+        [
+            Step(phase='given', narration=Narration(text='a machine')),
+            _value_step('3.5'),
+        ],
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [c.divergent for c in grouped.parameters.cases] == [False, True]
+
+
+def test_a_skipped_case_is_not_marked_divergent() -> None:
+    """A skipped case also contributes no cells, but its status already says
+    why — marking it divergent would blame a path it never took."""
+    scenarios, info = _two_case_group([_value_step('2.0')], [])
+    scenarios[1].status = 'skipped'
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [c.divergent for c in grouped.parameters.cases] == [False, False]
+
+
+def test_extra_occurrences_count_from_the_baseline_not_the_first_case() -> None:
+    """The baseline is the first *passed* case, which is not the first case
+    when that one was skipped. Counting a label's baseline occurrences off the
+    first case instead would promote occurrences the baseline already carries a
+    badge for — a second column holding the same payload."""
+    scenarios, info = _three_case_group(
+        [],
+        [_att_step(Attachment(label='log', content='b1'))],
+        [
+            _att_step(
+                Attachment(label='log', content='c1'),
+                Attachment(label='log', content='c2'),
+            )
+        ],
+    )
+    scenarios[0].status = 'skipped'
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [(c.id, c.name) for c in grouped.parameters.columns] == [
+        ('cup_size', 'cup_size'),
+        ('attachment:0', 'log'),
+        ('attachment:1', 'log #2'),
+    ]
+    assert [c.values[1:] for c in grouped.parameters.cases] == [
+        [None, None],
+        [Attachment(label='log', content='b1'), None],
+        [
+            Attachment(label='log', content='c1'),
+            Attachment(label='log', content='c2'),
+        ],
+    ]
