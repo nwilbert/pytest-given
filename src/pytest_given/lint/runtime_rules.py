@@ -13,14 +13,15 @@ from ..model import (
     NodeId,
     Phase,
     Scenario,
-    Step,
     Story,
     TermId,
     case_suffix,
     id_derive,
+    iter_steps,
     node_base,
+    structure_signature,
 )
-from .base import RULES_BY_ID, Finding, RuleId, iter_steps, location_suffix
+from .base import RULES_BY_ID, Finding, RuleId, location_suffix
 
 
 def run_runtime_rules(
@@ -48,11 +49,6 @@ def run_runtime_rules(
 # Canonical Given/When/Then order, used both to test completeness and to
 # report missing phases in reading order rather than alphabetically.
 _PHASE_ORDER: tuple[Phase, ...] = ('given', 'when', 'then')
-
-# A step tree reduced to nested phase tuples — narration text and values
-# ignored. Two cases with equal signatures render truthfully in the merged
-# parameter-table view.
-type _StepSignature = tuple[tuple[Phase, _StepSignature], ...]
 
 
 def _missing_phase_findings(grouped: list[Scenario]) -> list[Finding]:
@@ -96,11 +92,11 @@ def _divergent_case_findings(per_case: list[Scenario]) -> list[Finding]:
         passed = [case for case in cases if case.status == 'passed']
         if len(passed) < 2:
             continue
-        baseline = _structure_signature(passed[0].steps)
+        baseline = structure_signature(passed[0].steps)
         diverging = [
             case_suffix(case.id)
             for case in passed[1:]
-            if _structure_signature(case.steps) != baseline
+            if structure_signature(case.steps) != baseline
         ]
         if diverging:
             findings.append(
@@ -117,10 +113,6 @@ def _divergent_case_findings(per_case: list[Scenario]) -> list[Finding]:
                 )
             )
     return findings
-
-
-def _structure_signature(steps: list[Step]) -> _StepSignature:
-    return tuple((step.phase, _structure_signature(step.children)) for step in steps)
 
 
 def _tag_shadows_term_findings(

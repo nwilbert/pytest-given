@@ -38,6 +38,7 @@ from .schema import (
     TracebackFrame,
 )
 from .serde import report_from_dict, report_to_dict
+from .steps import StepPath, StepSignature, iter_steps, structure_signature, walk_steps
 
 __all__ = [
     'Activity',
@@ -72,13 +73,18 @@ __all__ = [
     'Scenario',
     'SourceLocation',
     'Step',
+    'StepPath',
+    'StepSignature',
     'Story',
     'StoryId',
     'TermId',
     'TracebackFrame',
     'case_suffix',
     'id_derive',
+    'iter_steps',
     'node_base',
     'report_from_dict',
     'report_to_dict',
+    'structure_signature',
+    'walk_steps',
 ]

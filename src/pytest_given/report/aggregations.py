@@ -26,8 +26,9 @@ from ..model import (
     StoryId,
     TermId,
     node_base,
+    walk_steps,
 )
-from .coverage import StepRef, compute_coverage, is_coverage_eligible, walk_steps
+from .coverage import StepRef, compute_coverage, is_coverage_eligible
 
 # ---------------------------------------------------------------------------
 # Public dataclasses
