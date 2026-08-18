@@ -2,8 +2,10 @@
 
 ## Now
 
+- [ ] use proper report titles for the examples
 - [ ] Bug: when the glossary term filter is active in the Scenarios tab, jumping to a scenario from the Stories tab doesn't reset this filter
-- [ ] Clean up dummy tags in Coffeeshop example (billing, discounts)
+- [ ] improve navigation from story activities to scenarios, similar to glossary term filters
+- [ ] Clean up dummy tags in Coffeeshop example (loyalty, discounts)
 - [ ] continue work on the story-diagrams branch
 
 ## Next

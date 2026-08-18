@@ -443,7 +443,9 @@ body {
 }
 .param-table tr.failed-row { background: var(--color-error-bg); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }
-.param-table tbody tr:hover:not(.failed-row) { background: var(--color-accent-bg); }
+/* A payload panel is not a case: it carries no cells to highlight and no row
+   to substitute from, so hovering it must not look like hovering a case row. */
+.param-table tbody tr:hover:not(.failed-row):not(.attachment-panel-row) { background: var(--color-accent-bg); }
 
 /* Crosshair: triggered by JS hovering a th/td. Highlights the matching column
    header, every cell in the column, and any narration placeholders bound to
@@ -567,20 +569,38 @@ span.param-highlight {
   margin-right: 4px;
   color: inherit;
 }
-.attachment-panel-row:hover { background: none; }
+.attachment-badge:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
 .attachment-panel { padding: 0 !important; border: none !important; }
-/* The panel spans every column, so its payload would otherwise drive the whole
-   table's preferred width — a wide attachment stretching the table even while
-   collapsed. Zero intrinsic width plus `min-width: 100%` lets it fill the row
-   it is given and scroll past it, without ever widening the table. */
+/* The payload is not standing in for a row: it is indented out of the column
+   grid and captioned in the report's label register (`.sidebar-label`), so
+   nothing inside it reads as a case value. */
+.attachment-panel-body {
+  margin: 0 var(--space-md) var(--space-sm) var(--space-xl);
+}
+.attachment-panel-label {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: var(--space-sm) 0 var(--space-xs);
+}
+/* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks into
+   it; on the card colour it reads as the document it is. `width: 0` with
+   `min-width: 100%` keeps a wide payload from driving the whole table's
+   preferred width — it fills the row it is given and scrolls past it. */
 .attachment-panel .attachment-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  margin-top: 0;
   width: 0;
   min-width: 100%;
 }
-.attachment-panel-label {
-  font-size: var(--font-size-sm);
-  color: var(--text-muted);
-  padding: var(--space-xs) var(--space-md) 0;
+@media (prefers-reduced-motion: reduce) {
+  .attachment-expand { transition: none; }
 }
 .attachment-content {
   background: var(--bg-page);
@@ -1153,7 +1173,11 @@ span.param-highlight {
             <div class="step-text">I insert $2</div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text">I get a coffee</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s0_2_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Machine state</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s0_2_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s0_2_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s0_2_att_0')"
+          @keydown.space.prevent="toggleAttachment('s0_2_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Machine state</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s0_2_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{
@@ -1170,7 +1194,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1207,7 +1231,11 @@ span.param-highlight {
             <div class="step-text">a coffee machine</div>
           </div><div class="phase-steps">
             <div class="step-text">a printed receipt</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s1_1_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Receipt</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s1_1_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s1_1_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s1_1_att_0')"
+          @keydown.space.prevent="toggleAttachment('s1_1_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Receipt</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s1_1_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>Coffee x1     $2.00
@@ -1227,7 +1255,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1271,7 +1299,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1317,7 +1345,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
       
     </div>
     </div>
@@ -1367,7 +1395,11 @@ Total:        $2.00</pre></div>
         a coffee is dispensed
       </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s4_3'] }">
       <div class="step-children"><div class="step-text">the machine state is consistent</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s4_3_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Final state</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s4_3_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s4_3_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s4_3_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s4_3_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Final state</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s4_3_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{
@@ -1385,7 +1417,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L151">examples/coffeeshop/test_coffeeshop.py:151</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L151">examples/coffeeshop/test_coffeeshop.py:151</a></div>
       
     </div>
     </div>
@@ -1444,7 +1476,11 @@ Total:        $2.00</pre></div>
         the loyalty points are deducted
       </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s5_3_1'] }">
       <div class="step-children"><div class="step-text">the remaining points are valid</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s5_3_1_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Loyalty state</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s5_3_1_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s5_3_1_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s5_3_1_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s5_3_1_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Loyalty state</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s5_3_1_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{
@@ -1457,7 +1493,11 @@ Total:        $2.00</pre></div>
     </div>
           </div><div class="phase-steps">
             <div class="step-text">the machine state is consistent</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s5_4_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Final machine state</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s5_4_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s5_4_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s5_4_att_0')"
+          @keydown.space.prevent="toggleAttachment('s5_4_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Final machine state</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s5_4_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{
@@ -1474,7 +1514,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L164">examples/coffeeshop/test_coffeeshop.py:164</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L164">examples/coffeeshop/test_coffeeshop.py:164</a></div>
       
     </div>
     </div>
@@ -1524,7 +1564,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L198">examples/coffeeshop/test_coffeeshop.py:198</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L198">examples/coffeeshop/test_coffeeshop.py:198</a></div>
       
     </div>
     </div>
@@ -1584,7 +1624,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
@@ -1608,7 +1648,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">58ms</span>
+        <span class="scenario-duration">62ms</span>
       </span>
     </div>
 
@@ -1684,7 +1724,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L231">examples/coffeeshop/test_coffeeshop.py:231</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L231">examples/coffeeshop/test_coffeeshop.py:231</a></div>
       
     </div>
     </div>
@@ -1727,7 +1767,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L237">examples/coffeeshop/test_coffeeshop.py:237</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L237">examples/coffeeshop/test_coffeeshop.py:237</a></div>
       
     </div>
     </div>
@@ -1877,7 +1917,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -1979,7 +2019,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -2079,7 +2119,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
       
     </div>
     </div>
@@ -2164,7 +2204,11 @@ Total:        $2.00</pre></div>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">
               
               
-              <span class="attachment-badge" @click="toggleAttachment('s13_case0_col1')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>brew log</span>
+              <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s13_case0_col1'] ? 'true' : 'false'"
+          @click="toggleAttachment('s13_case0_col1')"
+          @keydown.enter.prevent="toggleAttachment('s13_case0_col1')"
+          @keydown.space.prevent="toggleAttachment('s13_case0_col1')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>brew log</span>
               
             </td>
             
@@ -2185,22 +2229,23 @@ Total:        $2.00</pre></div>
           
           
           
+          
           <tr class="attachment-panel-row">
             <td class="attachment-panel" colspan="4">
               <div class="attachment-expand" :class="{ expanded: expandedAttachments['s13_case0_col1'] }">
                 <div class="attachment-expand-inner">
-                  <div class="attachment-panel-label">brew log</div>
-                  <div class="attachment-content"><pre>00:00  purge vanilla line, 40 ml at 92.8C
+                  <div class="attachment-panel-body"><div class="attachment-panel-label">brew log</div>
+                    <div class="attachment-content"><pre>00:00  purge vanilla line, 40 ml at 92.8C
 00:04  dose 18.5 g, grind 12, hopper: vanilla
 00:09  pre-infuse at 3.0 bar for 4.0 s
 00:13  ramp to 9.0 bar
 00:27  stop at 36.0 g yield, ratio 1:1.95
 00:31  purge group head, vanilla residue cleared</pre></div>
+                  </div>
                 </div>
               </div>
             </td>
           </tr>
-          
           
           
           
@@ -2222,7 +2267,11 @@ Total:        $2.00</pre></div>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">
               
               
-              <span class="attachment-badge" @click="toggleAttachment('s13_case1_col1')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>brew log</span>
+              <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s13_case1_col1'] ? 'true' : 'false'"
+          @click="toggleAttachment('s13_case1_col1')"
+          @keydown.enter.prevent="toggleAttachment('s13_case1_col1')"
+          @keydown.space.prevent="toggleAttachment('s13_case1_col1')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>brew log</span>
               
             </td>
             
@@ -2243,22 +2292,23 @@ Total:        $2.00</pre></div>
           
           
           
+          
           <tr class="attachment-panel-row">
             <td class="attachment-panel" colspan="4">
               <div class="attachment-expand" :class="{ expanded: expandedAttachments['s13_case1_col1'] }">
                 <div class="attachment-expand-inner">
-                  <div class="attachment-panel-label">brew log</div>
-                  <div class="attachment-content"><pre>00:00  purge mocha line, 40 ml at 92.8C
+                  <div class="attachment-panel-body"><div class="attachment-panel-label">brew log</div>
+                    <div class="attachment-content"><pre>00:00  purge mocha line, 40 ml at 92.8C
 00:04  dose 18.5 g, grind 12, hopper: mocha
 00:09  pre-infuse at 3.0 bar for 4.0 s
 00:13  ramp to 9.0 bar
 00:27  stop at 36.0 g yield, ratio 1:1.95
 00:31  purge group head, mocha residue cleared</pre></div>
+                  </div>
                 </div>
               </div>
             </td>
           </tr>
-          
           
           
           
@@ -2271,7 +2321,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L104">examples/coffeeshop/test_coffeeshop.py:104</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L104">examples/coffeeshop/test_coffeeshop.py:104</a></div>
       
     </div>
     </div>
@@ -2363,7 +2413,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
       
     </div>
     </div>
@@ -2394,10 +2444,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-18T21:10:46.782541+00:00",
+    "timestamp": "2026-08-18T21:26:37.090365+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "a0bca854c447ef6e5616722d9142a4fe444dca05"
+    "commit_sha": "a796990a61f3deac3da5211195baf0ed670a61cf"
   },
   "scenarios": [
     {
@@ -3222,7 +3272,7 @@ window.__REPORT_DATA__ = {
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 58,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",

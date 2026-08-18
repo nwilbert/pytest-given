@@ -81,6 +81,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Fixed
 
+- Attachment badges are operable from the keyboard: they take focus, show a
+  focus ring, respond to Enter and Space, and report their expanded state.
 - An attachment line wider than its container was silently cut off — `<pre>`
   does not wrap and nothing scrolled. Attachment content now scrolls
   horizontally, in the step tree as well as the case table.
