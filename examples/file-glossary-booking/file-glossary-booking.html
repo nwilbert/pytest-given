@@ -427,6 +427,7 @@ body {
   margin-top: var(--space-sm);
   margin-left: var(--space-xl);
 }
+.param-table--full { width: calc(100% - var(--space-xl)); }
 .param-table th {
   text-align: left;
   padding: var(--space-sm) var(--space-md);
@@ -566,6 +567,21 @@ span.param-highlight {
   margin-right: 4px;
   color: inherit;
 }
+.attachment-panel-row:hover { background: none; }
+.attachment-panel { padding: 0 !important; border: none !important; }
+/* The panel spans every column, so its payload would otherwise drive the whole
+   table's preferred width — a wide attachment stretching the table even while
+   collapsed. Zero intrinsic width plus `min-width: 100%` lets it fill the row
+   it is given and scroll past it, without ever widening the table. */
+.attachment-panel .attachment-content {
+  width: 0;
+  min-width: 100%;
+}
+.attachment-panel-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  padding: var(--space-xs) var(--space-md) 0;
+}
 .attachment-content {
   background: var(--bg-page);
   padding: var(--space-sm) var(--space-md);
@@ -573,6 +589,7 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
   white-space: pre-wrap;
+  overflow-x: auto;
   color: var(--text-secondary);
   margin-top: var(--space-xs);
 }
@@ -1157,7 +1174,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4ed35fab4f7c978bca7500ae32553dbdbe1f2d09/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
       
     </div>
     </div>
@@ -1203,7 +1220,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4ed35fab4f7c978bca7500ae32553dbdbe1f2d09/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
       
     </div>
     </div>
@@ -1370,7 +1387,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4ed35fab4f7c978bca7500ae32553dbdbe1f2d09/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -1518,7 +1535,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4ed35fab4f7c978bca7500ae32553dbdbe1f2d09/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
                 
               </div>
             </div>
@@ -1594,7 +1611,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4ed35fab4f7c978bca7500ae32553dbdbe1f2d09/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
                 
               </div>
             </div>
@@ -1655,7 +1672,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4ed35fab4f7c978bca7500ae32553dbdbe1f2d09/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
                 
               </div>
             </div>
@@ -1738,7 +1755,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4ed35fab4f7c978bca7500ae32553dbdbe1f2d09/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
                 
               </div>
             </div>
@@ -1804,7 +1821,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4ed35fab4f7c978bca7500ae32553dbdbe1f2d09/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
                 
               </div>
             </div>
@@ -1845,7 +1862,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4ed35fab4f7c978bca7500ae32553dbdbe1f2d09/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
                 
               </div>
             </div>
@@ -1873,10 +1890,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-18T15:31:47.844165+00:00",
+    "timestamp": "2026-08-18T21:10:47.222802+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "4ed35fab4f7c978bca7500ae32553dbdbe1f2d09"
+    "commit_sha": "a0bca854c447ef6e5616722d9142a4fe444dca05"
   },
   "scenarios": [
     {

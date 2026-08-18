@@ -165,8 +165,23 @@ def _case_key(table: ParameterTable, case: ParameterCase) -> str:
     )
 
 
+_MAX_INLINE = 72
+
+
 def _fits_inline(content: str) -> bool:
-    return not any(nl in content for nl in ('\r\n', '\n', '\r')) and '`' not in content
+    """Whether `content` can sit inside a table cell or an attachment bullet.
+
+    A newline or a backtick would break the surrounding structure outright.
+    Length breaks it just as effectively without being malformed: a
+    300-character cell — one `json.dumps` without `indent` — pushes every other
+    column of the case table off the terminal. `_MAX_INLINE` is the width of a
+    payload that still leaves room for the columns beside it.
+    """
+    return (
+        not any(nl in content for nl in ('\r\n', '\n', '\r'))
+        and '`' not in content
+        and len(content) <= _MAX_INLINE
+    )
 
 
 def _fenced(content: str) -> list[str]:

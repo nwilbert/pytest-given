@@ -68,8 +68,12 @@
   {#- Badge plus the payload it expands, keyed on `cell_id`. The step tree and
       the case table both attach this way; only a promoted attachment differs,
       having no payload of its own to expand. -#}
-  {%- macro expandable_attachment(cell_id, label, content) -%}
+  {%- macro attachment_badge(cell_id, label) -%}
     <span class="attachment-badge" @click="toggleAttachment('{{ cell_id }}')">{{ attachment_icon() }}{{ label }}</span>
+  {%- endmacro -%}
+
+  {%- macro expandable_attachment(cell_id, label, content) -%}
+    {{ attachment_badge(cell_id, label) }}
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{{ content }}</pre></div>
@@ -270,7 +274,11 @@
       </div>
 
       {% if scenario.parameters %}
-      <table class="param-table">
+      {#- A table with an attachment column carries payload panels spanning its
+          full width, so it takes the card's width rather than its columns'.
+          A table without one stays as wide as its data. -#}
+      {% set has_attachment = scenario.parameters.columns | selectattr('kind', 'equalto', 'attachment') | list %}
+      <table class="param-table{% if has_attachment %} param-table--full{% endif %}">
         <thead>
           <tr>
             {% for col in scenario.parameters.columns %}
@@ -294,8 +302,7 @@
                 @mouseleave="setHoverParam(null, $event.currentTarget)">
               {% if val %}
               {# Keyed on the column's position, never on `col.id`: the id is report data and this lands inside an Alpine expression. #}
-              {% set cell_id = 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0 %}
-              {{ expandable_attachment(cell_id, col.name, val.content) }}
+              {{ attachment_badge('s' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0, col.name) }}
               {% endif %}
             </td>
             {% else %}
@@ -314,6 +321,26 @@
               {% if case.status == 'passed' %}<span class="dot-passed">✓</span>{% elif case.status == 'skipped' %}<span class="dot-skipped">○</span>{% else %}<span class="dot-failed">✗</span>{% endif %}
             </td>
           </tr>
+          {#- A payload opens across the whole table rather than inside its
+              cell: an attachment is routinely wider than any column, and a
+              cell that holds one both squeezes the columns beside it (the
+              collapsed content still sizes the column) and clips what it
+              cannot fit. -#}
+          {% for col, val in zip(scenario.parameters.columns, case.values) %}
+          {% if col.kind == 'attachment' and val %}
+          {% set cell_id = 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0 %}
+          <tr class="attachment-panel-row">
+            <td class="attachment-panel" colspan="{{ scenario.parameters.columns | length + 1 }}">
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-panel-label">{{ col.name }}</div>
+                  <div class="attachment-content"><pre>{{ val.content }}</pre></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
           {% if case.error %}
           <tr>
             <td colspan="{{ scenario.parameters.columns | length + 1 }}">

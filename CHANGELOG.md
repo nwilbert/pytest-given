@@ -22,8 +22,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
   payload as if it spoke for all of them. A case that attaches a label more
   times than the baseline case gets a column per extra occurrence, which
   carries no badge — the grouped step has no slot for an attachment the
-  baseline never recorded. In Markdown a short payload sits inline in the cell
-  and a long one is fenced below the table. No two columns share a header: a
+  baseline never recorded. A payload only sits in the cell when it is short and
+  single-line: in HTML the badge opens a panel spanning the table under its
+  row, and in Markdown a longer payload is fenced below the table. Neither
+  squeezes the column, and a line too wide for the panel scrolls rather than
+  being cut off. No two columns share a header: a
   label attached twice in one step, or one expression promoted in two steps,
   gives the second and later columns a ` #2` / ` #3` suffix, and the step
   tree's badge or `{name}` token carries the suffixed name too — a pointer
@@ -77,6 +80,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
   `given(t"{pg['Customer']} {name} places an order")`.
 
 ### Fixed
+
+- An attachment line wider than its container was silently cut off — `<pre>`
+  does not wrap and nothing scrolled. Attachment content now scrolls
+  horizontally, in the step tree as well as the case table.
 
 - A run that ends in a parametrize grouping error now deletes the report files
   it was told to write instead of leaving the previous run's behind, where they

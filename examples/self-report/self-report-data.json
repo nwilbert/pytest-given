@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-18T15:45:37.193534+00:00",
+    "timestamp": "2026-08-18T21:10:46.161592+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "7a2f3bb3644ebbb6171d5c1458d3b9ad684c8cde"
+    "commit_sha": "a0bca854c447ef6e5616722d9142a4fe444dca05"
   },
   "scenarios": [
     {
@@ -14416,7 +14416,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
