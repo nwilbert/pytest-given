@@ -68,8 +68,14 @@
   {#- Badge plus the payload it expands, keyed on `cell_id`. The step tree and
       the case table both attach this way; only a promoted attachment differs,
       having no payload of its own to expand. -#}
+  {#- A badge opens a payload, so it is operable: reachable by keyboard and
+      announced as a control, not as decorated text. -#}
   {%- macro attachment_badge(cell_id, label) -%}
-    <span class="attachment-badge" @click="toggleAttachment('{{ cell_id }}')">{{ attachment_icon() }}{{ label }}</span>
+    <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['{{ cell_id }}'] ? 'true' : 'false'"
+          @click="toggleAttachment('{{ cell_id }}')"
+          @keydown.enter.prevent="toggleAttachment('{{ cell_id }}')"
+          @keydown.space.prevent="toggleAttachment('{{ cell_id }}')">{{ attachment_icon() }}{{ label }}</span>
   {%- endmacro -%}
 
   {%- macro expandable_attachment(cell_id, label, content) -%}
@@ -321,6 +327,13 @@
               {% if case.status == 'passed' %}<span class="dot-passed">✓</span>{% elif case.status == 'skipped' %}<span class="dot-skipped">○</span>{% else %}<span class="dot-failed">✗</span>{% endif %}
             </td>
           </tr>
+          {% if case.error %}
+          <tr>
+            <td colspan="{{ scenario.parameters.columns | length + 1 }}">
+              {{ render_error(case.error) }}
+            </td>
+          </tr>
+          {% endif %}
           {#- A payload opens across the whole table rather than inside its
               cell: an attachment is routinely wider than any column, and a
               cell that holds one both squeezes the columns beside it (the
@@ -333,21 +346,21 @@
             <td class="attachment-panel" colspan="{{ scenario.parameters.columns | length + 1 }}">
               <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
                 <div class="attachment-expand-inner">
-                  <div class="attachment-panel-label">{{ col.name }}</div>
-                  <div class="attachment-content"><pre>{{ val.content }}</pre></div>
+                  <div class="attachment-panel-body">
+                    {#- The column name alone: the panel opens under its own
+                        row, so the case is already on screen — unlike a Markdown
+                        block, which is collected below the whole table and needs
+                        the case key to say where it belongs. What the caption is
+                        for is telling two panels open on one row apart. -#}
+                    <div class="attachment-panel-label">{{ col.name }}</div>
+                    <div class="attachment-content"><pre>{{ val.content }}</pre></div>
+                  </div>
                 </div>
               </div>
             </td>
           </tr>
           {% endif %}
           {% endfor %}
-          {% if case.error %}
-          <tr>
-            <td colspan="{{ scenario.parameters.columns | length + 1 }}">
-              {{ render_error(case.error) }}
-            </td>
-          </tr>
-          {% endif %}
           {% endfor %}
         </tbody>
       </table>

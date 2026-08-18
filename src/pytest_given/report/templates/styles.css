@@ -436,7 +436,9 @@ body {
 }
 .param-table tr.failed-row { background: var(--color-error-bg); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }
-.param-table tbody tr:hover:not(.failed-row) { background: var(--color-accent-bg); }
+/* A payload panel is not a case: it carries no cells to highlight and no row
+   to substitute from, so hovering it must not look like hovering a case row. */
+.param-table tbody tr:hover:not(.failed-row):not(.attachment-panel-row) { background: var(--color-accent-bg); }
 
 /* Crosshair: triggered by JS hovering a th/td. Highlights the matching column
    header, every cell in the column, and any narration placeholders bound to
@@ -560,20 +562,38 @@ span.param-highlight {
   margin-right: 4px;
   color: inherit;
 }
-.attachment-panel-row:hover { background: none; }
+.attachment-badge:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
 .attachment-panel { padding: 0 !important; border: none !important; }
-/* The panel spans every column, so its payload would otherwise drive the whole
-   table's preferred width — a wide attachment stretching the table even while
-   collapsed. Zero intrinsic width plus `min-width: 100%` lets it fill the row
-   it is given and scroll past it, without ever widening the table. */
+/* The payload is not standing in for a row: it is indented out of the column
+   grid and captioned in the report's label register (`.sidebar-label`), so
+   nothing inside it reads as a case value. */
+.attachment-panel-body {
+  margin: 0 var(--space-md) var(--space-sm) var(--space-xl);
+}
+.attachment-panel-label {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: var(--space-sm) 0 var(--space-xs);
+}
+/* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks into
+   it; on the card colour it reads as the document it is. `width: 0` with
+   `min-width: 100%` keeps a wide payload from driving the whole table's
+   preferred width — it fills the row it is given and scrolls past it. */
 .attachment-panel .attachment-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  margin-top: 0;
   width: 0;
   min-width: 100%;
 }
-.attachment-panel-label {
-  font-size: var(--font-size-sm);
-  color: var(--text-muted);
-  padding: var(--space-xs) var(--space-md) 0;
+@media (prefers-reduced-motion: reduce) {
+  .attachment-expand { transition: none; }
 }
 .attachment-content {
   background: var(--bg-page);

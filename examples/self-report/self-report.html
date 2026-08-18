@@ -443,7 +443,9 @@ body {
 }
 .param-table tr.failed-row { background: var(--color-error-bg); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }
-.param-table tbody tr:hover:not(.failed-row) { background: var(--color-accent-bg); }
+/* A payload panel is not a case: it carries no cells to highlight and no row
+   to substitute from, so hovering it must not look like hovering a case row. */
+.param-table tbody tr:hover:not(.failed-row):not(.attachment-panel-row) { background: var(--color-accent-bg); }
 
 /* Crosshair: triggered by JS hovering a th/td. Highlights the matching column
    header, every cell in the column, and any narration placeholders bound to
@@ -567,20 +569,38 @@ span.param-highlight {
   margin-right: 4px;
   color: inherit;
 }
-.attachment-panel-row:hover { background: none; }
+.attachment-badge:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
 .attachment-panel { padding: 0 !important; border: none !important; }
-/* The panel spans every column, so its payload would otherwise drive the whole
-   table's preferred width — a wide attachment stretching the table even while
-   collapsed. Zero intrinsic width plus `min-width: 100%` lets it fill the row
-   it is given and scroll past it, without ever widening the table. */
+/* The payload is not standing in for a row: it is indented out of the column
+   grid and captioned in the report's label register (`.sidebar-label`), so
+   nothing inside it reads as a case value. */
+.attachment-panel-body {
+  margin: 0 var(--space-md) var(--space-sm) var(--space-xl);
+}
+.attachment-panel-label {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: var(--space-sm) 0 var(--space-xs);
+}
+/* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks into
+   it; on the card colour it reads as the document it is. `width: 0` with
+   `min-width: 100%` keeps a wide payload from driving the whole table's
+   preferred width — it fills the row it is given and scrolls past it. */
 .attachment-panel .attachment-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  margin-top: 0;
   width: 0;
   min-width: 100%;
 }
-.attachment-panel-label {
-  font-size: var(--font-size-sm);
-  color: var(--text-muted);
-  padding: var(--space-xs) var(--space-md) 0;
+@media (prefers-reduced-motion: reduce) {
+  .attachment-expand { transition: none; }
 }
 .attachment-content {
   background: var(--bg-page);
@@ -1174,7 +1194,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_collector.py#L23">tests/unit/capture/test_collector.py:23</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_collector.py#L23">tests/unit/capture/test_collector.py:23</a></div>
       
     </div>
     </div>
@@ -1220,7 +1240,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_collector.py#L43">tests/unit/capture/test_collector.py:43</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_collector.py#L43">tests/unit/capture/test_collector.py:43</a></div>
       
     </div>
     </div>
@@ -1266,7 +1286,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_collector.py#L213">tests/unit/capture/test_collector.py:213</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_collector.py#L213">tests/unit/capture/test_collector.py:213</a></div>
       
     </div>
     </div>
@@ -1312,7 +1332,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_collector.py#L234">tests/unit/capture/test_collector.py:234</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_collector.py#L234">tests/unit/capture/test_collector.py:234</a></div>
       
     </div>
     </div>
@@ -1358,7 +1378,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_collector.py#L253">tests/unit/capture/test_collector.py:253</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_collector.py#L253">tests/unit/capture/test_collector.py:253</a></div>
       
     </div>
     </div>
@@ -1404,7 +1424,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_collector.py#L316">tests/unit/capture/test_collector.py:316</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_collector.py#L316">tests/unit/capture/test_collector.py:316</a></div>
       
     </div>
     </div>
@@ -1450,7 +1470,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_collector.py#L458">tests/unit/capture/test_collector.py:458</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_collector.py#L458">tests/unit/capture/test_collector.py:458</a></div>
       
     </div>
     </div>
@@ -1496,7 +1516,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_collector.py#L477">tests/unit/capture/test_collector.py:477</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_collector.py#L477">tests/unit/capture/test_collector.py:477</a></div>
       
     </div>
     </div>
@@ -1542,7 +1562,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_collector.py#L503">tests/unit/capture/test_collector.py:503</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_collector.py#L503">tests/unit/capture/test_collector.py:503</a></div>
       
     </div>
     </div>
@@ -1577,7 +1597,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary" data-term-name="File glossary" data-term-def="A glossary loaded from a Markdown file, via the &lt;code&gt;FileGlossary(path)&lt;/code&gt; class. It parses all GFM pipe tables in the file into the same inner &lt;code&gt;Glossary&lt;/code&gt; model; terms are accessed by name (&lt;code&gt;g[&amp;#39;Guest&amp;#39;]&lt;/code&gt;, case-insensitive). &lt;em&gt;Kind inference&lt;/em&gt; fills in term kinds post-collection from activity &lt;em&gt;slot&lt;/em&gt; positions when no explicit &lt;code&gt;kind_column&lt;/code&gt; is configured.">File glossary</span> loaded from a Markdown file</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s9_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s9_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s9_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s9_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s9_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s9_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -1602,7 +1626,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L27">tests/unit/capture/test_file_glossary.py:27</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L27">tests/unit/capture/test_file_glossary.py:27</a></div>
       
     </div>
     </div>
@@ -1637,7 +1661,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary" data-term-name="File glossary" data-term-def="A glossary loaded from a Markdown file, via the &lt;code&gt;FileGlossary(path)&lt;/code&gt; class. It parses all GFM pipe tables in the file into the same inner &lt;code&gt;Glossary&lt;/code&gt; model; terms are accessed by name (&lt;code&gt;g[&amp;#39;Guest&amp;#39;]&lt;/code&gt;, case-insensitive). &lt;em&gt;Kind inference&lt;/em&gt; fills in term kinds post-collection from activity &lt;em&gt;slot&lt;/em&gt; positions when no explicit &lt;code&gt;kind_column&lt;/code&gt; is configured.">File glossary</span> loaded from a Markdown file</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s10_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s10_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s10_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s10_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s10_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s10_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -1662,7 +1690,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L42">tests/unit/capture/test_file_glossary.py:42</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L42">tests/unit/capture/test_file_glossary.py:42</a></div>
       
     </div>
     </div>
@@ -1697,7 +1725,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a Markdown glossary file with no kind column</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s11_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s11_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s11_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s11_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s11_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s11_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -1722,7 +1754,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L56">tests/unit/capture/test_file_glossary.py:56</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L56">tests/unit/capture/test_file_glossary.py:56</a></div>
       
     </div>
     </div>
@@ -1757,7 +1789,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary" data-term-name="File glossary" data-term-def="A glossary loaded from a Markdown file, via the &lt;code&gt;FileGlossary(path)&lt;/code&gt; class. It parses all GFM pipe tables in the file into the same inner &lt;code&gt;Glossary&lt;/code&gt; model; terms are accessed by name (&lt;code&gt;g[&amp;#39;Guest&amp;#39;]&lt;/code&gt;, case-insensitive). &lt;em&gt;Kind inference&lt;/em&gt; fills in term kinds post-collection from activity &lt;em&gt;slot&lt;/em&gt; positions when no explicit &lt;code&gt;kind_column&lt;/code&gt; is configured.">File glossary</span> loaded from a Markdown file</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s12_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s12_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s12_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s12_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s12_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s12_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -1782,7 +1818,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L73">tests/unit/capture/test_file_glossary.py:73</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L73">tests/unit/capture/test_file_glossary.py:73</a></div>
       
     </div>
     </div>
@@ -1817,7 +1853,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary" data-term-name="File glossary" data-term-def="A glossary loaded from a Markdown file, via the &lt;code&gt;FileGlossary(path)&lt;/code&gt; class. It parses all GFM pipe tables in the file into the same inner &lt;code&gt;Glossary&lt;/code&gt; model; terms are accessed by name (&lt;code&gt;g[&amp;#39;Guest&amp;#39;]&lt;/code&gt;, case-insensitive). &lt;em&gt;Kind inference&lt;/em&gt; fills in term kinds post-collection from activity &lt;em&gt;slot&lt;/em&gt; positions when no explicit &lt;code&gt;kind_column&lt;/code&gt; is configured.">File glossary</span> loaded from a Markdown file</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s13_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s13_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s13_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s13_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s13_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s13_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -1842,7 +1882,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L91">tests/unit/capture/test_file_glossary.py:91</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L91">tests/unit/capture/test_file_glossary.py:91</a></div>
       
     </div>
     </div>
@@ -1877,7 +1917,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary" data-term-name="File glossary" data-term-def="A glossary loaded from a Markdown file, via the &lt;code&gt;FileGlossary(path)&lt;/code&gt; class. It parses all GFM pipe tables in the file into the same inner &lt;code&gt;Glossary&lt;/code&gt; model; terms are accessed by name (&lt;code&gt;g[&amp;#39;Guest&amp;#39;]&lt;/code&gt;, case-insensitive). &lt;em&gt;Kind inference&lt;/em&gt; fills in term kinds post-collection from activity &lt;em&gt;slot&lt;/em&gt; positions when no explicit &lt;code&gt;kind_column&lt;/code&gt; is configured.">File glossary</span> loaded from a Markdown file</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s14_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s14_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s14_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s14_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s14_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s14_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -1902,7 +1946,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L108">tests/unit/capture/test_file_glossary.py:108</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L108">tests/unit/capture/test_file_glossary.py:108</a></div>
       
     </div>
     </div>
@@ -1937,7 +1981,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a Markdown glossary with an explicit Kind column</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s15_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s15_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s15_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s15_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s15_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s15_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning | Kind |
@@ -1959,7 +2007,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L128">tests/unit/capture/test_file_glossary.py:128</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L128">tests/unit/capture/test_file_glossary.py:128</a></div>
       
     </div>
     </div>
@@ -1994,7 +2042,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a Markdown glossary with the kind in the third column</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s16_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s16_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s16_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s16_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s16_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s16_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning | Kind |
@@ -2016,7 +2068,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L148">tests/unit/capture/test_file_glossary.py:148</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L148">tests/unit/capture/test_file_glossary.py:148</a></div>
       
     </div>
     </div>
@@ -2051,7 +2103,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a glossary whose Kind cell says work_object</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s17_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s17_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s17_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s17_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s17_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s17_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning | Kind |
@@ -2072,7 +2128,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L168">tests/unit/capture/test_file_glossary.py:168</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L168">tests/unit/capture/test_file_glossary.py:168</a></div>
       
     </div>
     </div>
@@ -2107,7 +2163,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a glossary whose Kind cell holds an unknown value</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s18_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s18_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s18_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s18_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s18_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s18_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning | Kind |
@@ -2128,7 +2188,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L184">tests/unit/capture/test_file_glossary.py:184</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L184">tests/unit/capture/test_file_glossary.py:184</a></div>
       
     </div>
     </div>
@@ -2174,7 +2234,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L204">tests/unit/capture/test_file_glossary.py:204</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L204">tests/unit/capture/test_file_glossary.py:204</a></div>
       
     </div>
     </div>
@@ -2209,7 +2269,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a row whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term" data-term-name="Term" data-term-def="A registered glossary entry: an Actor, Work Object, Verb, or kindless term. Each carries an id (slug), a canonical name, a kind (&lt;code&gt;None&lt;/code&gt; when kindless), and an optional definition (`str">Term</span> cell has no id-able characters</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s20_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s20_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s20_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s20_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s20_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s20_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning |
@@ -2230,7 +2294,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L231">tests/unit/capture/test_file_glossary.py:231</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L231">tests/unit/capture/test_file_glossary.py:231</a></div>
       
     </div>
     </div>
@@ -2265,7 +2329,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">two rows for one <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term" data-term-name="Term" data-term-def="A registered glossary entry: an Actor, Work Object, Verb, or kindless term. Each carries an id (slug), a canonical name, a kind (&lt;code&gt;None&lt;/code&gt; when kindless), and an optional definition (`str">Term</span> with different definitions</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s21_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s21_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s21_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s21_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s21_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s21_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning |
@@ -2287,7 +2355,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L251">tests/unit/capture/test_file_glossary.py:251</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L251">tests/unit/capture/test_file_glossary.py:251</a></div>
       
     </div>
     </div>
@@ -2322,7 +2390,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a row whose description cell is blank</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s22_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s22_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s22_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s22_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s22_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s22_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning |
@@ -2343,7 +2415,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L275">tests/unit/capture/test_file_glossary.py:275</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L275">tests/unit/capture/test_file_glossary.py:275</a></div>
       
     </div>
     </div>
@@ -2378,7 +2450,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">two identical rows for the same <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term" data-term-name="Term" data-term-def="A registered glossary entry: an Actor, Work Object, Verb, or kindless term. Each carries an id (slug), a canonical name, a kind (&lt;code&gt;None&lt;/code&gt; when kindless), and an optional definition (`str">Term</span></div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s23_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s23_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s23_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s23_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s23_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s23_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning |
@@ -2400,7 +2476,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L293">tests/unit/capture/test_file_glossary.py:293</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L293">tests/unit/capture/test_file_glossary.py:293</a></div>
       
     </div>
     </div>
@@ -2435,7 +2511,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary" data-term-name="File glossary" data-term-def="A glossary loaded from a Markdown file, via the &lt;code&gt;FileGlossary(path)&lt;/code&gt; class. It parses all GFM pipe tables in the file into the same inner &lt;code&gt;Glossary&lt;/code&gt; model; terms are accessed by name (&lt;code&gt;g[&amp;#39;Guest&amp;#39;]&lt;/code&gt;, case-insensitive). &lt;em&gt;Kind inference&lt;/em&gt; fills in term kinds post-collection from activity &lt;em&gt;slot&lt;/em&gt; positions when no explicit &lt;code&gt;kind_column&lt;/code&gt; is configured.">File glossary</span> loaded from a Markdown file</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s24_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s24_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s24_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s24_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s24_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s24_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -2460,7 +2540,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L319">tests/unit/capture/test_file_glossary.py:319</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L319">tests/unit/capture/test_file_glossary.py:319</a></div>
       
     </div>
     </div>
@@ -2495,7 +2575,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary" data-term-name="File glossary" data-term-def="A glossary loaded from a Markdown file, via the &lt;code&gt;FileGlossary(path)&lt;/code&gt; class. It parses all GFM pipe tables in the file into the same inner &lt;code&gt;Glossary&lt;/code&gt; model; terms are accessed by name (&lt;code&gt;g[&amp;#39;Guest&amp;#39;]&lt;/code&gt;, case-insensitive). &lt;em&gt;Kind inference&lt;/em&gt; fills in term kinds post-collection from activity &lt;em&gt;slot&lt;/em&gt; positions when no explicit &lt;code&gt;kind_column&lt;/code&gt; is configured.">File glossary</span> loaded from a Markdown file</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s25_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s25_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s25_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s25_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s25_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Glossary file</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s25_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -2522,7 +2606,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_file_glossary.py#L334">tests/unit/capture/test_file_glossary.py:334</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_file_glossary.py#L334">tests/unit/capture/test_file_glossary.py:334</a></div>
       
     </div>
     </div>
@@ -2568,7 +2652,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L106">tests/unit/capture/test_glossary.py:106</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L106">tests/unit/capture/test_glossary.py:106</a></div>
       
     </div>
     </div>
@@ -2614,7 +2698,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L133">tests/unit/capture/test_glossary.py:133</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L133">tests/unit/capture/test_glossary.py:133</a></div>
       
     </div>
     </div>
@@ -2660,7 +2744,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L154">tests/unit/capture/test_glossary.py:154</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L154">tests/unit/capture/test_glossary.py:154</a></div>
       
     </div>
     </div>
@@ -2706,7 +2790,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L186">tests/unit/capture/test_glossary.py:186</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L186">tests/unit/capture/test_glossary.py:186</a></div>
       
     </div>
     </div>
@@ -2752,7 +2836,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L201">tests/unit/capture/test_glossary.py:201</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L201">tests/unit/capture/test_glossary.py:201</a></div>
       
     </div>
     </div>
@@ -2798,7 +2882,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L219">tests/unit/capture/test_glossary.py:219</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L219">tests/unit/capture/test_glossary.py:219</a></div>
       
     </div>
     </div>
@@ -2844,7 +2928,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L243">tests/unit/capture/test_glossary.py:243</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L243">tests/unit/capture/test_glossary.py:243</a></div>
       
     </div>
     </div>
@@ -2890,7 +2974,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L338">tests/unit/capture/test_glossary.py:338</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L338">tests/unit/capture/test_glossary.py:338</a></div>
       
     </div>
     </div>
@@ -2936,7 +3020,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L418">tests/unit/capture/test_glossary.py:418</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L418">tests/unit/capture/test_glossary.py:418</a></div>
       
     </div>
     </div>
@@ -2982,7 +3066,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L432">tests/unit/capture/test_glossary.py:432</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L432">tests/unit/capture/test_glossary.py:432</a></div>
       
     </div>
     </div>
@@ -3028,7 +3112,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L46">tests/unit/capture/test_kind_inference.py:46</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L46">tests/unit/capture/test_kind_inference.py:46</a></div>
       
     </div>
     </div>
@@ -3074,7 +3158,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L65">tests/unit/capture/test_kind_inference.py:65</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L65">tests/unit/capture/test_kind_inference.py:65</a></div>
       
     </div>
     </div>
@@ -3120,7 +3204,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L86">tests/unit/capture/test_kind_inference.py:86</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L86">tests/unit/capture/test_kind_inference.py:86</a></div>
       
     </div>
     </div>
@@ -3166,7 +3250,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L99">tests/unit/capture/test_kind_inference.py:99</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L99">tests/unit/capture/test_kind_inference.py:99</a></div>
       
     </div>
     </div>
@@ -3212,7 +3296,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L121">tests/unit/capture/test_kind_inference.py:121</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L121">tests/unit/capture/test_kind_inference.py:121</a></div>
       
     </div>
     </div>
@@ -3258,7 +3342,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L144">tests/unit/capture/test_kind_inference.py:144</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L144">tests/unit/capture/test_kind_inference.py:144</a></div>
       
     </div>
     </div>
@@ -3304,7 +3388,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L161">tests/unit/capture/test_kind_inference.py:161</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L161">tests/unit/capture/test_kind_inference.py:161</a></div>
       
     </div>
     </div>
@@ -3350,7 +3434,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L187">tests/unit/capture/test_kind_inference.py:187</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L187">tests/unit/capture/test_kind_inference.py:187</a></div>
       
     </div>
     </div>
@@ -3396,7 +3480,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L205">tests/unit/capture/test_kind_inference.py:205</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L205">tests/unit/capture/test_kind_inference.py:205</a></div>
       
     </div>
     </div>
@@ -3442,7 +3526,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L224">tests/unit/capture/test_kind_inference.py:224</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L224">tests/unit/capture/test_kind_inference.py:224</a></div>
       
     </div>
     </div>
@@ -3488,7 +3572,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L244">tests/unit/capture/test_kind_inference.py:244</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L244">tests/unit/capture/test_kind_inference.py:244</a></div>
       
     </div>
     </div>
@@ -3534,7 +3618,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L267">tests/unit/capture/test_kind_inference.py:267</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L267">tests/unit/capture/test_kind_inference.py:267</a></div>
       
     </div>
     </div>
@@ -3580,7 +3664,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_kind_inference.py#L286">tests/unit/capture/test_kind_inference.py:286</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_kind_inference.py#L286">tests/unit/capture/test_kind_inference.py:286</a></div>
       
     </div>
     </div>
@@ -3617,7 +3701,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a Markdown document with one pipe table</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s49_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s49_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s49_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s49_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s49_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s49_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -3641,7 +3729,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L24">tests/unit/capture/test_markdown_glossary.py:24</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L24">tests/unit/capture/test_markdown_glossary.py:24</a></div>
       
     </div>
     </div>
@@ -3678,7 +3766,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a document containing two separate pipe tables</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s50_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s50_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s50_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s50_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s50_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s50_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -3708,7 +3800,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L42">tests/unit/capture/test_markdown_glossary.py:42</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L42">tests/unit/capture/test_markdown_glossary.py:42</a></div>
       
     </div>
     </div>
@@ -3745,7 +3837,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a table with custom, differently-cased header names</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s51_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s51_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s51_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s51_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s51_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s51_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Word | Note | Role |
@@ -3766,7 +3862,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L61">tests/unit/capture/test_markdown_glossary.py:61</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L61">tests/unit/capture/test_markdown_glossary.py:61</a></div>
       
     </div>
     </div>
@@ -3803,7 +3899,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">cells containing escaped pipe characters (\|)</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s52_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s52_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s52_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s52_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s52_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s52_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning |
@@ -3824,7 +3924,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L77">tests/unit/capture/test_markdown_glossary.py:77</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L77">tests/unit/capture/test_markdown_glossary.py:77</a></div>
       
     </div>
     </div>
@@ -3861,7 +3961,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a fenced code block that contains a look-alike table</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s53_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s53_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s53_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s53_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s53_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s53_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>```
@@ -3888,7 +3992,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L95">tests/unit/capture/test_markdown_glossary.py:95</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L95">tests/unit/capture/test_markdown_glossary.py:95</a></div>
       
     </div>
     </div>
@@ -3925,7 +4029,11 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a document with no pipe table</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s54_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s54_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s54_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s54_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s54_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s54_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Just a heading
@@ -3945,7 +4053,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L114">tests/unit/capture/test_markdown_glossary.py:114</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L114">tests/unit/capture/test_markdown_glossary.py:114</a></div>
       
     </div>
     </div>
@@ -3982,7 +4090,11 @@ No tables here.</pre></div>
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a Markdown document with one pipe table</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s55_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s55_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s55_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s55_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s55_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s55_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -4006,7 +4118,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L134">tests/unit/capture/test_markdown_glossary.py:134</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L134">tests/unit/capture/test_markdown_glossary.py:134</a></div>
       
     </div>
     </div>
@@ -4043,7 +4155,11 @@ No tables here.</pre></div>
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a Markdown document with one pipe table</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s56_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s56_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s56_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s56_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s56_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s56_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre># Glossary
@@ -4067,7 +4183,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L151">tests/unit/capture/test_markdown_glossary.py:151</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L151">tests/unit/capture/test_markdown_glossary.py:151</a></div>
       
     </div>
     </div>
@@ -4104,7 +4220,11 @@ No tables here.</pre></div>
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a table with a data row narrower than its header</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s57_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s57_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s57_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s57_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s57_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s57_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning | Type |
@@ -4126,7 +4246,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L175">tests/unit/capture/test_markdown_glossary.py:175</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L175">tests/unit/capture/test_markdown_glossary.py:175</a></div>
       
     </div>
     </div>
@@ -4163,7 +4283,11 @@ No tables here.</pre></div>
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term" data-term-name="Term" data-term-def="A registered glossary entry: an Actor, Work Object, Verb, or kindless term. Each carries an id (slug), a canonical name, a kind (&lt;code&gt;None&lt;/code&gt; when kindless), and an optional definition (`str">Term</span> cell written with **bold** emphasis</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s58_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s58_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s58_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s58_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s58_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s58_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning |
@@ -4184,7 +4308,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L193">tests/unit/capture/test_markdown_glossary.py:193</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L193">tests/unit/capture/test_markdown_glossary.py:193</a></div>
       
     </div>
     </div>
@@ -4221,7 +4345,11 @@ No tables here.</pre></div>
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text"><span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term" data-term-name="Term" data-term-def="A registered glossary entry: an Actor, Work Object, Verb, or kindless term. Each carries an id (slug), a canonical name, a kind (&lt;code&gt;None&lt;/code&gt; when kindless), and an optional definition (`str">Term</span> cells using *italic* and `code` emphasis</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s59_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s59_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s59_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s59_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s59_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s59_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning |
@@ -4243,7 +4371,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L213">tests/unit/capture/test_markdown_glossary.py:213</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L213">tests/unit/capture/test_markdown_glossary.py:213</a></div>
       
     </div>
     </div>
@@ -4280,7 +4408,11 @@ No tables here.</pre></div>
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term" data-term-name="Term" data-term-def="A registered glossary entry: an Actor, Work Object, Verb, or kindless term. Each carries an id (slug), a canonical name, a kind (&lt;code&gt;None&lt;/code&gt; when kindless), and an optional definition (`str">Term</span> literally named work_object</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s60_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s60_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s60_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s60_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s60_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s60_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning |
@@ -4301,7 +4433,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L229">tests/unit/capture/test_markdown_glossary.py:229</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L229">tests/unit/capture/test_markdown_glossary.py:229</a></div>
       
     </div>
     </div>
@@ -4338,7 +4470,11 @@ No tables here.</pre></div>
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a Kind cell written with bold emphasis</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s61_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s61_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s61_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s61_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s61_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s61_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning | Kind |
@@ -4359,7 +4495,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L245">tests/unit/capture/test_markdown_glossary.py:245</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L245">tests/unit/capture/test_markdown_glossary.py:245</a></div>
       
     </div>
     </div>
@@ -4396,7 +4532,11 @@ No tables here.</pre></div>
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a definition cell rich with inline code</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s62_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s62_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s62_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s62_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s62_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s62_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>| Term | Meaning |
@@ -4417,7 +4557,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L261">tests/unit/capture/test_markdown_glossary.py:261</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L261">tests/unit/capture/test_markdown_glossary.py:261</a></div>
       
     </div>
     </div>
@@ -4454,7 +4594,11 @@ No tables here.</pre></div>
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">prose containing a stray pipe, then a real table</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s63_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s63_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s63_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s63_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s63_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Markdown document</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s63_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>This line has a | in it but no separator follows.
@@ -4478,7 +4622,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_markdown_glossary.py#L280">tests/unit/capture/test_markdown_glossary.py:280</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_markdown_glossary.py#L280">tests/unit/capture/test_markdown_glossary.py:280</a></div>
       
     </div>
     </div>
@@ -4522,7 +4666,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_step_descriptor.py#L54">tests/unit/capture/test_step_descriptor.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_step_descriptor.py#L54">tests/unit/capture/test_step_descriptor.py:54</a></div>
       
     </div>
     </div>
@@ -4568,7 +4712,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_step_descriptor.py#L249">tests/unit/capture/test_step_descriptor.py:249</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_step_descriptor.py#L249">tests/unit/capture/test_step_descriptor.py:249</a></div>
       
     </div>
     </div>
@@ -4614,7 +4758,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_step_descriptor.py#L278">tests/unit/capture/test_step_descriptor.py:278</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_step_descriptor.py#L278">tests/unit/capture/test_step_descriptor.py:278</a></div>
       
     </div>
     </div>
@@ -4660,7 +4804,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_step_descriptor.py#L309">tests/unit/capture/test_step_descriptor.py:309</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_step_descriptor.py#L309">tests/unit/capture/test_step_descriptor.py:309</a></div>
       
     </div>
     </div>
@@ -4706,7 +4850,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_step_descriptor.py#L389">tests/unit/capture/test_step_descriptor.py:389</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_step_descriptor.py#L389">tests/unit/capture/test_step_descriptor.py:389</a></div>
       
     </div>
     </div>
@@ -4758,7 +4902,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L54">tests/unit/capture/test_story.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L54">tests/unit/capture/test_story.py:54</a></div>
       
     </div>
     </div>
@@ -4812,7 +4956,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L98">tests/unit/capture/test_story.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L98">tests/unit/capture/test_story.py:98</a></div>
       
     </div>
     </div>
@@ -4864,7 +5008,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L116">tests/unit/capture/test_story.py:116</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L116">tests/unit/capture/test_story.py:116</a></div>
       
     </div>
     </div>
@@ -4914,7 +5058,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L132">tests/unit/capture/test_story.py:132</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L132">tests/unit/capture/test_story.py:132</a></div>
       
     </div>
     </div>
@@ -4964,7 +5108,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L148">tests/unit/capture/test_story.py:148</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L148">tests/unit/capture/test_story.py:148</a></div>
       
     </div>
     </div>
@@ -5016,7 +5160,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L163">tests/unit/capture/test_story.py:163</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L163">tests/unit/capture/test_story.py:163</a></div>
       
     </div>
     </div>
@@ -5066,7 +5210,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L178">tests/unit/capture/test_story.py:178</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L178">tests/unit/capture/test_story.py:178</a></div>
       
     </div>
     </div>
@@ -5116,7 +5260,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L189">tests/unit/capture/test_story.py:189</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L189">tests/unit/capture/test_story.py:189</a></div>
       
     </div>
     </div>
@@ -5166,7 +5310,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L204">tests/unit/capture/test_story.py:204</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L204">tests/unit/capture/test_story.py:204</a></div>
       
     </div>
     </div>
@@ -5216,7 +5360,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L219">tests/unit/capture/test_story.py:219</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L219">tests/unit/capture/test_story.py:219</a></div>
       
     </div>
     </div>
@@ -5266,7 +5410,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L234">tests/unit/capture/test_story.py:234</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L234">tests/unit/capture/test_story.py:234</a></div>
       
     </div>
     </div>
@@ -5314,7 +5458,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L250">tests/unit/capture/test_story.py:250</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L250">tests/unit/capture/test_story.py:250</a></div>
       
     </div>
     </div>
@@ -5362,7 +5506,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L270">tests/unit/capture/test_story.py:270</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L270">tests/unit/capture/test_story.py:270</a></div>
       
     </div>
     </div>
@@ -5410,7 +5554,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L296">tests/unit/capture/test_story.py:296</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L296">tests/unit/capture/test_story.py:296</a></div>
       
     </div>
     </div>
@@ -5462,7 +5606,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L321">tests/unit/capture/test_story.py:321</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L321">tests/unit/capture/test_story.py:321</a></div>
       
     </div>
     </div>
@@ -5516,7 +5660,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L335">tests/unit/capture/test_story.py:335</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L335">tests/unit/capture/test_story.py:335</a></div>
       
     </div>
     </div>
@@ -5570,7 +5714,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L350">tests/unit/capture/test_story.py:350</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L350">tests/unit/capture/test_story.py:350</a></div>
       
     </div>
     </div>
@@ -5622,7 +5766,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L367">tests/unit/capture/test_story.py:367</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L367">tests/unit/capture/test_story.py:367</a></div>
       
     </div>
     </div>
@@ -5674,7 +5818,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L385">tests/unit/capture/test_story.py:385</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L385">tests/unit/capture/test_story.py:385</a></div>
       
     </div>
     </div>
@@ -5728,7 +5872,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L401">tests/unit/capture/test_story.py:401</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L401">tests/unit/capture/test_story.py:401</a></div>
       
     </div>
     </div>
@@ -5782,7 +5926,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L419">tests/unit/capture/test_story.py:419</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L419">tests/unit/capture/test_story.py:419</a></div>
       
     </div>
     </div>
@@ -5830,7 +5974,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L439">tests/unit/capture/test_story.py:439</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L439">tests/unit/capture/test_story.py:439</a></div>
       
     </div>
     </div>
@@ -5884,7 +6028,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L452">tests/unit/capture/test_story.py:452</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L452">tests/unit/capture/test_story.py:452</a></div>
       
     </div>
     </div>
@@ -5932,7 +6076,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L498">tests/unit/capture/test_story.py:498</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L498">tests/unit/capture/test_story.py:498</a></div>
       
     </div>
     </div>
@@ -5980,7 +6124,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_story.py#L568">tests/unit/capture/test_story.py:568</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_story.py#L568">tests/unit/capture/test_story.py:568</a></div>
       
     </div>
     </div>
@@ -6028,7 +6172,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_template.py#L35">tests/unit/capture/test_template.py:35</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_template.py#L35">tests/unit/capture/test_template.py:35</a></div>
       
     </div>
     </div>
@@ -6076,7 +6220,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_template.py#L73">tests/unit/capture/test_template.py:73</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_template.py#L73">tests/unit/capture/test_template.py:73</a></div>
       
     </div>
     </div>
@@ -6124,7 +6268,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_template.py#L141">tests/unit/capture/test_template.py:141</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_template.py#L141">tests/unit/capture/test_template.py:141</a></div>
       
     </div>
     </div>
@@ -6172,7 +6316,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_template.py#L205">tests/unit/capture/test_template.py:205</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_template.py#L205">tests/unit/capture/test_template.py:205</a></div>
       
     </div>
     </div>
@@ -6218,7 +6362,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_template.py#L245">tests/unit/capture/test_template.py:245</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_template.py#L245">tests/unit/capture/test_template.py:245</a></div>
       
     </div>
     </div>
@@ -6264,7 +6408,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_template.py#L275">tests/unit/capture/test_template.py:275</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_template.py#L275">tests/unit/capture/test_template.py:275</a></div>
       
     </div>
     </div>
@@ -6310,7 +6454,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_template.py#L297">tests/unit/capture/test_template.py:297</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_template.py#L297">tests/unit/capture/test_template.py:297</a></div>
       
     </div>
     </div>
@@ -6356,7 +6500,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_template.py#L313">tests/unit/capture/test_template.py:313</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_template.py#L313">tests/unit/capture/test_template.py:313</a></div>
       
     </div>
     </div>
@@ -6404,7 +6548,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_template.py#L354">tests/unit/capture/test_template.py:354</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_template.py#L354">tests/unit/capture/test_template.py:354</a></div>
       
     </div>
     </div>
@@ -6450,7 +6594,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_template.py#L397">tests/unit/capture/test_template.py:397</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_template.py#L397">tests/unit/capture/test_template.py:397</a></div>
       
     </div>
     </div>
@@ -6485,7 +6629,11 @@ Next line is not a separator.
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report" data-term-name="Report" data-term-def="The output artifact: a JSON data file and optional self-contained HTML and Markdown renderings derived from it. The JSON is the source of truth.">Report</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story" data-term-name="Story" data-term-def="A named flow modelled as a sequence of activities. Constructed by &lt;code&gt;story(&amp;#39;Title&amp;#39;, [activity(...), ...])&lt;/code&gt;. Stories are first-class report tabs and the unit of coverage.">Story</span> and <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario" data-term-name="Scenario" data-term-def="A test function decorated with &lt;code&gt;@scenario(...)&lt;/code&gt;. Not every pytest test is a scenario — undecorated tests are tolerated but not collected.">Scenario</span> reference entity <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="instance" data-term-name="Instance" data-term-def="A named refinement of an Actor or Work Object (e.g., &lt;code&gt;guest(&amp;#39;Alice&amp;#39;)&lt;/code&gt; is an instance of the &lt;em&gt;Guest&lt;/em&gt; actor). Instances aggregate in the Glossary tab&amp;#39;s refs block.">Instance</span>s and an <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="inflection" data-term-name="Inflection" data-term-def="A surface form of a Verb other than its canonical name (e.g., &lt;em&gt;searches for&lt;/em&gt; as an inflection of &lt;em&gt;search&lt;/em&gt;). Reported under &amp;#34;Also used as:&amp;#34; in the Glossary.">Inflection</span></div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s104_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Report data</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s104_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s104_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s104_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s104_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Report data</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s104_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{
@@ -6621,7 +6769,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_aggregations.py#L163">tests/unit/report/test_aggregations.py:163</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_aggregations.py#L163">tests/unit/report/test_aggregations.py:163</a></div>
       
     </div>
     </div>
@@ -6667,7 +6815,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_aggregations.py#L268">tests/unit/report/test_aggregations.py:268</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_aggregations.py#L268">tests/unit/report/test_aggregations.py:268</a></div>
       
     </div>
     </div>
@@ -6713,7 +6861,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_aggregations.py#L339">tests/unit/report/test_aggregations.py:339</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_aggregations.py#L339">tests/unit/report/test_aggregations.py:339</a></div>
       
     </div>
     </div>
@@ -6759,7 +6907,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_aggregations.py#L428">tests/unit/report/test_aggregations.py:428</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_aggregations.py#L428">tests/unit/report/test_aggregations.py:428</a></div>
       
     </div>
     </div>
@@ -6805,7 +6953,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_aggregations.py#L462">tests/unit/report/test_aggregations.py:462</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_aggregations.py#L462">tests/unit/report/test_aggregations.py:462</a></div>
       
     </div>
     </div>
@@ -6851,7 +6999,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_aggregations.py#L556">tests/unit/report/test_aggregations.py:556</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_aggregations.py#L556">tests/unit/report/test_aggregations.py:556</a></div>
       
     </div>
     </div>
@@ -6897,7 +7045,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_aggregations.py#L669">tests/unit/report/test_aggregations.py:669</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_aggregations.py#L669">tests/unit/report/test_aggregations.py:669</a></div>
       
     </div>
     </div>
@@ -6943,7 +7091,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L70">tests/unit/report/test_coverage.py:70</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L70">tests/unit/report/test_coverage.py:70</a></div>
       
     </div>
     </div>
@@ -6989,7 +7137,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L154">tests/unit/report/test_coverage.py:154</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L154">tests/unit/report/test_coverage.py:154</a></div>
       
     </div>
     </div>
@@ -7035,7 +7183,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L206">tests/unit/report/test_coverage.py:206</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L206">tests/unit/report/test_coverage.py:206</a></div>
       
     </div>
     </div>
@@ -7081,7 +7229,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L222">tests/unit/report/test_coverage.py:222</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L222">tests/unit/report/test_coverage.py:222</a></div>
       
     </div>
     </div>
@@ -7127,7 +7275,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L235">tests/unit/report/test_coverage.py:235</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L235">tests/unit/report/test_coverage.py:235</a></div>
       
     </div>
     </div>
@@ -7173,7 +7321,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L259">tests/unit/report/test_coverage.py:259</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L259">tests/unit/report/test_coverage.py:259</a></div>
       
     </div>
     </div>
@@ -7219,7 +7367,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L291">tests/unit/report/test_coverage.py:291</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L291">tests/unit/report/test_coverage.py:291</a></div>
       
     </div>
     </div>
@@ -7269,7 +7417,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L323">tests/unit/report/test_coverage.py:323</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L323">tests/unit/report/test_coverage.py:323</a></div>
       
     </div>
     </div>
@@ -7315,7 +7463,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L372">tests/unit/report/test_coverage.py:372</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L372">tests/unit/report/test_coverage.py:372</a></div>
       
     </div>
     </div>
@@ -7361,7 +7509,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L419">tests/unit/report/test_coverage.py:419</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L419">tests/unit/report/test_coverage.py:419</a></div>
       
     </div>
     </div>
@@ -7407,7 +7555,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L442">tests/unit/report/test_coverage.py:442</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L442">tests/unit/report/test_coverage.py:442</a></div>
       
     </div>
     </div>
@@ -7453,7 +7601,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L473">tests/unit/report/test_coverage.py:473</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L473">tests/unit/report/test_coverage.py:473</a></div>
       
     </div>
     </div>
@@ -7499,7 +7647,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L497">tests/unit/report/test_coverage.py:497</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L497">tests/unit/report/test_coverage.py:497</a></div>
       
     </div>
     </div>
@@ -7545,7 +7693,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L533">tests/unit/report/test_coverage.py:533</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L533">tests/unit/report/test_coverage.py:533</a></div>
       
     </div>
     </div>
@@ -7591,7 +7739,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_coverage.py#L562">tests/unit/report/test_coverage.py:562</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_coverage.py#L562">tests/unit/report/test_coverage.py:562</a></div>
       
     </div>
     </div>
@@ -7617,7 +7765,7 @@ Next line is not a separator.
         <span class="scenario-status passed">
           ✓ passed
         </span>
-        <span class="scenario-duration">33ms</span>
+        <span class="scenario-duration">34ms</span>
       </span>
     </div>
 
@@ -7637,7 +7785,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_html_renderer.py#L167">tests/unit/report/test_html_renderer.py:167</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_html_renderer.py#L167">tests/unit/report/test_html_renderer.py:167</a></div>
       
     </div>
     </div>
@@ -7672,7 +7820,11 @@ Next line is not a separator.
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report" data-term-name="Report" data-term-def="The output artifact: a JSON data file and optional self-contained HTML and Markdown renderings derived from it. The JSON is the source of truth.">Report</span> holding a passed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario" data-term-name="Scenario" data-term-def="A test function decorated with &lt;code&gt;@scenario(...)&lt;/code&gt;. Not every pytest test is a scenario — undecorated tests are tolerated but not collected.">Scenario</span> with three steps</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s127_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Scenario record</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s127_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s127_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s127_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s127_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Scenario record</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s127_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{
@@ -7750,7 +7902,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_md_renderer.py#L43">tests/unit/report/test_md_renderer.py:43</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_md_renderer.py#L43">tests/unit/report/test_md_renderer.py:43</a></div>
       
     </div>
     </div>
@@ -7796,7 +7948,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_md_renderer.py#L143">tests/unit/report/test_md_renderer.py:143</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_md_renderer.py#L143">tests/unit/report/test_md_renderer.py:143</a></div>
       
     </div>
     </div>
@@ -7842,7 +7994,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_md_renderer.py#L167">tests/unit/report/test_md_renderer.py:167</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_md_renderer.py#L167">tests/unit/report/test_md_renderer.py:167</a></div>
       
     </div>
     </div>
@@ -7888,7 +8040,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_md_renderer.py#L222">tests/unit/report/test_md_renderer.py:222</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_md_renderer.py#L222">tests/unit/report/test_md_renderer.py:222</a></div>
       
     </div>
     </div>
@@ -7923,7 +8075,11 @@ Next line is not a separator.
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a failed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario" data-term-name="Scenario" data-term-def="A test function decorated with &lt;code&gt;@scenario(...)&lt;/code&gt;. Not every pytest test is a scenario — undecorated tests are tolerated but not collected.">Scenario</span> whose then <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step" data-term-name="Step" data-term-def="A unit of narration: a &lt;code&gt;with given(...)&lt;/code&gt; / &lt;code&gt;when(...)&lt;/code&gt; / &lt;code&gt;then(...)&lt;/code&gt; block, or the root recording from a step fixture. Steps nest. Each carries a phase, text, status (&lt;code&gt;&amp;#39;passed&amp;#39;&lt;/code&gt; by default; set to &lt;code&gt;&amp;#39;failed&amp;#39;&lt;/code&gt; on the step where a scenario fails, for highlighting in the report), optional error, attachments, and children.">Step</span> carries a two-line error and an internal frame</div><div>
-      <span class="attachment-badge" @click="toggleAttachment('s131_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Error record</span>
+      <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['s131_0_att_0'] ? 'true' : 'false'"
+          @click="toggleAttachment('s131_0_att_0')"
+          @keydown.enter.prevent="toggleAttachment('s131_0_att_0')"
+          @keydown.space.prevent="toggleAttachment('s131_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>Error record</span>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s131_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{
@@ -7962,7 +8118,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_md_renderer.py#L258">tests/unit/report/test_md_renderer.py:258</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_md_renderer.py#L258">tests/unit/report/test_md_renderer.py:258</a></div>
       
     </div>
     </div>
@@ -8008,7 +8164,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_md_renderer.py#L330">tests/unit/report/test_md_renderer.py:330</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_md_renderer.py#L330">tests/unit/report/test_md_renderer.py:330</a></div>
       
     </div>
     </div>
@@ -8054,7 +8210,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/report/test_md_renderer.py#L451">tests/unit/report/test_md_renderer.py:451</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/report/test_md_renderer.py#L451">tests/unit/report/test_md_renderer.py:451</a></div>
       
     </div>
     </div>
@@ -8100,7 +8256,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/test_grouping.py#L73">tests/unit/test_grouping.py:73</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/test_grouping.py#L73">tests/unit/test_grouping.py:73</a></div>
       
     </div>
     </div>
@@ -8390,7 +8546,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L31">tests/unit/capture/test_glossary.py:31</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L31">tests/unit/capture/test_glossary.py:31</a></div>
       
     </div>
     </div>
@@ -8528,7 +8684,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_glossary.py#L58">tests/unit/capture/test_glossary.py:58</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_glossary.py#L58">tests/unit/capture/test_glossary.py:58</a></div>
       
     </div>
     </div>
@@ -8630,7 +8786,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_step_descriptor.py#L355">tests/unit/capture/test_step_descriptor.py:355</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_step_descriptor.py#L355">tests/unit/capture/test_step_descriptor.py:355</a></div>
       
     </div>
     </div>
@@ -8751,7 +8907,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/unit/capture/test_template.py#L112">tests/unit/capture/test_template.py:112</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/unit/capture/test_template.py#L112">tests/unit/capture/test_template.py:112</a></div>
       
     </div>
     </div>
@@ -9524,7 +9680,7 @@ Next line is not a separator.
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/tests/ubiquitous_language.py#L51">tests/ubiquitous_language.py:51</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/tests/ubiquitous_language.py#L51">tests/ubiquitous_language.py:51</a></div>
         
       </div>
       
@@ -9672,7 +9828,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L44">GLOSSARY.md:44</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L44">GLOSSARY.md:44</a></div>
                 
               </div>
             </div>
@@ -9733,7 +9889,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L54">GLOSSARY.md:54</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L54">GLOSSARY.md:54</a></div>
                 
               </div>
             </div>
@@ -9784,7 +9940,7 @@ Next line is not a separator.
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L92">GLOSSARY.md:92</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L92">GLOSSARY.md:92</a></div>
                 
               </div>
             </div>
@@ -9835,7 +9991,7 @@ Next line is not a separator.
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L93">GLOSSARY.md:93</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L93">GLOSSARY.md:93</a></div>
                 
               </div>
             </div>
@@ -9886,7 +10042,7 @@ Next line is not a separator.
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L94">GLOSSARY.md:94</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L94">GLOSSARY.md:94</a></div>
                 
               </div>
             </div>
@@ -9962,7 +10118,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L13">GLOSSARY.md:13</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L13">GLOSSARY.md:13</a></div>
                 
               </div>
             </div>
@@ -10023,7 +10179,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L14">GLOSSARY.md:14</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L14">GLOSSARY.md:14</a></div>
                 
               </div>
             </div>
@@ -10084,7 +10240,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L16">GLOSSARY.md:16</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L16">GLOSSARY.md:16</a></div>
                 
               </div>
             </div>
@@ -10145,7 +10301,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L18">GLOSSARY.md:18</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L18">GLOSSARY.md:18</a></div>
                 
               </div>
             </div>
@@ -10206,7 +10362,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L19">GLOSSARY.md:19</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L19">GLOSSARY.md:19</a></div>
                 
               </div>
             </div>
@@ -10267,7 +10423,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L25">GLOSSARY.md:25</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L25">GLOSSARY.md:25</a></div>
                 
               </div>
             </div>
@@ -10328,7 +10484,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L27">GLOSSARY.md:27</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L27">GLOSSARY.md:27</a></div>
                 
               </div>
             </div>
@@ -10379,7 +10535,7 @@ Next line is not a separator.
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L35">GLOSSARY.md:35</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L35">GLOSSARY.md:35</a></div>
                 
               </div>
             </div>
@@ -10440,7 +10596,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L37">GLOSSARY.md:37</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L37">GLOSSARY.md:37</a></div>
                 
               </div>
             </div>
@@ -10501,7 +10657,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L47">GLOSSARY.md:47</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L47">GLOSSARY.md:47</a></div>
                 
               </div>
             </div>
@@ -10562,7 +10718,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L53">GLOSSARY.md:53</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L53">GLOSSARY.md:53</a></div>
                 
               </div>
             </div>
@@ -10623,7 +10779,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L55">GLOSSARY.md:55</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L55">GLOSSARY.md:55</a></div>
                 
               </div>
             </div>
@@ -10684,7 +10840,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L65">GLOSSARY.md:65</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L65">GLOSSARY.md:65</a></div>
                 
               </div>
             </div>
@@ -10745,7 +10901,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L75">GLOSSARY.md:75</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L75">GLOSSARY.md:75</a></div>
                 
               </div>
             </div>
@@ -10806,7 +10962,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L76">GLOSSARY.md:76</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L76">GLOSSARY.md:76</a></div>
                 
               </div>
             </div>
@@ -10889,7 +11045,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L28">GLOSSARY.md:28</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L28">GLOSSARY.md:28</a></div>
                 
               </div>
             </div>
@@ -10957,7 +11113,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L38">GLOSSARY.md:38</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L38">GLOSSARY.md:38</a></div>
                 
               </div>
             </div>
@@ -11023,7 +11179,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L15">GLOSSARY.md:15</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L15">GLOSSARY.md:15</a></div>
                 
               </div>
             </div>
@@ -11074,7 +11230,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L17">GLOSSARY.md:17</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L17">GLOSSARY.md:17</a></div>
                 
               </div>
             </div>
@@ -11125,7 +11281,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L26">GLOSSARY.md:26</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L26">GLOSSARY.md:26</a></div>
                 
               </div>
             </div>
@@ -11176,7 +11332,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L29">GLOSSARY.md:29</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L29">GLOSSARY.md:29</a></div>
                 
               </div>
             </div>
@@ -11217,7 +11373,7 @@ Next line is not a separator.
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L36">GLOSSARY.md:36</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L36">GLOSSARY.md:36</a></div>
                 
               </div>
             </div>
@@ -11268,7 +11424,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L45">GLOSSARY.md:45</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L45">GLOSSARY.md:45</a></div>
                 
               </div>
             </div>
@@ -11319,7 +11475,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L46">GLOSSARY.md:46</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L46">GLOSSARY.md:46</a></div>
                 
               </div>
             </div>
@@ -11370,7 +11526,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L56">GLOSSARY.md:56</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L56">GLOSSARY.md:56</a></div>
                 
               </div>
             </div>
@@ -11421,7 +11577,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L57">GLOSSARY.md:57</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L57">GLOSSARY.md:57</a></div>
                 
               </div>
             </div>
@@ -11472,7 +11628,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L66">GLOSSARY.md:66</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L66">GLOSSARY.md:66</a></div>
                 
               </div>
             </div>
@@ -11523,7 +11679,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L67">GLOSSARY.md:67</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L67">GLOSSARY.md:67</a></div>
                 
               </div>
             </div>
@@ -11574,7 +11730,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L68">GLOSSARY.md:68</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L68">GLOSSARY.md:68</a></div>
                 
               </div>
             </div>
@@ -11625,7 +11781,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L69">GLOSSARY.md:69</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L69">GLOSSARY.md:69</a></div>
                 
               </div>
             </div>
@@ -11676,7 +11832,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L70">GLOSSARY.md:70</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L70">GLOSSARY.md:70</a></div>
                 
               </div>
             </div>
@@ -11727,7 +11883,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L71">GLOSSARY.md:71</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L71">GLOSSARY.md:71</a></div>
                 
               </div>
             </div>
@@ -11778,7 +11934,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L72">GLOSSARY.md:72</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L72">GLOSSARY.md:72</a></div>
                 
               </div>
             </div>
@@ -11829,7 +11985,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L73">GLOSSARY.md:73</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L73">GLOSSARY.md:73</a></div>
                 
               </div>
             </div>
@@ -11880,7 +12036,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L74">GLOSSARY.md:74</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L74">GLOSSARY.md:74</a></div>
                 
               </div>
             </div>
@@ -11931,7 +12087,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L77">GLOSSARY.md:77</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L77">GLOSSARY.md:77</a></div>
                 
               </div>
             </div>
@@ -11982,7 +12138,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L78">GLOSSARY.md:78</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L78">GLOSSARY.md:78</a></div>
                 
               </div>
             </div>
@@ -12033,7 +12189,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L79">GLOSSARY.md:79</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L79">GLOSSARY.md:79</a></div>
                 
               </div>
             </div>
@@ -12084,7 +12240,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L80">GLOSSARY.md:80</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L80">GLOSSARY.md:80</a></div>
                 
               </div>
             </div>
@@ -12135,7 +12291,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L81">GLOSSARY.md:81</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L81">GLOSSARY.md:81</a></div>
                 
               </div>
             </div>
@@ -12186,7 +12342,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L82">GLOSSARY.md:82</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L82">GLOSSARY.md:82</a></div>
                 
               </div>
             </div>
@@ -12237,7 +12393,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L83">GLOSSARY.md:83</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L83">GLOSSARY.md:83</a></div>
                 
               </div>
             </div>
@@ -12288,7 +12444,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bca854c447ef6e5616722d9142a4fe444dca05/GLOSSARY.md#L84">GLOSSARY.md:84</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/GLOSSARY.md#L84">GLOSSARY.md:84</a></div>
                 
               </div>
             </div>
@@ -12316,10 +12472,10 @@ Next line is not a separator.
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-18T21:10:46.161592+00:00",
+    "timestamp": "2026-08-18T21:27:32.134399+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "a0bca854c447ef6e5616722d9142a4fe444dca05"
+    "commit_sha": "a796990a61f3deac3da5211195baf0ed670a61cf"
   },
   "scenarios": [
     {
@@ -26731,7 +26887,7 @@ window.__REPORT_DATA__ = {
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 33,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
