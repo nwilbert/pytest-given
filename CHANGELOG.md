@@ -11,6 +11,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Added
+
+- A t-string interpolation whose value varies across parametrize cases is now a
+  `derived` column in the case table, with a `{name}` placeholder left in the
+  grouped step, instead of being frozen to the first case's value.
+
 ### Changed
 
 - **Breaking (JSON report).** `parameters.names` becomes `parameters.columns`,
@@ -32,6 +38,21 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** `attach` takes a plain `str` label; a t-string or `Template`
   label now raises `PytestGivenError` instead of being silently flattened. Use
   an f-string — `attach(f'{flavor} log', …)`.
+- **Breaking.** A parametrized scenario whose step narration is a plain `str`
+  (usually an f-string) that renders differently per case now raises
+  `PytestGivenError`; the run fails and writes no report. Use a t-string so the
+  varying part is recorded as a part instead of baked into case 1's text.
+- **Breaking (JSON report).** A grouped parametrized scenario's step
+  `narration.text` is now the template (`the drink costs {price} euros`), not
+  the first case's rendering. HTML and Markdown output is unchanged; JSON
+  readers only.
+- **Breaking.** A varying t-string interpolation whose expression is not a bare
+  name (`t"{cup_size * 0.01}"`, `t"{m.balance}"`) now raises
+  `PytestGivenError`. Bind it to a local and narrate that.
+- **Breaking.** A glossary term ref whose pill differs between parametrize
+  cases now raises `PytestGivenError` — unless the pill *is* a parametrize
+  value, which stays supported. Split the pill from the value:
+  `given(t"{pg['Customer']} {name} places an order")`.
 
 ### Fixed
 
@@ -42,6 +63,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
   whole glossary in the parameter table; the column now holds the term's
   display, and story coverage and the Glossary view see every case's instance
   rather than only the first's.
+- A grouped parametrized scenario whose first case was skipped rendered an empty
+  step tree even though later cases ran. The grouped tree now comes from the
+  first case that passed.
+- **Breaking.** A t-string interpolating a *rebound* parametrize name rendered
+  the parameter's value rather than the narrated one — wrong for every case, not
+  just the first. It now raises `PytestGivenError`; rename the local.
 
 ## [0.1.0] - 2026-08-08
 

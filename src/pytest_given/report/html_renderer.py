@@ -252,20 +252,26 @@ def _render_narration_part(
             return str(escape(value))
         case NarrationValue(rendered=rendered):
             return f'<span class="value-highlight">{escape(rendered)}</span>'
-        case NarrationPlaceholder(name=name):
+        case NarrationPlaceholder(name=name, column_id=column_id):
             color_idx = param_color_map.get(name, 0) % _NUM_PARAM_COLORS
             label = _placeholder_token(part)
-            # The name goes in `data-param` and the handler reads it back off
-            # the element. Interpolating it into the Alpine expression instead
-            # would be an injection: Alpine compiles a directive's *decoded*
-            # attribute text as JS, so HTML-escaping a `'` to `&#39;` does not
-            # keep it out of the expression. See `data-tag` in report.html.j2.
-            safe_name = escape(name)
+            # `data-param` keys the hover highlight and carries the column *id*
+            # — two steps can interpolate the same expression with different
+            # values, which would cross-wire if the name were the key. The
+            # palette keys on `name` instead, so one parameter reads the same
+            # colour everywhere. `data-subst` is row-hover substitution's own
+            # attribute (see setHoverRow in app.js).
+            #
+            # Both go in data-* and are read back off the element: interpolating
+            # into the Alpine expression would be an injection, since Alpine
+            # compiles a directive's *decoded* attribute text as JS.
+            safe_id = escape(column_id)
             enter = 'setHoverParam($el.dataset.param, $event.currentTarget)'
             leave = 'setHoverParam(null, $event.currentTarget)'
             return (
                 f'<span class="param-color-{color_idx}" '
-                f'data-param="{safe_name}" '
+                f'data-param="{safe_id}" '
+                f'data-subst="{safe_id}" '
                 f'@mouseenter="{enter}" '
                 f'@mouseleave="{leave}"'
                 f'>{escape(label)}</span>'
@@ -338,9 +344,9 @@ def _render_term_ref(
 
 
 def _placeholder_token(part: NarrationPlaceholder) -> str:
-    """Render the merged-template slot as a bare `{name}`.
+    """Render the grouped-template slot as a bare `{name}`.
 
-    The merged view is schematic — it marks *which* column varies, not how any
+    The grouped view is schematic — it marks *which* column varies, not how any
     one value prints. Conversion (`!r`) and format spec (`:03d`) are per-value
     rendering details, already applied in the concrete per-case rows, so they
     are noise in the collapsed slot and are dropped here (still stored on the

@@ -243,11 +243,11 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
         render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
         content = html_path.read_text(encoding='utf-8')
     with then(
-        t'{pg["Parameter coloring"]} classes mark the merged placeholder '
+        t'{pg["Parameter coloring"]} classes mark the grouped placeholder '
         t'and the table headers'
     ):
         assert 'param-color-0' in content
-        # The merged step shows the {name} token
+        # The grouped step shows the {name} token
         assert '{euros}' in content
         # Headers carry color class + data-param for the crosshair JS
         assert re.search(r'<th[^>]*\bparam-color-0\b[^>]*\bdata-param="euros"', content)
@@ -256,10 +256,10 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
         )
 
 
-def test_render_merged_placeholder_drops_format_spec_and_conversion(
+def test_render_grouped_placeholder_drops_format_spec_and_conversion(
     tmp_path: Path,
 ) -> None:
-    """Merged-template view shows a bare {name}: the schematic slot marks which
+    """Grouped-template view shows a bare {name}: the schematic slot marks which
     column varies, not how a value prints. Conversion and format spec are
     per-value details applied in the concrete per-case rows, so they are
     dropped from the collapsed slot."""
