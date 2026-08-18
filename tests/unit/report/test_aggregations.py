@@ -760,3 +760,18 @@ def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
     assert cov.passed == 2
     assert cov.failed == 1
     assert cov.skipped == 1
+
+
+def test_glossary_view_lists_every_case_instance_of_a_param_linked_pill(
+    guest_scenario: tuple[Glossary, Story, Scenario],
+) -> None:
+    glossary, _story, scenario = guest_scenario
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0'
+        ),
+        scenarios=[scenario],
+        glossary=glossary,
+    )
+    aggs = build_glossary_aggregations(report)
+    assert {i.display for i in aggs[TermId('guest')].instances} == {'Alice', 'Bob'}

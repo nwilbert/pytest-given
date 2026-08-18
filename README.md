@@ -324,6 +324,8 @@ attach('Receipt', 'Coffee x1     $2.00')             # text
 attach('Machine state', {'coffees': 9, 'price': 2})  # JSON
 ```
 
+The label is a plain `str`; a `Template` or t-string label raises. Vary it with an f-string — `attach(f'{flavor} log', …)`.
+
 ## pytest options
 
 All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-*` flag enables its own sink independently, and they combine freely (e.g. pass both `--given-json` and `--given-html` to get both files from one run). `--given-html` no longer writes a JSON file alongside it.

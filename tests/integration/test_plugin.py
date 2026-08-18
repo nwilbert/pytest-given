@@ -214,7 +214,10 @@ def test_parametrized_test_as_table(pytester, tmp_path):
     s = data['scenarios'][0]
     assert s['narration']['text'] == 'Param test'
     assert s['parameters'] is not None
-    assert s['parameters']['names'] == ['a', 'b', 'expected']
+    columns = s['parameters']['columns']
+    assert [c['name'] for c in columns] == ['a', 'b', 'expected']
+    assert all(c['kind'] == 'param' for c in columns)
+    assert all(c['id'] == c['name'] for c in columns)
     assert len(s['parameters']['cases']) == 2
     assert s['parameters']['cases'][0]['values'] == [1, 2, 3]
     assert s['parameters']['cases'][0]['status'] == 'passed'
@@ -755,7 +758,10 @@ def test_scenario_with_template_name_merges_and_renders(pytester, tmp_path):
     s = data['scenarios'][0]
     assert s['narration']['text'] == 'Brew {cup_size} ml'
     assert s['narration']['parts'] != []
-    assert s['parameters']['names'] == ['cup_size']
+    columns = s['parameters']['columns']
+    assert [c['name'] for c in columns] == ['cup_size']
+    assert all(c['kind'] == 'param' for c in columns)
+    assert all(c['id'] == c['name'] for c in columns)
     assert [c['values'] for c in s['parameters']['cases']] == [[200], [300]]
 
 
@@ -798,7 +804,7 @@ def test_attach_with_template_raises(pytester, tmp_path):
     )
     result = pytester.runpytest('-v')
     assert result.ret != 0
-    result.stdout.fnmatch_lines(['*attach*not supported*'])
+    result.stdout.fnmatch_lines(['*attachment labels are plain text*'])
 
 
 def test_static_str_with_literal_braces_renders_verbatim(pytester, tmp_path):
@@ -1586,9 +1592,15 @@ def test_annotated_given_on_parametrize_value_synthesizes_leaf(pytester, tmp_pat
     (merged,) = data['scenarios']
     given_step = merged['steps'][0]
     assert given_step['phase'] == 'given'
-    names = [p.get('name') for p in given_step['narration']['parts']]
+    parts = given_step['narration']['parts']
+    names = [p.get('name') for p in parts]
     assert 'text' in names
-    assert merged['parameters']['names'] == ['text']
+    placeholder = next(p for p in parts if p.get('name') == 'text')
+    assert placeholder['column_id'] == 'text'
+    columns = merged['parameters']['columns']
+    assert [c['name'] for c in columns] == ['text']
+    assert all(c['kind'] == 'param' for c in columns)
+    assert all(c['id'] == c['name'] for c in columns)
 
 
 def test_annotated_given_on_multiple_param_columns(pytester, tmp_path):

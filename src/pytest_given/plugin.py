@@ -23,6 +23,7 @@ from .capture import (
     get_active_collector,
     parse_short_repr,
     set_active_collector,
+    try_term_ref,
 )
 from .capture.decorators import (
     ScenarioDecorator,
@@ -62,11 +63,13 @@ from .model import (
     NarrationValue,
     NodeId,
     ParameterCase,
+    ParameterColumn,
     ParameterTable,
     ParamInfo,
     ParamSpec,
     ParamValue,
     PytestGivenError,
+    RawParamValue,
     ReportData,
     Scenario,
     Step,
@@ -347,18 +350,13 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     callspec = getattr(item, 'callspec', None)
     if callspec is not None:
         names = list(callspec.params.keys())
-        values = [_param_value(callspec.params[n]) for n in names]
-        collector.param_info[node_id] = ParamSpec(names=names, values=values)
+        collector.param_info[node_id] = ParamSpec(
+            names=names, values=[callspec.params[name] for name in names]
+        )
     # Pre-fixture-setup work done; let pytest run fixture setup here.
     yield
     _graft_fixture_recordings(item, collector)
     collector.start_times[node_id] = time.monotonic()
-
-
-def _param_value(value: object) -> ParamValue:
-    if value is None or isinstance(value, (str, int, float, bool)):
-        return value
-    return str(value)
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -864,7 +862,7 @@ def _group_parametrized(
             _, values = param_info[scenario.id]
             cases.append(
                 ParameterCase(
-                    values=values,
+                    values=[_param_value(v) for v in values],
                     status=scenario.status,
                     error=scenario.error,
                 )
@@ -886,7 +884,13 @@ def _group_parametrized(
             status=merged_status,
             duration_ms=total_duration,
             steps=template_steps,
-            parameters=ParameterTable(names=param_names, cases=cases),
+            parameters=ParameterTable(
+                columns=[
+                    ParameterColumn(id=name, name=name, kind='param')
+                    for name in param_names
+                ],
+                cases=cases,
+            ),
             source=first.source,
             story_id=first.story_id,
             activity_ids=first.activity_ids,
@@ -894,6 +898,23 @@ def _group_parametrized(
         result.append(merged)
 
     return result
+
+
+def _param_value(value: RawParamValue) -> ParamValue:
+    """Coerce a raw parametrize argument into a table cell.
+
+    A glossary term instance unwraps to its display — the `param` column is the
+    only place a case's display exists once the pill in the grouped tree reads
+    the baseline's, and `str()` on the instance would store a dataclass repr of
+    the whole `Glossary`. JSON primitives pass through; everything else is its
+    `str()`, since a cell only ever feeds display and the JSON sink.
+    """
+    term_ref = try_term_ref(value)
+    if term_ref is not None:
+        return term_ref.display
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    return str(value)
 
 
 def _templatize_steps(
@@ -934,6 +955,7 @@ def _templatize_narration(
                     out.append(
                         NarrationPlaceholder(
                             name=expression,
+                            column_id=expression,
                             format_spec=fs,
                             conversion=conv,
                         )

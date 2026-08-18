@@ -2,6 +2,7 @@
 in integration tests; tested here directly so coverage hits 100%."""
 
 import inspect
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from typing import Annotated, Any, cast
 
@@ -286,7 +287,9 @@ def test_templatize_narration_rejects_unknown_placeholder() -> None:
     catches Template placeholders in scenario names (and step text from
     Template can't happen since given/when/then reject Template). The runtime
     guard covers any future code path that might construct parts directly."""
-    narration = Narration(text='', parts=[NarrationPlaceholder(name='cup_zize')])
+    narration = Narration(
+        text='', parts=[NarrationPlaceholder(name='cup_zize', column_id='cup_zize')]
+    )
     with pytest.raises(PytestGivenError, match='cup_zize'):
         plugin._templatize_narration(narration, ['cup_size'])
 
@@ -401,10 +404,40 @@ def test_group_parametrized_distinct_functions_same_name_do_not_merge() -> None:
     }
     merged = plugin._group_parametrized(scenarios, param_info)
     assert {s.id for s in merged} == {nid1, nid2}
-    assert {tuple(s.parameters.names) for s in merged if s.parameters} == {
+    assert {
+        tuple(c.name for c in s.parameters.columns) for s in merged if s.parameters
+    } == {
         ('n',),
         ('k',),
     }
+
+
+def test_param_cell_unwraps_a_term_instance_to_its_display() -> None:
+    glossary = Glossary()
+    guest = glossary.actor('Guest')
+    nid1, nid2 = NodeId('t::x[alice]'), NodeId('t::x[bob]')
+    scenarios = [
+        Scenario(id=nid1, narration=Narration(text='x'), module='m', status='passed'),
+        Scenario(id=nid2, narration=Narration(text='x'), module='m', status='passed'),
+    ]
+    param_info = {
+        nid1: ParamSpec(names=['guest'], values=[guest('Alice')]),
+        nid2: ParamSpec(names=['guest'], values=[guest('Bob')]),
+    }
+    grouped = plugin._group_parametrized(scenarios, param_info)
+    assert [case.values[0] for case in grouped[0].parameters.cases] == ['Alice', 'Bob']
+
+
+def test_a_non_scalar_parametrize_value_still_reaches_the_cell_as_a_string() -> None:
+    """Coercion moved to the cell; the shape it produces is unchanged."""
+    moment = datetime(2026, 1, 1, tzinfo=UTC)
+    nid = NodeId('t::x[a]')
+    scenarios = [
+        Scenario(id=nid, narration=Narration(text='x'), module='m', status='passed')
+    ]
+    param_info = {nid: ParamSpec(names=['when'], values=[moment])}
+    grouped = plugin._group_parametrized(scenarios, param_info)
+    assert grouped[0].parameters.cases[0].values == [str(moment)]
 
 
 def test_templatize_sets_param_column_when_term_ref_expression_matches() -> None:

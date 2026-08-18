@@ -17,7 +17,7 @@ from .decorators import (
 from .file_glossary import FileGlossary
 from .glossary import DeferredTermHandle, DeferredTermInstance
 from .story import activity, path, story
-from .template import Template, narration_from
+from .template import Template, narration_from, try_term_ref
 from .traceback import filter_internal_frames, parse_short_repr
 
 __all__ = [
@@ -41,6 +41,7 @@ __all__ = [
     'set_active_collector',
     'story',
     'then',
+    'try_term_ref',
     'when',
     'when_then',
 ]

@@ -13,6 +13,14 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Changed
 
+- **Breaking (JSON report).** `parameters.names` becomes `parameters.columns`,
+  each `{id, name, kind}` with `kind` one of `param` / `derived` /
+  `attachment`; a case's `values` stays positionally aligned with it and a cell
+  may now be an attachment object rather than a scalar. Placeholder narration
+  parts gain `column_id`, and a step attachment may be a content-less
+  `{label, content_type, column_id}` reference to a column. Update any `jq`
+  reading `parameters`. There is no migration: re-run the suite to regenerate a
+  report saved before this change.
 - `activity(..., id=N)` is now `activity(..., activity_id=N)`. The keyword
   shadowed the `id` builtin; the `Activity.id` field itself is unchanged.
 - The bundled `pytest-given-authoring` skill now documents the report mechanics
@@ -21,12 +29,19 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled `pytest-given-reviewing` skill gains a completeness audit (what
   the report fails to say), a terminal-readable story-coverage check, and a
   full-suite fallback for adoption branches with no base report to diff.
+- **Breaking.** `attach` takes a plain `str` label; a t-string or `Template`
+  label now raises `PytestGivenError` instead of being silently flattened. Use
+  an f-string — `attach(f'{flavor} log', …)`.
 
 ### Fixed
 
 - The bundled authoring skill's glossary-discovery advice: `conftest.py` must
   bind the `Glossary` / `FileGlossary` handle itself, not merely import the
   module defining it, or the report's Glossary tab stays empty.
+- Parametrizing over a glossary term instance stored a dataclass repr of the
+  whole glossary in the parameter table; the column now holds the term's
+  display, and story coverage and the Glossary view see every case's instance
+  rather than only the first's.
 
 ## [0.1.0] - 2026-08-08
 

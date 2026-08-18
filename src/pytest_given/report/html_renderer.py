@@ -165,14 +165,19 @@ def render_html(
 
 
 def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
+    """One colour per column *name* across the report, so a parameter reads the
+    same colour in every scenario. Attachment columns are excluded — a badge
+    needs no value colour."""
     color_map: ParamColorMap = {}
     color_idx = 0
     for scenario in scenarios:
         if scenario.parameters is None:
             continue
-        for name in scenario.parameters.names:
-            if name not in color_map:
-                color_map[name] = color_idx
+        for column in scenario.parameters.columns:
+            if column.kind == 'attachment':
+                continue
+            if column.name not in color_map:
+                color_map[column.name] = color_idx
                 color_idx += 1
     return color_map
 
