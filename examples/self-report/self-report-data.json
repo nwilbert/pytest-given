@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-17T17:32:58.411092+00:00",
+    "timestamp": "2026-08-18T07:41:57.357508+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "cc8e99247aa2bb1a2d0c69e4a16b16947fa17ad7"
+    "commit_sha": "c6310f45d77be02db44dbf8300c1f57456a9a5ba"
   },
   "scenarios": [
     {
@@ -14416,7 +14416,7 @@
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -16215,7 +16215,7 @@
         "id": "parameter-table",
         "kind": "object",
         "canonical": "Parameter table",
-        "definition": "The per-scenario grouping of column names + cases. Appears in the report below the grouped-template steps.",
+        "definition": "The per-scenario grouping of typed columns + cases. A column is a `param` (a `@pytest.mark.parametrize` input), a `derived` (a narrated value that varies across cases) or an `attachment` (an attachment whose payload varies). Appears in the report below the grouped-template steps.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 27
@@ -16235,7 +16235,7 @@
         "id": "templatize",
         "kind": null,
         "canonical": "Templatize",
-        "definition": "Derive the grouped-template step text from the first case, so the report shows a single set of steps with `{name}` placeholders that the parameter table fills in per case. Non-first cases' structured text is discarded.",
+        "definition": "Derive the grouped-template step text by comparing every comparable case: what all of them share stays inline, and anything that varies becomes a `{name}` placeholder or attachment badge pointing at a parameter-table column. The baseline tree comes from the first passed case.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 29
@@ -16355,7 +16355,7 @@
         "id": "value-highlight",
         "kind": null,
         "canonical": "Value highlight",
-        "definition": "A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column (e.g., a computed expression like `price * 1.2`).",
+        "definition": "A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column and are constant across every case (e.g., a computed expression like `price * 1.2`). One that varies becomes a `derived` column instead.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 56

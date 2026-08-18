@@ -2,17 +2,17 @@
 
 ## Now
 
-- [ ] Bug: when the glossary term filter is active in the Scenarios tab, jumping to a scenario from the Stories tab doesn't reset this filter  
-- [ ] continue work on the story-diagrams branch
+- [ ] Bug: when the glossary term filter is active in the Scenarios tab, jumping to a scenario from the Stories tab doesn't reset this filter
 - [ ] implement the parametrized-case-columns-design spec
 
 ## Next
 
+- [ ] Turn on branch coverage: `nox -s coverage` runs `coverage run` without `--branch`, so the 100% gate is line coverage only and a compound condition passes it with an untested False outcome. Found during the per-case columns work, where three unexercised conditions in one filter shipped inside a green 100% run. Enabling it (`--branch`, or `[tool.coverage.run] branch = true` in `pyproject.toml`) will surface partial branches in pre-existing code, so it needs its own pass rather than riding along with a feature branch.
 - [ ] check support for https://library-skills.io/
 - [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
 - [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
-- [ ] Attachment badges: pick the icon from `content_type` instead of always a paperclip — a document glyph for `text`, braces for `json`. Replaces the HTML report's paperclip SVG and the Markdown renderer's `📎`: a branch in the badge macro plus a second inline SVG, no new data. Split out of the [per-case columns spec](docs/specs/proposed/2026-08-14-parametrized-case-columns-design.md), which touches the same badge macro but doesn't need this; `AttachmentRef` there carries `content_type` for it to read.
+- [ ] Attachment badges: pick the icon from `content_type` instead of always a paperclip — a document glyph for `text`, braces for `json`. Replaces the HTML report's paperclip SVG and the Markdown renderer's `📎`: a branch in the badge macro plus a second inline SVG, no new data. Split out of the [per-case columns spec](docs/specs/2026-08-14-parametrized-case-columns-design.md), which touches the same badge macro but doesn't need this; `AttachmentRef` there carries `content_type` for it to read.
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
@@ -31,7 +31,7 @@
 - [ ] Add `@scenario(group_parametrized=False)` option to opt out of parametrize merging 
   - emit each case as its own scenario (named per case via Template substitution, or by appending the parametrize id to a `str` name).
   - Needed when narration structure genuinely varies per case; today's behavior silently shows case 1's structure for all rows. See caveat in `docs/specs/2026-05-23-structured-step-text-design.md`.
-  - Scope narrowed by the [per-case columns spec](docs/specs/proposed/2026-08-14-parametrized-case-columns-design.md): varying attachments and varying derived values become columns there, and five unrenderable authoring forms raise. Structural divergence is all that is left for the opt-out.
+  - Scope narrowed by the [per-case columns spec](docs/specs/2026-08-14-parametrized-case-columns-design.md): varying attachments and varying derived values become columns there, and five unrenderable authoring forms raise. Structural divergence is all that is left for the opt-out.
   - That spec defers one question to this item: whether the opt-out should also apply *automatically* when structure diverges, rather than only on request — `divergent-case-structure` is lint-only and `given_lint` defaults off, so today that case still renders the baseline's structure silently. Deciding that here retires the lint rule.
   - It also defers **hard validation of structural variance** to here, and with it the narrower case of narration that changes shape without changing structure (a conditional `when(t"…" if n else "…")` keeps `(phase, children)` equal, so the merge still walks parts by index into a differently-shaped sentence). Both want the same treatment — refuse to merge and emit one scenario per case — which only exists once the opt-out does.
   - This is also where per-case substitution of `Template` scenario names and t-string step text (`step_text(case=...)` / `Template.substitute(...)`) becomes load-bearing. Today the substitution machinery is wired but unreachable — the merged view only shows `{name}` tokens, so `Template` for scenario names mostly just contributes the placeholder highlight in the merged title.

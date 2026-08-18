@@ -518,6 +518,14 @@ def test_a_short_attachment_cell_sits_inline_in_backticks() -> None:
     assert '— state:' not in md
 
 
+def test_a_pipe_in_an_inline_attachment_cell_is_escaped() -> None:
+    """An inline attachment cell is the one cell path that interpolates raw
+    payload text into a table row, so an unescaped `|` in it would split the
+    row into a new column and derail every cell after it."""
+    md = render_md(_report_with(_attachment_table(short='ok|fine', long=None)))
+    assert '| 350 | `ok\\|fine` | ✓ |' in md
+
+
 def test_a_multiline_attachment_cell_shows_the_column_name_and_fences_below() -> None:
     """Cell and block both name the *column*, not the attachment label: two
     columns can share a label, and only the column name is disambiguated."""

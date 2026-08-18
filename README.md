@@ -132,7 +132,7 @@ def test_rejects_empty(text: Annotated[str, given(Template('the name {text}'))])
         id_derive(text)
 ```
 
-Use `Template('… {col} …')` for a per-case placeholder (substituted against the parametrize column, rendered `{col}` in the merged view and the concrete value per row) or a plain string for a static label. A t-string is rejected here — the parameter value isn't in scope at definition time. `when`/`then` inside `Annotated` are rejected too; the action and outcome live in the test body.
+Use `Template('… {col} …')` for a per-case placeholder (substituted against the parametrize column, rendered `{col}` in the grouped view and the concrete value per row) or a plain string for a static label. A t-string is rejected here — the parameter value isn't in scope at definition time. `when`/`then` inside `Annotated` are rejected too; the action and outcome live in the test body.
 
 As a helper-function decorator (any phase). The helper records its own step on each call; for dynamic narration, use `pytest_given.Template` and reference the helper's parameters:
 
@@ -324,7 +324,9 @@ attach('Receipt', 'Coffee x1     $2.00')             # text
 attach('Machine state', {'coffees': 9, 'price': 2})  # JSON
 ```
 
-The label is a plain `str`; a `Template` or t-string label raises. Vary it with an f-string — `attach(f'{flavor} log', …)`.
+The label is a plain `str`; a `Template` or t-string label raises — build it with an f-string if it needs interpolating.
+
+In a parametrized scenario the label must read the same in every case: a payload that varies across cases becomes a case-table column headed by that label, and the step keeps a badge pointing at it. A label that differs between cases raises — the varying part belongs in the content.
 
 ## pytest options
 

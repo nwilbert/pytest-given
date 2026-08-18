@@ -24,9 +24,9 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 |---|---|
 | **Parametrized scenario** | A `@scenario`-decorated test that also carries `@pytest.mark.parametrize(...)`. Produces multiple scenario records during a run; pytest-given groups them. |
 | **Case** | One row of a parametrized scenario — a single tuple of parameter values, its status, and any error. |
-| **Parameter table** | The per-scenario grouping of column names + cases. Appears in the report below the grouped-template steps. |
+| **Parameter table** | The per-scenario grouping of typed columns + cases. A column is a `param` (a `@pytest.mark.parametrize` input), a `derived` (a narrated value that varies across cases) or an `attachment` (an attachment whose payload varies). Appears in the report below the grouped-template steps. |
 | **Group** | Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a parameter table. Scenarios group when they share the same name and module. |
-| **Templatize** | Derive the grouped-template step text from the first case, so the report shows a single set of steps with `{name}` placeholders that the parameter table fills in per case. Non-first cases' structured text is discarded. |
+| **Templatize** | Derive the grouped-template step text by comparing every comparable case: what all of them share stays inline, and anything that varies becomes a `{name}` placeholder or attachment badge pointing at a parameter-table column. The baseline tree comes from the first passed case. |
 
 ## Fixtures and recording
 
@@ -53,7 +53,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Report** | The output artifact: a JSON data file and optional self-contained HTML and Markdown renderings derived from it. The JSON is the source of truth. |
 | **Renderer** | Converts a JSON report into a self-contained HTML page. |
 | **Parameter coloring** | Each parametrize column gets a stable highlight color; placeholders and matching values share that color wherever they appear in step text and the parameter table. |
-| **Value highlight** | A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column (e.g., a computed expression like `price * 1.2`). |
+| **Value highlight** | A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column and are constant across every case (e.g., a computed expression like `price * 1.2`). One that varies becomes a `derived` column instead. |
 | **Source link** | A clickable file:line anchor on a scenario card. Resolved from the `given_source_link` config (preset name like `vscode` / `github`, or a raw URL template). Captured per-scenario as a `SourceLocation` (POSIX relpath + 1-indexed line) from `pytest.Item.location`. Disabled by default. |
 
 ## Domain Storytelling

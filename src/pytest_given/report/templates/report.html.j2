@@ -83,6 +83,13 @@
   {%- endif -%}
   {%- if step.attachments -%}
     {%- for att in step.attachments -%}
+    {%- if att is attachment_ref -%}
+    <div>
+      <span class="attachment-badge" data-param="{{ att.column_id }}"
+            @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
+            @mouseleave="setHoverParam(null, $event.currentTarget)"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>{{ att.label }}</span>
+    </div>
+    {%- else -%}
     <div>
       <span class="attachment-badge" @click="toggleAttachment('{{ step_id }}_att_{{ loop.index0 }}')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>{{ att.label }}</span>
       <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}'] }">
@@ -91,6 +98,7 @@
         </div>
       </div>
     </div>
+    {%- endif -%}
     {%- endfor -%}
   {%- endif -%}
   {%- if step.error -%}
@@ -264,13 +272,30 @@
         </thead>
         <tbody>
           {% for case in scenario.parameters.cases %}
+          {%- set case_idx = loop.index0 -%}
           <tr class="{{ 'failed-row' if case.status == 'failed' else '' }}"
               @mouseenter="setHoverRow($event.currentTarget)"
               @mouseleave="clearHoverRow($event.currentTarget)">
             {% for col, val in zip(scenario.parameters.columns, case.values) %}
+            {% if col.kind == 'attachment' %}
+            <td data-param="{{ col.id }}"
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">
+              {% if val %}
+              {% set cell_id = 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_' ~ col.id %}
+              <span class="attachment-badge" @click="toggleAttachment('{{ cell_id }}')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>{{ col.name }}</span>
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-content"><pre>{{ val.content }}</pre></div>
+                </div>
+              </div>
+              {% endif %}
+            </td>
+            {% else %}
             <td data-param="{{ col.id }}" data-subst="{{ col.id }}"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">{{ val }}</td>
+                @mouseleave="setHoverParam(null, $event.currentTarget)">{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
+            {% endif %}
             {% endfor %}
             <td style="text-align:right">
               {% if case.status == 'passed' %}<span class="dot-passed">✓</span>{% elif case.status == 'skipped' %}<span class="dot-skipped">○</span>{% else %}<span class="dot-failed">✗</span>{% endif %}
