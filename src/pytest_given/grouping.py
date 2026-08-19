@@ -82,6 +82,13 @@ def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
     for scenario in group:
         if scenario.status == 'passed':
             _check_rebound_params(scenario, param_info[scenario.id], ctx)
+    # Before the walk, not with the other cells below: a `param` cell is what
+    # its placeholder substitutes, so the walk compares against it.
+    formats = _param_cell_formats(baseline.steps, param_names)
+    for scenario in group:
+        spec = param_info[scenario.id]
+        for name, value in zip(spec.names, spec.values, strict=True):
+            ctx.set_cell(name, scenario.id, _param_cell(value, formats.get(name)))
     template_steps = _templatize_steps(baseline.steps, (), ctx)
     grouped_narration = _templatize_narration(first.narration, param_names)
 
@@ -89,9 +96,6 @@ def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
     total_duration = 0
     comparable_ids = {s.id for s in comparable}
     for scenario in group:
-        spec = param_info[scenario.id]
-        for name, value in zip(spec.names, spec.values, strict=True):
-            ctx.set_cell(name, scenario.id, _param_value(value))
         cases.append(
             ParameterCase(
                 values=[ctx.cells[c.id].get(scenario.id) for c in ctx.columns],
@@ -357,6 +361,70 @@ def _param_value(value: RawParamValue) -> ParamValue:
     return str(value)
 
 
+type _Format = tuple[str | None, str]
+
+
+def _param_cell_formats(
+    steps: list[Step], param_names: list[str]
+) -> dict[str, _Format]:
+    """The formatting each `param` column's cells are rendered with, for the
+    columns whose placeholders agree on one.
+
+    A cell is not decoration: row hover substitutes it into the slot the step
+    rendered, so it has to *be* what that slot showed. `t"at {when:%H:%M}"`
+    narrates `14:30` while `str(when)` is `2026-08-19 14:30:00`, and splicing
+    the latter in builds a sentence no case ever narrated. Rule 3 has already
+    established that the narration is the raw value rendered through the
+    interpolation's own conversion and spec, so re-applying that spec to the
+    cell reproduces the narrated text exactly.
+
+    Only a formatting every placeholder for that column shares is used. Two
+    steps formatting one parameter differently (`{when:%H:%M}` and
+    `{when:%Y-%m-%d}`) leave no single text a shared cell could hold; the
+    column keeps its plain value and the walk gives each disagreeing slot a
+    column of its own (see `_templatize_param_value`). The trivial formatting
+    counts as one of the two, so a column read plainly in one step and
+    formatted in another goes the same way.
+    """
+    seen: dict[str, set[_Format]] = {}
+    for _path, step in walk_steps(steps):
+        for part in step.narration.parts:
+            if isinstance(part, NarrationValue) and part.expression in param_names:
+                seen.setdefault(part.expression, set()).add(
+                    (part.conversion, part.format_spec)
+                )
+    return {
+        name: next(iter(formats))
+        for name, formats in seen.items()
+        if len(formats) == 1 and formats != {(None, '')}
+    }
+
+
+def _param_cell(value: RawParamValue, fmt: _Format | None) -> ParamValue:
+    """One `param` cell: the value rendered the way its placeholders render it,
+    or `_param_value`'s plain coercion when they carry no formatting of their
+    own or the value refuses this one.
+
+    The unformatted path stays `_param_value` rather than `format(value, '')` —
+    a glossary term instance has to unwrap to its display, and every cell that
+    exists today keeps its current type and text.
+    """
+    if fmt is None:
+        return _param_value(value)
+    try:
+        return render_interpolation(value, *fmt)
+    except Exception:  # noqa: BLE001 — a value whose own rendering raises
+        # The step cannot have narrated it either, so there is nothing to
+        # agree with; the plain coercion is the honest fallback.
+        return _param_value(value)
+
+
+def _cell_text(cell: CellValue | None) -> str:
+    """A cell as the renderers print it — what hover substitutes into a slot."""
+    assert not isinstance(cell, Attachment), 'a param column holds no attachment'
+    return str(cell)
+
+
 def _templatize_steps(
     steps: list[Step], prefix: StepPath, ctx: _GroupContext
 ) -> list[Step]:
@@ -563,6 +631,10 @@ def _templatize_part(
 ) -> NarrationPart:
     independent = _case_independent_part(part, ctx.param_names)
     if independent is not None:
+        if isinstance(part, NarrationValue) and isinstance(
+            independent, NarrationPlaceholder
+        ):
+            return _templatize_param_value(part, independent, index, path, ctx)
         return independent
     if isinstance(part, NarrationValue):
         return _templatize_value(part, index, path, phase, ctx)
@@ -571,6 +643,43 @@ def _templatize_part(
     )
     _check_constant_term_ref(part, index, path, phase, ctx)
     return part
+
+
+def _templatize_param_value(
+    part: NarrationValue,
+    placeholder: NarrationPlaceholder,
+    index: int,
+    path: StepPath,
+    ctx: _GroupContext,
+) -> NarrationPart:
+    """A slot bound to a `param` column: it keeps pointing there when the cell
+    reads the way this slot rendered, and gets a column of its own when it does
+    not.
+
+    `_param_cell_formats` already gave the column the one formatting its
+    placeholders agree on, so this is a no-op for every slot in the ordinary
+    case. It earns its keep where they disagree — two steps formatting one
+    parameter differently — which no shared cell can serve: the odd slot is
+    promoted like any other varying value, and the ` #2` suffix keeps its token
+    pointing at the column that actually holds its text.
+    """
+    rendered = {
+        case.id: _value_at(ctx.indexed[case.id][path], index) for case in ctx.comparable
+    }
+    if all(
+        text == _cell_text(ctx.cells[part.expression][case_id])
+        for case_id, text in rendered.items()
+    ):
+        return placeholder
+    column = ctx.new_column('derived', part.expression)
+    for case_id, text in rendered.items():
+        ctx.set_cell(column.id, case_id, text)
+    return NarrationPlaceholder(
+        name=column.name,
+        column_id=column.id,
+        format_spec=part.format_spec,
+        conversion=part.conversion,
+    )
 
 
 def _templatize_value(
