@@ -80,6 +80,7 @@ The narration rules live in the **`pytest-given-authoring` skill** — auto-disc
 
 - The glossary handle is `pg` — `GLOSSARY.md` loaded as a `FileGlossary` in `tests/conftest.py` via `tests/ubiquitous_language.py`. Term-rename mechanics live under [Conventions](#conventions).
 - Regeneration (`uv run nox -s self_report`), narration-lint gating, and the commit-noise / `.md`-diff-review rules live under [Quality gates](#quality-gates).
+- **New or changed user-facing behaviour needs a scenario, not just a test.** Decorate the test that best *states* the rule — one per rule, not per branch; the edge cases around it stay plain. A behaviour tested only by undecorated tests is invisible in the report, which is the one artifact this project asks anyone to read. Two checks make the gap concrete: a rule the [CHANGELOG](CHANGELOG.md) announces with no scenario naming it, and a [GLOSSARY.md](GLOSSARY.md) row that *asserts* behaviour (`Templatize`, `Parameter table`) with no scenario demonstrating the claim — the `dead-term` lint cannot catch the latter, since a term referenced anywhere counts as alive.
 
 ## Conventions
 

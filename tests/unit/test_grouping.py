@@ -187,29 +187,34 @@ def test_templatize_term_ref_param_column_stays_none_when_no_column_match() -> N
     assert ref.param_column is None
 
 
+@scenario(
+    t'The grouped tree comes from the first passed {pg["Case"].low}',
+    tags=['parametrization'],
+)
 def test_baseline_is_the_first_passed_case_not_the_first_case() -> None:
-    """A skipped first case records no steps; the grouped tree must come from a
-    case that actually ran."""
-    nid1, nid2 = NodeId('t.py::test_brew[200]'), NodeId('t.py::test_brew[350]')
-    ran = Step(phase='when', narration=Narration(text='I brew'))
-    scenarios = [
-        Scenario(
-            id=nid1, narration=Narration(text='brew'), module='m', status='skipped'
-        ),
-        Scenario(
-            id=nid2,
-            narration=Narration(text='brew'),
-            module='m',
-            status='passed',
-            steps=[ran],
-        ),
-    ]
-    param_info = {
-        nid1: ParamSpec(names=['cup_size'], values=[200]),
-        nid2: ParamSpec(names=['cup_size'], values=[350]),
-    }
-    grouped = group_parametrized(scenarios, param_info)
-    assert [s.narration.text for s in grouped[0].steps] == ['I brew']
+    with given(t'a skipped first {pg["Case"]} and a second one that ran'):
+        nid1, nid2 = NodeId('t.py::test_brew[200]'), NodeId('t.py::test_brew[350]')
+        ran = Step(phase='when', narration=Narration(text='I brew'))
+        scenarios = [
+            Scenario(
+                id=nid1, narration=Narration(text='brew'), module='m', status='skipped'
+            ),
+            Scenario(
+                id=nid2,
+                narration=Narration(text='brew'),
+                module='m',
+                status='passed',
+                steps=[ran],
+            ),
+        ]
+        param_info = {
+            nid1: ParamSpec(names=['cup_size'], values=[200]),
+            nid2: ParamSpec(names=['cup_size'], values=[350]),
+        }
+    with when(t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}'):
+        grouped = group_parametrized(scenarios, param_info)
+    with then(t'the tree is the one the passed {pg["Case"]} recorded'):
+        assert [s.narration.text for s in grouped[0].steps] == ['I brew']
 
 
 def test_grouped_scenario_keeps_the_first_cases_identity_fields() -> None:
@@ -408,18 +413,33 @@ def _three_case_group(
     }
 
 
+@scenario(
+    t'A plain-str {pg["Narration"].low} that varies across '
+    t'{pg["Case"]("cases")} is refused',
+    tags=['parametrization', 'validation'],
+)
 def test_a_varying_str_narration_raises_rule_one() -> None:
-    scenarios, info = _two_case_group(
-        [Step(phase='when', narration=Narration(text='the machine brews 200 ml'))],
-        [Step(phase='when', narration=Narration(text='the machine brews 350 ml'))],
-    )
-    with pytest.raises(PytestGivenError) as excinfo:
+    with given(t'two {pg["Case"]("cases")} whose text differs but records no parts'):
+        scenarios, info = _two_case_group(
+            [Step(phase='when', narration=Narration(text='the machine brews 200 ml'))],
+            [Step(phase='when', narration=Narration(text='the machine brews 350 ml'))],
+        )
+    with (
+        when_then(
+            t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}',
+            'the grouping is refused',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
         group_parametrized(scenarios, info)
-    message = str(excinfo.value)
-    assert "step narration in 'test_brew' varies across parametrize cases" in message
-    assert 'records no parts' in message
-    assert 'Use a t-string' in message
-    assert message.endswith('(t.py:12)')
+    with then('the error names the test, the missing parts and the t-string fix'):
+        message = str(excinfo.value)
+        assert (
+            "step narration in 'test_brew' varies across parametrize cases" in message
+        )
+        assert 'records no parts' in message
+        assert 'Use a t-string' in message
+        assert message.endswith('(t.py:12)')
 
 
 def test_a_varying_str_narration_names_the_violating_steps_own_phase() -> None:
@@ -525,23 +545,32 @@ def _value_step(
     )
 
 
+@scenario(
+    t'A narrated value that varies becomes a derived {pg["Parameter table"].low} '
+    t'column',
+    tags=['parametrization'],
+)
 def test_a_varying_bare_name_interpolation_becomes_a_derived_column() -> None:
-    scenarios, info = _two_case_group(
-        [_value_step('2.0', format_spec='.2f', conversion='r')],
-        [_value_step('3.5', format_spec='.2f', conversion='r')],
-    )
-    grouped = group_parametrized(scenarios, info)[0]
-    assert [(c.id, c.name, c.kind) for c in grouped.parameters.columns] == [
-        ('cup_size', 'cup_size', 'param'),
-        ('derived:0', 'price', 'derived'),
-    ]
-    assert [case.values for case in grouped.parameters.cases] == [
-        [200, '2.0'],
-        [350, '3.5'],
-    ]
-    part = grouped.steps[0].narration.parts[1]
-    assert isinstance(part, NarrationPlaceholder)
-    assert (part.name, part.column_id) == ('price', 'derived:0')
+    with given(t'two {pg["Case"]("cases")} narrating a value that differs'):
+        scenarios, info = _two_case_group(
+            [_value_step('2.0', format_spec='.2f', conversion='r')],
+            [_value_step('3.5', format_spec='.2f', conversion='r')],
+        )
+    with when(t'{pg["Templatize"]("templatizing")} walks the {pg["Case"]("cases")}'):
+        grouped = group_parametrized(scenarios, info)[0]
+    with then('the value becomes a derived column beside the parametrize one'):
+        assert [(c.id, c.name, c.kind) for c in grouped.parameters.columns] == [
+            ('cup_size', 'cup_size', 'param'),
+            ('derived:0', 'price', 'derived'),
+        ]
+        assert [case.values for case in grouped.parameters.cases] == [
+            [200, '2.0'],
+            [350, '3.5'],
+        ]
+    with then(t'the {pg["Step"]} keeps a placeholder pointing at that column'):
+        part = grouped.steps[0].narration.parts[1]
+        assert isinstance(part, NarrationPlaceholder)
+        assert (part.name, part.column_id) == ('price', 'derived:0')
     # format_spec/conversion pass through the derived-placeholder site
     # unchanged — rule 3 (a later task) re-applies them to the raw value.
     assert (part.format_spec, part.conversion) == ('.2f', 'r')
@@ -628,17 +657,32 @@ def test_a_constant_interpolation_stays_inline_and_makes_no_column() -> None:
     assert grouped.steps[0].narration.text == 'the drink costs 2.0 euros'
 
 
+@scenario(
+    t'A varying interpolation that is not a bare name is refused',
+    tags=['parametrization', 'validation'],
+)
 def test_a_varying_compound_interpolation_raises_rule_two() -> None:
-    scenarios, info = _two_case_group(
-        [_value_step('2.0', expression='cup_size * 0.01')],
-        [_value_step('3.5', expression='cup_size * 0.01')],
-    )
-    with pytest.raises(PytestGivenError) as excinfo:
+    with given(t'two {pg["Case"]("cases")} narrating a computed expression'):
+        scenarios, info = _two_case_group(
+            [_value_step('2.0', expression='cup_size * 0.01')],
+            [_value_step('3.5', expression='cup_size * 0.01')],
+        )
+    with (
+        when_then(
+            t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}',
+            'the grouping is refused',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
         group_parametrized(scenarios, info)
-    message = str(excinfo.value)
-    assert "'cup_size * 0.01' in 'test_brew' varies across parametrize cases" in message
-    assert 'value = cup_size * 0.01' in message
-    assert message.endswith('(t.py:12)')
+    with then('the error quotes the expression and shows the bind-a-local fix'):
+        message = str(excinfo.value)
+        assert (
+            "'cup_size * 0.01' in 'test_brew' varies across parametrize cases"
+            in message
+        )
+        assert 'value = cup_size * 0.01' in message
+        assert message.endswith('(t.py:12)')
 
 
 def test_rule_two_names_the_violating_steps_own_phase() -> None:
@@ -1348,16 +1392,31 @@ def _pill_step(
     )
 
 
+@scenario(
+    t'A {pg["Term ref"].low} whose pill differs between {pg["Case"]("cases")} '
+    t'is refused',
+    tags=['parametrization', 'validation'],
+)
 def test_a_varying_pill_display_raises_rule_four() -> None:
-    scenarios, info = _two_case_group(
-        [_pill_step('customer', 'Alice')], [_pill_step('customer', 'Bob')]
-    )
-    with pytest.raises(PytestGivenError) as excinfo:
+    with given(t'two {pg["Case"]("cases")} whose {pg["Term ref"]} reads differently'):
+        scenarios, info = _two_case_group(
+            [_pill_step('customer', 'Alice')], [_pill_step('customer', 'Bob')]
+        )
+    with (
+        when_then(
+            t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}',
+            'the grouping is refused',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
         group_parametrized(scenarios, info)
-    message = str(excinfo.value)
-    assert "glossary term ref {pg['Customer'](name)} in 'test_brew' varies" in message
-    assert 'Split the pill from the value' in message
-    assert message.endswith('(t.py:12)')
+    with then(t'the error names the {pg["Term ref"]} and the split-the-pill fix'):
+        message = str(excinfo.value)
+        assert (
+            "glossary term ref {pg['Customer'](name)} in 'test_brew' varies" in message
+        )
+        assert 'Split the pill from the value' in message
+        assert message.endswith('(t.py:12)')
 
 
 def test_a_varying_pill_term_id_raises_rule_four() -> None:
@@ -1390,20 +1449,25 @@ def test_an_identical_pill_stays_inline() -> None:
     assert [c.kind for c in grouped.parameters.columns] == ['param']
 
 
+@scenario(
+    t'A {pg["Term ref"].low} that *is* the parametrize value stays supported',
+    tags=['parametrization'],
+)
 def test_a_pill_bound_to_a_parametrize_column_does_not_raise() -> None:
-    """The exemption: its display varies by construction, and the `param`
-    column already holds every case's value. This is what keeps
-    `param_column` alive."""
-    scenarios, info = _two_case_group(
-        [_pill_step('guest', 'Alice', expression='cup_size')],
-        [_pill_step('guest', 'Bob', expression='cup_size')],
-    )
-    grouped = group_parametrized(scenarios, info)[0]
-    part = grouped.steps[0].narration.parts[0]
-    assert isinstance(part, NarrationTermRef)
-    assert part.param_column == 'cup_size'
-    assert grouped.parameters is not None
-    assert [c.kind for c in grouped.parameters.columns] == ['param']
+    with given(t'two {pg["Case"]("cases")} whose pill is the parameter itself'):
+        scenarios, info = _two_case_group(
+            [_pill_step('guest', 'Alice', expression='cup_size')],
+            [_pill_step('guest', 'Bob', expression='cup_size')],
+        )
+    with when(t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}'):
+        grouped = group_parametrized(scenarios, info)[0]
+    with then(t'the {pg["Term ref"]} is kept, bound to its parametrize column'):
+        part = grouped.steps[0].narration.parts[0]
+        assert isinstance(part, NarrationTermRef)
+        assert part.param_column == 'cup_size'
+    with then('no extra column is made — the parametrize one already holds it'):
+        assert grouped.parameters is not None
+        assert [c.kind for c in grouped.parameters.columns] == ['param']
 
 
 def test_a_differently_shaped_comparable_pill_reads_as_differing() -> None:
@@ -1548,28 +1612,37 @@ def _att_step(*attachments: Attachment) -> Step:
     )
 
 
+@scenario(
+    t'An {pg["Attachment"].low} whose payload varies becomes an '
+    t'{pg["Attachment"].low} column',
+    tags=['parametrization'],
+)
 def test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge() -> (
     None
 ):
-    scenarios, info = _two_case_group(
-        [_att_step(Attachment(label='brew log', content='log-for-vanilla'))],
-        [_att_step(Attachment(label='brew log', content='log-for-mocha'))],
-    )
-    grouped = group_parametrized(scenarios, info)[0]
-    assert grouped.parameters is not None
-    assert [(c.id, c.name, c.kind) for c in grouped.parameters.columns] == [
-        ('cup_size', 'cup_size', 'param'),
-        ('attachment:0', 'brew log', 'attachment'),
-    ]
-    badge = grouped.steps[0].attachments[0]
-    assert badge == AttachmentRef(
-        label='brew log', content_type='text', column_id='attachment:0'
-    )
-    assert not hasattr(badge, 'content')
-    assert [c.values[1] for c in grouped.parameters.cases] == [
-        Attachment(label='brew log', content='log-for-vanilla'),
-        Attachment(label='brew log', content='log-for-mocha'),
-    ]
+    with given(t'two {pg["Case"]("cases")} attaching a label with differing payloads'):
+        scenarios, info = _two_case_group(
+            [_att_step(Attachment(label='brew log', content='log-for-vanilla'))],
+            [_att_step(Attachment(label='brew log', content='log-for-mocha'))],
+        )
+    with when(t'{pg["Templatize"]("templatizing")} walks the {pg["Case"]("cases")}'):
+        grouped = group_parametrized(scenarios, info)[0]
+    with then(t'the payload moves into an {pg["Attachment"].low} column'):
+        assert grouped.parameters is not None
+        assert [(c.id, c.name, c.kind) for c in grouped.parameters.columns] == [
+            ('cup_size', 'cup_size', 'param'),
+            ('attachment:0', 'brew log', 'attachment'),
+        ]
+        assert [c.values[1] for c in grouped.parameters.cases] == [
+            Attachment(label='brew log', content='log-for-vanilla'),
+            Attachment(label='brew log', content='log-for-mocha'),
+        ]
+    with then(t'the {pg["Step"]} keeps a content-less badge pointing at it'):
+        badge = grouped.steps[0].attachments[0]
+        assert badge == AttachmentRef(
+            label='brew log', content_type='text', column_id='attachment:0'
+        )
+        assert not hasattr(badge, 'content')
 
 
 def test_a_byte_identical_attachment_stays_inline_and_makes_no_column() -> None:
@@ -1595,19 +1668,33 @@ def test_a_varying_content_type_promotes_too() -> None:
     assert [c.kind for c in grouped.parameters.columns] == ['param', 'attachment']
 
 
+@scenario(
+    t'A {pg["Step"].low} whose set of {pg["Attachment"]("attachment")} labels '
+    t'differs between {pg["Case"]("cases")} is refused',
+    tags=['parametrization', 'validation'],
+)
 def test_a_label_present_in_one_case_only_raises_rule_five() -> None:
-    scenarios, info = _two_case_group(
-        [_att_step(Attachment(label='vanilla log', content='x'))],
-        [_att_step()],
-    )
-    with pytest.raises(PytestGivenError) as excinfo:
+    with given(t'an {pg["Attachment"]} label only one {pg["Case"]} attaches'):
+        scenarios, info = _two_case_group(
+            [_att_step(Attachment(label='vanilla log', content='x'))],
+            [_att_step()],
+        )
+    with (
+        when_then(
+            t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}',
+            'the grouping is refused',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
         group_parametrized(scenarios, info)
-    message = str(excinfo.value)
-    assert (
-        "attachment label 'vanilla log' in 'test_brew' is attached in some" in message
-    )
-    assert 'attach("<constant>", …).' in message  # pins correction 4 — see Step 6
-    assert message.endswith('(t.py:12)')
+    with then('the error names the label and asks for a constant one'):
+        message = str(excinfo.value)
+        assert (
+            "attachment label 'vanilla log' in 'test_brew' is attached in some"
+            in message
+        )
+        assert 'attach("<constant>", …).' in message  # pins correction 4
+        assert message.endswith('(t.py:12)')
 
 
 def test_rule_five_fires_when_the_extra_label_is_on_the_other_case() -> None:

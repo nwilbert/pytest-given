@@ -18,6 +18,7 @@ from pytest_given.capture.decorators import (
     scenario,
     then,
     when,
+    when_then,
 )
 from pytest_given.capture.source import _reset_rootdir, set_rootdir
 from pytest_given.capture.story import (
@@ -480,17 +481,32 @@ def test_scenario_with_glossary_tstring_preserves_surface_text() -> None:
     assert deco.name.text == 'guests arrive'
 
 
-@pytest.mark.parametrize(
-    'label',
-    [
-        pytest.param(Template('{flavor} log'), id='deferred-template'),
-        pytest.param(t'vanilla log', id='t-string'),
-        pytest.param(42, id='not-a-string'),
-    ],
+# Parametrized over a *description* rather than the label object itself: the
+# case table prints the parameter, and a `Template` renders as its address —
+# non-deterministic, so the committed report would churn on every regeneration.
+_BAD_LABELS: dict[str, object] = {
+    'deferred-template': Template('{flavor} log'),
+    't-string': t'vanilla log',
+    'not-a-string': 42,
+}
+
+
+@pytest.mark.parametrize('label_kind', list(_BAD_LABELS))
+@scenario(
+    t'An {pg["Attachment"].low} label must be plain text',
+    tags=['validation'],
 )
-def test_attach_rejects_a_non_str_label(label: object) -> None:
-    with pytest.raises(PytestGivenError, match='attachment labels are plain text'):
-        attach(cast(str, label), 'payload')
+def test_attach_rejects_a_non_str_label(label_kind: str) -> None:
+    with given(t'a non-str {pg["Attachment"]} label of kind {label_kind}'):
+        candidate = cast(str, _BAD_LABELS[label_kind])
+    with (
+        when_then(
+            t'it is attached',
+            t'a PytestGivenError says {pg["Attachment"]} labels are plain text',
+        ),
+        pytest.raises(PytestGivenError, match='attachment labels are plain text'),
+    ):
+        attach(candidate, 'payload')
 
 
 def test_step_descriptor_with_tstring_no_interpolations_still_has_parts() -> None:
