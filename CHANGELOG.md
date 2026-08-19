@@ -21,17 +21,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A varying attachment payload likewise becomes an `attachment` column, leaving
   a badge in the step that points at it. A payload too long for its cell opens
   in a panel spanning the table (HTML) or a fence below it (Markdown).
-- Two columns wanting the same header get ` #2` / ` #3` suffixes, carried by
-  the token or badge that points there.
-- A case that passed while recording a different step structure than the
-  grouped tree is now marked as such — `≠` in HTML, a note under the table in
-  Markdown, `divergent: true` in JSON. Its blank cells then read as "took
-  another path" rather than as missing data. Such a case no longer lends its
-  parameter values to a term pill either, so it cannot credit story coverage
-  or list Glossary instances for steps it never recorded in that shape.
 
 ### Changed
 
+- `activity(..., id=N)` is now `activity(..., activity_id=N)`. The keyword
+  shadowed the `id` builtin; the `Activity.id` field itself is unchanged.
 - **Breaking.** Step narration must now be uniform across parametrize cases.
   These raise `PytestGivenError` instead of quietly reporting case 1:
 
@@ -51,11 +45,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking (JSON report).** `parameters.names` becomes `parameters.columns`
   (`{id, name, kind}`), cells may hold an attachment object, placeholder parts
   gain `column_id`, and a grouped step's `narration.text` is the template
-  rather than case 1's rendering. Update any `jq` reading `parameters`; HTML
-  and Markdown output is unchanged. No migration — re-run the suite, and
-  `pytest-given report` on an older file says so.
-- `activity(..., id=N)` is now `activity(..., activity_id=N)`. The keyword
-  shadowed the `id` builtin; the `Activity.id` field itself is unchanged.
+  rather than case 1's rendering.
 - The bundled `pytest-given-authoring` skill now documents the report mechanics
   its rules depend on (story binding, coverage matching, lint severities), adds
   a symptom index, and groups the scenario rules under subheads.
@@ -71,12 +61,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
   interpolation's own format spec (`{price:.2f}` gives `2.50`, not `2.5`), and
   under `indirect=True` it holds the bound test argument rather than the
   parametrize input.
-- Parametrizing over a glossary term instance stores the term's display, not a
-  repr of the whole glossary.
 - Only a passing case with a value for the column contributes its glossary
   instance and story coverage.
-- `unused-interpolation` fires on parametrized scenarios again, where a varying
-  interpolation is a placeholder rather than a value.
 - Attachment content scrolls horizontally instead of being silently cut off
   (`<pre>` does not wrap), in the step tree as well as the case table. Badges
   are keyboard-operable too: focusable, with a focus ring, Enter and Space, and
