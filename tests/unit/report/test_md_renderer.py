@@ -43,7 +43,6 @@ def test_header_names_the_project() -> None:
 @scenario(
     t'A passed {pg["Scenario"].low} renders as a checked heading with '
     t'{pg["Step"].low} bullets',
-    tags=['happy-path'],
 )
 def test_passed_scenario_heading_and_steps() -> None:
     with given(t'a {pg["Report"]} holding a passed {pg["Scenario"]} with three steps'):
@@ -141,7 +140,7 @@ def test_source_without_location_still_drops_parametrize_suffix() -> None:
 
 
 @scenario(
-    t'Nested {pg["Step"]("steps")} indent under their parent', tags=['happy-path']
+    t'Nested {pg["Step"]("steps")} indent under their parent',
 )
 def test_nested_steps_indent() -> None:
     with given(t'a {pg["Scenario"]} whose when {pg["Step"]} has a nested child'):
@@ -167,7 +166,6 @@ def test_nested_steps_indent() -> None:
 @scenario(
     t'Structured {pg["Narration"].low} renders {pg["Term"]("terms")}, '
     t'values and placeholders',
-    tags=['step-text'],
 )
 def test_narration_parts_resolve_terms_and_values() -> None:
     with given(
@@ -257,7 +255,6 @@ def test_parametrized_scenario_renders_table() -> None:
 
 @scenario(
     t'A failing {pg["Step"].low} is marked with a minimal error digest',
-    tags=['happy-path'],
 )
 def test_failing_step_is_marked_with_minimal_error() -> None:
     with given(
@@ -329,7 +326,6 @@ def test_single_line_attachment_renders_inline() -> None:
 
 @scenario(
     t'A multi-line {pg["Attachment"].low} renders as a fenced block',
-    tags=['happy-path'],
 )
 def test_multiline_attachment_renders_fenced_block() -> None:
     with given(t'a {pg["Step"]} carrying a multi-line {pg["Attachment"]}'):
@@ -448,7 +444,9 @@ def test_param_table_renders_none_value_as_text_not_blank() -> None:
     assert '| None | ✓ |' in md
 
 
-@scenario('A skipped scenario shows its skip reason', tags=['happy-path'])
+@scenario(
+    'A skipped scenario shows its skip reason',
+)
 def test_skipped_scenario_shows_reason() -> None:
     with given(t'a skipped {pg["Scenario"]} with a reason'):
         scn = Scenario(

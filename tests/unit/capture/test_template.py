@@ -34,7 +34,7 @@ def test_template_parses_literal_only() -> None:
 
 @scenario(
     'A Template parses a bare placeholder',
-    tags=['step-text', 'parametrization'],
+    tags=['parametrization'],
 )
 def test_template_parses_single_placeholder() -> None:
     with given(t'a deferred {pg["Templatize"]} template with one placeholder'):
@@ -72,7 +72,7 @@ def test_template_get_identifiers() -> None:
 
 @scenario(
     'A Template substitutes parametrize values',
-    tags=['step-text', 'parametrization'],
+    tags=['parametrization'],
 )
 def test_template_substitute_basic() -> None:
     with given(t'a {pg["Templatize"]} template referencing a {pg["Case"]} column'):
@@ -111,7 +111,7 @@ def test_template_unclosed_brace_raises_value_error() -> None:
 
 @scenario(
     'A Template accepts bare identifiers only',
-    tags=['step-text', 'validation'],
+    tags=['validation'],
 )
 @pytest.mark.parametrize(
     'text',
@@ -140,7 +140,6 @@ def test_parse_tstring_literal_only() -> None:
 
 @scenario(
     'A t-string interpolation becomes a value part',
-    tags=['step-text', 'happy-path'],
 )
 def test_parse_tstring_single_interpolation() -> None:
     with given('a t-string step with one interpolated value'):
@@ -204,7 +203,6 @@ def test_parse_tstring_consecutive_interpolations() -> None:
 
 @scenario(
     'A t-string can interpolate an arbitrary expression',
-    tags=['step-text', 'happy-path'],
 )
 def test_parse_tstring_expression() -> None:
     with given('a t-string step interpolating a computed expression'):
@@ -244,7 +242,6 @@ def glossary() -> Glossary:
 
 @scenario(
     t'A {pg["Glossary"].low} handle in a t-string emits a {pg["Term ref"].low}',
-    tags=['step-text'],
 )
 def test_tstring_with_actor_emits_term_ref(glossary: Glossary) -> None:
     with given(t'an {pg["Actor"]} handle from the glossary'):
@@ -274,7 +271,6 @@ def test_tstring_with_actor_instance_emits_term_ref_with_instance_display(
 
 @scenario(
     t'A {pg["Work Object"].low} handle in a t-string emits a {pg["Term ref"].low}',
-    tags=['step-text'],
 )
 def test_tstring_with_work_object_emits_term_ref(glossary: Glossary) -> None:
     with given(t'a {pg["Work Object"]} handle from the glossary'):
@@ -296,7 +292,6 @@ def test_tstring_with_work_object_instance_emits_term_ref(glossary: Glossary) ->
 
 @scenario(
     t'A bare {pg["Verb"].low} handle keeps its canonical display',
-    tags=['step-text'],
 )
 def test_tstring_with_verb_emits_term_ref_with_canonical_display(
     glossary: Glossary,
@@ -312,7 +307,6 @@ def test_tstring_with_verb_emits_term_ref_with_canonical_display(
 
 @scenario(
     t'An inflected {pg["Verb"].low} in a t-string shows the {pg["Inflection"].low}',
-    tags=['step-text'],
 )
 def test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display(
     glossary: Glossary,
@@ -353,7 +347,7 @@ def test_tstring_with_term_ref_populates_expression(glossary: Glossary) -> None:
 
 @scenario(
     t'A {pg["Term ref"].low} may not carry a format spec',
-    tags=['step-text', 'validation'],
+    tags=['validation'],
 )
 def test_tstring_term_ref_with_format_spec_raises(glossary: Glossary) -> None:
     with given(t'an {pg["Actor"]} handle interpolated with a format spec'):
@@ -397,7 +391,6 @@ def file_glossary(tmp_path: Path) -> FileGlossary:
 @scenario(
     t'A {pg["File glossary"]("FileGlossary")} handle works in a t-string '
     t'{pg["Step"].low}',
-    tags=['step-text'],
     story=adopt_pytest_given,
 )
 def test_tstring_with_file_term_handle_emits_term_ref(

@@ -21,9 +21,25 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A varying attachment payload likewise becomes an `attachment` column, leaving
   a badge in the step that points at it. A payload too long for its cell opens
   in a panel spanning the table (HTML) or a fence below it (Markdown).
+- The HTML report's sidebar gains **Terms** as a third browse axis next to Tags
+  and Modules, listing the glossary terms your scenarios reference, ordered by
+  how many scenarios each one carries. Clicking a term filters the Scenarios
+  view by it (the chevron expands the group instead), so a term filter no
+  longer has to be started from the Glossary tab. Reports with a glossary now
+  open on this axis; reports without one show no Terms segment and open on
+  Tags as before.
+
+### Fixed
+
+- The active-term chip in the Scenarios header now shows the term's canonical
+  name (`File glossary`) instead of its slug id (`file-glossary`).
 
 ### Changed
 
+- The bundled authoring skill's tagging guidance now argues for sparse tagging:
+  a tag should cut across modules and cover a minority of the suite. It no
+  longer offers `happy-path` as an example — it labels a test category rather
+  than a behaviour, and on a majority of scenarios it filters nothing.
 - `activity(..., id=N)` is now `activity(..., activity_id=N)`. The keyword
   shadowed the `id` builtin; the `Activity.id` field itself is unchanged.
 - **Breaking.** Step narration must now be uniform across parametrize cases.

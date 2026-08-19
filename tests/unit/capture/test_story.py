@@ -53,7 +53,6 @@ def search(g):
 
 @scenario(
     t'An {pg["Actor"].low} handle in a {pg["Path"].low} becomes a {pg["Term ref"].low}',
-    tags=['story-grammar', 'happy-path'],
 )
 def test_path_dispatches_actor_to_activity_term_ref(guest, search, room):
     with when(t'a {pg["Path"]} is built from three glossary handles'):
@@ -98,7 +97,6 @@ def test_path_dispatches_verb_to_activity_term_ref_with_canonical_display(
 @scenario(
     t'An inflected {pg["Verb"].low} keeps its {pg["Term"].low} identity '
     t'but shows the {pg["Inflection"].low}',
-    tags=['story-grammar', 'happy-path'],
 )
 def test_path_dispatches_inflected_verb_to_activity_term_ref_with_inflected_display(
     guest,
@@ -115,7 +113,6 @@ def test_path_dispatches_inflected_verb_to_activity_term_ref_with_inflected_disp
 
 @scenario(
     t'A bare string in a {pg["Path"].low} becomes a connective word',
-    tags=['story-grammar', 'happy-path'],
 )
 def test_path_dispatches_bare_string_to_activity_word(guest, search, room):
     with when(t'a {pg["Path"]} is built with a bare word between term nodes'):
@@ -132,7 +129,7 @@ def test_path_dispatches_bare_string_to_activity_word(guest, search, room):
 @scenario(
     t'A {pg["Path"].low} needs at least an {pg["Actor"].low}, a '
     t'{pg["Verb"].low} and a node',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_path_rejects_path_with_fewer_than_three_parts(guest, search):
     with (
@@ -147,7 +144,7 @@ def test_path_rejects_path_with_fewer_than_three_parts(guest, search):
 
 @scenario(
     t'Position 0 of a {pg["Path"].low} must be an {pg["Actor"].low}',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_path_rejects_work_object_in_position_0(search, room):
     with (
@@ -162,7 +159,7 @@ def test_path_rejects_work_object_in_position_0(search, room):
 
 @scenario(
     t'A {pg["Verb"].low} cannot open a {pg["Path"].low}',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_path_rejects_verb_in_position_0(guest, search, room):
     with (
@@ -177,7 +174,6 @@ def test_path_rejects_verb_in_position_0(guest, search, room):
 
 @scenario(
     t'A bare string may stand in for the {pg["Actor"].low} {pg["Slot"].low}',
-    tags=['story-grammar', 'happy-path'],
 )
 def test_path_allows_bare_string_in_position_0(search, room):
     with when(t'a bare string takes position 0 of a {pg["Path"]}'):
@@ -188,7 +184,7 @@ def test_path_allows_bare_string_in_position_0(search, room):
 
 @scenario(
     t'Position 1 of a {pg["Path"].low} must be a {pg["Verb"].low}',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_path_rejects_actor_in_position_1(guest, room):
     with (
@@ -203,7 +199,7 @@ def test_path_rejects_actor_in_position_1(guest, room):
 
 @scenario(
     t'A {pg["Work Object"].low} cannot fill the {pg["Verb"].low} {pg["Slot"].low}',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_path_rejects_work_object_in_position_1(guest, room):
     with (
@@ -218,7 +214,7 @@ def test_path_rejects_work_object_in_position_1(guest, room):
 
 @scenario(
     t'Position 2 of a {pg["Path"].low} must be a noun',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_path_rejects_verb_in_position_2(guest, search):
     with (
@@ -233,7 +229,6 @@ def test_path_rejects_verb_in_position_2(guest, search):
 
 @scenario(
     t'A bare {pg["Verb"].low} may sit between two real entity nodes',
-    tags=['story-grammar', 'happy-path'],
 )
 def test_path_allows_bare_verb_between_term_nodes(guest, room):
     with when(t'a bare verb sits between an {pg["Actor"]} and a {pg["Work Object"]}'):
@@ -249,7 +244,6 @@ def test_path_allows_bare_verb_between_term_nodes(guest, room):
 
 @scenario(
     t'A {pg["Path"].low} may be fully bare words',
-    tags=['story-grammar', 'happy-path'],
 )
 def test_path_allows_fully_bare_path():
     with given('three plain words with no glossary handles'):
@@ -269,7 +263,6 @@ def test_path_allows_fully_bare_path():
 
 @scenario(
     'Node/edge alternation allows a trailing connective node',
-    tags=['story-grammar', 'happy-path'],
 )
 def test_path_allows_node_edge_alternation_with_connective():
     with given(
@@ -295,7 +288,7 @@ def test_path_allows_node_edge_alternation_with_connective():
 
 @scenario(
     t'A {pg["Path"].low} may not end on a dangling edge',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_path_rejects_dangling_edge():
     with given(
@@ -320,7 +313,6 @@ def test_path_rejects_dangling_edge():
 
 @scenario(
     t'A single-path {pg["Activity"].low} synthesizes one {pg["Path"].low}',
-    tags=['story-grammar', 'happy-path'],
     story=adopt_pytest_given,
 )
 def test_activity_single_path_synthesizes_one_path(guest, search, room):
@@ -334,7 +326,6 @@ def test_activity_single_path_synthesizes_one_path(guest, search, room):
 
 @scenario(
     t'An {pg["Activity"].low} may branch into multiple {pg["Path"]("paths")}',
-    tags=['story-grammar', 'happy-path'],
     story=adopt_pytest_given,
 )
 def test_activity_multi_path_accepts_multiple_paths(guest, search, room):
@@ -349,7 +340,7 @@ def test_activity_multi_path_accepts_multiple_paths(guest, search, room):
 
 @scenario(
     t'Mixing loose parts and prebuilt {pg["Path"]("paths")} is rejected',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_activity_mixing_parts_and_paths_raises(guest, search, room):
     with given(t'a prebuilt {pg["Path"]}'):
@@ -366,7 +357,7 @@ def test_activity_mixing_parts_and_paths_raises(guest, search, room):
 
 @scenario(
     t'{pg["Activity"]} id 0 is reserved',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_activity_explicit_id_zero_raises(guest, search, room):
     with (
@@ -384,7 +375,6 @@ def test_activity_explicit_id_zero_raises(guest, search, room):
 
 @scenario(
     t'A {pg["Story"].low} auto-numbers its {pg["Activity"]("activities")} from one',
-    tags=['story-grammar', 'happy-path'],
     story=adopt_pytest_given,
 )
 def test_story_auto_numbers_activities_from_one(guest, search, room):
@@ -400,7 +390,6 @@ def test_story_auto_numbers_activities_from_one(guest, search, room):
 
 @scenario(
     'Auto-numbering skips ids already taken explicitly',
-    tags=['story-grammar', 'happy-path'],
 )
 def test_story_auto_numbering_skips_taken_explicit_ids(guest, search, room):
     with given(t'a mix of explicit and auto {pg["Activity"]} ids'):
@@ -418,7 +407,7 @@ def test_story_auto_numbering_skips_taken_explicit_ids(guest, search, room):
 
 @scenario(
     t'Duplicate {pg["Activity"].low} ids in a {pg["Story"].low} are rejected',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_story_rejects_duplicate_activity_ids(guest, search, room):
     with given(t'two {pg["Activity"]} rows sharing an explicit id'):
@@ -438,7 +427,6 @@ def test_story_rejects_duplicate_activity_ids(guest, search, room):
 
 @scenario(
     t'A {pg["Story"].low} derives its id from its title',
-    tags=['story-grammar', 'happy-path'],
 )
 def test_story_derives_id_from_title():
     with given('a human-readable story title'):
@@ -451,7 +439,7 @@ def test_story_derives_id_from_title():
 
 @scenario(
     t'A {pg["Story"].low} may span only one {pg["Glossary"].low}',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_story_rejects_two_glossaries(guest, search, room):
     with given('two activities that reach two different glossaries'):
@@ -497,7 +485,7 @@ def test_story_captures_source_from_call_site(g):
 
 @scenario(
     t'Two {pg["Story"]("stories")} with the same id collide',
-    tags=['story-grammar', 'validation'],
+    tags=['validation'],
 )
 def test_story_id_collision_raises_with_both_sites():
     with given(t'a {pg["Story"]} already declared under an id'):
@@ -567,7 +555,6 @@ def test_path_accepts_extended_alternation(guest, search, room):
 
 @scenario(
     t'A {pg["Path"].low} may chain a second verb-object pair',
-    tags=['story-grammar', 'happy-path'],
 )
 def test_path_allows_second_verb_edge():
     with given(

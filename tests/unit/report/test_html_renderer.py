@@ -166,7 +166,6 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
 
 @scenario(
     t'{pg["Parameter coloring"]} marks placeholders and table headers',
-    tags=['happy-path'],
     story=adopt_pytest_given,
 )
 def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> None:
@@ -727,6 +726,71 @@ def test_render_status_filter_pills(tmp_path: Path) -> None:
     assert 'showPassed' in content
     assert 'showFailed' in content
     assert 'showSkipped' in content
+
+
+def _report_with_glossary(tmp_path: Path, *, terms: list[dict]) -> str:
+    """Render a one-scenario report whose glossary carries `terms`."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_x',
+                        'narration': _narration('A scenario'),
+                        'module': 'test_mod',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                    }
+                ],
+                'glossary': {'terms': terms},
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    return html_path.read_text(encoding='utf-8')
+
+
+def test_render_includes_terms_browse_segment(tmp_path: Path) -> None:
+    """A report with a glossary offers Terms as a third browse axis."""
+    content = _report_with_glossary(
+        tmp_path,
+        terms=[
+            {
+                'id': 'guest',
+                'kind': 'actor',
+                'canonical': 'Guest',
+                'definition': 'A person staying over.',
+                'source': None,
+            }
+        ],
+    )
+    assert "view === 'terms'" in content
+    assert '>Terms<' in content
+    assert 'onGroupClick(group)' in content
+    # The active-term chip reads the canonical name, not the slug id.
+    assert 'termLabel(termFilter)' in content
+    assert "termNames[t.id] = t.canonical" in content
+
+
+def test_render_omits_terms_segment_without_a_glossary(tmp_path: Path) -> None:
+    """Without a glossary there is nothing to browse, so the segment is gone
+    and app.js opens on Tags instead of an empty axis."""
+    content = _report_with_glossary(tmp_path, terms=[])
+    assert '>Terms<' not in content
+    assert '>Tags<' in content
+    assert '>Modules<' in content
 
 
 def test_render_includes_skip_reason_block_and_chevron(tmp_path: Path) -> None:

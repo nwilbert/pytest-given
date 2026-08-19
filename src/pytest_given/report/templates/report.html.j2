@@ -177,18 +177,26 @@
       <div class="sidebar-label">Browse by</div>
       <div class="seg-toggle">
         <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
+        {#- The Terms axis needs a glossary to browse; without one the segment
+            is omitted and app.js falls back to opening on Tags. -#}
+        {% if tab_visibility.glossary %}
+        <div class="seg-btn" :class="{ active: view === 'terms' }" @click="view = 'terms'">Terms</div>
+        {% endif %}
         <div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
       </div>
       <div class="nav-tree">
-        <template x-for="group in groups" :key="group.name">
+        <template x-for="group in groups" :key="group.id">
           <div>
-            <div class="nav-group" :class="{ 'nav-group-active': activeTag === group.name, 'nav-group-dimmed': activeTag && activeTag !== group.name }" @click="view === 'tags' && activeTag === group.name ? filterByTag(group.name) : toggleGroup(group.name)">
-              <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.name] }"></span>
+            {#- Groups key on `group.id`, not the display name: a term group
+                shows its canonical name but filters by term id. The chevron
+                stops propagation so it expands without touching the filter. -#}
+            <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group), 'nav-group-dimmed': isGroupDimmed(group) }" @click="onGroupClick(group)">
+              <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
               <span class="nav-group-name" x-text="group.name"></span>
-              <span class="nav-group-dismiss" x-show="activeTag === group.name">×</span>
+              <span class="nav-group-dismiss" x-show="isGroupActive(group)">×</span>
               <span class="nav-group-count" x-text="group.scenarios.length"></span>
             </div>
-            <template x-if="expandedGroups[group.name]">
+            <template x-if="expandedGroups[group.id]">
               <div>
                 <template x-for="s in group.scenarios" :key="s.id">
                   <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
@@ -209,7 +217,7 @@
       <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
       <div class="header-context" x-text="filterSummary"></div>
       <span class="filter-chip" x-show="termFilter" x-cloak>
-        Term: <span x-text="termFilter"></span>
+        Term: <span x-text="termLabel(termFilter)"></span>
         <button type="button" class="filter-chip-x" @click="clearTermFilter()" aria-label="Clear term filter">×</button>
       </span>
       <button class="collapse-all-btn" @click="toggleAllScenarios()">

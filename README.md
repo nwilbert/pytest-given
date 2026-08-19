@@ -35,7 +35,7 @@ def machine():
     return {'coffees': 10, 'price': 2}
 
 
-@scenario('Buy coffee', tags=['billing', 'happy-path'])
+@scenario('Buy coffee', tags=['billing'])
 def test_buy_coffee(machine):
     with when('I insert $2'):
         machine['coffees'] -= 1

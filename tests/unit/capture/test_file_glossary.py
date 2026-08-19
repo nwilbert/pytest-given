@@ -26,7 +26,6 @@ def glossary_file(tmp_path):
 
 @scenario(
     t'{pg["File glossary"]("FileGlossary")} lookup is case-insensitive',
-    tags=['happy-path'],
 )
 def test_lookup_is_case_insensitive(glossary_file):
     with given(t'a {pg["File glossary"]} loaded from a Markdown file'):
@@ -41,7 +40,6 @@ def test_lookup_is_case_insensitive(glossary_file):
 
 @scenario(
     'Repeated lookups return the same handle',
-    tags=['happy-path'],
 )
 def test_handles_are_memoized(glossary_file):
     with given(t'a {pg["File glossary"]} loaded from a Markdown file'):
@@ -55,7 +53,6 @@ def test_handles_are_memoized(glossary_file):
 
 @scenario(
     t'File-loaded {pg["Term"]("terms")} start {pg["Kindless"].low}',
-    tags=['happy-path'],
 )
 def test_terms_start_kindless(glossary_file):
     with given('a Markdown glossary file with no kind column'):
@@ -72,7 +69,7 @@ def test_terms_start_kindless(glossary_file):
 
 @scenario(
     'An unknown name raises with a suggestion',
-    tags=['validation'],
+    tags=['diagnostics', 'validation'],
 )
 def test_unknown_name_raises_with_suggestion(glossary_file):
     with given(t'a {pg["File glossary"]} loaded from a Markdown file'):
@@ -90,7 +87,6 @@ def test_unknown_name_raises_with_suggestion(glossary_file):
 
 @scenario(
     t'Handles are usable inline in an {pg["Activity"].low}',
-    tags=['story-grammar'],
 )
 def test_usable_inline_in_activity(glossary_file):
     with given(t'a {pg["File glossary"]} loaded from a Markdown file'):
@@ -107,7 +103,6 @@ def test_usable_inline_in_activity(glossary_file):
 
 @scenario(
     'Calling a handle overrides its display',
-    tags=['story-grammar'],
 )
 def test_call_overrides_display(glossary_file):
     with given(t'a {pg["File glossary"]} loaded from a Markdown file'):
@@ -127,7 +122,6 @@ def test_call_overrides_display(glossary_file):
 
 @scenario(
     t'An explicit kind column sets {pg["Term"].low} kinds',
-    tags=['happy-path'],
 )
 def test_explicit_kind_column(tmp_path):
     with given(t'a Markdown glossary with an explicit Kind column'):
@@ -147,7 +141,6 @@ def test_explicit_kind_column(tmp_path):
 
 @scenario(
     'A kind column can be selected by integer index',
-    tags=['happy-path'],
 )
 def test_kind_column_by_integer_index(tmp_path):
     with given('a Markdown glossary with the kind in the third column'):
@@ -167,7 +160,6 @@ def test_kind_column_by_integer_index(tmp_path):
 
 @scenario(
     t'A {pg["Work Object"]("work_object")} kind alias maps to the object kind',
-    tags=['happy-path'],
 )
 def test_work_object_underscore_alias(tmp_path):
     with given(t'a glossary whose Kind cell says work_object'):
@@ -183,7 +175,7 @@ def test_work_object_underscore_alias(tmp_path):
 
 @scenario(
     'An unrecognised kind value is rejected',
-    tags=['validation'],
+    tags=['diagnostics', 'validation'],
 )
 def test_unrecognised_kind_value_raises(tmp_path):
     with given('a glossary whose Kind cell holds an unknown value'):
@@ -230,7 +222,7 @@ def test_glossary_property_returns_inner_glossary(glossary_file):
 
 @scenario(
     t'A {pg["Term"].low} cell with no alphanumeric characters is rejected',
-    tags=['validation'],
+    tags=['diagnostics', 'validation'],
 )
 def test_empty_id_term_cell_raises(tmp_path):
     with given(t'a row whose {pg["Term"]} cell has no id-able characters'):
@@ -274,7 +266,6 @@ def test_conflicting_duplicate_rows_raise(tmp_path):
 
 @scenario(
     t'A blank description normalizes to {pg["Undefined"].low}',
-    tags=['happy-path'],
 )
 def test_blank_description_cell_normalizes_to_none(tmp_path):
     from pytest_given.model import TermId
@@ -292,7 +283,6 @@ def test_blank_description_cell_normalizes_to_none(tmp_path):
 
 @scenario(
     t'Identical duplicate rows collapse to one {pg["Term"].low}',
-    tags=['happy-path'],
 )
 def test_idempotent_duplicate_rows_ok(tmp_path):
     from pytest_given.model import TermId
@@ -318,7 +308,6 @@ def test_idempotent_duplicate_rows_ok(tmp_path):
 
 @scenario(
     t'Calling {pg["File glossary"]("FileGlossary")} looks up a known {pg["Term"].low}',
-    tags=['happy-path'],
 )
 def test_file_glossary_call_known_name_returns_handle(glossary_file):
     with given(t'a {pg["File glossary"]} loaded from a Markdown file'):

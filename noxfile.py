@@ -294,6 +294,13 @@ def examples(session: nox.Session) -> None:
             # error-level lint findings. The printed summary is the signal
             # here.
             '--given-lint=true',
+            # `given_lint_ignore` in pyproject.toml scopes an exemption to the
+            # backend suite in `tests/`. An entry that suppresses nothing is
+            # an error-level `stale-ignore` by design, so leaving the list in
+            # place would print a spurious error on every examples run — the
+            # entry's node is never collected here. Clear it for this suite.
+            '-o',
+            'given_lint_ignore=',
             '--tb=no',
             '--no-header',
             '-q',

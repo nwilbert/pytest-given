@@ -27,12 +27,28 @@ function deserializeStory(params) {
 }
 
 // --- Alpine app ---
+// Scenarios that reference no glossary term bucket together under this key.
+// A \u0000 prefix keeps it from colliding with any real term id.
+const NO_TERMS = '\u0000no-terms';
+
 function reportApp() {
   const data = window.__REPORT_DATA__;
   const storyIds = window.__storyIds || [];
+  const glossaryTerms = (data.glossary && data.glossary.terms) || [];
+  const hasGlossary = glossaryTerms.length > 0;
+  // Term id -> canonical display name, for the Terms browse axis.
+  const termNames = {};
+  for (const t of glossaryTerms) termNames[t.id] = t.canonical;
+  // __termScenarios is term -> scenarios; the sidebar needs the inverse.
+  const scenarioTerms = {};
+  for (const [termId, ids] of Object.entries(window.__termScenarios || {})) {
+    for (const sid of ids) (scenarioTerms[sid] || (scenarioTerms[sid] = [])).push(termId);
+  }
   return {
     search: '',
-    view: 'tags',
+    // Terms is the richest axis when there is a glossary to browse; reports
+    // without one have no Terms segment, so they open on Tags.
+    view: hasGlossary ? 'terms' : 'tags',
     mainView: 'scenarios',
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
@@ -119,17 +135,39 @@ function reportApp() {
     },
     get groups() {
       const grouped = {};
+      const isTerms = this.view === 'terms';
       for (const s of data.scenarios) {
         if (!this._matchesFilters(s)) continue;
-        const keys = this.view === 'tags'
-          ? (s.tags.length ? s.tags : ['untagged'])
-          : [s.module];
+        let keys;
+        if (isTerms) {
+          const ids = scenarioTerms[s.id] || [];
+          keys = ids.length ? ids : [NO_TERMS];
+        } else if (this.view === 'tags') {
+          keys = s.tags.length ? s.tags : ['untagged'];
+        } else {
+          keys = [s.module];
+        }
         for (const k of keys) {
-          if (!grouped[k]) grouped[k] = { name: k, scenarios: [] };
+          if (!grouped[k]) {
+            grouped[k] = {
+              id: k,
+              name: isTerms ? (termNames[k] || 'no terms') : k,
+              scenarios: [],
+            };
+          }
           grouped[k].scenarios.push(s);
         }
       }
-      return Object.values(grouped).sort((a, b) => a.name.localeCompare(b.name));
+      const out = Object.values(grouped);
+      // Terms sort by weight, not alphabetically: the axis has a long tail
+      // (a third of a glossary typically lands on one or two scenarios), and
+      // the terms carrying the most behaviour are what you want to browse
+      // first. Tags and modules stay alphabetical.
+      if (isTerms) {
+        return out.sort((a, b) =>
+          b.scenarios.length - a.scenarios.length || a.name.localeCompare(b.name));
+      }
+      return out.sort((a, b) => a.name.localeCompare(b.name));
     },
     _matchesFilters(s) {
       if (s.status === 'passed' && !this.showPassed) return false;
@@ -200,9 +238,42 @@ function reportApp() {
     filterScenariosByTerm(id) {
       this.termFilter = id;
       this.mainView = 'scenarios';
+      // Reveal the active term in the sidebar rather than landing on an
+      // unrelated axis, mirroring what filterByTag does for tags.
+      if (hasGlossary) this.view = 'terms';
     },
     clearTermFilter() {
       this.termFilter = null;
+    },
+    termLabel(id) {
+      // Term ids are slugs ('file-glossary'); the report speaks canonical
+      // names ('File glossary'). Falls back to the id for a term the
+      // glossary no longer carries.
+      return termNames[id] || id;
+    },
+    isGroupActive(group) {
+      return this.view === 'terms'
+        ? this.termFilter === group.id
+        : this.activeTag === group.id;
+    },
+    isGroupDimmed(group) {
+      const active = this.view === 'terms' ? this.termFilter : this.activeTag;
+      return !!active && active !== group.id;
+    },
+    onGroupClick(group) {
+      // In the Terms view the group name is the filter control: unlike tags,
+      // a term has no pill on the scenario card to activate a filter from,
+      // so the sidebar has to own that affordance. The chevron still expands
+      // (its own click stops propagation before reaching here).
+      if (this.view === 'terms') {
+        this.termFilter = this.termFilter === group.id ? null : group.id;
+        return;
+      }
+      if (this.view === 'tags' && this.activeTag === group.id) {
+        this.filterByTag(group.id);
+        return;
+      }
+      this.toggleGroup(group.id);
     },
     filterByTag(tag) {
       if (this.activeTag === tag) {

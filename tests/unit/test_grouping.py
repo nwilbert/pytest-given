@@ -659,7 +659,7 @@ def test_a_constant_interpolation_stays_inline_and_makes_no_column() -> None:
 
 @scenario(
     t'A varying interpolation that is not a bare name is refused',
-    tags=['parametrization', 'validation'],
+    tags=['diagnostics', 'parametrization', 'validation'],
 )
 def test_a_varying_compound_interpolation_raises_rule_two() -> None:
     with given(t'two {pg["Case"]("cases")} narrating a computed expression'):

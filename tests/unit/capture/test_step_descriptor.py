@@ -54,7 +54,6 @@ def _reset_story_registry():
 
 @scenario(
     t'A {pg["Step"].low} pairs its {pg["Narration"].low} with a {pg["Phase"].low}',
-    tags=['happy-path'],
     story=adopt_pytest_given,
 )
 def test_context_manager_basic() -> None:
@@ -249,7 +248,6 @@ def test_step_descriptor_decorator_rejects_tstring_mixed_glossary_and_value() ->
 
 @scenario(
     t'{pg["when_then"]} records the action and its outcome as siblings',
-    tags=['happy-path'],
     story=adopt_pytest_given,
 )
 def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
@@ -278,7 +276,6 @@ def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
 
 @scenario(
     t'{pg["when_then"]} pairs with an inner pytest.raises',
-    tags=['happy-path'],
 )
 def test_when_then_pairs_with_inner_pytest_raises() -> None:
     from pytest_given.capture.decorators import when_then
@@ -389,7 +386,6 @@ def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
 
 @scenario(
     t'A nested when becomes a child of the {pg["when_then"]} action',
-    tags=['happy-path'],
     story=adopt_pytest_given,
 )
 def test_when_then_allows_nested_when_as_child_sub_step() -> None:

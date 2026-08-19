@@ -72,7 +72,6 @@ def test_identity_of_activity_term_ref_actor_instance(g):
 @scenario(
     t'A {pg["Verb"].low} {pg["Activity"].low} ref has one identity '
     t'regardless of {pg["Inflection"].low}',
-    tags=['happy-path'],
 )
 def test_identity_of_activity_term_ref_verb_ignores_display(g):
     with given(t'a {pg["Verb"]} written canonically and as an {pg["Inflection"]}'):
@@ -156,7 +155,6 @@ def test_a_refs_for_instance_activity(g):
 @scenario(
     t'A branching {pg["Activity"].low} unions references across its '
     t'{pg["Path"]("paths")}',
-    tags=['happy-path'],
 )
 def test_a_refs_unions_across_multi_path_activity(g):
     with given(t'an {pg["Activity"]} that branches into two {pg["Path"]} alternatives'):
@@ -207,7 +205,6 @@ def test_s_for_step_canonical_entity_ref(g):
 
 @scenario(
     t'An {pg["Instance"].low} {pg["Step"].low} ref adds a canonical fallback',
-    tags=['happy-path'],
 )
 def test_s_for_step_instance_entity_ref_adds_canonical_fallback(g):
     with given(t'a {pg["Step"]} referring to a named {pg["Instance"]}'):
@@ -223,7 +220,6 @@ def test_s_for_step_instance_entity_ref_adds_canonical_fallback(g):
 
 @scenario(
     t'A {pg["Verb"].low} ref always resolves to its canonical identity',
-    tags=['happy-path'],
 )
 def test_s_for_step_verb_ref_always_canonical(g):
     with given(t'a {pg["Step"]} using an {pg["Inflection"]} of a {pg["Verb"]}'):
@@ -260,7 +256,6 @@ def _scenario_with_steps(*steps, activity_ids=()):
 
 @scenario(
     t'An {pg["Instance"].low} {pg["Step"].low} covers a canonical {pg["Activity"].low}',
-    tags=['happy-path'],
 )
 def test_compute_coverage_covers_canonical_activity_via_instance_step(g):
     with given(t'a {pg["Story"]} with a canonical {pg["Activity"]}'):
@@ -293,7 +288,6 @@ def test_compute_coverage_covers_canonical_activity_via_instance_step(g):
 @scenario(
     t'A canonical {pg["Step"].low} does not cover an {pg["Instance"].low} '
     t'{pg["Activity"].low}',
-    tags=['happy-path'],
 )
 def test_compute_coverage_does_not_cover_instance_activity_with_canonical_step(g):
     with given(t'an {pg["Activity"]} anchored to a named {pg["Instance"]}'):
@@ -325,7 +319,6 @@ def test_compute_coverage_does_not_cover_instance_activity_with_canonical_step(g
 @scenario(
     t'Promoting a bare word to a {pg["Verb"].low} ref drops '
     t'{pg["Coverage"].low} from a {pg["Step"].low} that matched',
-    tags=['happy-path'],
 )
 def test_compute_coverage_lost_when_activity_gains_a_term(g):
     """Widening an activity's identity set silently uncovers it: a step that
@@ -374,7 +367,6 @@ def test_compute_coverage_lost_when_activity_gains_a_term(g):
 @scenario(
     t'A {pg["Scenario"].low} {pg["Activity"].low} binding '
     t'constrains {pg["Coverage"].low}',
-    tags=['happy-path'],
 )
 def test_compute_coverage_scenario_constrained_to_activity_ids(g):
     with given(t'a {pg["Story"]} with two matching activities'):
@@ -421,7 +413,6 @@ def test_compute_coverage_scenario_constrained_to_activity_ids(g):
 @scenario(
     t'An {pg["Activity"].low} with two distinct {pg["Term"]("terms")} is '
     t'{pg["Coverage"].low}-eligible',
-    tags=['happy-path'],
 )
 def test_is_coverage_eligible_true_for_two_distinct_terms(g):
     with given(t'an {pg["Activity"]} anchored by two distinct {pg["Term"]} refs'):
@@ -443,7 +434,6 @@ def test_is_coverage_eligible_true_for_two_distinct_terms(g):
 
 @scenario(
     t'An under-anchored {pg["Activity"].low} is not {pg["Coverage"].low}-eligible',
-    tags=['happy-path'],
 )
 def test_is_coverage_eligible_false_for_one_distinct_term(g):
     with given(t'an {pg["Activity"]} that mentions only one distinct {pg["Term"]}'):
@@ -474,7 +464,6 @@ def test_is_coverage_eligible_false_for_all_bare_activity(g):
 
 @scenario(
     t'An under-anchored {pg["Activity"].low} is never reported as covered',
-    tags=['happy-path'],
 )
 def test_compute_coverage_excludes_under_anchored_activity(g):
     """An activity with fewer than two distinct terms is excluded from
@@ -498,7 +487,6 @@ def test_compute_coverage_excludes_under_anchored_activity(g):
 
 @scenario(
     t'Nested {pg["Step"]("steps")} are walked for {pg["Coverage"].low}',
-    tags=['happy-path'],
 )
 def test_compute_coverage_nested_steps_are_walked(g):
     """Steps nested as children are also examined for coverage."""
@@ -534,7 +522,6 @@ def test_compute_coverage_nested_steps_are_walked(g):
 
 @scenario(
     t'An explicit {pg["Step"].low} binding covers an eligible {pg["Activity"].low}',
-    tags=['happy-path'],
 )
 def test_compute_coverage_explicit_step_binding_covers_eligible_activity(g):
     """An explicit step activity_ids binding covers an eligible (>=2 distinct

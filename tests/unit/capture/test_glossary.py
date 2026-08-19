@@ -30,7 +30,6 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 
 @scenario(
     t'{pg["Term"]} ids are derived as URL-safe slugs',
-    tags=['happy-path'],
 )
 @pytest.mark.parametrize(
     ('text', 'expected'),
@@ -105,7 +104,6 @@ def test_verb_carries_term_and_glossary_back_ref():
 
 @scenario(
     t'Calling an {pg["Actor"].low} names a distinct {pg["Instance"].low}',
-    tags=['happy-path'],
 )
 def test_actor_call_returns_instance_with_distinct_display():
     with given(t'an {pg["Actor"]} handle for Guest'):
@@ -133,7 +131,6 @@ def test_work_object_call_returns_instance_with_distinct_display():
 @scenario(
     t'Calling a {pg["Verb"].low} records an {pg["Inflection"].low} '
     t'of the same {pg["Term"].low}',
-    tags=['happy-path'],
 )
 def test_verb_call_returns_inflection_sharing_term_identity():
     with given(t'a {pg["Verb"]} handle for confirm'):
@@ -153,7 +150,6 @@ def test_verb_call_returns_inflection_sharing_term_identity():
 
 @scenario(
     t'Registering an {pg["Actor"].low} returns a typed handle',
-    tags=['happy-path'],
     story=adopt_pytest_given,
 )
 def test_glossary_actor_registers_and_returns_handle():
@@ -185,7 +181,6 @@ def test_glossary_verb_registers_and_returns_handle():
 
 @scenario(
     t'Re-registering a {pg["Term"].low} with matching fields is idempotent',
-    tags=['happy-path'],
     story=adopt_pytest_given,
 )
 def test_glossary_re_registration_with_matching_fields_is_idempotent():
@@ -242,7 +237,6 @@ def test_glossary_actor_empty_name_raises():
 
 @scenario(
     t'Registering an {pg["Actor"].low} captures its definition site',
-    tags=['happy-path'],
 )
 def test_glossary_actor_captures_source():
     source_mod.set_rootdir(Path(__file__).resolve().parents[3])
@@ -338,7 +332,6 @@ def test_real_definition_is_kept():
 @scenario(
     t'Calling the {pg["Glossary"].low} declares a '
     t'{pg["Kindless"].low} {pg["Term"].low}',
-    tags=['happy-path'],
     story=adopt_pytest_given,
 )
 def test_call_declares_kindless_term():
@@ -417,7 +410,6 @@ def test_verb_low_yields_lowercased_inflection():
 
 @scenario(
     t'Subscript looks up an already-declared {pg["Term"].low}',
-    tags=['happy-path'],
 )
 def test_subscript_get_only_returns_handle():
     with given(t'a glossary with one declared {pg["Term"]}'):
@@ -431,7 +423,7 @@ def test_subscript_get_only_returns_handle():
 
 @scenario(
     'Subscripting an unknown name raises with a hint',
-    tags=['validation'],
+    tags=['diagnostics', 'validation'],
 )
 def test_subscript_unknown_name_raises_with_hint():
     with given(t'a glossary with one declared {pg["Term"]}'):

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-19T14:24:51.622804+00:00",
+    "timestamp": "2026-08-19T16:36:21.100680+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "a9a5412425cb4fc7d1a5dcc38d0b456d47acb7a2"
+    "commit_sha": "513f9b3cf268ba4cf642ff6059d0ba5d2b374e75"
   },
   "scenarios": [
     {
@@ -33,9 +33,7 @@
         ]
       },
       "module": "tests.unit.capture.test_collector",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -163,9 +161,7 @@
         ]
       },
       "module": "tests.unit.capture.test_collector",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -267,7 +263,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 43
+        "line": 42
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -295,9 +291,7 @@
         ]
       },
       "module": "tests.unit.capture.test_collector",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -374,7 +368,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 213
+        "line": 211
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -408,9 +402,7 @@
         ]
       },
       "module": "tests.unit.capture.test_collector",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -500,7 +492,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 234
+        "line": 231
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -531,9 +523,7 @@
         ]
       },
       "module": "tests.unit.capture.test_collector",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -616,7 +606,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 253
+        "line": 249
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -647,9 +637,7 @@
         ]
       },
       "module": "tests.unit.capture.test_collector",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -738,7 +726,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 316
+        "line": 311
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -769,9 +757,7 @@
         ]
       },
       "module": "tests.unit.capture.test_collector",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -854,7 +840,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 458
+        "line": 452
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -876,9 +862,7 @@
         ]
       },
       "module": "tests.unit.capture.test_collector",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -961,7 +945,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 477
+        "line": 470
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -992,9 +976,7 @@
         ]
       },
       "module": "tests.unit.capture.test_collector",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -1066,7 +1048,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 503
+        "line": 495
       },
       "story_id": null,
       "activity_ids": []
@@ -1088,9 +1070,7 @@
         ]
       },
       "module": "tests.unit.capture.test_file_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -1183,9 +1163,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_file_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -1266,7 +1244,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 42
+        "line": 41
       },
       "story_id": null,
       "activity_ids": []
@@ -1297,9 +1275,7 @@
         ]
       },
       "module": "tests.unit.capture.test_file_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -1398,7 +1374,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 56
+        "line": 54
       },
       "story_id": null,
       "activity_ids": []
@@ -1411,6 +1387,7 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
+        "diagnostics",
         "validation"
       ],
       "status": "passed",
@@ -1493,7 +1470,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 73
+        "line": 70
       },
       "story_id": null,
       "activity_ids": []
@@ -1515,9 +1492,7 @@
         ]
       },
       "module": "tests.unit.capture.test_file_glossary",
-      "tags": [
-        "story-grammar"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -1605,7 +1580,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 91
+        "line": 88
       },
       "story_id": null,
       "activity_ids": []
@@ -1617,9 +1592,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_file_glossary",
-      "tags": [
-        "story-grammar"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -1710,7 +1683,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 108
+        "line": 104
       },
       "story_id": null,
       "activity_ids": []
@@ -1735,9 +1708,7 @@
         ]
       },
       "module": "tests.unit.capture.test_file_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -1822,7 +1793,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 128
+        "line": 123
       },
       "story_id": null,
       "activity_ids": []
@@ -1834,9 +1805,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_file_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -1904,7 +1873,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 148
+        "line": 142
       },
       "story_id": null,
       "activity_ids": []
@@ -1929,9 +1898,7 @@
         ]
       },
       "module": "tests.unit.capture.test_file_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -2016,7 +1983,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 168
+        "line": 161
       },
       "story_id": null,
       "activity_ids": []
@@ -2029,6 +1996,7 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
+        "diagnostics",
         "validation"
       ],
       "status": "passed",
@@ -2098,7 +2066,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 184
+        "line": 176
       },
       "story_id": null,
       "activity_ids": []
@@ -2187,7 +2155,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 204
+        "line": 196
       },
       "story_id": null,
       "activity_ids": []
@@ -2213,6 +2181,7 @@
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
+        "diagnostics",
         "validation"
       ],
       "status": "passed",
@@ -2295,7 +2264,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 231
+        "line": 223
       },
       "story_id": null,
       "activity_ids": []
@@ -2390,7 +2359,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 251
+        "line": 243
       },
       "story_id": null,
       "activity_ids": []
@@ -2412,9 +2381,7 @@
         ]
       },
       "module": "tests.unit.capture.test_file_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -2505,7 +2472,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 275
+        "line": 267
       },
       "story_id": null,
       "activity_ids": []
@@ -2527,9 +2494,7 @@
         ]
       },
       "module": "tests.unit.capture.test_file_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -2617,7 +2582,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 293
+        "line": 284
       },
       "story_id": null,
       "activity_ids": []
@@ -2648,9 +2613,7 @@
         ]
       },
       "module": "tests.unit.capture.test_file_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -2744,7 +2707,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 319
+        "line": 309
       },
       "story_id": null,
       "activity_ids": []
@@ -2862,7 +2825,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 334
+        "line": 323
       },
       "story_id": null,
       "activity_ids": []
@@ -2893,9 +2856,7 @@
         ]
       },
       "module": "tests.unit.capture.test_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -2983,7 +2944,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 106
+        "line": 105
       },
       "story_id": null,
       "activity_ids": []
@@ -3023,9 +2984,7 @@
         ]
       },
       "module": "tests.unit.capture.test_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -3113,7 +3072,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 133
+        "line": 131
       },
       "story_id": null,
       "activity_ids": []
@@ -3138,9 +3097,7 @@
         ]
       },
       "module": "tests.unit.capture.test_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -3226,7 +3183,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 154
+        "line": 151
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -3251,9 +3208,7 @@
         ]
       },
       "module": "tests.unit.capture.test_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -3327,7 +3282,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 186
+        "line": 182
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -3416,7 +3371,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 201
+        "line": 196
       },
       "story_id": null,
       "activity_ids": []
@@ -3499,7 +3454,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 219
+        "line": 214
       },
       "story_id": null,
       "activity_ids": []
@@ -3524,9 +3479,7 @@
         ]
       },
       "module": "tests.unit.capture.test_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -3610,7 +3563,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 243
+        "line": 238
       },
       "story_id": null,
       "activity_ids": []
@@ -3650,9 +3603,7 @@
         ]
       },
       "module": "tests.unit.capture.test_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -3735,7 +3686,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 338
+        "line": 332
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -3757,9 +3708,7 @@
         ]
       },
       "module": "tests.unit.capture.test_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -3831,7 +3780,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 418
+        "line": 411
       },
       "story_id": null,
       "activity_ids": []
@@ -3844,6 +3793,7 @@
       },
       "module": "tests.unit.capture.test_glossary",
       "tags": [
+        "diagnostics",
         "validation"
       ],
       "status": "passed",
@@ -3904,7 +3854,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 432
+        "line": 424
       },
       "story_id": null,
       "activity_ids": []
@@ -3926,9 +3876,7 @@
         ]
       },
       "module": "tests.unit.capture.test_kind_inference",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -4089,9 +4037,7 @@
         ]
       },
       "module": "tests.unit.capture.test_kind_inference",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -4191,7 +4137,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 65
+        "line": 64
       },
       "story_id": null,
       "activity_ids": []
@@ -4231,9 +4177,7 @@
         ]
       },
       "module": "tests.unit.capture.test_kind_inference",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -4330,7 +4274,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 86
+        "line": 84
       },
       "story_id": null,
       "activity_ids": []
@@ -4374,6 +4318,7 @@
       },
       "module": "tests.unit.capture.test_kind_inference",
       "tags": [
+        "diagnostics",
         "validation"
       ],
       "status": "passed",
@@ -4446,7 +4391,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 99
+        "line": 96
       },
       "story_id": null,
       "activity_ids": []
@@ -4471,9 +4416,7 @@
         ]
       },
       "module": "tests.unit.capture.test_kind_inference",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -4551,7 +4494,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 121
+        "line": 118
       },
       "story_id": null,
       "activity_ids": []
@@ -4595,6 +4538,7 @@
       },
       "module": "tests.unit.capture.test_kind_inference",
       "tags": [
+        "diagnostics",
         "validation"
       ],
       "status": "passed",
@@ -4677,7 +4621,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 144
+        "line": 140
       },
       "story_id": null,
       "activity_ids": []
@@ -4721,6 +4665,7 @@
       },
       "module": "tests.unit.capture.test_kind_inference",
       "tags": [
+        "diagnostics",
         "validation"
       ],
       "status": "passed",
@@ -4793,7 +4738,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 161
+        "line": 157
       },
       "story_id": null,
       "activity_ids": []
@@ -4837,6 +4782,7 @@
       },
       "module": "tests.unit.capture.test_kind_inference",
       "tags": [
+        "diagnostics",
         "validation"
       ],
       "status": "passed",
@@ -4919,7 +4865,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 187
+        "line": 183
       },
       "story_id": null,
       "activity_ids": []
@@ -5032,7 +4978,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 205
+        "line": 201
       },
       "story_id": null,
       "activity_ids": []
@@ -5055,6 +5001,7 @@
       },
       "module": "tests.unit.capture.test_kind_inference",
       "tags": [
+        "diagnostics",
         "validation"
       ],
       "status": "passed",
@@ -5127,7 +5074,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 224
+        "line": 220
       },
       "story_id": null,
       "activity_ids": []
@@ -5159,6 +5106,7 @@
       },
       "module": "tests.unit.capture.test_kind_inference",
       "tags": [
+        "diagnostics",
         "validation"
       ],
       "status": "passed",
@@ -5231,7 +5179,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 244
+        "line": 240
       },
       "story_id": null,
       "activity_ids": []
@@ -5335,7 +5283,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 267
+        "line": 263
       },
       "story_id": null,
       "activity_ids": []
@@ -5363,9 +5311,7 @@
         ]
       },
       "module": "tests.unit.capture.test_kind_inference",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -5440,7 +5386,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 286
+        "line": 282
       },
       "story_id": null,
       "activity_ids": []
@@ -5466,8 +5412,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
-        "happy-path"
+        "markdown"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -5559,8 +5504,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
-        "happy-path"
+        "markdown"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -5642,8 +5586,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
-        "happy-path"
+        "markdown"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -5712,8 +5655,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
-        "happy-path"
+        "markdown"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -5782,8 +5724,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
-        "happy-path"
+        "markdown"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -5932,6 +5873,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
+        "diagnostics",
         "markdown",
         "validation"
       ],
@@ -6002,6 +5944,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
+        "diagnostics",
         "markdown",
         "validation"
       ],
@@ -6072,6 +6015,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
+        "diagnostics",
         "markdown",
         "validation"
       ],
@@ -6161,8 +6105,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
-        "happy-path"
+        "markdown"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -6257,8 +6200,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
-        "happy-path"
+        "markdown"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -6337,8 +6279,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
-        "happy-path"
+        "markdown"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -6420,8 +6361,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
-        "happy-path"
+        "markdown"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -6490,8 +6430,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
-        "happy-path"
+        "markdown"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -6560,8 +6499,7 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
-        "happy-path"
+        "markdown"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -6657,9 +6595,7 @@
         ]
       },
       "module": "tests.unit.capture.test_step_descriptor",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -6751,9 +6687,7 @@
         ]
       },
       "module": "tests.unit.capture.test_step_descriptor",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -6849,7 +6783,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 250
+        "line": 249
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -6871,9 +6805,7 @@
         ]
       },
       "module": "tests.unit.capture.test_step_descriptor",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -6954,7 +6886,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 279
+        "line": 277
       },
       "story_id": null,
       "activity_ids": []
@@ -7059,7 +6991,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 310
+        "line": 307
       },
       "story_id": null,
       "activity_ids": []
@@ -7084,9 +7016,7 @@
         ]
       },
       "module": "tests.unit.capture.test_step_descriptor",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7169,7 +7099,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 390
+        "line": 387
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -7209,10 +7139,7 @@
         ]
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7359,10 +7286,7 @@
         ]
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7498,7 +7422,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 98
+        "line": 97
       },
       "story_id": null,
       "activity_ids": []
@@ -7523,10 +7447,7 @@
         ]
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7633,7 +7554,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 116
+        "line": 114
       },
       "story_id": null,
       "activity_ids": []
@@ -7677,7 +7598,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -7754,7 +7674,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 132
+        "line": 129
       },
       "story_id": null,
       "activity_ids": []
@@ -7786,7 +7706,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -7885,7 +7804,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 148
+        "line": 145
       },
       "story_id": null,
       "activity_ids": []
@@ -7917,7 +7836,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -8026,7 +7944,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 163
+        "line": 160
       },
       "story_id": null,
       "activity_ids": []
@@ -8057,10 +7975,7 @@
         ]
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -8145,7 +8060,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 178
+        "line": 175
       },
       "story_id": null,
       "activity_ids": []
@@ -8177,7 +8092,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -8273,7 +8187,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 189
+        "line": 185
       },
       "story_id": null,
       "activity_ids": []
@@ -8314,7 +8228,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -8410,7 +8323,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 204
+        "line": 200
       },
       "story_id": null,
       "activity_ids": []
@@ -8436,7 +8349,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -8519,7 +8431,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 219
+        "line": 215
       },
       "story_id": null,
       "activity_ids": []
@@ -8544,10 +8456,7 @@
         ]
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -8628,7 +8537,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 234
+        "line": 230
       },
       "story_id": null,
       "activity_ids": []
@@ -8653,10 +8562,7 @@
         ]
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -8731,7 +8637,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 250
+        "line": 245
       },
       "story_id": null,
       "activity_ids": []
@@ -8743,10 +8649,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -8839,7 +8742,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 270
+        "line": 264
       },
       "story_id": null,
       "activity_ids": []
@@ -8865,7 +8768,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -8947,7 +8849,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 296
+        "line": 289
       },
       "story_id": null,
       "activity_ids": []
@@ -8978,10 +8880,7 @@
         ]
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -9081,7 +8980,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 321
+        "line": 314
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -9112,10 +9011,7 @@
         ]
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -9228,7 +9124,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 335
+        "line": 327
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -9254,7 +9150,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -9364,7 +9259,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 350
+        "line": 341
       },
       "story_id": null,
       "activity_ids": []
@@ -9387,7 +9282,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -9477,7 +9371,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 367
+        "line": 358
       },
       "story_id": null,
       "activity_ids": []
@@ -9511,10 +9405,7 @@
         ]
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -9613,7 +9504,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 385
+        "line": 376
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -9625,10 +9516,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -9739,7 +9627,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 401
+        "line": 391
       },
       "story_id": null,
       "activity_ids": []
@@ -9774,7 +9662,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -9887,7 +9774,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 419
+        "line": 408
       },
       "story_id": null,
       "activity_ids": []
@@ -9912,10 +9799,7 @@
         ]
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -9977,7 +9861,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 439
+        "line": 428
       },
       "story_id": null,
       "activity_ids": []
@@ -10009,7 +9893,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -10112,7 +9995,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 452
+        "line": 440
       },
       "story_id": null,
       "activity_ids": []
@@ -10138,7 +10021,6 @@
       },
       "module": "tests.unit.capture.test_story",
       "tags": [
-        "story-grammar",
         "validation"
       ],
       "status": "passed",
@@ -10202,7 +10084,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 498
+        "line": 486
       },
       "story_id": null,
       "activity_ids": []
@@ -10227,10 +10109,7 @@
         ]
       },
       "module": "tests.unit.capture.test_story",
-      "tags": [
-        "story-grammar",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -10336,7 +10215,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 568
+        "line": 556
       },
       "story_id": null,
       "activity_ids": []
@@ -10349,7 +10228,6 @@
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
-        "step-text",
         "parametrization"
       ],
       "status": "passed",
@@ -10439,7 +10317,6 @@
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
-        "step-text",
         "parametrization"
       ],
       "status": "passed",
@@ -10537,10 +10414,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_template",
-      "tags": [
-        "step-text",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -10614,10 +10488,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_template",
-      "tags": [
-        "step-text",
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -10679,7 +10550,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 205
+        "line": 204
       },
       "story_id": null,
       "activity_ids": []
@@ -10710,9 +10581,7 @@
         ]
       },
       "module": "tests.unit.capture.test_template",
-      "tags": [
-        "step-text"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -10793,7 +10662,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 245
+        "line": 243
       },
       "story_id": null,
       "activity_ids": []
@@ -10824,9 +10693,7 @@
         ]
       },
       "module": "tests.unit.capture.test_template",
-      "tags": [
-        "step-text"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -10907,7 +10774,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 275
+        "line": 272
       },
       "story_id": null,
       "activity_ids": []
@@ -10932,9 +10799,7 @@
         ]
       },
       "module": "tests.unit.capture.test_template",
-      "tags": [
-        "step-text"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -11015,7 +10880,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 297
+        "line": 293
       },
       "story_id": null,
       "activity_ids": []
@@ -11046,9 +10911,7 @@
         ]
       },
       "module": "tests.unit.capture.test_template",
-      "tags": [
-        "step-text"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -11129,7 +10992,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 313
+        "line": 308
       },
       "story_id": null,
       "activity_ids": []
@@ -11155,7 +11018,6 @@
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
-        "step-text",
         "validation"
       ],
       "status": "passed",
@@ -11232,7 +11094,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 354
+        "line": 348
       },
       "story_id": null,
       "activity_ids": []
@@ -11263,9 +11125,7 @@
         ]
       },
       "module": "tests.unit.capture.test_template",
-      "tags": [
-        "step-text"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -11348,7 +11208,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 397
+        "line": 391
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -11391,9 +11251,7 @@
         ]
       },
       "module": "tests.unit.report.test_aggregations",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -11583,9 +11441,7 @@
         ]
       },
       "module": "tests.unit.report.test_aggregations",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -11679,7 +11535,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 270
+        "line": 269
       },
       "story_id": null,
       "activity_ids": []
@@ -11701,9 +11557,7 @@
         ]
       },
       "module": "tests.unit.report.test_aggregations",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -11797,7 +11651,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 341
+        "line": 339
       },
       "story_id": null,
       "activity_ids": []
@@ -11840,9 +11694,7 @@
         ]
       },
       "module": "tests.unit.report.test_aggregations",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -11972,7 +11824,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 430
+        "line": 427
       },
       "story_id": null,
       "activity_ids": []
@@ -12006,9 +11858,7 @@
         ]
       },
       "module": "tests.unit.report.test_aggregations",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -12111,7 +11961,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 464
+        "line": 460
       },
       "story_id": null,
       "activity_ids": []
@@ -12154,9 +12004,7 @@
         ]
       },
       "module": "tests.unit.report.test_aggregations",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -12240,7 +12088,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 558
+        "line": 553
       },
       "story_id": null,
       "activity_ids": []
@@ -12265,9 +12113,7 @@
         ]
       },
       "module": "tests.unit.report.test_aggregations",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -12357,7 +12203,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 671
+        "line": 665
       },
       "story_id": null,
       "activity_ids": []
@@ -12496,7 +12342,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 785
+        "line": 778
       },
       "story_id": null,
       "activity_ids": []
@@ -12536,9 +12382,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -12656,9 +12500,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -12761,7 +12603,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 156
+        "line": 155
       },
       "story_id": null,
       "activity_ids": []
@@ -12795,9 +12637,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -12894,7 +12734,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 208
+        "line": 206
       },
       "story_id": null,
       "activity_ids": []
@@ -12919,9 +12759,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -13008,7 +12846,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 224
+        "line": 221
       },
       "story_id": null,
       "activity_ids": []
@@ -13116,7 +12954,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 237
+        "line": 233
       },
       "story_id": null,
       "activity_ids": []
@@ -13156,9 +12994,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -13264,7 +13100,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 261
+        "line": 257
       },
       "story_id": null,
       "activity_ids": []
@@ -13304,9 +13140,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -13403,7 +13237,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 293
+        "line": 288
       },
       "story_id": null,
       "activity_ids": []
@@ -13446,9 +13280,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -13606,7 +13438,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 325
+        "line": 319
       },
       "story_id": null,
       "activity_ids": []
@@ -13646,9 +13478,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -13748,7 +13578,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 374
+        "line": 367
       },
       "story_id": null,
       "activity_ids": []
@@ -13791,9 +13621,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -13890,7 +13718,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 421
+        "line": 413
       },
       "story_id": null,
       "activity_ids": []
@@ -13924,9 +13752,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -14020,7 +13846,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 444
+        "line": 435
       },
       "story_id": null,
       "activity_ids": []
@@ -14045,9 +13871,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -14134,7 +13958,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 475
+        "line": 465
       },
       "story_id": null,
       "activity_ids": []
@@ -14165,9 +13989,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -14276,7 +14098,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 499
+        "line": 488
       },
       "story_id": null,
       "activity_ids": []
@@ -14307,9 +14129,7 @@
         ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -14409,7 +14229,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 535
+        "line": 523
       },
       "story_id": null,
       "activity_ids": []
@@ -14529,7 +14349,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 564
+        "line": 551
       },
       "story_id": null,
       "activity_ids": []
@@ -14668,7 +14488,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 600
+        "line": 587
       },
       "story_id": null,
       "activity_ids": []
@@ -14690,11 +14510,9 @@
         ]
       },
       "module": "tests.unit.report.test_html_renderer",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -14828,9 +14646,7 @@
         ]
       },
       "module": "tests.unit.report.test_md_renderer",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -14958,9 +14774,7 @@
         ]
       },
       "module": "tests.unit.report.test_md_renderer",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -15044,7 +14858,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 143
+        "line": 142
       },
       "story_id": null,
       "activity_ids": []
@@ -15078,9 +14892,7 @@
         ]
       },
       "module": "tests.unit.report.test_md_renderer",
-      "tags": [
-        "step-text"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -15186,7 +14998,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 167
+        "line": 166
       },
       "story_id": null,
       "activity_ids": []
@@ -15322,7 +15134,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 222
+        "line": 220
       },
       "story_id": null,
       "activity_ids": []
@@ -15347,9 +15159,7 @@
         ]
       },
       "module": "tests.unit.report.test_md_renderer",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -15452,7 +15262,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 258
+        "line": 256
       },
       "story_id": null,
       "activity_ids": []
@@ -15477,9 +15287,7 @@
         ]
       },
       "module": "tests.unit.report.test_md_renderer",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -15573,7 +15381,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 330
+        "line": 327
       },
       "story_id": null,
       "activity_ids": []
@@ -15585,9 +15393,7 @@
         "parts": []
       },
       "module": "tests.unit.report.test_md_renderer",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -15662,7 +15468,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 451
+        "line": 447
       },
       "story_id": null,
       "activity_ids": []
@@ -16194,6 +16000,7 @@
       },
       "module": "tests.unit.test_grouping",
       "tags": [
+        "diagnostics",
         "parametrization",
         "validation"
       ],
@@ -17150,9 +16957,7 @@
         ]
       },
       "module": "tests.unit.capture.test_glossary",
-      "tags": [
-        "happy-path"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -17449,7 +17254,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 58
+        "line": 57
       },
       "story_id": null,
       "activity_ids": []
@@ -17618,7 +17423,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 356
+        "line": 353
       },
       "story_id": null,
       "activity_ids": []
@@ -17764,7 +17569,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 494
+        "line": 490
       },
       "story_id": null,
       "activity_ids": []
@@ -17777,7 +17582,6 @@
       },
       "module": "tests.unit.capture.test_template",
       "tags": [
-        "step-text",
         "validation"
       ],
       "status": "passed",
