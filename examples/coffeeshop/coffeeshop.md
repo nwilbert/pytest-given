@@ -1,7 +1,7 @@
 # pytest-given — Coffee Shop Example
 
 ## ✓ Basic scenario with when/then and a JSON attachment
-`examples/coffeeshop/test_coffeeshop.py:22::test_buy_coffee` · billing, happy-path
+`examples/coffeeshop/test_coffeeshop.py:22::test_buy_coffee` · checkout
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -15,7 +15,7 @@
     ```
 
 ## ✓ Plain text attachment
-`examples/coffeeshop/test_coffeeshop.py:34::test_text_attachment` · billing
+`examples/coffeeshop/test_coffeeshop.py:34::test_text_attachment`
 
 - **given** a coffee machine
 - **given** a printed receipt
@@ -36,7 +36,7 @@
 - **then** the connection is open and the query was logged
 
 ## ✓ T-string with a non-parametrize value (neutral highlight)
-`examples/coffeeshop/test_coffeeshop.py:81::test_neutral_highlight`
+`examples/coffeeshop/test_coffeeshop.py:78::test_neutral_highlight`
 
 - **given** a coffee machine
 - **given** I have some coins in hand
@@ -44,7 +44,7 @@
 - **then** the machine has 9 coffees left
 
 ## ✓ Helper functions can record their own steps
-`examples/coffeeshop/test_coffeeshop.py:151::test_buy_with_validation` · billing
+`examples/coffeeshop/test_coffeeshop.py:145::test_buy_with_validation` · checkout, validation
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -62,7 +62,7 @@
       ```
 
 ## ✓ Top-level `given` block and deeply nested steps
-`examples/coffeeshop/test_coffeeshop.py:164::test_complex_order` · billing
+`examples/coffeeshop/test_coffeeshop.py:161::test_complex_order` · checkout, loyalty, discounts
 
 - **given** a coffee machine
 - **given** a loyalty card with 5 points
@@ -91,7 +91,7 @@
     ```
 
 ## ✓ An expected error, narrated as when + then (when_then)
-`examples/coffeeshop/test_coffeeshop.py:198::test_sold_out_is_rejected` · billing, validation
+`examples/coffeeshop/test_coffeeshop.py:198::test_sold_out_is_rejected` · checkout, validation
 
 - **given** a coffee machine
 - **given** a machine that has sold its last coffee
@@ -99,7 +99,7 @@
 - **then** the machine reports it is sold out
 
 ## ✓ Many tags (the report collapses them behind a +N pill)
-`examples/coffeeshop/test_coffeeshop.py:215::test_discounted_purchase` · billing, loyalty, discounts, happy-path, regression
+`examples/coffeeshop/test_coffeeshop.py:215::test_discounted_purchase` · checkout, loyalty, discounts, pricing
 
 - **given** a coffee machine
 - **given** a loyalty card good for a $1 discount
@@ -118,7 +118,7 @@
 
 
 ## ✓ Parametrized test (renders as a parameter table) · 3 cases
-`examples/coffeeshop/test_coffeeshop.py:54::test_pricing` · billing
+`examples/coffeeshop/test_coffeeshop.py:54::test_pricing` · pricing
 
 - **given** a coffee machine
 - **when** I insert ${euros}
@@ -131,7 +131,7 @@
 | 3 | True | ✓ |
 
 ## ✓ Parametrize value surfaced as a given (Annotated) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:66::test_annotated_given_label` · billing
+`examples/coffeeshop/test_coffeeshop.py:66::test_annotated_given_label`
 
 - **given** a coffee machine
 - **given** an order for a {cup_size} ml cup
@@ -144,7 +144,7 @@
 | 350 | ✓ |
 
 ## ✓ Brew {cup_size} ml (templated scenario name) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:92::test_brew` · billing
+`examples/coffeeshop/test_coffeeshop.py:89::test_brew`
 
 - **given** a coffee machine
 - **when** I brew a {cup_size} ml cup
@@ -156,7 +156,7 @@
 | 300 | ✓ |
 
 ## ✓ Brew a {flavor} coffee (per-case columns) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:104::test_flavor_columns` · billing
+`examples/coffeeshop/test_coffeeshop.py:98::test_flavor_columns` · pricing
 
 - **given** a coffee machine
 - **given** the machine is primed for {flavor}

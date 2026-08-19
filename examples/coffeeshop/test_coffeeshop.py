@@ -21,7 +21,7 @@ def db():
 
 @scenario(
     'Basic scenario with when/then and a JSON attachment',
-    tags=['billing', 'happy-path'],
+    tags=['checkout'],
 )
 def test_buy_coffee(machine):
     with when('I insert $2'):
@@ -31,7 +31,7 @@ def test_buy_coffee(machine):
         attach('Machine state', machine)
 
 
-@scenario('Plain text attachment', tags=['billing'])
+@scenario('Plain text attachment')
 def test_text_attachment(machine):
     with given('a printed receipt'):
         receipt = 'Coffee x1     $2.00\n----------------\nTotal:        $2.00'
@@ -53,7 +53,7 @@ def test_generator_fixture(db):
 
 @scenario(
     'Parametrized test (renders as a parameter table)',
-    tags=['billing'],
+    tags=['pricing'],
 )
 @pytest.mark.parametrize(('euros', 'expect'), [(1, False), (2, True), (3, True)])
 def test_pricing(machine, euros, expect):
@@ -63,10 +63,7 @@ def test_pricing(machine, euros, expect):
         assert purchase_allowed == expect
 
 
-@scenario(
-    'Parametrize value surfaced as a given (Annotated)',
-    tags=['billing'],
-)
+@scenario('Parametrize value surfaced as a given (Annotated)')
 @pytest.mark.parametrize('cup_size', [200, 350])
 def test_annotated_given_label(
     machine,
@@ -89,10 +86,7 @@ def test_neutral_highlight(machine):
         assert machine['coffees'] == 9
 
 
-@scenario(
-    Template('Brew {cup_size} ml (templated scenario name)'),
-    tags=['billing'],
-)
+@scenario(Template('Brew {cup_size} ml (templated scenario name)'))
 @pytest.mark.parametrize('cup_size', [200, 300])
 def test_brew(machine, cup_size):
     with when(t'I brew a {cup_size} ml cup'):
@@ -103,7 +97,7 @@ def test_brew(machine, cup_size):
 
 @scenario(
     Template('Brew a {flavor} coffee (per-case columns)'),
-    tags=['billing'],
+    tags=['pricing'],
 )
 @pytest.mark.parametrize('flavor', ['vanilla', 'mocha'])
 def test_flavor_columns(machine, flavor):
@@ -148,7 +142,10 @@ def validate_coin(machine, amount):
     return valid
 
 
-@scenario('Helper functions can record their own steps', tags=['billing'])
+@scenario(
+    'Helper functions can record their own steps',
+    tags=['checkout', 'validation'],
+)
 def test_buy_with_validation(machine):
     with when('I insert $2'):
         result = validate_coin(machine, 2)
@@ -161,7 +158,10 @@ def test_buy_with_validation(machine):
             attach('Final state', machine)
 
 
-@scenario('Top-level `given` block and deeply nested steps', tags=['billing'])
+@scenario(
+    'Top-level `given` block and deeply nested steps',
+    tags=['checkout', 'loyalty', 'discounts'],
+)
 def test_complex_order(machine):
     with given('a loyalty card with 5 points'):
         loyalty = {'points': 5}
@@ -197,7 +197,7 @@ def buy_coffee(machine):
 
 @scenario(
     'An expected error, narrated as when + then (when_then)',
-    tags=['billing', 'validation'],
+    tags=['checkout', 'validation'],
 )
 def test_sold_out_is_rejected(machine):
     with given('a machine that has sold its last coffee'):
@@ -214,7 +214,7 @@ def test_sold_out_is_rejected(machine):
 
 @scenario(
     'Many tags (the report collapses them behind a +N pill)',
-    tags=['billing', 'loyalty', 'discounts', 'happy-path', 'regression'],
+    tags=['checkout', 'loyalty', 'discounts', 'pricing'],
 )
 def test_discounted_purchase(machine):
     with given('a loyalty card good for a $1 discount'):

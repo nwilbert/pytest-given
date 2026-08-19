@@ -3,7 +3,6 @@
 ## Now
 
 - [ ] improve navigation from story activities to scenarios, similar to glossary term filters
-- [ ] Clean up dummy tags in Coffeeshop example (loyalty, discounts)
 - [ ] continue work on the story-diagrams branch
 
 ## Next
