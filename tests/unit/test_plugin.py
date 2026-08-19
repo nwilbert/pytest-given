@@ -499,3 +499,31 @@ def test_a_copyable_parametrize_value_is_snapshotted() -> None:
     snapshot = plugin._snapshot(value)
     value.append('cup')
     assert snapshot == ['latte']
+
+
+class _IdentityRepr:
+    """A parametrize value inheriting `object.__repr__`, which renders the
+    object's own address — the shape a `MagicMock` shares."""
+
+
+def test_a_value_rendering_by_identity_is_kept_as_it_is() -> None:
+    """A copy renders as a different address than the object the test narrated,
+    which would put a value in the cell that no case ever narrated and read to
+    the rebound-parameter rule as a rebinding that never happened. Mutation
+    cannot change such a rendering, so the copy protects nothing."""
+    value = _IdentityRepr()
+    assert plugin._snapshot(value) is value
+
+
+class _StrByValueReprByIdentity:
+    """`__str__` defined by value, `__repr__` inherited — so a copy renders
+    alike under `{x}` but not under `{x!r}`."""
+
+    def __str__(self) -> str:
+        return 'a mug'
+
+
+def test_a_value_rendering_by_identity_under_repr_only_is_kept_as_it_is() -> None:
+    """Both renderings are checked: an interpolation may ask for either."""
+    value = _StrByValueReprByIdentity()
+    assert plugin._snapshot(value) is value

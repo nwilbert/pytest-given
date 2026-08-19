@@ -5,6 +5,7 @@ body is inspected for structural lies."""
 from __future__ import annotations
 
 import ast
+import keyword
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -328,12 +329,19 @@ def _is_attach_stmt(stmt: ast.stmt) -> bool:
 
 
 def _bare_identifier(expression: str) -> str | None:
-    """The name if *expression* parses to a single `Name`, else None."""
-    try:
-        parsed = ast.parse(expression, mode='eval')
-    except SyntaxError:
+    """The name if *expression* is a single identifier, else None.
+
+    Asked of the string rather than of `ast.parse`, which reads `#` as a
+    comment: a disambiguated column name (`price #2`) parses to `Name('price')`
+    and would be reported under a token the report never shows, sending the
+    reader looking for a `{price}` that is not there. The keyword test stands
+    in for the rest of what the parse ruled out — `class` is an identifier by
+    `str`'s reckoning but not a name, and `None` is a constant. Soft keywords
+    (`match`, `type`) are ordinary names and stay.
+    """
+    if not expression.isidentifier() or keyword.iskeyword(expression):
         return None
-    return parsed.body.id if isinstance(parsed.body, ast.Name) else None
+    return expression
 
 
 def _names_used(node: ast.With, *, include_stores: bool) -> set[str]:

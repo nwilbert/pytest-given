@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from pytest_given import given, grouping, scenario, then, when
+from pytest_given import given, grouping, scenario, then, when, when_then
 from pytest_given.grouping import group_parametrized
 from pytest_given.model import (
     Attachment,
@@ -997,16 +997,43 @@ def _param_value_step(
     )
 
 
+@scenario(
+    t'A {pg["Step"].low} narrating a parameter its column no longer holds is refused',
+    tags=['parametrization', 'validation'],
+)
 def test_a_rebound_parametrize_name_raises_rule_three() -> None:
+    with given(t'two {pg["Case"]("cases")} narrating a value their column lacks'):
+        scenarios, info = _two_case_group(
+            [_param_value_step('400')], [_param_value_step('700')]
+        )
+    with (
+        when_then(
+            t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}',
+            'the grouping is refused',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
+        group_parametrized(scenarios, info)
+    with then('the error names the column and what the case actually narrated'):
+        message = str(excinfo.value)
+        assert "'cup_size' in 'test_brew' matches a parametrize column" in message
+        assert "case [200] narrates '400'" in message
+        assert message.endswith('(t.py:12)')
+
+
+def test_rule_three_offers_both_remedies_it_cannot_tell_apart() -> None:
+    """A mismatch proves the cell and the step disagree, not *why*: a rebound
+    local and a value mutated in place before narration both land here. The
+    message must not assert one cause and send the reader looking for a local
+    that does not exist."""
     scenarios, info = _two_case_group(
         [_param_value_step('400')], [_param_value_step('700')]
     )
     with pytest.raises(PytestGivenError) as excinfo:
         group_parametrized(scenarios, info)
     message = str(excinfo.value)
-    assert "'cup_size' in 'test_brew' matches a parametrize column" in message
-    assert "case [200] narrates '400'" in message
-    assert message.endswith('(t.py:12)')
+    assert 'rename the local' in message
+    assert 'mutates the value in place' in message
 
 
 def test_rule_three_fires_on_a_single_case_parametrize() -> None:
