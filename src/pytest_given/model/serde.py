@@ -96,6 +96,7 @@ def _metadata_from_dict(d: dict[str, Any]) -> Metadata:
         pytest_version=d['pytest_version'],
         plugin_version=d['plugin_version'],
         commit_sha=d.get('commit_sha'),
+        title=d.get('title'),
     )
 
 

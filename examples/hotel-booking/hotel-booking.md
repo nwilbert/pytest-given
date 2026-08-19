@@ -1,4 +1,4 @@
-# pytest-given — pytest-given
+# pytest-given — Hotel Booking Example
 
 ## ✓ Carol picks a suite for the group
 `examples/hotel-booking/test_hotel_booking.py:148::test_pick_suite`

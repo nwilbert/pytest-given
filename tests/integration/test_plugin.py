@@ -2027,3 +2027,97 @@ def test_a_rejected_form_fails_the_run_with_no_sink_flag(pytester):
     result = pytester.runpytest()
     assert result.ret != 0
     result.stdout.fnmatch_lines(['*varies across parametrize cases*'])
+
+
+def test_given_title_cli_flag_names_the_report(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario("A")
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    md_path = tmp_path / 'report.md'
+    result = pytester.runpytest(
+        f'--given-json={json_path}',
+        f'--given-md={md_path}',
+        '--given-title=Coffee Shop Example',
+    )
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text())
+    assert data['metadata']['title'] == 'Coffee Shop Example'
+    assert md_path.read_text(encoding='utf-8').startswith(
+        '# pytest-given — Coffee Shop Example'
+    )
+
+
+def test_given_title_absent_leaves_the_title_unset(pytester, tmp_path):
+    """Without the flag the title stays None and the rootdir name still names
+    the report — the pre-title behaviour, unchanged."""
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario("A")
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    assert data['metadata']['title'] is None
+
+
+def test_given_title_ini_value(pytester, tmp_path):
+    pytester.makeini(
+        """
+        [pytest]
+        given_title = Hotel Booking Example
+        """
+    )
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario("A")
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    data = json.loads(json_path.read_text())
+    assert data['metadata']['title'] == 'Hotel Booking Example'
+
+
+def test_given_title_cli_overrides_ini(pytester, tmp_path):
+    pytester.makeini(
+        """
+        [pytest]
+        given_title = From Ini
+        """
+    )
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario("A")
+        def test_a():
+            with when("x"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(
+        f'--given-json={json_path}',
+        '--given-title=From CLI',
+    )
+    data = json.loads(json_path.read_text())
+    assert data['metadata']['title'] == 'From CLI'

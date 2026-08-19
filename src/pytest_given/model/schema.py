@@ -398,6 +398,10 @@ class Metadata:
     pytest_version: str
     plugin_version: str
     commit_sha: str | None = None
+    # Display name for the report. `project` stays the rootdir name because it
+    # also feeds the `{project}` source-link variable; renderers fall back to it
+    # when no title is configured.
+    title: str | None = None
 
 
 @dataclass

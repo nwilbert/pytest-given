@@ -2083,3 +2083,25 @@ def test_a_disambiguated_columns_token_takes_its_own_columns_colour(
     assert header is not None
     assert token is not None
     assert token.group(1) == header.group(1)
+
+
+def test_render_prefers_the_title_over_the_project(tmp_path: Path) -> None:
+    """`metadata.title`, when set, names the report in the browser tab and the
+    topbar; `metadata.project` stays the rootdir name for source-link `{project}`."""
+    report = report_from_dict(
+        {
+            'metadata': {
+                'project': 'pytest-given',
+                'title': 'Coffee Shop Example',
+                'timestamp': 't',
+                'pytest_version': '9',
+                'plugin_version': '0.1',
+            },
+            'scenarios': [],
+        }
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(report, html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert '<title>Coffee Shop Example — pytest-given Report</title>' in content
+    assert '<div class="topbar-title">Coffee Shop Example</div>' in content

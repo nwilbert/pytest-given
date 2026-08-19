@@ -347,6 +347,7 @@ All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-
 | `--given-json[=PATH]` | off | Write JSON report data (bare → `given-report/report-data.json`). |
 | `--given-html[=PATH]` | off | Write the HTML report (bare → `given-report/report.html`). |
 | `--given-md[=PATH]` | off | Write the Markdown report; **bare renders to stdout** (fenced). |
+| `--given-title=TEXT` | rootdir name | Name the report, shown as the Markdown heading and the HTML tab title and topbar. Also settable as the `given_title` ini. |
 | `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. See [Source links](#source-links). |
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
 | `--given-lint=BOOL` | `false` | Run the narration lint (`true` \| `false`); an error-level finding fails the run. See [Narration lint](#narration-lint). |

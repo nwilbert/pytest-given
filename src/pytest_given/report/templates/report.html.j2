@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ metadata.project }} — pytest-given Report</title>
+<title>{{ metadata.title or metadata.project }} — pytest-given Report</title>
 <style>
 {{ css }}
 </style>
@@ -128,7 +128,7 @@
   {%- endmacro -%}
 
   <header class="topbar">
-    <div class="topbar-title">{{ metadata.project }}</div>
+    <div class="topbar-title">{{ metadata.title or metadata.project }}</div>
     <div class="topbar-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · <span x-text="formattedTimestamp"></span></div>
   </header>
 

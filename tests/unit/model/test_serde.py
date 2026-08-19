@@ -784,3 +784,15 @@ def test_a_pre_columns_placeholder_says_to_re_run_the_suite():
 
     with pytest.raises(PytestGivenError, match='re-run the suite'):
         _narration_part_from_dict({'name': 'cup_size'})
+
+
+def test_metadata_title_defaults_to_none_when_absent() -> None:
+    report = report_from_dict({'metadata': _minimal_metadata_dict(), 'scenarios': []})
+    assert report.metadata.title is None
+
+
+def test_metadata_title_round_trips() -> None:
+    md = _minimal_metadata_dict() | {'title': 'Coffee Shop Example'}
+    report = report_from_dict({'metadata': md, 'scenarios': []})
+    assert report.metadata.title == 'Coffee Shop Example'
+    assert report_to_dict(report)['metadata']['title'] == 'Coffee Shop Example'

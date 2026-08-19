@@ -148,6 +148,14 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     group.addoption(
+        '--given-title',
+        default=None,
+        help=(
+            'Name the report. Defaults to the rootdir name. Overrides the '
+            'given_title ini for one run.'
+        ),
+    )
+    group.addoption(
         '--given-lint',
         default=None,
         choices=_LINT_CHOICES,
@@ -161,6 +169,12 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         type='string',
         default='none',
         help='Source-link template or preset name (CLI flag overrides this).',
+    )
+    parser.addini(
+        'given_title',
+        type='string',
+        default='',
+        help='Name the report (CLI flag overrides this).',
     )
     parser.addini(
         'given_lint',
@@ -184,6 +198,17 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             'run.'
         ),
     )
+
+
+def _resolve_title(config: pytest.Config) -> str | None:
+    """Resolve the report title: CLI flag (when given) wins over the ini value.
+
+    None when neither is set, which leaves renderers on the rootdir name.
+    """
+    cli = config.getoption('given_title')
+    if cli is not None:
+        return cast('str', cli)
+    return cast('str', config.getini('given_title')) or None
 
 
 def _lint_enabled(config: pytest.Config) -> bool:
@@ -735,6 +760,7 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             pytest_version=pytest.__version__,
             plugin_version='0.1.0',
             commit_sha=detect_commit_sha(),
+            title=_resolve_title(session.config),
         ),
         scenarios=scenarios,
         stories=stories,

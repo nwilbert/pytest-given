@@ -27,7 +27,8 @@ _STATUS_GLYPH = {'passed': '✓', 'failed': '✗', 'skipped': '⤼'}
 
 def render_md(report: ReportData) -> str:
     """Render the report model to an agent-facing Markdown string."""
-    blocks = [f'# pytest-given — {report.metadata.project}']
+    name = report.metadata.title or report.metadata.project
+    blocks = [f'# pytest-given — {name}']
     blocks.extend(_scenario_md(scenario) for scenario in report.scenarios)
     return '\n\n'.join(blocks) + '\n'
 

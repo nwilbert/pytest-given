@@ -1,4 +1,4 @@
-# pytest-given — pytest-given
+# pytest-given — pytest-given Self-Report
 
 ## ✓ A «scenario» records under its «node ID»
 `tests/unit/capture/test_collector.py:23::test_start_and_finish_scenario`
@@ -1028,7 +1028,8 @@
         "timestamp": "t",
         "pytest_version": "8",
         "plugin_version": "0",
-        "commit_sha": null
+        "commit_sha": null,
+        "title": null
       },
       "scenarios": [
         {
@@ -1315,7 +1316,7 @@
 - **then** «Parameter coloring» classes mark the grouped placeholder and the table headers
 
 ## ✓ A passed «scenario» renders as a checked heading with «step» bullets
-`tests/unit/report/test_md_renderer.py:43::test_passed_scenario_heading_and_steps`
+`tests/unit/report/test_md_renderer.py:46::test_passed_scenario_heading_and_steps`
 
 - **given** a «Report» holding a passed «Scenario» with three steps
   - 📎 Scenario record:
@@ -1386,28 +1387,28 @@
 - **then** the heading is checked and each «Step» is a phase bullet
 
 ## ✓ Nested «steps» indent under their parent
-`tests/unit/report/test_md_renderer.py:142::test_nested_steps_indent`
+`tests/unit/report/test_md_renderer.py:145::test_nested_steps_indent`
 
 - **given** a «Scenario» whose when «Step» has a nested child
 - **when** the Markdown «Report» is rendered
 - **then** the child bullet indents under its parent
 
 ## ✓ Structured «narration» renders «terms», values and placeholders
-`tests/unit/report/test_md_renderer.py:166::test_narration_parts_resolve_terms_and_values`
+`tests/unit/report/test_md_renderer.py:169::test_narration_parts_resolve_terms_and_values`
 
 - **given** a «Step» whose «Narration» carries a «Term ref», a value and a placeholder
 - **when** the Markdown «Report» is rendered
 - **then** the «Term ref» renders in guillemets, the value verbatim and the placeholder in braces
 
 ## ✓ A «parametrized scenario» renders its «parameter table»
-`tests/unit/report/test_md_renderer.py:220::test_parametrized_scenario_renders_table` · parametrization
+`tests/unit/report/test_md_renderer.py:223::test_parametrized_scenario_renders_table` · parametrization
 
 - **given** a «Parametrized scenario» with a two-«Case» «Parameter table»
 - **when** the Markdown «Report» is rendered
 - **then** the heading counts the cases and the «Parameter table» lists each row
 
 ## ✓ A failing «step» is marked with a minimal error digest
-`tests/unit/report/test_md_renderer.py:256::test_failing_step_is_marked_with_minimal_error`
+`tests/unit/report/test_md_renderer.py:259::test_failing_step_is_marked_with_minimal_error`
 
 - **given** a failed «Scenario» whose then «Step» carries a two-line error and an internal frame
   - 📎 Error record:
@@ -1438,14 +1439,14 @@
 - **then** only the first message line and the non-internal frame are quoted
 
 ## ✓ A multi-line «attachment» renders as a fenced block
-`tests/unit/report/test_md_renderer.py:327::test_multiline_attachment_renders_fenced_block`
+`tests/unit/report/test_md_renderer.py:330::test_multiline_attachment_renders_fenced_block`
 
 - **given** a «Step» carrying a multi-line «Attachment»
 - **when** the Markdown «Report» is rendered
 - **then** the «Attachment» content sits in an indented fence, not inline
 
 ## ✓ A skipped scenario shows its skip reason
-`tests/unit/report/test_md_renderer.py:447::test_skipped_scenario_shows_reason`
+`tests/unit/report/test_md_renderer.py:450::test_skipped_scenario_shows_reason`
 
 - **given** a skipped «Scenario» with a reason
 - **when** the Markdown «Report» is rendered

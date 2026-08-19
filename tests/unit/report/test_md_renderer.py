@@ -23,13 +23,16 @@ from pytest_given.report.md_renderer import render_md
 from tests.ubiquitous_language import pg
 
 
-def _report(*scenarios: Scenario, project: str = 'proj') -> ReportData:
+def _report(
+    *scenarios: Scenario, project: str = 'proj', title: str | None = None
+) -> ReportData:
     return ReportData(
         metadata=Metadata(
             project=project,
             timestamp='t',
             pytest_version='9',
             plugin_version='0.1',
+            title=title,
         ),
         scenarios=list(scenarios),
     )
@@ -658,3 +661,8 @@ def test_an_attachment_cell_at_the_inline_limit_still_sits_inline() -> None:
     payload = 'x' * 72
     md = render_md(_report_with(_attachment_table(short=payload, long=None)))
     assert f'| 350 | `{payload}` | ✓ |' in md
+
+
+def test_header_prefers_the_title_over_the_project() -> None:
+    md = render_md(_report(project='pytest-given', title='Coffee Shop Example'))
+    assert md.startswith('# pytest-given — Coffee Shop Example')

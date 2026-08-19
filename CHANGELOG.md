@@ -13,6 +13,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
+- `--given-title=TEXT` (or the `given_title` ini) names the report, replacing the
+  rootdir name in the Markdown heading and the HTML tab title and topbar.
 - A parametrized scenario's cases now share one narrated step tree above a
   typed case table, instead of case 1's values standing in for all of them.
 - A varying attachment payload becomes an `attachment` column of its own,

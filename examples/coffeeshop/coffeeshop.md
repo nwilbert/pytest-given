@@ -1,4 +1,4 @@
-# pytest-given — pytest-given
+# pytest-given — Coffee Shop Example
 
 ## ✓ Basic scenario with when/then and a JSON attachment
 `examples/coffeeshop/test_coffeeshop.py:22::test_buy_coffee` · billing, happy-path

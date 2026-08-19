@@ -269,16 +269,23 @@ def examples(session: nox.Session) -> None:
     # coffeeshop runs with --given-all-frames so it demonstrates the "show
     # internal frames" toggle on a real failure; the others use the default
     # filter so they show the clean user-only frames most users see.
-    for test_file, slug, extra in [
+    for test_file, slug, title, extra in [
         (
             'examples/coffeeshop/test_coffeeshop.py',
             'coffeeshop',
+            'Coffee Shop Example',
             ['--given-all-frames'],
         ),
-        ('examples/hotel-booking/test_hotel_booking.py', 'hotel-booking', []),
+        (
+            'examples/hotel-booking/test_hotel_booking.py',
+            'hotel-booking',
+            'Hotel Booking Example',
+            [],
+        ),
         (
             'examples/file-glossary-booking/test_file_glossary_booking.py',
             'file-glossary-booking',
+            'File Glossary Example',
             [],
         ),
     ]:
@@ -288,6 +295,7 @@ def examples(session: nox.Session) -> None:
             f'--given-json=examples/{slug}/{slug}-data.json',
             f'--given-html=examples/{slug}/{slug}.html',
             f'--given-md=examples/{slug}/{slug}.md',
+            f'--given-title={title}',
             '--given-source-link=github',
             # These suites have intentional failures, so the run already
             # returns a tolerated exit 1 (success_codes below), which masks
@@ -333,6 +341,7 @@ def self_report(session: nox.Session) -> None:
         '--given-json=examples/self-report/self-report-data.json',
         '--given-html=examples/self-report/self-report.html',
         '--given-md=examples/self-report/self-report.md',
+        '--given-title=pytest-given Self-Report',
         '--given-source-link=github',
         # The backend suite has no intentional failures, so an error-level
         # lint finding turns this session red — a real gate.

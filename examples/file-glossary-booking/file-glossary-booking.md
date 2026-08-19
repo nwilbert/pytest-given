@@ -1,4 +1,4 @@
-# pytest-given — pytest-given
+# pytest-given — File Glossary Example
 
 ## ✓ Guest books an available room
 `examples/file-glossary-booking/test_file_glossary_booking.py:52::test_book_available_room`
