@@ -190,7 +190,7 @@
             {#- Groups key on `group.id`, not the display name: a term group
                 shows its canonical name but filters by term id. The chevron
                 stops propagation so it expands without touching the filter. -#}
-            <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group), 'nav-group-dimmed': isGroupDimmed(group) }" @click="onGroupClick(group)">
+            <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }" @click="onGroupClick(group)">
               <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
               <span class="nav-group-name" x-text="group.name"></span>
               <span class="nav-group-dismiss" x-show="isGroupActive(group)">×</span>
@@ -216,10 +216,24 @@
     <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
       <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
       <div class="header-context" x-text="filterSummary"></div>
-      <span class="filter-chip" x-show="termFilter" x-cloak>
-        Term: <span x-text="termLabel(termFilter)"></span>
-        <button type="button" class="filter-chip-x" @click="clearTermFilter()" aria-label="Clear term filter">×</button>
+      {#- One chip per active filter, each dismissable on its own. Tags and
+          terms intersect (AND) and so can stack; module is single-select. -#}
+      <span class="filter-chip" x-show="moduleFilter" x-cloak>
+        Module: <span x-text="moduleFilter"></span>
+        <button type="button" class="filter-chip-x" @click="clearModuleFilter()" aria-label="Clear module filter">×</button>
       </span>
+      <template x-for="tag in tagFilters" :key="tag">
+        <span class="filter-chip" x-cloak>
+          Tag: <span x-text="tagLabel(tag)"></span>
+          <button type="button" class="filter-chip-x" @click="removeTagFilter(tag)" aria-label="Clear tag filter">×</button>
+        </span>
+      </template>
+      <template x-for="termId in termFilters" :key="termId">
+        <span class="filter-chip" x-cloak>
+          Term: <span x-text="termLabel(termId)"></span>
+          <button type="button" class="filter-chip-x" @click="removeTermFilter(termId)" aria-label="Clear term filter">×</button>
+        </span>
+      </template>
       <button class="collapse-all-btn" @click="toggleAllScenarios()">
         <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
         <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
@@ -250,10 +264,10 @@
         {%- set visible_tags = scenario.tags[:3] if collapse_tags else scenario.tags -%}
         {%- set overflow_tags = scenario.tags[3:] if collapse_tags else [] -%}
         {% for tag in visible_tags %}
-        <span class="scenario-tag" data-tag="{{ tag }}" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">{{ tag }}</span>
+        <span class="scenario-tag" data-tag="{{ tag }}" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">{{ tag }}</span>
         {% endfor %}
         {% for tag in overflow_tags %}
-        <span class="scenario-tag" x-cloak data-tag="{{ tag }}" x-show="expandedTags[{{ scenario_idx }}] || activeTag === $el.dataset.tag" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">{{ tag }}</span>
+        <span class="scenario-tag" x-cloak data-tag="{{ tag }}" x-show="expandedTags[{{ scenario_idx }}] || tagFilters.includes($el.dataset.tag)" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">{{ tag }}</span>
         {% endfor %}
         {% if overflow_tags %}
         <span class="scenario-tag scenario-tag-more" x-show="!expandedTags[{{ scenario_idx }}]" @click.stop="expandedTags[{{ scenario_idx }}] = true">+{{ overflow_tags | length }}</span>

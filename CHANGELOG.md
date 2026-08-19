@@ -22,17 +22,34 @@ form `## [x.y.z] - YYYY-MM-DD`.
   a badge in the step that points at it. A payload too long for its cell opens
   in a panel spanning the table (HTML) or a fence below it (Markdown).
 - The HTML report's sidebar gains **Terms** as a third browse axis next to Tags
-  and Modules, listing the glossary terms your scenarios reference, ordered by
-  how many scenarios each one carries. Clicking a term filters the Scenarios
-  view by it (the chevron expands the group instead), so a term filter no
-  longer has to be started from the Glossary tab. Reports with a glossary now
-  open on this axis; reports without one show no Terms segment and open on
-  Tags as before.
+  and Modules, listing the glossary terms your scenarios reference. Clicking a
+  term filters the Scenarios view by it (the chevron expands the group
+  instead), so a term filter no
+  longer has to be started from the Glossary tab. Selecting further terms
+  intersects them — `Story` plus `Coverage` shows only the scenarios
+  referencing both — with one dismissable chip per term, and the sharable URL
+  carries the whole set. Reports with a glossary now open on this axis; reports
+  without one show no Terms segment and open on Tags as before.
+- All three sidebar axes now filter the same way. A tag can be applied from the
+  sidebar (before, a group there could only dismiss a filter started from a
+  scenario card) and tags stack with AND like terms; modules gained a filter
+  they never had, single-select because a scenario has exactly one. Every
+  active filter shows as its own dismissable chip, and the `untagged` /
+  `no terms` buckets are selectable like any other group. Every axis reads
+  alphabetically, with whatever is selected pinned to the top so the group you
+  filtered by stays in view. Nothing dims any more — with filters that
+  compose, greying the rest marked as unavailable exactly the groups worth
+  clicking next.
 
 ### Fixed
 
 - The active-term chip in the Scenarios header now shows the term's canonical
   name (`File glossary`) instead of its slug id (`file-glossary`).
+- Jumping to a scenario from a story activity, or to a term's scenarios from
+  the Glossary tab, now clears the filters already applied in the Scenarios
+  view. Previously the target could land behind a filter that hid it, leaving
+  the view apparently empty. `#scenario=` deep links are unaffected: the
+  filters in the link itself still win.
 
 ### Changed
 

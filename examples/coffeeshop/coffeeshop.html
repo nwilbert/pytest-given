@@ -207,7 +207,6 @@ body {
 .nav-group-active .nav-group-toggle,
 .nav-group-active .nav-group-count { color: rgba(255, 255, 255, 0.7); }
 .nav-group-active .nav-group-name { font-weight: 600; }
-.nav-group-dimmed { opacity: 0.4; }
 .nav-group-dismiss { font-size: 0.875rem; margin-left: var(--space-xs); opacity: 0.8; }
 /* padding-left keeps a minimum gap from the group name even when a wrapped
    name fills the row and the auto margin collapses to zero. */
@@ -1099,7 +1098,7 @@ span.param-highlight {
       </div>
       <div class="nav-tree">
         <template x-for="group in groups" :key="group.id">
-          <div><div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group), 'nav-group-dimmed': isGroupDimmed(group) }" @click="onGroupClick(group)">
+          <div><div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }" @click="onGroupClick(group)">
               <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
               <span class="nav-group-name" x-text="group.name"></span>
               <span class="nav-group-dismiss" x-show="isGroupActive(group)">×</span>
@@ -1124,11 +1123,22 @@ span.param-highlight {
   <div class="header">
     <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
       <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
-      <div class="header-context" x-text="filterSummary"></div>
-      <span class="filter-chip" x-show="termFilter" x-cloak>
-        Term: <span x-text="termLabel(termFilter)"></span>
-        <button type="button" class="filter-chip-x" @click="clearTermFilter()" aria-label="Clear term filter">×</button>
+      <div class="header-context" x-text="filterSummary"></div><span class="filter-chip" x-show="moduleFilter" x-cloak>
+        Module: <span x-text="moduleFilter"></span>
+        <button type="button" class="filter-chip-x" @click="clearModuleFilter()" aria-label="Clear module filter">×</button>
       </span>
+      <template x-for="tag in tagFilters" :key="tag">
+        <span class="filter-chip" x-cloak>
+          Tag: <span x-text="tagLabel(tag)"></span>
+          <button type="button" class="filter-chip-x" @click="removeTagFilter(tag)" aria-label="Clear tag filter">×</button>
+        </span>
+      </template>
+      <template x-for="termId in termFilters" :key="termId">
+        <span class="filter-chip" x-cloak>
+          Term: <span x-text="termLabel(termId)"></span>
+          <button type="button" class="filter-chip-x" @click="removeTermFilter(termId)" aria-label="Clear term filter">×</button>
+        </span>
+      </template>
       <button class="collapse-all-btn" @click="toggleAllScenarios()">
         <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
         <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
@@ -1150,16 +1160,16 @@ span.param-highlight {
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
-        <span class="scenario-tag" data-tag="happy-path" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">happy-path</span>
+        <span class="scenario-tag" data-tag="happy-path" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">happy-path</span>
         
         
         
         <span class="scenario-status passed">
           ✓ passed
         </span>
-        <span class="scenario-duration">1ms</span>
+        <span class="scenario-duration">0ms</span>
       </span>
     </div>
 
@@ -1193,7 +1203,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1212,7 +1222,7 @@ span.param-highlight {
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -1254,7 +1264,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1298,7 +1308,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1344,7 +1354,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
       
     </div>
     </div>
@@ -1363,7 +1373,7 @@ Total:        $2.00</pre></div>
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -1416,7 +1426,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L151">examples/coffeeshop/test_coffeeshop.py:151</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L151">examples/coffeeshop/test_coffeeshop.py:151</a></div>
       
     </div>
     </div>
@@ -1435,7 +1445,7 @@ Total:        $2.00</pre></div>
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -1513,7 +1523,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L164">examples/coffeeshop/test_coffeeshop.py:164</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L164">examples/coffeeshop/test_coffeeshop.py:164</a></div>
       
     </div>
     </div>
@@ -1532,9 +1542,9 @@ Total:        $2.00</pre></div>
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
-        <span class="scenario-tag" data-tag="validation" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">validation</span>
+        <span class="scenario-tag" data-tag="validation" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">validation</span>
         
         
         
@@ -1563,7 +1573,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L198">examples/coffeeshop/test_coffeeshop.py:198</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L198">examples/coffeeshop/test_coffeeshop.py:198</a></div>
       
     </div>
     </div>
@@ -1582,16 +1592,16 @@ Total:        $2.00</pre></div>
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
-        <span class="scenario-tag" data-tag="loyalty" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">loyalty</span>
+        <span class="scenario-tag" data-tag="loyalty" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">loyalty</span>
         
-        <span class="scenario-tag" data-tag="discounts" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">discounts</span>
+        <span class="scenario-tag" data-tag="discounts" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">discounts</span>
         
         
-        <span class="scenario-tag" x-cloak data-tag="happy-path" x-show="expandedTags[7] || activeTag === $el.dataset.tag" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">happy-path</span>
+        <span class="scenario-tag" x-cloak data-tag="happy-path" x-show="expandedTags[7] || tagFilters.includes($el.dataset.tag)" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">happy-path</span>
         
-        <span class="scenario-tag" x-cloak data-tag="regression" x-show="expandedTags[7] || activeTag === $el.dataset.tag" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">regression</span>
+        <span class="scenario-tag" x-cloak data-tag="regression" x-show="expandedTags[7] || tagFilters.includes($el.dataset.tag)" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">regression</span>
         
         
         <span class="scenario-tag scenario-tag-more" x-show="!expandedTags[7]" @click.stop="expandedTags[7] = true">+2</span>
@@ -1623,7 +1633,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
@@ -1647,7 +1657,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">66ms</span>
+        <span class="scenario-duration">64ms</span>
       </span>
     </div>
 
@@ -1723,7 +1733,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L231">examples/coffeeshop/test_coffeeshop.py:231</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L231">examples/coffeeshop/test_coffeeshop.py:231</a></div>
       
     </div>
     </div>
@@ -1766,7 +1776,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L237">examples/coffeeshop/test_coffeeshop.py:237</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L237">examples/coffeeshop/test_coffeeshop.py:237</a></div>
       
     </div>
     </div>
@@ -1785,7 +1795,7 @@ Total:        $2.00</pre></div>
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -1916,7 +1926,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -1935,7 +1945,7 @@ Total:        $2.00</pre></div>
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -2018,7 +2028,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -2037,7 +2047,7 @@ Total:        $2.00</pre></div>
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -2118,7 +2128,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
       
     </div>
     </div>
@@ -2137,7 +2147,7 @@ Total:        $2.00</pre></div>
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': activeTag === $el.dataset.tag }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
+        <span class="scenario-tag" data-tag="billing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">billing</span>
         
         
         
@@ -2320,7 +2330,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L104">examples/coffeeshop/test_coffeeshop.py:104</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L104">examples/coffeeshop/test_coffeeshop.py:104</a></div>
       
     </div>
     </div>
@@ -2412,7 +2422,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/513f9b3cf268ba4cf642ff6059d0ba5d2b374e75/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
       
     </div>
     </div>
@@ -2443,10 +2453,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-19T16:36:29.933800+00:00",
+    "timestamp": "2026-08-19T17:08:28.549873+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "513f9b3cf268ba4cf642ff6059d0ba5d2b374e75"
+    "commit_sha": "7cc28b9ab1d7e6669a4cfe3ed878764573cc17f9"
   },
   "scenarios": [
     {
@@ -2461,7 +2471,7 @@ window.__REPORT_DATA__ = {
         "happy-path"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -3271,7 +3281,7 @@ window.__REPORT_DATA__ = {
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 66,
+      "duration_ms": 64,
       "steps": [
         {
           "phase": "given",
@@ -4052,9 +4062,11 @@ function deserializeStory(params) {
 }
 
 // --- Alpine app ---
-// Scenarios that reference no glossary term bucket together under this key.
-// A \u0000 prefix keeps it from colliding with any real term id.
-const NO_TERMS = '\u0000no-terms';
+// Buckets for scenarios with nothing on an axis. Both are selectable
+// filters, so the tokens have to survive a URL: a leading '!' cannot start a
+// term id (they are slugs) and is implausible as a tag.
+const NO_TERMS = '!no-terms';
+const NO_TAGS = '!untagged';
 
 function reportApp() {
   const data = window.__REPORT_DATA__;
@@ -4090,8 +4102,9 @@ function reportApp() {
     expandedAttachments: {},
     expandedScenarios: {},
     expandedTags: {},
-    activeTag: null,
-    termFilter: null,
+    tagFilters: [],
+    termFilters: [],
+    moduleFilter: null,
     _suppressHashWrite: false,
     highlightedActivities: {},
     get anyActivitiesHighlighted() {
@@ -4124,7 +4137,6 @@ function reportApp() {
     },
     get filterSummary() {
       const parts = [];
-      if (this.activeTag) parts.push('Tag: ' + this.activeTag);
       const hasStatus = (s) => data.scenarios.some(sc => sc.status === s);
       const allShown = (this.showPassed || !hasStatus('passed'))
         && (this.showFailed || !hasStatus('failed'))
@@ -4137,10 +4149,13 @@ function reportApp() {
         if (shown.length) parts.push(shown.join(', '));
       }
       if (this.search) parts.push('"' + this.search + '"');
-      // The term filter is shown as its own removable chip, so it isn't
-      // repeated here; suppress the "All Scenarios" fallback while it's active.
+      // Term/tag/module filters each show as their own removable chip, so
+      // they aren't repeated here; suppress the "All Scenarios" fallback
+      // while any of them is active.
       if (parts.length) return parts.join(' · ');
-      return this.termFilter ? '' : 'All Scenarios';
+      const chipped = this.termFilters.length || this.tagFilters.length
+        || this.moduleFilter;
+      return chipped ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
@@ -4168,7 +4183,7 @@ function reportApp() {
           const ids = scenarioTerms[s.id] || [];
           keys = ids.length ? ids : [NO_TERMS];
         } else if (this.view === 'tags') {
-          keys = s.tags.length ? s.tags : ['untagged'];
+          keys = s.tags.length ? s.tags : [NO_TAGS];
         } else {
           keys = [s.module];
         }
@@ -4176,32 +4191,40 @@ function reportApp() {
           if (!grouped[k]) {
             grouped[k] = {
               id: k,
-              name: isTerms ? (termNames[k] || 'no terms') : k,
+              name: isTerms ? this.termLabel(k) : this.tagLabel(k),
               scenarios: [],
             };
           }
           grouped[k].scenarios.push(s);
         }
       }
-      const out = Object.values(grouped);
-      // Terms sort by weight, not alphabetically: the axis has a long tail
-      // (a third of a glossary typically lands on one or two scenarios), and
-      // the terms carrying the most behaviour are what you want to browse
-      // first. Tags and modules stay alphabetical.
-      if (isTerms) {
-        return out.sort((a, b) =>
-          b.scenarios.length - a.scenarios.length || a.name.localeCompare(b.name));
-      }
-      return out.sort((a, b) => a.name.localeCompare(b.name));
+      // Selected groups pin to the top so what you filtered by stays in view
+      // — arriving from the Glossary tab, the term you came for is the first
+      // row rather than somewhere down the list. The rest read alphabetically,
+      // the same on all three axes.
+      return Object.values(grouped).sort((a, b) =>
+        (this.isGroupActive(a) ? 0 : 1) - (this.isGroupActive(b) ? 0 : 1)
+        || a.name.localeCompare(b.name));
     },
     _matchesFilters(s) {
       if (s.status === 'passed' && !this.showPassed) return false;
       if (s.status === 'failed' && !this.showFailed) return false;
       if (s.status === 'skipped' && !this.showSkipped) return false;
-      if (this.activeTag && !s.tags.includes(this.activeTag)) return false;
-      if (this.termFilter &&
-          !(window.__termScenarios[this.termFilter] || []).includes(s.id)) {
-        return false;
+      // A scenario has exactly one module, so this axis stays single-select.
+      if (this.moduleFilter && s.module !== this.moduleFilter) return false;
+      // Tags and terms are set-valued, so several of them narrow with AND:
+      // the scenario must carry every selected one, not any of them.
+      for (const tag of this.tagFilters) {
+        if (tag === NO_TAGS) {
+          if (s.tags.length) return false;
+        } else if (!s.tags.includes(tag)) return false;
+      }
+      for (const termId of this.termFilters) {
+        if (termId === NO_TERMS) {
+          if ((scenarioTerms[s.id] || []).length) return false;
+        } else if (!(window.__termScenarios[termId] || []).includes(s.id)) {
+          return false;
+        }
       }
       if (this.search) {
         const q = this.search.toLowerCase();
@@ -4252,6 +4275,23 @@ function reportApp() {
       this.mainView = 'scenarios';
       this.$nextTick(() => this.scrollToAndExpand(nodeId));
     },
+    goToScenarioFresh(nodeId) {
+      // Jumping in from a story activity: clear whatever was filtering the
+      // Scenarios view first, or the scenario you asked for can land behind
+      // a filter that hides it. Kept out of goToScenario itself, which also
+      // serves `#scenario=` deep links where the hash's own filters must win.
+      this.resetFilters();
+      this.goToScenario(nodeId);
+    },
+    resetFilters() {
+      this.tagFilters = [];
+      this.termFilters = [];
+      this.moduleFilter = null;
+      this.search = '';
+      this.showPassed = true;
+      this.showFailed = true;
+      this.showSkipped = true;
+    },
     goToTerm(id) {
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
@@ -4261,29 +4301,39 @@ function reportApp() {
       });
     },
     filterScenariosByTerm(id) {
-      this.termFilter = id;
+      // A jump from the Glossary tab is navigation, not refinement: it shows
+      // the term you clicked, on its own, rather than intersecting it with
+      // whatever the Scenarios view was already filtered by.
+      this.resetFilters();
+      this.termFilters = [id];
       this.mainView = 'scenarios';
       // Reveal the active term in the sidebar rather than landing on an
       // unrelated axis, mirroring what filterByTag does for tags.
       if (hasGlossary) this.view = 'terms';
     },
-    clearTermFilter() {
-      this.termFilter = null;
+    removeTermFilter(id) {
+      this.termFilters = this.termFilters.filter(t => t !== id);
+    },
+    removeTagFilter(tag) {
+      this.tagFilters = this.tagFilters.filter(t => t !== tag);
+    },
+    clearModuleFilter() {
+      this.moduleFilter = null;
     },
     termLabel(id) {
+      if (id === NO_TERMS) return 'no terms';
       // Term ids are slugs ('file-glossary'); the report speaks canonical
       // names ('File glossary'). Falls back to the id for a term the
       // glossary no longer carries.
       return termNames[id] || id;
     },
-    isGroupActive(group) {
-      return this.view === 'terms'
-        ? this.termFilter === group.id
-        : this.activeTag === group.id;
+    tagLabel(tag) {
+      return tag === NO_TAGS ? 'untagged' : tag;
     },
-    isGroupDimmed(group) {
-      const active = this.view === 'terms' ? this.termFilter : this.activeTag;
-      return !!active && active !== group.id;
+    isGroupActive(group) {
+      if (this.view === 'terms') return this.termFilters.includes(group.id);
+      if (this.view === 'tags') return this.tagFilters.includes(group.id);
+      return this.moduleFilter === group.id;
     },
     onGroupClick(group) {
       // In the Terms view the group name is the filter control: unlike tags,
@@ -4291,20 +4341,22 @@ function reportApp() {
       // so the sidebar has to own that affordance. The chevron still expands
       // (its own click stops propagation before reaching here).
       if (this.view === 'terms') {
-        this.termFilter = this.termFilter === group.id ? null : group.id;
-        return;
-      }
-      if (this.view === 'tags' && this.activeTag === group.id) {
+        this.termFilters = this.termFilters.includes(group.id)
+          ? this.termFilters.filter(t => t !== group.id)
+          : [...this.termFilters, group.id];
+      } else if (this.view === 'tags') {
         this.filterByTag(group.id);
-        return;
+      } else {
+        // Single-select: a scenario has one module, so intersecting two of
+        // them could only ever be empty.
+        this.moduleFilter = this.moduleFilter === group.id ? null : group.id;
       }
-      this.toggleGroup(group.id);
     },
     filterByTag(tag) {
-      if (this.activeTag === tag) {
-        this.activeTag = null;
+      if (this.tagFilters.includes(tag)) {
+        this.tagFilters = this.tagFilters.filter(t => t !== tag);
       } else {
-        this.activeTag = tag;
+        this.tagFilters = [...this.tagFilters, tag];
         this.view = 'tags';
       }
     },
@@ -4396,7 +4448,7 @@ function reportApp() {
       // spam); discrete navigations/filters push a back-able entry. All writes
       // are suppressed while we're applying state FROM the hash (see _readHash).
       this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
-      ['activeTag', 'termFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+      ['tagFilters', 'termFilters', 'moduleFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
       this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
@@ -4425,7 +4477,7 @@ function reportApp() {
         const link = event.target.closest('[data-goto-scenario]');
         if (!link) return;
         event.preventDefault();
-        this.goToScenario(link.dataset.gotoScenario);
+        this.goToScenarioFresh(link.dataset.gotoScenario);
       });
       this._initTermTooltip();
     },
@@ -4478,10 +4530,17 @@ function reportApp() {
       // would create bogus history entries on back/forward).
       this._suppressHashWrite = true;
       const params = parseHash();
-      if (params.has('tag')) this.activeTag = params.get('tag');
-      else this.activeTag = null;
-      if (params.has('term-filter')) this.termFilter = params.get('term-filter');
-      else this.termFilter = null;
+      // Comma-separated; a single-value link from an older report still reads.
+      if (params.has('tag')) this.tagFilters = params.get('tag').split(',').filter(Boolean);
+      else this.tagFilters = [];
+      if (params.has('module')) this.moduleFilter = params.get('module');
+      else this.moduleFilter = null;
+      // Comma-separated; a single-term link from an older report still reads.
+      if (params.has('term-filter')) {
+        this.termFilters = params.get('term-filter').split(',').filter(Boolean);
+      } else {
+        this.termFilters = [];
+      }
       if (params.has('status')) {
         const shown = new Set(params.get('status').split(',').filter(Boolean));
         this.showPassed = shown.has('passed');
@@ -4516,8 +4575,9 @@ function reportApp() {
       const params = new URLSearchParams();
       if (this.mainView !== 'scenarios') params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
-      if (this.activeTag) params.set('tag', this.activeTag);
-      if (this.termFilter) params.set('term-filter', this.termFilter);
+      if (this.tagFilters.length) params.set('tag', this.tagFilters.join(','));
+      if (this.moduleFilter) params.set('module', this.moduleFilter);
+      if (this.termFilters.length) params.set('term-filter', this.termFilters.join(','));
 
       const present = new Set(data.scenarios.map(s => s.status));
       const shown = [];

@@ -200,7 +200,6 @@ body {
 .nav-group-active .nav-group-toggle,
 .nav-group-active .nav-group-count { color: rgba(255, 255, 255, 0.7); }
 .nav-group-active .nav-group-name { font-weight: 600; }
-.nav-group-dimmed { opacity: 0.4; }
 .nav-group-dismiss { font-size: 0.875rem; margin-left: var(--space-xs); opacity: 0.8; }
 /* padding-left keeps a minimum gap from the group name even when a wrapped
    name fills the row and the auto margin collapses to zero. */

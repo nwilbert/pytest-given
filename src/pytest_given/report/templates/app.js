@@ -27,9 +27,11 @@ function deserializeStory(params) {
 }
 
 // --- Alpine app ---
-// Scenarios that reference no glossary term bucket together under this key.
-// A \u0000 prefix keeps it from colliding with any real term id.
-const NO_TERMS = '\u0000no-terms';
+// Buckets for scenarios with nothing on an axis. Both are selectable
+// filters, so the tokens have to survive a URL: a leading '!' cannot start a
+// term id (they are slugs) and is implausible as a tag.
+const NO_TERMS = '!no-terms';
+const NO_TAGS = '!untagged';
 
 function reportApp() {
   const data = window.__REPORT_DATA__;
@@ -65,8 +67,9 @@ function reportApp() {
     expandedAttachments: {},
     expandedScenarios: {},
     expandedTags: {},
-    activeTag: null,
-    termFilter: null,
+    tagFilters: [],
+    termFilters: [],
+    moduleFilter: null,
     _suppressHashWrite: false,
     highlightedActivities: {},
     get anyActivitiesHighlighted() {
@@ -99,7 +102,6 @@ function reportApp() {
     },
     get filterSummary() {
       const parts = [];
-      if (this.activeTag) parts.push('Tag: ' + this.activeTag);
       const hasStatus = (s) => data.scenarios.some(sc => sc.status === s);
       const allShown = (this.showPassed || !hasStatus('passed'))
         && (this.showFailed || !hasStatus('failed'))
@@ -112,10 +114,13 @@ function reportApp() {
         if (shown.length) parts.push(shown.join(', '));
       }
       if (this.search) parts.push('"' + this.search + '"');
-      // The term filter is shown as its own removable chip, so it isn't
-      // repeated here; suppress the "All Scenarios" fallback while it's active.
+      // Term/tag/module filters each show as their own removable chip, so
+      // they aren't repeated here; suppress the "All Scenarios" fallback
+      // while any of them is active.
       if (parts.length) return parts.join(' · ');
-      return this.termFilter ? '' : 'All Scenarios';
+      const chipped = this.termFilters.length || this.tagFilters.length
+        || this.moduleFilter;
+      return chipped ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
@@ -143,7 +148,7 @@ function reportApp() {
           const ids = scenarioTerms[s.id] || [];
           keys = ids.length ? ids : [NO_TERMS];
         } else if (this.view === 'tags') {
-          keys = s.tags.length ? s.tags : ['untagged'];
+          keys = s.tags.length ? s.tags : [NO_TAGS];
         } else {
           keys = [s.module];
         }
@@ -151,32 +156,40 @@ function reportApp() {
           if (!grouped[k]) {
             grouped[k] = {
               id: k,
-              name: isTerms ? (termNames[k] || 'no terms') : k,
+              name: isTerms ? this.termLabel(k) : this.tagLabel(k),
               scenarios: [],
             };
           }
           grouped[k].scenarios.push(s);
         }
       }
-      const out = Object.values(grouped);
-      // Terms sort by weight, not alphabetically: the axis has a long tail
-      // (a third of a glossary typically lands on one or two scenarios), and
-      // the terms carrying the most behaviour are what you want to browse
-      // first. Tags and modules stay alphabetical.
-      if (isTerms) {
-        return out.sort((a, b) =>
-          b.scenarios.length - a.scenarios.length || a.name.localeCompare(b.name));
-      }
-      return out.sort((a, b) => a.name.localeCompare(b.name));
+      // Selected groups pin to the top so what you filtered by stays in view
+      // — arriving from the Glossary tab, the term you came for is the first
+      // row rather than somewhere down the list. The rest read alphabetically,
+      // the same on all three axes.
+      return Object.values(grouped).sort((a, b) =>
+        (this.isGroupActive(a) ? 0 : 1) - (this.isGroupActive(b) ? 0 : 1)
+        || a.name.localeCompare(b.name));
     },
     _matchesFilters(s) {
       if (s.status === 'passed' && !this.showPassed) return false;
       if (s.status === 'failed' && !this.showFailed) return false;
       if (s.status === 'skipped' && !this.showSkipped) return false;
-      if (this.activeTag && !s.tags.includes(this.activeTag)) return false;
-      if (this.termFilter &&
-          !(window.__termScenarios[this.termFilter] || []).includes(s.id)) {
-        return false;
+      // A scenario has exactly one module, so this axis stays single-select.
+      if (this.moduleFilter && s.module !== this.moduleFilter) return false;
+      // Tags and terms are set-valued, so several of them narrow with AND:
+      // the scenario must carry every selected one, not any of them.
+      for (const tag of this.tagFilters) {
+        if (tag === NO_TAGS) {
+          if (s.tags.length) return false;
+        } else if (!s.tags.includes(tag)) return false;
+      }
+      for (const termId of this.termFilters) {
+        if (termId === NO_TERMS) {
+          if ((scenarioTerms[s.id] || []).length) return false;
+        } else if (!(window.__termScenarios[termId] || []).includes(s.id)) {
+          return false;
+        }
       }
       if (this.search) {
         const q = this.search.toLowerCase();
@@ -227,6 +240,23 @@ function reportApp() {
       this.mainView = 'scenarios';
       this.$nextTick(() => this.scrollToAndExpand(nodeId));
     },
+    goToScenarioFresh(nodeId) {
+      // Jumping in from a story activity: clear whatever was filtering the
+      // Scenarios view first, or the scenario you asked for can land behind
+      // a filter that hides it. Kept out of goToScenario itself, which also
+      // serves `#scenario=` deep links where the hash's own filters must win.
+      this.resetFilters();
+      this.goToScenario(nodeId);
+    },
+    resetFilters() {
+      this.tagFilters = [];
+      this.termFilters = [];
+      this.moduleFilter = null;
+      this.search = '';
+      this.showPassed = true;
+      this.showFailed = true;
+      this.showSkipped = true;
+    },
     goToTerm(id) {
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
@@ -236,29 +266,39 @@ function reportApp() {
       });
     },
     filterScenariosByTerm(id) {
-      this.termFilter = id;
+      // A jump from the Glossary tab is navigation, not refinement: it shows
+      // the term you clicked, on its own, rather than intersecting it with
+      // whatever the Scenarios view was already filtered by.
+      this.resetFilters();
+      this.termFilters = [id];
       this.mainView = 'scenarios';
       // Reveal the active term in the sidebar rather than landing on an
       // unrelated axis, mirroring what filterByTag does for tags.
       if (hasGlossary) this.view = 'terms';
     },
-    clearTermFilter() {
-      this.termFilter = null;
+    removeTermFilter(id) {
+      this.termFilters = this.termFilters.filter(t => t !== id);
+    },
+    removeTagFilter(tag) {
+      this.tagFilters = this.tagFilters.filter(t => t !== tag);
+    },
+    clearModuleFilter() {
+      this.moduleFilter = null;
     },
     termLabel(id) {
+      if (id === NO_TERMS) return 'no terms';
       // Term ids are slugs ('file-glossary'); the report speaks canonical
       // names ('File glossary'). Falls back to the id for a term the
       // glossary no longer carries.
       return termNames[id] || id;
     },
-    isGroupActive(group) {
-      return this.view === 'terms'
-        ? this.termFilter === group.id
-        : this.activeTag === group.id;
+    tagLabel(tag) {
+      return tag === NO_TAGS ? 'untagged' : tag;
     },
-    isGroupDimmed(group) {
-      const active = this.view === 'terms' ? this.termFilter : this.activeTag;
-      return !!active && active !== group.id;
+    isGroupActive(group) {
+      if (this.view === 'terms') return this.termFilters.includes(group.id);
+      if (this.view === 'tags') return this.tagFilters.includes(group.id);
+      return this.moduleFilter === group.id;
     },
     onGroupClick(group) {
       // In the Terms view the group name is the filter control: unlike tags,
@@ -266,20 +306,22 @@ function reportApp() {
       // so the sidebar has to own that affordance. The chevron still expands
       // (its own click stops propagation before reaching here).
       if (this.view === 'terms') {
-        this.termFilter = this.termFilter === group.id ? null : group.id;
-        return;
-      }
-      if (this.view === 'tags' && this.activeTag === group.id) {
+        this.termFilters = this.termFilters.includes(group.id)
+          ? this.termFilters.filter(t => t !== group.id)
+          : [...this.termFilters, group.id];
+      } else if (this.view === 'tags') {
         this.filterByTag(group.id);
-        return;
+      } else {
+        // Single-select: a scenario has one module, so intersecting two of
+        // them could only ever be empty.
+        this.moduleFilter = this.moduleFilter === group.id ? null : group.id;
       }
-      this.toggleGroup(group.id);
     },
     filterByTag(tag) {
-      if (this.activeTag === tag) {
-        this.activeTag = null;
+      if (this.tagFilters.includes(tag)) {
+        this.tagFilters = this.tagFilters.filter(t => t !== tag);
       } else {
-        this.activeTag = tag;
+        this.tagFilters = [...this.tagFilters, tag];
         this.view = 'tags';
       }
     },
@@ -371,7 +413,7 @@ function reportApp() {
       // spam); discrete navigations/filters push a back-able entry. All writes
       // are suppressed while we're applying state FROM the hash (see _readHash).
       this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
-      ['activeTag', 'termFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+      ['tagFilters', 'termFilters', 'moduleFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
       this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
@@ -400,7 +442,7 @@ function reportApp() {
         const link = event.target.closest('[data-goto-scenario]');
         if (!link) return;
         event.preventDefault();
-        this.goToScenario(link.dataset.gotoScenario);
+        this.goToScenarioFresh(link.dataset.gotoScenario);
       });
       this._initTermTooltip();
     },
@@ -453,10 +495,17 @@ function reportApp() {
       // would create bogus history entries on back/forward).
       this._suppressHashWrite = true;
       const params = parseHash();
-      if (params.has('tag')) this.activeTag = params.get('tag');
-      else this.activeTag = null;
-      if (params.has('term-filter')) this.termFilter = params.get('term-filter');
-      else this.termFilter = null;
+      // Comma-separated; a single-value link from an older report still reads.
+      if (params.has('tag')) this.tagFilters = params.get('tag').split(',').filter(Boolean);
+      else this.tagFilters = [];
+      if (params.has('module')) this.moduleFilter = params.get('module');
+      else this.moduleFilter = null;
+      // Comma-separated; a single-term link from an older report still reads.
+      if (params.has('term-filter')) {
+        this.termFilters = params.get('term-filter').split(',').filter(Boolean);
+      } else {
+        this.termFilters = [];
+      }
       if (params.has('status')) {
         const shown = new Set(params.get('status').split(',').filter(Boolean));
         this.showPassed = shown.has('passed');
@@ -491,8 +540,9 @@ function reportApp() {
       const params = new URLSearchParams();
       if (this.mainView !== 'scenarios') params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
-      if (this.activeTag) params.set('tag', this.activeTag);
-      if (this.termFilter) params.set('term-filter', this.termFilter);
+      if (this.tagFilters.length) params.set('tag', this.tagFilters.join(','));
+      if (this.moduleFilter) params.set('module', this.moduleFilter);
+      if (this.termFilters.length) params.set('term-filter', this.termFilters.join(','));
 
       const present = new Set(data.scenarios.map(s => s.status));
       const shown = [];

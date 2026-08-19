@@ -779,9 +779,12 @@ def test_render_includes_terms_browse_segment(tmp_path: Path) -> None:
     assert "view === 'terms'" in content
     assert '>Terms<' in content
     assert 'onGroupClick(group)' in content
-    # The active-term chip reads the canonical name, not the slug id.
-    assert 'termLabel(termFilter)' in content
-    assert "termNames[t.id] = t.canonical" in content
+    # The active-term chips read canonical names, not slug ids, and several
+    # terms intersect rather than replacing one another.
+    assert 'termLabel(termId)' in content
+    assert 'x-for="termId in termFilters"' in content
+    assert 'removeTermFilter(termId)' in content
+    assert 'termNames[t.id] = t.canonical' in content
 
 
 def test_render_omits_terms_segment_without_a_glossary(tmp_path: Path) -> None:
