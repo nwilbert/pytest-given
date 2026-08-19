@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-19T17:52:54.950349+00:00",
+    "timestamp": "2026-08-19T17:59:23.341764+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "05b665a614d9ec53b3355425f22d6a9f548977d8"
+    "commit_sha": "9af90c79c73b2e6cde4811c15afbcd71a26536c6"
   },
   "scenarios": [
     {
@@ -829,7 +829,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 59,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
