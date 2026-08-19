@@ -14,42 +14,46 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Added
 
 - A parametrized scenario's cases now share one narrated step tree above a
-  typed case table, instead of the first case's values standing in for all of
-  them. A varying t-string interpolation becomes a `derived` column and leaves
-  a `{name}` placeholder in the step; a varying attachment payload becomes an
-  `attachment` column and leaves a badge pointing at it. Column headers are
-  unique (` #2`, ` #3` suffixes, carried by the badge or `{name}` token that
-  points there), and a payload too long for its cell opens in a panel spanning
-  the table (HTML) or a fence below it (Markdown).
+  typed case table, instead of case 1's values standing in for all of them.
+  A step that read `the drink costs 2.50 euros` now reads `the drink costs
+  {price} euros`, with a `derived` column holding each case's price — hovering
+  a row substitutes that case's value back into the token.
+- A varying attachment payload likewise becomes an `attachment` column, leaving
+  a badge in the step that points at it. A payload too long for its cell opens
+  in a panel spanning the table (HTML) or a fence below it (Markdown).
+- Two columns wanting the same header get ` #2` / ` #3` suffixes, carried by
+  the token or badge that points there.
 - A case that passed while recording a different step structure than the
   grouped tree is now marked as such — `≠` in HTML, a note under the table in
-  Markdown, `divergent: true` in JSON — so its blank cells read as "took
-  another path" rather than as missing data.
+  Markdown, `divergent: true` in JSON. Its blank cells then read as "took
+  another path" rather than as missing data. Such a case no longer lends its
+  parameter values to a term pill either, so it cannot credit story coverage
+  or list Glossary instances for steps it never recorded in that shape.
 
 ### Changed
 
 - **Breaking.** Step narration must now be uniform across parametrize cases.
-  These raise `PytestGivenError` instead of quietly reporting case 1: a plain
-  `str` (usually an f-string) that renders differently per case; a varying
-  interpolation whose expression is not a bare name (`t"{cup_size * 0.01}"`,
-  `t"{m.balance}"`); a t-string interpolating a *rebound* parametrize name; a
-  t-string or `Template` `attach` label; a step whose set of `attach` labels
-  differs between cases; and a glossary term ref whose pill varies — a pill
-  that *is* a parametrize value stays supported. The fix is the same
-  throughout: bind the varying part to a local and narrate it with a t-string,
-  keeping labels and pills constant. Content may still vary freely — that is
-  what the new `attachment` column is for.
-- **Breaking (JSON report).** `parameters.names` becomes `parameters.columns`,
-  each `{id, name, kind}` with `kind` one of `param` / `derived` /
-  `attachment`; `values` stays positionally aligned with it and a cell may now
-  be an attachment object rather than a scalar. Placeholder narration parts
-  gain `column_id`, a step attachment may be a content-less
-  `{label, content_type, column_id}` column reference, and a grouped step's
-  `narration.text` is now the template (`the drink costs {price} euros`) rather
-  than case 1's rendering. HTML and Markdown output is unchanged; update any
-  `jq` reading `parameters`. There is no migration: re-run the suite to
-  regenerate an older report — `pytest-given report` on one says so instead of
-  failing with a bare `KeyError`.
+  These raise `PytestGivenError` instead of quietly reporting case 1:
+
+  - a plain `str` (usually an f-string) that renders differently per case;
+  - a varying interpolation that is not a bare name (`t"{cup_size * 0.01}"`,
+    `t"{m.balance}"`);
+  - a t-string narrating a parametrize name that no longer holds the case's
+    value — either a local rebound it, or the body mutated it in place;
+  - a t-string or `Template` `attach` label;
+  - a step whose set of `attach` labels differs between cases;
+  - a glossary term ref whose pill varies. A pill that *is* a parametrize
+    value stays supported.
+
+  The fix is the same throughout: bind the varying part to a local and narrate
+  it with a t-string, keeping labels and pills constant. Content may still vary
+  freely — that is what the new `attachment` column is for.
+- **Breaking (JSON report).** `parameters.names` becomes `parameters.columns`
+  (`{id, name, kind}`), cells may hold an attachment object, placeholder parts
+  gain `column_id`, and a grouped step's `narration.text` is the template
+  rather than case 1's rendering. Update any `jq` reading `parameters`; HTML
+  and Markdown output is unchanged. No migration — re-run the suite, and
+  `pytest-given report` on an older file says so.
 - `activity(..., id=N)` is now `activity(..., activity_id=N)`. The keyword
   shadowed the `id` builtin; the `Activity.id` field itself is unchanged.
 - The bundled `pytest-given-authoring` skill now documents the report mechanics
@@ -61,16 +65,18 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Fixed
 
-- Parametrized-scenario reporting: the grouped step tree now comes from the
-  first case that passed — previously a skipped case 1 rendered an empty tree
-  and hid later failures; parametrizing over a glossary term instance stores
-  the term's display rather than a repr of the whole glossary; only a passing
-  case with a value for the column contributes its glossary instance and story
-  coverage; `unused-interpolation` fires on parametrized scenarios again, where
-  a varying interpolation is a placeholder rather than a value; and an
-  `indirect=True` parameter's cells held the parametrize input while the step
-  narrated what the fixture returned, so row hover substituted a value the step
-  never rendered — cells now hold the bound test argument.
+- The grouped step tree now comes from the first case that *passed*. A skipped
+  case 1 used to render an empty tree and hide later failures.
+- A cell now reads the way the step that points at it read. It carries the
+  interpolation's own format spec (`{price:.2f}` gives `2.50`, not `2.5`), and
+  under `indirect=True` it holds the bound test argument rather than the
+  parametrize input.
+- Parametrizing over a glossary term instance stores the term's display, not a
+  repr of the whole glossary.
+- Only a passing case with a value for the column contributes its glossary
+  instance and story coverage.
+- `unused-interpolation` fires on parametrized scenarios again, where a varying
+  interpolation is a placeholder rather than a value.
 - Attachment content scrolls horizontally instead of being silently cut off
   (`<pre>` does not wrap), in the step tree as well as the case table. Badges
   are keyboard-operable too: focusable, with a focus ring, Enter and Space, and
