@@ -5,8 +5,8 @@ from datetime import UTC, datetime
 
 import pytest
 
-from pytest_given import given, grouping, scenario, then, when, when_then
-from pytest_given.grouping import group_parametrized
+from pytest_given import given, scenario, then, when, when_then
+from pytest_given.grouping import checks, columns, group, group_parametrized, templatize
 from pytest_given.model import (
     Attachment,
     AttachmentRef,
@@ -38,7 +38,7 @@ def test_templatize_narration_rejects_unknown_placeholder() -> None:
         text='', parts=[NarrationPlaceholder(name='cup_zize', column_id='cup_zize')]
     )
     with pytest.raises(PytestGivenError, match='cup_zize'):
-        grouping._templatize_narration(narration, ['cup_size'])
+        templatize.templatize_narration(narration, ['cup_size'])
 
 
 def test_group_parametrized_all_skipped_groups_as_skipped() -> None:
@@ -165,7 +165,7 @@ def test_templatize_sets_param_column_when_term_ref_expression_matches() -> None
             NarrationLiteral(value=' arrives'),
         ],
     )
-    out = grouping._templatize_narration(narration, param_names=['guest'])
+    out = templatize.templatize_narration(narration, param_names=['guest'])
     ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
     assert ref.param_column == 'guest'
     assert ref.display == 'Alice'
@@ -182,7 +182,7 @@ def test_templatize_term_ref_param_column_stays_none_when_no_column_match() -> N
             ),
         ],
     )
-    out = grouping._templatize_narration(narration, param_names=['euros'])
+    out = templatize.templatize_narration(narration, param_names=['euros'])
     ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
     assert ref.param_column is None
 
@@ -320,7 +320,7 @@ def test_comparable_excludes_a_structurally_divergent_case() -> None:
         status='passed',
         steps=[Step(phase='when', narration=Narration(text='a'))],
     )
-    assert grouping._comparable([base, other], base) == [base]
+    assert group._comparable([base, other], base) == [base]
 
 
 def test_comparable_excludes_a_non_passed_case() -> None:
@@ -341,12 +341,12 @@ def test_comparable_excludes_a_non_passed_case() -> None:
         status='failed',
         steps=[Step(phase='given', narration=Narration(text='a'))],
     )
-    assert grouping._comparable([base, other], base) == [base]
+    assert group._comparable([base, other], base) == [base]
 
 
 def test_test_name_drops_the_path_and_the_case_suffix() -> None:
     assert (
-        grouping._test_name(
+        checks._test_name(
             Scenario(
                 id=NodeId('tests/t.py::test_brew[200]'),
                 narration=Narration(text='x'),
@@ -1013,7 +1013,7 @@ def test_templatize_narration_converts_a_matching_value_to_a_placeholder() -> No
             NarrationValue(rendered='12.5', expression='price'),
         ],
     )
-    out = grouping._templatize_narration(narration, param_names=['cup_size'])
+    out = templatize.templatize_narration(narration, param_names=['cup_size'])
     placeholder = out.parts[1]
     assert isinstance(placeholder, NarrationPlaceholder)
     assert (placeholder.name, placeholder.column_id) == ('cup_size', 'cup_size')
@@ -2342,8 +2342,8 @@ def test_a_param_cell_falls_back_when_the_value_refuses_the_format() -> None:
             return 'awkward'
 
     value = _Awkward()
-    assert grouping._param_cell(value, (None, '.2f')) == 'awkward'
-    assert grouping._param_cell(value, None) == 'awkward'
+    assert columns.param_cell(value, (None, '.2f')) == 'awkward'
+    assert columns.param_cell(value, None) == 'awkward'
 
 
 def test_a_format_that_reads_like_the_plain_cell_adds_no_column() -> None:
