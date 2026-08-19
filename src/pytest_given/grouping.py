@@ -261,13 +261,20 @@ def _check_rebound_params(
 ) -> None:
     """Rule 3: an expression that matches a parametrize name but not its value.
 
-    A param match discards `rendered` and renders from the cell instead, so
-    rebinding the name silently makes the report wrong for *every* case. Per
-    case, re-apply the interpolation's own conversion and format spec to that
-    case's **raw** parameter object and compare with what was recorded —
-    exactly what the t-string did at capture time, so a faithful interpolation
-    agrees for every type. Being a per-case check rather than a comparison, this
-    fires where no other rule can: a single-value parametrize still catches it.
+    A param match discards `rendered` and renders from the cell instead, so a
+    step narrating anything else silently makes the report wrong for *every*
+    case. Per case, re-apply the interpolation's own conversion and format spec
+    to that case's **raw** parameter object and compare with what was recorded
+    — exactly what the t-string did at capture time, so a faithful
+    interpolation agrees for every type. Being a per-case check rather than a
+    comparison, this fires where no other rule can: a single-value parametrize
+    still catches it.
+
+    What a mismatch proves is that the cell and the step disagree, not *why*.
+    A local rebinding the name is one cause; a body mutating the value in place
+    before narrating it is the other, since the cell holds the value as it
+    stood at fixture setup (see `_capture_param_spec`). The message offers both
+    remedies rather than asserting a cause it cannot tell apart.
     """
     params = dict(zip(spec.names, spec.values, strict=True))
     for _path, step in walk_steps(scenario.steps):
@@ -289,10 +296,14 @@ def _check_rebound_params(
             raise _grouping_error(
                 ctx.anchor,
                 f'{part.expression!r} in {_test_name(ctx.anchor)!r} matches a '
-                f'parametrize column but narrates a different value '
-                f'(case {case_suffix(scenario.id)} narrates {part.rendered!r}) '
-                f'— rebinding a parameter name makes the narration ambiguous. '
-                f'Rename the local.',
+                f'parametrize column but narrates a value that column does not '
+                f'hold (case {case_suffix(scenario.id)} narrates '
+                f'{part.rendered!r}) — the cell and the step would disagree, '
+                f'and row hover substitutes the cell into the slot the step '
+                f'rendered. Either a local rebinds the parametrize name, in '
+                f'which case rename the local; or the body mutates the value '
+                f'in place before narrating it, in which case bind the result '
+                f'to its own name and narrate that.',
             )
 
 

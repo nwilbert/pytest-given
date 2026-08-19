@@ -235,7 +235,7 @@ Four things worth knowing:
    |---|---|
    | A plain `str` (usually an f-string) whose text differs per case | Narrate with a t-string so the varying part is a placeholder, not case 1's text |
    | A varying interpolation that isn't a bare name — `t'{cup_size * 0.01}'`, `t'{m.balance}'` | Bind it to a local and narrate that local |
-   | An interpolation naming a parametrize column after the name was rebound, so it narrates a value the column doesn't hold | Rename the local |
+   | An interpolation naming a parametrize column that no longer holds the case's value | Rename the local that rebound the name — or, if the body mutated the value in place before narrating it, bind the result to its own name and narrate that |
    | A step whose set of `attach` labels differs between cases | Keep the label constant and let the content vary — that's what the attachment column is for |
    | A glossary term pill whose display differs between cases (unless the pill *is* the parametrize value) | Split the pill from the value: `given(t"{pg['Customer']} {name} places an order")` |
 
