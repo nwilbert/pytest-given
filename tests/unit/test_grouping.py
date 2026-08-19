@@ -2150,3 +2150,130 @@ def test_extra_occurrences_count_from_the_baseline_not_the_first_case() -> None:
             Attachment(label='log', content='c2'),
         ],
     ]
+
+
+# --- `param` cells carry the formatting their placeholders render with ---
+
+
+@scenario(
+    t'A {pg["Parameter table"].low} cell reads the way the {pg["Step"].low} '
+    t'that points at it read',
+    tags=['parametrization'],
+    story=adopt_pytest_given,
+)
+def test_a_formatted_param_cell_holds_the_text_the_step_narrated() -> None:
+    with given(t'two {pg["Case"]("cases")} narrating a parameter with a format spec'):
+        scenarios, info = _two_case_group(
+            [_param_value_step('200.00', spec='.2f')],
+            [_param_value_step('350.00', spec='.2f')],
+        )
+    with when(t'{pg["Group"]("grouping")} builds the {pg["Parameter table"].low}'):
+        [grouped] = group_parametrized(scenarios, info)
+    with then('each cell carries the formatted text, under one column'):
+        assert grouped.parameters is not None
+        assert [c.name for c in grouped.parameters.columns] == ['cup_size']
+        assert [case.values for case in grouped.parameters.cases] == [
+            ['200.00'],
+            ['350.00'],
+        ]
+    with then('the step keeps its placeholder, which that cell substitutes into'):
+        assert grouped.steps[0].narration.text == 'the machine brews {cup_size} ml'
+
+
+def test_a_param_conversion_reaches_the_cell_too() -> None:
+    """`!r` is a formatting like any other: the cell has to carry it."""
+    scenarios, info = _two_case_group(
+        [_param_value_step('200', conv='r')], [_param_value_step('350', conv='r')]
+    )
+    [grouped] = group_parametrized(scenarios, info)
+    assert grouped.parameters is not None
+    assert [case.values for case in grouped.parameters.cases] == [['200'], ['350']]
+
+
+def test_two_steps_formatting_one_param_differently_each_get_a_column() -> None:
+    """No single cell can serve both slots, so the column keeps its plain value
+    and each slot is promoted like any other varying value — the ` #2` suffix
+    keeping each token pointed at the column that holds its own text."""
+    scenarios, info = _two_case_group(
+        [
+            _param_value_step('200.00', spec='.2f'),
+            _param_value_step('   200', spec='>6'),
+        ],
+        [
+            _param_value_step('350.00', spec='.2f'),
+            _param_value_step('   350', spec='>6'),
+        ],
+    )
+    [grouped] = group_parametrized(scenarios, info)
+    assert grouped.parameters is not None
+    assert [(c.name, c.kind) for c in grouped.parameters.columns] == [
+        ('cup_size', 'param'),
+        ('cup_size #2', 'derived'),
+        ('cup_size #3', 'derived'),
+    ]
+    assert [case.values for case in grouped.parameters.cases] == [
+        [200, '200.00', '   200'],
+        [350, '350.00', '   350'],
+    ]
+    assert grouped.steps[0].narration.text == 'the machine brews {cup_size #2} ml'
+    assert grouped.steps[1].narration.text == 'the machine brews {cup_size #3} ml'
+
+
+def test_a_param_read_plainly_in_one_step_and_formatted_in_another() -> None:
+    """The trivial formatting counts as one of the two disagreeing ones: the
+    plain slot keeps the column and the formatted slot takes its own."""
+    scenarios, info = _two_case_group(
+        [_param_value_step('200'), _param_value_step('200.00', spec='.2f')],
+        [_param_value_step('350'), _param_value_step('350.00', spec='.2f')],
+    )
+    [grouped] = group_parametrized(scenarios, info)
+    assert grouped.parameters is not None
+    assert [(c.name, c.kind) for c in grouped.parameters.columns] == [
+        ('cup_size', 'param'),
+        ('cup_size #2', 'derived'),
+    ]
+    assert [case.values for case in grouped.parameters.cases] == [
+        [200, '200.00'],
+        [350, '350.00'],
+    ]
+    assert grouped.steps[0].narration.text == 'the machine brews {cup_size} ml'
+    assert grouped.steps[1].narration.text == 'the machine brews {cup_size #2} ml'
+
+
+def test_a_param_cell_falls_back_when_the_value_refuses_the_format() -> None:
+    """A value whose own rendering raises could not have been narrated through
+    that spec either, so there is nothing for the cell to agree with — the
+    plain coercion is the honest fallback rather than an aborted session."""
+
+    class _Awkward:
+        def __format__(self, spec: str) -> str:
+            if spec:
+                raise ValueError('no')
+            return 'awkward'
+
+        def __str__(self) -> str:
+            return 'awkward'
+
+    value = _Awkward()
+    assert grouping._param_cell(value, (None, '.2f')) == 'awkward'
+    assert grouping._param_cell(value, None) == 'awkward'
+
+
+def test_a_format_that_reads_like_the_plain_cell_adds_no_column() -> None:
+    """Promotion keys on the rendered text, not on the presence of a spec:
+    `{cup_size:d}` reads exactly as the plain cell does, so the slot keeps
+    pointing at the column it already agrees with."""
+    scenarios, info = _two_case_group(
+        [_param_value_step('200'), _param_value_step('200', spec='d')],
+        [_param_value_step('350'), _param_value_step('350', spec='d')],
+    )
+    [grouped] = group_parametrized(scenarios, info)
+    assert grouped.parameters is not None
+    assert [(c.name, c.kind) for c in grouped.parameters.columns] == [
+        ('cup_size', 'param')
+    ]
+    assert [case.values for case in grouped.parameters.cases] == [[200], [350]]
+    assert [s.narration.text for s in grouped.steps] == [
+        'the machine brews {cup_size} ml',
+        'the machine brews {cup_size} ml',
+    ]
