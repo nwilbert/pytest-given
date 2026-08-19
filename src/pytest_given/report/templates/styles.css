@@ -125,6 +125,42 @@ body {
   letter-spacing: 0.5px;
   margin-bottom: var(--space-sm);
 }
+/* The sort control shares the caption line with the section label. It stays
+   in the label's own register — no box, no fill — so the section keeps a
+   single bordered control (the browse-axis segments below it): choosing an
+   axis is the decision, ordering it is a modifier. Selection is marked the
+   way the top-level tabs mark it (accent text over an accent rule), not the
+   way filters do (tint + border) — sorting narrows nothing. */
+.sidebar-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+.sort-toggle { display: flex; gap: var(--space-md); }
+.sort-btn {
+  background: none;
+  border: none;
+  border-bottom: 1.5px solid transparent;
+  padding: 0 0 1px;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sort-btn:hover { color: var(--color-accent-text); }
+.sort-btn-active {
+  color: var(--color-accent-text);
+  border-bottom-color: var(--color-accent);
+}
+.sort-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
 
 /* Status filter pills */
 .status-pills { display: flex; gap: var(--space-xs); }

@@ -174,7 +174,19 @@
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">Browse by</div>
+      <div class="sidebar-label-row">
+        <div class="sidebar-label">Browse by</div>
+        {#- Sort applies to the group rows below, whatever axis is showing:
+            "A–Z" reads the name column, "Count" the count column. -#}
+        <div class="sort-toggle">
+          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'name' }"
+                  :aria-pressed="sortBy === 'name'" @click="sortBy = 'name'"
+                  aria-label="Sort groups by name">A&ndash;Z</button>
+          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'count' }"
+                  :aria-pressed="sortBy === 'count'" @click="sortBy = 'count'"
+                  aria-label="Sort groups by scenario count">Count</button>
+        </div>
+      </div>
       <div class="seg-toggle">
         <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
         {#- The Terms axis needs a glossary to browse; without one the segment

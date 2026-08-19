@@ -46,6 +46,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
   itself toggles, and the header chip carries the real dismiss button — and
   a header chip and the sidebar row it mirrors now share one shape, instead of
   the chip carrying the pill radius used by tags and status.
+- The sidebar's browse list can be ordered by group size as well as by name,
+  via an **A–Z / Count** toggle on the Browse-by line.
 
 ### Fixed
 

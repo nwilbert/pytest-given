@@ -132,6 +132,42 @@ body {
   letter-spacing: 0.5px;
   margin-bottom: var(--space-sm);
 }
+/* The sort control shares the caption line with the section label. It stays
+   in the label's own register — no box, no fill — so the section keeps a
+   single bordered control (the browse-axis segments below it): choosing an
+   axis is the decision, ordering it is a modifier. Selection is marked the
+   way the top-level tabs mark it (accent text over an accent rule), not the
+   way filters do (tint + border) — sorting narrows nothing. */
+.sidebar-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+.sort-toggle { display: flex; gap: var(--space-md); }
+.sort-btn {
+  background: none;
+  border: none;
+  border-bottom: 1.5px solid transparent;
+  padding: 0 0 1px;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sort-btn:hover { color: var(--color-accent-text); }
+.sort-btn-active {
+  color: var(--color-accent-text);
+  border-bottom-color: var(--color-accent);
+}
+.sort-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
 
 /* Status filter pills */
 .status-pills { display: flex; gap: var(--space-xs); }
@@ -1124,7 +1160,16 @@ span.param-highlight {
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">Browse by</div>
+      <div class="sidebar-label-row">
+        <div class="sidebar-label">Browse by</div><div class="sort-toggle">
+          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'name' }"
+                  :aria-pressed="sortBy === 'name'" @click="sortBy = 'name'"
+                  aria-label="Sort groups by name">A&ndash;Z</button>
+          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'count' }"
+                  :aria-pressed="sortBy === 'count'" @click="sortBy = 'count'"
+                  aria-label="Sort groups by scenario count">Count</button>
+        </div>
+      </div>
       <div class="seg-toggle">
         <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
         <div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
@@ -1235,7 +1280,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1296,7 +1341,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1340,7 +1385,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1386,7 +1431,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
       
     </div>
     </div>
@@ -1458,7 +1503,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L151">examples/coffeeshop/test_coffeeshop.py:151</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L151">examples/coffeeshop/test_coffeeshop.py:151</a></div>
       
     </div>
     </div>
@@ -1555,7 +1600,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L164">examples/coffeeshop/test_coffeeshop.py:164</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L164">examples/coffeeshop/test_coffeeshop.py:164</a></div>
       
     </div>
     </div>
@@ -1605,7 +1650,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L198">examples/coffeeshop/test_coffeeshop.py:198</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L198">examples/coffeeshop/test_coffeeshop.py:198</a></div>
       
     </div>
     </div>
@@ -1665,7 +1710,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
@@ -1689,7 +1734,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">60ms</span>
+        <span class="scenario-duration">62ms</span>
       </span>
     </div>
 
@@ -1765,7 +1810,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L231">examples/coffeeshop/test_coffeeshop.py:231</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L231">examples/coffeeshop/test_coffeeshop.py:231</a></div>
       
     </div>
     </div>
@@ -1808,7 +1853,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L237">examples/coffeeshop/test_coffeeshop.py:237</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L237">examples/coffeeshop/test_coffeeshop.py:237</a></div>
       
     </div>
     </div>
@@ -1958,7 +2003,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -2060,7 +2105,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -2160,7 +2205,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
       
     </div>
     </div>
@@ -2362,7 +2407,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L104">examples/coffeeshop/test_coffeeshop.py:104</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L104">examples/coffeeshop/test_coffeeshop.py:104</a></div>
       
     </div>
     </div>
@@ -2454,7 +2499,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9af90c79c73b2e6cde4811c15afbcd71a26536c6/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/9cefe05723e503a818c530d691b65651f9b409d1/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
       
     </div>
     </div>
@@ -2485,10 +2530,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-19T17:59:23.341764+00:00",
+    "timestamp": "2026-08-19T18:08:46.676444+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "9af90c79c73b2e6cde4811c15afbcd71a26536c6"
+    "commit_sha": "9cefe05723e503a818c530d691b65651f9b409d1"
   },
   "scenarios": [
     {
@@ -3313,7 +3358,7 @@ window.__REPORT_DATA__ = {
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 60,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -4119,6 +4164,10 @@ function reportApp() {
     // without one have no Terms segment, so they open on Tags.
     view: hasGlossary ? 'terms' : 'tags',
     mainView: 'scenarios',
+    // How the browse tree orders its groups: 'name' alphabetically, 'count'
+    // by how many scenarios each holds. Ephemeral like `view` above — the
+    // hash carries filters, which change what you see, not the reading order.
+    sortBy: 'name',
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
@@ -4232,10 +4281,14 @@ function reportApp() {
       }
       // Selected groups pin to the top so what you filtered by stays in view
       // — arriving from the Glossary tab, the term you came for is the first
-      // row rather than somewhere down the list. The rest read alphabetically,
-      // the same on all three axes.
+      // row rather than somewhere down the list. Below that pin, the sort
+      // toggle decides, the same on all three axes: alphabetical for looking
+      // a name up, biggest-first for seeing where the coverage sits (ties
+      // still alphabetical, so equal-sized groups keep a stable reading order).
+      const byCount = this.sortBy === 'count';
       return Object.values(grouped).sort((a, b) =>
         (this.isGroupActive(a) ? 0 : 1) - (this.isGroupActive(b) ? 0 : 1)
+        || (byCount ? b.scenarios.length - a.scenarios.length : 0)
         || a.name.localeCompare(b.name));
     },
     _matchesFilters(s) {

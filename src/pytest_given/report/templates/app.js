@@ -52,6 +52,10 @@ function reportApp() {
     // without one have no Terms segment, so they open on Tags.
     view: hasGlossary ? 'terms' : 'tags',
     mainView: 'scenarios',
+    // How the browse tree orders its groups: 'name' alphabetically, 'count'
+    // by how many scenarios each holds. Ephemeral like `view` above — the
+    // hash carries filters, which change what you see, not the reading order.
+    sortBy: 'name',
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
@@ -165,10 +169,14 @@ function reportApp() {
       }
       // Selected groups pin to the top so what you filtered by stays in view
       // — arriving from the Glossary tab, the term you came for is the first
-      // row rather than somewhere down the list. The rest read alphabetically,
-      // the same on all three axes.
+      // row rather than somewhere down the list. Below that pin, the sort
+      // toggle decides, the same on all three axes: alphabetical for looking
+      // a name up, biggest-first for seeing where the coverage sits (ties
+      // still alphabetical, so equal-sized groups keep a stable reading order).
+      const byCount = this.sortBy === 'count';
       return Object.values(grouped).sort((a, b) =>
         (this.isGroupActive(a) ? 0 : 1) - (this.isGroupActive(b) ? 0 : 1)
+        || (byCount ? b.scenarios.length - a.scenarios.length : 0)
         || a.name.localeCompare(b.name));
     },
     _matchesFilters(s) {
