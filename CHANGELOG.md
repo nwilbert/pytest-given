@@ -39,12 +39,22 @@ form `## [x.y.z] - YYYY-MM-DD`.
   alphabetically, with whatever is selected pinned to the top so the group you
   filtered by stays in view. Nothing dims any more — with filters that
   compose, greying the rest marked as unavailable exactly the groups worth
-  clicking next.
+  clicking next. A selected group is now tinted and outlined rather than
+  filled solid, so several selected rows read as separate filters instead of
+  fusing into one block, and the treatment matches the status pills and
+  segments beside it.
 
 ### Fixed
 
 - The active-term chip in the Scenarios header now shows the term's canonical
   name (`File glossary`) instead of its slug id (`file-glossary`).
+- Accent-coloured text across the HTML report now meets WCAG AA. The brand
+  accent measured 3.95:1 on its own tint (filter chips, tag pills, the
+  Browse-by segments, the selected story) and 4.27:1 on the page background
+  (the active view tab, and the collapse-all and term-reference hovers), both
+  under the 4.5:1 floor. Those surfaces now use a darkened accent — 5.65:1 and
+  6.11:1 — while the brand colour stays as borders and glyphs, where the 3:1
+  threshold for UI components applies.
 - Jumping to a scenario from a story activity, or to a term's scenarios from
   the Glossary tab, now clears the filters already applied in the Scenarios
   view. Previously the target could land behind a filter that hid it, leaving
