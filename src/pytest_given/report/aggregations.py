@@ -4,6 +4,7 @@ Helpers exposed:
   - `build_coverage_maps`        — per-scenario activity coverage dicts
   - `build_story_rollups`        — per-story scenarios + per-activity rollup
   - `build_scenario_activity_index` — per-scenario sorted activity ids
+  - `build_activity_labels`      — per-activity plain-text prose label
   - `build_glossary_aggregations` — per-term instance/form/story aggregations
   - `build_term_scenario_index`  — per-term scenario ids
   - `build_scenario_slug_index` — per-scenario short URL-fragment slug
@@ -17,6 +18,7 @@ from dataclasses import dataclass, field
 
 from ..model import (
     ActivityId,
+    ActivityPath,
     ActivityTermRef,
     NarrationTermRef,
     NodeId,
@@ -39,6 +41,19 @@ from .coverage import (
 # ---------------------------------------------------------------------------
 # Public dataclasses
 # ---------------------------------------------------------------------------
+
+
+type ActivityKey = str
+"""`'<story id>:<activity id>'` — an activity's handle outside its own story.
+
+Activity ids are per-story ints, so the story id has to travel with them
+wherever activities from different stories can meet: the report's activity
+filter, and the URL fragment that carries it.
+"""
+
+
+def activity_key(story_id: StoryId, activity_id: ActivityId) -> ActivityKey:
+    return f'{story_id}:{activity_id}'
 
 
 @dataclass
@@ -178,6 +193,31 @@ def build_scenario_activity_index(
 ) -> dict[NodeId, list[ActivityId]]:
     """For each scenario, the sorted list of activity ids it covers."""
     return {scn_id: sorted(amap.keys()) for scn_id, amap in coverage_maps.items()}
+
+
+def build_activity_labels(report: ReportData) -> dict[ActivityKey, str]:
+    """For each activity, its prose as plain text, keyed by `ActivityKey`.
+
+    Lets the report name an activity outside the story timeline — in the
+    Scenarios view's activity filter chip — where the numbered bubble that
+    identifies it in the timeline carries no meaning on its own.
+    """
+    return {
+        activity_key(story.id, activity.id): ' · '.join(
+            _path_text(path) for path in activity.paths
+        )
+        for story in report.stories
+        for activity in story.activities
+    }
+
+
+def _path_text(path: ActivityPath) -> str:
+    """One activity path as plain prose. Term refs read as their surface form,
+    the same word the timeline shows in a pill."""
+    return ' '.join(
+        part.display if isinstance(part, ActivityTermRef) else part.text
+        for part in path.parts
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -245,6 +245,12 @@
           <button type="button" class="filter-chip-x" @click="removeTermFilter(termId)" aria-label="Clear term filter">×</button>
         </span>
       </template>
+      {#- The activity label is a whole sentence, so it truncates and carries
+          the full prose in a title rather than pushing the chips off the row. -#}
+      <span class="filter-chip" x-show="activityFilter" x-cloak>
+        <span class="filter-chip-text" x-text="activityLabel(activityFilter)" :title="activityLabel(activityFilter)"></span>
+        <button type="button" class="filter-chip-x" @click="clearActivityFilter()" aria-label="Clear activity filter">×</button>
+      </span>
       <button class="collapse-all-btn" @click="toggleAllScenarios()">
         <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
         <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
@@ -467,6 +473,14 @@
               {% else %}
               {% set cov_class = 'cov-passed' if (cov.failed == 0 and cov.skipped == 0) else ('cov-failed' if cov.failed == cov.total else 'cov-mixed') %}
               <span class="cov-chip {{ cov_class }}">{{ cov.total }} scenario{{ 's' if cov.total != 1 else '' }}{% if cov.failed %} · {{ cov.failed }} failing{% endif %}{% if cov.skipped %} · {{ cov.skipped }} skipped{% endif %}</span>
+              {% endif %}
+              {#- Revealed by CSS once the row is selected (see .activity-jump),
+                  so the row keeps one meaning per click: the row selects, this
+                  leaves for the Scenarios view. Only where there is something
+                  to show — an uncovered activity would land on an empty list. -#}
+              {% if cov.eligible and cov.total %}
+              <button type="button" class="use-chip activity-jump"
+                      data-activity-jump="{{ story.id }}:{{ activity.id }}">Open in Scenarios <span aria-hidden="true">→</span></button>
               {% endif %}
             </div>
           </div>
@@ -709,6 +723,8 @@ window.__REPORT_DATA__ = {{ report_json }};
 window.__storyIds = {{ story_ids_json }};
 window.__termIds = {{ term_ids_json }};
 window.__termScenarios = {{ term_scenarios_json }};
+window.__scenarioActivities = {{ scenario_activities_json }};
+window.__activityLabels = {{ activity_labels_json }};
 window.__scenarioSlugs = {{ scenario_slugs_json }};
 {{ app_js }}
 </script>

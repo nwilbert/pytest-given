@@ -1017,7 +1017,7 @@
 - **then** the step carries a single «Term ref» pill
 
 ## ✓ The «glossary» view aggregates «instances» and «verb» forms
-`tests/unit/report/test_aggregations.py:165::test_build_glossary_aggregations_collects_instances_and_forms`
+`tests/unit/report/test_aggregations.py:166::test_build_glossary_aggregations_collects_instances_and_forms`
 
 - **given** a «Report» whose «Story» and «Scenario» reference entity «Instance»s and an «Inflection»
   - 📎 Report data:
@@ -1146,53 +1146,60 @@
 - **then** the verb collects its «Inflection» but not its canonical form
 
 ## ✓ «Terms» referenced by an «activity» record the «story»
-`tests/unit/report/test_aggregations.py:269::test_build_glossary_aggregations_records_story_refs_via_activities`
+`tests/unit/report/test_aggregations.py:270::test_build_glossary_aggregations_records_story_refs_via_activities`
 
 - **given** a «Story» whose «Activity» references an actor and a verb
 - **when** the «Glossary» aggregations are built
 - **then** the actor and the verb each list that «Story»
 
 ## ✓ A canonical entity reference is not an «instance»
-`tests/unit/report/test_aggregations.py:339::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
+`tests/unit/report/test_aggregations.py:340::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
 
 - **given** a «Story» activity and a «Step» referencing entities by canonical name only
 - **when** the «Glossary» aggregations are built
 - **then** neither entity term records an «Instance»
 
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_aggregations.py:427::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
+`tests/unit/report/test_aggregations.py:428::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
 
 - **given** a «Kindless» «Term» referenced by a «Story» activity
 - **when** the «Glossary» aggregations are built
 - **then** the «Term» lists the «Story» but no «Instance» and no «Inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_aggregations.py:460::test_glossary_aggregations_annotates_fixture_provenance`
+`tests/unit/report/test_aggregations.py:461::test_glossary_aggregations_annotates_fixture_provenance`
 
 - **given** a «Scenario» whose fixture-sourced «Step» names an «Instance»
 - **when** the «Glossary» aggregations are built
 - **then** the «Instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_aggregations.py:553::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
+`tests/unit/report/test_aggregations.py:554::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
 
 - **given** a «Scenario» referencing one «Term» in two steps and another in its name
 - **when** the term-scenario index is built
 - **then** each «Term» maps to the scenario exactly once
 
 ## ✓ An under-anchored «activity» is flagged ineligible in rollups
-`tests/unit/report/test_aggregations.py:665::test_build_story_rollups_flags_under_anchored_activity_ineligible`
+`tests/unit/report/test_aggregations.py:666::test_build_story_rollups_flags_under_anchored_activity_ineligible`
 
 - **given** a «Story» with an anchored and an under-anchored «Activity»
 - **when** the story rollups are built
 - **then** only the anchored «Activity» is «Coverage»-eligible
 
 ## ✓ A divergent «case» contributes no «Instance» to the «glossary»
-`tests/unit/report/test_aggregations.py:778::test_glossary_view_omits_a_divergent_cases_instance` · parametrization
+`tests/unit/report/test_aggregations.py:779::test_glossary_view_omits_a_divergent_cases_instance` · parametrization
 
 - **given** a «Parametrized scenario» whose second «Case» diverged
 - **when** the «Glossary» aggregations are built
 - **then** only the «Case» the grouped tree speaks for is listed
+
+## ✓ an «Activity» is labelled by the prose of its «paths»
+`tests/unit/report/test_aggregations.py:849::test_build_activity_labels_joins_parts_into_prose`
+
+- **given** a «Story» with a two-«path» «activity»
+- **when** the «activity» labels are built
+- **then** the label reads as prose under a story-scoped key, with the «path» texts joined
 
 ## ✓ A «verb» «activity» ref has one identity regardless of «inflection»
 `tests/unit/report/test_coverage.py:72::test_identity_of_activity_term_ref_verb_ignores_display`

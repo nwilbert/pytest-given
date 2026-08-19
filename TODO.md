@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] improve navigation from story activities to scenarios, similar to glossary term filters
 - [ ] continue work on the story-diagrams branch
 
 ## Next

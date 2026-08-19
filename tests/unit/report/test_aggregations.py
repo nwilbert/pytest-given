@@ -27,6 +27,7 @@ from pytest_given.model import (
     report_to_dict,
 )
 from pytest_given.report.aggregations import (
+    build_activity_labels,
     build_coverage_maps,
     build_glossary_aggregations,
     build_scenario_slug_index,
@@ -843,3 +844,59 @@ def test_a_pill_is_not_listed_for_a_case_that_has_no_value_for_it() -> None:
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
     aggs = build_glossary_aggregations(rd)
     assert TermId('guest') not in aggs
+
+
+@scenario(
+    t'an {pg["Activity"]} is labelled by the prose of its {pg["Path"]("paths")}',
+)
+def test_build_activity_labels_joins_parts_into_prose() -> None:
+    with given(t'a {pg["Story"]} with a two-{pg["Path"].low} {pg["Activity"].low}'):
+        activity = Activity(
+            id=ActivityId(3),
+            paths=(
+                ActivityPath(
+                    parts=(
+                        _ent('guest', 'Carol'),
+                        _verb_part('search'),
+                        ActivityWord(text='for'),
+                        _ent('room', 'Room'),
+                    )
+                ),
+                ActivityPath(parts=(_ent('guest', 'Bob'), _verb_part('search'))),
+            ),
+        )
+        story = Story(id=StoryId('book'), title='Book', activities=(activity,))
+        rd = ReportData(metadata=_meta(), stories=[story], glossary=_g())
+    with when(t'the {pg["Activity"].low} labels are built'):
+        labels = build_activity_labels(rd)
+    with then(
+        t'the label reads as prose under a story-scoped key, '
+        t'with the {pg["Path"].low} texts joined'
+    ):
+        assert labels == {'book:3': 'Carol search for Room · Bob search'}
+
+
+def test_build_activity_labels_keys_same_numbered_activities_per_story() -> None:
+    """Activity ids are per-story ints: two stories both have an activity 1, so
+    the key has to carry the story id to keep them apart."""
+    parts = (_ent('guest', 'Guest'), _verb_part('search'))
+    first = Story(
+        id=StoryId('book'),
+        title='Book',
+        activities=(Activity(id=ActivityId(1), paths=(ActivityPath(parts=parts),)),),
+    )
+    second = Story(
+        id=StoryId('cancel'),
+        title='Cancel',
+        activities=(
+            Activity(
+                id=ActivityId(1),
+                paths=(
+                    ActivityPath(parts=(_ent('guest', 'Guest'), _verb_part('cancel'))),
+                ),
+            ),
+        ),
+    )
+    rd = ReportData(metadata=_meta(), stories=[first, second], glossary=_g())
+    labels = build_activity_labels(rd)
+    assert labels == {'book:1': 'Guest search', 'cancel:1': 'Guest cancel'}

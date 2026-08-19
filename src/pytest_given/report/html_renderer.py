@@ -24,6 +24,7 @@ from ..model import (
     report_to_dict,
 )
 from .aggregations import (
+    build_activity_labels,
     build_coverage_maps,
     build_glossary_aggregations,
     build_scenario_activity_index,
@@ -119,6 +120,7 @@ def render_html(
     glossary_aggregations = build_glossary_aggregations(report)
     story_rollups = build_story_rollups(report, coverage_maps)
     scn_covers = build_scenario_activity_index(coverage_maps)
+    activity_labels = build_activity_labels(report)
     visibility = tab_visibility(report)
 
     story_ids_json = _script_json([story.id for story in report.stories])
@@ -127,6 +129,8 @@ def render_html(
         if report.glossary is not None
         else []
     )
+    scenario_activities_json = _script_json(scn_covers)
+    activity_labels_json = _script_json(activity_labels)
     term_scenario_index = build_term_scenario_index(report)
     term_scenarios_json = _script_json(term_scenario_index)
     scenario_slugs = build_scenario_slug_index(report)
@@ -151,6 +155,8 @@ def render_html(
         tab_visibility=visibility,
         story_rollups=story_rollups,
         scn_covers=scn_covers,
+        scenario_activities_json=scenario_activities_json,
+        activity_labels_json=activity_labels_json,
         report_json=Markup(safe_report_json),
         story_ids_json=story_ids_json,
         term_ids_json=term_ids_json,

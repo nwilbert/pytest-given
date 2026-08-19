@@ -23,7 +23,13 @@ function deserializeView(params) {
 function deserializeStory(params) {
   const s = params.get('story');
   const ids = window.__storyIds || [];
-  return (s && ids.includes(s)) ? s : (ids[0] || null);
+  if (s && ids.includes(s)) return s;
+  // An activity filter names the story it came from. A pasted `#activity-filter=`
+  // link carries no `story=` (the Scenarios view doesn't write one), so read it
+  // from the filter — otherwise the Stories tab opens on an unrelated story.
+  const fromFilter = (params.get('activity-filter') || '').split(':')[0];
+  if (ids.includes(fromFilter)) return fromFilter;
+  return ids[0] || null;
 }
 
 // --- Alpine app ---
@@ -37,6 +43,10 @@ function reportApp() {
   const data = window.__REPORT_DATA__;
   const storyIds = window.__storyIds || [];
   const glossaryTerms = (data.glossary && data.glossary.terms) || [];
+  // Scenario -> covered activity ids, and activity key -> its prose. The story
+  // markup paints that prose as pills, which is unreadable as a filter label.
+  const scenarioActivities = window.__scenarioActivities || {};
+  const activityLabels = window.__activityLabels || {};
   const hasGlossary = glossaryTerms.length > 0;
   // Term id -> canonical display name, for the Terms browse axis.
   const termNames = {};
@@ -74,6 +84,10 @@ function reportApp() {
     tagFilters: [],
     termFilters: [],
     moduleFilter: null,
+    // '<story id>:<activity id>', set by the jump from a story activity.
+    // Single-select: the Stories view is the only way in and every jump
+    // replaces the last, so a second one could never be selected.
+    activityFilter: null,
     _suppressHashWrite: false,
     highlightedActivities: {},
     get anyActivitiesHighlighted() {
@@ -123,7 +137,7 @@ function reportApp() {
       // while any of them is active.
       if (parts.length) return parts.join(' · ');
       const chipped = this.termFilters.length || this.tagFilters.length
-        || this.moduleFilter;
+        || this.moduleFilter || this.activityFilter;
       return chipped ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
@@ -199,6 +213,13 @@ function reportApp() {
           return false;
         }
       }
+      if (this.activityFilter) {
+        const [storyId, activityId] = this.activityFilter.split(':');
+        if (s.story_id !== storyId) return false;
+        if (!(scenarioActivities[s.id] || []).includes(Number(activityId))) {
+          return false;
+        }
+      }
       if (this.search) {
         const q = this.search.toLowerCase();
         const text = (s.narration.text + ' ' + s.tags.join(' ')).toLowerCase();
@@ -260,6 +281,7 @@ function reportApp() {
       this.tagFilters = [];
       this.termFilters = [];
       this.moduleFilter = null;
+      this.activityFilter = null;
       this.search = '';
       this.showPassed = true;
       this.showFailed = true;
@@ -283,6 +305,29 @@ function reportApp() {
       // Reveal the active term in the sidebar rather than landing on an
       // unrelated axis, mirroring what filterByTag does for tags.
       if (hasGlossary) this.view = 'terms';
+    },
+    filterScenariosByActivity(key) {
+      // Navigation, not refinement — the same rule filterScenariosByTerm
+      // follows: the activity arrives on its own rather than intersected with
+      // whatever the Scenarios view was already filtered by.
+      this.resetFilters();
+      this.activityFilter = key;
+      // Keep the timeline lit on the activity you left from, so the Stories
+      // tab is a way back rather than a fresh start.
+      this.highlightedActivities = { [key.split(':')[1]]: true };
+      this.mainView = 'scenarios';
+    },
+    clearActivityFilter() {
+      this.activityFilter = null;
+    },
+    activityLabel(key) {
+      if (!key) return '';
+      // Activities are numbered in the timeline, but the number means nothing
+      // in the Scenarios view — so the chip leads with the prose and keeps the
+      // number as the pointer back into the story.
+      const number = key.split(':')[1];
+      const text = activityLabels[key];
+      return text ? `Activity ${number}: ${text}` : `Activity ${number}`;
     },
     removeTermFilter(id) {
       this.termFilters = this.termFilters.filter(t => t !== id);
@@ -421,7 +466,7 @@ function reportApp() {
       // spam); discrete navigations/filters push a back-able entry. All writes
       // are suppressed while we're applying state FROM the hash (see _readHash).
       this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
-      ['tagFilters', 'termFilters', 'moduleFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+      ['tagFilters', 'termFilters', 'moduleFilter', 'activityFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
       this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
@@ -443,7 +488,17 @@ function reportApp() {
       document.addEventListener('click', (event) => {
         const chip = event.target.closest('[data-activity-id]');
         if (!chip) return;
+        // The row's jump control sits inside the row and has its own
+        // destination; selecting the row as well would fight it.
+        if (event.target.closest('[data-activity-jump]')) return;
         this.toggleActivityHighlight(chip.dataset.activityId);
+      });
+      // The selected activity row's jump control: filter the Scenarios view
+      // down to the scenarios covering that activity.
+      document.addEventListener('click', (event) => {
+        const jump = event.target.closest('[data-activity-jump]');
+        if (!jump) return;
+        this.filterScenariosByActivity(jump.dataset.activityJump);
       });
       // Story-view scenario card titles jump to the scenario in the Scenarios view.
       document.addEventListener('click', (event) => {
@@ -514,6 +569,8 @@ function reportApp() {
       } else {
         this.termFilters = [];
       }
+      if (params.has('activity-filter')) this.activityFilter = params.get('activity-filter');
+      else this.activityFilter = null;
       if (params.has('status')) {
         const shown = new Set(params.get('status').split(',').filter(Boolean));
         this.showPassed = shown.has('passed');
@@ -551,6 +608,7 @@ function reportApp() {
       if (this.tagFilters.length) params.set('tag', this.tagFilters.join(','));
       if (this.moduleFilter) params.set('module', this.moduleFilter);
       if (this.termFilters.length) params.set('term-filter', this.termFilters.join(','));
+      if (this.activityFilter) params.set('activity-filter', this.activityFilter);
 
       const present = new Set(data.scenarios.map(s => s.status));
       const shown = [];

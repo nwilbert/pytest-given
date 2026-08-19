@@ -2105,3 +2105,94 @@ def test_render_prefers_the_title_over_the_project(tmp_path: Path) -> None:
     content = html_path.read_text(encoding='utf-8')
     assert '<title>Coffee Shop Example — pytest-given Report</title>' in content
     assert '<div class="topbar-title">Coffee Shop Example</div>' in content
+
+
+def test_render_embeds_activity_filter_data(tmp_path: Path) -> None:
+    """The Scenarios view filters by activity in the browser, so the page has to
+    carry both directions as data: which activities each scenario covers, and
+    what each activity says. Neither is derivable from the story markup, which
+    only paints the activity's prose as pills inside the Stories view."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'glossary': {
+                    'terms': [
+                        {'id': 'guest', 'kind': 'actor', 'canonical': 'Guest'},
+                        {'id': 'search', 'kind': 'verb', 'canonical': 'search'},
+                        {'id': 'room', 'kind': 'object', 'canonical': 'Room'},
+                    ],
+                },
+                'stories': [
+                    {
+                        'id': 'book-a-room',
+                        'title': 'Book a Room',
+                        'activities': [
+                            {
+                                'id': 1,
+                                'paths': [
+                                    {
+                                        'parts': [
+                                            {'term_id': 'guest', 'display': 'Carol'},
+                                            {
+                                                'term_id': 'search',
+                                                'display': 'searches for',
+                                            },
+                                            {'term_id': 'room', 'display': 'Room'},
+                                        ]
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ],
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_x',
+                        'narration': _narration('Carol searches'),
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'story_id': 'book-a-room',
+                        'steps': [
+                            {
+                                'phase': 'when',
+                                'narration': _narration(
+                                    'Carol searches for a Room',
+                                    [
+                                        {'term_id': 'guest', 'display': 'Carol'},
+                                        {
+                                            'term_id': 'search',
+                                            'display': 'searches for',
+                                        },
+                                        {'term_id': 'room', 'display': 'Room'},
+                                    ],
+                                ),
+                                'status': 'passed',
+                                'children': [],
+                                'attachments': [],
+                                'error': None,
+                            }
+                        ],
+                        'parameters': None,
+                        'error': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert 'window.__scenarioActivities = {"test.py::test_x": [1]};' in content
+    assert (
+        'window.__activityLabels = {"book-a-room:1": "Carol searches for Room"};'
+        in content
+    )

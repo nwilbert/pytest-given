@@ -880,7 +880,7 @@ span.param-highlight {
 .activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 
 /* === Coverage chip === */
-.activity-cov { flex-shrink: 0; }
+.activity-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
 .cov-chip {
   display: inline-block;
   padding: 2px 8px;
@@ -1075,6 +1075,13 @@ span.param-highlight {
   white-space: nowrap;
   font-weight: 500;
 }
+.filter-chip-text {
+  display: block;
+  max-width: 34ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .filter-chip-x {
   background: none;
   border: none;
@@ -1087,6 +1094,22 @@ span.param-highlight {
   opacity: 0.7;
 }
 .filter-chip-x:hover { opacity: 1; }
+
+/* Selecting an activity row reveals its way out: the glossary hides the
+   equivalent action ("Show N scenarios using this term") behind expanding the
+   entry, and a selected row is this timeline's expanded state. Hidden rather
+   than dimmed so it is not a tab stop while it is out of reach. */
+.activity-jump {
+  display: none;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+.activity-row-highlight .activity-jump { display: inline-block; }
+.activity-jump:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
 
 /* === Activity highlighting (multi-select) === */
 /* selected activity's timeline row: light-blue card (same tint as scenarios) */

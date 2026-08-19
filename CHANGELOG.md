@@ -26,6 +26,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
   sharable URL carries.
 - The sidebar's browse list can be ordered by group size as well as by name,
   via an **A–Z / Count** toggle on the Browse-by line.
+- A selected activity in the Stories view offers **Open in Scenarios**, which
+  filters the Scenarios view down to the scenarios covering that activity.
 
 ### Changed
 
