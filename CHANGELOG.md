@@ -42,7 +42,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
   clicking next. A selected group is now tinted and outlined rather than
   filled solid, so several selected rows read as separate filters instead of
   fusing into one block, and the treatment matches the status pills and
-  segments beside it.
+  segments beside it. The `×` marker on a selected row is gone — the row
+  itself toggles, and the header chip carries the real dismiss button — and
+  a header chip and the sidebar row it mirrors now share one shape, instead of
+  the chip carrying the pill radius used by tags and status.
 
 ### Fixed
 

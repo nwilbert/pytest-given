@@ -193,7 +193,6 @@
             <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }" @click="onGroupClick(group)">
               <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
               <span class="nav-group-name" x-text="group.name"></span>
-              <span class="nav-group-dismiss" x-show="isGroupActive(group)">×</span>
               <span class="nav-group-count" x-text="group.scenarios.length"></span>
             </div>
             <template x-if="expandedGroups[group.id]">

@@ -185,7 +185,11 @@ body {
 /* Navigation tree */
 .nav-tree { font-size: var(--font-size-base); margin-top: var(--space-md); }
 .nav-group {
-  padding: 5px var(--space-xs);
+  /* Same vertical inset as a filter chip, so a selected row and the chip it
+     mirrors come out near enough the same height (26px against 24px — the
+     row's text is a step larger). Also tightens the list: at 5px the rows
+     sat on a 34px pitch, loose for a 13px font. */
+  padding: 2px var(--space-xs);
   /* Bleed the row into the sidebar's own padding: the selected pill needs
      horizontal padding, but the label should stay aligned with the section
      heading above it. The 2px bottom margin keeps two selected rows from
@@ -231,7 +235,6 @@ body {
 .nav-group-active .nav-group-toggle { color: var(--color-accent); }
 .nav-group-active .nav-group-count { color: var(--color-accent-text); opacity: 0.75; }
 .nav-group-active .nav-group-name { font-weight: 600; }
-.nav-group-dismiss { font-size: 0.875rem; margin-left: var(--space-xs); opacity: 0.8; }
 /* padding-left keeps a minimum gap from the group name even when a wrapped
    name fills the row and the auto margin collapses to zero. */
 .nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); }
@@ -1031,9 +1034,15 @@ span.param-highlight {
   background: var(--color-accent-bg);
   color: var(--color-accent-text);
   border: 1px solid var(--color-accent);
-  border-radius: var(--radius-pill);
+  /* Matches the selected sidebar group rather than the pill radius used by
+     tags and status: a chip and a highlighted row are the same filter drawn
+     in two places, so they take the same shape. (A stadium radius also
+     scales with height, and these chips are taller than a tag pill, so the
+     shared pill token read markedly rounder here.) Symmetric padding for the
+     same reason: the extra left inset only existed to balance the curve. */
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
-  padding: 2px 8px 2px 10px;
+  padding: 2px 8px;
   white-space: nowrap;
   font-weight: 500;
 }
@@ -1125,7 +1134,6 @@ span.param-highlight {
           <div><div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }" @click="onGroupClick(group)">
               <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
               <span class="nav-group-name" x-text="group.name"></span>
-              <span class="nav-group-dismiss" x-show="isGroupActive(group)">×</span>
               <span class="nav-group-count" x-text="group.scenarios.length"></span>
             </div>
             <template x-if="expandedGroups[group.id]">
@@ -1227,7 +1235,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1288,7 +1296,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1332,7 +1340,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1378,7 +1386,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L81">examples/coffeeshop/test_coffeeshop.py:81</a></div>
       
     </div>
     </div>
@@ -1450,7 +1458,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L151">examples/coffeeshop/test_coffeeshop.py:151</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L151">examples/coffeeshop/test_coffeeshop.py:151</a></div>
       
     </div>
     </div>
@@ -1547,7 +1555,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L164">examples/coffeeshop/test_coffeeshop.py:164</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L164">examples/coffeeshop/test_coffeeshop.py:164</a></div>
       
     </div>
     </div>
@@ -1597,7 +1605,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L198">examples/coffeeshop/test_coffeeshop.py:198</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L198">examples/coffeeshop/test_coffeeshop.py:198</a></div>
       
     </div>
     </div>
@@ -1657,7 +1665,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
@@ -1757,7 +1765,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L231">examples/coffeeshop/test_coffeeshop.py:231</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L231">examples/coffeeshop/test_coffeeshop.py:231</a></div>
       
     </div>
     </div>
@@ -1800,7 +1808,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L237">examples/coffeeshop/test_coffeeshop.py:237</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L237">examples/coffeeshop/test_coffeeshop.py:237</a></div>
       
     </div>
     </div>
@@ -1950,7 +1958,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -2052,7 +2060,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -2152,7 +2160,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L92">examples/coffeeshop/test_coffeeshop.py:92</a></div>
       
     </div>
     </div>
@@ -2354,7 +2362,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L104">examples/coffeeshop/test_coffeeshop.py:104</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L104">examples/coffeeshop/test_coffeeshop.py:104</a></div>
       
     </div>
     </div>
@@ -2446,7 +2454,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ce4fdbd35a9b3940f2e47a757631425942a093de/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05b665a614d9ec53b3355425f22d6a9f548977d8/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
       
     </div>
     </div>
@@ -2477,10 +2485,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-19T17:37:08.966523+00:00",
+    "timestamp": "2026-08-19T17:52:54.950349+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "ce4fdbd35a9b3940f2e47a757631425942a093de"
+    "commit_sha": "05b665a614d9ec53b3355425f22d6a9f548977d8"
   },
   "scenarios": [
     {
