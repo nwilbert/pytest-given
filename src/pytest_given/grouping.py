@@ -603,7 +603,7 @@ def _check_constant_term_ref(
     phase: Phase,
     ctx: _GroupContext,
 ) -> None:
-    """Rule 5: a pill no parametrize column binds must read the same in every
+    """Rule 4: a pill no parametrize column binds must read the same in every
     case.
 
     Rejected rather than promoted: promotion would strip the pill out of the
