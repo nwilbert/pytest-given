@@ -61,6 +61,32 @@
       of the string literal — HTML-escaping does not stop that. Anything
       data-derived goes in a `data-*` attribute and is read via
       `$el.dataset.*`, as `data-tag` and `data-term-id` do. -#}
+  {%- macro attachment_icon() -%}
+    <svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>
+  {%- endmacro -%}
+
+  {#- Badge plus the payload it expands, keyed on `cell_id`. The step tree and
+      the case table both attach this way; only a promoted attachment differs,
+      having no payload of its own to expand. -#}
+  {#- A badge opens a payload, so it is operable: reachable by keyboard and
+      announced as a control, not as decorated text. -#}
+  {%- macro attachment_badge(cell_id, label) -%}
+    <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['{{ cell_id }}'] ? 'true' : 'false'"
+          @click="toggleAttachment('{{ cell_id }}')"
+          @keydown.enter.prevent="toggleAttachment('{{ cell_id }}')"
+          @keydown.space.prevent="toggleAttachment('{{ cell_id }}')">{{ attachment_icon() }}{{ label }}</span>
+  {%- endmacro -%}
+
+  {%- macro expandable_attachment(cell_id, label, content) -%}
+    {{ attachment_badge(cell_id, label) }}
+    <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
+      <div class="attachment-expand-inner">
+        <div class="attachment-content"><pre>{{ content }}</pre></div>
+      </div>
+    </div>
+  {%- endmacro -%}
+
   {%- macro render_step(step, step_id) -%}
   <div class="step-text">
     {%- if step.children and step.children | length > 0 -%}
@@ -83,14 +109,17 @@
   {%- endif -%}
   {%- if step.attachments -%}
     {%- for att in step.attachments -%}
+    {%- if att is attachment_ref -%}
     <div>
-      <span class="attachment-badge" @click="toggleAttachment('{{ step_id }}_att_{{ loop.index0 }}')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>{{ att.label }}</span>
-      <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ step_id }}_att_{{ loop.index0 }}'] }">
-        <div class="attachment-expand-inner">
-          <div class="attachment-content"><pre>{{ att.content }}</pre></div>
-        </div>
-      </div>
+      <span class="attachment-badge" data-param="{{ att.column_id }}"
+            @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
+            @mouseleave="setHoverParam(null, $event.currentTarget)">{{ attachment_icon() }}{{ att.label }}</span>
     </div>
+    {%- else -%}
+    <div>
+      {{ expandable_attachment(step_id ~ '_att_' ~ loop.index0, att.label, att.content) }}
+    </div>
+    {%- endif -%}
     {%- endfor -%}
   {%- endif -%}
   {%- if step.error -%}
@@ -251,38 +280,87 @@
       </div>
 
       {% if scenario.parameters %}
-      <table class="param-table">
+      {#- A table with an attachment column carries payload panels spanning its
+          full width, so it takes the card's width rather than its columns'.
+          A table without one stays as wide as its data. -#}
+      {% set has_attachment = scenario.parameters.columns | selectattr('kind', 'equalto', 'attachment') | list %}
+      <table class="param-table{% if has_attachment %} param-table--full{% endif %}">
         <thead>
           <tr>
-            {% for name in scenario.parameters.names %}
-            <th class="param-color-{{ param_color_map.get(name, 0) % num_param_colors }}" data-param="{{ name }}"
+            {% for col in scenario.parameters.columns %}
+            <th {% if col.kind != 'attachment' %}class="param-color-{{ param_color_map.get(col.name, 0) % num_param_colors }}" {% endif %}data-param="{{ col.id }}"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">{{ name }}</th>
+                @mouseleave="setHoverParam(null, $event.currentTarget)">{{ col.name }}</th>
             {% endfor %}
             <th style="text-align:right">status</th>
           </tr>
         </thead>
         <tbody>
           {% for case in scenario.parameters.cases %}
+          {%- set case_idx = loop.index0 -%}
           <tr class="{{ 'failed-row' if case.status == 'failed' else '' }}"
               @mouseenter="setHoverRow($event.currentTarget)"
               @mouseleave="clearHoverRow($event.currentTarget)">
-            {% for name, val in zip(scenario.parameters.names, case.values) %}
-            <td data-param="{{ name }}"
+            {% for col, val in zip(scenario.parameters.columns, case.values) %}
+            {% if col.kind == 'attachment' %}
+            <td data-param="{{ col.id }}"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">{{ val }}</td>
+                @mouseleave="setHoverParam(null, $event.currentTarget)">
+              {% if val %}
+              {# Keyed on the column's position, never on `col.id`: the id is report data and this lands inside an Alpine expression. #}
+              {{ attachment_badge('s' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0, col.name) }}
+              {% endif %}
+            </td>
+            {% else %}
+            {# `data-subst` only where the cell has something to substitute: a
+               generated column is blank for a case that recorded no value, and
+               substituting that blank would erase the step's {token} instead of
+               replacing it. A `param` cell always substitutes — `None` there is
+               a real parametrize value. #}
+            <td data-param="{{ col.id }}"{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}
+                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
+                @mouseleave="setHoverParam(null, $event.currentTarget)">{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
+            {% endif %}
             {% endfor %}
             <td style="text-align:right">
+              {% if case.divergent %}<span class="case-divergent" title="Steps differ from the other cases, so the grouped tree is not this one and its columns stay blank.">≠</span>{% endif %}
               {% if case.status == 'passed' %}<span class="dot-passed">✓</span>{% elif case.status == 'skipped' %}<span class="dot-skipped">○</span>{% else %}<span class="dot-failed">✗</span>{% endif %}
             </td>
           </tr>
           {% if case.error %}
           <tr>
-            <td colspan="{{ scenario.parameters.names | length + 1 }}">
+            <td colspan="{{ scenario.parameters.columns | length + 1 }}">
               {{ render_error(case.error) }}
             </td>
           </tr>
           {% endif %}
+          {#- A payload opens across the whole table rather than inside its
+              cell: an attachment is routinely wider than any column, and a
+              cell that holds one both squeezes the columns beside it (the
+              collapsed content still sizes the column) and clips what it
+              cannot fit. -#}
+          {% for col, val in zip(scenario.parameters.columns, case.values) %}
+          {% if col.kind == 'attachment' and val %}
+          {% set cell_id = 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0 %}
+          <tr class="attachment-panel-row">
+            <td class="attachment-panel" colspan="{{ scenario.parameters.columns | length + 1 }}">
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-panel-body">
+                    {#- The column name alone: the panel opens under its own
+                        row, so the case is already on screen — unlike a Markdown
+                        block, which is collected below the whole table and needs
+                        the case key to say where it belongs. What the caption is
+                        for is telling two panels open on one row apart. -#}
+                    <div class="attachment-panel-label">{{ col.name }}</div>
+                    <div class="attachment-content"><pre>{{ val.content }}</pre></div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
           {% endfor %}
         </tbody>
       </table>

@@ -1,6 +1,6 @@
 """Scenario ↔ story-activity coverage matching."""
 
-from collections.abc import Iterable
+from collections.abc import Mapping
 from typing import NamedTuple
 
 from ..model import (
@@ -17,6 +17,7 @@ from ..model import (
     Story,
     TermId,
     id_derive,
+    walk_steps,
 )
 
 
@@ -87,11 +88,19 @@ def is_coverage_eligible(activity: Activity) -> bool:
     return len(term_ids) >= 2
 
 
-def s_for_step(glossary: Glossary, step: Step) -> set[Identity]:
+def s_for_step(
+    glossary: Glossary,
+    step: Step,
+    substitutions: Mapping[str, str] | None = None,
+) -> set[Identity]:
     """Identity set contributed by a step's narration term refs.
 
     Applies the canonical-fallback rule: entity instance refs contribute
     both their specific identity and the canonical (term_id, None).
+
+    `substitutions` maps a parametrize column name to the display that column
+    holds for one case; a pill bound to that column reads that display instead
+    of the baseline's, so a grouped scenario can be matched case by case.
     """
     out: set[Identity] = set()
     for part in step.narration.parts:
@@ -103,7 +112,10 @@ def s_for_step(glossary: Glossary, step: Step) -> set[Identity]:
         if term.kind == 'verb':
             out.add(Identity(term_id=part.term_id, instance_id=None))
             continue
-        inst_id = instance_id_of(glossary, part.term_id, part.display)
+        display = pill_display(part, substitutions)
+        if display is None:
+            continue
+        inst_id = instance_id_of(glossary, part.term_id, display)
         if inst_id is None:
             out.add(Identity(term_id=part.term_id, instance_id=None))
         else:
@@ -131,6 +143,10 @@ def compute_coverage(
     per scenario: per step, the candidate set narrows to activities sharing
     at least one identity with the step's `s_for_step`, replacing the prior
     O(|activities|) inner scan with O(|s_cache| + |candidates|).
+
+    A grouped scenario is matched once per case (see `param_case_displays`),
+    so a term pill bound to a parametrize column is checked against every
+    case's display, not only the baseline's.
     """
     scope = (
         set(scenario.activity_ids)
@@ -147,6 +163,11 @@ def compute_coverage(
         for ident in refs:
             identity_to_activities.setdefault(ident, set()).add(aid)
 
+    # `[None]` when no case speaks for itself: one pass over the grouped tree
+    # as it stands, which is what an unparametrized scenario gets.
+    passes: list[Mapping[str, str] | None] = list(param_case_displays(scenario)) or [
+        None
+    ]
     result: dict[ActivityId, set[StepRef]] = {}
     for path_index, step in walk_steps(scenario.steps):
         ref: StepRef = (scenario.id, path_index)
@@ -155,21 +176,77 @@ def compute_coverage(
                 if aid in refs_by_activity:
                     result.setdefault(aid, set()).add(ref)
             continue
-        s_cache = s_for_step(glossary, step)
-        candidates: set[ActivityId] = set()
-        for ident in s_cache:
-            candidates |= identity_to_activities.get(ident, set())
-        for aid in candidates:
-            if refs_by_activity[aid].issubset(s_cache):
-                result.setdefault(aid, set()).add(ref)
+        # Match once per case and union the *matches*, never the identity sets:
+        # a grouped identity set would let a step satisfy an activity by
+        # combining one case's Alice with another's latte, which no single case
+        # satisfies.
+        for substitutions in passes:
+            s_cache = s_for_step(glossary, step, substitutions)
+            candidates: set[ActivityId] = set()
+            for ident in s_cache:
+                candidates |= identity_to_activities.get(ident, set())
+            for aid in candidates:
+                if refs_by_activity[aid].issubset(s_cache):
+                    result.setdefault(aid, set()).add(ref)
     return result
 
 
-def walk_steps(
-    steps: list[Step], prefix: tuple[int, ...] = ()
-) -> Iterable[tuple[tuple[int, ...], Step]]:
-    """Depth-first walk yielding (index_path, step) for every step in the tree."""
-    for index, step in enumerate(steps):
-        yield (*prefix, index), step
-        if step.children:
-            yield from walk_steps(step.children, (*prefix, index))
+def pill_display(
+    part: NarrationTermRef, substitutions: Mapping[str, str] | None
+) -> str | None:
+    """The display this pill reads for one case, or None when the case has
+    nothing to say about it.
+
+    A pill not bound to a parametrize column reads the same in every case. One
+    that is bound reads its column's cell — and when this case has no cell
+    there, the pill has no display at all: the grouped tree's belongs to
+    whichever case the tree came from, so lending it here would let this case
+    satisfy an activity naming a guest it never had, or file that guest in the
+    Glossary as one a passing case used.
+    """
+    if substitutions is None or part.param_column is None:
+        return part.display
+    return substitutions.get(part.param_column)
+
+
+def param_case_displays(scenario: Scenario) -> list[dict[str, str]]:
+    """One `{param column name: cell text}` mapping per case the grouped tree
+    speaks for — passed and not divergent — or `[]`.
+
+    Empty when the scenario has no term ref bound to a parametrize column —
+    the grouped tree then already tells the whole truth and callers keep their
+    single-pass path.
+
+    A case that did not pass exercised nothing, so its value must not stand in
+    for a pill: it would satisfy a story activity and be listed in the Glossary
+    as an observed instance. A divergent case is excluded for the same reason
+    one step further on — it passed, but through a different step structure, so
+    the tree walked here is not its own and its value would credit steps it
+    never recorded in this shape. That is what the `≠` marker and its blank
+    generated cells already say; coverage and the Glossary say it too rather
+    than contradicting the table beside them.
+
+    With no such case at all the result is empty, which puts callers back on
+    the baseline — the same single pass an unparametrized failing scenario
+    gets.
+    """
+    if scenario.parameters is None:
+        return []
+    linked = {
+        part.param_column
+        for _path, step in walk_steps(scenario.steps)
+        for part in step.narration.parts
+        if isinstance(part, NarrationTermRef) and part.param_column is not None
+    }
+    if not linked:
+        return []
+    columns = scenario.parameters.columns
+    return [
+        {
+            column.name: str(value)
+            for column, value in zip(columns, case.values, strict=True)
+            if column.kind == 'param' and column.name in linked and value is not None
+        }
+        for case in scenario.parameters.cases
+        if case.status == 'passed' and not case.divergent
+    ]

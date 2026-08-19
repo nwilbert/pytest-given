@@ -5,8 +5,12 @@ out underscore-prefixed fields (e.g. `_by_id` on `Story`/`Glossary`).
 `report_from_dict` is the inverse; the renderer reads the JSON, calls it
 once, and operates on typed dataclasses from there.
 
-The only non-trivial part is `Narration.parts`, whose three subtypes share
-the parent type but each carry a distinct key (`value` / `rendered` / `name`).
+The non-trivial parts: `Narration.parts`, whose subtypes share the parent
+type but each carry a distinct key (`value` / `rendered` / `name` /
+`term_id`); a `ParameterCase` cell, discriminated object-vs-scalar (an object
+is an attachment payload, anything else a scalar); and a step attachment,
+discriminated by `content`-vs-`column_id` (a promoted attachment carries no
+`content`, only a pointer to its column).
 """
 
 import dataclasses
@@ -21,6 +25,9 @@ from .schema import (
     ActivityTermRef,
     ActivityWord,
     Attachment,
+    AttachmentRef,
+    CellValue,
+    ColumnKind,
     ContentType,
     ErrorInfo,
     Glossary,
@@ -34,12 +41,14 @@ from .schema import (
     NarrationValue,
     NodeId,
     ParameterCase,
+    ParameterColumn,
     ParameterTable,
     Phase,
     ReportData,
     Scenario,
     SourceLocation,
     Step,
+    StepAttachment,
     Story,
     StoryId,
     TermId,
@@ -175,10 +184,20 @@ def _step_from_dict(d: dict[str, Any]) -> Step:
         narration=_narration_from_dict(d['narration']),
         status=d.get('status', 'passed'),
         children=[_step_from_dict(c) for c in d.get('children', [])],
-        attachments=[_attachment_from_dict(a) for a in d.get('attachments', [])],
+        attachments=[_step_attachment_from_dict(a) for a in d.get('attachments', [])],
         error=_error_from_dict(d.get('error')),
         activity_ids=tuple(ActivityId(i) for i in d.get('activity_ids') or ()),
         fixture_name=d.get('fixture_name'),
+    )
+
+
+def _step_attachment_from_dict(d: dict[str, Any]) -> StepAttachment:
+    """A promoted attachment carries no `content` — only a pointer to its column."""
+    if 'content' in d:
+        return _attachment_from_dict(d)
+    content_type: ContentType = d.get('content_type', 'text')
+    return AttachmentRef(
+        label=d['label'], content_type=content_type, column_id=d['column_id']
     )
 
 
@@ -210,18 +229,48 @@ def _frame_from_dict(d: dict[str, Any]) -> TracebackFrame:
 def _param_table_from_dict(d: dict[str, Any] | None) -> ParameterTable | None:
     if d is None:
         return None
+    if 'columns' not in d:
+        raise _stale_report_error("a parameter table with 'names' but no 'columns'")
     return ParameterTable(
-        names=list(d['names']),
+        columns=[_param_column_from_dict(c) for c in d['columns']],
         cases=[_param_case_from_dict(c) for c in d.get('cases', [])],
     )
 
 
+def _stale_report_error(shape: str) -> PytestGivenError:
+    """A JSON report predating the case-column change.
+
+    There is no migration — the missing fields are grouping-time knowledge that
+    the saved report never recorded — so the message says the one thing that
+    fixes it rather than leaving a bare `KeyError` to surface out of
+    `pytest-given report`.
+    """
+    return PytestGivenError(
+        f'This JSON report predates pytest-given 0.2 ({shape}). There is no '
+        f'migration: re-run the suite to regenerate it.'
+    )
+
+
+def _param_column_from_dict(d: dict[str, Any]) -> ParameterColumn:
+    kind: ColumnKind = d['kind']
+    return ParameterColumn(id=d['id'], name=d['name'], kind=kind)
+
+
 def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
     return ParameterCase(
-        values=list(d['values']),
+        values=[_cell_from_json(v) for v in d['values']],
         status=d.get('status', 'passed'),
         error=_error_from_dict(d.get('error')),
+        divergent=d.get('divergent', False),
     )
+
+
+def _cell_from_json(value: Any) -> CellValue | None:
+    """An object cell is an attachment payload; anything else is a scalar."""
+    if isinstance(value, dict):
+        return _attachment_from_dict(value)
+    scalar: CellValue | None = value
+    return scalar
 
 
 def _narration_from_dict(d: dict[str, Any]) -> Narration:
@@ -252,8 +301,11 @@ def _narration_part_from_dict(d: dict[str, Any]) -> NarrationPart:
             conversion=d.get('conversion'),
         )
     if 'name' in d:
+        if 'column_id' not in d:
+            raise _stale_report_error("a placeholder part with no 'column_id'")
         return NarrationPlaceholder(
             name=d['name'],
+            column_id=d['column_id'],
             format_spec=d.get('format_spec', ''),
             conversion=d.get('conversion'),
         )

@@ -427,6 +427,7 @@ body {
   margin-top: var(--space-sm);
   margin-left: var(--space-xl);
 }
+.param-table--full { width: calc(100% - var(--space-xl)); }
 .param-table th {
   text-align: left;
   padding: var(--space-sm) var(--space-md);
@@ -442,7 +443,9 @@ body {
 }
 .param-table tr.failed-row { background: var(--color-error-bg); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }
-.param-table tbody tr:hover:not(.failed-row) { background: var(--color-accent-bg); }
+/* A payload panel is not a case: it carries no cells to highlight and no row
+   to substitute from, so hovering it must not look like hovering a case row. */
+.param-table tbody tr:hover:not(.failed-row):not(.attachment-panel-row) { background: var(--color-accent-bg); }
 
 /* Crosshair: triggered by JS hovering a th/td. Highlights the matching column
    header, every cell in the column, and any narration placeholders bound to
@@ -566,6 +569,39 @@ span.param-highlight {
   margin-right: 4px;
   color: inherit;
 }
+.attachment-badge:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.attachment-panel { padding: 0 !important; border: none !important; }
+/* The payload is not standing in for a row: it is indented out of the column
+   grid and captioned in the report's label register (`.sidebar-label`), so
+   nothing inside it reads as a case value. */
+.attachment-panel-body {
+  margin: 0 var(--space-md) var(--space-sm) var(--space-xl);
+}
+.attachment-panel-label {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: var(--space-sm) 0 var(--space-xs);
+}
+/* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks into
+   it; on the card colour it reads as the document it is. `width: 0` with
+   `min-width: 100%` keeps a wide payload from driving the whole table's
+   preferred width — it fills the row it is given and scrolls past it. */
+.attachment-panel .attachment-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  margin-top: 0;
+  width: 0;
+  min-width: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .attachment-expand { transition: none; }
+}
 .attachment-content {
   background: var(--bg-page);
   padding: var(--space-sm) var(--space-md);
@@ -573,6 +609,7 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
   white-space: pre-wrap;
+  overflow-x: auto;
   color: var(--text-secondary);
   margin-top: var(--space-xs);
 }
@@ -581,6 +618,7 @@ span.param-highlight {
 .dot-passed { color: var(--color-passed); }
 .dot-failed { color: var(--color-failed); }
 .dot-skipped { color: var(--color-skipped); }
+.case-divergent { color: var(--text-muted); margin-right: var(--space-xs); cursor: help; }
 
 /* Parameter colors — light-background variants */
 .param-color-0, th.param-color-0 { color: #d63384; font-weight: 600; }
@@ -1158,7 +1196,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L148">examples/hotel-booking/test_hotel_booking.py:148</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L148">examples/hotel-booking/test_hotel_booking.py:148</a></div>
       
     </div>
     </div>
@@ -1212,7 +1250,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L163">examples/hotel-booking/test_hotel_booking.py:163</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L163">examples/hotel-booking/test_hotel_booking.py:163</a></div>
       
     </div>
     </div>
@@ -1260,7 +1298,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L240">examples/hotel-booking/test_hotel_booking.py:240</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L240">examples/hotel-booking/test_hotel_booking.py:240</a></div>
       
     </div>
     </div>
@@ -1284,7 +1322,7 @@ span.param-highlight {
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">28ms</span>
+        <span class="scenario-duration">8ms</span>
       </span>
     </div>
 
@@ -1300,9 +1338,9 @@ span.param-highlight {
           </div><div class="phase-steps">
             <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer" data-term-name="Organizer" data-term-def="Person booking accommodation on behalf of a group.">Carol</span> has <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="add" data-term-name="add" data-term-def="Attach a member to a collection.">added</span> <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="Individual traveler in the group.">Alice</span> and <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="Individual traveler in the group.">Bob</span> to the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking" data-term-name="Booking" data-term-def="A reservation for one or more rooms.">Booking</span></div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer" data-term-name="Organizer" data-term-def="Person booking accommodation on behalf of a group.">Carol</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="submit" data-term-name="submit" data-term-def="Send to the system for processing.">submits</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment" data-term-name="Payment" data-term-def="Money transferred for a booking.">Payment</span> by <span class="param-color-0" data-param="payment_method" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{payment_method}</span> for the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking" data-term-name="Booking" data-term-def="A reservation for one or more rooms.">Booking</span></div>
+            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer" data-term-name="Organizer" data-term-def="Person booking accommodation on behalf of a group.">Carol</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="submit" data-term-name="submit" data-term-def="Send to the system for processing.">submits</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment" data-term-name="Payment" data-term-def="Money transferred for a booking.">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{payment_method}</span> for the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking" data-term-name="Booking" data-term-def="A reservation for one or more rooms.">Booking</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system" data-term-name="Booking System" data-term-def="Automated reservation back-end.">Booking System</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="reject" data-term-name="reject" data-term-def="Refuse to process or accept.">rejects</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment" data-term-name="Payment" data-term-def="Money transferred for a booking.">Payment</span> because of <span class="param-color-1" data-param="decline_reason" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{decline_reason}</span></div>
+            <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system" data-term-name="Booking System" data-term-def="Automated reservation back-end.">Booking System</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="reject" data-term-name="reject" data-term-def="Refuse to process or accept.">rejects</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment" data-term-name="Payment" data-term-def="Money transferred for a booking.">Payment</span> because of <span class="param-color-1" data-param="decline_reason" data-subst="decline_reason" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{decline_reason}</span></div>
           </div><div class="phase-steps">
             <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking" data-term-name="Booking" data-term-def="A reservation for one or more rooms.">Booking</span> stays pending and no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation" data-term-name="Confirmation" data-term-def="Notification of a successful booking.">Confirmation</span> is sent to <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="Individual traveler in the group.">Alice</span> or <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="Individual traveler in the group.">Bob</span></div>
           </div></div>
@@ -1324,74 +1362,110 @@ span.param-highlight {
           </tr>
         </thead>
         <tbody>
-          
           <tr class=""
               @mouseenter="setHoverRow($event.currentTarget)"
               @mouseleave="clearHoverRow($event.currentTarget)">
             
-            <td data-param="payment_method"
+            
+            
+            <td data-param="payment_method" data-subst="payment_method"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">credit card</td>
             
-            <td data-param="decline_reason"
+            
+            
+            
+            <td data-param="decline_reason" data-subst="decline_reason"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">insufficient funds</td>
             
+            
             <td style="text-align:right">
+              
               <span class="dot-passed">✓</span>
             </td>
           </tr>
+          
+          
+          
           
           
           <tr class=""
               @mouseenter="setHoverRow($event.currentTarget)"
               @mouseleave="clearHoverRow($event.currentTarget)">
             
-            <td data-param="payment_method"
+            
+            
+            <td data-param="payment_method" data-subst="payment_method"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">debit card</td>
             
-            <td data-param="decline_reason"
+            
+            
+            
+            <td data-param="decline_reason" data-subst="decline_reason"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">expired card</td>
             
+            
             <td style="text-align:right">
+              
               <span class="dot-passed">✓</span>
             </td>
           </tr>
+          
+          
+          
           
           
           <tr class=""
               @mouseenter="setHoverRow($event.currentTarget)"
               @mouseleave="clearHoverRow($event.currentTarget)">
             
-            <td data-param="payment_method"
+            
+            
+            <td data-param="payment_method" data-subst="payment_method"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">bank transfer</td>
             
-            <td data-param="decline_reason"
+            
+            
+            
+            <td data-param="decline_reason" data-subst="decline_reason"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">fraud check failed</td>
             
+            
             <td style="text-align:right">
+              
               <span class="dot-passed">✓</span>
             </td>
           </tr>
+          
+          
+          
           
           
           <tr class="failed-row"
               @mouseenter="setHoverRow($event.currentTarget)"
               @mouseleave="clearHoverRow($event.currentTarget)">
             
-            <td data-param="payment_method"
+            
+            
+            <td data-param="payment_method" data-subst="payment_method"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">gift card</td>
             
-            <td data-param="decline_reason"
+            
+            
+            
+            <td data-param="decline_reason" data-subst="decline_reason"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">partial balance</td>
             
+            
             <td style="text-align:right">
+              
               <span class="dot-failed">✗</span>
             </td>
           </tr>
@@ -1407,6 +1481,10 @@ span.param-highlight {
           </tr>
           
           
+          
+          
+          
+          
         </tbody>
       </table>
       
@@ -1414,7 +1492,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L198">examples/hotel-booking/test_hotel_booking.py:198</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L198">examples/hotel-booking/test_hotel_booking.py:198</a></div>
       
     </div>
     </div>
@@ -1722,7 +1800,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
         
       </div>
       
@@ -1843,7 +1921,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L116">examples/hotel-booking/test_hotel_booking.py:116</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L116">examples/hotel-booking/test_hotel_booking.py:116</a></div>
         
       </div>
       
@@ -2002,7 +2080,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L56">examples/hotel-booking/test_hotel_booking.py:56</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L56">examples/hotel-booking/test_hotel_booking.py:56</a></div>
                 
               </div>
             </div>
@@ -2077,7 +2155,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L57">examples/hotel-booking/test_hotel_booking.py:57</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L57">examples/hotel-booking/test_hotel_booking.py:57</a></div>
                 
               </div>
             </div>
@@ -2140,7 +2218,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L58">examples/hotel-booking/test_hotel_booking.py:58</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L58">examples/hotel-booking/test_hotel_booking.py:58</a></div>
                 
               </div>
             </div>
@@ -2226,7 +2304,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L60">examples/hotel-booking/test_hotel_booking.py:60</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L60">examples/hotel-booking/test_hotel_booking.py:60</a></div>
                 
               </div>
             </div>
@@ -2289,7 +2367,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L61">examples/hotel-booking/test_hotel_booking.py:61</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L61">examples/hotel-booking/test_hotel_booking.py:61</a></div>
                 
               </div>
             </div>
@@ -2352,7 +2430,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L62">examples/hotel-booking/test_hotel_booking.py:62</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L62">examples/hotel-booking/test_hotel_booking.py:62</a></div>
                 
               </div>
             </div>
@@ -2415,7 +2493,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L63">examples/hotel-booking/test_hotel_booking.py:63</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L63">examples/hotel-booking/test_hotel_booking.py:63</a></div>
                 
               </div>
             </div>
@@ -2466,7 +2544,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L107">examples/hotel-booking/test_hotel_booking.py:107</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L107">examples/hotel-booking/test_hotel_booking.py:107</a></div>
                 
               </div>
             </div>
@@ -2549,7 +2627,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
                 
               </div>
             </div>
@@ -2617,7 +2695,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
                 
               </div>
             </div>
@@ -2685,7 +2763,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
                 
               </div>
             </div>
@@ -2753,7 +2831,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L68">examples/hotel-booking/test_hotel_booking.py:68</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L68">examples/hotel-booking/test_hotel_booking.py:68</a></div>
                 
               </div>
             </div>
@@ -2821,7 +2899,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
                 
               </div>
             </div>
@@ -2891,7 +2969,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
                 
               </div>
             </div>
@@ -2942,7 +3020,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
                 
               </div>
             </div>
@@ -3010,7 +3088,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L75">examples/hotel-booking/test_hotel_booking.py:75</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L75">examples/hotel-booking/test_hotel_booking.py:75</a></div>
                 
               </div>
             </div>
@@ -3078,7 +3156,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
                 
               </div>
             </div>
@@ -3129,7 +3207,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e98e43d3bfd997ced56539948ac625e05c560011/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a796990a61f3deac3da5211195baf0ed670a61cf/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
                 
               </div>
             </div>
@@ -3162,10 +3240,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-08T10:31:30.988420+00:00",
+    "timestamp": "2026-08-18T21:26:37.314271+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "e98e43d3bfd997ced56539948ac625e05c560011"
+    "commit_sha": "a796990a61f3deac3da5211195baf0ed670a61cf"
   },
   "scenarios": [
     {
@@ -3903,7 +3981,7 @@ window.__REPORT_DATA__ = {
       "module": "test_hotel_booking",
       "tags": [],
       "status": "failed",
-      "duration_ms": 28,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -4033,7 +4111,7 @@ window.__REPORT_DATA__ = {
         {
           "phase": "when",
           "narration": {
-            "text": "Carol submits the Payment by credit card for the Booking",
+            "text": "Carol submits the Payment by {payment_method} for the Booking",
             "parts": [
               {
                 "term_id": "organizer",
@@ -4064,6 +4142,7 @@ window.__REPORT_DATA__ = {
               },
               {
                 "name": "payment_method",
+                "column_id": "payment_method",
                 "format_spec": "",
                 "conversion": null
               },
@@ -4088,7 +4167,7 @@ window.__REPORT_DATA__ = {
         {
           "phase": "then",
           "narration": {
-            "text": "the Booking System rejects the Payment because of insufficient funds",
+            "text": "the Booking System rejects the Payment because of {decline_reason}",
             "parts": [
               {
                 "value": "the "
@@ -4122,6 +4201,7 @@ window.__REPORT_DATA__ = {
               },
               {
                 "name": "decline_reason",
+                "column_id": "decline_reason",
                 "format_spec": "",
                 "conversion": null
               }
@@ -4186,9 +4266,17 @@ window.__REPORT_DATA__ = {
         }
       ],
       "parameters": {
-        "names": [
-          "payment_method",
-          "decline_reason"
+        "columns": [
+          {
+            "id": "payment_method",
+            "name": "payment_method",
+            "kind": "param"
+          },
+          {
+            "id": "decline_reason",
+            "name": "decline_reason",
+            "kind": "param"
+          }
         ],
         "cases": [
           {
@@ -4197,7 +4285,8 @@ window.__REPORT_DATA__ = {
               "insufficient funds"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -4205,7 +4294,8 @@ window.__REPORT_DATA__ = {
               "expired card"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -4213,7 +4303,8 @@ window.__REPORT_DATA__ = {
               "fraud check failed"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -4233,7 +4324,8 @@ window.__REPORT_DATA__ = {
                 }
               ],
               "error_tail": "E   AssertionError: assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}"
-            }
+            },
+            "divergent": false
           }
         ]
       },
@@ -5019,11 +5111,14 @@ function reportApp() {
       const scope = rowEl?.closest('.scenario');
       if (!scope) return;
       const values = {};
-      rowEl.querySelectorAll('td[data-param]').forEach(td => {
-        values[td.dataset.param] = td.textContent.trim();
+      // `data-subst` rather than `data-param`: the highlight keys on
+      // `data-param`, which attachment cells and tree badges also carry, and
+      // writing textContent into a badge would destroy its inline SVG.
+      rowEl.querySelectorAll('td[data-subst]').forEach(td => {
+        values[td.dataset.subst] = td.textContent.trim();
       });
-      scope.querySelectorAll('span[data-param]').forEach(span => {
-        const val = values[span.dataset.param];
+      scope.querySelectorAll('span[data-subst]').forEach(span => {
+        const val = values[span.dataset.subst];
         if (val === undefined) return;
         // Stash the original {token} once so re-entry stays idempotent.
         if (span.dataset.token === undefined) span.dataset.token = span.textContent;

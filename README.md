@@ -132,7 +132,7 @@ def test_rejects_empty(text: Annotated[str, given(Template('the name {text}'))])
         id_derive(text)
 ```
 
-Use `Template('… {col} …')` for a per-case placeholder (substituted against the parametrize column, rendered `{col}` in the merged view and the concrete value per row) or a plain string for a static label. A t-string is rejected here — the parameter value isn't in scope at definition time. `when`/`then` inside `Annotated` are rejected too; the action and outcome live in the test body.
+Use `Template('… {col} …')` for a per-case placeholder (substituted against the parametrize column, rendered `{col}` in the grouped view and the concrete value per row) or a plain string for a static label. A t-string is rejected here — the parameter value isn't in scope at definition time. `when`/`then` inside `Annotated` are rejected too; the action and outcome live in the test body.
 
 As a helper-function decorator (any phase). The helper records its own step on each call; for dynamic narration, use `pytest_given.Template` and reference the helper's parameters:
 
@@ -221,13 +221,23 @@ Because a t-string is evaluated at import, only glossary handles (which are in s
 | `Template` on a helper-function decorator | `@when(Template('I insert {amount}'))` | Deferred substitution against the function's bound arguments at each call. Placeholders must name a positional-or-keyword parameter of the helper. Unmatched placeholders raise `PytestGivenError` at decoration time. |
 | `Annotated[..., given(...)]` on a test parameter | `def test(text: Annotated[str, given(Template('a {text} cup'))])` | Synthesizes a `given` step for a fixture or parametrize value at the call site. Plain string renders verbatim; `Template` does deferred substitution against parametrize columns. Only `given` is allowed; a t-string is rejected. |
 
-Three things worth knowing:
+Four things worth knowing:
 
 1. **`pytest_given.Template` only accepts bare identifiers** — `{name}`, `{name:spec}`, `{name!conv}`. Attribute access (`{obj.attr}`), indexing (`{d[key]}`), and arbitrary expressions (`{x + 1}`) raise `PytestGivenError` at construction. Workaround: parametrize by the attributes directly, or move the step into a test-body t-string (which supports full expression syntax).
 
 2. **`Template` vs. t-string is about scope.** `Template` defers substitution, so it belongs where values aren't yet bound — `@scenario(...)` and helper decorators (the table above). A t-string evaluates eagerly, so it belongs where values *are* bound: the test body. Each is rejected in the other's place — `with given(Template(...))` raises `PytestGivenError` at entry, as does a t-string on a fixture/helper decorator. The one exception: a t-string in `@scenario(...)` is allowed when every interpolation is a glossary handle, since terms are in scope at import.
 
-3. **Parametrized scenarios use the first case's steps as the template.** All rows of the parameter table share the step structure recorded by case 1, with values substituted per row. That's the right behaviour when every case runs the same code with different values — and misleading when the steps themselves vary, e.g. a conditional `with given(t'...')` will only show case 1's branch. If steps diverge per case, split into separate `@scenario` tests.
+3. **A parametrized scenario is grouped into one narrated tree plus a case table.** The tree comes from a baseline case (the first that passed), and anything varying across cases is promoted into a column of the case table: a parametrize argument, a t-string interpolation whose value differs per case (the step keeps a `{name}` placeholder pointing at the column), and an attachment whose payload differs (the step keeps a content-less badge). A case that passed on a *different* step structure fills no such column and is marked `≠` — the tree isn't its own. If steps genuinely diverge per case, split into separate `@scenario` tests.
+
+4. **Five authoring forms are rejected outright in a parametrized scenario**, because each would make the grouped tree lie. Every one fails the run and writes no report — the message names the fix:
+
+   | Rejected | Fix |
+   |---|---|
+   | A plain `str` (usually an f-string) whose text differs per case | Narrate with a t-string so the varying part is a placeholder, not case 1's text |
+   | A varying interpolation that isn't a bare name — `t'{cup_size * 0.01}'`, `t'{m.balance}'` | Bind it to a local and narrate that local |
+   | An interpolation naming a parametrize column that no longer holds the case's value | Rename the local that rebound the name — or, if the body mutated the value in place before narrating it, bind the result to its own name and narrate that |
+   | A step whose set of `attach` labels differs between cases | Keep the label constant and let the content vary — that's what the attachment column is for |
+   | A glossary term pill whose display differs between cases (unless the pill *is* the parametrize value) | Split the pill from the value: `given(t"{pg['Customer']} {name} places an order")` |
 
 ### Domain Storytelling
 
@@ -324,6 +334,10 @@ attach('Receipt', 'Coffee x1     $2.00')             # text
 attach('Machine state', {'coffees': 9, 'price': 2})  # JSON
 ```
 
+The label is a plain `str`; a `Template` or t-string label raises — build it with an f-string if it needs interpolating.
+
+In a parametrized scenario the label must read the same in every case: a payload that varies across cases becomes a case-table column headed by that label, and the step keeps a badge pointing at it. A label that differs between cases raises — the varying part belongs in the content.
+
 ## pytest options
 
 All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-*` flag enables its own sink independently, and they combine freely (e.g. pass both `--given-json` and `--given-html` to get both files from one run). `--given-html` no longer writes a JSON file alongside it.
@@ -353,7 +367,7 @@ Each rule has a fixed default severity; there is no master level. A `warn` findi
 | `check-outside-then` | `warn` | An `assert` inside a `given` or `when` (the `when` half of a `when_then` pair is exempt). |
 | `action-in-then` | `warn` | A scenario where no `when` performs an action and a `then` folds the action into its assertion. |
 | `unused-interpolation` | `warn` | A t-string narration that interpolates `{name}` but never uses `name` in the step body. |
-| `divergent-case-structure` | `warn` | A parametrized scenario whose passed cases record different step structures (the report shows only case 1's tree). |
+| `divergent-case-structure` | `warn` | A parametrized scenario whose passed cases record different step structures (the report shows the baseline case's tree and marks the others `≠`). |
 | `tag-shadows-term` | `warn` | A scenario tag whose slug duplicates a glossary term — one concept named through two mechanisms. |
 | `dead-term` | `off` | A glossary term referenced by no step narration and no story activity. Opt in on suites whose glossary is meant to be fully exercised. |
 

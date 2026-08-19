@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 
 from pytest_given import given, scenario, then, when
@@ -14,6 +16,9 @@ from pytest_given.model import (
     NarrationLiteral,
     NarrationTermRef,
     NodeId,
+    ParameterCase,
+    ParameterColumn,
+    ParameterTable,
     Scenario,
     Step,
     Story,
@@ -27,6 +32,7 @@ from pytest_given.report.coverage import (
     identity_of_part,
     instance_id_of,
     is_coverage_eligible,
+    param_case_displays,
     s_for_step,
 )
 from tests.ubiquitous_language import pg
@@ -582,3 +588,185 @@ def test_compute_coverage_explicit_binding_ignored_for_ineligible_activity(g):
         coverage = compute_coverage(g, scenario, story)
     with then(t'eligibility gates the binding, so {pg["Coverage"]} stays empty'):
         assert ActivityId(1) not in coverage
+
+
+def test_coverage_finds_an_activity_anchored_on_a_non_baseline_case(
+    guest_scenario: tuple[Glossary, Story, Scenario],
+) -> None:
+    glossary, story, scenario = guest_scenario
+    assert ActivityId(1) in compute_coverage(glossary, scenario, story)
+
+
+@scenario(
+    t'A divergent {pg["Case"].low} does not lend its value to {pg["Coverage"]}',
+    tags=['parametrization'],
+)
+def test_coverage_ignores_a_divergent_case(
+    guest_scenario: tuple[Glossary, Story, Scenario],
+) -> None:
+    with given(t'an {pg["Activity"]} anchored on the second {pg["Case"]} alone'):
+        glossary, story, scenario = guest_scenario
+        table = scenario.parameters
+        assert table is not None
+    with when(t'that {pg["Case"]} recorded a different {pg["Step"]} structure'):
+        scenario = replace(
+            scenario,
+            parameters=replace(
+                table,
+                cases=[table.cases[0], replace(table.cases[1], divergent=True)],
+            ),
+        )
+        coverage = compute_coverage(glossary, scenario, story)
+    with then(t'no {pg["Activity"]} is covered — the tree walked is not its own'):
+        assert coverage == {}
+
+
+def test_coverage_does_not_mix_displays_from_two_cases(
+    guest_scenario: tuple[Glossary, Story, Scenario],
+) -> None:
+    """An activity satisfied only by combining case 1's Alice with case 2's Bob
+    is matched by no single case, so it must not be matched at all."""
+    glossary, _story, scenario = guest_scenario
+    story = Story(
+        id=StoryId('s'),
+        title='S',
+        activities=(
+            Activity(
+                id=ActivityId(1),
+                paths=(
+                    ActivityPath(
+                        parts=(
+                            ActivityTermRef(term_id=TermId('guest'), display='Alice'),
+                            ActivityTermRef(term_id=TermId('guest'), display='Bob'),
+                            ActivityTermRef(
+                                term_id=TermId('check-in'), display='checks in'
+                            ),
+                        )
+                    ),
+                ),
+            ),
+        ),
+    )
+    assert compute_coverage(glossary, scenario, story) == {}
+
+
+def test_param_case_displays_is_empty_without_a_param_linked_pill(
+    guest_scenario: tuple[Glossary, Story, Scenario],
+) -> None:
+    _glossary, _story, scenario = guest_scenario
+    scenario.steps[0].narration.parts[0] = NarrationTermRef(
+        term_id=TermId('guest'), display='Alice'
+    )
+    assert param_case_displays(scenario) == []
+
+
+def test_param_case_displays_is_empty_for_an_unparametrized_scenario() -> None:
+    scenario = Scenario(
+        id=NodeId('t.py::test_x'), narration=Narration(text='x'), module='m'
+    )
+    assert param_case_displays(scenario) == []
+
+
+def test_param_case_displays_skips_non_param_unlinked_and_none_cells() -> None:
+    """The per-case filter has three independent reasons to drop a column
+    from a case's substitution mapping: it isn't a `param` column even though
+    a pill is bound to it (`note`, below — a derived column can share a name
+    with a parametrize argname), it's a `param` column but no pill is bound to
+    it (`other`, below), or the cell is `None` for a case — a legitimate
+    parametrize value, not a missing one, but not something a pill display
+    substitutes in."""
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='Alice checks in noteA',
+            parts=[
+                NarrationTermRef(
+                    term_id=TermId('guest'),
+                    display='Alice',
+                    expression='guest',
+                    param_column='guest',
+                ),
+                NarrationTermRef(
+                    term_id=TermId('note'),
+                    display='noteA',
+                    expression='note',
+                    param_column='note',
+                ),
+            ],
+        ),
+    )
+    scenario = Scenario(
+        id=NodeId('t.py::test_check_in'),
+        narration=Narration(text='checks in'),
+        module='m',
+        steps=[step],
+        parameters=ParameterTable(
+            columns=[
+                ParameterColumn(id='guest', name='guest', kind='param'),
+                ParameterColumn(id='derived:0', name='note', kind='derived'),
+                ParameterColumn(id='attachment:0', name='log', kind='attachment'),
+                ParameterColumn(id='other', name='other', kind='param'),
+            ],
+            cases=[
+                ParameterCase(values=['Alice', 'noteA', None, 'X'], status='passed'),
+                ParameterCase(values=[None, 'noteB', None, 'Y'], status='passed'),
+            ],
+        ),
+    )
+    assert param_case_displays(scenario) == [{'guest': 'Alice'}, {}]
+
+
+def test_param_case_displays_drops_a_case_that_did_not_pass() -> None:
+    """A skipped case ran nothing, so its parametrize value must not stand in
+    for a pill: doing so lets it satisfy a story activity and lists it in the
+    Glossary as an observed instance of the term."""
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='Alice checks in',
+            parts=[
+                NarrationTermRef(
+                    term_id=TermId('guest'),
+                    display='Alice',
+                    expression='guest',
+                    param_column='guest',
+                ),
+            ],
+        ),
+    )
+    scenario = Scenario(
+        id=NodeId('t.py::test_check_in'),
+        narration=Narration(text='checks in'),
+        module='m',
+        steps=[step],
+        parameters=ParameterTable(
+            columns=[ParameterColumn(id='guest', name='guest', kind='param')],
+            cases=[
+                ParameterCase(values=['Alice'], status='passed'),
+                ParameterCase(values=['Bob'], status='skipped'),
+                ParameterCase(values=['Carol'], status='failed'),
+            ],
+        ),
+    )
+    assert param_case_displays(scenario) == [{'guest': 'Alice'}]
+
+
+def test_s_for_step_drops_a_pill_the_case_has_no_value_for(g) -> None:
+    """A pill bound to a parametrize column whose cell this case leaves empty
+    has no display *for this case*. Falling back to the one the grouped tree
+    carries would hand the case another case's guest, and let it satisfy an
+    activity naming that guest."""
+    step = _step(
+        'when',
+        NarrationTermRef(
+            term_id=TermId('guest'),
+            display='Alice',
+            expression='guest',
+            param_column='guest',
+        ),
+    )
+    assert s_for_step(g, step, {}) == set()
+    assert s_for_step(g, step, {'guest': 'Alice'}) == {
+        Identity('guest', 'alice'),
+        Identity('guest', None),
+    }

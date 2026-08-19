@@ -8,6 +8,7 @@ import pytest
 from pytest_given.lint import RuleId, run_ast_rules
 from pytest_given.model import (
     Narration,
+    NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
     NodeId,
@@ -690,6 +691,65 @@ def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
     assert finding.message == (
         f"given 'a 200 ml cup' interpolates {{size}} but never uses it "
         f'(test_x.py:{with_line})'
+    )
+
+
+def test_unused_interpolation_fires_on_a_grouped_placeholder(tmp_path) -> None:
+    """The lint runs on *grouped* scenarios, where a varying interpolation is
+    already a placeholder rather than a value. Scanning only values leaves the
+    rule blind to every parametrized scenario — the ones with the most
+    narration to drift."""
+    src = _write(
+        tmp_path,
+        """\
+        def test_a(size):
+            with given(t'a {size} ml cup'):
+                cup = make_cup()
+        """,
+    )
+    with_line = _line(src, 'with given')
+    step = _step('given', 'a {size} ml cup', with_line)
+    step = dataclasses.replace(
+        step,
+        narration=Narration(
+            text='a {size} ml cup',
+            parts=[NarrationPlaceholder(name='size', column_id='size')],
+        ),
+    )
+    findings = _rule_findings(
+        run_ast_rules([_scenario([step])], tmp_path), 'unused-interpolation'
+    )
+    [finding] = findings
+    assert 'interpolates {size} but never uses it' in finding.message
+
+
+def test_unused_interpolation_skips_a_disambiguated_column_name(tmp_path) -> None:
+    """A column whose name was disambiguated (`size #2`) is not a bare
+    identifier and drops out with the complex expressions. `ast.parse` alone
+    would read `#2` as a comment and report the step under `{size}`, a token
+    the report never shows — the reader would go looking for it in vain."""
+    src = _write(
+        tmp_path,
+        """\
+        def test_a(size):
+            with given(t'a {size} ml cup'):
+                cup = make_cup()
+        """,
+    )
+    with_line = _line(src, 'with given')
+    step = _step('given', 'a {size #2} ml cup', with_line)
+    step = dataclasses.replace(
+        step,
+        narration=Narration(
+            text='a {size #2} ml cup',
+            parts=[NarrationPlaceholder(name='size #2', column_id='derived:0')],
+        ),
+    )
+    assert (
+        _rule_findings(
+            run_ast_rules([_scenario([step])], tmp_path), 'unused-interpolation'
+        )
+        == []
     )
 
 

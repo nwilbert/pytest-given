@@ -1,6 +1,7 @@
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import (
     Attachment,
+    AttachmentRef,
     ErrorInfo,
     Metadata,
     Narration,
@@ -9,6 +10,7 @@ from pytest_given.model import (
     NarrationTermRef,
     NarrationValue,
     ParameterCase,
+    ParameterColumn,
     ParameterTable,
     ReportData,
     Scenario,
@@ -185,7 +187,7 @@ def test_narration_parts_resolve_terms_and_values() -> None:
                             NarrationLiteral(value='a '),
                             NarrationTermRef(term_id='guest', display='Guest'),
                             NarrationValue(rendered='42', expression='n'),
-                            NarrationPlaceholder(name='amount'),
+                            NarrationPlaceholder(name='amount', column_id='amount'),
                         ],
                     ),
                 )
@@ -232,7 +234,10 @@ def test_parametrized_scenario_renders_table() -> None:
             module='tests/t.py',
             steps=[Step(phase='when', narration=Narration(text='insert'))],
             parameters=ParameterTable(
-                names=['euros', 'expect'],
+                columns=[
+                    ParameterColumn(id='euros', name='euros', kind='param'),
+                    ParameterColumn(id='expect', name='expect', kind='param'),
+                ],
                 cases=[
                     ParameterCase(values=[1, False], status='passed'),
                     ParameterCase(values=[2, True], status='passed'),
@@ -397,7 +402,7 @@ def test_param_table_escapes_pipe_in_value() -> None:
         module='tests/t.py',
         steps=[Step(phase='when', narration=Narration(text='act'))],
         parameters=ParameterTable(
-            names=['label'],
+            columns=[ParameterColumn(id='label', name='label', kind='param')],
             cases=[ParameterCase(values=['a|b'], status='passed')],
         ),
     )
@@ -414,13 +419,33 @@ def test_param_table_escapes_newline_in_value() -> None:
         module='tests/t.py',
         steps=[Step(phase='when', narration=Narration(text='act'))],
         parameters=ParameterTable(
-            names=['label'],
+            columns=[ParameterColumn(id='label', name='label', kind='param')],
             cases=[ParameterCase(values=['a\nb'], status='passed')],
         ),
     )
     md = render_md(_report(scn))
     assert '| a<br>b |' in md
     assert 'a\nb' not in md
+
+
+def test_param_table_renders_none_value_as_text_not_blank() -> None:
+    """A `None` parametrize value is a legitimate value on a `param` column
+    (unlike a `derived`/`attachment` column, where `None` means "no value for
+    this case"), so it must render, not blank out. Regression guard for a
+    drift where the HTML renderer briefly blanked `None` cells while this
+    renderer kept printing the literal text."""
+    scn = Scenario(
+        id='tests/t.py::test_none',
+        narration=Narration(text='None param'),
+        module='tests/t.py',
+        steps=[Step(phase='when', narration=Narration(text='act'))],
+        parameters=ParameterTable(
+            columns=[ParameterColumn(id='label', name='label', kind='param')],
+            cases=[ParameterCase(values=[None], status='passed')],
+        ),
+    )
+    md = render_md(_report(scn))
+    assert '| None | ✓ |' in md
 
 
 @scenario('A skipped scenario shows its skip reason', tags=['happy-path'])
@@ -439,3 +464,199 @@ def test_skipped_scenario_shows_reason() -> None:
     with then('the heading is marked skipped and the reason follows the node id'):
         assert '## ⤼ Later · skipped' in md
         assert '`tests/t.py::test_skip` — reason: needs fixture data' in md
+
+
+def _attachment_table(*, short: str | None, long: str | None) -> ParameterTable:
+    """A one-case table with one attachment cell.
+
+    The column's name and the attachment's label are deliberately *different*:
+    with both called `state`, a `'| state |'` needle is satisfied by the header
+    row, and the cell's label fallback ships unpinned.
+    """
+    content = short if short is not None else long
+    assert content is not None
+    return ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='attachment:0', name='machine state', kind='attachment'),
+        ],
+        cases=[
+            ParameterCase(
+                values=[350, Attachment(label='state', content=content)],
+                status='passed',
+            ),
+        ],
+    )
+
+
+def _report_with(table: ParameterTable) -> ReportData:
+    scn = Scenario(
+        id='tests/t.py::test_att',
+        narration=Narration(text='Att'),
+        module='tests/t.py',
+        steps=[Step(phase='when', narration=Narration(text='act'))],
+        parameters=table,
+    )
+    return _report(scn)
+
+
+def _report_with_step(step: Step) -> ReportData:
+    scn = Scenario(
+        id='tests/t.py::test_att',
+        narration=Narration(text='Att'),
+        module='tests/t.py',
+        steps=[step],
+    )
+    return _report(scn)
+
+
+def test_a_short_attachment_cell_sits_inline_in_backticks() -> None:
+    md = render_md(_report_with(_attachment_table(short='ok', long=None)))
+    assert '| `ok` |' in md
+    # …and is not *also* fenced below the table: inline and fenced are
+    # alternatives, not both.
+    assert '— state:' not in md
+
+
+def test_a_pipe_in_an_inline_attachment_cell_is_escaped() -> None:
+    """An inline attachment cell is the one cell path that interpolates raw
+    payload text into a table row, so an unescaped `|` in it would split the
+    row into a new column and derail every cell after it."""
+    md = render_md(_report_with(_attachment_table(short='ok|fine', long=None)))
+    assert '| 350 | `ok\\|fine` | ✓ |' in md
+
+
+def test_a_multiline_attachment_cell_shows_the_column_name_and_fences_below() -> None:
+    """Cell and block both name the *column*, not the attachment label: two
+    columns can share a label, and only the column name is disambiguated."""
+    md = render_md(
+        _report_with(_attachment_table(short=None, long='{"ml": 350,\n "full": true}'))
+    )
+    assert '| 350 | machine state | ✓ |' in md
+    assert '{"ml": 350,' in md
+    # The fenced block belongs *after* the table, separated from it by a blank
+    # line: emitted before the rows it leaves a header-only table followed by
+    # loose text, and without the blank line a GFM parser keeps the block
+    # header inside the table.
+    assert '| 350 | machine state | ✓ |\n\n- **350** — machine state:\n' in md
+
+
+def test_a_backtick_bearing_attachment_cell_also_fences_below_the_table() -> None:
+    """`_fits_inline` rejects backticks as well as newlines, and the cell path
+    is a new caller of it — the multiline test above pins only one of its two
+    conditions."""
+    md = render_md(
+        _report_with(_attachment_table(short=None, long='use `attach` here'))
+    )
+    assert '| 350 | machine state | ✓ |' in md
+    assert '- **350** — machine state:' in md
+
+
+def test_two_columns_sharing_a_label_get_distinct_block_headers() -> None:
+    """Two occurrences of one attachment label make two columns, whose names
+    grouping has already disambiguated. Keying the fenced blocks on the label
+    would emit two identical `- **350** — log:` headers, leaving the reader no
+    way to tell which column each payload belongs to."""
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='attachment:0', name='log', kind='attachment'),
+            ParameterColumn(id='attachment:1', name='log #2', kind='attachment'),
+        ],
+        cases=[
+            ParameterCase(
+                values=[
+                    350,
+                    Attachment(label='log', content='first\nline'),
+                    Attachment(label='log', content='second\nline'),
+                ],
+                status='passed',
+            ),
+        ],
+    )
+    md = render_md(_report_with(table))
+    assert '| 350 | log | log #2 | ✓ |' in md
+    assert '- **350** — log:' in md
+    assert '- **350** — log #2:' in md
+
+
+def test_an_attachment_ref_renders_as_badge_and_label_alone() -> None:
+    step = Step(
+        phase='when',
+        narration=Narration(text='the machine brews'),
+        attachments=[
+            AttachmentRef(
+                label='machine state', content_type='json', column_id='attachment:0'
+            )
+        ],
+    )
+    md = render_md(_report_with_step(step))
+    assert '- 📎 machine state — *see case table*' in md
+
+
+def test_a_generated_column_with_no_value_for_a_case_renders_blank() -> None:
+    """`None` in a generated column means the case has no value for it and
+    renders blank — unlike a `param` column, where `None` is a real
+    parametrize value and renders verbatim."""
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='attachment:0', name='state', kind='attachment'),
+        ],
+        cases=[ParameterCase(values=[350, None], status='passed')],
+    )
+    md = render_md(_report_with(table))
+    assert '| 350 |  | ✓ |' in md
+
+
+def test_a_derived_column_cell_renders_through_the_ordinary_cell_path() -> None:
+    """A derived cell holds a plain value rather than an attachment, so it
+    renders verbatim — no backticks, no fenced block below the table."""
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='derived:0', name='price', kind='derived'),
+        ],
+        cases=[ParameterCase(values=[350, '3.5'], status='passed')],
+    )
+    md = render_md(_report_with(table))
+    assert '| 350 | 3.5 | ✓ |' in md
+
+
+def test_a_divergent_case_says_why_its_cells_are_blank() -> None:
+    """A case that passed on a different path fills no generated cell. Left
+    unexplained, the blanks beside its ✓ read as a recording failure."""
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='derived:0', name='price', kind='derived'),
+        ],
+        cases=[
+            ParameterCase(values=[200, '2.0'], status='passed'),
+            ParameterCase(values=[350, None], status='passed', divergent=True),
+        ],
+    )
+    md = render_md(_report_with(table))
+    assert '| 200 | 2.0 | ✓ |' in md
+    assert '| 350 |  | ✓ |' in md
+    assert '- **350** — steps differ from the other cases' in md
+
+
+def test_a_long_single_line_attachment_cell_fences_below_the_table() -> None:
+    """A payload with no newline still wrecks the table when it is long — a
+    300-character cell pushes every other column off the terminal. Length is
+    the same problem as a newline, so it takes the same route: the column name
+    in the cell, the payload fenced below."""
+    payload = '{"id": "ch_3PmZ", "amount": 250, ' + '"x": "y", ' * 30 + '"end": true}'
+    md = render_md(_report_with(_attachment_table(short=payload, long=None)))
+    assert '| 350 | machine state | ✓ |' in md
+    assert f'- **350** — machine state:\n  ```\n  {payload}\n  ```' in md
+
+
+def test_an_attachment_cell_at_the_inline_limit_still_sits_inline() -> None:
+    """The bound is on the payload itself, so a cell that fits stays inline —
+    pinning the boundary keeps the check from drifting into 'fence everything'.
+    """
+    payload = 'x' * 72
+    md = render_md(_report_with(_attachment_table(short=payload, long=None)))
+    assert f'| 350 | `{payload}` | ✓ |' in md

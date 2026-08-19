@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 
 from pytest_given import attach, given, scenario, then, when
@@ -13,6 +15,9 @@ from pytest_given.model import (
     Narration,
     NarrationTermRef,
     NodeId,
+    ParameterCase,
+    ParameterColumn,
+    ParameterTable,
     ReportData,
     Scenario,
     Step,
@@ -760,3 +765,88 @@ def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
     assert cov.passed == 2
     assert cov.failed == 1
     assert cov.skipped == 1
+
+
+def test_glossary_view_lists_every_case_instance_of_a_param_linked_pill(
+    guest_scenario: tuple[Glossary, Story, Scenario],
+) -> None:
+    glossary, _story, scenario = guest_scenario
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0'
+        ),
+        scenarios=[scenario],
+        glossary=glossary,
+    )
+    aggs = build_glossary_aggregations(report)
+    assert {i.display for i in aggs[TermId('guest')].instances} == {'Alice', 'Bob'}
+
+
+@scenario(
+    t'A divergent {pg["Case"].low} contributes no {pg["Instance"]} to the '
+    t'{pg["Glossary"].low}',
+    tags=['parametrization'],
+)
+def test_glossary_view_omits_a_divergent_cases_instance(
+    guest_scenario: tuple[Glossary, Story, Scenario],
+) -> None:
+    with given(t'a {pg["Parametrized scenario"]} whose second {pg["Case"]} diverged'):
+        glossary, _story, scenario = guest_scenario
+        table = scenario.parameters
+        assert table is not None
+        scenario = replace(
+            scenario,
+            parameters=replace(
+                table,
+                cases=[table.cases[0], replace(table.cases[1], divergent=True)],
+            ),
+        )
+    with when(t'the {pg["Glossary"]} aggregations are built'):
+        report = ReportData(
+            metadata=Metadata(
+                project='p', timestamp='t', pytest_version='9', plugin_version='0'
+            ),
+            scenarios=[scenario],
+            glossary=glossary,
+        )
+        aggs = build_glossary_aggregations(report)
+    with then(t'only the {pg["Case"]} the grouped tree speaks for is listed'):
+        assert {i.display for i in aggs[TermId('guest')].instances} == {'Alice'}
+
+
+def test_a_pill_is_not_listed_for_a_case_that_has_no_value_for_it() -> None:
+    """A pill bound to a parametrize column reads one display per passed case.
+    A case whose cell for that column is empty has no display of its own —
+    falling back to the grouped tree's puts a failed case's guest in the
+    Glossary as though a passing case had used it."""
+    g = _g()
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='Alice checks in',
+            parts=[
+                NarrationTermRef(
+                    term_id=TermId('guest'),
+                    display='Alice',
+                    expression='guest',
+                    param_column='guest',
+                )
+            ],
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('t.py::test_check_in'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[step],
+        parameters=ParameterTable(
+            columns=[ParameterColumn(id='guest', name='guest', kind='param')],
+            cases=[
+                ParameterCase(values=['Alice'], status='failed'),
+                ParameterCase(values=[None], status='passed'),
+            ],
+        ),
+    )
+    rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
+    aggs = build_glossary_aggregations(rd)
+    assert TermId('guest') not in aggs

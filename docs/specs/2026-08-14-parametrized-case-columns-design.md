@@ -2,9 +2,9 @@
 
 ## Problem
 
-Merging parametrize cases into one scenario (`_group_parametrized`, `plugin.py`) takes the
-step tree from `group[0]` and discards every other case's, so the merged view is only honest
-about the *first* case. Four kinds of per-case content vary and none survives the merge.
+Grouping parametrize cases into one scenario (`_group_parametrized`, `plugin.py`) takes the
+step tree from `group[0]` and discards every other case's, so the grouped view is only honest
+about the *first* case. Four kinds of per-case content vary and none survives grouping.
 
 1. **Attachments are dropped.** `_templatize_steps` rewrites narration and recurses into
    children; `dataclasses.replace` carries case 1's `attachments` through untouched. And
@@ -51,18 +51,24 @@ about the *first* case. Four kinds of per-case content vary and none survives th
    rendered report still shows case 1.
 
 A related defect falls out of the same line: the baseline is `group[0]` unconditionally, so
-when the first case is skipped the merged scenario renders `"steps": []` even though later
+when the first case is skipped the grouped scenario renders `"steps": []` even though later
 cases ran and recorded a full tree.
 
 ## Goal
 
-One rule: **the merged step tree shows only what every case shares; anything that varies
+One rule: **the grouped step tree shows only what every case shares; anything that varies
 becomes a column in the case table.**
 
 This is the split the table already embodies for parametrize inputs — `{cup_size}` in the
 narration, values in the column — extended to varying attachments and varying narrated
 values. Kinds 3 and 4 are the exceptions: a varying pill is rejected rather than promoted
 (promotion would strip the pill out of the tree), and structure stays lint-only.
+
+**Vocabulary.** This document says *group* for collapsing the N case records into one
+scenario and *templatize* for deriving the grouped step text inside it, per `GLOSSARY.md`;
+neither is a synonym of the other and neither is called a "merge". "Grouped" is the
+adjective for the result — a grouped scenario, the grouped step tree. Every name this design
+introduces follows suit.
 
 ## Behavior
 
@@ -78,7 +84,7 @@ An attachment that is byte-identical across every case is shared structure and s
 on its step. Same for a `NarrationValue` whose rendered text is identical everywhere —
 today's behaviour, now verified instead of assumed.
 
-Attachments live inside steps, sometimes nested; the badge keeps that position in the merged
+Attachments live inside steps, sometimes nested; the badge keeps that position in the grouped
 tree, tied to its column by the existing `data-param` hover highlight, exactly as a
 `{cup_size}` placeholder is. The tree says *where*, the table says *what* — and it says it
 only once, since a promoted badge carries no content of its own (see [Schema](#schema)).
@@ -150,7 +156,7 @@ def test_check_in(guest):
     with when(t"{guest} arrives"):
 ```
 
-The pill in the merged tree reads the baseline display and the column carries the rest;
+The pill in the grouped tree reads the baseline display and the column carries the rest;
 substituting the pill on row hover is out of scope for v1. Three consumers read `display` and
 all three currently see only the baseline — today's bugs, but this design makes the pattern
 more likely, so they are fixed here:
@@ -161,11 +167,11 @@ more likely, so they are fixed here:
   report. The `param` column is now the only place a case's display exists, so it has to hold
   `Alice`.
 - **Coverage matches per case, then unions the matches.** `s_for_step`
-  (`report/coverage.py:90`) derives an instance identity from `display`, so the merged
+  (`report/coverage.py:90`) derives an instance identity from `display`, so the grouped
   scenario matches on the baseline's `Alice` alone and silently loses coverage of a
   `Bob`-anchored activity. Evaluate each step once per case, substituting that case's cell
   value for every param-linked pill, and union the *matches* — never the identity sets:
-  matching is `refs_by_activity[aid].issubset(s_cache)`, so a merged identity set would let a
+  matching is `refs_by_activity[aid].issubset(s_cache)`, so a grouped identity set would let a
   step satisfy an activity by combining `Alice` from one case with `latte` from another,
   which no single case satisfies. A scenario with no param-linked pill — every scenario today
   — keeps the single-pass path.
@@ -183,7 +189,7 @@ The baseline becomes the first **passed** case rather than `group[0]`, matching 
 failed ones may abort mid-tree, so neither can define the shared structure. If no case
 passed, fall back to `group[0]` — there is nothing to compare.
 
-Baseline selection scopes to the step tree. The merged scenario keeps `group[0]`'s identity
+Baseline selection scopes to the step tree. The grouped scenario keeps `group[0]`'s identity
 fields (`id`, `source`, tags, story bindings), so deep links and report ordering do not shift
 with which case happened to pass.
 
@@ -194,13 +200,14 @@ scenario's file and line and the fix. The message quoted under each rule below i
 the locator is appended by `location_suffix` (`lint/base.py:71-76`), the same
 ` (test_brew.py:12)` suffix every lint finding already carries, so an error and a finding read
 alike and one formatter produces both. It stays in `lint/` — unlike the tree helpers, which
-`report/` and `lint/` both needed and neither could import, this one is wanted only by the
-merge, and `plugin.py` sits above both. A step-level anchor is not available: `Step.source` is
-captured only when lint is enabled (`plugin.py:241`), and these rules must hold with lint off.
+`report/` and `lint/` both needed and neither could import, this one is wanted only by
+grouping, and `plugin.py` sits above both. A step-level anchor is not available:
+`Step.source` is captured only when lint is enabled (`plugin.py:241`), and these rules must
+hold with lint off.
 
 **Which cases a rule sees.** Rules 1, 2, 4 and 5 compare cases against each other, and only
 across passed cases whose structure matches the baseline's (see
-[Merge algorithm](#merge-algorithm)): a case that branched differently is positionally
+[Grouping algorithm](#grouping-algorithm)): a case that branched differently is positionally
 incomparable, so comparing `[given, when, then]` against `[given, given, when, then]` would
 line a `when` up with a `given` and raise rule 1 about two unrelated steps. Divergence stays
 lint's business, and such a case drops out of validation exactly as it drops out of
@@ -214,10 +221,10 @@ structure is a known limitation, deferred with divergent structure itself (see
 Validation runs on **every** session, not only when a sink was requested: these are usage
 errors, and the plugin already treats malformed narration as one —
 `pytest_collection_modifyitems` raises for a bad `Template` placeholder whether or not a
-report was asked for (`plugin.py:289-295`). Gating the merge rules on flags would make
+report was asked for (`plugin.py:289-295`). Gating the grouping rules on flags would make
 whether your suite is well-formed depend on which ones you passed. The existing
 unknown-placeholder guard in `_templatize_narration` (`plugin.py:943-949`) therefore stays
-put, and the merge stays a path that can raise.
+put, and grouping stays a path that can raise.
 
 Nothing may escape the hook, though: an exception leaving `pytest_sessionfinish` is neither a
 test failure nor an INTERNALERROR — on pytest 9.0.3 it propagates out of `console_main` as a
@@ -261,7 +268,7 @@ CI.
    cross-case comparison, so no other rule sees it.
 
    The displayed value has one source of truth, the **cell**: `rendered` is discarded on a
-   param match, `_placeholder_token` renders the merged slot as a schematic `{cup_size}` with
+   param match, `_placeholder_token` renders the grouped slot as a schematic `{cup_size}` with
    conversion and spec deliberately dropped, and row hover substitutes the cell's own text —
    so `rendered` is never displayed for a param placeholder, only used as evidence. Per case,
    then: apply the interpolation's own `conversion` and `format_spec` to that case's
@@ -290,9 +297,9 @@ CI.
    Being a per-case check rather than a comparison, this rule fires where no other can: a
    single passed case is enough, so `@pytest.mark.parametrize('cup_size', [200])` still
    catches the rebinding. It runs on passed cases only, like every other rule — a failed
-   case's tree may be truncated mid-step, and the merge trusts nothing else from it either.
+   case's tree may be truncated mid-step, and grouping trusts nothing else from it either.
 
-   A pre-existing defect, fixed here because the merged view has to tell the truth about every
+   A pre-existing defect, fixed here because the grouped view has to tell the truth about every
    part kind it renders.
 
 4. **A glossary term ref whose pill varies across cases**, other than one bound to a
@@ -301,7 +308,7 @@ CI.
    `term_id` and `display` are compared, and either one varying raises.
 
    A varying pill is rejected rather than promoted, whatever the shape of its expression.
-   Promotion would strip the pill out of the merged tree, and `compute_coverage`
+   Promotion would strip the pill out of the grouped tree, and `compute_coverage`
    (`report/coverage.py:115`) matches story activities on term-ref identities — so a promoted
    pill silently drops that scenario's coverage of an activity and can trip `dead-term`. The
    fix splits the pill from the value, leaving a constant pill and an ordinary `param`
@@ -316,13 +323,13 @@ CI.
 5. **A step whose set of attachment labels differs across cases.** A label names its payload;
    the payload is what varies, and the row already says which case it belongs to.
    `attach(f"{flavor} log", …)` puts the parameter in the name instead of leaving it in the
-   `flavor` column that is already there, and leaves the merged tree with a badge that can
+   `flavor` column that is already there, and leaves the grouped tree with a badge that can
    only be one case's. The fix is a constant label with the varying part in the content.
    Content and content type are exempt by design: varying those is exactly what the
    `attachment` column is for.
 
    The comparison is over the **distinct labels** at a step, because that is the key
-   attachments merge on (see [Merge algorithm](#merge-algorithm)). A label attached a
+   attachments are paired on (see [Grouping algorithm](#grouping-algorithm)). A label attached a
    different *number* of times — a loop whose iteration count depends on the parameter —
    therefore does not raise: the occurrences become columns and the short case's trailing
    cells are blank.
@@ -330,7 +337,7 @@ CI.
    > `PytestGivenError: attachment label 'vanilla log' in 'test_brew' is attached in some parametrize cases but not others — a label names the payload and must read the same in every case. Use a constant label and let the content vary: attach("brew log", …).`
 
 An error means the author can do better: every rule above carries a one-line fix that yields
-a strictly better report. Where no such fix exists the merge copes instead of raising — a
+a strictly better report. Where no such fix exists grouping copes instead of raising — a
 pill bound to a parametrize column, and divergent structure (see
 [Out of scope](#out-of-scope)). Together the rules also make promotion **total**: every
 column is named by an identifier or a shared label by construction, so no `name` is nullable
@@ -338,7 +345,7 @@ and no renderer ever has to display raw source text or invent a header.
 
 ### When each fires
 
-The trigger is variance, not syntax: the merge sees recorded parts, never source, so rule 1's
+The trigger is variance, not syntax: grouping sees recorded parts, never source, so rule 1's
 real condition is `parts == []` **and** the rendered text differs. The table covers step
 narration only — an attachment label is plain text with one rule of its own (rule 5).
 
@@ -362,7 +369,7 @@ group with fewer than two comparable ones cannot raise rules 1, 2, 4 or 5.
 
 **Why not lint.** `given_lint` defaults to `False` (`plugin.py:172-177`), so an error-severity
 rule would enforce nothing for a default user and the report would go on lying quietly. The
-check belongs where the merge already holds every case's tree.
+check belongs where grouping already holds every case's tree.
 
 ### Compatibility
 
@@ -418,7 +425,7 @@ stays a plain `str` for every column kind.
 One shape for all three kinds, so both renderers and downstream `jq` recipes loop a single
 list instead of branching per kind.
 
-The tree side gets three changes, all so a merged step stops speaking for a single case.
+The tree side gets three changes, all so a grouped step stops speaking for a single case.
 
 **`NarrationPlaceholder` gains `column_id: str`**, always populated (see
 [Column identity](#column-identity)). `name` keeps supplying the `{price}` token and the
@@ -435,17 +442,17 @@ class AttachmentRef:
     column_id: str
 ```
 
-Having no `content` field is the point: the merged tree then *cannot* carry the baseline's
+Having no `content` field is the point: the grouped tree then *cannot* carry the baseline's
 payload, where an emptied `Attachment` would only promise not to. Payloads live in cells, the
 tree holds pointers. Serde discriminates the two on the presence of `content`, the union gives
 the renderers an exhaustive `match` the way `NarrationPart` already does, and only two sites
 read `step.attachments` (`md_renderer.py:110`, `report.html.j2:84`).
 
-**A merged step's `narration.text` is rebuilt from its merged parts**, so it reads `the drink
-costs {price} euros` rather than the baseline's `the drink costs 2.0 euros`. Today a merged
+**A grouped step's `narration.text` is rebuilt from its templatized parts**, so it reads `the drink
+costs {price} euros` rather than the baseline's `the drink costs 2.0 euros`. Today a grouped
 step's `text` is case 1's rendering even for `param` placeholders — coffeeshop ships
 `"text": "I insert $1"` under parts that say `{euros}` — while a *scenario*'s `text` is
-already "the merged template for parametrized scenarios" (`report-json.md:16`). Steps join
+already the grouped template for parametrized scenarios (`report-json.md:16`). Steps join
 scenarios. Both renderers prefer `parts` wherever they exist, so no HTML or Markdown output
 moves; what changes is the JSON field and the wording of three `ast_rules` findings that
 interpolate it (`ast_rules.py:194,272,282`) — ignore entries match on `finding.subject`, not
@@ -468,7 +475,7 @@ no compatibility shim: a report saved before this change will not load in `pytes
 (`report/cli.py` reads it through `report_from_dict`). Pre-1.0, that is accepted rather than
 worked around — the fix for an old report is to re-run the suite.
 
-## Merge algorithm
+## Grouping algorithm
 
 1. Group cases as today. Pick the baseline: first passed case, else `group[0]`.
 2. Take the **comparable** cases: the passed ones whose structure signature equals the
@@ -494,7 +501,7 @@ worked around — the fix for an old report is to re-run the suite.
 "The same position" is an index path, and the walk that produces one already exists twice —
 `walk_steps` (`report/coverage.py:168`) yields `(index_path, step)`, `iter_steps`
 (`lint/base.py:65`) yields the steps alone — with `report/` and `lint/` unable to import from
-each other, so neither copy can go. The merge would be the third. A new **`model/steps.py`**
+each other, so neither copy can go. The grouping pass would be the third. A new **`model/steps.py`**
 owns the walk instead; `model/` is the leaf all three depend on, and `ids.py` is the precedent
 for small pure helpers over the schema:
 
@@ -506,7 +513,7 @@ def structure_signature(steps: list[Step]) -> StepSignature: ...
 ```
 
 Both copies go, along with `_structure_signature` (`runtime_rules.py:122-123`); the two lint
-rule modules import from `..model` instead of `.base`; and the merge indexes each case's tree
+rule modules import from `..model` instead of `.base`; and grouping indexes each case's tree
 into a `dict[StepPath, Step]`, so "compare against the same position" is a lookup rather than
 a parallel descent through several trees at once. `StepPath` also gives the spec's positional
 language a name in the code.
@@ -577,7 +584,7 @@ lights up is the column holding every case's payload. `expandedAttachments` stay
 real `Attachment`s: the ones inline on a step because they were byte-identical everywhere, and
 the ones in case cells.
 
-The [row-hover value preview](../2026-06-28-row-hover-value-preview-design.md) is live, and this
+The [row-hover value preview](2026-06-28-row-hover-value-preview-design.md) is live, and this
 design silently extends it to two new column kinds. Three things need care:
 
 - **`data-param` carries the column `id`, not its name** (see
@@ -615,15 +622,15 @@ design silently extends it to two new column kinds. Three things need care:
 | `src/pytest_given/report/html_renderer.py`, `templates/report.html.j2`, `templates/styles.css`, `templates/app.js` | column loop, attachment cells, `data-param` keyed on column `id` (from `column_id` in the tree), `AttachmentRef` badges with no expander, `data-subst` on cells and narration slots, palette excludes attachment columns |
 | `src/pytest_given/report/md_renderer.py` | column loop, attachment cells and below-table blocks, `AttachmentRef` branch in `_attachment_lines` |
 | `examples/coffeeshop/test_coffeeshop.py` | a parametrized scenario that both attaches and narrates a derived local |
-| `GLOSSARY.md` | *Parameter table* is defined as "column names + cases" and needs the column kinds; *Value highlight* is defined around interpolations that don't match a parametrize column, now true only when they are constant across cases. Per AGENTS.md a glossary edit pulls in `uv run nox -s self_report` |
-| `src/pytest_given/skills_data/pytest-given-navigating/references/report-json.md` | new `parameters` shape, placeholder and attachment part shapes, merged step `text`, and `jq` recipes |
+| `GLOSSARY.md` | *Parameter table* is defined as "column names + cases" and needs the column kinds; *Templatize* is defined as deriving the step text "from the first case", discarding non-first cases' structured text — both clauses are what this design replaces; *Value highlight* is defined around interpolations that don't match a parametrize column, now true only when they are constant across cases. *Group* needs no change. Per AGENTS.md a glossary edit pulls in `uv run nox -s self_report` |
+| `src/pytest_given/skills_data/pytest-given-navigating/references/report-json.md` | new `parameters` shape, placeholder and attachment part shapes, grouped step `text`, and `jq` recipes |
 | `src/pytest_given/skills_data/pytest-given-authoring/references/scenarios.md`, `references/api.md` | in a parametrized scenario, a varying `str` narration (f-strings included), a varying compound interpolation and a varying `attach` label are now errors, not caveats; `attach` takes a `str` label |
 | `README.md` | `attach(label, content)` — the label is a plain `str`; t-strings are rejected |
 | `CHANGELOG.md` | seven `## [Unreleased]` entries (see below) |
 
 No lint rule changes: every rule keeps its behaviour and the catalog is untouched — the lint
 package only stops owning two tree helpers it was never the sole user of. The rules this
-design displaces move into the merge rather than into the catalog; what that implies for
+design displaces move into grouping rather than into the catalog; what that implies for
 `divergent-case-structure` is settled under [Out of scope](#out-of-scope).
 
 This lands as seven user-facing changes, each needing its own `## [Unreleased]` entry in the
@@ -633,7 +640,7 @@ commit that makes it (per AGENTS.md), five of them breaking:
   cells widen to scalar-or-attachment, placeholder parts gain `column_id`, and a promoted
   attachment appears in the step tree as a content-less reference to its column. Update any
   `jq` reading `parameters`.
-- **Changed (breaking).** A merged parametrized scenario's step `narration.text` is now the
+- **Changed (breaking).** A grouped parametrized scenario's step `narration.text` is now the
   template (`the drink costs {price} euros`), not the first case's rendering. HTML and
   Markdown are unchanged; JSON readers only.
 - **Added.** Attachments and derived values that vary across parametrize cases now render as
@@ -656,7 +663,7 @@ The project is pre-1.0, so these ride a minor bump rather than a major one.
 
 ## Verification
 
-- Unit: merge comparison (shared stays inline; varying promotes; identical-content attachments
+- Unit: grouping comparison (shared stays inline; varying promotes; identical-content attachments
   do not promote), passed-case baseline, divergent-structure blanks, schema round-trip, Markdown
   short/long split.
 - Unit: all five rejected forms raise, with the file/line and fix in the message; none fires
@@ -674,13 +681,13 @@ The project is pre-1.0, so these ride a minor bump rather than a major one.
   guard against re-introducing the defect this design opens with; a byte-identical attachment
   stays an inline `Attachment` and makes no column; `attach` rejects t-string and `Template`
   labels through the one guard (replacing today's eager-render test).
-- Unit: label-keyed merging — reordered `attach` calls merge rather than raising; the same
+- Unit: label-keyed pairing — reordered `attach` calls pair rather than raising; the same
   label attached a different number of times yields columns with blank trailing cells and no
   error; a label present in one case only raises rule 5 naming that label.
 - Unit: a structurally divergent case raises nothing — a shifted tree lining a `when` up
   against a `given` gets blank cells and the existing lint finding, not rule 1.
 - Unit: rule 3 fires on a single-case parametrize, where no comparison rule can.
-- Unit: a merged step's `narration.text` is the template, and matches what the parts render.
+- Unit: a grouped step's `narration.text` is the template, and matches what the parts render.
 - Unit: two same-named `derived` columns get distinct `id`s and each placeholder carries its
   own `column_id`, so hovering a row substitutes both independently. (Nothing tests id
   collision — the colon makes it unreachable.)
@@ -699,24 +706,24 @@ The project is pre-1.0, so these ride a minor bump rather than a major one.
 ## Out of scope
 
 - `@scenario(group_parametrized=False)` (TODO). This shrinks its remit but does not retire it:
-  varying *structure* still has no honest merged rendering, and the opt-out remains the answer
+  varying *structure* still has no honest grouped rendering, and the opt-out remains the answer
   there.
 - **`divergent-case-structure` stays a lint rule**, deferred to that same TODO — now the last
   member of the family behind an opt-in check, so with `given_lint` off a scenario whose cases
   branch differently still renders the baseline's tree and says nothing. Unlike the five rejected
-  forms it has no one-line fix: the cases genuinely differ and no merged view can represent them.
-  The graceful answer is to decline the merge and emit one scenario per case — the same opt-out,
+  forms it has no one-line fix: the cases genuinely differ and no grouped view can represent them.
+  The graceful answer is to decline the grouping and emit one scenario per case — the same opt-out,
   applied automatically — and that decision belongs with the opt-out.
 - **Narration that changes shape without changing structure**, which is the same problem one
   level down. `structure_signature` compares `(phase, children)`, so a step narrated
   `t"{n} items load" if n else "nothing loads"` leaves both cases comparable while their part
-  lists are laid out differently, and the merge walks parts by index into a sentence that is not
+  lists are laid out differently, and grouping walks parts by index into a sentence that is not
   shaped the same way. Depending on the shapes it either raises rule 1 with the wrong diagnosis
   or promotes a `derived` column named for the baseline's expression, standing in for a sentence
   the other case never narrated. It needs a conditional narration under otherwise identical
-  structure, so it is rare — and like divergent structure it has no honest merged rendering and
+  structure, so it is rare — and like divergent structure it has no honest grouped rendering and
   no one-line fix. Both get **hard validation when the opt-out lands**, which is where declining
-  the merge becomes an available answer. Widening the comparability key here instead would only
+  the grouping becomes an available answer. Widening the comparability key here instead would only
   trade a wrong sentence for a silent blank, since `divergent-case-structure` does not see
   narration shape either.
 - Substituting a param-linked term pill on row hover.

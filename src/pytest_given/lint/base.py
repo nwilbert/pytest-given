@@ -6,12 +6,10 @@ docs stay in sync with one table.
 
 from __future__ import annotations
 
-from collections.abc import Iterator
 from dataclasses import dataclass
-from pathlib import PurePosixPath
 from typing import Literal, NewType
 
-from ..model import NodeId, SourceLocation, Step
+from ..model import NodeId, SourceLocation
 
 type Level = Literal['off', 'warn', 'error']
 type Surface = Literal['runtime', 'ast']
@@ -60,18 +58,3 @@ RULES: tuple[LintRule, ...] = (
 )
 
 RULES_BY_ID: dict[RuleId, LintRule] = {rule.id: rule for rule in RULES}
-
-
-def iter_steps(steps: list[Step]) -> Iterator[Step]:
-    """Depth-first walk over a step tree."""
-    for step in steps:
-        yield step
-        yield from iter_steps(step.children)
-
-
-def location_suffix(location: SourceLocation | None) -> str:
-    """The `` (filename:line)`` locator appended to a finding message, or ``''``
-    when the finding carries no source location."""
-    if location is None:
-        return ''
-    return f' ({PurePosixPath(location.relpath).name}:{location.line})'

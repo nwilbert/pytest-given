@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-18T06:55:46.981643+00:00",
+    "timestamp": "2026-08-18T21:26:37.090365+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "5e48f654b31d9300791f8c83e0ec2bc086603ab1"
+    "commit_sha": "a796990a61f3deac3da5211195baf0ed670a61cf"
   },
   "scenarios": [
     {
@@ -449,7 +449,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 121
+        "line": 151
       },
       "story_id": null,
       "activity_ids": []
@@ -645,7 +645,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 134
+        "line": 164
       },
       "story_id": null,
       "activity_ids": []
@@ -722,7 +722,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 168
+        "line": 198
       },
       "story_id": null,
       "activity_ids": []
@@ -815,7 +815,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 185
+        "line": 215
       },
       "story_id": null,
       "activity_ids": []
@@ -829,7 +829,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 85,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -955,7 +955,7 @@
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 204,
+            "lineno": 234,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
             "is_internal": false
@@ -966,7 +966,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 201
+        "line": 231
       },
       "story_id": null,
       "activity_ids": []
@@ -987,7 +987,7 @@
       "skip_reason": "demonstrates skipped status",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 207
+        "line": 237
       },
       "story_id": null,
       "activity_ids": []
@@ -1021,13 +1021,14 @@
         {
           "phase": "when",
           "narration": {
-            "text": "I insert $1",
+            "text": "I insert ${euros}",
             "parts": [
               {
                 "value": "I insert $"
               },
               {
                 "name": "euros",
+                "column_id": "euros",
                 "format_spec": "",
                 "conversion": null
               }
@@ -1043,13 +1044,14 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the purchase is allowed: False",
+            "text": "the purchase is allowed: {expect}",
             "parts": [
               {
                 "value": "the purchase is allowed: "
               },
               {
                 "name": "expect",
+                "column_id": "expect",
                 "format_spec": "",
                 "conversion": null
               }
@@ -1064,9 +1066,17 @@
         }
       ],
       "parameters": {
-        "names": [
-          "euros",
-          "expect"
+        "columns": [
+          {
+            "id": "euros",
+            "name": "euros",
+            "kind": "param"
+          },
+          {
+            "id": "expect",
+            "name": "expect",
+            "kind": "param"
+          }
         ],
         "cases": [
           {
@@ -1075,7 +1085,8 @@
               false
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -1083,7 +1094,8 @@
               true
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -1091,7 +1103,8 @@
               true
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           }
         ]
       },
@@ -1140,6 +1153,7 @@
               },
               {
                 "name": "cup_size",
+                "column_id": "cup_size",
                 "format_spec": "",
                 "conversion": null
               },
@@ -1183,8 +1197,12 @@
         }
       ],
       "parameters": {
-        "names": [
-          "cup_size"
+        "columns": [
+          {
+            "id": "cup_size",
+            "name": "cup_size",
+            "kind": "param"
+          }
         ],
         "cases": [
           {
@@ -1192,14 +1210,16 @@
               200
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
               350
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           }
         ]
       },
@@ -1222,6 +1242,7 @@
           },
           {
             "name": "cup_size",
+            "column_id": "cup_size",
             "format_spec": "",
             "conversion": null
           },
@@ -1253,13 +1274,14 @@
         {
           "phase": "when",
           "narration": {
-            "text": "I brew a 200 ml cup",
+            "text": "I brew a {cup_size} ml cup",
             "parts": [
               {
                 "value": "I brew a "
               },
               {
                 "name": "cup_size",
+                "column_id": "cup_size",
                 "format_spec": "",
                 "conversion": null
               },
@@ -1290,8 +1312,12 @@
         }
       ],
       "parameters": {
-        "names": [
-          "cup_size"
+        "columns": [
+          {
+            "id": "cup_size",
+            "name": "cup_size",
+            "kind": "param"
+          }
         ],
         "cases": [
           {
@@ -1299,14 +1325,16 @@
               200
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
               300
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           }
         ]
       },
@@ -1315,6 +1343,185 @@
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 92
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]",
+      "narration": {
+        "text": "Brew a {flavor} coffee (per-case columns)",
+        "parts": [
+          {
+            "value": "Brew a "
+          },
+          {
+            "name": "flavor",
+            "column_id": "flavor",
+            "format_spec": "",
+            "conversion": null
+          },
+          {
+            "value": " coffee (per-case columns)"
+          }
+        ]
+      },
+      "module": "test_coffeeshop",
+      "tags": [
+        "billing"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "machine"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "the machine is primed for {flavor}",
+            "parts": [
+              {
+                "value": "the machine is primed for "
+              },
+              {
+                "name": "flavor",
+                "column_id": "flavor",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [
+            {
+              "label": "brew log",
+              "content_type": "text",
+              "column_id": "attachment:0"
+            }
+          ],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I brew a {flavor} coffee",
+            "parts": [
+              {
+                "value": "I brew a "
+              },
+              {
+                "name": "flavor",
+                "column_id": "flavor",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " coffee"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the drink costs {price} euros",
+            "parts": [
+              {
+                "value": "the drink costs "
+              },
+              {
+                "name": "price",
+                "column_id": "derived:0",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " euros"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "flavor",
+            "name": "flavor",
+            "kind": "param"
+          },
+          {
+            "id": "attachment:0",
+            "name": "brew log",
+            "kind": "attachment"
+          },
+          {
+            "id": "derived:0",
+            "name": "price",
+            "kind": "derived"
+          }
+        ],
+        "cases": [
+          {
+            "values": [
+              "vanilla",
+              {
+                "label": "brew log",
+                "content": "00:00  purge vanilla line, 40 ml at 92.8C\n00:04  dose 18.5 g, grind 12, hopper: vanilla\n00:09  pre-infuse at 3.0 bar for 4.0 s\n00:13  ramp to 9.0 bar\n00:27  stop at 36.0 g yield, ratio 1:1.95\n00:31  purge group head, vanilla residue cleared",
+                "content_type": "text"
+              },
+              "2"
+            ],
+            "status": "passed",
+            "error": null,
+            "divergent": false
+          },
+          {
+            "values": [
+              "mocha",
+              {
+                "label": "brew log",
+                "content": "00:00  purge mocha line, 40 ml at 92.8C\n00:04  dose 18.5 g, grind 12, hopper: mocha\n00:09  pre-infuse at 3.0 bar for 4.0 s\n00:13  ramp to 9.0 bar\n00:27  stop at 36.0 g yield, ratio 1:1.95\n00:31  purge group head, mocha residue cleared",
+                "content_type": "text"
+              },
+              "3"
+            ],
+            "status": "passed",
+            "error": null,
+            "divergent": false
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
+        "line": 104
       },
       "story_id": null,
       "activity_ids": []
@@ -1331,8 +1538,12 @@
       "duration_ms": 0,
       "steps": [],
       "parameters": {
-        "names": [
-          "n"
+        "columns": [
+          {
+            "id": "n",
+            "name": "n",
+            "kind": "param"
+          }
         ],
         "cases": [
           {
@@ -1340,14 +1551,16 @@
               1
             ],
             "status": "skipped",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
               2
             ],
             "status": "skipped",
-            "error": null
+            "error": null,
+            "divergent": false
           }
         ]
       },
@@ -1355,7 +1568,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 214
+        "line": 244
       },
       "story_id": null,
       "activity_ids": []

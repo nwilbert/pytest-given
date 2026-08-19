@@ -26,8 +26,15 @@ from ..model import (
     StoryId,
     TermId,
     node_base,
+    walk_steps,
 )
-from .coverage import StepRef, compute_coverage, is_coverage_eligible, walk_steps
+from .coverage import (
+    StepRef,
+    compute_coverage,
+    is_coverage_eligible,
+    param_case_displays,
+    pill_display,
+)
 
 # ---------------------------------------------------------------------------
 # Public dataclasses
@@ -209,18 +216,22 @@ def build_glossary_aggregations(
 
     # --- Walk scenario steps ---
     for scenario in report.scenarios:
+        cases = param_case_displays(scenario)
         for _, step in walk_steps(scenario.steps):
             for part in step.narration.parts:
                 if not isinstance(part, NarrationTermRef):
                     continue
                 term = glossary.get(part.term_id)
-                if term is None:
+                if term is None or term.kind not in ('actor', 'object'):
                     continue
-                if term.kind in ('actor', 'object'):
+                # A pill bound to a parametrize column reads the baseline's
+                # display in the grouped tree; collect one instance per case so
+                # the Glossary view lists them all.
+                for display in _pill_displays(part, cases):
                     _record_entity_observation(
                         agg=_ensure(part.term_id),
                         term_id=part.term_id,
-                        display=part.display,
+                        display=display,
                         canonical=term.canonical,
                         fixture_name=step.fixture_name,
                         seen_instances=seen_instances,
@@ -261,6 +272,20 @@ def build_glossary_aggregations(
                                 seen_forms.add(form_key)
 
     return aggs
+
+
+def _pill_displays(part: NarrationTermRef, cases: list[dict[str, str]]) -> list[str]:
+    """Every display this pill takes: one per case when it is bound to a
+    parametrize column, otherwise just the one it carries.
+
+    `pill_display` decides each of them, so the Glossary lists exactly the
+    instances coverage credits — the two views reading one case differently is
+    a report disagreeing with itself.
+    """
+    if part.param_column is None or not cases:
+        return [part.display]
+    displays = (pill_display(part, case) for case in cases)
+    return [display for display in displays if display is not None]
 
 
 def _record_entity_observation(
@@ -341,7 +366,7 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
     Slug is `<file>/<func>` where the file is the node id's basename with `.py`
     and a leading `test_` removed, and the func is the part after `::` with a
     leading `test_` removed. The parametrization tail (`[water]`) is **dropped**
-    to keep the fragment short — a parametrized test usually merges into a
+    to keep the fragment short — a parametrized test usually groups into a
     single scenario, so the tail is just noise.
 
     The tail is kept only when it is needed to disambiguate: a parametrized test

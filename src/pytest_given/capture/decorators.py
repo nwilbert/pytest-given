@@ -4,7 +4,7 @@ import json
 import types
 import warnings
 from collections.abc import Callable, Mapping, Sequence
-from string import Formatter, templatelib
+from string import templatelib
 from typing import Any, Protocol, Self, cast, runtime_checkable
 
 import pytest
@@ -23,7 +23,7 @@ from ..model import (
 )
 from .collector import get_active_collector
 from .source import capture_caller_source, code_source
-from .template import Template, narration_from
+from .template import Template, narration_from, render_interpolation
 
 
 @runtime_checkable
@@ -396,9 +396,6 @@ def when_then(
     return WhenThen(when_text, then_text)
 
 
-_FORMATTER = Formatter()
-
-
 def _resolve_template_parts(
     parts: list[NarrationPart],
     mapping: Mapping[str, Any],
@@ -412,10 +409,9 @@ def _resolve_template_parts(
             case NarrationLiteral():
                 out.append(part)
             case NarrationPlaceholder(name=name, format_spec=spec, conversion=conv):
-                resolved = _FORMATTER.convert_field(mapping[name], conv)
                 out.append(
                     NarrationValue(
-                        rendered=format(resolved, spec),
+                        rendered=render_interpolation(mapping[name], conv, spec),
                         expression=name,
                         format_spec=spec,
                         conversion=conv,
@@ -424,19 +420,18 @@ def _resolve_template_parts(
     return out
 
 
-def attach(label: str | templatelib.Template, content: object) -> None:
+def attach(label: str, content: object) -> None:
     """Attach data to the current step.
 
-    If *content* is a ``str`` it is stored verbatim.  Any other type is
-    serialised as indented JSON.
+    *label* is plain text — an f-string is the way to vary it. If *content* is a
+    ``str`` it is stored verbatim; any other type is serialised as indented JSON.
     """
-    if isinstance(label, Template):
+    if not isinstance(label, str):
         raise PytestGivenError(
-            'attach(Template(...)) is not supported; use a t-string (eager) '
-            'or a plain string.'
+            'attachment labels are plain text; f-strings are fine — '
+            'attach(f"{kind} log", …). In a parametrized scenario keep the '
+            'label the same in every case and let the content vary.'
         )
-    if isinstance(label, templatelib.Template):
-        label = narration_from(label).text
     collector = get_active_collector()
     if collector is None or collector.state == 'idle':
         if collector is not None and collector.inside_unannotated_test:

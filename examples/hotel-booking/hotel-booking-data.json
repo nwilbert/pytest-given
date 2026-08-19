@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-07-18T06:55:47.394420+00:00",
+    "timestamp": "2026-08-18T21:26:37.314271+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "5e48f654b31d9300791f8c83e0ec2bc086603ab1"
+    "commit_sha": "a796990a61f3deac3da5211195baf0ed670a61cf"
   },
   "scenarios": [
     {
@@ -742,7 +742,7 @@
       "module": "test_hotel_booking",
       "tags": [],
       "status": "failed",
-      "duration_ms": 36,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -872,7 +872,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "Carol submits the Payment by credit card for the Booking",
+            "text": "Carol submits the Payment by {payment_method} for the Booking",
             "parts": [
               {
                 "term_id": "organizer",
@@ -903,6 +903,7 @@
               },
               {
                 "name": "payment_method",
+                "column_id": "payment_method",
                 "format_spec": "",
                 "conversion": null
               },
@@ -927,7 +928,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the Booking System rejects the Payment because of insufficient funds",
+            "text": "the Booking System rejects the Payment because of {decline_reason}",
             "parts": [
               {
                 "value": "the "
@@ -961,6 +962,7 @@
               },
               {
                 "name": "decline_reason",
+                "column_id": "decline_reason",
                 "format_spec": "",
                 "conversion": null
               }
@@ -1025,9 +1027,17 @@
         }
       ],
       "parameters": {
-        "names": [
-          "payment_method",
-          "decline_reason"
+        "columns": [
+          {
+            "id": "payment_method",
+            "name": "payment_method",
+            "kind": "param"
+          },
+          {
+            "id": "decline_reason",
+            "name": "decline_reason",
+            "kind": "param"
+          }
         ],
         "cases": [
           {
@@ -1036,7 +1046,8 @@
               "insufficient funds"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -1044,7 +1055,8 @@
               "expired card"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -1052,7 +1064,8 @@
               "fraud check failed"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "divergent": false
           },
           {
             "values": [
@@ -1072,7 +1085,8 @@
                 }
               ],
               "error_tail": "E   AssertionError: assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}"
-            }
+            },
+            "divergent": false
           }
         ]
       },

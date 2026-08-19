@@ -201,6 +201,7 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
                                             {'value': 'I insert '},
                                             {
                                                 'name': 'euros',
+                                                'column_id': 'euros',
                                                 'format_spec': '',
                                                 'conversion': None,
                                             },
@@ -214,7 +215,10 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
                                 }
                             ],
                             'parameters': {
-                                'names': ['euros', 'expect'],
+                                'columns': [
+                                    {'id': 'euros', 'name': 'euros', 'kind': 'param'},
+                                    {'id': 'expect', 'name': 'expect', 'kind': 'param'},
+                                ],
                                 'cases': [
                                     {
                                         'values': [1, False],
@@ -239,11 +243,11 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
         render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
         content = html_path.read_text(encoding='utf-8')
     with then(
-        t'{pg["Parameter coloring"]} classes mark the merged placeholder '
+        t'{pg["Parameter coloring"]} classes mark the grouped placeholder '
         t'and the table headers'
     ):
         assert 'param-color-0' in content
-        # The merged step shows the {name} token
+        # The grouped step shows the {name} token
         assert '{euros}' in content
         # Headers carry color class + data-param for the crosshair JS
         assert re.search(r'<th[^>]*\bparam-color-0\b[^>]*\bdata-param="euros"', content)
@@ -252,10 +256,10 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
         )
 
 
-def test_render_merged_placeholder_drops_format_spec_and_conversion(
+def test_render_grouped_placeholder_drops_format_spec_and_conversion(
     tmp_path: Path,
 ) -> None:
-    """Merged-template view shows a bare {name}: the schematic slot marks which
+    """Grouped-template view shows a bare {name}: the schematic slot marks which
     column varies, not how a value prints. Conversion and format spec are
     per-value details applied in the concrete per-case rows, so they are
     dropped from the collapsed slot."""
@@ -279,7 +283,10 @@ def test_render_merged_placeholder_drops_format_spec_and_conversion(
                         'duration_ms': 0,
                         'error': None,
                         'parameters': {
-                            'names': ['n', 'obj'],
+                            'columns': [
+                                {'id': 'n', 'name': 'n', 'kind': 'param'},
+                                {'id': 'obj', 'name': 'obj', 'kind': 'param'},
+                            ],
                             'cases': [
                                 {
                                     'values': [7, 'hi'],
@@ -296,12 +303,14 @@ def test_render_merged_placeholder_drops_format_spec_and_conversion(
                                     [
                                         {
                                             'name': 'n',
+                                            'column_id': 'n',
                                             'format_spec': '03d',
                                             'conversion': None,
                                         },
                                         {'value': ' '},
                                         {
                                             'name': 'obj',
+                                            'column_id': 'obj',
                                             'format_spec': '',
                                             'conversion': 'r',
                                         },
@@ -814,7 +823,7 @@ def test_render_parameter_table_skipped_case_uses_dot_skipped(tmp_path: Path) ->
                         'duration_ms': 0,
                         'steps': [],
                         'parameters': {
-                            'names': ['n'],
+                            'columns': [{'id': 'n', 'name': 'n', 'kind': 'param'}],
                             'cases': [
                                 {'values': [1], 'status': 'skipped', 'error': None},
                                 {'values': [2], 'status': 'skipped', 'error': None},
@@ -1027,6 +1036,7 @@ def test_render_placeholder_gets_data_param_attribute(tmp_path: Path) -> None:
                                         {'value': 'I insert '},
                                         {
                                             'name': 'euros',
+                                            'column_id': 'euros',
                                             'format_spec': '',
                                             'conversion': None,
                                         },
@@ -1039,7 +1049,9 @@ def test_render_placeholder_gets_data_param_attribute(tmp_path: Path) -> None:
                             }
                         ],
                         'parameters': {
-                            'names': ['euros'],
+                            'columns': [
+                                {'id': 'euros', 'name': 'euros', 'kind': 'param'}
+                            ],
                             'cases': [
                                 {'values': [1], 'status': 'passed', 'error': None},
                             ],
@@ -1080,7 +1092,10 @@ def test_render_param_table_cells_get_data_param(tmp_path: Path) -> None:
                         'duration_ms': 0,
                         'steps': [],
                         'parameters': {
-                            'names': ['euros', 'expect'],
+                            'columns': [
+                                {'id': 'euros', 'name': 'euros', 'kind': 'param'},
+                                {'id': 'expect', 'name': 'expect', 'kind': 'param'},
+                            ],
                             'cases': [
                                 {
                                     'values': [1, False],
@@ -1112,6 +1127,51 @@ def test_render_param_table_cells_get_data_param(tmp_path: Path) -> None:
     assert re.search(r'<td[^>]*\bdata-param="expect"[^>]*>\s*False\s*</td>', content)
     assert re.search(r'<td[^>]*\bdata-param="euros"[^>]*>\s*2\s*</td>', content)
     assert re.search(r'<td[^>]*\bdata-param="expect"[^>]*>\s*True\s*</td>', content)
+
+
+def test_render_param_table_none_value_as_text_not_blank(tmp_path: Path) -> None:
+    """A `None` parametrize value is a legitimate value on a `param` column
+    (unlike a `derived`/`attachment` column, where `None` means "no value for
+    this case"), so it must render, not blank out. Regression guard for a
+    drift where this renderer briefly blanked `None` cells while the
+    Markdown renderer kept printing the literal text."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'test.py::test_none',
+                        'narration': _narration('None param'),
+                        'module': 'mod',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': {
+                            'columns': [
+                                {'id': 'label', 'name': 'label', 'kind': 'param'},
+                            ],
+                            'cases': [
+                                {'values': [None], 'status': 'passed', 'error': None},
+                            ],
+                        },
+                        'error': None,
+                    }
+                ],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert re.search(r'<td[^>]*\bdata-param="label"[^>]*>\s*None\s*</td>', content)
 
 
 # ---------------------------------------------------------------------------
@@ -1791,8 +1851,37 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
                     'status': 'passed',
                     'steps': [],
                     'parameters': {
-                        'names': [f'param{_BREAKOUT}'],
-                        'cases': [{'values': ['v'], 'status': 'passed'}],
+                        'columns': [
+                            {
+                                'id': f'param{_BREAKOUT}',
+                                'name': f'param{_BREAKOUT}',
+                                'kind': 'param',
+                            },
+                            {
+                                'id': f'derived{_BREAKOUT}',
+                                'name': f'derived{_BREAKOUT}',
+                                'kind': 'derived',
+                            },
+                            {
+                                'id': f'attachment{_BREAKOUT}',
+                                'name': f'attachment{_BREAKOUT}',
+                                'kind': 'attachment',
+                            },
+                        ],
+                        'cases': [
+                            {
+                                'values': [
+                                    'v',
+                                    'd',
+                                    {
+                                        'label': f'att{_BREAKOUT}',
+                                        'content': 'payload',
+                                        'content_type': 'text',
+                                    },
+                                ],
+                                'status': 'passed',
+                            }
+                        ],
                     },
                     'story_id': f'story{_BREAKOUT}',
                     'activity_ids': [f'act{_BREAKOUT}'],
@@ -1837,3 +1926,93 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
     assert not offenders, 'report data reached an Alpine expression: ' + '; '.join(
         offenders
     )
+
+
+# ---------------------------------------------------------------------------
+# Task 2 — typed parameter-table columns
+# ---------------------------------------------------------------------------
+
+from pytest_given.model import (  # noqa: E402
+    NodeId,
+    ParameterColumn,
+    ParameterTable,
+    Scenario,
+)
+from pytest_given.report.html_renderer import _build_param_color_map  # noqa: E402
+
+
+def test_param_color_map_skips_attachment_columns() -> None:
+    """An attachment column needs no value colour, so it is excluded from the
+    colour map even while its sibling param column still gets one."""
+    scenario = Scenario(
+        id=NodeId('t.py::test_brew'),
+        narration=Narration(text='brew'),
+        module='t',
+        parameters=ParameterTable(
+            columns=[
+                ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+                ParameterColumn(
+                    id='attachment:0', name='machine state', kind='attachment'
+                ),
+            ],
+            cases=[],
+        ),
+    )
+    color_map = _build_param_color_map([scenario])
+    assert color_map == {'cup_size': 0}
+
+
+def test_a_disambiguated_columns_token_takes_its_own_columns_colour(
+    tmp_path: Path,
+) -> None:
+    """The palette is keyed on the column *name*, so a token naming the column
+    it points at reads the header's colour. A token still carrying the bare
+    expression would take the first `price` column's colour while sitting under
+    the second one's header."""
+    report = report_from_dict(
+        {
+            'metadata': {
+                'project': 'p',
+                'timestamp': 't',
+                'pytest_version': '9',
+                'plugin_version': '0.1',
+            },
+            'scenarios': [
+                {
+                    'id': 't.py::test_brew',
+                    'narration': _narration('brew'),
+                    'module': 't',
+                    'status': 'passed',
+                    'steps': [
+                        {
+                            'phase': 'then',
+                            'narration': {
+                                'text': 'it costs {price #2}',
+                                'parts': [
+                                    {'value': 'it costs '},
+                                    {'name': 'price #2', 'column_id': 'derived:1'},
+                                ],
+                            },
+                        }
+                    ],
+                    'parameters': {
+                        'columns': [
+                            {'id': 'cup_size', 'name': 'cup_size', 'kind': 'param'},
+                            {'id': 'derived:0', 'name': 'price', 'kind': 'derived'},
+                            {'id': 'derived:1', 'name': 'price #2', 'kind': 'derived'},
+                        ],
+                        'cases': [{'values': [200, '2.0', '9.0'], 'status': 'passed'}],
+                    },
+                }
+            ],
+        }
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(report, html_path)
+    html = html_path.read_text(encoding='utf-8')
+
+    header = re.search(r'<th class="param-color-(\d+)" data-param="derived:1"', html)
+    token = re.search(r'<span class="param-color-(\d+)" data-param="derived:1"', html)
+    assert header is not None
+    assert token is not None
+    assert token.group(1) == header.group(1)

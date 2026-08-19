@@ -7,6 +7,7 @@ from pytest_given.model import (
     ActivityTermRef,
     ActivityWord,
     Attachment,
+    AttachmentRef,
     ErrorInfo,
     Glossary,
     GlossaryTerm,
@@ -18,6 +19,7 @@ from pytest_given.model import (
     NarrationValue,
     NodeId,
     ParameterCase,
+    ParameterColumn,
     ParameterTable,
     PytestGivenError,
     ReportData,
@@ -39,6 +41,10 @@ def _round_trip(report):
 
 def _meta():
     return Metadata(project='p', timestamp='t', pytest_version='8', plugin_version='0')
+
+
+def _restored(scenario: Scenario) -> Scenario:
+    return _round_trip(ReportData(metadata=_meta(), scenarios=[scenario])).scenarios[0]
 
 
 def _dummy_metadata() -> Metadata:
@@ -261,7 +267,10 @@ def test_parameter_table_round_trips() -> None:
                     'steps': [],
                     'error': None,
                     'parameters': {
-                        'names': ['euros', 'expect'],
+                        'columns': [
+                            {'id': 'euros', 'name': 'euros', 'kind': 'param'},
+                            {'id': 'expect', 'name': 'expect', 'kind': 'param'},
+                        ],
                         'cases': [
                             {'values': [1, False], 'status': 'passed', 'error': None},
                             {
@@ -281,7 +290,7 @@ def test_parameter_table_round_trips() -> None:
     )
     pt = report.scenarios[0].parameters
     assert isinstance(pt, ParameterTable)
-    assert pt.names == ['euros', 'expect']
+    assert [c.name for c in pt.columns] == ['euros', 'expect']
     assert pt.cases == [
         ParameterCase(values=[1, False], status='passed', error=None),
         ParameterCase(
@@ -424,6 +433,7 @@ def test_narration_placeholder_part() -> None:
                         'parts': [
                             {
                                 'name': 'euros',
+                                'column_id': 'euros',
                                 'format_spec': '03d',
                                 'conversion': 'r',
                             }
@@ -442,7 +452,9 @@ def test_narration_placeholder_part() -> None:
     )
     parts = report.scenarios[0].narration.parts
     assert parts == [
-        NarrationPlaceholder(name='euros', format_spec='03d', conversion='r')
+        NarrationPlaceholder(
+            name='euros', column_id='euros', format_spec='03d', conversion='r'
+        )
     ]
 
 
@@ -510,7 +522,7 @@ def test_round_trip_via_to_dict() -> None:
                     parts=[
                         NarrationLiteral(value='Brew '),
                         NarrationPlaceholder(
-                            name='cup', format_spec='', conversion=None
+                            name='cup', column_id='cup', format_spec='', conversion=None
                         ),
                     ],
                 ),
@@ -690,3 +702,85 @@ def test_glossary_term_source_roundtrips() -> None:
     round_tripped = report_from_dict(report_to_dict(report))
     assert round_tripped.glossary is not None
     assert round_tripped.glossary.terms[0].source == g.terms[0].source
+
+
+def test_round_trip_preserves_column_kinds_and_cell_shapes() -> None:
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='cup_size', name='cup_size', kind='param'),
+            ParameterColumn(id='derived:0', name='price', kind='derived'),
+            ParameterColumn(id='attachment:0', name='state', kind='attachment'),
+        ],
+        cases=[
+            ParameterCase(
+                values=[
+                    200,
+                    '2.0',
+                    Attachment(
+                        label='state', content='{"ml": 200}', content_type='json'
+                    ),
+                ],
+                status='passed',
+            ),
+            ParameterCase(values=[350, None, None], status='skipped'),
+        ],
+    )
+    scenario = Scenario(
+        id=NodeId('t.py::test_brew'),
+        narration=Narration(text='brew'),
+        module='m',
+        parameters=table,
+    )
+    restored = _restored(scenario)
+    assert restored.parameters == table
+
+
+def test_round_trip_preserves_attachment_ref_and_inline_attachment() -> None:
+    step = Step(
+        phase='when',
+        narration=Narration(text='brews'),
+        attachments=[
+            Attachment(label='inline', content='same everywhere'),
+            AttachmentRef(label='state', content_type='json', column_id='attachment:0'),
+        ],
+    )
+    scenario = Scenario(
+        id=NodeId('t.py::test_brew'),
+        narration=Narration(text='brew'),
+        module='m',
+        steps=[step],
+    )
+    restored = _restored(scenario)
+    assert restored.steps[0].attachments == step.attachments
+
+
+def test_round_trip_preserves_placeholder_column_id() -> None:
+    narration = Narration(
+        text='costs {price}',
+        parts=[
+            NarrationLiteral(value='costs '),
+            NarrationPlaceholder(name='price', column_id='derived:0'),
+        ],
+    )
+    scenario = Scenario(id=NodeId('t.py::t'), narration=narration, module='m')
+    restored = _restored(scenario)
+    assert restored.narration.parts[1] == narration.parts[1]
+
+
+def test_a_pre_columns_parameter_table_says_to_re_run_the_suite():
+    """`pytest-given report` on a report saved before `names` became `columns`
+    used to die with a bare `KeyError: 'columns'`. There is no migration — the
+    error has to say so."""
+    from pytest_given.model.serde import _param_table_from_dict
+
+    with pytest.raises(PytestGivenError, match='re-run the suite'):
+        _param_table_from_dict({'names': ['cup_size'], 'cases': []})
+
+
+def test_a_pre_columns_placeholder_says_to_re_run_the_suite():
+    """Same vintage of report, reached through a step's narration rather than
+    its parameter table: a placeholder gained `column_id` in the same change."""
+    from pytest_given.model.serde import _narration_part_from_dict
+
+    with pytest.raises(PytestGivenError, match='re-run the suite'):
+        _narration_part_from_dict({'name': 'cup_size'})

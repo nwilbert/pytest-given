@@ -1,5 +1,6 @@
 import inspect
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -17,6 +18,7 @@ from pytest_given.capture.decorators import (
     scenario,
     then,
     when,
+    when_then,
 )
 from pytest_given.capture.source import _reset_rootdir, set_rootdir
 from pytest_given.capture.story import (
@@ -479,25 +481,32 @@ def test_scenario_with_glossary_tstring_preserves_surface_text() -> None:
     assert deco.name.text == 'guests arrive'
 
 
-def test_attach_with_tstring_label_renders_eagerly() -> None:
-    collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('given', Narration(text='a step'))
-    set_active_collector(collector)
-    try:
-        size = 200
-        attach(t'cup {size}', 'content')
-    finally:
-        set_active_collector(None)
-    collector.pop_step()
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
-    att = scenario.steps[-1].attachments[0]
-    assert att.label == 'cup 200'
+# Parametrized over a *description* rather than the label object itself: the
+# case table prints the parameter, and a `Template` renders as its address —
+# non-deterministic, so the committed report would churn on every regeneration.
+_BAD_LABELS: dict[str, object] = {
+    'deferred-template': Template('{flavor} log'),
+    't-string': t'vanilla log',
+    'not-a-string': 42,
+}
 
 
-def test_attach_with_pytest_given_template_raises() -> None:
-    with pytest.raises(PytestGivenError, match=r'attach.*not supported'):
-        attach(Template('cup {size}'), 'content')
+@pytest.mark.parametrize('label_kind', list(_BAD_LABELS))
+@scenario(
+    t'An {pg["Attachment"].low} label must be plain text',
+    tags=['validation'],
+)
+def test_attach_rejects_a_non_str_label(label_kind: str) -> None:
+    with given(t'a non-str {pg["Attachment"]} label of kind {label_kind}'):
+        candidate = cast(str, _BAD_LABELS[label_kind])
+    with (
+        when_then(
+            t'it is attached',
+            t'a PytestGivenError says {pg["Attachment"]} labels are plain text',
+        ),
+        pytest.raises(PytestGivenError, match='attachment labels are plain text'),
+    ):
+        attach(candidate, 'payload')
 
 
 def test_step_descriptor_with_tstring_no_interpolations_still_has_parts() -> None:

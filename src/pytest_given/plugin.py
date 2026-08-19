@@ -1,7 +1,7 @@
 """pytest-given plugin entry point."""
 
 import contextlib
-import dataclasses
+import copy
 import functools
 import inspect
 import json
@@ -42,6 +42,7 @@ from .capture.story import (
     restore_story_registry,
     snapshot_story_registry,
 )
+from .grouping import group_parametrized
 from .lint import (
     Finding,
     apply_config,
@@ -54,25 +55,16 @@ from .model import (
     FixtureRecording,
     Glossary,
     Metadata,
-    Narration,
-    NarrationLiteral,
-    NarrationPart,
-    NarrationPlaceholder,
-    NarrationTermRef,
-    NarrationValue,
     NodeId,
-    ParameterCase,
-    ParameterTable,
-    ParamInfo,
     ParamSpec,
-    ParamValue,
     PytestGivenError,
+    RawParamValue,
     ReportData,
     Scenario,
     Step,
     Story,
     StoryId,
-    node_base,
+    placeholder_mismatch,
     report_from_dict,
     report_to_dict,
 )
@@ -102,6 +94,7 @@ _displaced_active_collector_key: pytest.StashKey[Collector | None] = pytest.Stas
 _LINT_CHOICES = ('true', 'false')
 _lint_findings: pytest.StashKey[list[Finding]] = pytest.StashKey()
 _md_stdout: pytest.StashKey[str] = pytest.StashKey()
+_grouping_error_message: pytest.StashKey[str] = pytest.StashKey()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -263,7 +256,7 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
        is `callspec.params`).
     2. Every Template placeholder must match a parametrize column name —
        catches typos at `pytest --collect-only` rather than at session-finish
-       merge, where the error would escape `pytest_sessionfinish` opaquely.
+       grouping, where the error would escape `pytest_sessionfinish` opaquely.
     3. Any activity_ids on the scenario must be valid ids within the story.
 
     Deferred to collection time (rather than decoration time) because
@@ -289,10 +282,10 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
         param_names = list(callspec.params.keys())
         for placeholder in marker.name.get_identifiers():
             if placeholder not in param_names:
-                raise PytestGivenError(
-                    f"pytest_given.Template placeholder '{{{placeholder}}}' "
-                    f'in @scenario(...) on {item.nodeid!r} does not match '
-                    f'any parametrize column (have: {sorted(param_names)}).'
+                raise placeholder_mismatch(
+                    placeholder,
+                    param_names,
+                    where=f'in @scenario(...) on {item.nodeid!r}',
                 )
 
 
@@ -344,21 +337,63 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
         activity_ids=scenario_marker.activity_ids,
     )
     set_active_collector(collector)
-    callspec = getattr(item, 'callspec', None)
-    if callspec is not None:
-        names = list(callspec.params.keys())
-        values = [_param_value(callspec.params[n]) for n in names]
-        collector.param_info[node_id] = ParamSpec(names=names, values=values)
     # Pre-fixture-setup work done; let pytest run fixture setup here.
     yield
+    _capture_param_spec(item, collector, node_id)
     _graft_fixture_recordings(item, collector)
     collector.start_times[node_id] = time.monotonic()
 
 
-def _param_value(value: object) -> ParamValue:
-    if value is None or isinstance(value, (str, int, float, bool)):
-        return value
-    return str(value)
+def _capture_param_spec(
+    item: pytest.Item, collector: Collector, node_id: NodeId
+) -> None:
+    """Snapshot the parametrize arguments as the test is about to see them.
+
+    Read from `item.funcargs` rather than `callspec.params`: under
+    `indirect=True` the argument is bound to whatever the fixture returned, and
+    that — not the parametrize input — is what the test narrates and what the
+    case cell has to show, since row hover substitutes a cell into the slot the
+    step rendered. `params` still supplies the names, and the value when a
+    fixture never got as far as binding one.
+
+    Snapshotted rather than kept live: these values are read again at session
+    finish, so a body that mutates one in place would otherwise put the
+    post-test state in the table and make the rebound-parameter rule compare
+    the narration against a value it never rendered.
+    """
+    callspec = getattr(item, 'callspec', None)
+    if callspec is None:
+        return
+    funcargs = getattr(item, 'funcargs', {})
+    names = list(callspec.params.keys())
+    collector.param_info[node_id] = ParamSpec(
+        names=names,
+        values=[_snapshot(funcargs.get(name, callspec.params[name])) for name in names],
+    )
+
+
+def _snapshot(value: RawParamValue) -> RawParamValue:
+    """A shallow copy of a parametrize value, or the value itself when its type
+    refuses to be copied or the copy would not render the way it does.
+
+    Best effort by nature: a value that cannot be copied is one whose mutation
+    cannot be guarded against either.
+
+    A copy that renders differently is worse than no copy at all. An object
+    inheriting the default `__repr__` — or a `MagicMock` — renders its own
+    address, so the copy puts a value in the cell that no case ever narrated
+    and reads to the rebound-parameter rule as a rebinding that never happened.
+    Mutation cannot change such a rendering anyway, so keeping the original
+    gives up nothing the copy was there to protect.
+    """
+    with contextlib.suppress(Exception):
+        snapshot = copy.copy(value)
+        # Both renderings, since an interpolation may ask for either: `!r`
+        # takes `repr` and a bare `{x}` takes `str`, and a type can define one
+        # by value and inherit the other from `object`.
+        if (str(snapshot), repr(snapshot)) == (str(value), repr(value)):
+            return snapshot
+    return value
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -673,8 +708,22 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
 
 def pytest_sessionfinish(session: pytest.Session) -> None:
     collector = _collector(session.config)
-    scenarios = _group_parametrized(collector.scenarios, collector.param_info)
-    collector.param_info.clear()
+    try:
+        scenarios = group_parametrized(collector.scenarios, collector.param_info)
+    except PytestGivenError as error:
+        # An exception leaving this hook is neither a test failure nor an
+        # INTERNALERROR — pytest lets it out of console_main as a bare
+        # traceback. Record it for the terminal summary, write no sink (a
+        # report we know to be false is never emitted), and fail the run.
+        session.config.stash[_grouping_error_message] = '\n'.join(
+            [str(error), *_discard_stale_sinks(session.config)]
+        )
+        session.exitstatus = pytest.ExitCode.TESTS_FAILED
+        return
+    finally:
+        # Both ways out drop the captured parametrize values: they are read
+        # only here, and a nested in-process run must not inherit them.
+        collector.param_info.clear()
     stories = list(collector._discovered_stories.values())
     glossary = _resolve_glossary(stories, session)
     if glossary is not None:
@@ -721,6 +770,27 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     _run_lint(session, scenarios, collector.scenarios, glossary, stories)
 
 
+def _discard_stale_sinks(config: pytest.Config) -> list[str]:
+    """Delete the sinks this run would have written, and say which.
+
+    Writing no report leaves the *previous* run's report in place, where it
+    reads as current — the one outcome worse than no report at all. Only the
+    paths this run was told to write are touched, and each was going to be
+    overwritten anyway.
+    """
+    removed = []
+    for option in ('given_json', 'given_html', 'given_md'):
+        value = config.getoption(option)
+        if value is None or value == '-':
+            continue
+        path = Path(value)
+        if not path.is_file():
+            continue
+        path.unlink()
+        removed.append(f'Removed the previous {path} — it would read as current.')
+    return removed
+
+
 def _run_lint(
     session: pytest.Session,
     scenarios: list[Scenario],
@@ -747,6 +817,12 @@ def _run_lint(
 
 
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
+    grouping_error = terminalreporter.config.stash.get(_grouping_error_message, None)
+    if grouping_error is not None:
+        terminalreporter.write_sep(
+            '=', 'pytest-given: parametrize grouping error', red=True
+        )
+        terminalreporter.line(grouping_error)
     findings = terminalreporter.config.stash.get(_lint_findings, [])
     if findings:
         errors = sum(1 for f in findings if f.severity == 'error')
@@ -829,128 +905,3 @@ def _scan_conftests_for_glossary(session: pytest.Session) -> Glossary | None:
     if distinct:
         return next(iter(distinct.values()))[1]
     return None
-
-
-def _group_parametrized(
-    scenarios: list[Scenario],
-    param_info: ParamInfo,
-) -> list[Scenario]:
-    """Group parametrized scenarios into single scenarios with parameter tables."""
-    result: list[Scenario] = []
-    groups: dict[tuple[str, str], list[Scenario]] = {}
-    group_order: list[tuple[str, str]] = []
-
-    for scenario in scenarios:
-        if scenario.id in param_info:
-            key = (node_base(scenario.id), scenario.narration.text)
-            if key not in groups:
-                groups[key] = []
-                group_order.append(key)
-            groups[key].append(scenario)
-        else:
-            result.append(scenario)
-
-    for key in group_order:
-        group = groups[key]
-        first = group[0]
-        param_names, _ = param_info[first.id]
-
-        template_steps = _templatize_steps(first.steps, param_names)
-        merged_narration = _templatize_narration(first.narration, param_names)
-
-        cases: list[ParameterCase] = []
-        total_duration = 0
-        for scenario in group:
-            _, values = param_info[scenario.id]
-            cases.append(
-                ParameterCase(
-                    values=values,
-                    status=scenario.status,
-                    error=scenario.error,
-                )
-            )
-            total_duration += scenario.duration_ms
-
-        if any(c.status == 'failed' for c in cases):
-            merged_status = 'failed'
-        elif all(c.status == 'skipped' for c in cases):
-            merged_status = 'skipped'
-        else:
-            merged_status = 'passed'
-
-        merged = Scenario(
-            id=first.id,
-            narration=merged_narration,
-            module=first.module,
-            tags=first.tags,
-            status=merged_status,
-            duration_ms=total_duration,
-            steps=template_steps,
-            parameters=ParameterTable(names=param_names, cases=cases),
-            source=first.source,
-            story_id=first.story_id,
-            activity_ids=first.activity_ids,
-        )
-        result.append(merged)
-
-    return result
-
-
-def _templatize_steps(
-    steps: list[Step],
-    param_names: list[str],
-) -> list[Step]:
-    """Walk steps and templatize their narration."""
-    result: list[Step] = []
-    for step in steps:
-        new_narration = _templatize_narration(step.narration, param_names)
-        new_children = _templatize_steps(step.children, param_names)
-        result.append(
-            dataclasses.replace(step, narration=new_narration, children=new_children)
-        )
-    return result
-
-
-def _templatize_narration(
-    narration: Narration,
-    param_names: list[str],
-) -> Narration:
-    """Convert matching NarrationValue entries to NarrationPlaceholder.
-
-    NarrationLiteral parts pass through unchanged. A NarrationValue whose
-    `expression` matches a parametrize column becomes a NarrationPlaceholder;
-    otherwise it stays verbatim (the rendered value is shared across cases).
-    A NarrationPlaceholder must reference a known parametrize column.
-    """
-    if not narration.parts:
-        return narration
-    out: list[NarrationPart] = []
-    for part in narration.parts:
-        match part:
-            case NarrationLiteral():
-                out.append(part)
-            case NarrationValue(expression=expression, format_spec=fs, conversion=conv):
-                if expression in param_names:
-                    out.append(
-                        NarrationPlaceholder(
-                            name=expression,
-                            format_spec=fs,
-                            conversion=conv,
-                        )
-                    )
-                else:
-                    out.append(part)
-            case NarrationPlaceholder(name=name):
-                if name not in param_names:
-                    raise PytestGivenError(
-                        f"pytest_given.Template placeholder '{{{name}}}' does "
-                        f'not match any parametrize column (have: '
-                        f'{sorted(param_names)}).'
-                    )
-                out.append(part)
-            case NarrationTermRef(expression=expression):
-                if expression in param_names:
-                    out.append(dataclasses.replace(part, param_column=expression))
-                else:
-                    out.append(part)
-    return dataclasses.replace(narration, parts=out)

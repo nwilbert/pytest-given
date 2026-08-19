@@ -35,9 +35,10 @@ The short version: bump `version` in `pyproject.toml` and add a matching `## [x.
 
 ## Architecture
 
-`src/pytest_given/` is four subpackages plus two top-level orchestrators, with a strict dependency direction (convention, not lint-enforced): `model/` is the leaf — dataclass schema, JSON serde, IDs, errors; `capture/` (records scenarios at runtime), `lint/` (checks them), and `report/` (renders HTML / Markdown / JSON) each depend on `model/` and never on each other. `plugin.py` and `cli.py` sit on top and may import from all four. Filenames carry the rest — what they don't:
+`src/pytest_given/` is five subpackages plus two top-level modules, with a strict dependency direction (convention, not lint-enforced): `model/` is the leaf — dataclass schema, JSON serde, IDs, errors; `capture/` (records scenarios at runtime), `lint/` (checks them), and `report/` (renders HTML / Markdown / JSON) each depend on `model/` and never on each other. `grouping/` sits one layer up, on `model/` and `capture/`. The top level holds entry points only: `plugin.py` and `cli.py`, which may import from all five. Filenames carry the rest — what they don't:
 
-- `plugin.py` — the pytest-side orchestrator: hooks, parametrized test grouping, structural templatize, scenario-source capture from `item.location`, and where lint findings surface (terminal summary + exit code, never in report artifacts).
+- `grouping/` — the parametrize pass: groups a scenario's cases into one narrated tree plus a case table, promotes what varies into `param` / `derived` / `attachment` columns, and raises `PytestGivenError` on the five authoring forms that would make the grouped tree lie. Runs at session finish, *before* the sink is written, so its output is what every renderer reads. Inside: `group` runs the pass (partition, baseline, assembly), `templatize` walks the baseline tree promoting what varies, `checks` holds the five rules, `columns` holds the table they build up.
+- `plugin.py` — the pytest-side orchestrator: hooks, parametrize-value capture, scenario-source capture from `item.location`, sink writing (and discarding a stale sink when grouping raises), and where lint findings surface (terminal summary + exit code, never in report artifacts).
 - `cli.py` — the `pytest-given` console entry point and argparse root; owns `skills install` (mirrors `skills_data/` into a project's `.claude/skills/`, `--check` for drift) and delegates `report` to `report/cli.py`.
 - `capture/source.py` — `capture_caller_source(skip=...)` walks `inspect.stack` to record a construction site for `story()` and glossary registration; also the one platform seam (see [Conventions](#conventions)).
 - `lint/` — pure, imports only `model/`: rule catalog as data (`base.py`), `given_lint_*` config (`config.py`), rules over the recorded model (`runtime_rules.py`) and over step-body ASTs (`ast_rules.py`).
@@ -66,6 +67,9 @@ Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filt
 
 **Setup:** copy `.mcp.json.example` to `.mcp.json` (gitignored) to enable the server. It is deliberately not committed: opening a report needs `--allow-unrestricted-file-access`, because Playwright MCP blocks `file://` navigation entirely by default and offers no narrower scope. That flag also lets the browser read any file the user can, so it stays opt-in per developer rather than arriving with a clone. Keep the version pinned — `@latest` would resolve fresh from npm on every launch.
 
+- `.mcp.json` is read at **session start**: creating it mid-session leaves the `browser_*` tools missing until a restart, so check for them before planning a task that ends in Playwright verification.
+- The pinned version wants its own browser build; an already-installed chromium fails at the first `browser_navigate` with `Browser "chrome-for-testing" is not installed`. Fix: `npx @playwright/mcp@<pinned-version> install-browser chrome-for-testing`.
+
 ## Writing self-report scenarios
 
 The narration rules live in the **`pytest-given-authoring` skill** — auto-discovered by contributor agents from [.claude/skills/pytest-given-authoring/](.claude/skills/pytest-given-authoring/SKILL.md) and shipped to downstream projects via `pytest-given skills install`. The canonical source is [src/pytest_given/skills_data/](src/pytest_given/skills_data/pytest-given-authoring/SKILL.md); after editing it, regenerate the committed copy with `uv run pytest-given skills install` and commit both (a sync test fails otherwise). The subsection below covers only what is specific to this repo's self-report.
@@ -76,6 +80,7 @@ The narration rules live in the **`pytest-given-authoring` skill** — auto-disc
 
 - The glossary handle is `pg` — `GLOSSARY.md` loaded as a `FileGlossary` in `tests/conftest.py` via `tests/ubiquitous_language.py`. Term-rename mechanics live under [Conventions](#conventions).
 - Regeneration (`uv run nox -s self_report`), narration-lint gating, and the commit-noise / `.md`-diff-review rules live under [Quality gates](#quality-gates).
+- **New or changed user-facing behaviour needs a scenario, not just a test** — otherwise the behaviour is invisible in the report. Decorate the test that best *states* the rule, one per rule, not per branch; the edge cases around it stay plain. Two gaps to check for: a rule the [CHANGELOG](CHANGELOG.md) announces that no scenario names, and a [GLOSSARY.md](GLOSSARY.md) row *asserting* behaviour (`Templatize`, `Parameter table`) that no scenario demonstrates.
 
 ## Conventions
 
