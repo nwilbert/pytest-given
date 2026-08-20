@@ -686,26 +686,43 @@ def pytest_runtest_teardown(item: pytest.Item) -> None:
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) -> None:
-    collector = _collector(item.config)
-    if collector.active_scenario_id != NodeId(item.nodeid):
+    """Put the error behind a failing phase on the scenario.
+
+    Setup (a fixture exception) and call (a test-body failure) fail the
+    *active* scenario; without the setup branch a fixture failure would bypass
+    `fail_scenario` and the scenario would carry no error info.
+
+    Teardown is the odd one out. The call report has already run
+    `finish_scenario` by then, so there is no active scenario to fail and the
+    scenario is amended by node id instead. Without that branch a fixture
+    raising past its `yield` leaves a green scenario behind a run pytest
+    counted as an error.
+    """
+    if call.excinfo is None or call.when not in ('setup', 'call', 'teardown'):
         return
-    # Capture errors from both setup (fixture exception) and call (test-body
-    # failure). Without the setup branch, fixture failures would silently
-    # bypass fail_scenario and the scenario would carry no error info.
-    if call.when in ('setup', 'call') and call.excinfo is not None:
-        # A skip raises Skipped (at setup for mark.skip/skipif, at call for an
-        # in-body pytest.skip()). Its traceback is pure skip machinery — the
-        # scenario carries a structured skip_reason instead (set in logreport).
-        # Short-circuit before getrepr, whose per-frame AST scan would otherwise
-        # run for every skipped scenario. Not gated on --given-all-frames: a skip
-        # never wants a traceback regardless.
-        if call.excinfo.errisinstance(pytest.skip.Exception):
-            return
-        if not item.config.getoption('given_all_frames'):
-            filter_internal_frames(call.excinfo)
-        error_repr = call.excinfo.getrepr(style='short')
-        message = str(call.excinfo.value)
-        frames, error_tail = parse_short_repr(str(error_repr))
+    collector = _collector(item.config)
+    node_id = NodeId(item.nodeid)
+    teardown = call.when == 'teardown'
+    if not teardown and collector.active_scenario_id != node_id:
+        return
+    # A skip raises Skipped (at setup for mark.skip/skipif, at call for an
+    # in-body pytest.skip()). Its traceback is pure skip machinery — the
+    # scenario carries a structured skip_reason instead (set in logreport).
+    # Short-circuit before getrepr, whose per-frame AST scan would otherwise
+    # run for every skipped scenario. Not gated on --given-all-frames: a skip
+    # never wants a traceback regardless.
+    if call.excinfo.errisinstance(pytest.skip.Exception):
+        return
+    if not item.config.getoption('given_all_frames'):
+        filter_internal_frames(call.excinfo)
+    error_repr = call.excinfo.getrepr(style='short')
+    message = str(call.excinfo.value)
+    frames, error_tail = parse_short_repr(str(error_repr))
+    if teardown:
+        collector.fail_recorded_scenario(
+            node_id, message=message, frames=frames, error_tail=error_tail
+        )
+    else:
         collector.fail_scenario(message=message, frames=frames, error_tail=error_tail)
 
 

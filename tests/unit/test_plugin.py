@@ -201,6 +201,25 @@ def test_pytest_runtest_teardown_clears_unannotated_flag(
     assert get_active_collector() is None
 
 
+def test_makereport_ignores_a_failure_outside_the_active_scenario(
+    fake_config: Any,
+    fresh_collector: Collector,
+) -> None:
+    """An unannotated test failing beside a tracked scenario must not fail it.
+
+    Only the teardown phase reaches the collector without an active scenario
+    (the call report finished it already); every other phase still has to match
+    the node id it is reporting on.
+    """
+    fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
+    call = SimpleNamespace(when='call', excinfo=SimpleNamespace())
+    item = cast(pytest.Item, SimpleNamespace(nodeid='t::b', config=fake_config))
+    plugin.pytest_runtest_makereport(item, cast(Any, call))
+    recorded = fresh_collector.finish_scenario(status='passed', duration_ms=0)
+    assert recorded.status == 'passed'
+    assert recorded.error is None
+
+
 def _fake_session() -> Any:
     """A session double with just enough config for `pytest_sessionstart`."""
     config = SimpleNamespace(

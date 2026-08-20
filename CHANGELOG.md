@@ -79,6 +79,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Fixed
 
+- A fixture that raises after its `yield` now fails the scenario it tore down,
+  instead of leaving it green in a report pytest counted as an error.
 - The grouped step tree now comes from the first case that *passed* — a skipped
   case 1 used to render an empty tree and hide later failures.
 - A cell now reads the way the step pointing at it read, carrying the

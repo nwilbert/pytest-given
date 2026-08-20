@@ -453,6 +453,41 @@ def test_fixture_setup_failure_appears_in_report(pytester, tmp_path):
     assert 'fixture boom' in s['error']['message']
 
 
+def test_fixture_teardown_failure_fails_the_scenario(pytester, tmp_path):
+    """A scenario whose fixture errors *after* its yield must not stay green.
+
+    The teardown report arrives once `finish_scenario` has already cleared the
+    active scenario, so without an explicit teardown path the error is dropped
+    and the report shows `passed` for a run pytest counted as an error.
+    """
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture
+        def resource():
+            yield 1
+            raise RuntimeError("teardown boom")
+
+        @scenario("Teardown-failed")
+        def test_a(resource):
+            with given("a resource"):
+                value = resource
+            with then("it is one"):
+                assert value == 1
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=1, errors=1)
+    data = json.loads(json_path.read_text())
+    s = data['scenarios'][0]
+    assert s['status'] == 'failed'
+    assert s['error'] is not None
+    assert 'teardown boom' in s['error']['message']
+
+
 def test_unannotated_after_setup_failure_is_not_contaminated(pytester, tmp_path):
     """When a @scenario test's fixture fails and is followed by an unannotated
     test, the next test's `with given(...)` must warn (not push into the

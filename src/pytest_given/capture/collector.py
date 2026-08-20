@@ -58,6 +58,7 @@ class Collector:
 
     def __init__(self) -> None:
         self._scenarios: list[Scenario] = []
+        self._scenarios_by_id: dict[NodeId, Scenario] = {}
         self._current_scenario: Scenario | None = None
         self._step_stack: list[Step] = []
         self.start_times: dict[NodeId, float] = {}
@@ -147,6 +148,7 @@ class Collector:
         self._current_scenario.skip_reason = skip_reason
         scenario = self._current_scenario
         self._scenarios.append(scenario)
+        self._scenarios_by_id[scenario.id] = scenario
         self._current_scenario = None
         self._step_stack = []
         self._state = 'idle'
@@ -348,6 +350,36 @@ class Collector:
         if self._current_scenario is not None:
             self._current_scenario.status = 'failed'
             self._current_scenario.error = ErrorInfo(
+                message=message,
+                frames=frames or [],
+                error_tail=error_tail,
+            )
+
+    def fail_recorded_scenario(
+        self,
+        node_id: NodeId,
+        message: str,
+        frames: list[TracebackFrame] | None = None,
+        error_tail: str | None = None,
+    ) -> None:
+        """Fail a scenario that has already finished — the teardown path.
+
+        A fixture raising past its `yield` errors after the call report ran
+        `finish_scenario`, so there is no active scenario left for
+        `fail_scenario` to mark and the run would otherwise report green for
+        something pytest counted as an error.
+
+        An error already on the scenario is kept: a call-phase failure is what
+        the reader opened the scenario for, and pytest reports the teardown
+        error separately either way. Unknown ids (an unannotated test, a
+        finalizer attributed to a non-scenario item) are ignored.
+        """
+        scenario = self._scenarios_by_id.get(node_id)
+        if scenario is None:
+            return
+        scenario.status = 'failed'
+        if scenario.error is None:
+            scenario.error = ErrorInfo(
                 message=message,
                 frames=frames or [],
                 error_tail=error_tail,

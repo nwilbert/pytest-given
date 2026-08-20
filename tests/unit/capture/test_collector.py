@@ -450,6 +450,58 @@ def test_start_scenario_source_defaults_to_none() -> None:
 
 
 @scenario(
+    t'A {pg["Step fixture"].low} failing in teardown fails its finished '
+    t'{pg["Scenario"].low}',
+)
+def test_fail_recorded_scenario_marks_a_finished_scenario_failed() -> None:
+    with given(t'a {pg["Scenario"]} that already finished as passed'):
+        collector = Collector()
+        collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
+        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+    with when('a fixture raises past its yield, after the scenario finished'):
+        collector.fail_recorded_scenario(
+            NodeId('test.py::test_x'), message='teardown boom'
+        )
+    with then(t'the recorded {pg["Scenario"].low} carries the failure'):
+        assert recorded.status == 'failed'
+        assert recorded.error is not None
+        assert recorded.error.message == 'teardown boom'
+
+
+@scenario(
+    t'A teardown failure keeps the error the {pg["Scenario"].low} already carries',
+)
+def test_fail_recorded_scenario_keeps_an_existing_error() -> None:
+    with given(t'a {pg["Scenario"]} that already failed in its body'):
+        collector = Collector()
+        collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
+        collector.fail_scenario(message='body boom')
+        recorded = collector.finish_scenario(status='failed', duration_ms=0)
+    with when('its fixture then also fails in teardown'):
+        collector.fail_recorded_scenario(
+            NodeId('test.py::test_x'), message='teardown boom'
+        )
+    with then('the body failure is what the report shows'):
+        assert recorded.error is not None
+        assert recorded.error.message == 'body boom'
+
+
+@scenario(
+    t'A teardown failure under an unknown {pg["Node ID"]} is ignored',
+)
+def test_fail_recorded_scenario_ignores_unknown_node_id() -> None:
+    with given(t'a {pg["Collector"]} that recorded one {pg["Scenario"].low}'):
+        collector = Collector()
+        collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
+        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+    with when('a teardown fails under a node id no scenario claimed'):
+        collector.fail_recorded_scenario(NodeId('test.py::test_other'), message='boom')
+    with then('the recorded scenario is untouched'):
+        assert recorded.status == 'passed'
+        assert recorded.error is None
+
+
+@scenario(
     t'A leaf given is {pg["Graft"]("grafted")} as a childless given {pg["Step"].low}',
     story=adopt_pytest_given,
 )

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-20T16:57:34.226465+00:00",
+    "timestamp": "2026-08-20T18:00:01.609256+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "e14f961dfa278fcb5ee706892e1466bae24cc2b1",
+    "commit_sha": "087892f95d91127c6aa9ed4d0d261c7eae602eb5",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -733,6 +733,292 @@
       "activity_ids": []
     },
     {
+      "id": "tests/unit/capture/test_collector.py::test_fail_recorded_scenario_marks_a_finished_scenario_failed",
+      "narration": {
+        "text": "A step fixture failing in teardown fails its finished scenario",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "step-fixture",
+            "display": "step fixture",
+            "expression": "pg[\"Step fixture\"].low",
+            "param_column": null
+          },
+          {
+            "value": " failing in teardown fails its finished "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].low",
+            "param_column": null
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Scenario that already finished as passed",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " that already finished as passed"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a fixture raises past its yield, after the scenario finished",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the recorded scenario carries the failure",
+            "parts": [
+              {
+                "value": "the recorded "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low",
+                "param_column": null
+              },
+              {
+                "value": " carries the failure"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 452
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_collector.py::test_fail_recorded_scenario_keeps_an_existing_error",
+      "narration": {
+        "text": "A teardown failure keeps the error the scenario already carries",
+        "parts": [
+          {
+            "value": "A teardown failure keeps the error the "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].low",
+            "param_column": null
+          },
+          {
+            "value": " already carries"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Scenario that already failed in its body",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " that already failed in its body"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "its fixture then also fails in teardown",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the body failure is what the report shows",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 471
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_collector.py::test_fail_recorded_scenario_ignores_unknown_node_id",
+      "narration": {
+        "text": "A teardown failure under an unknown Node ID is ignored",
+        "parts": [
+          {
+            "value": "A teardown failure under an unknown "
+          },
+          {
+            "term_id": "node-id",
+            "display": "Node ID",
+            "expression": "pg[\"Node ID\"]",
+            "param_column": null
+          },
+          {
+            "value": " is ignored"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Collector that recorded one scenario",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "collector",
+                "display": "Collector",
+                "expression": "pg[\"Collector\"]",
+                "param_column": null
+              },
+              {
+                "value": " that recorded one "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a teardown fails under a node id no scenario claimed",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the recorded scenario is untouched",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 489
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "tests/unit/capture/test_collector.py::test_graft_leaf_given_appends_childless_given_step",
       "narration": {
         "text": "A leaf given is grafted as a childless given step",
@@ -841,7 +1127,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 452
+        "line": 504
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -946,7 +1232,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 470
+        "line": 522
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -1049,7 +1335,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 495
+        "line": 547
       },
       "story_id": null,
       "activity_ids": []
@@ -14369,7 +14655,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
