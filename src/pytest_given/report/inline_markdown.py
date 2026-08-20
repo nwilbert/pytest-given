@@ -2,8 +2,6 @@
 breaks) from glossary term descriptions to safe HTML. Rendering is a report
 concern, so this lives in `report/` and never imports from `capture/`."""
 
-from __future__ import annotations
-
 import re
 
 from markupsafe import escape

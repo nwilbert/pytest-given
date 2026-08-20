@@ -5,8 +5,6 @@ appears in across all stories: 0 → actor, odd → verb, even ≥ 2 → noun
 (actor or work object). Undeclared kinds are inferred; declared kinds are
 verified against observed positions. Conflicts raise."""
 
-from __future__ import annotations
-
 from collections import defaultdict
 from dataclasses import replace
 from typing import Literal

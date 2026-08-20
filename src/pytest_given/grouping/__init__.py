@@ -5,7 +5,7 @@ varies becomes a column. See
 docs/specs/2026-08-14-parametrized-case-columns-design.md.
 
 `group` runs the pass, `templatize` walks the baseline tree promoting what
-varies, `checks` holds the five authoring rules that keep the grouped tree
+varies, `checks` holds the six authoring rules that keep the grouped tree
 honest, and `columns` holds the table the other three build up.
 """
 

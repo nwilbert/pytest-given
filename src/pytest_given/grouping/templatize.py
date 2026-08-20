@@ -342,7 +342,7 @@ def templatize_narration(
     For the **scenario** narration only — a scenario name is evaluated once at
     decoration time, so it cannot vary across cases and there is nothing to
     compare against other cases the way a step's narration is. That makes it
-    exactly `_param_bound_part` and nothing else: a part no parametrize column
+    exactly `_case_independent_part` and nothing else: a part no parametrize column
     binds stays verbatim, since its rendering is shared across cases.
     """
     if not narration.parts:

@@ -43,49 +43,49 @@
 - **then** it is refused rather than dropped
 
 ## ✓ A «fixture recording» is deep-copied when «grafted»
-`tests/unit/capture/test_collector.py:328::test_graft_recording_deep_copies_into_scenario`
+`tests/unit/capture/test_collector.py:332::test_graft_recording_deep_copies_into_scenario`
 
 - **given** a «Fixture recording» with a nested child «Step»
 - **when** a «Graft» copies it into the «Active scenario»
 - **then** the scenario gains a deep copy of the recorded steps
 
 ## ✓ A «step fixture» failing in teardown fails its finished «scenario»
-`tests/unit/capture/test_collector.py:469::test_fail_recorded_scenario_marks_a_finished_scenario_failed`
+`tests/unit/capture/test_collector.py:473::test_fail_recorded_scenario_marks_a_finished_scenario_failed`
 
 - **given** a «Scenario» that already finished as passed
 - **when** a fixture raises past its yield, after the scenario finished
 - **then** the recorded «scenario» carries the failure
 
 ## ✓ A teardown failure keeps the error the «scenario» already carries
-`tests/unit/capture/test_collector.py:488::test_fail_recorded_scenario_keeps_an_existing_error`
+`tests/unit/capture/test_collector.py:492::test_fail_recorded_scenario_keeps_an_existing_error`
 
 - **given** a «Scenario» that already failed in its body
 - **when** its fixture then also fails in teardown
 - **then** the body failure is what the report shows
 
 ## ✓ A teardown failure under an unknown «Node ID» is ignored
-`tests/unit/capture/test_collector.py:506::test_fail_recorded_scenario_ignores_unknown_node_id`
+`tests/unit/capture/test_collector.py:510::test_fail_recorded_scenario_ignores_unknown_node_id`
 
 - **given** a «Collector» that recorded one «scenario»
 - **when** a teardown fails under a node id no scenario claimed
 - **then** the recorded scenario is untouched
 
 ## ✓ A leaf given is «grafted» as a childless given «step»
-`tests/unit/capture/test_collector.py:521::test_graft_leaf_given_appends_childless_given_step`
+`tests/unit/capture/test_collector.py:525::test_graft_leaf_given_appends_childless_given_step`
 
 - **given** an «Active scenario» is being recorded
 - **when** a leaf «Graft» appends a childless «Step»
 - **then** the step is a given with no children
 
 ## ✓ «Grafting» with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:539::test_graft_recording_override_replaces_root_narration_keeps_children`
+`tests/unit/capture/test_collector.py:543::test_graft_recording_override_replaces_root_narration_keeps_children`
 
 - **given** a «Fixture recording» whose root has a label and a child
 - **when** a «Graft» supplies an override «Narration»
 - **then** the grafted root shows the override text and keeps its children
 
 ## ✓ «Grafting» with no «active scenario» is a no-op
-`tests/unit/capture/test_collector.py:564::test_graft_leaf_given_without_scenario_is_noop`
+`tests/unit/capture/test_collector.py:568::test_graft_leaf_given_without_scenario_is_noop`
 
 - **given** a collector with no «Active scenario»
 - **when** a leaf «Graft» runs

@@ -71,10 +71,10 @@ def check_same_template(baseline: Scenario, ctx: GroupContext) -> None:
 
     Runs first, against the very tree `templatize_steps` goes on to walk: the
     other rules index `ctx.indexed[case.id][path]` without a `.get`, and the
-    shape asserts in `_value_at` and `_term_at` read the part there as the
-    baseline's kind. Both hold because this ran and raised otherwise. A
-    non-passed case is exempt — a skipped one records no steps and a failed one
-    may abort mid-tree — which is exactly `ctx.comparable`.
+    shape asserts in `_value_at` and `check_constant_term_ref` read the part
+    there as the baseline's kind. Both hold because this ran and raised
+    otherwise. A non-passed case is exempt — a skipped one records no steps and
+    a failed one may abort mid-tree — which is exactly `ctx.comparable`.
     """
     signature = structure_signature(baseline.steps)
     # Walked and keyed once per group: every case is compared against the same

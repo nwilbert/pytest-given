@@ -2,6 +2,7 @@ import copy
 from collections.abc import Iterator
 from contextvars import ContextVar
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from ..model import (
     ActivityId,
@@ -24,6 +25,11 @@ from ..model import (
 )
 from .template import Template, narration_from
 
+if TYPE_CHECKING:
+    # `decorators` imports this module, so the descriptor type can only travel
+    # one way at runtime; the annotation still gets the real type.
+    from .decorators import StepDescriptor
+
 
 @dataclass(frozen=True)
 class StateToken:
@@ -31,7 +37,7 @@ class StateToken:
 
     previous_state: RecordingState
     previous_recording: FixtureRecording | None
-    previous_fixture_descriptor: object | None
+    previous_fixture_descriptor: StepDescriptor | None
 
 
 type FixtureInstanceKey = tuple[object, object]
@@ -65,7 +71,7 @@ class Collector:
         self.param_info: ParamInfo = {}
         self._state: RecordingState = 'idle'
         self._active_recording: FixtureRecording | None = None
-        self._active_fixture_descriptor: object | None = None
+        self._active_fixture_descriptor: StepDescriptor | None = None
         self._recordings: dict[FixtureInstanceKey, FixtureRecording] = {}
         self.inside_unannotated_test: bool = False
         # Whether steps record their body's source anchor (narration lint
@@ -98,7 +104,7 @@ class Collector:
         return None
 
     @property
-    def active_fixture_descriptor(self) -> object | None:
+    def active_fixture_descriptor(self) -> StepDescriptor | None:
         """The descriptor pytest_fixture_setup pinned for the current fixture call.
 
         Used by StepDescriptor's helper-decorator wrapper to recognise the case
@@ -159,33 +165,46 @@ class Collector:
     def enter_fixture_setup(
         self,
         recording: FixtureRecording,
-        descriptor: object | None = None,
+        descriptor: StepDescriptor | None = None,
     ) -> StateToken:
-        token = StateToken(
-            previous_state=self._state,
-            previous_recording=self._active_recording,
-            previous_fixture_descriptor=self._active_fixture_descriptor,
-        )
-        self._state = 'fixture_setup'
-        self._active_recording = recording
-        self._active_fixture_descriptor = descriptor
-        return token
+        """Route recording into `recording` until the matching exit."""
+        return self._enter('fixture_setup', recording=recording, descriptor=descriptor)
 
     def exit_fixture_setup(self, token: StateToken) -> None:
-        self._state = token.previous_state
-        self._active_recording = token.previous_recording
-        self._active_fixture_descriptor = token.previous_fixture_descriptor
+        self._exit(token)
 
     def enter_fixture_teardown(self) -> StateToken:
+        """Enter the state that refuses steps and attachments.
+
+        Unlike setup, teardown pins no recording: nothing may be recorded from
+        it, so there is nowhere for a step to go and no descriptor to match.
+        """
+        return self._enter('fixture_teardown')
+
+    def exit_fixture_teardown(self, token: StateToken) -> None:
+        self._exit(token)
+
+    def _enter(
+        self,
+        state: RecordingState,
+        recording: FixtureRecording | None = None,
+        descriptor: StepDescriptor | None = None,
+    ) -> StateToken:
+        """Switch to `state`, returning the token that puts back what it
+        displaced. Nested by construction — a fixture setting up inside another
+        fixture's setup restores the outer one's routing on the way out."""
         token = StateToken(
             previous_state=self._state,
             previous_recording=self._active_recording,
             previous_fixture_descriptor=self._active_fixture_descriptor,
         )
-        self._state = 'fixture_teardown'
+        self._state = state
+        if recording is not None:
+            self._active_recording = recording
+            self._active_fixture_descriptor = descriptor
         return token
 
-    def exit_fixture_teardown(self, token: StateToken) -> None:
+    def _exit(self, token: StateToken) -> None:
         self._state = token.previous_state
         self._active_recording = token.previous_recording
         self._active_fixture_descriptor = token.previous_fixture_descriptor
@@ -194,9 +213,6 @@ class Collector:
         self, key: FixtureInstanceKey, recording: FixtureRecording
     ) -> None:
         self._recordings[key] = recording
-
-    def get_recording(self, key: FixtureInstanceKey) -> FixtureRecording | None:
-        return self._recordings.get(key)
 
     def recordings(self) -> Iterator[tuple[FixtureInstanceKey, FixtureRecording]]:
         """(key, recording) pairs in storage (setup) order."""

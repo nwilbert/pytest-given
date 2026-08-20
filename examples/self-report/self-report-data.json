@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-20T18:23:01.097202+00:00",
+    "timestamp": "2026-08-20T18:27:02.713837+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "1afb33f5fdd6a360f0b9768b4aff6905fa4ff870",
+    "commit_sha": "e3773c9e54f29ca4adb256af01fb50a0a7b5d678",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -849,7 +849,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 328
+        "line": 332
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -955,7 +955,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 469
+        "line": 473
       },
       "story_id": null,
       "activity_ids": []
@@ -1042,7 +1042,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 488
+        "line": 492
       },
       "story_id": null,
       "activity_ids": []
@@ -1135,7 +1135,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 506
+        "line": 510
       },
       "story_id": null,
       "activity_ids": []
@@ -1249,7 +1249,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 521
+        "line": 525
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -1354,7 +1354,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 539
+        "line": 543
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -1457,7 +1457,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 564
+        "line": 568
       },
       "story_id": null,
       "activity_ids": []

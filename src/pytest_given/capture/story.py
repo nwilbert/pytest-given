@@ -1,7 +1,5 @@
 """Story / Activity / Path constructors."""
 
-from __future__ import annotations
-
 import sys
 from collections.abc import Iterable, Sequence
 

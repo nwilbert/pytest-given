@@ -1,17 +1,9 @@
 """Precomputed aggregations for the HTML report renderer.
 
-Helpers exposed:
-  - `build_coverage_maps`        — per-scenario activity coverage dicts
-  - `build_story_rollups`        — per-story scenarios + per-activity rollup
-  - `build_scenario_activity_index` — per-scenario sorted activity ids
-  - `build_activity_labels`      — per-activity plain-text prose label
-  - `build_glossary_aggregations` — per-term instance/form/story aggregations
-  - `build_term_scenario_index`  — per-term scenario ids
-  - `build_scenario_slug_index` — per-scenario short URL-fragment slug
-  - `tab_visibility`             — which top-level tabs should be visible
+Everything the Jinja templates would otherwise have to compute per render:
+coverage maps, story rollups, glossary cross-references, and the URL-fragment
+slugs. Each `build_*` takes the report and returns one indexed view of it.
 """
-
-from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass, field
@@ -37,11 +29,6 @@ from .coverage import (
     param_case_displays,
     pill_display,
 )
-
-# ---------------------------------------------------------------------------
-# Public dataclasses
-# ---------------------------------------------------------------------------
-
 
 type ActivityKey = str
 """`'<story id>:<activity id>'` — an activity's handle outside its own story.
@@ -108,11 +95,6 @@ class StoryRollup:
     per_activity: dict[ActivityId, ActivityCoverage] = field(default_factory=dict)
 
 
-# ---------------------------------------------------------------------------
-# Tab visibility
-# ---------------------------------------------------------------------------
-
-
 def tab_visibility(report: ReportData) -> dict[str, bool]:
     """Return a dict of tab-name → visible bool for the report UI."""
     return {
@@ -120,11 +102,6 @@ def tab_visibility(report: ReportData) -> dict[str, bool]:
         'stories': bool(report.stories),
         'glossary': bool(report.glossary is not None and report.glossary.terms),
     }
-
-
-# ---------------------------------------------------------------------------
-# Coverage maps
-# ---------------------------------------------------------------------------
 
 
 def build_coverage_maps(
@@ -218,11 +195,6 @@ def _path_text(path: ActivityPath) -> str:
         part.display if isinstance(part, ActivityTermRef) else part.text
         for part in path.parts
     )
-
-
-# ---------------------------------------------------------------------------
-# Glossary aggregations
-# ---------------------------------------------------------------------------
 
 
 def build_glossary_aggregations(
@@ -366,11 +338,6 @@ def _record_story_ref(
         agg.stories.append(story_id)
 
 
-# ---------------------------------------------------------------------------
-# Term-scenario index
-# ---------------------------------------------------------------------------
-
-
 def build_term_scenario_index(report: ReportData) -> dict[TermId, list[NodeId]]:
     """For each glossary term, the scenarios whose narration or steps reference
     it. Scenario render order is preserved; each scenario appears at most once
@@ -392,11 +359,6 @@ def build_term_scenario_index(report: ReportData) -> dict[TermId, list[NodeId]]:
                 seen.add(part.term_id)
                 index.setdefault(part.term_id, []).append(scenario.id)
     return index
-
-
-# ---------------------------------------------------------------------------
-# Scenario slug index
-# ---------------------------------------------------------------------------
 
 
 def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:

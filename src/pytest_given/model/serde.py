@@ -109,27 +109,28 @@ def _glossary_from_dict(d: dict[str, Any] | None) -> Glossary | None:
 
 
 def _glossary_term_from_dict(d: dict[str, Any]) -> GlossaryTerm:
-    src = d.get('source')
     return GlossaryTerm(
         id=TermId(d['id']),
         kind=d['kind'],
         canonical=d['canonical'],
         definition=d.get('definition'),
-        source=SourceLocation(relpath=src['relpath'], line=src['line'])
-        if src is not None
-        else None,
+        source=_source_from_dict(d.get('source')),
     )
 
 
+def _source_from_dict(d: dict[str, Any] | None) -> SourceLocation | None:
+    """The optional `source` a term, story, or scenario carries."""
+    if d is None:
+        return None
+    return SourceLocation(relpath=d['relpath'], line=d['line'])
+
+
 def _story_from_dict(d: dict[str, Any]) -> Story:
-    src = d.get('source')
     return Story(
         id=StoryId(d['id']),
         title=d['title'],
         activities=tuple(_activity_from_dict(a) for a in d.get('activities', [])),
-        source=SourceLocation(relpath=src['relpath'], line=src['line'])
-        if src is not None
-        else None,
+        source=_source_from_dict(d.get('source')),
     )
 
 
@@ -158,7 +159,6 @@ def _activity_part_from_dict(d: dict[str, Any]) -> ActivityPart:
 
 
 def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
-    src = d.get('source')
     return Scenario(
         id=NodeId(d['id']),
         narration=_narration_from_dict(d['narration']),
@@ -170,9 +170,7 @@ def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
         parameters=_param_table_from_dict(d.get('parameters')),
         error=_error_from_dict(d.get('error')),
         skip_reason=d.get('skip_reason'),
-        source=SourceLocation(relpath=src['relpath'], line=src['line'])
-        if src is not None
-        else None,
+        source=_source_from_dict(d.get('source')),
         story_id=StoryId(d['story_id']) if d.get('story_id') else None,
         activity_ids=tuple(ActivityId(i) for i in d.get('activity_ids') or ()),
     )

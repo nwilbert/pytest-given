@@ -2,8 +2,6 @@
 resolved to its `with` statement or decorated helper `FunctionDef`, and the
 body is inspected for structural lies."""
 
-from __future__ import annotations
-
 import ast
 import keyword
 from collections.abc import Iterator

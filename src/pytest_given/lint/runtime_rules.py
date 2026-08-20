@@ -1,9 +1,8 @@
 """Runtime-surface rules: pure inspection of the recorded report model, no
 source access needed."""
 
-from __future__ import annotations
-
 from collections.abc import Iterator
+from dataclasses import dataclass
 
 from ..model import (
     ActivityTermRef,
@@ -13,6 +12,7 @@ from ..model import (
     NodeId,
     Phase,
     Scenario,
+    SourceLocation,
     Story,
     TermId,
     id_derive,
@@ -68,6 +68,19 @@ def _missing_phase_findings(grouped: list[Scenario]) -> list[Finding]:
     return findings
 
 
+@dataclass
+class _ShadowingTag:
+    """A tag that collides with a glossary term, and where it was first seen.
+
+    The example node id is the first scenario carrying the tag, so the message
+    can point at one without listing them all.
+    """
+
+    tag: str
+    example: NodeId
+    scenarios: int = 1
+
+
 def _tag_shadows_term_findings(
     grouped: list[Scenario], glossary: Glossary
 ) -> list[Finding]:
@@ -76,32 +89,32 @@ def _tag_shadows_term_findings(
     One finding per unique tag (subject = tag slug) — the fix is renaming the
     tag once, and per-scenario findings would be pure repetition.
     """
-    counts: dict[TermId, tuple[str, NodeId, int]] = {}
+    shadowing: dict[TermId, _ShadowingTag] = {}
     for scenario in grouped:
         for tag in scenario.tags:
             slug = id_derive(tag)
             if glossary.get(slug) is None:
                 continue
-            if slug in counts:
-                first_tag, first_id, count = counts[slug]
-                counts[slug] = (first_tag, first_id, count + 1)
+            seen = shadowing.get(slug)
+            if seen is None:
+                shadowing[slug] = _ShadowingTag(tag=tag, example=scenario.id)
             else:
-                counts[slug] = (tag, scenario.id, 1)
+                seen.scenarios += 1
     findings: list[Finding] = []
-    for slug, (tag, node_id, count) in counts.items():
+    for slug, shadow in shadowing.items():
         term = glossary.get(slug)
         assert term is not None
-        noun = 'scenario' if count == 1 else 'scenarios'
+        noun = 'scenario' if shadow.scenarios == 1 else 'scenarios'
         findings.append(
-            Finding(
-                rule=RuleId('tag-shadows-term'),
-                severity=RULES_BY_ID[RuleId('tag-shadows-term')].default,
+            _finding(
+                RuleId('tag-shadows-term'),
                 subject=slug,
-                node_id=node_id,
+                node_id=shadow.example,
                 location=None,
                 message=(
-                    f'tag {tag!r} duplicates glossary term {term.canonical!r} '
-                    f'({count} {noun}, e.g. {node_id})'
+                    f'tag {shadow.tag!r} duplicates glossary term '
+                    f'{term.canonical!r} ({shadow.scenarios} {noun}, '
+                    f'e.g. {shadow.example})'
                 ),
             )
         )
@@ -127,9 +140,8 @@ def _dead_term_findings(
                     if isinstance(ref, ActivityTermRef):
                         referenced.add(ref.term_id)
     return [
-        Finding(
-            rule=RuleId('dead-term'),
-            severity=RULES_BY_ID[RuleId('dead-term')].default,
+        _finding(
+            RuleId('dead-term'),
             subject=term.id,
             node_id=None,
             location=term.source,
@@ -147,11 +159,33 @@ def _iter_narrations(scenario: Scenario) -> Iterator[Narration]:
 
 
 def _scenario_finding(rule: RuleId, scenario: Scenario, text: str) -> Finding:
-    return Finding(
-        rule=rule,
-        severity=RULES_BY_ID[rule].default,
+    """A finding about a whole scenario, located and suffixed like a lint
+    message anywhere else."""
+    return _finding(
+        rule,
         subject=scenario.id,
         node_id=scenario.id,
         location=scenario.source,
         message=f'{text}{location_suffix(scenario.source)}',
+    )
+
+
+def _finding(
+    rule: RuleId,
+    *,
+    subject: str,
+    node_id: NodeId | None,
+    location: SourceLocation | None,
+    message: str,
+) -> Finding:
+    """A finding at its rule's configured-default severity — the one place
+    that reads `RULES_BY_ID`, so a rule cannot be reported at a level its
+    catalog entry does not name."""
+    return Finding(
+        rule=rule,
+        severity=RULES_BY_ID[rule].default,
+        subject=subject,
+        node_id=node_id,
+        location=location,
+        message=message,
     )

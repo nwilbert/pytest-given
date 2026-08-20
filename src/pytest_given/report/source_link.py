@@ -12,11 +12,8 @@ import string
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
-from typing import Literal
 
 from ..model import PytestGivenError, SourceLocation
-
-type SourceLinkPreset = Literal['vscode', 'cursor', 'zed', 'pycharm', 'github']
 
 _STATIC_PRESETS: dict[str, str] = {
     'vscode': 'vscode://file/{path}:{line}',
@@ -30,6 +27,11 @@ _STATIC_PRESETS: dict[str, str] = {
 _ALL_PRESET_NAMES = frozenset(_STATIC_PRESETS) | {'github'}
 
 _VALID_VARS = frozenset({'path', 'relpath', 'line', 'project', 'sha'})
+
+
+def _valid_vars() -> str:
+    """The substitutable variables, for the messages that list them."""
+    return ', '.join(sorted(_VALID_VARS))
 
 
 def resolve_template(value: str | None) -> str | None:
@@ -80,10 +82,9 @@ def compile_source_link(
     used = set(_extract_field_names(template))
     unknown = used - _VALID_VARS
     if unknown:
-        valid = ', '.join(sorted(_VALID_VARS))
         raise PytestGivenError(
             f'Unknown source-link template variable(s) {sorted(unknown)!r}. '
-            f'Valid: {valid}.'
+            f'Valid: {_valid_vars()}.'
         )
     if 'sha' in used and commit_sha is None:
         raise PytestGivenError(
@@ -115,18 +116,16 @@ def _extract_field_names(template: str) -> list[str]:
         if field_name is None:
             continue
         if '.' in field_name or '[' in field_name:
-            valid = ', '.join(sorted(_VALID_VARS))
             raise PytestGivenError(
                 f'Source-link template field {{{field_name}}} uses attribute '
                 f'or index access; only bare variable names are supported. '
-                f'Valid: {valid}.'
+                f'Valid: {_valid_vars()}.'
             )
         if not field_name or field_name.isdigit():
-            valid = ', '.join(sorted(_VALID_VARS))
             raise PytestGivenError(
                 f'Source-link template uses a positional field {{{field_name}}}; '
                 f'only named variables are supported (substitution passes '
-                f'keywords only). Valid: {valid}.'
+                f'keywords only). Valid: {_valid_vars()}.'
             )
         fields.append(field_name)
     return fields
@@ -169,9 +168,26 @@ def _detect_github_repo() -> tuple[str, str] | None:
         org, _, repo = env.partition('/')
         if org and repo:
             return (org, repo)
+    remote = _git('remote', 'get-url', 'origin')
+    if remote is None:
+        return None
+    match = _GITHUB_URL_RE.match(remote)
+    if match is None:
+        return None
+    return (match['org'], match['repo'])
+
+
+def _git(*args: str) -> str | None:
+    """The stripped stdout of a `git` call, or None when it cannot answer.
+
+    Both callers want the same thing and the same failure policy — no git on
+    PATH, no repository, a non-zero exit — so the run lives here once. Timed
+    out rather than left to hang: this runs on the report path, where a wedged
+    git would hold up a finished test session.
+    """
     try:
         result = subprocess.run(
-            ['git', 'remote', 'get-url', 'origin'],
+            ['git', *args],
             capture_output=True,
             text=True,
             timeout=2,
@@ -179,10 +195,7 @@ def _detect_github_repo() -> tuple[str, str] | None:
         )
     except subprocess.SubprocessError, FileNotFoundError:
         return None
-    match = _GITHUB_URL_RE.match(result.stdout.strip())
-    if match is None:
-        return None
-    return (match['org'], match['repo'])
+    return result.stdout.strip()
 
 
 _COMMIT_ENV_VARS = ('GITHUB_SHA', 'CI_COMMIT_SHA', 'BUILDKITE_COMMIT')
@@ -194,19 +207,9 @@ def detect_commit_sha() -> str | None:
     Checks CI env vars in priority order (GitHub → GitLab → Buildkite) then
     falls back to `git rev-parse HEAD`. Any subprocess failure returns None
     silently — only relevant if the user's template references `{sha}`, and
-    that case raises a clearer error in `format_source_link`.
+    that case raises a clearer error in `compile_source_link`.
     """
     for var in _COMMIT_ENV_VARS:
         if sha := os.environ.get(var):
             return sha
-    try:
-        result = subprocess.run(
-            ['git', 'rev-parse', 'HEAD'],
-            capture_output=True,
-            text=True,
-            timeout=2,
-            check=True,
-        )
-    except subprocess.SubprocessError, FileNotFoundError:
-        return None
-    return result.stdout.strip()
+    return _git('rev-parse', 'HEAD')

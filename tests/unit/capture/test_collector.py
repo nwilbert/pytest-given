@@ -317,12 +317,16 @@ def test_attach_outside_any_step_raises() -> None:
         collector.attach('config', 'content')
 
 
-def test_store_and_retrieve_recording_by_key() -> None:
+def test_recordings_are_yielded_in_setup_order_under_their_key() -> None:
     collector = Collector()
-    recording = FixtureRecording(root=Step(phase='given', narration=_n('a shop')))
-    collector.store_recording(('fixdef_a', None), recording)
-    assert collector.get_recording(('fixdef_a', None)) is recording
-    assert collector.get_recording(('fixdef_b', None)) is None
+    first = FixtureRecording(root=Step(phase='given', narration=_n('a shop')))
+    second = FixtureRecording(root=Step(phase='given', narration=_n('a machine')))
+    collector.store_recording(('fixdef_a', None), first)
+    collector.store_recording(('fixdef_b', None), second)
+    assert list(collector.recordings()) == [
+        (('fixdef_a', None), first),
+        (('fixdef_b', None), second),
+    ]
 
 
 @scenario(

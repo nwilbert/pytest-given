@@ -6,8 +6,6 @@ escapes, and skips fenced code blocks. Column selection accepts a header
 name (case-insensitive) or a 0-based index.
 """
 
-from __future__ import annotations
-
 import re
 from dataclasses import dataclass
 

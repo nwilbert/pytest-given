@@ -1,7 +1,5 @@
 """File-backed glossary: parse a Markdown file into a Glossary, accessed by name."""
 
-from __future__ import annotations
-
 from pathlib import Path
 from typing import Literal
 

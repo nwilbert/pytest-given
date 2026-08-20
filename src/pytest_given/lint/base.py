@@ -4,8 +4,6 @@ The catalog is data (`RULES`), so config validation, severity defaults, and
 docs stay in sync with one table.
 """
 
-from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import Literal, NewType
 

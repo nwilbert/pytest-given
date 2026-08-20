@@ -10,8 +10,6 @@ renderer treats that as "no link", same as a scenario whose `item.location`
 is absent.
 """
 
-from __future__ import annotations
-
 import re
 import sys
 import types

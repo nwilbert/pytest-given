@@ -2,8 +2,6 @@
 ini options and resolving raw rule findings against them (severity overrides,
 ignore globs, stale-ignore errors)."""
 
-from __future__ import annotations
-
 import dataclasses
 import re
 from dataclasses import dataclass

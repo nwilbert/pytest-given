@@ -1,7 +1,5 @@
 """User-facing Glossary API: id derivation, value classes, registration."""
 
-from __future__ import annotations
-
 import difflib
 from dataclasses import dataclass
 from typing import Literal
