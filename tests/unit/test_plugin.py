@@ -2,6 +2,9 @@
 in integration tests; tested here directly so coverage hits 100%."""
 
 import inspect
+import tomllib
+from importlib.metadata import version
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Annotated, Any, cast
 
@@ -199,6 +202,15 @@ def test_pytest_runtest_teardown_clears_unannotated_flag(
     plugin.pytest_runtest_teardown(item)
     assert fresh_collector.inside_unannotated_test is False
     assert get_active_collector() is None
+
+
+def test_reported_plugin_version_matches_pyproject() -> None:
+    """The version in every report's metadata comes from the installed
+    distribution, so it cannot drift from `pyproject.toml` the way a literal
+    did — `docs/releasing.md` bumps one file, and nothing used to notice."""
+    pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
+    declared = tomllib.loads(pyproject.read_text(encoding='utf-8'))['project']
+    assert version('pytest-given') == declared['version']
 
 
 def test_makereport_ignores_a_failure_outside_the_active_scenario(

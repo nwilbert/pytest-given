@@ -9,6 +9,7 @@ import time
 from collections.abc import Callable, Generator
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from importlib.metadata import version
 from pathlib import Path
 from string import templatelib
 from typing import Any, cast, get_type_hints
@@ -850,7 +851,7 @@ def _build_report(session: pytest.Session, collector: Collector) -> _SessionRepo
             project=session.config.rootpath.name,
             timestamp=datetime.now(tz=UTC).isoformat(),
             pytest_version=pytest.__version__,
-            plugin_version='0.1.0',
+            plugin_version=version('pytest-given'),
             commit_sha=detect_commit_sha(),
             title=_resolve_title(session.config),
         ),
