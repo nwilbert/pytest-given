@@ -13,7 +13,7 @@ This is the authoring-relevant surface, version-matched to the installed package
 
 ## Core
 
-- **`@scenario(name, tags=None, story=None, group_parametrized=True)`** — marks a test for the report; required for it to appear. `name` is a plain string, a `Template` (for parametrized names), or a t-string whose interpolations are all glossary handles (they render as term pills in the title). `story=` binds the scenario to a `story(...)` for coverage.
+- **`@scenario(name, tags=None, story=None, activities=None, group_parametrized=True)`** — marks a test for the report; required for it to appear. `name` is a plain string, a `Template` (for parametrized names), or a t-string whose interpolations are all glossary handles (they render as term pills in the title). `story=` binds the scenario to a `story(...)` for coverage; `activities=` narrows it to those 1-based activity numbers, so the scenario can cover no others.
 - **`given(text)` / `when(text)` / `then(text)`** — dual-purpose:
   - **Context manager** in a test body: `with when('…'): result = sut(x)`. Steps nest freely.
   - **Fixture decorator** — `@given` only (`@pytest.fixture` then `@given('…')`); `@when`/`@then` on a fixture is rejected at runtime, and the label must be a plain string. Generator fixtures work; recording steps after `yield` is not allowed.

@@ -70,9 +70,9 @@ Increasingly those tests aren't hand-written at all: a human describes a scenari
 
 ## Public API
 
-### `@scenario(name, tags=None)`
+### `@scenario(name, tags=None, story=None, activities=None, group_parametrized=True)`
 
-Mark a test for inclusion in the report. Required for any test you want to appear.
+Mark a test for inclusion in the report. Required for any test you want to appear. `story=` / `activities=` bind it to a domain story (see [Domain Storytelling](#domain-storytelling)); `group_parametrized=False` declines parametrize merging.
 
 ```python
 @scenario('Buy coffee', tags=['billing'])
@@ -296,7 +296,7 @@ def test_select_suite(carol):
         ...
 ```
 
-Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it; selecting an activity offers *Open in Scenarios*, which filters the Scenarios view down to those scenarios. A step can also bind explicitly with `given(text, activity=...)`.
+Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it; selecting an activity offers *Open in Scenarios*, which filters the Scenarios view down to those scenarios. A step can also bind explicitly with `given(text, activity=...)`. `@scenario(..., activities=[2, 3])` narrows a scenario to those 1-based activity numbers, so it can cover no others.
 
 **Kindless and undefined terms** — use `g('foo')` to declare a term that the team hasn't classified yet. It registers under the *Uncategorized* bucket in the Glossary view (no kind pill) and shows an *Undefined* badge until `definition=` is supplied. Use `g['foo']` to look up an already-declared term by name (raises if unknown). Both forms return a `DeferredTermHandle` usable in t-strings and story activities, with the same bare / `.low` / callable surface forms as any other handle.
 

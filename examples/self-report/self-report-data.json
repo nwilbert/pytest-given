@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-20T10:17:51.652835+00:00",
+    "timestamp": "2026-08-20T16:55:49.384532+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "8b22654e505bf1adc4f4b8e84fd5a5bf9dff6a93",
+    "commit_sha": "7404cb7156956a4dcc77bb7fb67f9c9141c76975",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -14369,7 +14369,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 33,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -18068,7 +18068,7 @@
         "id": "source-link",
         "kind": null,
         "canonical": "Source link",
-        "definition": "A clickable file:line anchor on a scenario card. Resolved from the `given_source_link` config (preset name like `vscode` / `github`, or a raw URL template). Captured per-scenario as a `SourceLocation` (POSIX relpath + 1-indexed line) from `pytest.Item.location`. Disabled by default.",
+        "definition": "A clickable file:line anchor on a scenario card, a story panel, or an expanded glossary term card. Resolved from the `given_source_link` config (preset name like `vscode` / `github`, or a raw URL template). Captured as a `SourceLocation` (POSIX relpath + 1-indexed line) \u2014 from `pytest.Item.location` for a scenario, from the declaration site for a *Story* or *Term*. Disabled by default.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 57
