@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] redesign the scenario term design for verbs
 - [ ] continue work on the story-diagrams branch
 
 ## Next

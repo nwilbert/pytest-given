@@ -13,33 +13,33 @@
   --font-size-md: 0.875rem;
   --font-size-lg: 1.25rem;
 
-  --bg-page: #f8f9fa;
+  --bg-page: #f8fafc;
   --bg-card: #ffffff;
   --bg-sidebar: #ffffff;
-  --border: #dee2e6;
-  --text-primary: #212529;
-  --text-secondary: #495057;
-  --text-muted: #6c757d;
+  --border: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
 
-  --color-passed: #28a745;
-  --color-failed: #dc3545;
-  --color-skipped: #ffc107;
+  --color-passed: #16a34a;
+  --color-failed: #dc2626;
+  --color-skipped: #ea580c;
 
-  --color-accent: #0d6efd;
-  --color-accent-bg: #e7f1ff;
-  /* Accent as *text*. The brand accent is only 3.95:1 on its own tint and
-     4.27:1 on --bg-page, both under AA, so anything that sets accent-coloured
-     text uses this darker value (5.65:1 and 6.11:1) — the way the status
-     pills pair #155724 with a green tint rather than reusing --color-passed.
+  --color-accent: #2563eb;
+  --color-accent-bg: #dbeafe;
+  /* Accent as *text*. The brand accent is only 4.24:1 on its own tint, under
+     AA, so anything that sets accent-coloured text uses this darker value
+     (5.49:1 on the tint, 6.41:1 on --bg-page) — the way the status
+     pills pair #166534 with a green tint rather than reusing --color-passed.
      --color-accent itself stays the border/glyph colour, where the 3:1
      threshold for UI components applies. */
-  --color-accent-text: #0a58ca;
+  --color-accent-text: #1d4ed8;
 
-  --color-error-bg: #fff5f5;
-  --color-error-border: #f5c6cb;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fecaca;
 
-  --color-skip-bg: #fffbea;
-  --color-skip-border: #ffe69c;
+  --color-skip-bg: #fff7ed;
+  --color-skip-border: #fed7aa;
 
   --space-xs: 4px;
   --space-sm: 8px;
@@ -184,9 +184,9 @@ body {
   color: var(--text-muted);
   user-select: none;
 }
-.status-pill.active-passed { background: #d4edda; color: #155724; border-color: var(--color-passed); }
-.status-pill.active-failed { background: #f8d7da; color: #721c24; border-color: var(--color-failed); }
-.status-pill.active-skipped { background: #fff3cd; color: #856404; border-color: var(--color-skipped); }
+.status-pill.active-passed { background: #dcfce7; color: #166534; border-color: var(--color-passed); }
+.status-pill.active-failed { background: #fee2e2; color: #991b1b; border-color: var(--color-failed); }
+.status-pill.active-skipped { background: #ffedd5; color: #9a3412; border-color: var(--color-skipped); }
 .status-pill:not([class*="active-"]) { opacity: 0.5; text-decoration: line-through; }
 
 
@@ -514,7 +514,7 @@ body {
    the same parameter name. */
 .param-table th.param-highlight,
 .param-table td.param-highlight { background: var(--color-accent-bg); }
-.param-table tbody tr:hover td.param-highlight { background: #cfe2ff; }
+.param-table tbody tr:hover td.param-highlight { background: #bfdbfe; }
 span.param-highlight {
   background: var(--color-accent-bg);
   border-radius: 2px;
@@ -604,7 +604,7 @@ span.param-highlight {
   color: var(--text-secondary);
 }
 .skip-reason-label {
-  color: #856404;
+  color: #9a3412;
   font-weight: 600;
   margin-right: var(--space-xs);
 }
@@ -682,12 +682,16 @@ span.param-highlight {
 .dot-skipped { color: var(--color-skipped); }
 
 /* Parameter colors — light-background variants */
-.param-color-0, th.param-color-0 { color: #d63384; font-weight: 600; }
-.param-color-1, th.param-color-1 { color: #198754; font-weight: 600; }
-.param-color-2, th.param-color-2 { color: #0d6efd; font-weight: 600; }
-.param-color-3, th.param-color-3 { color: #ca8a04; font-weight: 600; }
-.param-color-4, th.param-color-4 { color: #7c3aed; font-weight: 600; }
-.param-color-5, th.param-color-5 { color: #e85d04; font-weight: 600; }
+/* Ordered so the low indices — the ones a two- or three-column case table
+   actually uses — are the furthest apart: columns 0/1 are ΔE00 74 apart and
+   0/1/2 are 32, where picking them in ramp order would have left every prefix
+   at 16 and put two greens side by side. */
+.param-color-0, th.param-color-0 { color: #3f6212; font-weight: 600; }
+.param-color-1, th.param-color-1 { color: #a21caf; font-weight: 600; }
+.param-color-2, th.param-color-2 { color: #155e75; font-weight: 600; }
+.param-color-3, th.param-color-3 { color: #be185d; font-weight: 600; }
+.param-color-4, th.param-color-4 { color: #1d4ed8; font-weight: 600; }
+.param-color-5, th.param-color-5 { color: #065f46; font-weight: 600; }
 .value-highlight { color: var(--text-primary); font-weight: 700; }
 
 .scenario-source {
@@ -724,36 +728,43 @@ span.param-highlight {
   padding-block: 0;
 }
 
-/* === Term-ref pills (actor / object / verb) === */
-.term-ref-actor {
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
+/* === Term-ref pills (actor / object / verb) ===
+   One shape for every kind, so a pill's kind reads from its colour alone.
+   The *text* colour is what carries the kind: the fills are all ramp-100 and
+   collapse into each other for a dichromat (teal vs violet is ΔE00 6.4 under
+   deuteranopia), while amber-800 / teal-700 / violet-700 stay 23.4 apart.
+   So fills group, text identifies — never the fill on its own. */
+.term-ref-actor,
+.term-ref-object,
+.term-ref-verb,
+.term-ref-unknown {
   border-radius: var(--radius-sm);
   padding: 1px 6px;
   font-weight: 500;
   cursor: pointer;
+}
+.term-ref-actor {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
 }
 .term-ref-object {
   background: #ccfbf1;
   color: #0f766e;
   border: 1px solid #5eead4;
-  border-radius: var(--radius-sm);
-  padding: 1px 6px;
-  cursor: pointer;
 }
 .term-ref-verb {
-  color: #0e7490;
-  border-bottom: 1px dotted #0e7490;
-  cursor: pointer;
-  font-weight: 500;
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #c4b5fd;
 }
+/* A term with no kind has no hue to spend, and gray-100 is only ΔE00 2.5 from
+   the card — the dashed border, not the fill, is what marks it. */
 .term-ref-unknown {
   background: #f3f4f6;
   color: var(--text-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 1px 6px;
+  border: 1px dashed #d1d5db;
+  cursor: default;
 }
 .term-ref--link { cursor: pointer; }
 .term-ref--link:hover { text-decoration: underline; }
@@ -810,8 +821,8 @@ span.param-highlight {
 
 /* === Tab strip === */
 :root {
-  --color-mixed: #ca8a04;
-  --color-uncovered: #9ca3af;
+  --color-mixed: #d97706;
+  --color-uncovered: #94a3b8;
 }
 .frame-nav {
   display: flex;
@@ -894,9 +905,9 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   font-weight: 600;
 }
-.cov-chip.cov-passed { background: #d4edda; color: #155724; }
-.cov-chip.cov-failed { background: #f8d7da; color: #721c24; }
-.cov-chip.cov-mixed { background: #fff3cd; color: #856404; }
+.cov-chip.cov-passed { background: #dcfce7; color: #166534; }
+.cov-chip.cov-failed { background: #fee2e2; color: #991b1b; }
+.cov-chip.cov-mixed { background: #ffedd5; color: #9a3412; }
 .cov-chip.cov-uncovered { background: #f3f4f6; color: var(--text-muted); }
 .cov-chip.cov-untracked {
   background: transparent;
@@ -970,7 +981,7 @@ span.param-highlight {
 }
 .kind-swatch-actor { background: #fcd34d; }
 .kind-swatch-object { background: #5eead4; }
-.kind-swatch-verb { background: #67e8f9; }
+.kind-swatch-verb { background: #c4b5fd; }
 .kind-swatch-kindless { background: #d1d5db; }
 
 /* === Kind section headers === */
@@ -991,7 +1002,7 @@ span.param-highlight {
 /* Kind colour classes for kind headers and term pills */
 .term-actor { color: #92400e; }
 .term-obj { color: #0f766e; }
-.term-verb { color: #0e7490; }
+.term-verb { color: #6d28d9; }
 .term-kindless { color: var(--text-secondary); }
 
 /* === Term pills === */
@@ -1004,8 +1015,8 @@ span.param-highlight {
 }
 .term-pill.term-actor { background: #fef3c7; border: 1px solid #fcd34d; }
 .term-pill.term-obj { background: #ccfbf1; border: 1px solid #5eead4; }
-.term-pill.term-verb { background: #ecfeff; border: 1px solid #67e8f9; }
-.term-pill.term-kindless { background: #f3f4f6; border: 1px solid var(--border); }
+.term-pill.term-verb { background: #ede9fe; border: 1px solid #c4b5fd; }
+.term-pill.term-kindless { background: #f3f4f6; border: 1px dashed #d1d5db; }
 
 /* === Glossary entry layout === */
 .entry {
@@ -1303,7 +1314,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1362,7 +1373,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1406,7 +1417,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1452,7 +1463,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
       
     </div>
     </div>
@@ -1526,7 +1537,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
       
     </div>
     </div>
@@ -1627,7 +1638,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
       
     </div>
     </div>
@@ -1677,7 +1688,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
@@ -1733,7 +1744,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
       
     </div>
     </div>
@@ -1833,7 +1844,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
       
     </div>
     </div>
@@ -1876,7 +1887,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
       
     </div>
     </div>
@@ -2023,7 +2034,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -2121,7 +2132,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -2217,7 +2228,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
       
     </div>
     </div>
@@ -2261,7 +2272,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -2307,7 +2318,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -2507,7 +2518,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
       
     </div>
     </div>
@@ -2597,7 +2608,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/136d7679adfa7f95302fce1fecd03df70e36d799/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
       
     </div>
     </div>
@@ -2628,10 +2639,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-20T18:37:22.291175+00:00",
+    "timestamp": "2026-08-20T21:28:35.966766+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "136d7679adfa7f95302fce1fecd03df70e36d799",
+    "commit_sha": "33703976aa4324fc798cb7a1770795696cb38229",
     "title": "Coffee Shop Example"
   },
   "scenarios": [

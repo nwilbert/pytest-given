@@ -99,7 +99,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - Jumping to a scenario from a story activity, or to a term's scenarios from the
   Glossary tab, now clears filters that would hide the target; the filters in a
   `#scenario=` deep link still win.
-- Accent-coloured text across the HTML report now meets WCAG AA.
+- The HTML report's colours are retuned into one system, so glossary term kinds,
+  statuses and parametrize columns can no longer land on the same colour.
+- Accent-coloured text and the parametrize column colours in the HTML report now
+  meet WCAG AA, and term kinds stay distinguishable for red-green colour
+  blindness.
 
 ## [0.1.0] - 2026-08-08
 
