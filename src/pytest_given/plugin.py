@@ -313,36 +313,51 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     @scenario and @pytest.mark.parametrize can appear in either order, and
     decoration-time inspection only sees markers from earlier (bottom-up)
     decorators.
+
+    Reported as a `pytest.UsageError`, the way `pytest_configure` reports a bad
+    lint config: an exception raised from a collection hook renders as an
+    INTERNALERROR stack dump with the message buried under forty lines of
+    pluggy frames, which is not what an author who mistyped a placeholder needs
+    to read.
     """
-    for item in items:
-        marker = _get_scenario_marker(item)
-        if marker is None:
-            continue
-        _validate_scenario_story_binding(item, marker)
-        callspec = getattr(item, 'callspec', None)
-        if not marker.group_parametrized and callspec is None:
-            raise PytestGivenError(
-                f'@scenario(group_parametrized=False) on {item.nodeid!r} has '
-                f'nothing to opt out of; the test is not parametrized. Drop '
-                f'the argument, or add @pytest.mark.parametrize.'
+    try:
+        for item in items:
+            _validate_scenario_marker(item)
+    except PytestGivenError as error:
+        raise pytest.UsageError(str(error)) from error
+
+
+def _validate_scenario_marker(item: pytest.Item) -> None:
+    """The four collection-time checks for one item, or nothing when it carries
+    no `@scenario`."""
+    marker = _get_scenario_marker(item)
+    if marker is None:
+        return
+    _validate_scenario_story_binding(item, marker)
+    callspec = getattr(item, 'callspec', None)
+    if not marker.group_parametrized and callspec is None:
+        raise PytestGivenError(
+            f'@scenario(group_parametrized=False) on {item.nodeid!r} has '
+            f'nothing to opt out of; the test is not parametrized. Drop '
+            f'the argument, or add @pytest.mark.parametrize.'
+        )
+    if not isinstance(marker.name, Template):
+        return
+    if callspec is None:
+        raise PytestGivenError(
+            f'@scenario(Template(...)) on {item.nodeid!r} requires '
+            f'@pytest.mark.parametrize; the substitution source is '
+            f'callspec.params only. Use a plain string for static '
+            f'scenario names, or add @pytest.mark.parametrize.'
+        )
+    param_names = list(callspec.params.keys())
+    for placeholder in marker.name.get_identifiers():
+        if placeholder not in param_names:
+            raise placeholder_mismatch(
+                placeholder,
+                param_names,
+                where=f'in @scenario(...) on {item.nodeid!r}',
             )
-        if not isinstance(marker.name, Template):
-            continue
-        if callspec is None:
-            raise PytestGivenError(
-                f'@scenario(Template(...)) on {item.nodeid!r} requires '
-                f'@pytest.mark.parametrize; the substitution source is '
-                f'callspec.params only. Use a plain string for static '
-                f'scenario names, or add @pytest.mark.parametrize.'
-            )
-        param_names = list(callspec.params.keys())
-        for placeholder in marker.name.get_identifiers():
-            if placeholder not in param_names:
-                raise placeholder_mismatch(
-                    placeholder,
-                    param_names,
-                    where=f'in @scenario(...) on {item.nodeid!r}',
-                )
 
 
 def _validate_scenario_story_binding(

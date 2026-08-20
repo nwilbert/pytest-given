@@ -1101,8 +1101,9 @@ def test_template_in_scenario_without_parametrize_raises_at_collection(
         """
     )
     result = pytester.runpytest('--collect-only')
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*requires @pytest.mark.parametrize*'])
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines(['*requires @pytest.mark.parametrize*'])
+    assert 'INTERNALERROR' not in result.stdout.str()
 
 
 def test_template_placeholder_typo_raises_helpful_error(pytester, tmp_path):
@@ -1119,8 +1120,9 @@ def test_template_placeholder_typo_raises_helpful_error(pytester, tmp_path):
         """
     )
     result = pytester.runpytest('-v')
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*cup_zize*'])
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines(['*cup_zize*'])
+    assert 'INTERNALERROR' not in result.stdout.str()
 
 
 def test_skipped_scenario_captures_mark_reason(pytester, tmp_path):
@@ -1645,7 +1647,9 @@ def test_scenario_activity_id_not_in_story_raises_at_collection(pytester):
             pass
     """)
     result = pytester.runpytest('--collect-only')
-    result.stdout.fnmatch_lines(['*activity id*99*not in story*'])
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines(['*activity id*99*not in story*'])
+    assert 'INTERNALERROR' not in result.stdout.str()
 
 
 def test_step_activity_outside_scenario_scope_raises(pytester):
@@ -2286,8 +2290,9 @@ def test_group_parametrized_false_without_parametrize_raises_at_collection(
         """
     )
     result = pytester.runpytest('--collect-only')
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*nothing to opt out of*'])
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines(['*nothing to opt out of*'])
+    assert 'INTERNALERROR' not in result.stdout.str()
 
 
 def test_group_parametrized_false_emits_one_scenario_per_case(pytester, tmp_path):

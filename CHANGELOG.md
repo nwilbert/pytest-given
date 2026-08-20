@@ -66,6 +66,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
   `given` / `when` / `then` block it belongs to.
 - An unknown `given_source_link` preset is now a `UsageError` raised before the
   suite runs, rather than a failure once it has finished.
+- The collection-time `@scenario` checks now report as a `UsageError` instead of
+  an `INTERNALERROR` traceback with the message buried at the bottom.
 - `activity(..., id=N)` is now `activity(..., activity_id=N)`; the
   `Activity.id` field itself is unchanged.
 - The bundled authoring skill's tagging guidance now argues for sparse tagging:
