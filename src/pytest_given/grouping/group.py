@@ -11,6 +11,7 @@ from ..model import (
     ParameterCase,
     ParameterTable,
     ParamInfo,
+    RawParamValue,
     Scenario,
     Step,
     StepPath,
@@ -22,9 +23,9 @@ from .checks import (
     check_same_template,
     check_varying_str_narration,
 )
-from .columns import GroupContext, param_cell, param_cell_formats
+from .columns import GroupContext, param_cell, param_cell_formats, step_narrations
 from .percase import per_case_scenarios
-from .templatize import templatize_narration, templatize_steps
+from .templatize import reconcile_name_slots, templatize_narration, templatize_steps
 
 
 def group_parametrized(
@@ -73,14 +74,22 @@ def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
         if scenario.status == 'passed':
             check_rebound_params(scenario, param_info[scenario.id], ctx)
     # Before the walk, not with the other cells below: a `param` cell is what
-    # its placeholder substitutes, so the walk compares against it.
-    formats = param_cell_formats(baseline.steps, param_names)
+    # its slots substitute, so the walk compares against it. The scenario name
+    # is scanned alongside the steps — a `Template` name's spec is a slot's
+    # spec, and often the only one in play.
+    formats = param_cell_formats(
+        [first.narration, *step_narrations(baseline.steps)], param_names
+    )
+    case_params: dict[NodeId, dict[str, RawParamValue]] = {}
     for scenario in group:
         spec = param_info[scenario.id]
+        case_params[scenario.id] = spec.mapping()
         for name, value in zip(spec.names, spec.values, strict=True):
             ctx.set_cell(name, scenario.id, param_cell(value, formats.get(name)))
     template_steps = templatize_steps(baseline.steps, (), ctx)
-    grouped_narration = templatize_narration(first.narration, param_names)
+    grouped_narration = reconcile_name_slots(
+        templatize_narration(first.narration, param_names), ctx, case_params
+    )
 
     cases: list[ParameterCase] = []
     total_duration = 0

@@ -9,6 +9,7 @@ from ..model import (
     NarrationTermRef,
     NarrationValue,
     PytestGivenError,
+    narration_text,
 )
 from .glossary import (
     Actor,
@@ -36,7 +37,12 @@ def narration_from(
         text, parts = parse_tstring(value)
         return Narration(text=text, parts=parts)
     if isinstance(value, Template):
-        return Narration(text=value.template, parts=list(value.parts))
+        # Text derived from the parts, never the raw template string: a
+        # placeholder renders as its bare `{name}` token, so `'{amount:.2f}'`
+        # would otherwise leave a `text` carrying a spec that nothing displays
+        # — and `text` is what the report's search box and a `jq` query read.
+        parts = list(value.parts)
+        return Narration(text=narration_text(parts), parts=parts)
     return Narration(text=value)
 
 

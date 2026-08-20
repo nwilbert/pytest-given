@@ -9,6 +9,7 @@ so has nothing to be compared against.
 
 from dataclasses import replace
 
+from ..capture import render_interpolation
 from ..model import (
     Attachment,
     AttachmentRef,
@@ -20,6 +21,7 @@ from ..model import (
     NarrationValue,
     NodeId,
     Phase,
+    RawParamValue,
     Step,
     StepAttachment,
     StepPath,
@@ -348,4 +350,75 @@ def templatize_narration(
     out = [
         _case_independent_part(part, param_names) or part for part in narration.parts
     ]
-    return replace(narration, parts=out)
+    return Narration(text=narration_text(out), parts=out)
+
+
+def reconcile_name_slots(
+    narration: Narration,
+    ctx: GroupContext,
+    case_params: dict[NodeId, dict[str, RawParamValue]],
+) -> Narration:
+    """The scenario name's slots re-pointed at columns that read the way they do.
+
+    The name is a hover-substitution slot like any step's: the card's `{token}`
+    spans all take the hovered row's cell text. A `{price:.2f}` slot over a
+    cell holding `1.5` therefore reads `charge 1.5 euros` on hover — a sentence
+    no case narrated. `param_cell_formats` gives the shared cell the one
+    formatting every slot agrees on, so this is a no-op whenever they do agree;
+    it earns its keep when a step reads the parameter plainly and the name
+    formats it, where no single cell can serve both.
+
+    A slot the cell cannot serve gets a `derived` column of its own, holding
+    what the slot renders for each case. Unlike a step's, the name has no
+    per-case recording to compare against — it is evaluated once at decoration
+    time — so the renderings are recomputed from each case's raw parameter,
+    exactly as `param_cell` builds the cell it is being compared with.
+    """
+    if not narration.parts:
+        return narration
+    out = [_reconciled_name_part(part, ctx, case_params) for part in narration.parts]
+    return Narration(text=narration_text(out), parts=out)
+
+
+def _reconciled_name_part(
+    part: NarrationPart,
+    ctx: GroupContext,
+    case_params: dict[NodeId, dict[str, RawParamValue]],
+) -> NarrationPart:
+    if not isinstance(part, NarrationPlaceholder) or part.column_id not in ctx.cells:
+        return part
+    rendered = _name_slot_renderings(part, case_params)
+    if rendered is None or all(
+        text == cell_text(ctx.cells[part.column_id][case_id])
+        for case_id, text in rendered.items()
+    ):
+        return part
+    column = ctx.new_column('derived', part.name)
+    for case_id, text in rendered.items():
+        ctx.set_cell(column.id, case_id, text)
+    return replace(part, name=column.name, column_id=column.id)
+
+
+def _name_slot_renderings(
+    part: NarrationPlaceholder,
+    case_params: dict[NodeId, dict[str, RawParamValue]],
+) -> dict[NodeId, str] | None:
+    """What this slot renders for each case, or None when any case cannot
+    produce that rendering at all.
+
+    None leaves the slot pointing at the shared column: a value whose own
+    `__format__` refuses this spec never rendered here either, so there is
+    nothing better to point it at.
+    """
+    out: dict[NodeId, str] = {}
+    for case_id, params in case_params.items():
+        assert part.name in params, (
+            f'{part.name!r} points at a param column, so every case binds it'
+        )
+        try:
+            out[case_id] = render_interpolation(
+                params[part.name], part.conversion, part.format_spec
+            )
+        except Exception:  # noqa: BLE001 — a value whose own rendering raises
+            return None
+    return out

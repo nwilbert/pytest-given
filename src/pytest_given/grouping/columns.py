@@ -7,6 +7,7 @@ placeholder pointing at it rendered, since row hover substitutes the one into
 the other.
 """
 
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 
 from ..capture import render_interpolation, try_term_ref
@@ -14,6 +15,9 @@ from ..model import (
     Attachment,
     CellValue,
     ColumnKind,
+    Narration,
+    NarrationPart,
+    NarrationPlaceholder,
     NarrationValue,
     NodeId,
     ParameterColumn,
@@ -119,38 +123,63 @@ def _param_value(value: RawParamValue) -> ParamValue:
 type Format = tuple[str | None, str]
 
 
-def param_cell_formats(steps: list[Step], param_names: list[str]) -> dict[str, Format]:
+def param_cell_formats(
+    narrations: Iterable[Narration], param_names: list[str]
+) -> dict[str, Format]:
     """The formatting each `param` column's cells are rendered with, for the
-    columns whose placeholders agree on one.
+    columns whose slots agree on one.
 
-    A cell is not decoration: row hover substitutes it into the slot the step
-    rendered, so it has to *be* what that slot showed. `t"at {when:%H:%M}"`
-    narrates `14:30` while `str(when)` is `2026-08-19 14:30:00`, and splicing
-    the latter in builds a sentence no case ever narrated. Rule 3 has already
-    established that the narration is the raw value rendered through the
-    interpolation's own conversion and spec, so re-applying that spec to the
-    cell reproduces the narrated text exactly.
+    A cell is not decoration: row hover substitutes it into every slot in the
+    scenario card that points at the column, so it has to *be* what those slots
+    showed. `t"at {when:%H:%M}"` narrates `14:30` while `str(when)` is
+    `2026-08-19 14:30:00`, and splicing the latter in builds a sentence no case
+    ever narrated. Rule 3 has already established that the narration is the raw
+    value rendered through the interpolation's own conversion and spec, so
+    re-applying that spec to the cell reproduces the narrated text exactly.
 
-    Only a formatting every placeholder for that column shares is used. Two
-    steps formatting one parameter differently (`{when:%H:%M}` and
-    `{when:%Y-%m-%d}`) leave no single text a shared cell could hold; the
-    column keeps its plain value and the walk gives each disagreeing slot a
-    column of its own (see `_templatize_param_value`). The trivial formatting
-    counts as one of the two, so a column read plainly in one step and
-    formatted in another goes the same way.
+    Both slot kinds count. A step records its interpolations as
+    `NarrationValue`; a `Template` — a scenario name, or an
+    `Annotated[..., given(Template(...))]` label — records a
+    `NarrationPlaceholder` whose spec is just as load-bearing and is likewise
+    the only formatting in play when no step interpolates that parameter.
+
+    Only a formatting every slot for that column shares is used. Two slots
+    formatting one parameter differently (`{when:%H:%M}` and `{when:%Y-%m-%d}`)
+    leave no single text a shared cell could hold; the column keeps its plain
+    value and each disagreeing slot gets a column of its own (see
+    `_templatize_param_value` for a step's, `reconcile_name_slots` for a
+    scenario name's). The trivial formatting counts as one of the two, so a
+    column read plainly in one slot and formatted in another goes the same way.
     """
     seen: dict[str, set[Format]] = {}
-    for _path, step in walk_steps(steps):
-        for part in step.narration.parts:
-            if isinstance(part, NarrationValue) and part.expression in param_names:
-                seen.setdefault(part.expression, set()).add(
-                    (part.conversion, part.format_spec)
-                )
+    for narration in narrations:
+        for part in narration.parts:
+            slot = _bound_slot(part, param_names)
+            if slot is not None:
+                name, fmt = slot
+                seen.setdefault(name, set()).add(fmt)
     return {
         name: next(iter(formats))
         for name, formats in seen.items()
         if len(formats) == 1 and formats != {(None, '')}
     }
+
+
+def _bound_slot(
+    part: NarrationPart, param_names: list[str]
+) -> tuple[str, Format] | None:
+    """The `param` column this part points at and the formatting it renders
+    with, or None when the part is not a slot bound to one."""
+    if isinstance(part, NarrationValue) and part.expression in param_names:
+        return part.expression, (part.conversion, part.format_spec)
+    if isinstance(part, NarrationPlaceholder) and part.name in param_names:
+        return part.name, (part.conversion, part.format_spec)
+    return None
+
+
+def step_narrations(steps: list[Step]) -> Iterator[Narration]:
+    """Every narration in a step tree, for the format scan."""
+    return (step.narration for _path, step in walk_steps(steps))
 
 
 def param_cell(value: RawParamValue, fmt: Format | None) -> ParamValue:

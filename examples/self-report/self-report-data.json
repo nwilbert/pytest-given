@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-20T18:13:07.806287+00:00",
+    "timestamp": "2026-08-20T18:23:01.097202+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "2f6850a9b4a118768ab1ec4281a094a78fdb12c8",
+    "commit_sha": "1afb33f5fdd6a360f0b9768b4aff6905fa4ff870",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -15868,7 +15868,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 73
+        "line": 75
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -15986,7 +15986,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 190
+        "line": 192
       },
       "story_id": null,
       "activity_ids": []
@@ -16117,7 +16117,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 411
+        "line": 413
       },
       "story_id": null,
       "activity_ids": []
@@ -16248,7 +16248,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 528
+        "line": 530
       },
       "story_id": null,
       "activity_ids": []
@@ -16362,7 +16362,210 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 640
+        "line": 642
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/test_grouping.py::test_a_scenario_name_format_spec_reaches_its_cell",
+      "narration": {
+        "text": "A parameter table cell reads the way the scenario name formats it",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "parameter-table",
+            "display": "parameter table",
+            "expression": "pg[\"Parameter table\"].low",
+            "param_column": null
+          },
+          {
+            "value": " cell reads the way the scenario name formats it"
+          }
+        ]
+      },
+      "module": "tests.unit.test_grouping",
+      "tags": [
+        "parametrization"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Template scenario name formatting its parameter",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the cases are grouped",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"](\"cases\")",
+                "param_column": null
+              },
+              {
+                "value": " are "
+              },
+              {
+                "term_id": "group",
+                "display": "grouped",
+                "expression": "pg[\"Group\"](\"grouped\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the cells carry the formatting the name declared",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/test_grouping.py",
+        "line": 1013
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/test_grouping.py::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column",
+      "narration": {
+        "text": "A scenario name formatting a parameter a step reads plainly gets its own column",
+        "parts": [
+          {
+            "value": "A scenario name formatting a parameter a "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " reads plainly gets its own column"
+          }
+        ]
+      },
+      "module": "tests.unit.test_grouping",
+      "tags": [
+        "parametrization"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a name formatting the parameter and a step reading it plainly",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the cases are grouped",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"](\"cases\")",
+                "param_column": null
+              },
+              {
+                "value": " are "
+              },
+              {
+                "term_id": "group",
+                "display": "grouped",
+                "expression": "pg[\"Group\"](\"grouped\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the name points at a column holding what it renders",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the name renders the disambiguated token, text and parts agreeing",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/test_grouping.py",
+        "line": 1028
       },
       "story_id": null,
       "activity_ids": []
@@ -16484,7 +16687,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 992
+        "line": 1087
       },
       "story_id": null,
       "activity_ids": []
@@ -16637,7 +16840,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1343
+        "line": 1438
       },
       "story_id": null,
       "activity_ids": []
@@ -16771,7 +16974,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1400
+        "line": 1495
       },
       "story_id": null,
       "activity_ids": []
@@ -16924,7 +17127,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1550
+        "line": 1645
       },
       "story_id": null,
       "activity_ids": []
@@ -17073,7 +17276,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1606
+        "line": 1701
       },
       "story_id": null,
       "activity_ids": []
@@ -17200,7 +17403,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2154
+        "line": 2249
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -17343,7 +17546,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2292
+        "line": 2387
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []

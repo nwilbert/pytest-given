@@ -96,6 +96,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
   can no longer leave this run's JSON beside the previous run's HTML.
 - Two test files sharing a basename across directories no longer abort the HTML
   report; the scenarios' `#scenario=` slugs gain directory components instead.
+- A format spec on a `Template` placeholder now reaches the case-table cell, so
+  hovering a row substitutes the text the slot declared rather than the raw
+  value; a name and a step formatting one parameter differently now get a
+  column each.
+- A `Template` narration's `text` is now what its parts render, so the report's
+  search box and `jq` queries no longer match a spec the page never displays.
 - The grouped step tree now comes from the first case that *passed* — a skipped
   case 1 used to render an empty tree and hide later failures.
 - A cell now reads the way the step pointing at it read, carrying the

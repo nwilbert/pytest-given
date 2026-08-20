@@ -1474,21 +1474,21 @@
 - **then** the heading is marked skipped and the reason follows the node id
 
 ## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
-`tests/unit/test_grouping.py:73::test_group_parametrized_any_failed_groups_as_failed` · parametrization
+`tests/unit/test_grouping.py:75::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
 - **given** three «Case» records of one «Parametrized scenario»
 - **when** the «grouping» pass collapses them
 - **then** one scenario remains and any failed «Case» fails it
 
 ## ✓ The grouped tree comes from the first passed «case»
-`tests/unit/test_grouping.py:190::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
+`tests/unit/test_grouping.py:192::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
 
 - **given** a skipped first «Case» and a second one that ran
 - **when** the «cases» are «grouped»
 - **then** the tree is the one the passed «Case» recorded
 
 ## ✓ A plain-str «narration» that varies across «cases» is refused
-`tests/unit/test_grouping.py:411::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
+`tests/unit/test_grouping.py:413::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
 
 - **given** two «cases» whose text differs but records no parts
 - **when** the «cases» are «grouped»
@@ -1496,7 +1496,7 @@
 - **then** the error names the test, the missing parts and the t-string fix
 
 ## ✓ A narrated value that varies becomes a derived «parameter table» column
-`tests/unit/test_grouping.py:528::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
+`tests/unit/test_grouping.py:530::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
 
 - **given** two «cases» narrating a value that differs
 - **when** «templatizing» walks the «cases»
@@ -1504,15 +1504,30 @@
 - **then** the «Step» keeps a placeholder pointing at that column
 
 ## ✓ A varying interpolation that is not a bare name is refused
-`tests/unit/test_grouping.py:640::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
+`tests/unit/test_grouping.py:642::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
 
 - **given** two «cases» narrating a computed expression
 - **when** the «cases» are «grouped»
 - **then** the grouping is refused
 - **then** the error quotes the expression and shows the bind-a-local fix
 
+## ✓ A «parameter table» cell reads the way the scenario name formats it
+`tests/unit/test_grouping.py:1013::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
+
+- **given** a Template scenario name formatting its parameter
+- **when** the «cases» are «grouped»
+- **then** the cells carry the formatting the name declared
+
+## ✓ A scenario name formatting a parameter a «step» reads plainly gets its own column
+`tests/unit/test_grouping.py:1028::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
+
+- **given** a name formatting the parameter and a step reading it plainly
+- **when** the «cases» are «grouped»
+- **then** the name points at a column holding what it renders
+- **then** the name renders the disambiguated token, text and parts agreeing
+
 ## ✓ A «step» narrating a parameter its column no longer holds is refused
-`tests/unit/test_grouping.py:992::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
+`tests/unit/test_grouping.py:1087::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
 
 - **given** two «cases» narrating a value their column lacks
 - **when** the «cases» are «grouped»
@@ -1520,7 +1535,7 @@
 - **then** the error names the column and what the case actually narrated
 
 ## ✓ A «term ref» whose pill differs between «cases» is refused
-`tests/unit/test_grouping.py:1343::test_a_varying_pill_display_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1438::test_a_varying_pill_display_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» reads differently
 - **when** the «cases» are «grouped»
@@ -1528,7 +1543,7 @@
 - **then** the error names the «Term ref» and the split-the-pill fix
 
 ## ✓ A «term ref» that *is* the parametrize value stays supported
-`tests/unit/test_grouping.py:1400::test_a_pill_bound_to_a_parametrize_column_does_not_raise` · parametrization
+`tests/unit/test_grouping.py:1495::test_a_pill_bound_to_a_parametrize_column_does_not_raise` · parametrization
 
 - **given** two «cases» whose pill is the parameter itself
 - **when** the «cases» are «grouped»
@@ -1536,7 +1551,7 @@
 - **then** no extra column is made — the parametrize one already holds it
 
 ## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py:1550::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+`tests/unit/test_grouping.py:1645::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
 
 - **given** two «cases» attaching a label with differing payloads
 - **when** «templatizing» walks the «cases»
@@ -1544,7 +1559,7 @@
 - **then** the «Step» keeps a content-less badge pointing at it
 
 ## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py:1606::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+`tests/unit/test_grouping.py:1701::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
 
 - **given** an «Attachment» label only one «Case» attaches
 - **when** the «cases» are «grouped»
@@ -1552,7 +1567,7 @@
 - **then** the error names the label and asks for a constant one
 
 ## ✓ A «parameter table» cell reads the way the «step» that points at it read
-`tests/unit/test_grouping.py:2154::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+`tests/unit/test_grouping.py:2249::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec
 - **when** «grouping» builds the «parameter table»
@@ -1560,7 +1575,7 @@
 - **then** the step keeps its placeholder, which that cell substitutes into
 
 ## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py:2292::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+`tests/unit/test_grouping.py:2387::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
 
 - **given** two «cases» whose «step» trees differ
 - **when** the «cases» are «grouped»

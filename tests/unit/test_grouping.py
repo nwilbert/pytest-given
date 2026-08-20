@@ -13,6 +13,7 @@ from pytest_given.model import (
     Glossary,
     Narration,
     NarrationLiteral,
+    NarrationPart,
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
@@ -24,6 +25,7 @@ from pytest_given.model import (
     SourceLocation,
     Step,
     TermId,
+    narration_text,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
@@ -987,6 +989,99 @@ def _param_value_step(
             ],
         ),
     )
+
+
+def _named_group(
+    name: Narration, steps1: list[Step], steps2: list[Step]
+) -> tuple[list[Scenario], ParamInfo]:
+    """`_two_case_group` with a `Template`-style scenario name carrying parts."""
+    scenarios, info = _two_case_group(steps1, steps2)
+    for case in scenarios:
+        case.narration = name
+    return scenarios, info
+
+
+def _price_name(spec: str) -> Narration:
+    parts: list[NarrationPart] = [
+        NarrationLiteral(value='charge '),
+        NarrationPlaceholder(name='cup_size', column_id='cup_size', format_spec=spec),
+        NarrationLiteral(value=' ml'),
+    ]
+    return Narration(text=narration_text(parts), parts=parts)
+
+
+@scenario(
+    t'A {pg["Parameter table"].low} cell reads the way the scenario name formats it',
+    tags=['parametrization'],
+)
+def test_a_scenario_name_format_spec_reaches_its_cell() -> None:
+    with given('a Template scenario name formatting its parameter'):
+        scenarios, info = _named_group(_price_name('.2f'), [], [])
+    with when(t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}'):
+        grouped = group_parametrized(scenarios, info)
+    with then('the cells carry the formatting the name declared'):
+        table = grouped[0].parameters
+        assert table is not None
+        assert [c.values for c in table.cases] == [['200.00'], ['350.00']]
+
+
+@scenario(
+    t'A scenario name formatting a parameter a {pg["Step"].low} reads plainly '
+    t'gets its own column',
+    tags=['parametrization'],
+)
+def test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column() -> None:
+    with given('a name formatting the parameter and a step reading it plainly'):
+        scenarios, info = _named_group(
+            _price_name('.2f'), [_param_value_step('200')], [_param_value_step('350')]
+        )
+    with when(t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}'):
+        grouped = group_parametrized(scenarios, info)
+    with then('the name points at a column holding what it renders'):
+        table = grouped[0].parameters
+        assert table is not None
+        assert [(c.id, c.name) for c in table.columns] == [
+            ('cup_size', 'cup_size'),
+            ('derived:0', 'cup_size #2'),
+        ]
+        assert [c.values for c in table.cases] == [
+            [200, '200.00'],
+            [350, '350.00'],
+        ]
+    with then('the name renders the disambiguated token, text and parts agreeing'):
+        slot = grouped[0].narration.parts[1]
+        assert isinstance(slot, NarrationPlaceholder)
+        assert (slot.name, slot.column_id) == ('cup_size #2', 'derived:0')
+        assert grouped[0].narration.text == 'charge {cup_size #2} ml'
+
+
+class _SpecRefusing:
+    """A value that renders bare but rejects any format spec — `datetime`'s
+    behaviour for a nonsense spec, in miniature."""
+
+    def __format__(self, spec: str) -> str:
+        if spec:
+            raise ValueError(f'unsupported format string: {spec}')
+        return 'cup'
+
+    def __str__(self) -> str:
+        return 'cup'
+
+
+def test_a_name_slot_a_value_cannot_render_keeps_the_shared_column() -> None:
+    """A value whose own `__format__` refuses the spec never rendered that way
+    in the name either, so there is no better column to point the slot at."""
+    scenarios, info = _named_group(_price_name('.2f'), [], [])
+    for spec in info.values():
+        spec.values[0] = _SpecRefusing()
+    grouped = group_parametrized(scenarios, info)
+    table = grouped[0].parameters
+    assert table is not None
+    assert [c.id for c in table.columns] == ['cup_size']
+    assert [c.values for c in table.cases] == [['cup'], ['cup']]
+    slot = grouped[0].narration.parts[1]
+    assert isinstance(slot, NarrationPlaceholder)
+    assert slot.column_id == 'cup_size'
 
 
 @scenario(
