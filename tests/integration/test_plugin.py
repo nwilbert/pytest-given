@@ -162,6 +162,29 @@ def test_attachment_in_report(pytester, tmp_path):
     assert att[0]['label'] == 'my log'
 
 
+def test_attach_outside_a_step_fails_the_test(pytester, tmp_path):
+    """Attaching from the test body, before any step is open, fails loudly.
+
+    The payload has no step to bind to, and the report would otherwise come out
+    complete-looking with the attachment silently missing.
+    """
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, then, attach
+
+        @scenario("Attach test")
+        def test_attach():
+            attach("my log", "log content")
+            with then("check"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(failed=1)
+    result.stdout.fnmatch_lines(['*no step is open*'])
+
+
 def test_step_fixture_appears_as_given_step(pytester, tmp_path):
     """A step fixture appears as a given step."""
     pytester.makepyfile(

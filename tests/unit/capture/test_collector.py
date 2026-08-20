@@ -1,6 +1,6 @@
 import pytest
 
-from pytest_given import Template, given, scenario, then, when
+from pytest_given import Template, given, scenario, then, when, when_then
 from pytest_given.capture.collector import Collector
 from pytest_given.model import (
     FixtureRecording,
@@ -298,6 +298,23 @@ def test_attach_during_idle_raises() -> None:
     collector = Collector()
     with pytest.raises(PytestGivenError, match='no active scenario or fixture'):
         collector.attach('label', 'content')
+
+
+@scenario(
+    t'An {pg["Attachment"].low} outside every {pg["Step"].low} is refused',
+)
+def test_attach_outside_any_step_raises() -> None:
+    with given(t'an {pg["Active scenario"]} with no {pg["Step"]} open'):
+        collector = Collector()
+        collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
+    with (
+        when_then(
+            t'an {pg["Attachment"].low} is made from the test body',
+            t'it is refused rather than dropped',
+        ),
+        pytest.raises(PytestGivenError, match='no step is open'),
+    ):
+        collector.attach('config', 'content')
 
 
 def test_store_and_retrieve_recording_by_key() -> None:

@@ -346,6 +346,8 @@ attach('Receipt', 'Coffee x1     $2.00')             # text
 attach('Machine state', {'coffees': 9, 'price': 2})  # JSON
 ```
 
+An attachment binds to the step being recorded, so the call belongs inside a `given` / `when` / `then` block. Attaching from the test body with no step open raises.
+
 The label is a plain `str`; a `Template` or t-string label raises — build it with an f-string if it needs interpolating.
 
 In a parametrized scenario the label must read the same in every case: a payload that varies across cases becomes a case-table column headed by that label, and the step keeps a badge pointing at it. A label that differs between cases raises — the varying part belongs in the content.

@@ -330,10 +330,20 @@ class Collector:
                 'teardown is technical, not narrative.'
             )
         stack = self._target_stack()
-        if stack:
-            stack[-1].attachments.append(
-                Attachment(label=label, content=content, content_type=content_type)
+        if not stack:
+            # An attachment binds to the step being recorded, so a test body
+            # that attaches before opening one has nowhere to put it. Refused
+            # rather than dropped: every other misuse of this API raises, and a
+            # payload that silently never reaches the report is the one outcome
+            # the author cannot notice.
+            raise PytestGivenError(
+                f"Cannot attach '{label}' — no step is open. An attachment "
+                'binds to the step being recorded; move the call inside a '
+                'given/when/then block.'
             )
+        stack[-1].attachments.append(
+            Attachment(label=label, content=content, content_type=content_type)
+        )
 
     def _target_stack(self) -> list[Step]:
         """Return the step stack that push/pop/attach should mutate, per state."""

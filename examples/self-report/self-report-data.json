@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-20T18:00:01.609256+00:00",
+    "timestamp": "2026-08-20T18:03:42.131011+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "087892f95d91127c6aa9ed4d0d261c7eae602eb5",
+    "commit_sha": "ed3931117e225dec9980c54f43f040fd5c282750",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -613,6 +613,128 @@
       "activity_ids": []
     },
     {
+      "id": "tests/unit/capture/test_collector.py::test_attach_outside_any_step_raises",
+      "narration": {
+        "text": "An attachment outside every step is refused",
+        "parts": [
+          {
+            "value": "An "
+          },
+          {
+            "term_id": "attachment",
+            "display": "attachment",
+            "expression": "pg[\"Attachment\"].low",
+            "param_column": null
+          },
+          {
+            "value": " outside every "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is refused"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Active scenario with no Step open",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "active-scenario",
+                "display": "Active scenario",
+                "expression": "pg[\"Active scenario\"]",
+                "param_column": null
+              },
+              {
+                "value": " with no "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]",
+                "param_column": null
+              },
+              {
+                "value": " open"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "an attachment is made from the test body",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "attachment",
+                "display": "attachment",
+                "expression": "pg[\"Attachment\"].low",
+                "param_column": null
+              },
+              {
+                "value": " is made from the test body"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it is refused rather than dropped",
+            "parts": [
+              {
+                "value": "it is refused rather than dropped"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 303
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "tests/unit/capture/test_collector.py::test_graft_recording_deep_copies_into_scenario",
       "narration": {
         "text": "A fixture recording is deep-copied when grafted",
@@ -727,7 +849,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 311
+        "line": 328
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -833,7 +955,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 452
+        "line": 469
       },
       "story_id": null,
       "activity_ids": []
@@ -920,7 +1042,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 471
+        "line": 488
       },
       "story_id": null,
       "activity_ids": []
@@ -1013,7 +1135,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 489
+        "line": 506
       },
       "story_id": null,
       "activity_ids": []
@@ -1127,7 +1249,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 504
+        "line": 521
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -1232,7 +1354,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 522
+        "line": 539
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -1335,7 +1457,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 547
+        "line": 564
       },
       "story_id": null,
       "activity_ids": []
@@ -14655,7 +14777,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 33,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",

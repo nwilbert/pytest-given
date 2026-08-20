@@ -61,6 +61,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
   (`{id, name, kind}`), cells may hold an attachment object, placeholder parts
   gain `column_id`, and a grouped step's `narration.text` is the template
   rather than case 1's rendering.
+- **Breaking.** `attach()` called with no step open now raises `PytestGivenError`
+  instead of silently discarding the payload; move the call inside the
+  `given` / `when` / `then` block it belongs to.
 - `activity(..., id=N)` is now `activity(..., activity_id=N)`; the
   `Activity.id` field itself is unchanged.
 - The bundled authoring skill's tagging guidance now argues for sparse tagging:
