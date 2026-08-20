@@ -7,6 +7,7 @@ import inspect
 import json
 import time
 from collections.abc import Callable, Generator
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from string import templatelib
@@ -68,7 +69,12 @@ from .model import (
     report_from_dict,
     report_to_dict,
 )
-from .report import detect_commit_sha, render_html, render_md, resolve_template
+from .report import (
+    detect_commit_sha,
+    render_html_string,
+    render_md,
+    resolve_template,
+)
 
 _collector_key: pytest.StashKey[Collector] = pytest.StashKey()
 
@@ -94,7 +100,10 @@ _displaced_active_collector_key: pytest.StashKey[Collector | None] = pytest.Stas
 _LINT_CHOICES = ('true', 'false')
 _lint_findings: pytest.StashKey[list[Finding]] = pytest.StashKey()
 _md_stdout: pytest.StashKey[str] = pytest.StashKey()
-_grouping_error_message: pytest.StashKey[str] = pytest.StashKey()
+_report_error_message: pytest.StashKey[str] = pytest.StashKey()
+# The source-link template, resolved once at configure time so a bad preset
+# fails before the suite runs rather than after it.
+_source_link_template: pytest.StashKey[str | None] = pytest.StashKey()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -226,6 +235,18 @@ def pytest_configure(config: pytest.Config) -> None:
         parse_rule_levels(config.getini('given_lint_rules'))
         parse_ignore_entries(config.getini('given_lint_ignore'))
     except ValueError as error:
+        raise pytest.UsageError(str(error)) from error
+    # Same reason, for the source-link config: an unknown preset is a typo in a
+    # flag, and learning about it only once the suite has finished is the worst
+    # moment to learn it. Resolved here and stashed, so `github` runs its
+    # org/repo detection once rather than once per resolution.
+    if config.getoption('given_html') is None:
+        return
+    try:
+        config.stash[_source_link_template] = resolve_template(
+            config.getoption('given_source_link') or config.getini('given_source_link')
+        )
+    except PytestGivenError as error:
         raise pytest.UsageError(str(error)) from error
 
 
@@ -760,24 +781,66 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
     )
 
 
+@dataclass(frozen=True, kw_only=True)
+class _SessionReport:
+    """A finished session's report: what the lint reads, and the sinks waiting
+    to be written.
+
+    `scenarios` is the grouped list as built, *before* the serde round-trip —
+    `Step.source` is deliberately not serialized, and the AST lint rules have
+    nothing to anchor to without it.
+    """
+
+    scenarios: list[Scenario]
+    glossary: Glossary | None
+    stories: list[Story]
+    files: list[tuple[Path, str]]
+    md_stdout: str | None
+
+
 def pytest_sessionfinish(session: pytest.Session) -> None:
+    """Build the report and write the configured sinks.
+
+    Every failure in here is a `PytestGivenError` — a rejected grouping form, a
+    suite reaching two glossaries, a term used in incompatible slots, an
+    unusable source-link template, colliding scenario slugs — and an exception
+    leaving this hook is neither a test failure nor an INTERNALERROR: pytest
+    lets it out of `console_main` as a bare traceback, with no summary line and
+    no exit code at all. So the whole body runs under one handler that reports
+    through the terminal summary, discards the sinks this run would have
+    written, and fails the run.
+
+    Guarding only the grouping call is not enough, and neither is guarding each
+    step separately: the sinks have to stay consistent *with each other*. They
+    are therefore rendered in full before any of them is written, so a render
+    that raises cannot leave this run's JSON beside the previous run's HTML —
+    two reports that disagree, with nothing on either saying so.
+    """
     collector = _collector(session.config)
     try:
-        scenarios = group_parametrized(collector.scenarios, collector.param_info)
+        built = _build_report(session, collector)
     except PytestGivenError as error:
-        # An exception leaving this hook is neither a test failure nor an
-        # INTERNALERROR — pytest lets it out of console_main as a bare
-        # traceback. Record it for the terminal summary, write no sink (a
-        # report we know to be false is never emitted), and fail the run.
-        session.config.stash[_grouping_error_message] = '\n'.join(
+        session.config.stash[_report_error_message] = '\n'.join(
             [str(error), *_discard_stale_sinks(session.config)]
         )
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
         return
     finally:
-        # Both ways out drop the captured parametrize values: they are read
+        # Every way out drops the captured parametrize values: they are read
         # only here, and a nested in-process run must not inherit them.
         collector.param_info.clear()
+    for path, text in built.files:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding='utf-8')
+    if built.md_stdout is not None:
+        session.config.stash[_md_stdout] = built.md_stdout
+    _run_lint(session, built.scenarios, built.glossary, built.stories)
+
+
+def _build_report(session: pytest.Session, collector: Collector) -> _SessionReport:
+    """Group, resolve, and render — everything that can fail, and nothing that
+    touches the filesystem."""
+    scenarios = group_parametrized(collector.scenarios, collector.param_info)
     stories = list(collector._discovered_stories.values())
     glossary = _resolve_glossary(stories, session)
     if glossary is not None:
@@ -796,33 +859,49 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         glossary=glossary,
     )
     report_dict = report_to_dict(report)
-    report = report_from_dict(report_dict)  # serde round-trip = fidelity guarantee
+    rendered = report_from_dict(report_dict)  # serde round-trip = fidelity guarantee
+    files, md_stdout = _render_sinks(session.config, rendered, report_dict)
+    return _SessionReport(
+        scenarios=scenarios,
+        glossary=glossary,
+        stories=stories,
+        files=files,
+        md_stdout=md_stdout,
+    )
 
-    json_opt = session.config.getoption('given_json')
+
+def _render_sinks(
+    config: pytest.Config, report: ReportData, report_dict: dict[str, Any]
+) -> tuple[list[tuple[Path, str]], str | None]:
+    """The configured sinks rendered to text, plus the Markdown bound for
+    stdout when `--given-md` was given bare."""
+    files: list[tuple[Path, str]] = []
+    json_opt = config.getoption('given_json')
     if json_opt is not None:
-        json_path = Path(json_opt)
-        json_path.parent.mkdir(parents=True, exist_ok=True)
-        json_path.write_text(json.dumps(report_dict, indent=2), encoding='utf-8')
-
-    html_opt = session.config.getoption('given_html')
+        files.append((Path(json_opt), json.dumps(report_dict, indent=2)))
+    html_opt = config.getoption('given_html')
     if html_opt is not None:
-        raw_link = session.config.getoption(
-            'given_source_link'
-        ) or session.config.getini('given_source_link')
-        template = resolve_template(raw_link)
-        render_html(report, Path(html_opt), source_link_template=template)
-
-    md_opt = session.config.getoption('given_md')
+        files.append(
+            (
+                Path(html_opt),
+                render_html_string(report, source_link_template=_source_link(config)),
+            )
+        )
+    md_stdout: str | None = None
+    md_opt = config.getoption('given_md')
     if md_opt is not None:
         md = render_md(report)
         if md_opt == '-':
-            session.config.stash[_md_stdout] = md
+            md_stdout = md
         else:
-            md_path = Path(md_opt)
-            md_path.parent.mkdir(parents=True, exist_ok=True)
-            md_path.write_text(md, encoding='utf-8')
+            files.append((Path(md_opt), md))
+    return files, md_stdout
 
-    _run_lint(session, scenarios, glossary, stories)
+
+def _source_link(config: pytest.Config) -> str | None:
+    """The template `pytest_configure` resolved. Only an HTML run resolves one,
+    and only an HTML run asks for it."""
+    return config.stash[_source_link_template]
 
 
 def _discard_stale_sinks(config: pytest.Config) -> list[str]:
@@ -871,12 +950,10 @@ def _run_lint(
 
 
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
-    grouping_error = terminalreporter.config.stash.get(_grouping_error_message, None)
-    if grouping_error is not None:
-        terminalreporter.write_sep(
-            '=', 'pytest-given: parametrize grouping error', red=True
-        )
-        terminalreporter.line(grouping_error)
+    report_error = terminalreporter.config.stash.get(_report_error_message, None)
+    if report_error is not None:
+        terminalreporter.write_sep('=', 'pytest-given: report not written', red=True)
+        terminalreporter.line(report_error)
     findings = terminalreporter.config.stash.get(_lint_findings, [])
     if findings:
         errors = sum(1 for f in findings if f.severity == 'error')

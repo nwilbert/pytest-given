@@ -64,6 +64,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** `attach()` called with no step open now raises `PytestGivenError`
   instead of silently discarding the payload; move the call inside the
   `given` / `when` / `then` block it belongs to.
+- An unknown `given_source_link` preset is now a `UsageError` raised before the
+  suite runs, rather than a failure once it has finished.
 - `activity(..., id=N)` is now `activity(..., activity_id=N)`; the
   `Activity.id` field itself is unchanged.
 - The bundled authoring skill's tagging guidance now argues for sparse tagging:
@@ -84,6 +86,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - A fixture that raises after its `yield` now fails the scenario it tore down,
   instead of leaving it green in a report pytest counted as an error.
+- Every report-building failure — a suite reaching two glossaries, a term used
+  in incompatible slots, an unusable source-link template — now surfaces as a
+  terminal summary and a failing exit code, where only grouping errors did;
+  the rest escaped as a bare traceback with no summary line at all.
+- The sinks are now rendered in full before any is written, so a failing render
+  can no longer leave this run's JSON beside the previous run's HTML.
 - The grouped step tree now comes from the first case that *passed* — a skipped
   case 1 used to render an empty tree and hide later failures.
 - A cell now reads the way the step pointing at it read, carrying the

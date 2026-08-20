@@ -304,7 +304,7 @@ def test_indirect_parametrize_narrates_the_fixture_value(pytester, tmp_path):
     json_path = tmp_path / 'report.json'
     result = pytester.runpytest(f'--given-json={json_path}')
     result.assert_outcomes(passed=2)
-    assert 'grouping error' not in result.stdout.str()
+    assert 'report not written' not in result.stdout.str()
     data = json.loads(json_path.read_text())
     cases = data['scenarios'][0]['parameters']['cases']
     # The cell holds what the test argument held, so row hover substitutes the
@@ -334,7 +334,7 @@ def test_a_mutated_parametrize_value_is_captured_as_it_was_at_setup(pytester, tm
     json_path = tmp_path / 'report.json'
     result = pytester.runpytest(f'--given-json={json_path}')
     result.assert_outcomes(passed=2)
-    assert 'grouping error' not in result.stdout.str()
+    assert 'report not written' not in result.stdout.str()
     data = json.loads(json_path.read_text())
     cases = data['scenarios'][0]['parameters']['cases']
     assert [c['values'] for c in cases] == [["['latte']"], ["['mocha']"]]
@@ -364,10 +364,67 @@ def test_a_grouping_error_discards_the_previous_report(pytester, tmp_path):
     result = pytester.runpytest(
         f'--given-json={json_path}', f'--given-html={html_path}'
     )
-    assert 'grouping error' in result.stdout.str()
+    assert 'report not written' in result.stdout.str()
     assert not json_path.exists()
     assert not html_path.exists()
     assert 'report.json' in result.stdout.str()
+
+
+def test_an_unknown_source_link_preset_fails_before_the_suite_runs(pytester):
+    """A typo in --given-source-link is a usage error, caught at configure time.
+
+    Learning about it only at session finish means paying for the whole suite
+    first, and the error arrived as a bare traceback with no summary line.
+    """
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, then
+
+        @scenario("Brew")
+        def test_brew():
+            with then("it brews"):
+                assert True
+        """
+    )
+    result = pytester.runpytest('--given-html=report.html', '--given-source-link=bogus')
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines(['*Unknown given_source_link preset*'])
+    # No outcome line at all: the run stopped at configure, before collection.
+    assert 'passed' not in result.stdout.str()
+
+
+def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):
+    """Every sink is rendered before any is written.
+
+    Otherwise the JSON lands, the HTML render raises, and the pair on disk
+    describes two different runs with nothing saying so.
+    """
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, then
+
+        @scenario("Brew")
+        def test_brew():
+            with then("it brews"):
+                assert True
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    html_path = tmp_path / 'report.html'
+    json_path.write_text('{"stale": true}')
+    html_path.write_text('<html>stale</html>')
+    # A raw template passes preset resolution at configure time and fails when
+    # the renderer compiles it — the last point a sink can still raise.
+    result = pytester.runpytest(
+        f'--given-json={json_path}',
+        f'--given-html={html_path}',
+        '--given-source-link={bogus}',
+    )
+    assert result.ret == pytest.ExitCode.TESTS_FAILED
+    result.stdout.fnmatch_lines(['*report not written*'])
+    # Neither the stale pair nor a half-written new one survives.
+    assert not json_path.exists()
+    assert not html_path.exists()
 
 
 def test_parametrized_with_failure(pytester, tmp_path):
@@ -1741,7 +1798,12 @@ def test_multiple_glossaries_in_conftests_raises(pytester):
             pass
     """)
     result = pytester.runpytest('--given-json=report.json')
-    result.stderr.fnmatch_lines(['*multiple Glossary*'])
+    # Reported through the terminal summary and the exit code, not as a bare
+    # traceback out of console_main: the tests themselves all passed, and the
+    # run has to say what went wrong with the report instead of dumping a stack.
+    assert result.ret == pytest.ExitCode.TESTS_FAILED
+    result.stdout.fnmatch_lines(['*report not written*', '*multiple Glossary*'])
+    assert not (pytester.path / 'report.json').exists()
 
 
 def test_annotated_given_on_parametrize_value_synthesizes_leaf(pytester, tmp_path):

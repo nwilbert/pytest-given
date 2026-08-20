@@ -82,10 +82,24 @@ def render_html(
     html_path: Path,
     source_link_template: str | None = None,
 ) -> None:
-    """Render a report model to a self-contained HTML file.
+    """Render a report model to a self-contained HTML file."""
+    html = render_html_string(report, source_link_template=source_link_template)
+    html_path.parent.mkdir(parents=True, exist_ok=True)
+    html_path.write_text(html, encoding='utf-8')
+
+
+def render_html_string(
+    report: ReportData,
+    source_link_template: str | None = None,
+) -> str:
+    """Render a report model to a self-contained HTML document.
 
     `source_link_template` is the already-resolved template string (preset
     expansion happens before this point). None disables source linking.
+
+    Separate from `render_html` so the plugin can render every sink before
+    writing any of them — a render that raises must not leave this run's JSON
+    beside the previous run's HTML.
     """
     raw_json = json.dumps(report_to_dict(report), indent=2)
     # JSON escapes neither `</` nor `<!--` inside string literals, but we embed
@@ -170,8 +184,8 @@ def render_html(
         param_color_map=param_color_map,
         num_param_colors=_NUM_PARAM_COLORS,
     )
-    html_path.parent.mkdir(parents=True, exist_ok=True)
-    html_path.write_text(html, encoding='utf-8')
+    assert isinstance(html, str)
+    return html
 
 
 def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
