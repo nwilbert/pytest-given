@@ -12,6 +12,7 @@ from pytest_given import (
     when,
     when_then,
 )
+from pytest_given.capture import glossary as gloss_mod
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.glossary import (
     Actor,
@@ -298,8 +299,6 @@ def test_glossary_re_registration_preserves_first_source(monkeypatch):
 def test_glossary_re_registration_matching_fields_ok_when_source_differs(monkeypatch):
     """Conflict equality must ignore `source`; same kind/canonical/definition
     from a different call site is not a conflict."""
-    import pytest_given.capture.glossary as gloss_mod
-
     g = Glossary()
 
     src1 = SourceLocation(relpath='a.py', line=1)

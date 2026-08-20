@@ -626,6 +626,10 @@ def test_story_auto_numbering_skips_taken_ids_even_when_earlier_auto(
 
 
 def test_top_level_imports():
+    # Deliberately function-level: this module imports these names from their
+    # internal paths, so the assertion here is that the *package root* also
+    # re-exports them. Hoisting would shadow the internal imports and test
+    # nothing.
     from pytest_given import Glossary, activity, path, story
 
     g = Glossary()

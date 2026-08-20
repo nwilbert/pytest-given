@@ -32,7 +32,12 @@ from pytest_given.model import (
     report_from_dict,
     report_to_dict,
 )
-from pytest_given.model.serde import _asdict_filtered
+from pytest_given.model.serde import (
+    _activity_part_from_dict,
+    _asdict_filtered,
+    _narration_part_from_dict,
+    _param_table_from_dict,
+)
 
 
 def _round_trip(report):
@@ -636,16 +641,12 @@ def test_step_activity_ids_round_trip():
 
 
 def test_activity_part_unknown_shape_raises():
-    from pytest_given.model.serde import _activity_part_from_dict
-
     with pytest.raises(PytestGivenError, match='unknown ActivityPart shape'):
         _activity_part_from_dict({'unknown_key': 'x'})
 
 
 def test_narration_part_unknown_shape_raises():
     """Pre-existing behavior — covered to keep 100% after extending the branch."""
-    from pytest_given.model.serde import _narration_part_from_dict
-
     with pytest.raises(PytestGivenError, match='Unknown narration part shape'):
         _narration_part_from_dict({'mystery': 'x'})
 
@@ -771,8 +772,6 @@ def test_a_pre_columns_parameter_table_says_to_re_run_the_suite():
     """`pytest-given report` on a report saved before `names` became `columns`
     used to die with a bare `KeyError: 'columns'`. There is no migration — the
     error has to say so."""
-    from pytest_given.model.serde import _param_table_from_dict
-
     with pytest.raises(PytestGivenError, match='re-run the suite'):
         _param_table_from_dict({'names': ['cup_size'], 'cases': []})
 
@@ -780,8 +779,6 @@ def test_a_pre_columns_parameter_table_says_to_re_run_the_suite():
 def test_a_pre_columns_placeholder_says_to_re_run_the_suite():
     """Same vintage of report, reached through a step's narration rather than
     its parameter table: a placeholder gained `column_id` in the same change."""
-    from pytest_given.model.serde import _narration_part_from_dict
-
     with pytest.raises(PytestGivenError, match='re-run the suite'):
         _narration_part_from_dict({'name': 'cup_size'})
 

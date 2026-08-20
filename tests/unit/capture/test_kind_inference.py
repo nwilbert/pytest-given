@@ -1,7 +1,7 @@
 import pytest
 
 from pytest_given import given, scenario, then, when, when_then
-from pytest_given.capture.kind_inference import infer_glossary_kinds
+from pytest_given.capture.kind_inference import _slot_for, infer_glossary_kinds
 from pytest_given.model import (
     Activity,
     ActivityId,
@@ -283,8 +283,6 @@ def test_declared_verb_in_noun_slot_raises():
     t'{pg["Slot"]} positions alternate verb/noun after the {pg["Actor"].low}',
 )
 def test_slot_for_maps_odd_positions_to_verb():
-    from pytest_given.capture.kind_inference import _slot_for
-
     with given('the five positions of a short activity path'):
         positions = range(5)
     with when(t'the {pg["Slot"]} rule is applied to each position'):

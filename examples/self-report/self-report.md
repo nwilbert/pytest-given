@@ -227,7 +227,7 @@
 - **then** a PytestGivenError reports the file is not found
 
 ## ✓ A «term» cell with no alphanumeric characters is rejected
-`tests/unit/capture/test_file_glossary.py:223::test_empty_id_term_cell_raises` · diagnostics, validation
+`tests/unit/capture/test_file_glossary.py:221::test_empty_id_term_cell_raises` · diagnostics, validation
 
 - **given** a row whose «Term» cell has no id-able characters
   - 📎 Glossary file:
@@ -240,7 +240,7 @@
 - **then** a PytestGivenError is raised with file:line context
 
 ## ✓ Conflicting duplicate rows are rejected
-`tests/unit/capture/test_file_glossary.py:243::test_conflicting_duplicate_rows_raise` · validation
+`tests/unit/capture/test_file_glossary.py:241::test_conflicting_duplicate_rows_raise` · validation
 
 - **given** two rows for one «Term» with different definitions
   - 📎 Glossary file:
@@ -254,7 +254,7 @@
 - **then** a PytestGivenError reports the conflicting rows
 
 ## ✓ A blank description normalizes to «undefined»
-`tests/unit/capture/test_file_glossary.py:267::test_blank_description_cell_normalizes_to_none`
+`tests/unit/capture/test_file_glossary.py:265::test_blank_description_cell_normalizes_to_none`
 
 - **given** a row whose description cell is blank
   - 📎 Glossary file:
@@ -267,7 +267,7 @@
 - **then** the «Term» definition is None, i.e. «Undefined»
 
 ## ✓ Identical duplicate rows collapse to one «term»
-`tests/unit/capture/test_file_glossary.py:284::test_idempotent_duplicate_rows_ok`
+`tests/unit/capture/test_file_glossary.py:280::test_idempotent_duplicate_rows_ok`
 
 - **given** two identical rows for the same «Term»
   - 📎 Glossary file:
@@ -281,7 +281,7 @@
 - **then** they collapse to a single «Term»
 
 ## ✓ Calling «FileGlossary» looks up a known «term»
-`tests/unit/capture/test_file_glossary.py:309::test_file_glossary_call_known_name_returns_handle`
+`tests/unit/capture/test_file_glossary.py:303::test_file_glossary_call_known_name_returns_handle`
 
 - **given** a «File glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -298,7 +298,7 @@
 - **then** a «Deferred term» is returned
 
 ## ✓ «FileGlossary» is a closed vocabulary
-`tests/unit/capture/test_file_glossary.py:323::test_file_glossary_call_unknown_name_raises` · validation
+`tests/unit/capture/test_file_glossary.py:317::test_file_glossary_call_unknown_name_raises` · validation
 
 - **given** a «File glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -316,70 +316,70 @@
 - **then** no new «Term» was created
 
 ## ✓ Calling an «actor» names a distinct «instance»
-`tests/unit/capture/test_glossary.py:105::test_actor_call_returns_instance_with_distinct_display`
+`tests/unit/capture/test_glossary.py:106::test_actor_call_returns_instance_with_distinct_display`
 
 - **given** an «Actor» handle for Guest
 - **when** the «Actor» is called with a name
 - **then** an «Instance» with a distinct display is returned
 
 ## ✓ Calling a «verb» records an «inflection» of the same «term»
-`tests/unit/capture/test_glossary.py:131::test_verb_call_returns_inflection_sharing_term_identity`
+`tests/unit/capture/test_glossary.py:132::test_verb_call_returns_inflection_sharing_term_identity`
 
 - **given** a «Verb» handle for confirm
 - **when** the «Verb» is called with a surface form
 - **then** an «Inflection» sharing the verb identity is returned
 
 ## ✓ Registering an «actor» returns a typed handle
-`tests/unit/capture/test_glossary.py:151::test_glossary_actor_registers_and_returns_handle`
+`tests/unit/capture/test_glossary.py:152::test_glossary_actor_registers_and_returns_handle`
 
 - **given** an empty glossary
 - **when** an «Actor» is registered with a definition
 - **then** a typed «Actor» handle with the «Actor» kind is returned
 
 ## ✓ Re-registering a «term» with matching fields is idempotent
-`tests/unit/capture/test_glossary.py:182::test_glossary_re_registration_with_matching_fields_is_idempotent`
+`tests/unit/capture/test_glossary.py:183::test_glossary_re_registration_with_matching_fields_is_idempotent`
 
 - **given** an «Actor» already registered with a definition
 - **when** the same name and definition are registered again
 - **then** both handles share the one «Term»
 
 ## ✓ Re-registering a «term» with a different definition is rejected
-`tests/unit/capture/test_glossary.py:196::test_glossary_re_registration_with_mismatched_definition_raises` · validation
+`tests/unit/capture/test_glossary.py:197::test_glossary_re_registration_with_mismatched_definition_raises` · validation
 
 - **given** an «Actor» already registered with one definition
 - **when** the name is registered again with a different definition
 - **then** a PytestGivenError reports the conflict with the prior registration
 
 ## ✓ The same name cannot be two different kinds
-`tests/unit/capture/test_glossary.py:214::test_glossary_cross_kind_collision_raises` · validation
+`tests/unit/capture/test_glossary.py:215::test_glossary_cross_kind_collision_raises` · validation
 
 - **given** a name already registered as an «Actor»
 - **when** the same name is registered as a «Verb»
 - **then** a PytestGivenError reports the conflict with the prior registration
 
 ## ✓ Registering an «actor» captures its definition site
-`tests/unit/capture/test_glossary.py:238::test_glossary_actor_captures_source`
+`tests/unit/capture/test_glossary.py:239::test_glossary_actor_captures_source`
 
 - **given** a rootdir-aware glossary
 - **when** an «Actor» is registered
 - **then** the «Term» records a «Source link» to this file
 
 ## ✓ Calling the «glossary» declares a «kindless» «term»
-`tests/unit/capture/test_glossary.py:332::test_call_declares_kindless_term`
+`tests/unit/capture/test_glossary.py:331::test_call_declares_kindless_term`
 
 - **given** an empty glossary
 - **when** a «Term» is declared by call, without a kind
 - **then** the «Term» is registered as «Kindless»
 
 ## ✓ Subscript looks up an already-declared «term»
-`tests/unit/capture/test_glossary.py:411::test_subscript_get_only_returns_handle`
+`tests/unit/capture/test_glossary.py:410::test_subscript_get_only_returns_handle`
 
 - **given** a glossary with one declared «Term»
 - **when** the name is looked up by subscript
 - **then** the returned «Term» is the declared one
 
 ## ✓ Subscripting an unknown name raises with a hint
-`tests/unit/capture/test_glossary.py:424::test_subscript_unknown_name_raises_with_hint` · diagnostics, validation
+`tests/unit/capture/test_glossary.py:423::test_subscript_unknown_name_raises_with_hint` · diagnostics, validation
 
 - **given** a glossary with one declared «Term»
 - **when** a near-miss name is subscripted
@@ -701,34 +701,34 @@
 - **then** only the real pipe table produces rows
 
 ## ✓ A «step» pairs its «narration» with a «phase»
-`tests/unit/capture/test_step_descriptor.py:55::test_context_manager_basic`
+`tests/unit/capture/test_step_descriptor.py:57::test_context_manager_basic`
 
 - **when** a given «Step» descriptor is created
 - **then** it carries the given «Phase» and its «Narration»
 
 ## ✓ «when_then» records the action and its outcome as siblings
-`tests/unit/capture/test_step_descriptor.py:249::test_when_then_records_two_sibling_steps_on_clean_exit`
+`tests/unit/capture/test_step_descriptor.py:250::test_when_then_records_two_sibling_steps_on_clean_exit`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a «when_then» block exits cleanly
 - **then** a when and a sibling then «Step» are recorded
 
 ## ✓ «when_then» pairs with an inner pytest.raises
-`tests/unit/capture/test_step_descriptor.py:277::test_when_then_pairs_with_inner_pytest_raises`
+`tests/unit/capture/test_step_descriptor.py:276::test_when_then_pairs_with_inner_pytest_raises`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises and an inner pytest.raises swallows it
 - **then** both sibling steps are still recorded
 
 ## ✓ «when_then» omits the then when the body raises uncaught
-`tests/unit/capture/test_step_descriptor.py:307::test_when_then_omits_then_when_body_raises_uncaught` · validation
+`tests/unit/capture/test_step_descriptor.py:304::test_when_then_omits_then_when_body_raises_uncaught` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises with nothing catching inside
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ A nested when becomes a child of the «when_then» action
-`tests/unit/capture/test_step_descriptor.py:387::test_when_then_allows_nested_when_as_child_sub_step`
+`tests/unit/capture/test_step_descriptor.py:378::test_when_then_allows_nested_when_as_child_sub_step`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a when opens inside the «when_then» body
@@ -1017,7 +1017,7 @@
 - **then** the step carries a single «Term ref» pill
 
 ## ✓ The «glossary» view aggregates «instances» and «verb» forms
-`tests/unit/report/test_aggregations.py:164::test_build_glossary_aggregations_collects_instances_and_forms`
+`tests/unit/report/test_aggregations.py:165::test_build_glossary_aggregations_collects_instances_and_forms`
 
 - **given** a «Report» whose «Story» and «Scenario» reference entity «Instance»s and an «Inflection»
   - 📎 Report data:
@@ -1146,49 +1146,49 @@
 - **then** the verb collects its «Inflection» but not its canonical form
 
 ## ✓ «Terms» referenced by an «activity» record the «story»
-`tests/unit/report/test_aggregations.py:268::test_build_glossary_aggregations_records_story_refs_via_activities`
+`tests/unit/report/test_aggregations.py:269::test_build_glossary_aggregations_records_story_refs_via_activities`
 
 - **given** a «Story» whose «Activity» references an actor and a verb
 - **when** the «Glossary» aggregations are built
 - **then** the actor and the verb each list that «Story»
 
 ## ✓ A canonical entity reference is not an «instance»
-`tests/unit/report/test_aggregations.py:338::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
+`tests/unit/report/test_aggregations.py:339::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
 
 - **given** a «Story» activity and a «Step» referencing entities by canonical name only
 - **when** the «Glossary» aggregations are built
 - **then** neither entity term records an «Instance»
 
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_aggregations.py:426::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
+`tests/unit/report/test_aggregations.py:425::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
 
 - **given** a «Kindless» «Term» referenced by a «Story» activity
 - **when** the «Glossary» aggregations are built
 - **then** the «Term» lists the «Story» but no «Instance» and no «Inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_aggregations.py:459::test_glossary_aggregations_annotates_fixture_provenance`
+`tests/unit/report/test_aggregations.py:458::test_glossary_aggregations_annotates_fixture_provenance`
 
 - **given** a «Scenario» whose fixture-sourced «Step» names an «Instance»
 - **when** the «Glossary» aggregations are built
 - **then** the «Instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_aggregations.py:552::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
+`tests/unit/report/test_aggregations.py:551::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
 
 - **given** a «Scenario» referencing one «Term» in two steps and another in its name
 - **when** the term-scenario index is built
 - **then** each «Term» maps to the scenario exactly once
 
 ## ✓ An under-anchored «activity» is flagged ineligible in rollups
-`tests/unit/report/test_aggregations.py:664::test_build_story_rollups_flags_under_anchored_activity_ineligible`
+`tests/unit/report/test_aggregations.py:663::test_build_story_rollups_flags_under_anchored_activity_ineligible`
 
 - **given** a «Story» with an anchored and an under-anchored «Activity»
 - **when** the story rollups are built
 - **then** only the anchored «Activity» is «Coverage»-eligible
 
 ## ✓ An «Activity» is labelled by the prose of its «paths»
-`tests/unit/report/test_aggregations.py:815::test_build_activity_labels_joins_parts_into_prose`
+`tests/unit/report/test_aggregations.py:814::test_build_activity_labels_joins_parts_into_prose`
 
 - **given** a «Story» with a two-«path» «activity»
 - **when** the «activity» labels are built
@@ -1302,7 +1302,7 @@
 - **then** eligibility gates the binding, so «Coverage» stays empty
 
 ## ✓ «Parameter coloring» marks placeholders and table headers
-`tests/unit/report/test_html_renderer.py:167::test_render_parametrized_step_with_structured_narration`
+`tests/unit/report/test_html_renderer.py:194::test_render_parametrized_step_with_structured_narration`
 
 - **given** a «Report» holding a «Parametrized scenario» with a «Parameter table»
 - **when** the «Renderer» renders the HTML page
@@ -1547,7 +1547,7 @@
 - **then** each «case» stands alone, with no «parameter table»
 
 ## ✓ «Term» ids are derived as URL-safe slugs · 8 cases
-`tests/unit/capture/test_glossary.py:31::test_id_derive_produces_expected_slug`
+`tests/unit/capture/test_glossary.py:32::test_id_derive_produces_expected_slug`
 
 - **given** the name {text}
 - **when** it is slugified into a «Term» id
@@ -1565,7 +1565,7 @@
 | booking system | 'booking-system' | ✓ |
 
 ## ✓ A name with no id-able characters is rejected · 4 cases
-`tests/unit/capture/test_glossary.py:57::test_id_derive_raises_on_empty_result` · validation
+`tests/unit/capture/test_glossary.py:58::test_id_derive_raises_on_empty_result` · validation
 
 - **given** the name {text}
 - **when** it is slugified into a «Term» id
@@ -1579,7 +1579,7 @@
 | ### | ✓ |
 
 ## ✓ A cross-phase «step» cannot open inside a «when_then» body · 2 cases
-`tests/unit/capture/test_step_descriptor.py:353::test_when_then_rejects_cross_phase_nested_step` · validation
+`tests/unit/capture/test_step_descriptor.py:346::test_when_then_rejects_cross_phase_nested_step` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a given or then opens inside the «when_then» body
@@ -1592,7 +1592,7 @@
 | then | ✓ |
 
 ## ✓ An «attachment» label must be plain text · 3 cases
-`tests/unit/capture/test_step_descriptor.py:490::test_attach_rejects_a_non_str_label` · validation
+`tests/unit/capture/test_step_descriptor.py:481::test_attach_rejects_a_non_str_label` · validation
 
 - **given** a non-str «Attachment» label of kind {label_kind}
 - **when** it is attached

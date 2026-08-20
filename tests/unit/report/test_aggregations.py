@@ -11,6 +11,7 @@ from pytest_given.model import (
     GlossaryTerm,
     Metadata,
     Narration,
+    NarrationLiteral,
     NarrationTermRef,
     NodeId,
     ParameterCase,
@@ -383,8 +384,6 @@ def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -
 
 def test_build_glossary_aggregations_skips_non_term_ref_narration_parts() -> None:
     """NarrationLiteral / NarrationValue parts in a step are skipped."""
-    from pytest_given.model import NarrationLiteral
-
     g = _g()
     step = Step(
         phase='when',

@@ -4,7 +4,7 @@ from pytest_given import attach, given, scenario, then, when, when_then
 from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.glossary import DeferredTermHandle
 from pytest_given.capture.story import activity
-from pytest_given.model import ActivityTermRef, PytestGivenError
+from pytest_given.model import ActivityTermRef, PytestGivenError, TermId
 from tests.ubiquitous_language import pg
 
 GLOSSARY_MD = """# Glossary
@@ -212,8 +212,6 @@ def test_missing_file_raises(tmp_path):
 
 def test_glossary_property_returns_inner_glossary(glossary_file):
     """FileGlossary.glossary property returns the inner Glossary with parsed terms."""
-    from pytest_given.model import TermId
-
     fg = FileGlossary(glossary_file)
     inner = fg.glossary
     assert inner is not None
@@ -268,8 +266,6 @@ def test_conflicting_duplicate_rows_raise(tmp_path):
     t'A blank description normalizes to {pg["Undefined"].low}',
 )
 def test_blank_description_cell_normalizes_to_none(tmp_path):
-    from pytest_given.model import TermId
-
     with given(t'a row whose description cell is blank'):
         doc = '| Term | Meaning |\n|---|---|\n| Guest |   |\n'
         attach('Glossary file', doc)
@@ -285,8 +281,6 @@ def test_blank_description_cell_normalizes_to_none(tmp_path):
     t'Identical duplicate rows collapse to one {pg["Term"].low}',
 )
 def test_idempotent_duplicate_rows_ok(tmp_path):
-    from pytest_given.model import TermId
-
     with given(t'two identical rows for the same {pg["Term"]}'):
         doc = (
             '| Term | Meaning |\n|---|---|\n'

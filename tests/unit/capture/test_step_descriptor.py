@@ -11,6 +11,8 @@ from pytest_given.capture.collector import (
     set_active_collector,
 )
 from pytest_given.capture.decorators import (
+    ScenarioMarked,
+    StepDecorated,
     StepDescriptor,
     _normalize_activity,
     attach,
@@ -81,7 +83,6 @@ def test_decorated_function_satisfies_step_decorated_protocol() -> None:
     """A function returned by StepDescriptor.__call__ structurally satisfies the
     StepDecorated protocol — the typed contract callers cast through to read
     `_step_descriptor` without a type: ignore."""
-    from pytest_given.capture.decorators import StepDecorated
 
     @when('inserting money')
     def insert_money() -> str:
@@ -251,8 +252,6 @@ def test_step_descriptor_decorator_rejects_tstring_mixed_glossary_and_value() ->
     story=adopt_pytest_given,
 )
 def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
-    from pytest_given.capture.decorators import when_then
-
     session_collector = get_active_collector()
     with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
         collector = Collector()
@@ -278,8 +277,6 @@ def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
     t'{pg["when_then"]} pairs with an inner pytest.raises',
 )
 def test_when_then_pairs_with_inner_pytest_raises() -> None:
-    from pytest_given.capture.decorators import when_then
-
     session_collector = get_active_collector()
     with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
         collector = Collector()
@@ -309,8 +306,6 @@ def test_when_then_pairs_with_inner_pytest_raises() -> None:
     tags=['validation'],
 )
 def test_when_then_omits_then_when_body_raises_uncaught() -> None:
-    from pytest_given.capture.decorators import when_then
-
     session_collector = get_active_collector()
     with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
         collector = Collector()
@@ -331,8 +326,6 @@ def test_when_then_omits_then_when_body_raises_uncaught() -> None:
 
 def test_when_then_accepts_tstrings_for_glossary_refs() -> None:
     """Both narrations accept t-strings so glossary handles can render."""
-    from pytest_given.capture.decorators import when_then
-
     g = Glossary()
     room = g.work_object('Room')
     collector = Collector()
@@ -356,8 +349,6 @@ def test_when_then_accepts_tstrings_for_glossary_refs() -> None:
 )
 @pytest.mark.parametrize('phase_name', ['given', 'then'])
 def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
-    from pytest_given.capture.decorators import when_then
-
     phase_factory = {'given': given, 'then': then}[phase_name]
     session_collector = get_active_collector()
     with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
@@ -389,8 +380,6 @@ def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
     story=adopt_pytest_given,
 )
 def test_when_then_allows_nested_when_as_child_sub_step() -> None:
-    from pytest_given.capture.decorators import when_then
-
     session_collector = get_active_collector()
     with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
         collector = Collector()
@@ -416,6 +405,9 @@ def test_when_then_allows_nested_when_as_child_sub_step() -> None:
 
 def test_when_then_exported_from_package() -> None:
     """when_then is part of the public API."""
+    # Deliberately function-level: the module imports when_then from
+    # capture.decorators, so only a fresh package-root lookup proves the
+    # re-export exists.
     import pytest_given
 
     assert pytest_given.when_then is not None
@@ -431,7 +423,6 @@ def test_marked_function_satisfies_scenario_marked_protocol() -> None:
     """A function returned by ScenarioDecorator.__call__ structurally satisfies
     the ScenarioMarked protocol — the typed contract `_get_scenario_marker`
     reads through to recover the ScenarioDecorator without a type: ignore."""
-    from pytest_given.capture.decorators import ScenarioMarked
 
     @scenario('Brew coffee')
     def brew() -> None:
@@ -988,8 +979,6 @@ def test_context_manager_captures_the_with_line() -> None:
 
 @pytest.mark.usefixtures('_rootdir_here')
 def test_when_then_steps_share_the_with_statement_anchor() -> None:
-    from pytest_given.capture.decorators import when_then
-
     collector = _capturing_collector()
     try:
         with when_then('act', 'outcome'):

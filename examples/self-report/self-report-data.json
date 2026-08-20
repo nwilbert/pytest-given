@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-20T16:56:13.528031+00:00",
+    "timestamp": "2026-08-20T16:57:34.226465+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "3ca4d045bea8b8ac8e484d88cbb5e9244eb82b38",
+    "commit_sha": "e14f961dfa278fcb5ee706892e1466bae24cc2b1",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -2265,7 +2265,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 223
+        "line": 221
       },
       "story_id": null,
       "activity_ids": []
@@ -2360,7 +2360,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 243
+        "line": 241
       },
       "story_id": null,
       "activity_ids": []
@@ -2473,7 +2473,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 267
+        "line": 265
       },
       "story_id": null,
       "activity_ids": []
@@ -2583,7 +2583,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 284
+        "line": 280
       },
       "story_id": null,
       "activity_ids": []
@@ -2708,7 +2708,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 309
+        "line": 303
       },
       "story_id": null,
       "activity_ids": []
@@ -2826,7 +2826,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 323
+        "line": 317
       },
       "story_id": null,
       "activity_ids": []
@@ -2945,7 +2945,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 105
+        "line": 106
       },
       "story_id": null,
       "activity_ids": []
@@ -3073,7 +3073,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 131
+        "line": 132
       },
       "story_id": null,
       "activity_ids": []
@@ -3184,7 +3184,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 151
+        "line": 152
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -3283,7 +3283,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 182
+        "line": 183
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -3372,7 +3372,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 196
+        "line": 197
       },
       "story_id": null,
       "activity_ids": []
@@ -3455,7 +3455,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 214
+        "line": 215
       },
       "story_id": null,
       "activity_ids": []
@@ -3564,7 +3564,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 238
+        "line": 239
       },
       "story_id": null,
       "activity_ids": []
@@ -3687,7 +3687,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 332
+        "line": 331
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -3781,7 +3781,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 411
+        "line": 410
       },
       "story_id": null,
       "activity_ids": []
@@ -3855,7 +3855,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 424
+        "line": 423
       },
       "story_id": null,
       "activity_ids": []
@@ -6666,7 +6666,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 55
+        "line": 57
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -6784,7 +6784,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 249
+        "line": 250
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -6887,7 +6887,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 277
+        "line": 276
       },
       "story_id": null,
       "activity_ids": []
@@ -6992,7 +6992,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 307
+        "line": 304
       },
       "story_id": null,
       "activity_ids": []
@@ -7100,7 +7100,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 387
+        "line": 378
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -11405,7 +11405,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 164
+        "line": 165
       },
       "story_id": null,
       "activity_ids": []
@@ -11536,7 +11536,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 268
+        "line": 269
       },
       "story_id": null,
       "activity_ids": []
@@ -11652,7 +11652,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 338
+        "line": 339
       },
       "story_id": null,
       "activity_ids": []
@@ -11825,7 +11825,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 426
+        "line": 425
       },
       "story_id": null,
       "activity_ids": []
@@ -11962,7 +11962,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 459
+        "line": 458
       },
       "story_id": null,
       "activity_ids": []
@@ -12089,7 +12089,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 552
+        "line": 551
       },
       "story_id": null,
       "activity_ids": []
@@ -12204,7 +12204,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 664
+        "line": 663
       },
       "story_id": null,
       "activity_ids": []
@@ -12338,7 +12338,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 815
+        "line": 814
       },
       "story_id": null,
       "activity_ids": []
@@ -14369,7 +14369,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 33,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -14469,7 +14469,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 167
+        "line": 194
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -17265,7 +17265,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 31
+        "line": 32
       },
       "story_id": null,
       "activity_ids": []
@@ -17389,7 +17389,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 57
+        "line": 58
       },
       "story_id": null,
       "activity_ids": []
@@ -17556,7 +17556,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 353
+        "line": 346
       },
       "story_id": null,
       "activity_ids": []
@@ -17699,7 +17699,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 490
+        "line": 481
       },
       "story_id": null,
       "activity_ids": []

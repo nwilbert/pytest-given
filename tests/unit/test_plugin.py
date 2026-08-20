@@ -14,6 +14,8 @@ from pytest_given.capture.collector import (
     set_active_collector,
 )
 from pytest_given.capture.decorators import ScenarioDecorator, StepDescriptor
+from pytest_given.capture.file_glossary import FileGlossary
+from pytest_given.capture.source import file_source
 from pytest_given.capture.story import (
     activity as activity_fn,
 )
@@ -250,8 +252,6 @@ def test_nested_config_lifecycle_restores_the_outer_rootdir(tmp_path: Any) -> No
     """`pytest_load_initial_conftests` re-points the capture rootdir for a
     nested in-process run; `pytest_unconfigure` must point it back so the
     outer session's path resolution keeps working after the nested run."""
-    from pytest_given.capture.source import file_source
-
     outer_config = SimpleNamespace(stash=pytest.Stash(), rootpath=tmp_path / 'outer')
     nested_config = SimpleNamespace(stash=pytest.Stash(), rootpath=tmp_path / 'nested')
     target = tmp_path / 'outer' / 'f.py'
@@ -355,8 +355,6 @@ def test_resolve_glossary_raises_with_two_distinct_glossaries_via_stories() -> N
 def test_scan_conftests_discovers_file_glossary(tmp_path: Any) -> None:
     """_scan_conftests_for_glossary returns the inner Glossary from a FileGlossary
     attribute on a conftest plugin object (plugin.py line 494)."""
-    from pytest_given.capture.file_glossary import FileGlossary
-
     md_path = tmp_path / 'conftest_glossary.md'
     md_path.write_text(
         '| Term | Meaning |\n|---|---|\n| Guest | A person booking. |\n',

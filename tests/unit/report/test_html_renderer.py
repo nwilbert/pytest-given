@@ -7,8 +7,35 @@ from typing import Any, cast
 import pytest
 
 from pytest_given import given, scenario, then, when
+from pytest_given.model import (
+    Activity,
+    ActivityId,
+    ActivityPath,
+    ActivityTermRef,
+    ActivityWord,
+    Glossary,
+    GlossaryTerm,
+    Metadata,
+    Narration,
+    NarrationLiteral,
+    NarrationTermRef,
+    NodeId,
+    ParameterColumn,
+    ParameterTable,
+    ReportData,
+    Scenario,
+    Step,
+    Story,
+    StoryId,
+    TermId,
+    report_from_dict,
+    report_to_dict,
+)
 from pytest_given.report.html_renderer import (
+    _build_param_color_map,
     _inline_md,
+    _make_activity_part_filter,
+    _make_narration_filter,
     _neutralize_script_data,
     _render_narration_part,
     render_html,
@@ -1242,17 +1269,8 @@ def test_render_param_table_none_value_as_text_not_blank(tmp_path: Path) -> None
 
 
 # ---------------------------------------------------------------------------
-# Task 10.1 — NarrationTermRef rendering
+# NarrationTermRef rendering
 # ---------------------------------------------------------------------------
-
-from pytest_given.model import (  # noqa: E402
-    Glossary,
-    GlossaryTerm,
-    Narration,
-    NarrationTermRef,
-    TermId,
-)
-from pytest_given.report.html_renderer import _make_narration_filter  # noqa: E402
 
 
 def _glossary() -> Glossary:
@@ -1370,14 +1388,8 @@ def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Task 11.2 — activity_part filter
+# activity_part filter
 # ---------------------------------------------------------------------------
-
-from pytest_given.model import (  # noqa: E402
-    ActivityTermRef,
-    ActivityWord,
-)
-from pytest_given.report.html_renderer import _make_activity_part_filter  # noqa: E402
 
 
 def test_activity_part_filter_actor_term_ref():
@@ -1420,7 +1432,7 @@ def test_activity_part_filter_word_renders_activity_word_class():
 
 
 # ---------------------------------------------------------------------------
-# Task 11.2 — stories coverage rollup computed in render_html
+# stories coverage rollup computed in render_html
 # ---------------------------------------------------------------------------
 
 
@@ -1610,28 +1622,6 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
     — must preserve the Glossary so term refs render as kind pills, not as
     silent escape() fallbacks. Regression guard for the side-channel
     `_glossaries` stash that previously didn't round-trip."""
-    from pytest_given.model import (
-        Activity,
-        ActivityId,
-        ActivityPath,
-        ActivityTermRef,
-        Glossary,
-        GlossaryTerm,
-        Metadata,
-        Narration,
-        NarrationLiteral,
-        NarrationTermRef,
-        NodeId,
-        ReportData,
-        Scenario,
-        Step,
-        Story,
-        StoryId,
-        TermId,
-        report_from_dict,
-        report_to_dict,
-    )
-
     g = Glossary()
     g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
     g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
@@ -1845,8 +1835,6 @@ def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> N
 # render_html accepts a ReportData model directly
 # ---------------------------------------------------------------------------
 
-from pytest_given.model import report_from_dict  # noqa: E402
-
 
 def test_render_html_accepts_report_data(tmp_path: Path) -> None:
     report = report_from_dict(
@@ -1996,16 +1984,8 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
 
 
 # ---------------------------------------------------------------------------
-# Task 2 — typed parameter-table columns
+# typed parameter-table columns
 # ---------------------------------------------------------------------------
-
-from pytest_given.model import (  # noqa: E402
-    NodeId,
-    ParameterColumn,
-    ParameterTable,
-    Scenario,
-)
-from pytest_given.report.html_renderer import _build_param_color_map  # noqa: E402
 
 
 def test_param_color_map_skips_attachment_columns() -> None:
