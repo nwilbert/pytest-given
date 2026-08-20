@@ -5,7 +5,9 @@ from dataclasses import dataclass
 from typing import Literal
 
 from ..model import (
-    Glossary,
+    Glossary as BaseGlossary,
+)
+from ..model import (
     GlossaryTerm,
     PytestGivenError,
     SourceLocation,
@@ -29,14 +31,14 @@ class TermHandle:
     """Common base: a GlossaryTerm + back-ref to its owning Glossary."""
 
     _term: GlossaryTerm
-    _glossary: Glossary
+    _glossary: BaseGlossary
 
     @property
     def term(self) -> GlossaryTerm:
         return self._term
 
     @property
-    def glossary(self) -> Glossary:
+    def glossary(self) -> BaseGlossary:
         return self._glossary
 
     @property
@@ -139,7 +141,7 @@ class InflectedVerb:
 
 
 def _register_kind(
-    self: Glossary,
+    glossary: BaseGlossary,
     kind: Literal['actor', 'object', 'verb'] | None,
     name: str,
     definition: str | None,
@@ -147,10 +149,11 @@ def _register_kind(
 ) -> GlossaryTerm:
     """Idempotent registration. Returns the canonical term (existing or new).
 
-    `source` is the call site of the user-facing wrapper (g.actor / g.work_object /
-    g.verb) — captured by those wrappers and threaded through. First-registration
-    wins: re-registration with matching (kind, canonical, definition) returns the
-    existing term unchanged, preserving its original `source`.
+    `source` is the call site of the user-facing method (`g.actor` /
+    `g.work_object` / `g.verb`), captured there and threaded through.
+    First-registration wins: re-registration with matching (kind, canonical,
+    definition) returns the existing term unchanged, preserving its original
+    `source`.
     """
     new = GlossaryTerm(
         id=id_derive(name),
@@ -159,7 +162,7 @@ def _register_kind(
         definition=_normalize_definition(definition),
         source=source,
     )
-    existing = self.get(new.id)
+    existing = glossary.get(new.id)
     if existing is not None:
         if terms_match(existing, new):
             return existing
@@ -169,51 +172,12 @@ def _register_kind(
             f'definition={existing.definition!r}; new: kind={new.kind!r}, '
             f'canonical={new.canonical!r}, definition={new.definition!r}).'
         )
-    self._register(new)
+    glossary._register(new)
     return new
 
 
-_HANDLE_BY_KIND: dict[Literal['actor', 'object', 'verb'], type[TermHandle]] = {
-    'actor': Actor,
-    'object': WorkObject,
-    'verb': Verb,
-}
-
-
-def _mint_handle(
-    glossary: Glossary,
-    kind: Literal['actor', 'object', 'verb'],
-    name: str,
-    definition: str | None,
-) -> TermHandle:
-    # skip=3: this function → kind wrapper (actor/work_object/verb) → user call site
-    source = capture_caller_source(skip=3)
-    term = _register_kind(glossary, kind, name, definition, source)
-    return _HANDLE_BY_KIND[kind](_term=term, _glossary=glossary)
-
-
-def _glossary_actor(self: Glossary, name: str, definition: str | None = None) -> Actor:
-    handle = _mint_handle(self, 'actor', name, definition)
-    assert isinstance(handle, Actor)
-    return handle
-
-
-def _glossary_work_object(
-    self: Glossary, name: str, definition: str | None = None
-) -> WorkObject:
-    handle = _mint_handle(self, 'object', name, definition)
-    assert isinstance(handle, WorkObject)
-    return handle
-
-
-def _glossary_verb(self: Glossary, name: str, definition: str | None = None) -> Verb:
-    handle = _mint_handle(self, 'verb', name, definition)
-    assert isinstance(handle, Verb)
-    return handle
-
-
 def deferred_handle_or_raise(
-    glossary: Glossary,
+    glossary: BaseGlossary,
     name: str,
     handle_cache: dict[TermId, DeferredTermHandle] | None = None,
 ) -> DeferredTermHandle:
@@ -236,21 +200,47 @@ def deferred_handle_or_raise(
     return handle
 
 
-def _glossary_call(
-    self: Glossary, name: str, definition: str | None = None
-) -> DeferredTermHandle:
-    # skip=2: this function → user call site
-    source = capture_caller_source(skip=2)
-    term = _register_kind(self, None, name, definition, source)
-    return DeferredTermHandle(_term=term, _glossary=self)
+class Glossary(BaseGlossary):
+    """The user-facing glossary: storage plus the registration API.
 
+    Subclasses the report model's storage rather than being grafted onto it.
+    Every method here needs the *caller's* source location, which only
+    `capture` knows how to resolve — and `model`, being the leaf, may not
+    import from it. Everything internal (serde, grouping, the renderers) keeps
+    annotating the base, which a `Glossary` satisfies; only what a user
+    constructs is this class.
 
-def _glossary_getitem(self: Glossary, name: str) -> DeferredTermHandle:
-    return deferred_handle_or_raise(self, name)
+    `skip=2` throughout: this method, then the user's call site.
+    """
 
+    def actor(self, name: str, definition: str | None = None) -> Actor:
+        """Register (or fetch) an actor — a participant in the domain."""
+        term = _register_kind(
+            self, 'actor', name, definition, capture_caller_source(skip=2)
+        )
+        return Actor(_term=term, _glossary=self)
 
-Glossary.actor = _glossary_actor  # type: ignore[method-assign]
-Glossary.work_object = _glossary_work_object  # type: ignore[method-assign]
-Glossary.verb = _glossary_verb  # type: ignore[method-assign]
-Glossary.__call__ = _glossary_call  # type: ignore[method-assign]
-Glossary.__getitem__ = _glossary_getitem  # type: ignore[method-assign]
+    def work_object(self, name: str, definition: str | None = None) -> WorkObject:
+        """Register (or fetch) a work object — a thing acted on."""
+        term = _register_kind(
+            self, 'object', name, definition, capture_caller_source(skip=2)
+        )
+        return WorkObject(_term=term, _glossary=self)
+
+    def verb(self, name: str, definition: str | None = None) -> Verb:
+        """Register (or fetch) a verb — an action."""
+        term = _register_kind(
+            self, 'verb', name, definition, capture_caller_source(skip=2)
+        )
+        return Verb(_term=term, _glossary=self)
+
+    def __call__(self, name: str, definition: str | None = None) -> DeferredTermHandle:
+        """Declare-or-get a term whose kind inference will settle later."""
+        term = _register_kind(
+            self, None, name, definition, capture_caller_source(skip=2)
+        )
+        return DeferredTermHandle(_term=term, _glossary=self)
+
+    def __getitem__(self, name: str) -> DeferredTermHandle:
+        """Get-only lookup; an unknown name raises with a did-you-mean hint."""
+        return deferred_handle_or_raise(self, name)

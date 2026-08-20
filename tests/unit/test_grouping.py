@@ -5,12 +5,11 @@ from datetime import UTC, datetime
 
 import pytest
 
-from pytest_given import given, scenario, then, when, when_then
+from pytest_given import Glossary, given, scenario, then, when, when_then
 from pytest_given.grouping import checks, columns, group, group_parametrized, templatize
 from pytest_given.model import (
     Attachment,
     AttachmentRef,
-    Glossary,
     Narration,
     NarrationLiteral,
     NarrationPart,

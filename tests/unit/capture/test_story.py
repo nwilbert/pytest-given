@@ -2,7 +2,15 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given import PytestGivenError, given, scenario, then, when, when_then
+from pytest_given import (
+    Glossary,
+    PytestGivenError,
+    given,
+    scenario,
+    then,
+    when,
+    when_then,
+)
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.story import (
     activity,
@@ -15,7 +23,6 @@ from pytest_given.model import (
     ActivityPath,
     ActivityTermRef,
     ActivityWord,
-    Glossary,
     StoryId,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg

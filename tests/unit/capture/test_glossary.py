@@ -19,13 +19,14 @@ from pytest_given.capture.glossary import (
     ActorInstance,
     DeferredTermHandle,
     DeferredTermInstance,
+    Glossary,
     InflectedVerb,
     Verb,
     WorkObject,
     WorkObjectInstance,
     id_derive,
 )
-from pytest_given.model import Glossary, GlossaryTerm, SourceLocation, TermId
+from pytest_given.model import GlossaryTerm, SourceLocation, TermId
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
 

@@ -1014,7 +1014,7 @@ def _resolve_glossary(stories: list[Story], session: pytest.Session) -> Glossary
     """
     reaching: dict[int, Glossary] = {}
     for story in stories:
-        reaching.update(getattr(story, '_glossaries', {}))
+        reaching.update(story._glossaries)
     if len(reaching) > 1:
         raise PytestGivenError(
             f'stories reach {len(reaching)} distinct Glossary instances; '

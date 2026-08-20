@@ -2,12 +2,12 @@
 
 import pytest
 
+from pytest_given import Glossary
 from pytest_given.model import (
     Activity,
     ActivityId,
     ActivityPath,
     ActivityTermRef,
-    Glossary,
     Narration,
     NarrationLiteral,
     NarrationTermRef,

@@ -1,9 +1,6 @@
 from dataclasses import dataclass, field
 from pathlib import PurePosixPath
-from typing import TYPE_CHECKING, Literal, NamedTuple, NewType
-
-if TYPE_CHECKING:
-    from ..capture.glossary import Actor, DeferredTermHandle, Verb, WorkObject
+from typing import Literal, NamedTuple, NewType
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -106,12 +103,30 @@ type ActivityPart = ActivityTermRef | ActivityWord
 @dataclass(frozen=True, kw_only=True)
 class ActivityPath:
     parts: tuple[ActivityPart, ...]
+    # The live `Glossary` objects this subtree references, keyed by `id()`.
+    # `story()` pins them at construction so `plugin._resolve_glossary` can pick
+    # the report's glossary off the story tree it was handed, rather than off a
+    # session-global that a nested run could clear. Declared here (not stashed
+    # by name at runtime) so it is typed and mypy sees every read; underscored,
+    # so serde drops it and it never reaches the JSON.
+    _glossaries: dict[int, Glossary] = field(
+        init=False, repr=False, compare=False, default_factory=dict
+    )
 
 
 @dataclass(frozen=True, kw_only=True)
 class Activity:
     id: ActivityId
     paths: tuple[ActivityPath, ...]
+    # The live `Glossary` objects this subtree references, keyed by `id()`.
+    # `story()` pins them at construction so `plugin._resolve_glossary` can pick
+    # the report's glossary off the story tree it was handed, rather than off a
+    # session-global that a nested run could clear. Declared here (not stashed
+    # by name at runtime) so it is typed and mypy sees every read; underscored,
+    # so serde drops it and it never reaches the JSON.
+    _glossaries: dict[int, Glossary] = field(
+        init=False, repr=False, compare=False, default_factory=dict
+    )
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -121,6 +136,15 @@ class Story:
     activities: tuple[Activity, ...]
     source: SourceLocation | None = None
     _by_id: dict[ActivityId, Activity] = field(
+        init=False, repr=False, compare=False, default_factory=dict
+    )
+    # The live `Glossary` objects this subtree references, keyed by `id()`.
+    # `story()` pins them at construction so `plugin._resolve_glossary` can pick
+    # the report's glossary off the story tree it was handed, rather than off a
+    # session-global that a nested run could clear. Declared here (not stashed
+    # by name at runtime) so it is typed and mypy sees every read; underscored,
+    # so serde drops it and it never reaches the JSON.
+    _glossaries: dict[int, Glossary] = field(
         init=False, repr=False, compare=False, default_factory=dict
     )
 
@@ -141,10 +165,13 @@ class Story:
 class Glossary:
     """Mutable container of glossary terms with an id-keyed index.
 
-    The user-facing registration methods (`actor` / `work_object` / `verb`)
-    live in `pytest_given.capture.glossary`; this class only owns storage
-    and atomic write-through. `_register` is the low-level primitive both
-    those methods and the deserializer call.
+    Storage and atomic write-through, nothing else: this is what the report
+    model carries and what the deserializer rebuilds. The user-facing
+    registration API (`actor` / `work_object` / `verb`, `g(...)`, `g[...]`) is
+    a subclass in `pytest_given.capture.glossary` — it needs the caller's
+    source location, which is capture's business, and `model` is the leaf that
+    may not reach into it. `_register` is the low-level primitive both that
+    subclass and the deserializer call.
     """
 
     terms: list[GlossaryTerm] = field(default_factory=list)
@@ -164,18 +191,6 @@ class Glossary:
             raise ValueError(f'term id {term.id!r} already registered')
         self.terms.append(term)
         self._by_id[term.id] = term
-
-    if TYPE_CHECKING:
-
-        def __call__(
-            self, name: str, definition: str | None = None
-        ) -> DeferredTermHandle: ...
-        def __getitem__(self, name: str) -> DeferredTermHandle: ...
-        def actor(self, name: str, definition: str | None = None) -> Actor: ...
-        def work_object(
-            self, name: str, definition: str | None = None
-        ) -> WorkObject: ...
-        def verb(self, name: str, definition: str | None = None) -> Verb: ...
 
 
 # Step phase

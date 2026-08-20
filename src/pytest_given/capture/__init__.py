@@ -15,7 +15,7 @@ from .decorators import (
     when_then,
 )
 from .file_glossary import FileGlossary
-from .glossary import DeferredTermHandle, DeferredTermInstance
+from .glossary import DeferredTermHandle, DeferredTermInstance, Glossary
 from .story import activity, path, story
 from .template import (
     Template,
@@ -32,6 +32,7 @@ __all__ = [
     'DeferredTermInstance',
     'FileGlossary',
     'FixtureInstanceKey',
+    'Glossary',
     'ScenarioMarked',
     'StepDecorated',
     'Template',
@@ -53,5 +54,3 @@ __all__ = [
     'when',
     'when_then',
 ]
-
-from . import glossary as _glossary_module  # noqa: F401 — registers methods on Glossary

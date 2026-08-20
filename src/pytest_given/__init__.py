@@ -2,6 +2,7 @@
 
 from .capture import (
     FileGlossary,
+    Glossary,
     Template,
     activity,
     attach,
@@ -13,7 +14,7 @@ from .capture import (
     when,
     when_then,
 )
-from .model import Glossary, PytestGivenError
+from .model import PytestGivenError
 
 __all__ = [
     'FileGlossary',

@@ -4,12 +4,11 @@ from typing import Annotated
 
 import pytest
 
-from pytest_given import given, scenario, then, when, when_then
+from pytest_given import Glossary, given, scenario, then, when, when_then
 from pytest_given.capture.decorators import _resolve_template_parts
 from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.template import Template, narration_from, parse_tstring
 from pytest_given.model import (
-    Glossary,
     Narration,
     NarrationLiteral,
     NarrationPlaceholder,

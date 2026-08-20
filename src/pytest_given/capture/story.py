@@ -94,8 +94,20 @@ def path(*parts: _PathArg) -> ActivityPath:
         if owner is not None
     }
     path_obj = ActivityPath(parts=schema_parts)
-    object.__setattr__(path_obj, '_glossaries', glossaries)
+    _pin_glossaries(path_obj, glossaries)
     return path_obj
+
+
+def _pin_glossaries(
+    node: ActivityPath | Activity | Story, glossaries: dict[int, Glossary]
+) -> None:
+    """Record which live `Glossary` objects a story node references.
+
+    The field is declared `init=False` on a frozen dataclass, so this is the
+    one way to fill it — and the one place that names it, rather than three
+    `object.__setattr__` calls spelling the attribute out by hand.
+    """
+    object.__setattr__(node, '_glossaries', glossaries)
 
 
 def _glossary_of(value: object) -> Glossary | None:
@@ -137,7 +149,7 @@ def activity(
         paths = tuple(p for p in parts_or_paths if isinstance(p, ActivityPath))
     else:
         paths = (path(*parts_or_paths),)  # type: ignore[arg-type]
-    glossaries = _merge_glossaries(getattr(p, '_glossaries', {}) for p in paths)
+    glossaries = _merge_glossaries(p._glossaries for p in paths)
     if activity_id == 0:
         raise PytestGivenError(
             'activity(activity_id=0) is reserved as the unset sentinel; '
@@ -147,7 +159,7 @@ def activity(
     a = Activity(
         id=ActivityId(activity_id if activity_id is not None else 0), paths=paths
     )
-    object.__setattr__(a, '_glossaries', glossaries)
+    _pin_glossaries(a, glossaries)
     return a
 
 
@@ -201,12 +213,12 @@ def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     source = capture_caller_source(skip=2)
     numbered = _assign_sequence_numbers(tuple(activities))
     _check_unique_ids(numbered)
-    glossaries = _merge_glossaries(getattr(a, '_glossaries', {}) for a in numbered)
+    glossaries = _merge_glossaries(a._glossaries for a in numbered)
     _check_single_glossary(title, glossaries)
     result = Story(id=sid, title=title, activities=numbered, source=source)
     # Carry the story's glossary on the tree so plugin._resolve_glossary can
     # pick it deterministically from the collected stories themselves.
-    object.__setattr__(result, '_glossaries', glossaries)
+    _pin_glossaries(result, glossaries)
     return result
 
 
@@ -226,7 +238,7 @@ def _assign_sequence_numbers(
         while ActivityId(next_seq) in taken:
             next_seq += 1
         new = Activity(id=ActivityId(next_seq), paths=a.paths)
-        object.__setattr__(new, '_glossaries', getattr(a, '_glossaries', {}))
+        _pin_glossaries(new, a._glossaries)
         out.append(new)
         next_seq += 1
     return tuple(out)
