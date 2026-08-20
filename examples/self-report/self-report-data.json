@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-20T16:55:49.384532+00:00",
+    "timestamp": "2026-08-20T16:56:13.528031+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "7404cb7156956a4dcc77bb7fb67f9c9141c76975",
+    "commit_sha": "3ca4d045bea8b8ac8e484d88cbb5e9244eb82b38",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -5845,7 +5845,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "no pipe table is reported",
+            "text": "a PytestGivenError reports that the file has no pipe table",
             "parts": []
           },
           "status": "passed",
@@ -12212,10 +12212,10 @@
     {
       "id": "tests/unit/report/test_aggregations.py::test_build_activity_labels_joins_parts_into_prose",
       "narration": {
-        "text": "an Activity is labelled by the prose of its paths",
+        "text": "An Activity is labelled by the prose of its paths",
         "parts": [
           {
-            "value": "an "
+            "value": "An "
           },
           {
             "term_id": "activity",
@@ -14369,7 +14369,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",

@@ -122,7 +122,7 @@ def test_no_table_raises():
     with (
         when_then(
             t'the parser reads it for a {pg["File glossary"]}',
-            'no pipe table is reported',
+            'a PytestGivenError reports that the file has no pipe table',
         ),
         pytest.raises(PytestGivenError, match=r'no .*table'),
     ):

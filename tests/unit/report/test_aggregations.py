@@ -813,7 +813,7 @@ def test_a_pill_is_not_listed_for_a_case_that_has_no_value_for_it() -> None:
 
 
 @scenario(
-    t'an {pg["Activity"]} is labelled by the prose of its {pg["Path"]("paths")}',
+    t'An {pg["Activity"]} is labelled by the prose of its {pg["Path"]("paths")}',
 )
 def test_build_activity_labels_joins_parts_into_prose() -> None:
     with given(t'a {pg["Story"]} with a two-{pg["Path"].low} {pg["Activity"].low}'):

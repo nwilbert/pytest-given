@@ -570,7 +570,7 @@
     No tables here.
     ```
 - **when** the parser reads it for a «File glossary»
-- **then** no pipe table is reported
+- **then** a PytestGivenError reports that the file has no pipe table
 
 ## ✓ A missing named column is rejected
 `tests/unit/capture/test_markdown_glossary.py:134::test_missing_named_column_raises` · diagnostics, markdown, validation
@@ -1187,7 +1187,7 @@
 - **when** the story rollups are built
 - **then** only the anchored «Activity» is «Coverage»-eligible
 
-## ✓ an «Activity» is labelled by the prose of its «paths»
+## ✓ An «Activity» is labelled by the prose of its «paths»
 `tests/unit/report/test_aggregations.py:815::test_build_activity_labels_joins_parts_into_prose`
 
 - **given** a «Story» with a two-«path» «activity»
