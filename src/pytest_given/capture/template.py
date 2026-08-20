@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 from string import Formatter, templatelib
 from typing import Any
 
@@ -72,18 +71,6 @@ class Template:
                     )
                 )
         self.parts: list[NarrationPart] = parts
-
-    def substitute(self, mapping: Mapping[str, Any]) -> str:
-        out: list[str] = []
-        for part in self.parts:
-            match part:
-                case NarrationLiteral(value=value):
-                    out.append(value)
-                case NarrationPlaceholder(name=name, format_spec=spec, conversion=conv):
-                    if name not in mapping:
-                        raise KeyError(name)
-                    out.append(render_interpolation(mapping[name], conv, spec))
-        return ''.join(out)
 
     def get_identifiers(self) -> list[str]:
         return [p.name for p in self.parts if isinstance(p, NarrationPlaceholder)]

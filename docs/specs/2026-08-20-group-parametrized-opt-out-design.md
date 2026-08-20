@@ -99,8 +99,10 @@ raises the existing `placeholder_mismatch` — the same error the grouped path r
 Note that this works on the **recorded** `Narration`, not on the `Template` object:
 `narration_from` already turned a `Template` name into `text='Brew {cup_size} ml'` plus
 placeholder parts at `start_scenario`. So the scenario name and the `Annotated` step label go
-through the identical code path, and `Template.substitute` stays what it is today — the
-helper-decorator's call-time renderer.
+through the identical code path. `Template.substitute` was the helper decorator's own
+call-time renderer and is now gone: that path resolves its placeholders into parts and reads
+the text off them with `narration_text`, the way this one does, so text and parts are no
+longer derived independently.
 
 ### Naming
 

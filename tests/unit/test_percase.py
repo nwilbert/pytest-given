@@ -5,7 +5,6 @@ import pytest
 from pytest_given import Template, given, scenario, then, when
 from pytest_given.capture import narration_from
 from pytest_given.grouping import group_parametrized
-from pytest_given.grouping.templatize import text_from_parts
 from pytest_given.model import (
     Narration,
     NarrationLiteral,
@@ -18,6 +17,7 @@ from pytest_given.model import (
     Scenario,
     Step,
     TermId,
+    narration_text,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
@@ -160,7 +160,7 @@ def test_suffixed_glossary_name_keeps_its_pill_and_carries_the_suffix() -> None:
 
     assert narration.text == 'Barista brews [200]'
     assert isinstance(narration.parts[0], NarrationTermRef)
-    assert text_from_parts(narration.parts) == narration.text
+    assert narration_text(narration.parts) == narration.text
 
 
 def test_substitution_applies_format_spec_and_conversion() -> None:

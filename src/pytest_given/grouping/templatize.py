@@ -23,6 +23,7 @@ from ..model import (
     Step,
     StepAttachment,
     StepPath,
+    narration_text,
     placeholder_mismatch,
 )
 from .checks import (
@@ -191,23 +192,7 @@ def _templatize_step_narration(
         _templatize_part(part, index, path, step.phase, ctx)
         for index, part in enumerate(narration.parts)
     ]
-    return Narration(text=text_from_parts(out), parts=out)
-
-
-def text_from_parts(parts: list[NarrationPart]) -> str:
-    """A grouped step's display text: the template, not the baseline's rendering."""
-    out: list[str] = []
-    for part in parts:
-        match part:
-            case NarrationLiteral(value=value):
-                out.append(value)
-            case NarrationValue(rendered=rendered):
-                out.append(rendered)
-            case NarrationPlaceholder(name=name):
-                out.append('{' + name + '}')
-            case NarrationTermRef(display=display):
-                out.append(display)
-    return ''.join(out)
+    return Narration(text=narration_text(out), parts=out)
 
 
 def _templatize_part(

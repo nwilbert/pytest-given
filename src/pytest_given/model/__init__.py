@@ -1,5 +1,6 @@
 from .errors import PytestGivenError, placeholder_mismatch
 from .ids import case_suffix, id_derive, node_base
+from .narration import narration_text
 from .schema import (
     Activity,
     ActivityId,
@@ -96,6 +97,7 @@ __all__ = [
     'id_derive',
     'iter_steps',
     'location_suffix',
+    'narration_text',
     'node_base',
     'placeholder_mismatch',
     'report_from_dict',

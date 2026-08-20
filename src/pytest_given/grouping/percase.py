@@ -20,9 +20,9 @@ from ..model import (
     Scenario,
     Step,
     case_suffix,
+    narration_text,
     placeholder_mismatch,
 )
-from .templatize import text_from_parts
 
 
 def per_case_scenarios(group: list[Scenario], param_info: ParamInfo) -> list[Scenario]:
@@ -77,7 +77,7 @@ def _substituted_narration(
     if not _has_placeholder(narration):
         return narration
     parts = [_substituted_part(part, params, names) for part in narration.parts]
-    return Narration(text=text_from_parts(parts), parts=parts)
+    return Narration(text=narration_text(parts), parts=parts)
 
 
 def _has_placeholder(narration: Narration) -> bool:

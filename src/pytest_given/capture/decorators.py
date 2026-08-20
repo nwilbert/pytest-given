@@ -20,6 +20,7 @@ from ..model import (
     PytestGivenError,
     SourceLocation,
     Story,
+    narration_text,
 )
 from .collector import get_active_collector
 from .source import capture_caller_source, code_source
@@ -250,7 +251,7 @@ class StepDescriptor:
         bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()
         parts = _resolve_template_parts(self.narration.parts, bound.arguments)
-        return Narration(text=self._source.substitute(bound.arguments), parts=parts)
+        return Narration(text=narration_text(parts), parts=parts)
 
 
 class ScenarioDecorator:

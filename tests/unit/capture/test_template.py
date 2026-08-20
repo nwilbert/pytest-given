@@ -5,6 +5,7 @@ from typing import Annotated
 import pytest
 
 from pytest_given import given, scenario, then, when, when_then
+from pytest_given.capture.decorators import _resolve_template_parts
 from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.template import Template, narration_from, parse_tstring
 from pytest_given.model import (
@@ -15,6 +16,7 @@ from pytest_given.model import (
     NarrationTermRef,
     NarrationValue,
     PytestGivenError,
+    narration_text,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
@@ -65,6 +67,12 @@ def test_template_parses_format_spec_and_conversion() -> None:
     ]
 
 
+def _rendered(template: Template, mapping: dict[str, object]) -> str:
+    """A Template rendered the way production renders one: its placeholders
+    resolved against a mapping, then the text read off the resulting parts."""
+    return narration_text(_resolve_template_parts(template.parts, mapping))
+
+
 def test_template_get_identifiers() -> None:
     t = Template('a {x} b {y} c {x}')
     assert t.get_identifiers() == ['x', 'y', 'x']
@@ -76,32 +84,30 @@ def test_template_get_identifiers() -> None:
 )
 def test_template_substitute_basic() -> None:
     with given(t'a {pg["Templatize"]} template referencing a {pg["Case"]} column'):
-        t = Template('Brew {cup_size} ml')
+        template = Template('Brew {cup_size} ml')
     with when(t'a {pg["Parameter table"]} value is substituted in'):
-        rendered = t.substitute({'cup_size': 200})
+        rendered = _rendered(template, {'cup_size': 200})
     with then('the placeholder is filled with that value'):
         assert rendered == 'Brew 200 ml'
 
 
 def test_template_substitute_with_format_spec() -> None:
-    t = Template('n={n:03d}')
-    assert t.substitute({'n': 7}) == 'n=007'
+    assert _rendered(Template('n={n:03d}'), {'n': 7}) == 'n=007'
 
 
 def test_template_substitute_with_conversion() -> None:
-    t = Template('r={obj!r}')
-    assert t.substitute({'obj': 'hi'}) == "r='hi'"
+    assert _rendered(Template('r={obj!r}'), {'obj': 'hi'}) == "r='hi'"
 
 
 def test_template_substitute_missing_key_raises() -> None:
-    t = Template('Brew {cup_size} ml')
     with pytest.raises(KeyError, match='cup_size'):
-        t.substitute({})
+        _rendered(Template('Brew {cup_size} ml'), {})
 
 
 def test_template_escape_braces_round_trip() -> None:
-    t = Template('escaped {{name}} literal')
-    assert t.substitute({}) == 'escaped {name} literal'
+    assert _rendered(Template('escaped {{name}} literal'), {}) == (
+        'escaped {name} literal'
+    )
 
 
 def test_template_unclosed_brace_raises_value_error() -> None:

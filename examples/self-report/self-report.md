@@ -947,70 +947,70 @@
 - **then** every slot is a «Term ref», with no bare words
 
 ## ✓ A Template parses a bare placeholder
-`tests/unit/capture/test_template.py:35::test_template_parses_single_placeholder` · parametrization
+`tests/unit/capture/test_template.py:37::test_template_parses_single_placeholder` · parametrization
 
 - **given** a deferred «Templatize» template with one placeholder
 - **when** the template is parsed
 - **then** it splits into literal and placeholder «Narration» parts
 
 ## ✓ A Template substitutes parametrize values
-`tests/unit/capture/test_template.py:73::test_template_substitute_basic` · parametrization
+`tests/unit/capture/test_template.py:81::test_template_substitute_basic` · parametrization
 
 - **given** a «Templatize» template referencing a «Case» column
 - **when** a «Parameter table» value is substituted in
 - **then** the placeholder is filled with that value
 
 ## ✓ A t-string interpolation becomes a value part
-`tests/unit/capture/test_template.py:141::test_parse_tstring_single_interpolation`
+`tests/unit/capture/test_template.py:147::test_parse_tstring_single_interpolation`
 
 - **given** a t-string step with one interpolated value
 - **when** the t-string is parsed at runtime
 - **then** the interpolation becomes a «Narration» value part
 
 ## ✓ A t-string can interpolate an arbitrary expression
-`tests/unit/capture/test_template.py:204::test_parse_tstring_expression`
+`tests/unit/capture/test_template.py:210::test_parse_tstring_expression`
 
 - **given** a t-string step interpolating a computed expression
 - **when** the t-string is parsed
 - **then** the «Value highlight» part records the full expression
 
 ## ✓ A «glossary» handle in a t-string emits a «term ref»
-`tests/unit/capture/test_template.py:243::test_tstring_with_actor_emits_term_ref`
+`tests/unit/capture/test_template.py:249::test_tstring_with_actor_emits_term_ref`
 
 - **given** an «Actor» handle from the glossary
 - **when** the handle is interpolated into a t-string step
 - **then** the step carries a «Term ref» pill for that «Actor»
 
 ## ✓ A «work object» handle in a t-string emits a «term ref»
-`tests/unit/capture/test_template.py:272::test_tstring_with_work_object_emits_term_ref`
+`tests/unit/capture/test_template.py:278::test_tstring_with_work_object_emits_term_ref`
 
 - **given** a «Work Object» handle from the glossary
 - **when** it is interpolated into a t-string step
 - **then** the step carries a «Term ref» for that «Work Object»
 
 ## ✓ A bare «verb» handle keeps its canonical display
-`tests/unit/capture/test_template.py:293::test_tstring_with_verb_emits_term_ref_with_canonical_display`
+`tests/unit/capture/test_template.py:299::test_tstring_with_verb_emits_term_ref_with_canonical_display`
 
 - **given** a «Verb» handle used without an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the canonical verb
 
 ## ✓ An inflected «verb» in a t-string shows the «inflection»
-`tests/unit/capture/test_template.py:308::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display`
+`tests/unit/capture/test_template.py:314::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display`
 
 - **given** a «Verb» handle called with an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the inflection but keeps the verb id
 
 ## ✓ A «term ref» may not carry a format spec
-`tests/unit/capture/test_template.py:348::test_tstring_term_ref_with_format_spec_raises` · validation
+`tests/unit/capture/test_template.py:354::test_tstring_term_ref_with_format_spec_raises` · validation
 
 - **given** an «Actor» handle interpolated with a format spec
 - **when** the t-string is parsed
 - **then** a PytestGivenError says a «Term ref» takes no format spec
 
 ## ✓ A «FileGlossary» handle works in a t-string «step»
-`tests/unit/capture/test_template.py:391::test_tstring_with_file_term_handle_emits_term_ref`
+`tests/unit/capture/test_template.py:397::test_tstring_with_file_term_handle_emits_term_ref`
 
 - **given** a «Deferred term» from a «File glossary»
 - **when** it is interpolated into a t-string step
@@ -1605,7 +1605,7 @@
 | not-a-string | ✓ |
 
 ## ✓ A Template accepts bare identifiers only · 3 cases
-`tests/unit/capture/test_template.py:112::test_template_non_identifier_raises_pytest_given_error` · validation
+`tests/unit/capture/test_template.py:118::test_template_non_identifier_raises_pytest_given_error` · validation
 
 - **given** the placeholder {text}
 - **when** a «Templatize» template is built from it
