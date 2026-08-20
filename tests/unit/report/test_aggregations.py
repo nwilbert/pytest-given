@@ -1,5 +1,3 @@
-import pytest
-
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import (
     Activity,
@@ -648,7 +646,8 @@ def test_scenario_slug_empty_report_is_empty() -> None:
     assert build_scenario_slug_index(rd) == {}
 
 
-def test_scenario_slug_duplicate_basename_raises() -> None:
+def test_scenario_slug_duplicate_basename_gains_its_directory() -> None:
+    """Two test files sharing a basename is an ordinary layout, not an error."""
     rd = ReportData(
         metadata=_meta(),
         scenarios=[
@@ -656,8 +655,38 @@ def test_scenario_slug_duplicate_basename_raises() -> None:
             _scn('b/test_booking.py::test_make'),
         ],
     )
-    with pytest.raises(ValueError, match='Duplicate scenario slug'):
-        build_scenario_slug_index(rd)
+    index = build_scenario_slug_index(rd)
+    assert index[NodeId('a/test_booking.py::test_make')] == 'a/booking/make'
+    assert index[NodeId('b/test_booking.py::test_make')] == 'b/booking/make'
+
+
+def test_scenario_slug_escalates_only_as_far_as_it_must() -> None:
+    """Directories come back one level at a time, and only for the colliding
+    scenarios — a scenario that is already unique keeps its short slug."""
+    rd = ReportData(
+        metadata=_meta(),
+        scenarios=[
+            _scn('t/u/a/test_x.py::test_y'),
+            _scn('t/v/a/test_x.py::test_y'),
+            _scn('other/test_z.py::test_w'),
+        ],
+    )
+    index = build_scenario_slug_index(rd)
+    assert index[NodeId('t/u/a/test_x.py::test_y')] == 'u/a/x/y'
+    assert index[NodeId('t/v/a/test_x.py::test_y')] == 'v/a/x/y'
+    assert index[NodeId('other/test_z.py::test_w')] == 'z/w'
+
+
+def test_scenario_slug_falls_back_to_the_node_id_when_paths_cannot_separate() -> None:
+    """`test_x.py` beside `x.py` in one directory reads the same at every
+    depth; the node id is the only thing left that is unique."""
+    rd = ReportData(
+        metadata=_meta(),
+        scenarios=[_scn('a/test_x.py::test_y'), _scn('a/x.py::test_y')],
+    )
+    index = build_scenario_slug_index(rd)
+    assert index[NodeId('a/test_x.py::test_y')] == 'a/test_x.py::test_y'
+    assert index[NodeId('a/x.py::test_y')] == 'a/x.py::test_y'
 
 
 @scenario(

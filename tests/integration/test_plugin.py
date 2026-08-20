@@ -370,6 +370,35 @@ def test_a_grouping_error_discards_the_previous_report(pytester, tmp_path):
     assert 'report.json' in result.stdout.str()
 
 
+def test_two_test_files_sharing_a_basename_render_fine(pytester, tmp_path):
+    """`tests/unit/test_x.py` beside `tests/integration/test_x.py` is an
+    ordinary layout; the HTML report used to abort on it."""
+    pytester.makepyfile(
+        test_dup="""
+        from pytest_given import scenario, then
+
+        @scenario("A")
+        def test_thing():
+            with then("it holds"):
+                assert True
+        """,
+    )
+    sub = pytester.mkpydir('pkg')
+    (sub / 'test_dup.py').write_text(
+        'from pytest_given import scenario, then\n'
+        '\n'
+        '@scenario("B")\n'
+        'def test_thing():\n'
+        '    with then("it holds"):\n'
+        '        assert True\n'
+    )
+    html_path = tmp_path / 'report.html'
+    result = pytester.runpytest(f'--given-html={html_path}')
+    result.assert_outcomes(passed=2)
+    assert html_path.exists()
+    assert 'pkg/dup/thing' in html_path.read_text(encoding='utf-8')
+
+
 def test_an_unknown_source_link_preset_fails_before_the_suite_runs(pytester):
     """A typo in --given-source-link is a usage error, caught at configure time.
 

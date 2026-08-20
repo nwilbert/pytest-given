@@ -403,45 +403,64 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
     """Map each scenario's node id to a short, readable slug for the URL
     fragment (`#scenario=<slug>`).
 
-    Slug is `<file>/<func>` where the file is the node id's basename with `.py`
-    and a leading `test_` removed, and the func is the part after `::` with a
-    leading `test_` removed. The parametrization tail (`[water]`) is **dropped**
-    to keep the fragment short — a parametrized test usually groups into a
-    single scenario, so the tail is just noise.
+    The short form is `<file>/<func>`: the node id's basename with `.py` and a
+    leading `test_` removed, the part after `::` with a leading `test_`
+    removed, and the parametrization tail (`[water]`) dropped — a parametrized
+    test usually groups into one scenario, so the tail is just noise.
 
-    The tail is kept only when it is needed to disambiguate: a parametrized test
-    whose narration varies per case yields several scenarios for the same
-    function, which would otherwise share a slug. Those (and only those) keep
-    their tails. This makes a colliding scenario's slug depend on the rest of
-    the report, but the common case stays short and stable across re-runs.
+    What was dropped comes back when it has to disambiguate, and only for the
+    scenarios that need it, so the common case stays short and stable across
+    re-runs. The tail returns first, for several scenarios out of one
+    parametrized function — they share a file and a name, so nothing else
+    separates them. Then directory components, innermost first, for two test
+    files sharing a basename: a `tests/unit` + `tests/integration` layout is
+    ordinary, and asking the author to rename a file to satisfy a URL fragment
+    is not a fix. Colliding scenarios escalate together, never greedily — which
+    slug a scenario gets must not depend on the order the report lists them in.
 
-    Raises ValueError if two scenarios still collide after that — two test files
-    sharing a basename across directories — naming the colliding node ids.
+    A pair that survives a full path (`a/test_x.py` beside `a/x.py`, both
+    defining `test_y`) falls back to the node id, which is unique by
+    construction.
     """
     base_counts = Counter(
         _scenario_slug(s.id, with_tail=False) for s in report.scenarios
     )
-    slugs: dict[NodeId, str] = {}
-    node_by_slug: dict[str, NodeId] = {}
-    for scenario in report.scenarios:
-        needs_tail = base_counts[_scenario_slug(scenario.id, with_tail=False)] > 1
-        slug = _scenario_slug(scenario.id, with_tail=needs_tail)
-        existing = node_by_slug.get(slug)
-        if existing is not None:
-            raise ValueError(
-                f'Duplicate scenario slug {slug!r} from node ids '
-                f'{existing!r} and {scenario.id!r}; rename one test file so '
-                f'their basenames differ.'
-            )
-        node_by_slug[slug] = scenario.id
-        slugs[scenario.id] = slug
+    tails = {
+        s.id: base_counts[_scenario_slug(s.id, with_tail=False)] > 1
+        for s in report.scenarios
+    }
+    slugs = {
+        s.id: _scenario_slug(s.id, with_tail=tails[s.id]) for s in report.scenarios
+    }
+    depth = 0
+    while colliding := _colliding_ids(slugs):
+        depth += 1
+        moved = False
+        for node_id in colliding:
+            candidate = _scenario_slug(node_id, with_tail=tails[node_id], depth=depth)
+            moved = moved or candidate != slugs[node_id]
+            slugs[node_id] = candidate
+        if not moved:
+            # Every directory is already in the slug and the pair still reads
+            # the same. Nothing shorter than the node id can separate them.
+            slugs.update({node_id: node_id for node_id in colliding})
+            break
     return slugs
 
 
-def _scenario_slug(node_id: NodeId, *, with_tail: bool) -> str:
+def _colliding_ids(slugs: dict[NodeId, str]) -> list[NodeId]:
+    """The node ids whose slug another scenario also holds, in report order."""
+    counts = Counter(slugs.values())
+    return [node_id for node_id, slug in slugs.items() if counts[slug] > 1]
+
+
+def _scenario_slug(node_id: NodeId, *, with_tail: bool, depth: int = 0) -> str:
+    """The slug for one node id, carrying `depth` of its parent directories."""
     file_part, _, func_part = node_id.partition('::')
-    basename = file_part.rsplit('/', 1)[-1].removesuffix('.py')
+    segments = file_part.split('/')
+    basename = segments[-1].removesuffix('.py').removeprefix('test_')
+    parents = segments[max(len(segments) - 1 - depth, 0) : -1]
     func = func_part.removeprefix('test_')
     if not with_tail:
         func = node_base(func)
-    return f'{basename.removeprefix("test_")}/{func}'
+    return '/'.join([*parents, basename, func])

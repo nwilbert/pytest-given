@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-20T18:03:42.131011+00:00",
+    "timestamp": "2026-08-20T18:13:07.806287+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "ed3931117e225dec9980c54f43f040fd5c282750",
+    "commit_sha": "2f6850a9b4a118768ab1ec4281a094a78fdb12c8",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -11813,7 +11813,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 165
+        "line": 163
       },
       "story_id": null,
       "activity_ids": []
@@ -11944,7 +11944,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 269
+        "line": 267
       },
       "story_id": null,
       "activity_ids": []
@@ -12060,7 +12060,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 339
+        "line": 337
       },
       "story_id": null,
       "activity_ids": []
@@ -12233,7 +12233,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 425
+        "line": 423
       },
       "story_id": null,
       "activity_ids": []
@@ -12370,7 +12370,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 458
+        "line": 456
       },
       "story_id": null,
       "activity_ids": []
@@ -12497,7 +12497,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 551
+        "line": 549
       },
       "story_id": null,
       "activity_ids": []
@@ -12612,7 +12612,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 663
+        "line": 692
       },
       "story_id": null,
       "activity_ids": []
@@ -12746,7 +12746,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 814
+        "line": 843
       },
       "story_id": null,
       "activity_ids": []
@@ -14777,7 +14777,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 32,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",

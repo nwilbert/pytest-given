@@ -92,6 +92,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
   the rest escaped as a bare traceback with no summary line at all.
 - The sinks are now rendered in full before any is written, so a failing render
   can no longer leave this run's JSON beside the previous run's HTML.
+- Two test files sharing a basename across directories no longer abort the HTML
+  report; the scenarios' `#scenario=` slugs gain directory components instead.
 - The grouped step tree now comes from the first case that *passed* — a skipped
   case 1 used to render an empty tree and hide later failures.
 - A cell now reads the way the step pointing at it read, carrying the
