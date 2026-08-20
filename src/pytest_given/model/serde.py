@@ -262,7 +262,6 @@ def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
         values=[_cell_from_json(v) for v in d['values']],
         status=d.get('status', 'passed'),
         error=_error_from_dict(d.get('error')),
-        divergent=d.get('divergent', False),
     )
 
 

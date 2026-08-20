@@ -93,24 +93,7 @@ def _param_table_md(table: ParameterTable) -> str:
             '| ' + ' | '.join([*cells, _STATUS_GLYPH.get(case.status, '✗')]) + ' |'
         )
         blocks.extend(_case_attachment_blocks(table, case))
-        blocks.extend(_case_divergence_note(table, case))
     return '\n'.join([header, separator, *rows, *blocks])
-
-
-def _case_divergence_note(table: ParameterTable, case: ParameterCase) -> list[str]:
-    """A line saying why a divergent case's generated cells are blank.
-
-    Without it the blanks sit next to a ✓ and read as a recording failure; the
-    case simply took a different path, so the grouped step tree — another
-    case's — has no slot to fill them from.
-    """
-    if not case.divergent:
-        return []
-    return [
-        '',
-        f'- **{_case_key(table, case)}** — steps differ from the other cases, so '
-        f'the grouped tree is not this one and its columns stay blank.',
-    ]
 
 
 def _case_cell(column: ParameterColumn, value: CellValue | None) -> str:

@@ -210,6 +210,17 @@ def test_check_in(guest):
 
 Because a t-string is evaluated at import, only glossary handles (which are in scope then) are allowed in a scenario name; a parametrize-value interpolation is rejected — use `Template` for that. The two don't combine in one name: a title needing both a term pill and a per-case value isn't expressible today.
 
+When the cases have nothing honest to share — the narration genuinely branches per case — decline the merge with `group_parametrized=False`:
+
+```python
+@scenario(Template('Brew {cup_size} ml'), group_parametrized=False)
+@pytest.mark.parametrize('cup_size', [200, 300])
+def test_brew(cup_size):
+    ...
+```
+
+Each case then becomes its own scenario with no case table, titled by its parametrize id — `Brew coffee [200]`, and `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first. Every case carries the id, including one whose name already renders its values: a `Template` naming only some of the columns would otherwise give two cases the same title, and suffixing only the clashes would make a title depend on which cases the run collected. On a test that isn't parametrized the argument raises at collection.
+
 #### Step text & placeholders
 
 | Form | Example | How it renders |
@@ -227,9 +238,9 @@ Four things worth knowing:
 
 2. **`Template` vs. t-string is about scope.** `Template` defers substitution, so it belongs where values aren't yet bound — `@scenario(...)` and helper decorators (the table above). A t-string evaluates eagerly, so it belongs where values *are* bound: the test body. Each is rejected in the other's place — `with given(Template(...))` raises `PytestGivenError` at entry, as does a t-string on a fixture/helper decorator. The one exception: a t-string in `@scenario(...)` is allowed when every interpolation is a glossary handle, since terms are in scope at import.
 
-3. **A parametrized scenario is grouped into one narrated tree plus a case table.** The tree comes from a baseline case (the first that passed), and anything varying across cases is promoted into a column of the case table: a parametrize argument, a t-string interpolation whose value differs per case (the step keeps a `{name}` placeholder pointing at the column), and an attachment whose payload differs (the step keeps a content-less badge). A case that passed on a *different* step structure fills no such column and is marked `≠` — the tree isn't its own. If steps genuinely diverge per case, split into separate `@scenario` tests.
+3. **A parametrized scenario is grouped into one narrated tree plus a case table.** The tree comes from a baseline case (the first that passed), and anything varying across cases is promoted into a column of the case table: a parametrize argument, a t-string interpolation whose value differs per case (the step keeps a `{name}` placeholder pointing at the column), and an attachment whose payload differs (the step keeps a content-less badge). What a column cannot carry is a case that narrates a *different sentence* — that is rule 6 below, and `group_parametrized=False` is its answer.
 
-4. **Five authoring forms are rejected outright in a parametrized scenario**, because each would make the grouped tree lie. Every one fails the run and writes no report — the message names the fix:
+4. **Six authoring forms are rejected outright in a parametrized scenario**, because each would make the grouped tree lie. Every one fails the run and writes no report — the message names the fix:
 
    | Rejected | Fix |
    |---|---|
@@ -238,6 +249,7 @@ Four things worth knowing:
    | An interpolation naming a parametrize column that no longer holds the case's value | Rename the local that rebound the name — or, if the body mutated the value in place before narrating it, bind the result to its own name and narrate that |
    | A step whose set of `attach` labels differs between cases | Keep the label constant and let the content vary — that's what the attachment column is for |
    | A glossary term pill whose display differs between cases (unless the pill *is* the parametrize value) | Split the pill from the value: `given(t"{pg['Customer']} {name} places an order")` |
+   | Passed cases that narrate different templates — a different step structure, a differently shaped narration, different wording, or a different interpolated expression | Decline the merge with `@scenario(..., group_parametrized=False)` and let each case be its own scenario |
 
 ### Domain Storytelling
 
@@ -368,7 +380,6 @@ Each rule has a fixed default severity; there is no master level. A `warn` findi
 | `check-outside-then` | `warn` | An `assert` inside a `given` or `when` (the `when` half of a `when_then` pair is exempt). |
 | `action-in-then` | `warn` | A scenario where no `when` performs an action and a `then` folds the action into its assertion. |
 | `unused-interpolation` | `warn` | A t-string narration that interpolates `{name}` but never uses `name` in the step body. |
-| `divergent-case-structure` | `warn` | A parametrized scenario whose passed cases record different step structures (the report shows the baseline case's tree and marks the others `≠`). |
 | `tag-shadows-term` | `warn` | A scenario tag whose slug duplicates a glossary term — one concept named through two mechanisms. |
 | `dead-term` | `off` | A glossary term referenced by no step narration and no story activity. Opt in on suites whose glossary is meant to be fully exercised. |
 

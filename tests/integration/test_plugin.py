@@ -2121,3 +2121,44 @@ def test_given_title_cli_overrides_ini(pytester, tmp_path):
     )
     data = json.loads(json_path.read_text())
     assert data['metadata']['title'] == 'From CLI'
+
+
+def test_group_parametrized_false_without_parametrize_raises_at_collection(
+    pytester, tmp_path
+):
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, then
+
+        @scenario('Brew coffee', group_parametrized=False)
+        def test_brew():
+            with then('ok'):
+                pass
+        """
+    )
+    result = pytester.runpytest('--collect-only')
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*nothing to opt out of*'])
+
+
+def test_group_parametrized_false_emits_one_scenario_per_case(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then, Template
+
+        @scenario(Template('Brew {cup_size} ml'), group_parametrized=False)
+        @pytest.mark.parametrize('cup_size', [200, 300])
+        def test_brew(cup_size):
+            with then('it brews'):
+                assert cup_size
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(passed=2)
+    data = json.loads(json_path.read_text())
+    assert [s['narration']['text'] for s in data['scenarios']] == [
+        'Brew 200 ml [200]',
+        'Brew 300 ml [300]',
+    ]
+    assert all(s['parameters'] is None for s in data['scenarios'])

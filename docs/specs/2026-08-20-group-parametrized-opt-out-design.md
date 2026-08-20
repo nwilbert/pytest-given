@@ -106,15 +106,18 @@ helper-decorator's call-time renderer.
 
 | name form | per-case name |
 |---|---|
-| `Template('Brew {cup_size} ml')` | `Brew 200 ml` — substituted as above |
+| `Template('Brew {cup_size} ml')` | `Brew 200 ml [200]` — substituted, then suffixed |
 | `'Brew coffee'` | `Brew coffee [200-oat]` — `case_suffix(scenario.id)` appended |
 | `t'{pg["Barista"]} brews'` | `Barista brews [200-oat]` — suffix appended as a trailing `NarrationLiteral`, so the pill survives |
 
-A `Template` naming only some columns can render the same name twice — `Brew {cup_size} ml`
-over `(cup_size, milk)` gives `Brew 200 ml` for both `200-oat` and `200-soy`. When any two
-substituted names in a group collide, **every** case in that group takes the id suffix. Two
-scenarios that look identical in the browse list are the failure worth avoiding; a title
-suffixed on some rows and not others reads as a bug, so the group is treated uniformly.
+**Every case takes the id**, including one whose `Template` name already renders its values.
+A `Template` naming only some columns renders identically for cases that differ only in the
+rest — `Brew {cup_size} ml` over `(cup_size, milk)` gives `Brew 200 ml` for both `200-oat` and
+`200-soy` — so some rule has to disambiguate. Suffixing only the clashes was the first design,
+and it makes a title depend on which cases the run collected: `-k` down to one case of a
+colliding group drops a suffix the full run carries. Suffixing unconditionally costs a
+redundant id on the names an author took care to write, and buys a title that reads the same
+under any selection.
 
 ## Rule 6: every passed case must narrate the same template
 
@@ -176,8 +179,8 @@ the author where to look.
 
 - **A group where no case passed.** Rule 6 never fires; the existing `_baseline` fallback
   (first case with steps) still renders. Unchanged.
-- **A single-case parametrize with the flag set.** One scenario out, named by substitution or
-  suffixed with its id. No collision possible, no rule 6.
+- **A single-case parametrize with the flag set.** One scenario out, substituted and suffixed
+  like any other. No rule 6 — nothing to compare.
 - **`indirect=True`.** Substitution reads `ParamSpec.values`, which `_capture_param_spec`
   already snapshots from `item.funcargs` — the value the test actually saw, which is what the
   narration rendered.
@@ -196,7 +199,7 @@ the author where to look.
 | `src/pytest_given/model/serde.py` | stop writing `divergent`; keep tolerating it on read |
 | `src/pytest_given/plugin.py` | collection-time rejection of the flag on a non-parametrized test; `_capture_param_spec` reads the marker and sets `ParamSpec.group`; `_run_lint` and `run_runtime_rules` drop their `per_case` parameter, and `pytest_sessionfinish` stops passing `collector.scenarios` alongside the grouped list |
 | `src/pytest_given/grouping/group.py` | route opted-out groups to the per-case path; `_comparable` collapses to the passed cases; `divergent=` drops out of `ParameterCase` construction |
-| `src/pytest_given/grouping/percase.py` (new) | placeholder substitution over a scenario's narration and step tree, per-case naming, group-wide collision suffixing |
+| `src/pytest_given/grouping/percase.py` (new) | placeholder substitution over a scenario's narration and step tree, then the parametrize-id suffix |
 | `src/pytest_given/grouping/templatize.py` | `_text_from_parts` shared out as `text_from_parts` for the new module |
 | `src/pytest_given/grouping/checks.py` | rule 6: `check_same_template`, plus the narration-shape signature |
 | `src/pytest_given/lint/base.py`, `lint/runtime_rules.py` | `divergent-case-structure` and `_divergent_case_findings` removed |
@@ -227,7 +230,7 @@ TDD throughout, except the template edits (per AGENTS.md, frontend changes are a
 then driven, not test-driven).
 
 - Unit, per-case path: `Template` name substituted per case; `str` and glossary-t-string names
-  suffixed; colliding `Template` names suffix the whole group; `Annotated` placeholder step
+  suffixed, and a substituted `Template` name suffixed too; `Annotated` placeholder step
   labels substituted; no `ParameterTable` on the result; format specs and conversions survive
   substitution; a failed and a skipped case emit normally.
 - Unit, rule 6: each of the four shapes raises, with its own first clause; a plain `str` that

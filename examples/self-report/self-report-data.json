@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-19T21:16:51.078976+00:00",
+    "timestamp": "2026-08-20T10:00:07.929282+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "7a06c7dc9e83b6cd30be416b2fd53f4355fe3b98",
+    "commit_sha": "c569a7ce8c7042066c31a87200254bf4bb9d4b0e",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -11405,7 +11405,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 166
+        "line": 164
       },
       "story_id": null,
       "activity_ids": []
@@ -11536,7 +11536,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 270
+        "line": 268
       },
       "story_id": null,
       "activity_ids": []
@@ -11652,7 +11652,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 340
+        "line": 338
       },
       "story_id": null,
       "activity_ids": []
@@ -11825,7 +11825,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 428
+        "line": 426
       },
       "story_id": null,
       "activity_ids": []
@@ -11962,7 +11962,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 461
+        "line": 459
       },
       "story_id": null,
       "activity_ids": []
@@ -12089,7 +12089,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 554
+        "line": 552
       },
       "story_id": null,
       "activity_ids": []
@@ -12204,146 +12204,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 666
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_aggregations.py::test_glossary_view_omits_a_divergent_cases_instance",
-      "narration": {
-        "text": "A divergent case contributes no Instance to the glossary",
-        "parts": [
-          {
-            "value": "A divergent "
-          },
-          {
-            "term_id": "case",
-            "display": "case",
-            "expression": "pg[\"Case\"].low",
-            "param_column": null
-          },
-          {
-            "value": " contributes no "
-          },
-          {
-            "term_id": "instance",
-            "display": "Instance",
-            "expression": "pg[\"Instance\"]",
-            "param_column": null
-          },
-          {
-            "value": " to the "
-          },
-          {
-            "term_id": "glossary",
-            "display": "glossary",
-            "expression": "pg[\"Glossary\"].low",
-            "param_column": null
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_aggregations",
-      "tags": [
-        "parametrization"
-      ],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Parametrized scenario whose second Case diverged",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "parametrized-scenario",
-                "display": "Parametrized scenario",
-                "expression": "pg[\"Parametrized scenario\"]",
-                "param_column": null
-              },
-              {
-                "value": " whose second "
-              },
-              {
-                "term_id": "case",
-                "display": "Case",
-                "expression": "pg[\"Case\"]",
-                "param_column": null
-              },
-              {
-                "value": " diverged"
-              }
-            ]
-          },
-          "status": "passed",
-          "children": [],
-          "attachments": [],
-          "error": null,
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the Glossary aggregations are built",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "glossary",
-                "display": "Glossary",
-                "expression": "pg[\"Glossary\"]",
-                "param_column": null
-              },
-              {
-                "value": " aggregations are built"
-              }
-            ]
-          },
-          "status": "passed",
-          "children": [],
-          "attachments": [],
-          "error": null,
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "only the Case the grouped tree speaks for is listed",
-            "parts": [
-              {
-                "value": "only the "
-              },
-              {
-                "term_id": "case",
-                "display": "Case",
-                "expression": "pg[\"Case\"]",
-                "param_column": null
-              },
-              {
-                "value": " the grouped tree speaks for is listed"
-              }
-            ]
-          },
-          "status": "passed",
-          "children": [],
-          "attachments": [],
-          "error": null,
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 779
+        "line": 664
       },
       "story_id": null,
       "activity_ids": []
@@ -12477,7 +12338,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 849
+        "line": 815
       },
       "story_id": null,
       "activity_ids": []
@@ -12604,7 +12465,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 72
+        "line": 70
       },
       "story_id": null,
       "activity_ids": []
@@ -12738,7 +12599,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 155
+        "line": 153
       },
       "story_id": null,
       "activity_ids": []
@@ -12869,7 +12730,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 206
+        "line": 204
       },
       "story_id": null,
       "activity_ids": []
@@ -12981,7 +12842,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 221
+        "line": 219
       },
       "story_id": null,
       "activity_ids": []
@@ -13089,7 +12950,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 233
+        "line": 231
       },
       "story_id": null,
       "activity_ids": []
@@ -13235,7 +13096,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 257
+        "line": 255
       },
       "story_id": null,
       "activity_ids": []
@@ -13372,7 +13233,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 288
+        "line": 286
       },
       "story_id": null,
       "activity_ids": []
@@ -13573,7 +13434,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 319
+        "line": 317
       },
       "story_id": null,
       "activity_ids": []
@@ -13713,7 +13574,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 367
+        "line": 365
       },
       "story_id": null,
       "activity_ids": []
@@ -13853,7 +13714,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 413
+        "line": 411
       },
       "story_id": null,
       "activity_ids": []
@@ -13981,7 +13842,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 435
+        "line": 433
       },
       "story_id": null,
       "activity_ids": []
@@ -14093,7 +13954,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 465
+        "line": 463
       },
       "story_id": null,
       "activity_ids": []
@@ -14233,7 +14094,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 488
+        "line": 486
       },
       "story_id": null,
       "activity_ids": []
@@ -14364,7 +14225,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 523
+        "line": 521
       },
       "story_id": null,
       "activity_ids": []
@@ -14484,146 +14345,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 551
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_coverage.py::test_coverage_ignores_a_divergent_case",
-      "narration": {
-        "text": "A divergent case does not lend its value to Coverage",
-        "parts": [
-          {
-            "value": "A divergent "
-          },
-          {
-            "term_id": "case",
-            "display": "case",
-            "expression": "pg[\"Case\"].low",
-            "param_column": null
-          },
-          {
-            "value": " does not lend its value to "
-          },
-          {
-            "term_id": "coverage",
-            "display": "Coverage",
-            "expression": "pg[\"Coverage\"]",
-            "param_column": null
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "parametrization"
-      ],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "an Activity anchored on the second Case alone",
-            "parts": [
-              {
-                "value": "an "
-              },
-              {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]",
-                "param_column": null
-              },
-              {
-                "value": " anchored on the second "
-              },
-              {
-                "term_id": "case",
-                "display": "Case",
-                "expression": "pg[\"Case\"]",
-                "param_column": null
-              },
-              {
-                "value": " alone"
-              }
-            ]
-          },
-          "status": "passed",
-          "children": [],
-          "attachments": [],
-          "error": null,
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "that Case recorded a different Step structure",
-            "parts": [
-              {
-                "value": "that "
-              },
-              {
-                "term_id": "case",
-                "display": "Case",
-                "expression": "pg[\"Case\"]",
-                "param_column": null
-              },
-              {
-                "value": " recorded a different "
-              },
-              {
-                "term_id": "step",
-                "display": "Step",
-                "expression": "pg[\"Step\"]",
-                "param_column": null
-              },
-              {
-                "value": " structure"
-              }
-            ]
-          },
-          "status": "passed",
-          "children": [],
-          "attachments": [],
-          "error": null,
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "no Activity is covered \u2014 the tree walked is not its own",
-            "parts": [
-              {
-                "value": "no "
-              },
-              {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]",
-                "param_column": null
-              },
-              {
-                "value": " is covered \u2014 the tree walked is not its own"
-              }
-            ]
-          },
-          "status": "passed",
-          "children": [],
-          "attachments": [],
-          "error": null,
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_coverage.py",
-        "line": 587
+        "line": 549
       },
       "story_id": null,
       "activity_ids": []
@@ -14647,7 +14369,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -15987,7 +15709,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 416
+        "line": 411
       },
       "story_id": null,
       "activity_ids": []
@@ -16118,7 +15840,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 548
+        "line": 528
       },
       "story_id": null,
       "activity_ids": []
@@ -16232,7 +15954,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 660
+        "line": 640
       },
       "story_id": null,
       "activity_ids": []
@@ -16354,7 +16076,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1044
+        "line": 992
       },
       "story_id": null,
       "activity_ids": []
@@ -16507,7 +16229,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1395
+        "line": 1343
       },
       "story_id": null,
       "activity_ids": []
@@ -16641,7 +16363,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1452
+        "line": 1400
       },
       "story_id": null,
       "activity_ids": []
@@ -16794,7 +16516,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1615
+        "line": 1550
       },
       "story_id": null,
       "activity_ids": []
@@ -16943,7 +16665,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1671
+        "line": 1606
       },
       "story_id": null,
       "activity_ids": []
@@ -17070,7 +16792,297 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2245
+        "line": 2154
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/test_grouping.py::test_divergent_step_structure_refuses_the_merge",
+      "narration": {
+        "text": "Cases that narrate different steps are refused rather than grouped",
+        "parts": [
+          {
+            "term_id": "case",
+            "display": "Cases",
+            "expression": "pg[\"Case\"](\"Cases\")",
+            "param_column": null
+          },
+          {
+            "value": " that narrate different "
+          },
+          {
+            "term_id": "step",
+            "display": "steps",
+            "expression": "pg[\"Step\"](\"steps\")",
+            "param_column": null
+          },
+          {
+            "value": " are refused rather than "
+          },
+          {
+            "term_id": "group",
+            "display": "grouped",
+            "expression": "pg[\"Group\"](\"grouped\")",
+            "param_column": null
+          }
+        ]
+      },
+      "module": "tests.unit.test_grouping",
+      "tags": [
+        "parametrization",
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "two cases whose step trees differ",
+            "parts": [
+              {
+                "value": "two "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"](\"cases\")",
+                "param_column": null
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"](\"step\")",
+                "param_column": null
+              },
+              {
+                "value": " trees differ"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the cases are grouped",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"](\"cases\")",
+                "param_column": null
+              },
+              {
+                "value": " are "
+              },
+              {
+                "term_id": "group",
+                "display": "grouped",
+                "expression": "pg[\"Group\"](\"grouped\")",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the grouping is refused",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the error names the divergence and the opt-out that answers it",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/test_grouping.py",
+        "line": 2292
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/test_percase.py::test_opted_out_group_emits_one_scenario_per_case",
+      "narration": {
+        "text": "A parametrized scenario can decline the grouping and keep one scenario per case",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "parametrized-scenario",
+            "display": "parametrized scenario",
+            "expression": "pg[\"Parametrized scenario\"].low",
+            "param_column": null
+          },
+          {
+            "value": " can decline the "
+          },
+          {
+            "term_id": "group",
+            "display": "grouping",
+            "expression": "pg[\"Group\"](\"grouping\")",
+            "param_column": null
+          },
+          {
+            "value": " and keep one "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].low",
+            "param_column": null
+          },
+          {
+            "value": " per "
+          },
+          {
+            "term_id": "case",
+            "display": "case",
+            "expression": "pg[\"Case\"].low",
+            "param_column": null
+          }
+        ]
+      },
+      "module": "tests.unit.test_percase",
+      "tags": [
+        "parametrization"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "two cases of a scenario that opted out",
+            "parts": [
+              {
+                "value": "two "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"](\"cases\")",
+                "param_column": null
+              },
+              {
+                "value": " of a scenario that opted out"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the grouping pass runs",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "group",
+                "display": "grouping",
+                "expression": "pg[\"Group\"](\"grouping\")",
+                "param_column": null
+              },
+              {
+                "value": " pass runs"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [
+            9
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each case stands alone, with no parameter table",
+            "parts": [
+              {
+                "value": "each "
+              },
+              {
+                "term_id": "case",
+                "display": "case",
+                "expression": "pg[\"Case\"].low",
+                "param_column": null
+              },
+              {
+                "value": " stands alone, with no "
+              },
+              {
+                "term_id": "parameter-table",
+                "display": "parameter table",
+                "expression": "pg[\"Parameter table\"].low",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/test_percase.py",
+        "line": 59
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -17189,8 +17201,7 @@
               "'guest'"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
@@ -17198,8 +17209,7 @@
               "'order-received'"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
@@ -17207,8 +17217,7 @@
               "'work-object'"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
@@ -17216,8 +17225,7 @@
               "'do-the-thing'"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
@@ -17225,8 +17233,7 @@
               "'buy-sell'"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
@@ -17234,8 +17241,7 @@
               "'guest-1'"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
@@ -17243,8 +17249,7 @@
               "'caf'"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
@@ -17252,8 +17257,7 @@
               "'booking-system'"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           }
         ]
       },
@@ -17356,32 +17360,28 @@
               "---"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
               "   "
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
               ""
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
               "###"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           }
         ]
       },
@@ -17541,16 +17541,14 @@
               "given"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
               "then"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           }
         ]
       },
@@ -17679,24 +17677,21 @@
               "deferred-template"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
               "t-string"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
               "not-a-string"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           }
         ]
       },
@@ -17799,24 +17794,21 @@
               "count={obj.attr}"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
               "{d[key]}"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           },
           {
             "values": [
               "{x + 1}"
             ],
             "status": "passed",
-            "error": null,
-            "divergent": false
+            "error": null
           }
         ]
       },
@@ -17936,7 +17928,7 @@
         "id": "group",
         "kind": "verb",
         "canonical": "Group",
-        "definition": "Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a parameter table. Scenarios group when they share the same name and module.",
+        "definition": "Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a parameter table. Scenarios group when they share the same name and module. `@scenario(group_parametrized=False)` declines the merge, so each case leaves as its own scenario.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 28
@@ -17946,7 +17938,7 @@
         "id": "templatize",
         "kind": null,
         "canonical": "Templatize",
-        "definition": "Derive the grouped-template step text by comparing every comparable case: what all of them share stays inline, and anything that varies becomes a `{name}` placeholder or attachment badge pointing at a parameter-table column. The baseline tree comes from the first passed case.",
+        "definition": "Derive the grouped-template step text by comparing every comparable case: what all of them share stays inline, and anything that varies becomes a `{name}` placeholder or attachment badge pointing at a parameter-table column. The baseline tree comes from the first passed case, and every other passed case must narrate that same template.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 29

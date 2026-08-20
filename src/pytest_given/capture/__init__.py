@@ -20,6 +20,7 @@ from .story import activity, path, story
 from .template import (
     Template,
     narration_from,
+    placeholder_value,
     render_interpolation,
     try_term_ref,
 )
@@ -42,6 +43,7 @@ __all__ = [
     'narration_from',
     'parse_short_repr',
     'path',
+    'placeholder_value',
     'render_interpolation',
     'scenario',
     'set_active_collector',

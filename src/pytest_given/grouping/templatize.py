@@ -191,10 +191,10 @@ def _templatize_step_narration(
         _templatize_part(part, index, path, step.phase, ctx)
         for index, part in enumerate(narration.parts)
     ]
-    return Narration(text=_text_from_parts(out), parts=out)
+    return Narration(text=text_from_parts(out), parts=out)
 
 
-def _text_from_parts(parts: list[NarrationPart]) -> str:
+def text_from_parts(parts: list[NarrationPart]) -> str:
     """A grouped step's display text: the template, not the baseline's rendering."""
     out: list[str] = []
     for part in parts:
@@ -332,19 +332,18 @@ def _case_independent_part(
     return None
 
 
-def _value_at(step: Step, index: int) -> str | None:
-    """That case's rendering of the interpolation at `index`, or None.
+def _value_at(step: Step, index: int) -> str:
+    """That case's rendering of the interpolation at `index`.
 
-    None covers a case whose part list is shaped differently under a matching
-    structure — a known limitation, deferred with divergent structure itself;
-    it reads as "differs", so the value is promoted. The step itself is always
-    present: only comparable cases are indexed, and they share the baseline's
-    structure.
+    Rule 6 pins every passed case to the baseline's template, so the part is
+    present and is an interpolation wherever the baseline's is — as is the step
+    itself, since only comparable cases are indexed.
     """
-    if index >= len(step.narration.parts):
-        return None
     part = step.narration.parts[index]
-    return part.rendered if isinstance(part, NarrationValue) else None
+    assert isinstance(part, NarrationValue), (
+        'rule 6 admits only cases shaped like the baseline'
+    )
+    return part.rendered
 
 
 def templatize_narration(

@@ -673,7 +673,6 @@ span.param-highlight {
 .dot-passed { color: var(--color-passed); }
 .dot-failed { color: var(--color-failed); }
 .dot-skipped { color: var(--color-skipped); }
-.case-divergent { color: var(--text-muted); margin-right: var(--space-xs); cursor: help; }
 
 /* Parameter colors — light-background variants */
 .param-color-0, th.param-color-0 { color: #d63384; font-weight: 600; }

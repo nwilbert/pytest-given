@@ -305,7 +305,9 @@ def test_with_no_passed_case_the_baseline_is_one_that_recorded_a_tree() -> None:
     assert [s.narration.text for s in grouped.steps] == ['it brews']
 
 
-def test_comparable_excludes_a_structurally_divergent_case() -> None:
+def test_comparable_is_every_passed_case() -> None:
+    """Rule 6 refuses a group whose passed cases differ in shape, so by the
+    time cells are filled every passed case is comparable by construction."""
     base = Scenario(
         id=NodeId('t.py::t[1]'),
         narration=Narration(text='x'),
@@ -313,20 +315,13 @@ def test_comparable_excludes_a_structurally_divergent_case() -> None:
         status='passed',
         steps=[Step(phase='given', narration=Narration(text='a'))],
     )
-    other = Scenario(
-        id=NodeId('t.py::t[2]'),
-        narration=Narration(text='x'),
-        module='m',
-        status='passed',
-        steps=[Step(phase='when', narration=Narration(text='a'))],
-    )
-    assert group._comparable([base, other], base) == [base]
+    other = dataclasses.replace(base, id=NodeId('t.py::t[2]'))
+    assert group._comparable([base, other]) == [base, other]
 
 
 def test_comparable_excludes_a_non_passed_case() -> None:
     """A failed case with the exact same step structure as the baseline must
-    still drop out — only its status disqualifies it, isolating that
-    condition from the structure-signature check above."""
+    still drop out — status is now the only thing that disqualifies a case."""
     base = Scenario(
         id=NodeId('t.py::t[1]'),
         narration=Narration(text='x'),
@@ -341,7 +336,7 @@ def test_comparable_excludes_a_non_passed_case() -> None:
         status='failed',
         steps=[Step(phase='given', narration=Narration(text='a'))],
     )
-    assert group._comparable([base, other], base) == [base]
+    assert group._comparable([base, other]) == [base]
 
 
 def test_test_name_drops_the_path_and_the_case_suffix() -> None:
@@ -504,21 +499,6 @@ def test_rule_one_reads_the_walked_step_in_a_nested_position() -> None:
     with pytest.raises(PytestGivenError) as excinfo:
         group_parametrized(scenarios, info)
     assert 'records no parts' in str(excinfo.value)
-
-
-def test_a_structurally_divergent_case_raises_nothing() -> None:
-    """A shifted tree lining a `when` up against a `given` gets blank cells and
-    the existing lint finding, not rule 1."""
-    scenarios, info = _two_case_group(
-        [Step(phase='when', narration=Narration(text='brews 200 ml'))],
-        [
-            Step(phase='given', narration=Narration(text='a machine')),
-            Step(phase='when', narration=Narration(text='brews 350 ml')),
-        ],
-    )
-    assert group_parametrized(scenarios, info)[0].steps[0].narration.text == (
-        'brews 200 ml'
-    )
 
 
 def _value_step(
@@ -904,42 +884,14 @@ def test_a_step_placeholder_naming_an_unknown_column_raises() -> None:
         group_parametrized(scenarios, info)
 
 
-def test_a_differently_shaped_comparable_case_reads_as_differing() -> None:
-    """`_value_at`'s bounds check: a comparable case shares the baseline's
-    `structure_signature` (phase + nesting only) but can still carry a
-    differently shaped `parts` list at the same path — a known limitation,
-    deferred with divergent structure itself. It reads as "differs", so the
-    value still gets promoted rather than compared past the end of the list."""
-    baseline_step = _value_step('2.0')
+def test_a_same_length_case_with_a_different_part_kind_refuses_the_merge() -> None:
+    """Rule 6 compares part *kinds*, not part counts: a case whose parts list
+    is as long as the baseline's but carries a literal where the baseline
+    carries an interpolation is differently shaped all the same."""
     other_step = Step(
         phase='then',
         narration=Narration(
-            text='the drink costs 3.5 euros',
-            parts=[NarrationLiteral(value='the drink costs 3.5 euros')],
-        ),
-    )
-    scenarios, info = _two_case_group([baseline_step], [other_step])
-    grouped = group_parametrized(scenarios, info)[0]
-    assert [c.kind for c in grouped.parameters.columns] == ['param', 'derived']
-    assert [case.values for case in grouped.parameters.cases] == [
-        [200, '2.0'],
-        [350, None],
-    ]
-
-
-def test_a_same_length_case_with_a_different_part_kind_reads_as_differing() -> None:
-    """`_value_at`'s isinstance guard: a comparable case can share the
-    baseline's `structure_signature` *and* have an equal-length `parts` list
-    at the promoted path, yet carry a different part kind there — e.g. a
-    NarrationLiteral where the baseline has a NarrationValue. The bounds
-    check above does not catch this (the index is in range); only the
-    isinstance check does. It must read as "differs" (None), not assert the
-    kind away."""
-    baseline_step = _value_step('2.0')
-    other_step = Step(
-        phase='then',
-        narration=Narration(
-            text='x 2.0 euros',
+            text='the drink costs 2.0 euros',
             parts=[
                 NarrationLiteral(value='the drink costs '),
                 NarrationLiteral(value='2.0'),
@@ -947,13 +899,9 @@ def test_a_same_length_case_with_a_different_part_kind_reads_as_differing() -> N
             ],
         ),
     )
-    scenarios, info = _two_case_group([baseline_step], [other_step])
-    grouped = group_parametrized(scenarios, info)[0]
-    assert [c.kind for c in grouped.parameters.columns] == ['param', 'derived']
-    assert [case.values for case in grouped.parameters.cases] == [
-        [200, '2.0'],
-        [350, None],
-    ]
+    scenarios, info = _two_case_group([_value_step('2.0')], [other_step])
+    with pytest.raises(PytestGivenError, match='differently shaped'):
+        group_parametrized(scenarios, info)
 
 
 def test_a_grouped_steps_text_rebuild_covers_every_part_kind() -> None:
@@ -1470,32 +1418,19 @@ def test_a_pill_bound_to_a_parametrize_column_does_not_raise() -> None:
         assert [c.kind for c in grouped.parameters.columns] == ['param']
 
 
-def test_a_differently_shaped_comparable_pill_reads_as_differing() -> None:
-    """`_term_at`'s bounds check: a comparable case shares the baseline's
-    `structure_signature` (phase + nesting only) but can carry a shorter
-    `parts` list at the same path — the compared index is out of range. It
-    reads as "differs" (None != identity), so rule 4 raises rather than
-    indexing past the end of the list."""
-    baseline_step = _pill_step('customer', 'Alice')
-    other_step = Step(
-        phase='given',
-        narration=Narration(text='Bob places an order', parts=[]),
+def test_a_differently_shaped_pill_refuses_the_merge_before_rule_four() -> None:
+    """A case carrying no parts where the baseline carries a pill is caught as
+    a shape difference — rule 4 speaks only for a pill that is still a pill in
+    every case."""
+    scenarios, info = _two_case_group(
+        [_pill_step('customer', 'Alice')],
+        [Step(phase='given', narration=Narration(text='Bob places an order'))],
     )
-    scenarios, info = _two_case_group([baseline_step], [other_step])
-    with pytest.raises(PytestGivenError, match='glossary term ref'):
+    with pytest.raises(PytestGivenError, match='differently shaped'):
         group_parametrized(scenarios, info)
 
 
-def test_a_same_length_pill_with_a_different_part_kind_reads_as_differing() -> None:
-    """`_term_at`'s isinstance guard: a comparable case can share the
-    baseline's `structure_signature` *and* have an equal-length `parts` list
-    at the compared path, yet carry a different part kind there — e.g. a
-    NarrationLiteral where the baseline has a NarrationTermRef. The bounds
-    check above does not catch this (the index is in range); only the
-    isinstance check does. It must read as "differs" (None), not assert the
-    kind away — this is the exact shape that survived Task 8's equivalent
-    check in `_value_at` while line coverage called it covered."""
-    baseline_step = _pill_step('customer', 'Alice')
+def test_a_same_length_pill_with_a_different_part_kind_refuses_the_merge() -> None:
     other_step = Step(
         phase='given',
         narration=Narration(
@@ -1506,8 +1441,8 @@ def test_a_same_length_pill_with_a_different_part_kind_reads_as_differing() -> N
             ],
         ),
     )
-    scenarios, info = _two_case_group([baseline_step], [other_step])
-    with pytest.raises(PytestGivenError, match='glossary term ref'):
+    scenarios, info = _two_case_group([_pill_step('customer', 'Alice')], [other_step])
+    with pytest.raises(PytestGivenError, match='differently shaped'):
         group_parametrized(scenarios, info)
 
 
@@ -2180,32 +2115,6 @@ def test_a_label_that_already_reads_as_a_suffixed_name_still_comes_out_distinct(
     assert names == ['cup_size', 'log', 'log #2', 'log #3']
 
 
-def test_a_divergent_case_is_marked_as_such() -> None:
-    """A case that passed but took a different path contributes no cells, so
-    its generated columns read blank next to a ✓ — indistinguishable from a
-    value the run failed to record. The case carries the reason instead."""
-    scenarios, info = _two_case_group(
-        [_value_step('2.0')],
-        [
-            Step(phase='given', narration=Narration(text='a machine')),
-            _value_step('3.5'),
-        ],
-    )
-    grouped = group_parametrized(scenarios, info)[0]
-    assert grouped.parameters is not None
-    assert [c.divergent for c in grouped.parameters.cases] == [False, True]
-
-
-def test_a_skipped_case_is_not_marked_divergent() -> None:
-    """A skipped case also contributes no cells, but its status already says
-    why — marking it divergent would blame a path it never took."""
-    scenarios, info = _two_case_group([_value_step('2.0')], [])
-    scenarios[1].status = 'skipped'
-    grouped = group_parametrized(scenarios, info)[0]
-    assert grouped.parameters is not None
-    assert [c.divergent for c in grouped.parameters.cases] == [False, False]
-
-
 def test_extra_occurrences_count_from_the_baseline_not_the_first_case() -> None:
     """The baseline is the first *passed* case, which is not the first case
     when that one was skipped. Counting a label's baseline occurrences off the
@@ -2364,3 +2273,112 @@ def test_a_format_that_reads_like_the_plain_cell_adds_no_column() -> None:
         'the machine brews {cup_size} ml',
         'the machine brews {cup_size} ml',
     ]
+
+
+def _tstring_step(phase: str, literal: str, expression: str, rendered: str) -> Step:
+    """A step narrated `phase(t"{expr}<literal>")`, as the recorder records it."""
+    return Step(
+        phase=phase,
+        narration=Narration(
+            text=f'{rendered}{literal}',
+            parts=[
+                NarrationValue(rendered=rendered, expression=expression),
+                NarrationLiteral(value=literal),
+            ],
+        ),
+    )
+
+
+@scenario(
+    t'{pg["Case"]("Cases")} that narrate different {pg["Step"]("steps")} are '
+    t'refused rather than {pg["Group"]("grouped")}',
+    tags=['parametrization', 'validation'],
+    story=adopt_pytest_given,
+)
+def test_divergent_step_structure_refuses_the_merge() -> None:
+    with given(t'two {pg["Case"]("cases")} whose {pg["Step"]("step")} trees differ'):
+        scenarios, info = _two_case_group(
+            [Step(phase='when', narration=Narration(text='it brews'))],
+            [
+                Step(phase='when', narration=Narration(text='it brews')),
+                Step(phase='then', narration=Narration(text='it is hot')),
+            ],
+        )
+    with (
+        when_then(
+            t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}',
+            'the grouping is refused',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
+        group_parametrized(scenarios, info)
+    with then('the error names the divergence and the opt-out that answers it'):
+        message = str(excinfo.value)
+        assert 'different step structure' in message
+        assert 'group_parametrized=False' in message
+
+
+def test_differently_shaped_narration_refuses_the_merge() -> None:
+    """`when(t"{n} items load" if n else "nothing loads")` leaves both cases
+    structurally comparable while their part lists are laid out differently."""
+    scenarios, info = _two_case_group(
+        [_tstring_step('when', ' items load', 'n', '3')],
+        [Step(phase='when', narration=Narration(text='nothing loads'))],
+    )
+    with pytest.raises(PytestGivenError, match='differently shaped'):
+        group_parametrized(scenarios, info)
+
+
+def test_narration_differing_only_in_wording_refuses_the_merge() -> None:
+    scenarios, info = _two_case_group(
+        [_tstring_step('when', ' items load', 'n', '3')],
+        [_tstring_step('when', ' things break', 'n', '4')],
+    )
+    with pytest.raises(PytestGivenError, match='different wording') as excinfo:
+        group_parametrized(scenarios, info)
+    message = str(excinfo.value)
+    assert "' items load'" in message
+    # The message names both sides of the comparison, not just the offender.
+    assert 'case [350] of ' in message
+    assert 'than case [200]' in message
+
+
+def test_narration_interpolating_a_different_expression_refuses_the_merge() -> None:
+    scenarios, info = _two_case_group(
+        [_tstring_step('when', ' items load', 'n', '3')],
+        [_tstring_step('when', ' items load', 'total', '4')],
+    )
+    with pytest.raises(PytestGivenError, match='different expression') as excinfo:
+        group_parametrized(scenarios, info)
+    assert "'total'" in str(excinfo.value)
+
+
+def test_cases_differing_only_in_rendered_values_still_merge() -> None:
+    scenarios, info = _two_case_group(
+        [_tstring_step('when', ' ml is brewed', 'cup_size', '200')],
+        [_tstring_step('when', ' ml is brewed', 'cup_size', '350')],
+    )
+    grouped = group_parametrized(scenarios, info)
+    assert grouped[0].steps[0].narration.text == '{cup_size} ml is brewed'
+
+
+def test_a_single_passed_case_has_nothing_to_compare() -> None:
+    """A failed case may abort mid-tree, so it is never held to the baseline's
+    shape."""
+    scenarios, info = _two_case_group(
+        [Step(phase='when', narration=Narration(text='it brews'))],
+        [Step(phase='when', narration=Narration(text='it brews'))],
+    )
+    scenarios[1] = dataclasses.replace(scenarios[1], status='failed', steps=[])
+    assert len(group_parametrized(scenarios, info)) == 1
+
+
+def test_a_varying_str_narration_keeps_rule_ones_diagnosis() -> None:
+    """Rule 6 stays silent on a `str` narration — both cases contribute no
+    parts — so rule 1 still explains the f-string trap."""
+    scenarios, info = _two_case_group(
+        [Step(phase='when', narration=Narration(text='the machine brews 200 ml'))],
+        [Step(phase='when', narration=Narration(text='the machine brews 350 ml'))],
+    )
+    with pytest.raises(PytestGivenError, match='records no parts'):
+        group_parametrized(scenarios, info)

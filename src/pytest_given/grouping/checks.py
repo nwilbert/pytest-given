@@ -1,14 +1,20 @@
-"""The five authoring forms that would make a grouped tree lie about its cases.
+"""The six authoring forms that would make a grouped tree lie about its cases.
 
 Each raises `PytestGivenError` rather than reporting a finding the way lint
 does: a grouped tree built on any of these is false, so the run fails and no
-sink is written (see `plugin.pytest_sessionfinish`). Rules 1 and 3 are checked
-up front, against the whole group; 2, 4 and 5 fire from the baseline walk,
-which is where the offending part is in hand.
+sink is written (see `plugin.pytest_sessionfinish`). Rules 1, 3 and 6 are
+checked up front, against the whole group; 2, 4 and 5 fire from the baseline
+walk, which is where the offending part is in hand.
 """
+
+from typing import NamedTuple
 
 from ..capture import render_interpolation
 from ..model import (
+    Narration,
+    NarrationLiteral,
+    NarrationPart,
+    NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
     ParamSpec,
@@ -18,10 +24,10 @@ from ..model import (
     Scenario,
     Step,
     StepPath,
-    TermId,
     case_suffix,
     location_suffix,
     node_base,
+    structure_signature,
     walk_steps,
 )
 from .columns import GroupContext
@@ -50,6 +56,107 @@ def check_varying_str_narration(baseline: Scenario, ctx: GroupContext) -> None:
                 f"case 1's values (an f-string is the usual cause). Use a "
                 f't-string: {step.phase}(t"…").',
             )
+
+
+def check_same_template(baseline: Scenario, ctx: GroupContext) -> None:
+    """Rule 6: every comparable case must narrate the baseline's template.
+
+    A column carries what varies *within* a sentence — a parameter, a derived
+    value, an attachment payload. A case that narrates a different sentence, or
+    a different tree of them, has nothing a column can hold: the grouped view
+    would show one case's words for all of them. Four shapes reach that state
+    (a different step structure, a differently shaped narration under a
+    matching one, different wording, a different interpolated expression) and
+    all four have the same answer, so they share a rule and a fix.
+
+    Runs first, against the very tree `templatize_steps` goes on to walk: the
+    other rules index `ctx.indexed[case.id][path]` without a `.get`, and the
+    shape asserts in `_value_at` and `_term_at` read the part there as the
+    baseline's kind. Both hold because this ran and raised otherwise. A
+    non-passed case is exempt — a skipped one records no steps and a failed one
+    may abort mid-tree — which is exactly `ctx.comparable`.
+    """
+    signature = structure_signature(baseline.steps)
+    # Walked and keyed once per group: every case is compared against the same
+    # baseline, and rebuilding its keys per case is the bulk of this rule's work.
+    baseline_steps = list(walk_steps(baseline.steps))
+    baseline_keys = [
+        [_part_key(part) for part in step.narration.parts]
+        for _path, step in baseline_steps
+    ]
+    for case in ctx.comparable:
+        if case.id == baseline.id:
+            continue
+        if structure_signature(case.steps) != signature:
+            raise _divergence_error(baseline, case, 'a different step structure', ctx)
+        for (path, step), keys in zip(baseline_steps, baseline_keys, strict=True):
+            difference = _narration_difference(
+                keys, ctx.indexed[case.id][path].narration
+            )
+            if difference is not None:
+                raise _divergence_error(
+                    baseline, case, f'{difference} in its {step.phase} step', ctx
+                )
+
+
+def _narration_difference(baseline: list[PartKey], case: Narration) -> str | None:
+    """How the case's narration differs from the baseline's keys as a template,
+    or None when they agree.
+
+    A `str` narration contributes no parts on either side, so this stays silent
+    on it and rule 1 keeps its own better diagnosis.
+    """
+    case_keys = [_part_key(part) for part in case.parts]
+    if [key.kind for key in baseline] != [key.kind for key in case_keys]:
+        return 'a differently shaped narration'
+    for baseline_key, case_key in zip(baseline, case_keys, strict=True):
+        if baseline_key == case_key:
+            continue
+        if baseline_key.kind == 'literal':
+            return f'different wording ({baseline_key.label!r} vs {case_key.label!r})'
+        return f'a different expression ({baseline_key.label!r} vs {case_key.label!r})'
+    return None
+
+
+class PartKey(NamedTuple):
+    """What a part contributes to its narration's template: its kind, the text
+    a divergence message names it by, and the rendering details that must match
+    without being worth naming."""
+
+    kind: str
+    label: str
+    detail: tuple[str, ...] = ()
+
+
+def _part_key(part: NarrationPart) -> PartKey:
+    """A part reduced to its template.
+
+    Never `rendered`, which is exactly what grouping promotes into a column,
+    and never a term ref's `display`, which rule 4 governs and which a
+    param-bound pill varies by design.
+    """
+    match part:
+        case NarrationLiteral(value=value):
+            return PartKey('literal', value)
+        case NarrationValue(expression=e, conversion=c, format_spec=f):
+            return PartKey('value', e, (c or '', f))
+        case NarrationPlaceholder(name=n, conversion=c, format_spec=f):
+            return PartKey('placeholder', n, (c or '', f))
+        case NarrationTermRef(expression=expression):
+            return PartKey('term', expression)
+
+
+def _divergence_error(
+    baseline: Scenario, case: Scenario, difference: str, ctx: GroupContext
+) -> PytestGivenError:
+    return grouping_error(
+        ctx.anchor,
+        f'case {case_suffix(case.id)} of {_test_name(ctx.anchor)!r} narrates '
+        f'{difference} than case {case_suffix(baseline.id)} — a grouped '
+        f'scenario renders one tree for every row, so the cases cannot be '
+        f'merged honestly. Use @scenario(..., group_parametrized=False) to '
+        f'emit one scenario per case.',
+    )
 
 
 def check_promotable_expression(
@@ -93,7 +200,7 @@ def check_rebound_params(
     stood at fixture setup (see `_capture_param_spec`). The message offers both
     remedies rather than asserting a cause it cannot tell apart.
     """
-    params = dict(zip(spec.names, spec.values, strict=True))
+    params = spec.mapping()
     for _path, step in walk_steps(scenario.steps):
         for part in step.narration.parts:
             if not isinstance(part, NarrationValue) or part.expression not in params:
@@ -189,7 +296,14 @@ def check_constant_term_ref(
     """
     identity = (part.term_id, part.display)
     for case in ctx.comparable:
-        if _term_at(ctx.indexed[case.id][path], index) == identity:
+        # Rule 6 pins every comparable case to the baseline's template, so a
+        # pill here is a pill there; what may still differ is which term it
+        # names and how it reads, which is this rule's subject.
+        case_part = ctx.indexed[case.id][path].narration.parts[index]
+        assert isinstance(case_part, NarrationTermRef), (
+            'rule 6 admits only cases shaped like the baseline'
+        )
+        if (case_part.term_id, case_part.display) == identity:
             continue
         raise grouping_error(
             ctx.anchor,
@@ -199,14 +313,3 @@ def check_constant_term_ref(
             f'same in every case. Split the pill from the value: '
             f'{phase}(t"{{pg[\'Term\']}} {{value}} …").',
         )
-
-
-def _term_at(step: Step, index: int) -> tuple[TermId, str] | None:
-    """That case's `(term_id, display)` at `index`, or None when the part list
-    is shaped differently there."""
-    if index >= len(step.narration.parts):
-        return None
-    part = step.narration.parts[index]
-    if not isinstance(part, NarrationTermRef):
-        return None
-    return part.term_id, part.display

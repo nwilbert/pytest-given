@@ -269,22 +269,6 @@ def test_param(n):
         assert x
 """
 
-DIVERGENT_CASES = """
-import pytest
-from pytest_given import scenario, given, when, then
-
-@scenario("Divergent")
-@pytest.mark.parametrize("n", [1, 2])
-def test_divergent(n):
-    with given("a value"):
-        x = n
-    if n == 2:
-        with when("doubling"):
-            x = x * 2
-    with then("it is positive"):
-        assert x > 0
-"""
-
 TAGGED_GLOSSARY_CONFTEST = """
 from pytest_given import Glossary
 
@@ -343,15 +327,6 @@ def test_missing_phase_parametrized_scenario_reported_once(pytester):
     result = _run(pytester, PARAMETRIZED_TWO_PHASE, '--given-lint=true')
     result.assert_outcomes(passed=2)
     assert result.stdout.str().count('missing: when') == 1
-
-
-def test_divergent_case_structure_warns_naming_the_case(pytester):
-    result = _run(pytester, DIVERGENT_CASES, '--given-lint=true')
-    result.assert_outcomes(passed=2)
-    assert result.ret == 0
-    result.stdout.fnmatch_lines(
-        ['*WARN*divergent-case-structure*test_sample.py::test_divergent*[[]2[]]*']
-    )
 
 
 def test_tag_shadows_term_warns_on_slug_collision(pytester):

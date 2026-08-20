@@ -13,7 +13,7 @@ This is the authoring-relevant surface, version-matched to the installed package
 
 ## Core
 
-- **`@scenario(name, tags=None, story=None)`** — marks a test for the report; required for it to appear. `name` is a plain string, a `Template` (for parametrized names), or a t-string whose interpolations are all glossary handles (they render as term pills in the title). `story=` binds the scenario to a `story(...)` for coverage.
+- **`@scenario(name, tags=None, story=None, group_parametrized=True)`** — marks a test for the report; required for it to appear. `name` is a plain string, a `Template` (for parametrized names), or a t-string whose interpolations are all glossary handles (they render as term pills in the title). `story=` binds the scenario to a `story(...)` for coverage.
 - **`given(text)` / `when(text)` / `then(text)`** — dual-purpose:
   - **Context manager** in a test body: `with when('…'): result = sut(x)`. Steps nest freely.
   - **Fixture decorator** — `@given` only (`@pytest.fixture` then `@given('…')`); `@when`/`@then` on a fixture is rejected at runtime, and the label must be a plain string. Generator fixtures work; recording steps after `yield` is not allowed.
@@ -39,8 +39,9 @@ Hard rules (each raises `PytestGivenError`):
 ## Parametrized tests
 
 - All cases group into **one scenario with a parameter table**. T-string interpolations naming a parametrize column render as colored values per row.
-- **The baseline case's steps are the template for every row** (the first case that passed) — narration that branches on a parameter value silently shows that one case's shape for all rows (see [scenarios.md](scenarios.md)).
-- Only the *structure* comes from the baseline: a narrated value or an attachment payload that varies across cases becomes its own case-table column, and five authoring forms that cannot be rendered honestly raise `PytestGivenError` instead of shipping a wrong report (see [scenarios.md](scenarios.md)).
+- **The baseline case's steps are the template for every row** (the first case that passed). Every passed case must narrate that same template: a case whose step structure, narration shape, wording or interpolated expression differs raises `PytestGivenError` rather than being rendered as the baseline's (see [scenarios.md](scenarios.md)).
+- Only the *structure* comes from the baseline: a narrated value or an attachment payload that varies across cases becomes its own case-table column, and six authoring forms that cannot be rendered honestly raise `PytestGivenError` instead of shipping a wrong report (see [scenarios.md](scenarios.md)).
+- **Narration that genuinely branches per case**: `@scenario(..., group_parametrized=False)` declines the merge and emits one scenario per case, each titled `<name> [<parametrize id>]` with any `Template` placeholders substituted per case first. No case table. On an unparametrized test it raises at collection.
 - Parametrized **scenario name**: `@scenario(Template('Brew {cup_size} ml'))`.
 - Surface a parametrize value as a `given`: `Annotated[int, given(Template('a {cup_size} ml cup'))]` on the parameter.
 

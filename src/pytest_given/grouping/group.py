@@ -15,11 +15,15 @@ from ..model import (
     Step,
     StepPath,
     node_base,
-    structure_signature,
     walk_steps,
 )
-from .checks import check_rebound_params, check_varying_str_narration
+from .checks import (
+    check_rebound_params,
+    check_same_template,
+    check_varying_str_narration,
+)
 from .columns import GroupContext, param_cell, param_cell_formats
+from .percase import per_case_scenarios
 from .templatize import templatize_narration, templatize_steps
 
 
@@ -41,7 +45,12 @@ def group_parametrized(
         else:
             result.append(scenario)
 
-    result.extend(_grouped_scenario(groups[key], param_info) for key in group_order)
+    for key in group_order:
+        cases = groups[key]
+        if param_info[cases[0].id].group:
+            result.append(_grouped_scenario(cases, param_info))
+        else:
+            result.extend(per_case_scenarios(cases, param_info))
 
     return result
 
@@ -50,7 +59,7 @@ def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
     first = group[0]
     param_names = list(param_info[first.id].names)
     baseline = _baseline(group)
-    comparable = _comparable(group, baseline)
+    comparable = _comparable(group)
     indexed = _indexed(comparable)
     ctx = GroupContext(
         param_names=param_names,
@@ -58,6 +67,7 @@ def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
         indexed=indexed,
         anchor=first,
     )
+    check_same_template(baseline, ctx)
     check_varying_str_narration(baseline, ctx)
     for scenario in group:
         if scenario.status == 'passed':
@@ -74,16 +84,12 @@ def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
 
     cases: list[ParameterCase] = []
     total_duration = 0
-    comparable_ids = {s.id for s in comparable}
     for scenario in group:
         cases.append(
             ParameterCase(
                 values=[ctx.cells[c.id].get(scenario.id) for c in ctx.columns],
                 status=scenario.status,
                 error=scenario.error,
-                divergent=(
-                    scenario.status == 'passed' and scenario.id not in comparable_ids
-                ),
             )
         )
         total_duration += scenario.duration_ms
@@ -120,20 +126,15 @@ def _baseline(group: list[Scenario]) -> Scenario:
     return next((s for s in group if s.steps), group[0])
 
 
-def _comparable(group: list[Scenario], baseline: Scenario) -> list[Scenario]:
-    """The passed cases whose step structure matches the baseline's.
+def _comparable(group: list[Scenario]) -> list[Scenario]:
+    """The passed cases — every one of them.
 
-    A case that branched differently is positionally incomparable — lining a
-    `when` up against a `given` would raise a rejected-form error about two
-    unrelated steps. Divergence stays `divergent-case-structure`'s business;
-    such a case drops out of validation exactly as it drops out of cell-filling.
+    Rule 6 has already refused any group whose passed cases narrate different
+    templates, so positional comparison is safe by construction here. A
+    non-passed case still drops out: a skipped one records no steps and a
+    failed one may abort mid-tree.
     """
-    signature = structure_signature(baseline.steps)
-    return [
-        s
-        for s in group
-        if s.status == 'passed' and structure_signature(s.steps) == signature
-    ]
+    return [s for s in group if s.status == 'passed']
 
 
 def _indexed(scenarios: list[Scenario]) -> dict[NodeId, dict[StepPath, Step]]:

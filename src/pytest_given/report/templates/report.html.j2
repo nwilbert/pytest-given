@@ -362,7 +362,6 @@
             {% endif %}
             {% endfor %}
             <td style="text-align:right">
-              {% if case.divergent %}<span class="case-divergent" title="Steps differ from the other cases, so the grouped tree is not this one and its columns stay blank.">≠</span>{% endif %}
               {% if case.status == 'passed' %}<span class="dot-passed">✓</span>{% elif case.status == 'skipped' %}<span class="dot-skipped">○</span>{% else %}<span class="dot-failed">✗</span>{% endif %}
             </td>
           </tr>

@@ -200,10 +200,22 @@ type RawParamValue = object
 
 
 class ParamSpec(NamedTuple):
-    """Parameter names and raw values for a single parametrized test run."""
+    """Parameter names and raw values for a single parametrized test run.
+
+    `group` carries `@scenario(group_parametrized=...)`: False declines the
+    merge and emits this case as its own scenario. It rides here rather than on
+    `Scenario` because the grouping pass already reads a `ParamSpec` per case
+    and `param_info` is runtime-only — the report schema stays untouched.
+    """
 
     names: list[str]
     values: list[RawParamValue]
+    group: bool = True
+
+    def mapping(self) -> dict[str, RawParamValue]:
+        """This case's parameters by name — the pairing of the two lists,
+        defined once for everything that needs to look a name up."""
+        return dict(zip(self.names, self.values, strict=True))
 
 
 # Maps node IDs to their parameter specification
@@ -354,18 +366,11 @@ type CellValue = ParamValue | Attachment
 @dataclass
 class ParameterCase:
     """One parametrize case: its cells, positionally aligned with the table's
-    columns.
-
-    `divergent` marks a case that passed while recording a different step
-    structure than the grouped tree. Such a case fills no generated cell, so
-    without the mark its blanks read as missing data next to a ✓. (A skipped or
-    failed case fills none either, but its status already says why.)
-    """
+    columns."""
 
     values: list[CellValue | None]
     status: str = 'passed'
     error: ErrorInfo | None = None
-    divergent: bool = False
 
 
 @dataclass

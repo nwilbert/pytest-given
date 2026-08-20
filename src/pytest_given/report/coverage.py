@@ -211,7 +211,7 @@ def pill_display(
 
 def param_case_displays(scenario: Scenario) -> list[dict[str, str]]:
     """One `{param column name: cell text}` mapping per case the grouped tree
-    speaks for — passed and not divergent — or `[]`.
+    speaks for — the passed ones — or `[]`.
 
     Empty when the scenario has no term ref bound to a parametrize column —
     the grouped tree then already tells the whole truth and callers keep their
@@ -219,12 +219,8 @@ def param_case_displays(scenario: Scenario) -> list[dict[str, str]]:
 
     A case that did not pass exercised nothing, so its value must not stand in
     for a pill: it would satisfy a story activity and be listed in the Glossary
-    as an observed instance. A divergent case is excluded for the same reason
-    one step further on — it passed, but through a different step structure, so
-    the tree walked here is not its own and its value would credit steps it
-    never recorded in this shape. That is what the `≠` marker and its blank
-    generated cells already say; coverage and the Glossary say it too rather
-    than contradicting the table beside them.
+    as an observed instance. A passed case always speaks for the tree walked
+    here — rule 6 refuses to merge cases that narrate anything else.
 
     With no such case at all the result is empty, which puts callers back on
     the baseline — the same single pass an unparametrized failing scenario
@@ -248,5 +244,5 @@ def param_case_displays(scenario: Scenario) -> list[dict[str, str]]:
             if column.kind == 'param' and column.name in linked and value is not None
         }
         for case in scenario.parameters.cases
-        if case.status == 'passed' and not case.divergent
+        if case.status == 'passed'
     ]

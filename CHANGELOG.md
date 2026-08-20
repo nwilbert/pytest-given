@@ -17,6 +17,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
   rootdir name in the Markdown heading and the HTML tab title and topbar.
 - A parametrized scenario's cases now share one narrated step tree above a
   typed case table, instead of case 1's values standing in for all of them.
+- `@scenario(group_parametrized=False)` declines that merge and emits each case
+  as its own scenario, titled by its parametrize id with any `Template`
+  placeholders substituted per case.
 - A varying attachment payload becomes an `attachment` column of its own,
   leaving a badge in the step that points at it.
 - The HTML report's sidebar gains **Terms** as a third browse axis beside Tags
@@ -51,6 +54,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
   (`{id, name, kind}`), cells may hold an attachment object, placeholder parts
   gain `column_id`, and a grouped step's `narration.text` is the template
   rather than case 1's rendering.
+- **Breaking.** A parametrized scenario whose passed cases narrate different
+  templates — a different step structure, a differently shaped narration,
+  different wording, or a different interpolated expression — now raises
+  `PytestGivenError`; add `@scenario(..., group_parametrized=False)` to emit one
+  scenario per case instead.
 - `activity(..., id=N)` is now `activity(..., activity_id=N)`; the
   `Activity.id` field itself is unchanged.
 - The bundled authoring skill's tagging guidance now argues for sparse tagging:
@@ -60,6 +68,14 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The Scenarios sidebar and its header chips are visually tidied: a selected
   row and the chip mirroring it now share one shape, unselected groups no
   longer dim, and chips name a term the way the glossary does.
+
+### Removed
+
+- **Breaking.** The `divergent-case-structure` lint rule; delete any
+  `given_lint_rules` or `given_lint_ignore` entry naming it, which would
+  otherwise fail config parsing.
+- **Breaking (JSON report).** `divergent` on a parameter-table case, which the
+  rejected form above makes impossible.
 
 ### Fixed
 

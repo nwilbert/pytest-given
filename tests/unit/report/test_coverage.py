@@ -1,5 +1,3 @@
-from dataclasses import replace
-
 import pytest
 
 from pytest_given import given, scenario, then, when
@@ -582,30 +580,6 @@ def test_coverage_finds_an_activity_anchored_on_a_non_baseline_case(
 ) -> None:
     glossary, story, scenario = guest_scenario
     assert ActivityId(1) in compute_coverage(glossary, scenario, story)
-
-
-@scenario(
-    t'A divergent {pg["Case"].low} does not lend its value to {pg["Coverage"]}',
-    tags=['parametrization'],
-)
-def test_coverage_ignores_a_divergent_case(
-    guest_scenario: tuple[Glossary, Story, Scenario],
-) -> None:
-    with given(t'an {pg["Activity"]} anchored on the second {pg["Case"]} alone'):
-        glossary, story, scenario = guest_scenario
-        table = scenario.parameters
-        assert table is not None
-    with when(t'that {pg["Case"]} recorded a different {pg["Step"]} structure'):
-        scenario = replace(
-            scenario,
-            parameters=replace(
-                table,
-                cases=[table.cases[0], replace(table.cases[1], divergent=True)],
-            ),
-        )
-        coverage = compute_coverage(glossary, scenario, story)
-    with then(t'no {pg["Activity"]} is covered — the tree walked is not its own'):
-        assert coverage == {}
 
 
 def test_coverage_does_not_mix_displays_from_two_cases(

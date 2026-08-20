@@ -37,8 +37,7 @@ def _rule_findings(findings, rule):
     return [f for f in findings if f.rule == RuleId(rule)]
 
 
-# --- Runtime rules: missing-phase, divergent-case-structure,
-# --- tag-shadows-term, dead-term ---
+# --- Runtime rules: missing-phase, tag-shadows-term, dead-term ---
 
 
 def _phases_scenario(node_id, phases, *, status='passed', steps=None, tags=None):
@@ -53,8 +52,8 @@ def _phases_scenario(node_id, phases, *, status='passed', steps=None, tags=None)
     )
 
 
-def _runtime(grouped=(), per_case=(), glossary=None, stories=()):
-    return run_runtime_rules(list(grouped), list(per_case), glossary, list(stories))
+def _runtime(grouped=(), glossary=None, stories=()):
+    return run_runtime_rules(list(grouped), glossary, list(stories))
 
 
 def test_missing_phase_fires_on_passed_two_phase_scenario() -> None:
@@ -102,64 +101,6 @@ def test_missing_phase_without_scenario_source_omits_location() -> None:
 
 def _case(node_id, phases, *, status='passed'):
     return _phases_scenario(node_id, phases, status=status)
-
-
-def test_divergent_case_structure_passes_matching_cases() -> None:
-    cases = [
-        _case('test_x.py::test_a[1]', ['given', 'when', 'then']),
-        _case('test_x.py::test_a[2]', ['given', 'when', 'then']),
-    ]
-    assert _runtime(per_case=cases) == []
-
-
-def test_divergent_case_structure_fires_once_naming_the_case() -> None:
-    cases = [
-        _case('test_x.py::test_a[1]', ['given', 'when', 'then']),
-        _case('test_x.py::test_a[2]', ['given', 'then']),
-        _case('test_x.py::test_a[3]', ['given', 'then']),
-    ]
-    [finding] = _runtime(per_case=cases)
-    assert finding.rule == RuleId('divergent-case-structure')
-    assert finding.severity == 'warn'
-    assert finding.subject == 'test_x.py::test_a'
-    assert '[2]' in finding.message
-    assert '[3]' in finding.message
-
-
-def test_divergent_case_structure_detects_nested_differences() -> None:
-    nested = [
-        _step('given', 'g', None),
-        _step('when', 'w', None, [_step('when', 'sub', None)]),
-        _step('then', 't', None),
-    ]
-    flat = [
-        _step('given', 'g', None),
-        _step('when', 'w', None),
-        _step('then', 't', None),
-    ]
-    cases = [
-        _phases_scenario('test_x.py::test_a[1]', [], steps=nested),
-        _phases_scenario('test_x.py::test_a[2]', [], steps=flat),
-    ]
-    [finding] = _runtime(per_case=cases)
-    assert finding.rule == RuleId('divergent-case-structure')
-
-
-def test_divergent_case_structure_exempts_non_passed_cases() -> None:
-    cases = [
-        _case('test_x.py::test_a[1]', ['given', 'when', 'then']),
-        _case('test_x.py::test_a[2]', ['given'], status='failed'),
-        _case('test_x.py::test_a[3]', [], status='skipped'),
-    ]
-    assert _runtime(per_case=cases) == []
-
-
-def test_divergent_case_structure_ignores_unparametrized_scenarios() -> None:
-    cases = [
-        _case('test_x.py::test_a', ['given', 'when', 'then']),
-        _case('test_x.py::test_b', ['given', 'then']),
-    ]
-    assert _runtime(per_case=cases) == []
 
 
 def _glossary(*names):

@@ -96,6 +96,23 @@ def test_brew(machine, cup_size):
 
 
 @scenario(
+    Template('Serve a {cup_size} ml cup (one scenario per case)'),
+    group_parametrized=False,
+)
+@pytest.mark.parametrize('cup_size', [200, 400])
+def test_serve(machine, cup_size):
+    # The large cup needs a step the small one doesn't, so the cases have no
+    # shared tree to merge into — hence group_parametrized=False.
+    if cup_size > 300:
+        with given('the barista reaches for a takeaway cup'):
+            machine['takeaway'] = True
+    with when(t'I order a {cup_size} ml cup'):
+        machine['coffees'] -= 1
+    with then('the machine has one fewer coffee'):
+        assert machine['coffees'] == 9
+
+
+@scenario(
     Template('Brew a {flavor} coffee (per-case columns)'),
     tags=['pricing'],
 )

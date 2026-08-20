@@ -101,6 +101,25 @@ def render_interpolation(value: Any, conversion: str | None, format_spec: str) -
     return format(_FORMATTER.convert_field(value, conversion), format_spec)
 
 
+def placeholder_value(part: NarrationPlaceholder, value: Any) -> NarrationValue:
+    """One `Template` placeholder resolved against the value bound to its name.
+
+    The single definition of that conversion, for the same reason
+    `render_interpolation` is the single definition of the rendering it wraps:
+    the helper-decorator path resolves against bound arguments and the per-case
+    path against a case's parameters, and a second copy would let the recorded
+    shape drift between them. Each caller keeps its own lookup, since what a
+    missing name means differs — a helper's signature has already been bound,
+    while a per-case placeholder naming no column is an author's typo.
+    """
+    return NarrationValue(
+        rendered=render_interpolation(value, part.conversion, part.format_spec),
+        expression=part.name,
+        format_spec=part.format_spec,
+        conversion=part.conversion,
+    )
+
+
 def parse_tstring(
     tstring: templatelib.Template,
 ) -> tuple[str, list[NarrationPart]]:

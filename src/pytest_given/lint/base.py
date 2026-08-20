@@ -52,7 +52,6 @@ RULES: tuple[LintRule, ...] = (
     LintRule(id=RuleId('check-outside-then'), surface='ast', default='warn'),
     LintRule(id=RuleId('action-in-then'), surface='ast', default='warn'),
     LintRule(id=RuleId('unused-interpolation'), surface='ast', default='warn'),
-    LintRule(id=RuleId('divergent-case-structure'), surface='runtime', default='warn'),
     LintRule(id=RuleId('tag-shadows-term'), surface='runtime', default='warn'),
     LintRule(id=RuleId('dead-term'), surface='runtime', default='off'),
 )

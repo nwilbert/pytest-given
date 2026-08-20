@@ -1,5 +1,3 @@
-from dataclasses import replace
-
 import pytest
 
 from pytest_given import attach, given, scenario, then, when
@@ -774,38 +772,6 @@ def test_glossary_view_lists_every_case_instance_of_a_param_linked_pill(
     )
     aggs = build_glossary_aggregations(report)
     assert {i.display for i in aggs[TermId('guest')].instances} == {'Alice', 'Bob'}
-
-
-@scenario(
-    t'A divergent {pg["Case"].low} contributes no {pg["Instance"]} to the '
-    t'{pg["Glossary"].low}',
-    tags=['parametrization'],
-)
-def test_glossary_view_omits_a_divergent_cases_instance(
-    guest_scenario: tuple[Glossary, Story, Scenario],
-) -> None:
-    with given(t'a {pg["Parametrized scenario"]} whose second {pg["Case"]} diverged'):
-        glossary, _story, scenario = guest_scenario
-        table = scenario.parameters
-        assert table is not None
-        scenario = replace(
-            scenario,
-            parameters=replace(
-                table,
-                cases=[table.cases[0], replace(table.cases[1], divergent=True)],
-            ),
-        )
-    with when(t'the {pg["Glossary"]} aggregations are built'):
-        report = ReportData(
-            metadata=Metadata(
-                project='p', timestamp='t', pytest_version='9', plugin_version='0'
-            ),
-            scenarios=[scenario],
-            glossary=glossary,
-        )
-        aggs = build_glossary_aggregations(report)
-    with then(t'only the {pg["Case"]} the grouped tree speaks for is listed'):
-        assert {i.display for i in aggs[TermId('guest')].instances} == {'Alice'}
 
 
 def test_a_pill_is_not_listed_for_a_case_that_has_no_value_for_it() -> None:

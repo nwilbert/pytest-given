@@ -276,13 +276,16 @@ def pytest_unconfigure(config: pytest.Config) -> None:
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     """Validate Template-named scenarios and story bindings eagerly at collection.
 
-    Three checks:
+    Four checks:
     1. A Template-named scenario must be parametrized (its substitution source
        is `callspec.params`).
     2. Every Template placeholder must match a parametrize column name —
        catches typos at `pytest --collect-only` rather than at session-finish
        grouping, where the error would escape `pytest_sessionfinish` opaquely.
     3. Any activity_ids on the scenario must be valid ids within the story.
+    4. `group_parametrized=False` must have a parametrization to decline —
+       otherwise the flag would silently do nothing, since an unparametrized
+       scenario never reaches the grouping pass at all.
 
     Deferred to collection time (rather than decoration time) because
     @scenario and @pytest.mark.parametrize can appear in either order, and
@@ -294,9 +297,15 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
         if marker is None:
             continue
         _validate_scenario_story_binding(item, marker)
+        callspec = getattr(item, 'callspec', None)
+        if not marker.group_parametrized and callspec is None:
+            raise PytestGivenError(
+                f'@scenario(group_parametrized=False) on {item.nodeid!r} has '
+                f'nothing to opt out of; the test is not parametrized. Drop '
+                f'the argument, or add @pytest.mark.parametrize.'
+            )
         if not isinstance(marker.name, Template):
             continue
-        callspec = getattr(item, 'callspec', None)
         if callspec is None:
             raise PytestGivenError(
                 f'@scenario(Template(...)) on {item.nodeid!r} requires '
@@ -364,13 +373,15 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     set_active_collector(collector)
     # Pre-fixture-setup work done; let pytest run fixture setup here.
     yield
-    _capture_param_spec(item, collector, node_id)
+    _capture_param_spec(
+        item, collector, node_id, group=scenario_marker.group_parametrized
+    )
     _graft_fixture_recordings(item, collector)
     collector.start_times[node_id] = time.monotonic()
 
 
 def _capture_param_spec(
-    item: pytest.Item, collector: Collector, node_id: NodeId
+    item: pytest.Item, collector: Collector, node_id: NodeId, *, group: bool
 ) -> None:
     """Snapshot the parametrize arguments as the test is about to see them.
 
@@ -394,6 +405,7 @@ def _capture_param_spec(
     collector.param_info[node_id] = ParamSpec(
         names=names,
         values=[_snapshot(funcargs.get(name, callspec.params[name])) for name in names],
+        group=group,
     )
 
 
@@ -793,7 +805,7 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             md_path.parent.mkdir(parents=True, exist_ok=True)
             md_path.write_text(md, encoding='utf-8')
 
-    _run_lint(session, scenarios, collector.scenarios, glossary, stories)
+    _run_lint(session, scenarios, glossary, stories)
 
 
 def _discard_stale_sinks(config: pytest.Config) -> list[str]:
@@ -820,7 +832,6 @@ def _discard_stale_sinks(config: pytest.Config) -> list[str]:
 def _run_lint(
     session: pytest.Session,
     scenarios: list[Scenario],
-    per_case: list[Scenario],
     glossary: Glossary | None,
     stories: list[Story],
 ) -> None:
@@ -830,7 +841,7 @@ def _run_lint(
     if not _lint_enabled(config):
         return
     findings = apply_config(
-        run_runtime_rules(scenarios, per_case, glossary, stories)
+        run_runtime_rules(scenarios, glossary, stories)
         + run_ast_rules(scenarios, Path(config.rootpath)),
         parse_rule_levels(config.getini('given_lint_rules')),
         parse_ignore_entries(config.getini('given_lint_ignore')),

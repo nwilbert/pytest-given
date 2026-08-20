@@ -18,7 +18,7 @@ stories[]     one entry per story(...)
 | `tags[]` | `tags=` from `@scenario` — report metadata, **not** pytest marks |
 | `status` | `passed` / `failed` / `skipped` |
 | `steps[]` | Recursive step tree (see below) |
-| `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{values, status, error, divergent}]}` for parametrized scenarios. `kind` is `param` / `derived` / `attachment`; a case's `values` is positionally aligned with `columns`, and an `attachment` cell is an `{label, content, content_type}` object (or `null` for a case with no value). `divergent` marks a case that passed on a different step structure than the grouped tree, which is why its generated cells are `null` |
+| `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{values, status, error}]}` for parametrized scenarios. `kind` is `param` / `derived` / `attachment`; a case's `values` is positionally aligned with `columns`, and an `attachment` cell is an `{label, content, content_type}` object (or `null` for a case with no value). A scenario opted out of grouping with `group_parametrized=False` has `parameters: null` like any unparametrized one |
 | `error` | `null`, or `{message, frames: [{path, lineno, func, code}]}` |
 | `source` | `{relpath, line}` — the test function's definition site |
 | `story_id` / `activity_ids` | Story binding from `@scenario(..., story=...)` |

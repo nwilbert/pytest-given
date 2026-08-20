@@ -15,32 +15,25 @@ from ..model import (
     Scenario,
     Story,
     TermId,
-    case_suffix,
     id_derive,
     iter_steps,
     location_suffix,
-    node_base,
-    structure_signature,
 )
 from .base import RULES_BY_ID, Finding, RuleId
 
 
 def run_runtime_rules(
     grouped: list[Scenario],
-    per_case: list[Scenario],
     glossary: Glossary | None,
     stories: list[Story],
 ) -> list[Finding]:
     """Run the runtime-surface rules over the recorded report model.
 
-    `missing-phase` and the glossary rules evaluate the grouped scenario list
-    (one evaluation per logical scenario); `divergent-case-structure` needs
-    the pre-grouping per-case list — the only place per-case step structure
-    exists, since grouping collapses every case onto case 1's tree.
+    Every rule here evaluates the grouped scenario list — one evaluation per
+    logical scenario.
     """
     findings: list[Finding] = []
     findings.extend(_missing_phase_findings(grouped))
-    findings.extend(_divergent_case_findings(per_case))
     if glossary is not None:
         findings.extend(_tag_shadows_term_findings(grouped, glossary))
         findings.extend(_dead_term_findings(grouped, glossary, stories))
@@ -70,47 +63,6 @@ def _missing_phase_findings(grouped: list[Scenario]) -> list[Finding]:
                     RuleId('missing-phase'),
                     scenario,
                     f'missing: {", ".join(missing)}',
-                )
-            )
-    return findings
-
-
-def _divergent_case_findings(per_case: list[Scenario]) -> list[Finding]:
-    """Rule `divergent-case-structure`: a parametrize case records a
-    different step structure than case 1.
-
-    Groups the pre-grouping cases by node-id base. Non-passed cases are
-    exempt (skipped cases record no steps; failed cases abort mid-tree), so
-    the baseline is the first passed case. One finding per scenario, naming
-    the diverging case ids.
-    """
-    groups: dict[str, list[Scenario]] = {}
-    for scenario in per_case:
-        if '[' in scenario.id:
-            groups.setdefault(node_base(scenario.id), []).append(scenario)
-    findings: list[Finding] = []
-    for base, cases in groups.items():
-        passed = [case for case in cases if case.status == 'passed']
-        if len(passed) < 2:
-            continue
-        baseline = structure_signature(passed[0].steps)
-        diverging = [
-            case_suffix(case.id)
-            for case in passed[1:]
-            if structure_signature(case.steps) != baseline
-        ]
-        if diverging:
-            findings.append(
-                Finding(
-                    rule=RuleId('divergent-case-structure'),
-                    severity=RULES_BY_ID[RuleId('divergent-case-structure')].default,
-                    subject=base,
-                    node_id=NodeId(base),
-                    location=passed[0].source,
-                    message=(
-                        f'cases {", ".join(diverging)} record a different step '
-                        f'structure than case {case_suffix(passed[0].id)}'
-                    ),
                 )
             )
     return findings

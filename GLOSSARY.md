@@ -25,8 +25,8 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Parametrized scenario** | A `@scenario`-decorated test that also carries `@pytest.mark.parametrize(...)`. Produces multiple scenario records during a run; pytest-given groups them. |
 | **Case** | One row of a parametrized scenario — a single tuple of parameter values, its status, and any error. |
 | **Parameter table** | The per-scenario grouping of typed columns + cases. A column is a `param` (a `@pytest.mark.parametrize` input), a `derived` (a narrated value that varies across cases) or an `attachment` (an attachment whose payload varies). Appears in the report below the grouped-template steps. |
-| **Group** | Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a parameter table. Scenarios group when they share the same name and module. |
-| **Templatize** | Derive the grouped-template step text by comparing every comparable case: what all of them share stays inline, and anything that varies becomes a `{name}` placeholder or attachment badge pointing at a parameter-table column. The baseline tree comes from the first passed case. |
+| **Group** | Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a parameter table. Scenarios group when they share the same name and module. `@scenario(group_parametrized=False)` declines the merge, so each case leaves as its own scenario. |
+| **Templatize** | Derive the grouped-template step text by comparing every comparable case: what all of them share stays inline, and anything that varies becomes a `{name}` placeholder or attachment badge pointing at a parameter-table column. The baseline tree comes from the first passed case, and every other passed case must narrate that same template. |
 
 ## Fixtures and recording
 

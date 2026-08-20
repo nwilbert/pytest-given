@@ -44,7 +44,7 @@
 - **then** the machine has 9 coffees left
 
 ## ✓ Helper functions can record their own steps
-`examples/coffeeshop/test_coffeeshop.py:145::test_buy_with_validation` · checkout, validation
+`examples/coffeeshop/test_coffeeshop.py:162::test_buy_with_validation` · checkout, validation
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -62,7 +62,7 @@
       ```
 
 ## ✓ Top-level `given` block and deeply nested steps
-`examples/coffeeshop/test_coffeeshop.py:161::test_complex_order` · checkout, loyalty, discounts
+`examples/coffeeshop/test_coffeeshop.py:178::test_complex_order` · checkout, loyalty, discounts
 
 - **given** a coffee machine
 - **given** a loyalty card with 5 points
@@ -91,7 +91,7 @@
     ```
 
 ## ✓ An expected error, narrated as when + then (when_then)
-`examples/coffeeshop/test_coffeeshop.py:198::test_sold_out_is_rejected` · checkout, validation
+`examples/coffeeshop/test_coffeeshop.py:215::test_sold_out_is_rejected` · checkout, validation
 
 - **given** a coffee machine
 - **given** a machine that has sold its last coffee
@@ -99,7 +99,7 @@
 - **then** the machine reports it is sold out
 
 ## ✓ Many tags (the report collapses them behind a +N pill)
-`examples/coffeeshop/test_coffeeshop.py:215::test_discounted_purchase` · checkout, loyalty, discounts, pricing
+`examples/coffeeshop/test_coffeeshop.py:232::test_discounted_purchase` · checkout, loyalty, discounts, pricing
 
 - **given** a coffee machine
 - **given** a loyalty card good for a $1 discount
@@ -108,13 +108,13 @@
 - **then** a coffee is dispensed
 
 ## ✗ Failure rendering (intentionally failing)
-`examples/coffeeshop/test_coffeeshop.py:231::test_failing`
+`examples/coffeeshop/test_coffeeshop.py:248::test_failing`
 
 - **given** a coffee machine
 - **then** the machine has 20 coffees
 
 ## ⤼ Skipped scenario rendering · skipped
-`examples/coffeeshop/test_coffeeshop.py:237::test_skipped` — reason: demonstrates skipped status
+`examples/coffeeshop/test_coffeeshop.py:254::test_skipped` — reason: demonstrates skipped status
 
 
 ## ✓ Parametrized test (renders as a parameter table) · 3 cases
@@ -155,8 +155,23 @@
 | 200 | ✓ |
 | 300 | ✓ |
 
+## ✓ Serve a 200 ml cup (one scenario per case) [200]
+`examples/coffeeshop/test_coffeeshop.py:98::test_serve`
+
+- **given** a coffee machine
+- **when** I order a 200 ml cup
+- **then** the machine has one fewer coffee
+
+## ✓ Serve a 400 ml cup (one scenario per case) [400]
+`examples/coffeeshop/test_coffeeshop.py:98::test_serve`
+
+- **given** a coffee machine
+- **given** the barista reaches for a takeaway cup
+- **when** I order a 400 ml cup
+- **then** the machine has one fewer coffee
+
 ## ✓ Brew a {flavor} coffee (per-case columns) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:98::test_flavor_columns` · pricing
+`examples/coffeeshop/test_coffeeshop.py:115::test_flavor_columns` · pricing
 
 - **given** a coffee machine
 - **given** the machine is primed for {flavor}
@@ -190,7 +205,7 @@
   ```
 
 ## ⤼ All cases skipped · skipped
-`examples/coffeeshop/test_coffeeshop.py:244::test_parametrized_all_skipped`
+`examples/coffeeshop/test_coffeeshop.py:261::test_parametrized_all_skipped`
 
 
 | n | |

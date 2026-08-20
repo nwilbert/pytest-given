@@ -23,7 +23,7 @@ from ..model import (
 )
 from .collector import get_active_collector
 from .source import capture_caller_source, code_source
-from .template import Template, narration_from, render_interpolation
+from .template import Template, narration_from, placeholder_value
 
 
 @runtime_checkable
@@ -263,11 +263,13 @@ class ScenarioDecorator:
         *,
         story: Story | None = None,
         activity_ids: tuple[ActivityId, ...] = (),
+        group_parametrized: bool = True,
     ) -> None:
         self.name: str | Template | Narration = name
         self.tags = tags
         self.story = story
         self.activity_ids = activity_ids
+        self.group_parametrized = group_parametrized
 
     def __call__(self, func: Callable[..., object]) -> ScenarioMarked:
         @functools.wraps(func)
@@ -408,15 +410,8 @@ def _resolve_template_parts(
         match part:
             case NarrationLiteral():
                 out.append(part)
-            case NarrationPlaceholder(name=name, format_spec=spec, conversion=conv):
-                out.append(
-                    NarrationValue(
-                        rendered=render_interpolation(mapping[name], conv, spec),
-                        expression=name,
-                        format_spec=spec,
-                        conversion=conv,
-                    )
-                )
+            case NarrationPlaceholder(name=name):
+                out.append(placeholder_value(part, mapping[name]))
     return out
 
 
@@ -461,6 +456,7 @@ def scenario(
     *,
     story: Story | None = None,
     activities: Sequence[int] | None = None,
+    group_parametrized: bool = True,
 ) -> ScenarioDecorator:
     """Mark a test for inclusion in the report."""
     resolved_name: str | Template | Narration
@@ -493,5 +489,9 @@ def scenario(
         tuple(ActivityId(i) for i in activities) if activities else ()
     )
     return ScenarioDecorator(
-        resolved_name, tags or [], story=story, activity_ids=activity_ids
+        resolved_name,
+        tags or [],
+        story=story,
+        activity_ids=activity_ids,
+        group_parametrized=group_parametrized,
     )
