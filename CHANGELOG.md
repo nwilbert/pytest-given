@@ -35,30 +35,32 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Changed
 
 - **Breaking.** Step narration must now be uniform across parametrize cases;
-  these raise `PytestGivenError` instead of quietly reporting case 1:
+  these now fail the run with `PytestGivenError`, writing no report, instead of
+  quietly reporting case 1:
 
   - a plain `str` (usually an f-string) that renders differently per case;
   - a varying interpolation that is not a bare name (`t"{cup_size * 0.01}"`,
     `t"{m.balance}"`);
   - a t-string narrating a parametrize name that no longer holds the case's
     value — either a local rebound it, or the body mutated it in place;
-  - a t-string or `Template` `attach` label;
+  - a t-string `attach` label — `attach` now takes a plain `str`;
   - a step whose set of `attach` labels differs between cases;
   - a glossary term ref whose pill varies. A pill that *is* a parametrize
-    value stays supported.
+    value stays supported;
+  - passed cases that narrate different templates altogether — a different step
+    structure, a differently shaped narration, different wording, or a
+    different interpolated expression.
 
-  The fix is the same throughout: bind the varying part to a local and narrate
-  it with a t-string, keeping labels and pills constant. Content may still vary
-  freely — that is what the new `attachment` column is for.
+  Every one but the last has the same fix: bind the varying part to a local and
+  narrate it with a t-string, keeping labels and pills constant. Content may
+  still vary freely — that is what the new `attachment` column is for. The last
+  has no such fix, because the cases genuinely differ: decline the merge with
+  `@scenario(..., group_parametrized=False)` and let each case be its own
+  scenario.
 - **Breaking (JSON report).** `parameters.names` becomes `parameters.columns`
   (`{id, name, kind}`), cells may hold an attachment object, placeholder parts
   gain `column_id`, and a grouped step's `narration.text` is the template
   rather than case 1's rendering.
-- **Breaking.** A parametrized scenario whose passed cases narrate different
-  templates — a different step structure, a differently shaped narration,
-  different wording, or a different interpolated expression — now raises
-  `PytestGivenError`; add `@scenario(..., group_parametrized=False)` to emit one
-  scenario per case instead.
 - `activity(..., id=N)` is now `activity(..., activity_id=N)`; the
   `Activity.id` field itself is unchanged.
 - The bundled authoring skill's tagging guidance now argues for sparse tagging:
@@ -74,8 +76,6 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** The `divergent-case-structure` lint rule; delete any
   `given_lint_rules` or `given_lint_ignore` entry naming it, which would
   otherwise fail config parsing.
-- **Breaking (JSON report).** `divergent` on a parameter-table case, which the
-  rejected form above makes impossible.
 
 ### Fixed
 
@@ -84,16 +84,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A cell now reads the way the step pointing at it read, carrying the
   interpolation's own format spec and, under `indirect=True`, the bound test
   argument.
-- Only a passing case with a value for the column contributes its glossary
-  instance and story coverage.
 - Attachment content now scrolls instead of being silently cut off, and
   attachment badges are keyboard-operable.
 - Jumping to a scenario from a story activity, or to a term's scenarios from
   the Glossary tab, now clears filters that would hide the target; the filters
   in a `#scenario=` deep link still win.
 - Accent-coloured text across the HTML report now meets WCAG AA.
-- A run that ends in a parametrize grouping error now deletes the report files
-  it was told to write, instead of leaving the previous run's behind.
 
 ## [0.1.0] - 2026-08-08
 
