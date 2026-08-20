@@ -36,6 +36,7 @@ from .aggregations import (
 from .inline_markdown import render_inline_markdown
 from .source_link import compile_source_link
 
+_TEMPLATES_DIR = Path(__file__).parent / 'templates'
 _NUM_PARAM_COLORS = 6
 
 # Maps parameter name to its color index (0-based, wraps at _NUM_PARAM_COLORS)
@@ -101,91 +102,93 @@ def render_html_string(
     writing any of them — a render that raises must not leave this run's JSON
     beside the previous run's HTML.
     """
-    raw_json = json.dumps(report_to_dict(report), indent=2)
-    # JSON escapes neither `</` nor `<!--` inside string literals, but we embed
-    # `raw_json` inside an inline <script>; an attachment containing `</script>`
-    # would close the tag and yield stored XSS, and one containing `<!--<script`
-    # would swallow the rest of the document. See `_neutralize_script_data`.
-    safe_report_json = _neutralize_script_data(raw_json)
+    env = _build_env(report, source_link_template)
+    html = env.get_template('report.html.j2').render(**_render_context(report))
+    assert isinstance(html, str)
+    return html
 
-    templates_dir = Path(__file__).parent / 'templates'
-    css = (templates_dir / 'styles.css').read_text(encoding='utf-8')
-    app_js = (templates_dir / 'app.js').read_text(encoding='utf-8')
-    alpine_js = (templates_dir / 'alpine.min.js').read_text(encoding='utf-8')
 
+def _build_env(
+    report: ReportData, source_link_template: str | None
+) -> jinja2.Environment:
+    """The Jinja environment: the template loader plus every filter and test
+    the report templates call."""
     env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(str(templates_dir)),
+        loader=jinja2.FileSystemLoader(str(_TEMPLATES_DIR)),
         autoescape=True,
     )
     env.globals['zip'] = zip
     # The step-tree macro branches on this: an AttachmentRef has no content to
     # expand, only a column to point at.
     env.tests['attachment_ref'] = lambda value: isinstance(value, AttachmentRef)
-
-    param_color_map = _build_param_color_map(report.scenarios)
-
     env.filters['source_url'] = _make_source_url_filter(
         template=source_link_template,
         project=report.metadata.project,
         commit_sha=report.metadata.commit_sha,
     )
-
-    coverage_maps = build_coverage_maps(report)
-    glossary_aggregations = build_glossary_aggregations(report)
-    story_rollups = build_story_rollups(report, coverage_maps)
-    scn_covers = build_scenario_activity_index(coverage_maps)
-    activity_labels = build_activity_labels(report)
-    visibility = tab_visibility(report)
-
-    story_ids_json = _script_json([story.id for story in report.stories])
-    term_ids_json = _script_json(
-        [term.id for term in report.glossary.terms]
-        if report.glossary is not None
-        else []
-    )
-    scenario_activities_json = _script_json(scn_covers)
-    activity_labels_json = _script_json(activity_labels)
-    term_scenario_index = build_term_scenario_index(report)
-    term_scenarios_json = _script_json(term_scenario_index)
-    scenario_slugs = build_scenario_slug_index(report)
-    scenario_slugs_json = _script_json(
-        {slug: node_id for node_id, slug in scenario_slugs.items()}
-    )
-
     env.filters['narration'] = _make_narration_filter(
-        param_color_map,
+        _build_param_color_map(report.scenarios),
         glossary=report.glossary,
     )
     env.filters['activity_part'] = _make_activity_part_filter(report.glossary)
     env.filters['inline_md'] = _inline_md
-    template = env.get_template('report.html.j2')
-    html = template.render(
-        metadata=report.metadata,
-        scenarios=report.scenarios,
-        stories=report.stories,
-        glossary=report.glossary,
-        coverage_maps=coverage_maps,
-        glossary_aggregations=glossary_aggregations,
-        tab_visibility=visibility,
-        story_rollups=story_rollups,
-        scn_covers=scn_covers,
-        scenario_activities_json=scenario_activities_json,
-        activity_labels_json=activity_labels_json,
-        report_json=Markup(safe_report_json),
-        story_ids_json=story_ids_json,
-        term_ids_json=term_ids_json,
-        term_scenarios_json=term_scenarios_json,
-        term_scenario_index=term_scenario_index,
-        scenario_slugs=scenario_slugs,
-        scenario_slugs_json=scenario_slugs_json,
-        css=Markup(css),
-        app_js=Markup(app_js),
-        alpine_js=Markup(alpine_js),
-        param_color_map=param_color_map,
-        num_param_colors=_NUM_PARAM_COLORS,
-    )
-    assert isinstance(html, str)
-    return html
+    return env
+
+
+def _render_context(report: ReportData) -> dict[str, object]:
+    """Everything `report.html.j2` reads, in three groups: the report model
+    itself, the precomputed aggregations, and the JSON blobs the page's Alpine
+    state is seeded from."""
+    coverage_maps = build_coverage_maps(report)
+    scn_covers = build_scenario_activity_index(coverage_maps)
+    activity_labels = build_activity_labels(report)
+    term_scenario_index = build_term_scenario_index(report)
+    scenario_slugs = build_scenario_slug_index(report)
+    term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
+    return {
+        'metadata': report.metadata,
+        'scenarios': report.scenarios,
+        'stories': report.stories,
+        'glossary': report.glossary,
+        'coverage_maps': coverage_maps,
+        'glossary_aggregations': build_glossary_aggregations(report),
+        'tab_visibility': tab_visibility(report),
+        'story_rollups': build_story_rollups(report, coverage_maps),
+        'scn_covers': scn_covers,
+        'term_scenario_index': term_scenario_index,
+        'scenario_slugs': scenario_slugs,
+        'param_color_map': _build_param_color_map(report.scenarios),
+        'num_param_colors': _NUM_PARAM_COLORS,
+        'scenario_activities_json': _script_json(scn_covers),
+        'activity_labels_json': _script_json(activity_labels),
+        'story_ids_json': _script_json([story.id for story in report.stories]),
+        'term_ids_json': _script_json(term_ids),
+        'term_scenarios_json': _script_json(term_scenario_index),
+        'scenario_slugs_json': _script_json(
+            {slug: node_id for node_id, slug in scenario_slugs.items()}
+        ),
+        # JSON escapes neither `</` nor `<!--` inside string literals, but this
+        # is embedded in an inline <script>; an attachment containing
+        # `</script>` would close the tag and yield stored XSS, and one
+        # containing `<!--<script` would swallow the rest of the document.
+        'report_json': Markup(
+            _neutralize_script_data(json.dumps(report_to_dict(report), indent=2))
+        ),
+        **_bundled_assets(),
+    }
+
+
+def _bundled_assets() -> dict[str, Markup]:
+    """The stylesheet and scripts inlined into the page — the whole reason the
+    report needs no server and no external asset."""
+    return {
+        name: Markup((_TEMPLATES_DIR / filename).read_text(encoding='utf-8'))
+        for name, filename in (
+            ('css', 'styles.css'),
+            ('app_js', 'app.js'),
+            ('alpine_js', 'alpine.min.js'),
+        )
+    }
 
 
 def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:

@@ -6,12 +6,14 @@ slugs. Each `build_*` takes the report and returns one indexed view of it.
 """
 
 from collections import Counter
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 
 from ..model import (
     ActivityId,
     ActivityPath,
     ActivityTermRef,
+    Glossary,
     NarrationTermRef,
     NodeId,
     ReportData,
@@ -202,88 +204,115 @@ def build_glossary_aggregations(
 ) -> dict[TermId, GlossaryAggregation]:
     """Build per-term aggregations from scenarios and stories.
 
-    Walks:
-    1. All scenario steps (recursively) to collect entity instances and
-       occurrence counts.
-    2. All story activity paths to collect verb surface forms and story refs.
+    Two walks feed one index: scenario steps contribute entity instances, and
+    story activity prose contributes story refs, more instances, and verb
+    surface forms. `_GlossaryIndex` owns the dedup, so each walk just reports
+    what it sees.
     """
     glossary = report.glossary
     if glossary is None:
         return {}
-
-    aggs: dict[TermId, GlossaryAggregation] = {}
-    # Track which (term_id, display) pairs have been seen to avoid duplicate
-    # instance entries; keyed by (term_id, display) → fixture_name of first
-    # observation.
-    seen_instances: dict[tuple[TermId, str], str | None] = {}
-    # Track which (term_id, display) verb forms have been seen.
-    seen_forms: set[tuple[TermId, str]] = set()
-    # Track which (term_id, story_id) story refs have been recorded.
-    seen_story_refs: set[tuple[TermId, StoryId]] = set()
-
-    def _ensure(term_id: TermId) -> GlossaryAggregation:
-        if term_id not in aggs:
-            aggs[term_id] = GlossaryAggregation()
-        return aggs[term_id]
-
-    # --- Walk scenario steps ---
+    index = _GlossaryIndex(glossary)
     for scenario in report.scenarios:
         cases = param_case_displays(scenario)
-        for _, step in walk_steps(scenario.steps):
+        for _path, step in walk_steps(scenario.steps):
             for part in step.narration.parts:
                 if not isinstance(part, NarrationTermRef):
-                    continue
-                term = glossary.get(part.term_id)
-                if term is None or term.kind not in ('actor', 'object'):
                     continue
                 # A pill bound to a parametrize column reads the baseline's
                 # display in the grouped tree; collect one instance per case so
                 # the Glossary view lists them all.
                 for display in _pill_displays(part, cases):
-                    _record_entity_observation(
-                        agg=_ensure(part.term_id),
-                        term_id=part.term_id,
-                        display=display,
-                        canonical=term.canonical,
-                        fixture_name=step.fixture_name,
-                        seen_instances=seen_instances,
+                    index.record_instance(
+                        part.term_id, display, fixture_name=step.fixture_name
                     )
-
-    # --- Walk story activities ---
     for story in report.stories:
-        for activity in story.activities:
-            for path in activity.paths:
-                for apath_part in path.parts:
-                    if isinstance(apath_part, ActivityTermRef):
-                        term = glossary.get(apath_part.term_id)
-                        if term is None:
-                            continue
-                        agg = _ensure(apath_part.term_id)
-                        _record_story_ref(
-                            agg=agg,
-                            term_id=apath_part.term_id,
-                            story_id=story.id,
-                            seen_story_refs=seen_story_refs,
-                        )
-                        if term.kind in ('actor', 'object'):
-                            _record_entity_observation(
-                                agg=agg,
-                                term_id=apath_part.term_id,
-                                display=apath_part.display,
-                                canonical=term.canonical,
-                                fixture_name=None,
-                                seen_instances=seen_instances,
-                            )
-                        elif term.kind == 'verb':
-                            form_key = (apath_part.term_id, apath_part.display)
-                            if form_key not in seen_forms:
-                                if apath_part.display != term.canonical:
-                                    agg.forms.append(
-                                        TermForm(display=apath_part.display)
-                                    )
-                                seen_forms.add(form_key)
+        for ref in _story_term_refs(story):
+            # Each `record_*` no-ops for a term of the wrong kind, so the walk
+            # states what it saw rather than re-deriving which bucket it lands in.
+            index.record_story_ref(ref.term_id, story.id)
+            index.record_instance(ref.term_id, ref.display)
+            index.record_form(ref.term_id, ref.display)
+    return index.result()
 
-    return aggs
+
+def _story_term_refs(story: Story) -> Iterator[ActivityTermRef]:
+    """Every glossary reference in a story's activity prose."""
+    return (
+        part
+        for activity in story.activities
+        for path in activity.paths
+        for part in path.parts
+        if isinstance(part, ActivityTermRef)
+    )
+
+
+class _GlossaryIndex:
+    """Accumulates the Glossary view's cross-references, deduping as it goes.
+
+    Owns the three "already recorded" sets that the walks would otherwise have
+    to thread through every helper. Every `record_*` is idempotent for a given
+    identity and silently ignores a term whose kind the bucket does not take,
+    so a caller can report an observation without first working out where it
+    belongs.
+    """
+
+    def __init__(self, glossary: Glossary) -> None:
+        self._glossary = glossary
+        self._aggs: dict[TermId, GlossaryAggregation] = {}
+        self._instances: set[tuple[TermId, str]] = set()
+        self._forms: set[tuple[TermId, str]] = set()
+        self._story_refs: set[tuple[TermId, StoryId]] = set()
+
+    def result(self) -> dict[TermId, GlossaryAggregation]:
+        """The aggregations, keyed by term id, in first-observation order."""
+        return self._aggs
+
+    def record_instance(
+        self, term_id: TermId, display: str, fixture_name: str | None = None
+    ) -> None:
+        """Note one occurrence of an entity term reading as `display`.
+
+        A reference whose display matches the term's canonical name is the
+        concept itself, not an instance, so only specific displays (``Alice``
+        for ``Guest``) reach the Instances list. Verbs and kindless terms have
+        no instances and are ignored here.
+        """
+        term = self._glossary.get(term_id)
+        if term is None or term.kind not in ('actor', 'object'):
+            return
+        agg = self._agg(term_id)
+        if display == term.canonical or (term_id, display) in self._instances:
+            return
+        self._instances.add((term_id, display))
+        agg.instances.append(TermInstance(display=display, fixture_name=fixture_name))
+
+    def record_form(self, term_id: TermId, display: str) -> None:
+        """Note one surface form of a verb term.
+
+        The canonical form is the term's own name and is not a *form* of it, so
+        only inflections are listed. Non-verbs are ignored.
+        """
+        term = self._glossary.get(term_id)
+        if term is None or term.kind != 'verb':
+            return
+        if (term_id, display) in self._forms:
+            return
+        self._forms.add((term_id, display))
+        if display != term.canonical:
+            self._agg(term_id).forms.append(TermForm(display=display))
+
+    def record_story_ref(self, term_id: TermId, story_id: StoryId) -> None:
+        """Note that `story_id` references this term. Every kind participates."""
+        if self._glossary.get(term_id) is None:
+            return
+        if (term_id, story_id) in self._story_refs:
+            return
+        self._story_refs.add((term_id, story_id))
+        self._agg(term_id).stories.append(story_id)
+
+    def _agg(self, term_id: TermId) -> GlossaryAggregation:
+        return self._aggs.setdefault(term_id, GlossaryAggregation())
 
 
 def _pill_displays(part: NarrationTermRef, cases: list[dict[str, str]]) -> list[str]:
@@ -298,44 +327,6 @@ def _pill_displays(part: NarrationTermRef, cases: list[dict[str, str]]) -> list[
         return [part.display]
     displays = (pill_display(part, case) for case in cases)
     return [display for display in displays if display is not None]
-
-
-def _record_entity_observation(
-    *,
-    agg: GlossaryAggregation,
-    term_id: TermId,
-    display: str,
-    canonical: str,
-    fixture_name: str | None,
-    seen_instances: dict[tuple[TermId, str], str | None],
-) -> None:
-    """Record a new instance for the given term, if not already seen.
-
-    A reference whose display matches the term's canonical name is the
-    canonical concept (identity `(term_id, None)`), not an instance, so it is
-    not collected. Only specific instance displays (e.g. ``Alice`` for
-    ``Guest``) end up in the Glossary view's Instances list.
-    """
-    if display == canonical:
-        return
-    key = (term_id, display)
-    if key not in seen_instances:
-        seen_instances[key] = fixture_name
-        agg.instances.append(TermInstance(display=display, fixture_name=fixture_name))
-
-
-def _record_story_ref(
-    *,
-    agg: GlossaryAggregation,
-    term_id: TermId,
-    story_id: StoryId,
-    seen_story_refs: set[tuple[TermId, StoryId]],
-) -> None:
-    """Record a story ref for the given term, if not already seen."""
-    ref_key = (term_id, story_id)
-    if ref_key not in seen_story_refs:
-        seen_story_refs.add(ref_key)
-        agg.stories.append(story_id)
 
 
 def build_term_scenario_index(report: ReportData) -> dict[TermId, list[NodeId]]:

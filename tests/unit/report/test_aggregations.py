@@ -294,6 +294,36 @@ def test_build_glossary_aggregations_records_story_refs_via_activities() -> None
         assert aggs[TermId('search')].stories == [StoryId('book')]
 
 
+@scenario(
+    t'A {pg["Story"].low} referencing a {pg["Term"].low} twice lists it once',
+)
+def test_repeated_references_within_one_story_are_recorded_once() -> None:
+    with given(
+        t'a {pg["Story"]} whose two {pg["Activity"]("activities")} repeat the '
+        t'same {pg["Term"]} and the same {pg["Inflection"]}'
+    ):
+        g = _g()
+        parts = (
+            _ent('guest', 'Guest'),
+            ActivityTermRef(term_id=TermId('search'), display='searches for'),
+            _ent('room', 'Room'),
+        )
+        story = Story(
+            id=StoryId('book'),
+            title='Book',
+            activities=(
+                Activity(id=ActivityId(1), paths=(ActivityPath(parts=parts),)),
+                Activity(id=ActivityId(2), paths=(ActivityPath(parts=parts),)),
+            ),
+        )
+        rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
+    with when(t'the {pg["Glossary"]} aggregations are built'):
+        aggs = build_glossary_aggregations(rd)
+    with then(t'the {pg["Story"]} and the {pg["Inflection"]} appear once each'):
+        assert aggs[TermId('guest')].stories == [StoryId('book')]
+        assert [f.display for f in aggs[TermId('search')].forms] == ['searches for']
+
+
 def test_build_coverage_maps_empty_for_scenario_with_unknown_story_id() -> None:
     """Scenario has a story_id that doesn't match any story in the report."""
     g = _g()

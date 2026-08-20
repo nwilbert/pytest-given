@@ -1180,43 +1180,50 @@
 - **when** the «Glossary» aggregations are built
 - **then** the actor and the verb each list that «Story»
 
+## ✓ A «story» referencing a «term» twice lists it once
+`tests/unit/report/test_aggregations.py:297::test_repeated_references_within_one_story_are_recorded_once`
+
+- **given** a «Story» whose two «activities» repeat the same «Term» and the same «Inflection»
+- **when** the «Glossary» aggregations are built
+- **then** the «Story» and the «Inflection» appear once each
+
 ## ✓ A canonical entity reference is not an «instance»
-`tests/unit/report/test_aggregations.py:337::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
+`tests/unit/report/test_aggregations.py:367::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
 
 - **given** a «Story» activity and a «Step» referencing entities by canonical name only
 - **when** the «Glossary» aggregations are built
 - **then** neither entity term records an «Instance»
 
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_aggregations.py:423::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
+`tests/unit/report/test_aggregations.py:453::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
 
 - **given** a «Kindless» «Term» referenced by a «Story» activity
 - **when** the «Glossary» aggregations are built
 - **then** the «Term» lists the «Story» but no «Instance» and no «Inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_aggregations.py:456::test_glossary_aggregations_annotates_fixture_provenance`
+`tests/unit/report/test_aggregations.py:486::test_glossary_aggregations_annotates_fixture_provenance`
 
 - **given** a «Scenario» whose fixture-sourced «Step» names an «Instance»
 - **when** the «Glossary» aggregations are built
 - **then** the «Instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_aggregations.py:549::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
+`tests/unit/report/test_aggregations.py:579::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
 
 - **given** a «Scenario» referencing one «Term» in two steps and another in its name
 - **when** the term-scenario index is built
 - **then** each «Term» maps to the scenario exactly once
 
 ## ✓ An under-anchored «activity» is flagged ineligible in rollups
-`tests/unit/report/test_aggregations.py:692::test_build_story_rollups_flags_under_anchored_activity_ineligible`
+`tests/unit/report/test_aggregations.py:722::test_build_story_rollups_flags_under_anchored_activity_ineligible`
 
 - **given** a «Story» with an anchored and an under-anchored «Activity»
 - **when** the story rollups are built
 - **then** only the anchored «Activity» is «Coverage»-eligible
 
 ## ✓ An «Activity» is labelled by the prose of its «paths»
-`tests/unit/report/test_aggregations.py:843::test_build_activity_labels_joins_parts_into_prose`
+`tests/unit/report/test_aggregations.py:873::test_build_activity_labels_joins_parts_into_prose`
 
 - **given** a «Story» with a two-«path» «activity»
 - **when** the «activity» labels are built
