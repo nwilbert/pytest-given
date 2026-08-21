@@ -509,10 +509,10 @@ function reportApp() {
       });
       this._initTermTooltip();
     },
-    // Single shared tooltip for every term-ref pill. We position it with
-    // `fixed` from the pill's bounding box (rather than a CSS-only tooltip)
-    // because pills live inside `overflow: hidden` collapsible bodies that
-    // would otherwise clip an absolutely positioned child.
+    // Single shared tooltip for every term ref. We position it with
+    // `fixed` from the ref's bounding box (rather than a CSS-only tooltip)
+    // because term refs live inside `overflow: hidden` collapsible bodies
+    // that would otherwise clip an absolutely positioned child.
     _initTermTooltip() {
       const tip = document.getElementById('term-tip');
       if (!tip) return;

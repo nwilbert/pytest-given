@@ -36,7 +36,7 @@ Read the guide for the artifact you are about to touch — not all of them:
 
 ## Adoption levels
 
-Each artifact kind stands on its own — scenarios-only is a perfectly good adoption level. They compound when combined: scenarios narrate in glossary vocabulary (term refs render as pills and power per-term filtering), and stories give the actor-level view that scenarios link into for coverage.
+Each artifact kind stands on its own — scenarios-only is a perfectly good adoption level. They compound when combined: scenarios narrate in glossary vocabulary (term refs render as kind-coloured words and power per-term filtering), and stories give the actor-level view that scenarios link into for coverage.
 
 The natural adoption order depends on the project:
 

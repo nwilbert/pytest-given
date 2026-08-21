@@ -200,7 +200,7 @@ def test_brew(cup_size):
     ...
 ```
 
-A scenario name can also be a **t-string** whose interpolations are all glossary handles — they render as term pills in the title, exactly as they do in step text:
+A scenario name can also be a **t-string** whose interpolations are all glossary handles — they render as term refs in the title, exactly as they do in step text:
 
 ```python
 @scenario(t'a {guest} checks in')
@@ -208,7 +208,7 @@ def test_check_in(guest):
     ...
 ```
 
-Because a t-string is evaluated at import, only glossary handles (which are in scope then) are allowed in a scenario name; a parametrize-value interpolation is rejected — use `Template` for that. The two don't combine in one name: a title needing both a term pill and a per-case value isn't expressible today.
+Because a t-string is evaluated at import, only glossary handles (which are in scope then) are allowed in a scenario name; a parametrize-value interpolation is rejected — use `Template` for that. The two don't combine in one name: a title needing both a term ref and a per-case value isn't expressible today.
 
 When the cases have nothing honest to share — the narration genuinely branches per case — decline the merge with `group_parametrized=False`:
 
@@ -228,7 +228,7 @@ Each case then becomes its own scenario with no case table, titled by its parame
 | Plain string (including f-strings) | `with given('a cup')` <br> `with given(f'a {cup_size} cup')` | Rendered verbatim. F-string interpolation happens before pytest-given runs, so values aren't highlighted. |
 | T-string | `with given(t'a {cup_size} cup')` | pytest-given interpolates at runtime. Values are color-coded when the interpolation expression matches a parametrize column; otherwise highlighted neutrally. |
 | `Template` in `@scenario(...)` | `@scenario(Template('Brew {cup_size} ml'))` | Deferred substitution against parametrize columns at report time. Unmatched placeholders raise `PytestGivenError` at collection. |
-| T-string in `@scenario(...)` | `@scenario(t'a {guest} checks in')` | Glossary handles render as term pills in the title. Evaluated eagerly at import, so only glossary handles are allowed; a value/expression interpolation raises `PytestGivenError`. |
+| T-string in `@scenario(...)` | `@scenario(t'a {guest} checks in')` | Glossary handles render as term refs in the title. Evaluated eagerly at import, so only glossary handles are allowed; a value/expression interpolation raises `PytestGivenError`. |
 | `Template` on a helper-function decorator | `@when(Template('I insert {amount}'))` | Deferred substitution against the function's bound arguments at each call. Placeholders must name a positional-or-keyword parameter of the helper. Unmatched placeholders raise `PytestGivenError` at decoration time. |
 | `Annotated[..., given(...)]` on a test parameter | `def test(text: Annotated[str, given(Template('a {text} cup'))])` | Synthesizes a `given` step for a fixture or parametrize value at the call site. Plain string renders verbatim; `Template` does deferred substitution against parametrize columns. Only `given` is allowed; a t-string is rejected. |
 
@@ -248,7 +248,7 @@ Four things worth knowing:
    | A varying interpolation that isn't a bare name — `t'{cup_size * 0.01}'`, `t'{m.balance}'` | Bind it to a local and narrate that local |
    | An interpolation naming a parametrize column that no longer holds the case's value | Rename the local that rebound the name — or, if the body mutated the value in place before narrating it, bind the result to its own name and narrate that |
    | A step whose set of `attach` labels differs between cases | Keep the label constant and let the content vary — that's what the attachment column is for |
-   | A glossary term pill whose display differs between cases (unless the pill *is* the parametrize value) | Split the pill from the value: `given(t"{pg['Customer']} {name} places an order")` |
+   | A glossary term ref whose display differs between cases (unless the term ref *is* the parametrize value) | Split the term ref from the value: `given(t"{pg['Customer']} {name} places an order")` |
    | Passed cases that narrate different templates — a different step structure, a differently shaped narration, different wording, or a different interpolated expression | Decline the merge with `@scenario(..., group_parametrized=False)` and let each case be its own scenario |
 
 ### Domain Storytelling
@@ -266,7 +266,7 @@ room = g.work_object('Room', definition='A bookable hotel room.')
 search = g.verb('search', definition='Look up available options.')
 ```
 
-Use the captured handles directly in t-strings — `t'a {guest} {search("searches for")} a {room}'`. Each interpolation becomes a kind-coloured pill in the rendered step, with the term's definition as a tooltip. Glossary terms feed the Glossary tab.
+Use the captured handles directly in t-strings — `t'a {guest} {search("searches for")} a {room}'`. Each interpolation becomes a washed, kind-coloured word in the rendered step, with the term's definition as a tooltip. Glossary terms feed the Glossary tab.
 
 Reference a term with the lightest surface form that fits the sentence — the same three forms on every handle (captured or looked up):
 
@@ -331,7 +331,7 @@ with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
     ...
 ```
 
-When no `kind_column` is present, term kinds are **inferred from story activity-slot positions** at session finish: slot 0 → actor, slot 1 → verb, slot ≥ 2 → work object. A term used only in t-string steps (never in any story activity) stays kindless and renders with a neutral, uncoloured pill.
+When no `kind_column` is present, term kinds are **inferred from story activity-slot positions** at session finish: slot 0 → actor, slot 1 → verb, slot ≥ 2 → work object. A term used only in t-string steps (never in any story activity) stays kindless and renders under a neutral wash instead of a kind colour.
 
 **Every term in the glossary file is included in the report**, even one referenced by no story and no step. Terms whose kind could not be identified are listed under the **Uncategorized** section in the Glossary tab (and filterable via its own toggle).
 
@@ -482,7 +482,7 @@ Four example suites live under [`examples/`](https://github.com/nwilbert/pytest-
 
 - [`coffeeshop/test_coffeeshop.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/coffeeshop/test_coffeeshop.py) — a tour of the core feature surface: `when`/`then` blocks, generator fixtures with teardown, plain text and JSON attachments, parametrized tests rendered as tables, t-string interpolation, `Annotated[..., given(...)]` labels on a parametrize value, helper functions that record their own steps, top-level `given` blocks, deeply nested steps, failure rendering, and skipped scenarios. Output: [`coffeeshop.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/coffeeshop/coffeeshop.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop/coffeeshop.html)).
 - [`hotel-booking/test_hotel_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/test_hotel_booking.py) — Domain Storytelling features: a `Glossary` of actors / work objects / verbs, a `story(...)` with `activity(...)` rows, scenarios bound to a story with per-activity coverage, and kindless + undefined terms (registered with `g('foo')`) awaiting classification. Output: [`hotel-booking.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/hotel-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking/hotel-booking.html)).
-- [`file-glossary-booking/test_file_glossary_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/test_file_glossary_booking.py) — `FileGlossary` features: loading a Markdown glossary file, name-based term access, inferred kinds from story activity slots, and a deliberately kindless term (neutral pill). Output: [`file-glossary-booking.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/file-glossary-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/file-glossary-booking/file-glossary-booking.html)).
+- [`file-glossary-booking/test_file_glossary_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/test_file_glossary_booking.py) — `FileGlossary` features: loading a Markdown glossary file, name-based term access, inferred kinds from story activity slots, and a deliberately kindless term (neutral wash). Output: [`file-glossary-booking.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/file-glossary-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/file-glossary-booking/file-glossary-booking.html)).
 - [`self-report/`](https://github.com/nwilbert/pytest-given/tree/main/examples/self-report/) — pytest-given applied to its own backend test suite: many unit tests are `@scenario`-decorated and narrated in the vocabulary of [`GLOSSARY.md`](https://github.com/nwilbert/pytest-given/blob/main/GLOSSARY.md) (loaded as a `FileGlossary`). No hand-written test file — it's generated from the whole suite. Output: [`self-report.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/self-report/self-report.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/self-report/self-report.html)).
 
 Run `nox -s examples` to regenerate the first three, and `nox -s self_report` for the self-report.

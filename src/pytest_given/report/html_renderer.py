@@ -34,12 +34,14 @@ from .aggregations import (
     tab_visibility,
 )
 from .inline_markdown import render_inline_markdown
+from .palette import param_column_colors
 from .source_link import compile_source_link
 
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
-_NUM_PARAM_COLORS = 6
 
-# Maps parameter name to its color index (0-based, wraps at _NUM_PARAM_COLORS)
+# Maps parameter name to its color index. The index resolves to a colour via
+# `palette.param_column_colors`, which never runs out — the fixed list it
+# replaced wrapped at six.
 type ParamColorMap = dict[str, int]
 
 
@@ -145,6 +147,7 @@ def _render_context(report: ReportData) -> dict[str, object]:
     term_scenario_index = build_term_scenario_index(report)
     scenario_slugs = build_scenario_slug_index(report)
     term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
+    param_color_map = _build_param_color_map(report.scenarios)
     return {
         'metadata': report.metadata,
         'scenarios': report.scenarios,
@@ -157,8 +160,12 @@ def _render_context(report: ReportData) -> dict[str, object]:
         'scn_covers': scn_covers,
         'term_scenario_index': term_scenario_index,
         'scenario_slugs': scenario_slugs,
-        'param_color_map': _build_param_color_map(report.scenarios),
-        'num_param_colors': _NUM_PARAM_COLORS,
+        'param_color_map': param_color_map,
+        # The colours themselves, emitted as `.param-color-N` rules beside the
+        # stylesheet. They are generated per report rather than sitting in
+        # styles.css, because how many a report needs is a property of the
+        # report.
+        'param_colors': param_column_colors(len(param_color_map)),
         'scenario_activities_json': _script_json(scn_covers),
         'activity_labels_json': _script_json(activity_labels),
         'story_ids_json': _script_json([story.id for story in report.stories]),
@@ -250,7 +257,7 @@ def _make_narration_filter(
       - `NarrationLiteral` → escape `value`
       - `NarrationValue`   → `.value-highlight` around `rendered`
       - `NarrationPlaceholder` → color-coded `{name}` token
-      - `NarrationTermRef` → kind-coloured pill resolved via glossary
+      - `NarrationTermRef` → kind-coloured term ref resolved via glossary
     Empty parts → escape `text` and emit verbatim.
     """
 
@@ -280,7 +287,7 @@ def _render_narration_part(
         case NarrationValue(rendered=rendered):
             return f'<span class="value-highlight">{escape(rendered)}</span>'
         case NarrationPlaceholder(name=name, column_id=column_id):
-            color_idx = param_color_map.get(name, 0) % _NUM_PARAM_COLORS
+            color_idx = param_color_map.get(name, 0)
             label = _placeholder_token(part)
             # `data-param` keys the hover highlight and carries the column *id*
             # — two steps can interpolate the same expression with different
@@ -322,7 +329,7 @@ def _term_kind_class(kind: str | None) -> str:
     )
 
 
-def _term_pill(
+def _term_ref_span(
     *,
     classes: list[str],
     display: str,
@@ -330,12 +337,12 @@ def _term_pill(
     tooltip_name: str = '',
     tooltip_def: str = '',
 ) -> str:
-    pill_classes = list(classes)
+    ref_classes = list(classes)
     if term_id is not None:
-        pill_classes.append('term-ref--link')
+        ref_classes.append('term-ref--link')
     if tooltip_name:
-        pill_classes.append('has-term-tip')
-    attrs = [f'class="{" ".join(pill_classes)}"']
+        ref_classes.append('has-term-tip')
+    attrs = [f'class="{" ".join(ref_classes)}"']
     if term_id is not None:
         attrs.append(f'data-term-id="{escape(term_id)}"')
     # The custom hover tooltip (see app.js) reads the canonical name and
@@ -359,9 +366,9 @@ def _render_term_ref(
         return str(escape(part.display))
     classes = [_term_kind_class(term.kind)]
     if part.param_column is not None:
-        color_idx = param_color_map.get(part.param_column, 0) % _NUM_PARAM_COLORS
+        color_idx = param_color_map.get(part.param_column, 0)
         classes.append(f'param-color-{color_idx}')
-    return _term_pill(
+    return _term_ref_span(
         classes=classes,
         display=part.display,
         term_id=part.term_id,
@@ -394,7 +401,7 @@ def _make_activity_part_filter(
             case ActivityTermRef(term_id=tid, display=display):
                 term = glossary.get(tid) if glossary else None
                 return Markup(
-                    _term_pill(
+                    _term_ref_span(
                         classes=[_term_kind_class(term.kind if term else None)],
                         display=display,
                         term_id=tid,

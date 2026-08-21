@@ -1342,6 +1342,7 @@
 - **given** a «Report» holding a «Parametrized scenario» with a «Parameter table»
 - **when** the «Renderer» renders the HTML page
 - **then** «Parameter coloring» classes mark the grouped placeholder and the table headers
+- **then** the page carries one generated colour rule per column, after the stylesheet so a term ref bound to a column takes the column ink
 
 ## ✓ A passed «scenario» renders as a checked heading with «step» bullets
 `tests/unit/report/test_md_renderer.py:46::test_passed_scenario_heading_and_steps`

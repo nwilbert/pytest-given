@@ -42,12 +42,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
     value — either a local rebound it, or the body mutated it in place;
   - a t-string `attach` label — `attach` now takes a plain `str`;
   - a step whose set of `attach` labels differs between cases;
-  - a glossary term ref whose pill varies. A pill that *is* a parametrize value
-    stays supported;
+  - a glossary term ref whose term varies. A term ref that *is* a parametrize
+    value stays supported;
   - passed cases that narrate different templates altogether.
 
   Every one but the last has the same fix: bind the varying part to a local and
-  narrate it with a t-string, keeping labels and pills constant; content may
+  narrate it with a t-string, keeping labels and term refs constant; content may
   still vary freely, which is what the new `attachment` column is for. The last
   needs `@scenario(..., group_parametrized=False)`, giving each case its own
   scenario.
@@ -69,6 +69,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled authoring and reviewing skills gain the report mechanics their
   rules depend on, a symptom index, and a completeness audit.
 - The Scenarios sidebar and its header chips are visually tidied.
+- Glossary terms in a step or a scenario title now read as a word under a light
+  wash rather than a bordered pill, with the kind in the ink and a neutral wash
+  where there is no kind; parametrize column colours are generated per column
+  rather than drawn from a fixed list of six, so a seventh column no longer
+  wraps back onto the first. The Glossary view keeps its pills.
 
 ### Removed
 

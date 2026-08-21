@@ -280,6 +280,17 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
         assert re.search(
             r'<th[^>]*\bparam-color-1\b[^>]*\bdata-param="expect"', content
         )
+    with then(
+        t'the page carries one generated colour rule per column, after the '
+        t'stylesheet so a term ref bound to a column takes the column ink'
+    ):
+        rules = re.findall(
+            r'\.param-color-(\d+), th\.param-color-\1 \{ color: (#[0-9a-f]{6}); \}',
+            content,
+        )
+        assert [index for index, _ in rules] == ['0', '1']
+        assert len({color for _, color in rules}) == 2
+        assert content.index('.param-color-0,') > content.index('.term-ref-actor {')
 
 
 def test_render_grouped_placeholder_drops_format_spec_and_conversion(

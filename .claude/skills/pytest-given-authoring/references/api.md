@@ -13,7 +13,7 @@ This is the authoring-relevant surface, version-matched to the installed package
 
 ## Core
 
-- **`@scenario(name, tags=None, story=None, activities=None, group_parametrized=True)`** — marks a test for the report; required for it to appear. `name` is a plain string, a `Template` (for parametrized names), or a t-string whose interpolations are all glossary handles (they render as term pills in the title). `story=` binds the scenario to a `story(...)` for coverage; `activities=` narrows it to those 1-based activity numbers, so the scenario can cover no others.
+- **`@scenario(name, tags=None, story=None, activities=None, group_parametrized=True)`** — marks a test for the report; required for it to appear. `name` is a plain string, a `Template` (for parametrized names), or a t-string whose interpolations are all glossary handles (they render as term refs in the title). `story=` binds the scenario to a `story(...)` for coverage; `activities=` narrows it to those 1-based activity numbers, so the scenario can cover no others.
 - **`given(text)` / `when(text)` / `then(text)`** — dual-purpose:
   - **Context manager** in a test body: `with when('…'): result = sut(x)`. Steps nest freely.
   - **Fixture decorator** — `@given` only (`@pytest.fixture` then `@given('…')`); `@when`/`@then` on a fixture is rejected at runtime, and the label must be a plain string. Generator fixtures work; recording steps after `yield` is not allowed.
@@ -28,13 +28,13 @@ This is the authoring-relevant surface, version-matched to the installed package
 |---|---|---|
 | Plain string / f-string | anywhere | Rendered verbatim; f-string values are not highlighted. |
 | T-string `t'a {cup_size} cup'` | test-body steps only | Interpolated at runtime; values color-coded when the expression matches a parametrize column. Full expression syntax allowed. |
-| T-string `t'a {guest} checks in'` | `@scenario(...)` name — glossary handles only | Evaluated eagerly at import; each handle renders as a term pill in the title. A value/expression interpolation is rejected (values aren't in scope at import). |
+| T-string `t'a {guest} checks in'` | `@scenario(...)` name — glossary handles only | Evaluated eagerly at import; each handle renders as a term ref in the title. A value/expression interpolation is rejected (values aren't in scope at import). |
 | `Template('… {col} …')` | `@scenario(...)`, helper decorators, `Annotated[..., given(...)]` | Deferred substitution — against parametrize columns (`@scenario`, `Annotated`) or the helper's bound arguments (decorators). |
 
 Hard rules (each raises `PytestGivenError`):
 
 1. **`Template` accepts bare identifiers only** — `{name}`, `{name:spec}`, `{name!conv}`. No attribute access, indexing, or expressions. Workaround: parametrize by the attribute, or move the step to a test-body t-string.
-2. **`Template` and t-strings don't swap places.** A `Template` in a test-body step is rejected (values are in scope — use a t-string); a t-string on a fixture/helper decorator or in `Annotated[..., given(...)]` is rejected (values aren't in scope — use `Template` or a plain string). A t-string in `@scenario(...)` is the one exception: it's accepted when every interpolation is a glossary handle (a term reference is in scope at import and renders as a title pill), but a value/expression interpolation is still rejected — use `Template` for a parametrized name. A term pill and a per-case value can't combine in one name.
+2. **`Template` and t-strings don't swap places.** A `Template` in a test-body step is rejected (values are in scope — use a t-string); a t-string on a fixture/helper decorator or in `Annotated[..., given(...)]` is rejected (values aren't in scope — use `Template` or a plain string). A t-string in `@scenario(...)` is the one exception: it's accepted when every interpolation is a glossary handle (a term reference is in scope at import and renders as a title term ref), but a value/expression interpolation is still rejected — use `Template` for a parametrized name. A term ref and a per-case value can't combine in one name.
 
 ## Parametrized tests
 
@@ -49,7 +49,7 @@ Hard rules (each raises `PytestGivenError`):
 
 - **Code-defined**: `g = Glossary()`, then `guest = g.actor('Guest', definition='…')`, `g.work_object('Room', …)`, `g.verb('search', …)`. Where to define `g`, and how `conftest.py` must bind it for the plugin to find it: [glossaries.md](glossaries.md).
 - **File-backed**: `g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')` — needs at least one GFM pipe table; first column = term, second = description by default (`term_column=` / `description_column=` / `kind_column=` override, 0-based index or header name, case-insensitive).
-- **Handles in t-strings** render as kind-coloured pills with definition tooltips: `t'a {guest} {search("searches for")} a {room}'`. Three surface forms: **bare** `g['Room']` (the canonical text), **`.low`** `g['Room'].low` (lowercased), and a **callable** override `g['borrow']('borrows')` for any other inflection, plural (`g['Term']('terms')`), or instance (`organizer('Carol')`). Which to pick: [glossaries.md](glossaries.md).
+- **Handles in t-strings** render as kind-coloured words with definition tooltips: `t'a {guest} {search("searches for")} a {room}'`. Three surface forms: **bare** `g['Room']` (the canonical text), **`.low`** `g['Room'].low` (lowercased), and a **callable** override `g['borrow']('borrows')` for any other inflection, plural (`g['Term']('terms')`), or instance (`organizer('Carol')`). Which to pick: [glossaries.md](glossaries.md).
 - **Lookup and deferral**: `g['Guest']` fetches a declared term (case-insensitive; raises if unknown). On a code-defined glossary, `g('foo')` declares an as-yet-unclassified term (lands in *Uncategorized*, shows *Undefined* until `definition=` is supplied); on a `FileGlossary` the vocabulary is closed — `g('foo')` only looks up, and new terms are added as rows in the file. Both forms return handles usable in t-strings and activities.
 - Without a `kind_column`, kinds are inferred from story activity-slot positions (position 0 → actor, odd → verb, even ≥ 2 → work object); a term used only in steps stays kindless. Collision rules: [glossaries.md](glossaries.md).
 

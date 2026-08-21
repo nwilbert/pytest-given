@@ -6,6 +6,13 @@
 <title>{{ metadata.title or metadata.project }} — pytest-given Report</title>
 <style>
 {{ css }}
+{# One rule per parametrize column, generated for this report's column count.
+   See report/palette.py for how the ring is derived; styles.css holds only the
+   properties every column shares. The `th` half of each selector is there to
+   outrank `.param-table th`, which sets a colour of its own. #}
+{%- for color in param_colors %}
+.param-color-{{ loop.index0 }}, th.param-color-{{ loop.index0 }} { color: {{ color }}; }
+{%- endfor %}
 </style>
 </head>
 <body x-data="reportApp()">
@@ -327,7 +334,7 @@
         <thead>
           <tr>
             {% for col in scenario.parameters.columns %}
-            <th {% if col.kind != 'attachment' %}class="param-color-{{ param_color_map.get(col.name, 0) % num_param_colors }}" {% endif %}data-param="{{ col.id }}"
+            <th {% if col.kind != 'attachment' %}class="param-color-{{ param_color_map.get(col.name, 0) }}" {% endif %}data-param="{{ col.id }}"
                 @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
                 @mouseleave="setHoverParam(null, $event.currentTarget)">{{ col.name }}</th>
             {% endfor %}
@@ -710,7 +717,7 @@
 
 </div>
 
-<!-- Shared hover tooltip for term-ref pills; positioned by app.js. Lives at
+<!-- Shared hover tooltip for term refs; positioned by app.js. Lives at
      body level so it is never clipped by collapsible scenario bodies. -->
 <div id="term-tip" role="tooltip" hidden>
   <span class="term-tip-name"></span>

@@ -1,6 +1,6 @@
 # Authoring glossaries
 
-A glossary declares the ubiquitous language your tests speak: actors, work objects, and verbs, each with a definition. Steps, stories, and scenario titles reference terms through handles; every reference renders as a kind-coloured pill with the definition as tooltip and feeds the report's Glossary tab (with per-term scenario filtering).
+A glossary declares the ubiquitous language your tests speak: actors, work objects, and verbs, each with a definition. Steps, stories, and scenario titles reference terms through handles; every reference renders as a kind-coloured word with the definition as tooltip and feeds the report's Glossary tab (with per-term scenario filtering).
 
 ## Two ways to declare a glossary
 
@@ -66,12 +66,12 @@ Pick the lightest surface form for the word you need — the same three forms on
 Terms are actors, verbs, or work objects. Three ways a term gets its kind:
 
 1. **Explicit** — `g.actor(...)` / `g.verb(...)` / `g.work_object(...)`, or a `kind_column` in the glossary file.
-2. **Inferred from stories** — when a file glossary has no kind column, kinds are inferred from story activity-slot positions: position 0 → actor, odd positions → verb, even positions ≥ 2 → work object. A term seen in both actor and noun slots resolves to actor (an actor can be the target of a hand-off); a term seen in a verb slot *and* any other slot raises — add a kind column to disambiguate. A term used only in steps stays kindless (neutral pill).
+2. **Inferred from stories** — when a file glossary has no kind column, kinds are inferred from story activity-slot positions: position 0 → actor, odd positions → verb, even positions ≥ 2 → work object. A term seen in both actor and noun slots resolves to actor (an actor can be the target of a hand-off); a term seen in a verb slot *and* any other slot raises — add a kind column to disambiguate. A term used only in steps stays kindless (neutral wash).
 3. **Deliberately deferred** — `g('foo')` declares a term the team hasn't classified yet: it lands in the *Uncategorized* bucket and shows an *Undefined* badge until a definition arrives. Use it as a triage bucket, not a resting place. Code-defined glossaries only: a `FileGlossary` is a **closed vocabulary** — `g('foo')` and `g['foo']` both merely look up and raise on unknown names; new vocabulary is added as a row in the file.
 
 ## Keeping the glossary honest
 
-- **Don't dilute the glossary — keep it sharp.** A term earns its row by being vocabulary the team actually speaks: something someone would look up, with a meaning specific to the domain. Never add terms to make activities render more pills or to improve lint metrics; a generic word in an activity is better left a bare string, and the honest fix for a dead term is as often deleting it as manufacturing a reference.
+- **Don't dilute the glossary — keep it sharp.** A term earns its row by being vocabulary the team actually speaks: something someone would look up, with a meaning specific to the domain. Never add terms to make activities render more term refs or to improve lint metrics; a generic word in an activity is better left a bare string, and the honest fix for a dead term is as often deleting it as manufacturing a reference.
 - **Watch the size — a glossary is read whole, never sampled.** Authors and reviewers absorb every term in one pass; that is how a near-duplicate term gets caught before it is coined. A glossary that outgrows one comfortable reading is speaking for more than one bounded context: alert the user and propose one glossary per context, rather than starting to read it piecemeal.
 - **Tags never duplicate terms** — filter a feature area via its term, and keep tags for what the glossary can't carry (behaviour, mechanism). The `tag-shadows-term` lint rule enforces this.
 - **Every file term appears in the report**, even one no step or story references. On suites whose glossary should be fully exercised, opt into the `dead-term` lint rule to flag unreferenced terms.

@@ -393,8 +393,9 @@ body {
 
 .scenario-name { font-size: var(--font-size-md); font-weight: 500; }
 /* Story-view scenario title: a plain clickable heading (jumps to the scenario).
-   No hover underline — it would bleed onto the term pills the title can carry;
-   the trailing → cue signals clickability instead. */
+   No hover underline — it would bleed onto the term refs the title can carry,
+   whose own hover underline means something different (jump to the term, not
+   to the scenario); the trailing → cue signals clickability instead. */
 .scenario-name--goto {
   color: inherit;
   text-decoration: none;
@@ -681,17 +682,11 @@ span.param-highlight {
 .dot-failed { color: var(--color-failed); }
 .dot-skipped { color: var(--color-skipped); }
 
-/* Parameter colors — light-background variants */
-/* Ordered so the low indices — the ones a two- or three-column case table
-   actually uses — are the furthest apart: columns 0/1 are ΔE00 74 apart and
-   0/1/2 are 32, where picking them in ramp order would have left every prefix
-   at 16 and put two greens side by side. */
-.param-color-0, th.param-color-0 { color: #3f6212; font-weight: 600; }
-.param-color-1, th.param-color-1 { color: #a21caf; font-weight: 600; }
-.param-color-2, th.param-color-2 { color: #155e75; font-weight: 600; }
-.param-color-3, th.param-color-3 { color: #be185d; font-weight: 600; }
-.param-color-4, th.param-color-4 { color: #1d4ed8; font-weight: 600; }
-.param-color-5, th.param-color-5 { color: #065f46; font-weight: 600; }
+/* Parameter colors. The colour of each column is generated per report — see
+   report/palette.py, which splits the hue circle into as many steps as the
+   report has columns — and emitted as `.param-color-N` rules after this
+   sheet. Only what every column shares lives here. */
+[class*="param-color-"] { font-weight: 600; }
 .value-highlight { color: var(--text-primary); font-weight: 700; }
 
 .scenario-source {
@@ -728,50 +723,71 @@ span.param-highlight {
   padding-block: 0;
 }
 
-/* === Term-ref pills (actor / object / verb) ===
-   One shape for every kind, so a pill's kind reads from its colour alone.
-   The *text* colour is what carries the kind: the fills are all ramp-100 and
-   collapse into each other for a dichromat (teal vs violet is ΔE00 6.4 under
-   deuteranopia), while amber-800 / teal-700 / violet-700 stay 23.4 apart.
-   So fills group, text identifies — never the fill on its own. */
+/* === Term refs in narration (actor / object / verb / no kind) ===
+   A light wash behind the word, with the kind in the ink. The two channels
+   carry different things: the wash says "this word is a glossary term", the
+   ink says which kind, and only the first has to survive every context the
+   word lands in.
+
+   That split is what fixed the hard case. A term with no kind has no hue, and
+   there is no fourth hue to give it — a colour clearing the three kinds, the
+   body text, the statuses, the accent and the generated column ring while
+   holding AA on white does not exist at readable lightness. Standing weight in
+   for hue did not work either: weight only reads against its container, so a
+   step that is legible in 400 body text vanishes in a 500 scenario title, and
+   a third of the kindless refs sit in titles. A neutral wash is legible in
+   both, because it is measured against the card, which does not change.
+
+   The washes are equalised perceptually, not by a fixed chroma: at equal
+   chroma the violet all but disappears while the teal reads strongly, so each
+   is placed at dE00 12 from the card instead. A neutral needs less — a grey
+   wash is never mistaken for paper tone the way a pale hue is — so the
+   kindless one sits lighter and still reads the strongest of the four.
+
+   Boxiness was the whole reason the old filled pills went, and it came from
+   their borders and their padding, not from the fill: "the Booking System
+   sends the Confirmation to Alice and Bob" is five terms and three
+   connectives, and bordered pills made the boxes the line. A wash with no
+   border, 3px of padding and a 1px negative margin marks the word without
+   changing where the line breaks. */
 .term-ref-actor,
 .term-ref-object,
 .term-ref-verb,
 .term-ref-unknown {
-  border-radius: var(--radius-sm);
-  padding: 1px 6px;
+  padding: 1px 3px;
+  margin: 0 -1px;
+  border-radius: 3px;
   font-weight: 500;
   cursor: pointer;
+  /* Without this a term ref that wraps loses its padding and rounding on one
+     of the two fragments. */
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
-.term-ref-actor {
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
-}
-.term-ref-object {
-  background: #ccfbf1;
-  color: #0f766e;
-  border: 1px solid #5eead4;
-}
-.term-ref-verb {
-  background: #ede9fe;
-  color: #6d28d9;
-  border: 1px solid #c4b5fd;
-}
-/* A term with no kind has no hue to spend, and gray-100 is only ΔE00 2.5 from
-   the card — the dashed border, not the fill, is what marks it. */
+/* A term ref that is *also* a parametrize value carries a `.param-color-N`
+   alongside its kind class, and those rules are emitted after this sheet, so
+   the column takes the ink and the kind keeps the wash. That is the split
+   working as intended rather than a collision: the reader still sees which
+   kind the word is, and gains the line to its column in the case table. */
+.term-ref-actor { background: #ffe4d6; color: #92400e; }
+.term-ref-object { background: #d9f7f3; color: #0f766e; }
+.term-ref-verb { background: #f4e8ff; color: #6d28d9; }
+/* Warm stone for the ink rather than a slate: the body text is slate-900, so a
+   slate separates from it on lightness alone and reads as body text lightened
+   — receding, the opposite of marked. */
 .term-ref-unknown {
-  background: #f3f4f6;
-  color: var(--text-secondary);
-  border: 1px dashed #d1d5db;
+  background: #ebebea;
+  color: #57534e;
   cursor: default;
 }
 .term-ref--link { cursor: pointer; }
+/* Coloured text underlining on hover is the plain link idiom, which is what
+   lets the resting state spend nothing on a click affordance. */
 .term-ref--link:hover { text-decoration: underline; }
 .activity-word {
   color: var(--text-secondary);
 }
-/* Custom hover tooltip for term-ref pills (replaces the native title): the
+/* Custom hover tooltip for term refs (replaces the native title): the
    canonical term name as a heading above its definition. Shown/positioned by
    app.js; a single shared node lives at body level to dodge overflow clipping. */
 #term-tip {
@@ -982,7 +998,7 @@ span.param-highlight {
 .kind-swatch-actor { background: #fcd34d; }
 .kind-swatch-object { background: #5eead4; }
 .kind-swatch-verb { background: #c4b5fd; }
-.kind-swatch-kindless { background: #d1d5db; }
+.kind-swatch-kindless { background: #d6d3d1; }
 
 /* === Kind section headers === */
 .kind-header {
@@ -999,11 +1015,16 @@ span.param-highlight {
 }
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
 
-/* Kind colour classes for kind headers and term pills */
+/* Kind colour classes for kind headers and term pills. Kindless carries the
+   stone the narration gives it, so one kind is one colour across both views —
+   the catalog would otherwise read cool slate for what prose reads warm stone.
+   Stone-100/300 keep it on the same ramp-100 fill / ramp-300 border pattern as
+   the three kinds; the border stays dashed, which is the catalog's own mark
+   for "not a kind" and is about the bucket, not the colour. */
 .term-actor { color: #92400e; }
 .term-obj { color: #0f766e; }
 .term-verb { color: #6d28d9; }
-.term-kindless { color: var(--text-secondary); }
+.term-kindless { color: #57534e; }
 
 /* === Term pills === */
 .term-pill {
@@ -1016,7 +1037,7 @@ span.param-highlight {
 .term-pill.term-actor { background: #fef3c7; border: 1px solid #fcd34d; }
 .term-pill.term-obj { background: #ccfbf1; border: 1px solid #5eead4; }
 .term-pill.term-verb { background: #ede9fe; border: 1px solid #c4b5fd; }
-.term-pill.term-kindless { background: #f3f4f6; border: 1px dashed #d1d5db; }
+.term-pill.term-kindless { background: #f5f5f4; border: 1px dashed #d6d3d1; }
 
 /* === Glossary entry layout === */
 .entry {
@@ -1158,6 +1179,9 @@ span.param-highlight {
 .anchor-link:hover { opacity: 1 !important; }
 .anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-passed); }
 
+
+.param-color-0, th.param-color-0 { color: #307400; }
+.param-color-1, th.param-color-1 { color: #c80060; }
 </style>
 </head>
 <body x-data="reportApp()">
@@ -1320,7 +1344,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L148">examples/hotel-booking/test_hotel_booking.py:148</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L148">examples/hotel-booking/test_hotel_booking.py:148</a></div>
       
     </div>
     </div>
@@ -1374,7 +1398,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L163">examples/hotel-booking/test_hotel_booking.py:163</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L163">examples/hotel-booking/test_hotel_booking.py:163</a></div>
       
     </div>
     </div>
@@ -1422,7 +1446,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L240">examples/hotel-booking/test_hotel_booking.py:240</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L240">examples/hotel-booking/test_hotel_booking.py:240</a></div>
       
     </div>
     </div>
@@ -1612,7 +1636,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L198">examples/hotel-booking/test_hotel_booking.py:198</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L198">examples/hotel-booking/test_hotel_booking.py:198</a></div>
       
     </div>
     </div>
@@ -1938,7 +1962,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
         
       </div>
       
@@ -2068,7 +2092,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L116">examples/hotel-booking/test_hotel_booking.py:116</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L116">examples/hotel-booking/test_hotel_booking.py:116</a></div>
         
       </div>
       
@@ -2227,7 +2251,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L56">examples/hotel-booking/test_hotel_booking.py:56</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L56">examples/hotel-booking/test_hotel_booking.py:56</a></div>
                 
               </div>
             </div>
@@ -2302,7 +2326,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L57">examples/hotel-booking/test_hotel_booking.py:57</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L57">examples/hotel-booking/test_hotel_booking.py:57</a></div>
                 
               </div>
             </div>
@@ -2365,7 +2389,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L58">examples/hotel-booking/test_hotel_booking.py:58</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L58">examples/hotel-booking/test_hotel_booking.py:58</a></div>
                 
               </div>
             </div>
@@ -2451,7 +2475,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L60">examples/hotel-booking/test_hotel_booking.py:60</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L60">examples/hotel-booking/test_hotel_booking.py:60</a></div>
                 
               </div>
             </div>
@@ -2514,7 +2538,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L61">examples/hotel-booking/test_hotel_booking.py:61</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L61">examples/hotel-booking/test_hotel_booking.py:61</a></div>
                 
               </div>
             </div>
@@ -2577,7 +2601,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L62">examples/hotel-booking/test_hotel_booking.py:62</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L62">examples/hotel-booking/test_hotel_booking.py:62</a></div>
                 
               </div>
             </div>
@@ -2640,7 +2664,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L63">examples/hotel-booking/test_hotel_booking.py:63</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L63">examples/hotel-booking/test_hotel_booking.py:63</a></div>
                 
               </div>
             </div>
@@ -2691,7 +2715,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L107">examples/hotel-booking/test_hotel_booking.py:107</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L107">examples/hotel-booking/test_hotel_booking.py:107</a></div>
                 
               </div>
             </div>
@@ -2774,7 +2798,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
                 
               </div>
             </div>
@@ -2842,7 +2866,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
                 
               </div>
             </div>
@@ -2910,7 +2934,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
                 
               </div>
             </div>
@@ -2978,7 +3002,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L68">examples/hotel-booking/test_hotel_booking.py:68</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L68">examples/hotel-booking/test_hotel_booking.py:68</a></div>
                 
               </div>
             </div>
@@ -3046,7 +3070,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
                 
               </div>
             </div>
@@ -3116,7 +3140,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
                 
               </div>
             </div>
@@ -3167,7 +3191,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
                 
               </div>
             </div>
@@ -3235,7 +3259,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L75">examples/hotel-booking/test_hotel_booking.py:75</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L75">examples/hotel-booking/test_hotel_booking.py:75</a></div>
                 
               </div>
             </div>
@@ -3303,7 +3327,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
                 
               </div>
             </div>
@@ -3354,7 +3378,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/33703976aa4324fc798cb7a1770795696cb38229/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/1c9a607e6dfd1e26c06b9f8653cc453ba32a835e/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
                 
               </div>
             </div>
@@ -3376,7 +3400,7 @@ span.param-highlight {
 
 </div>
 
-<!-- Shared hover tooltip for term-ref pills; positioned by app.js. Lives at
+<!-- Shared hover tooltip for term refs; positioned by app.js. Lives at
      body level so it is never clipped by collapsible scenario bodies. -->
 <div id="term-tip" role="tooltip" hidden>
   <span class="term-tip-name"></span>
@@ -3387,10 +3411,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-20T21:28:36.209695+00:00",
+    "timestamp": "2026-08-21T17:33:35.300720+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "33703976aa4324fc798cb7a1770795696cb38229",
+    "commit_sha": "1c9a607e6dfd1e26c06b9f8653cc453ba32a835e",
     "title": "Hotel Booking Example"
   },
   "scenarios": [
@@ -5498,10 +5522,10 @@ function reportApp() {
       });
       this._initTermTooltip();
     },
-    // Single shared tooltip for every term-ref pill. We position it with
-    // `fixed` from the pill's bounding box (rather than a CSS-only tooltip)
-    // because pills live inside `overflow: hidden` collapsible bodies that
-    // would otherwise clip an absolutely positioned child.
+    // Single shared tooltip for every term ref. We position it with
+    // `fixed` from the ref's bounding box (rather than a CSS-only tooltip)
+    // because term refs live inside `overflow: hidden` collapsible bodies
+    // that would otherwise clip an absolutely positioned child.
     _initTermTooltip() {
       const tip = document.getElementById('term-tip');
       if (!tip) return;
