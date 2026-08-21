@@ -326,11 +326,8 @@
       </div>
 
       {% if scenario.parameters %}
-      {#- A table with an attachment column carries payload panels spanning its
-          full width, so it takes the card's width rather than its columns'.
-          A table without one stays as wide as its data. -#}
-      {% set has_attachment = scenario.parameters.columns | selectattr('kind', 'equalto', 'attachment') | list %}
-      <table class="param-table{% if has_attachment %} param-table--full{% endif %}">
+      <div class="param-table-scroll">
+      <table class="param-table">
         <thead>
           <tr>
             {% for col in scenario.parameters.columns %}
@@ -409,6 +406,7 @@
           {% endfor %}
         </tbody>
       </table>
+      </div>
       {% endif %}
 
       {% if scenario.error %}

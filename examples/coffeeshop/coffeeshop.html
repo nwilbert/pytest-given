@@ -479,9 +479,22 @@ body {
 }
 .step-chevron-open { transform: rotate(45deg) translateY(-2px); }
 
+/* A table cannot be shrunk below its columns' min-content width, so a long
+   unbreakable parametrize value outgrows the `max-width` cap below however
+   little room there is — at any viewport, and at a narrow one for ordinary
+   content. The card is `overflow: hidden` (the expand animation needs it), so
+   an uncontained overflow is clipped with no scrollbar and no way to reach the
+   columns past the edge. This scroll box turns that into a scrollbar. It stays
+   invisible until a table actually outgrows the card. */
+.param-table-scroll { overflow-x: auto; }
+
 /* Param table */
 .param-table {
   width: auto;
+  /* The cap is what lets a payload size the table (see `.attachment-panel
+     .attachment-content`) without any payload being able to push the table
+     past the card. */
+  max-width: calc(100% - var(--space-xl));
   border-collapse: collapse;
   font-size: var(--font-size-base);
   background: var(--bg-page);
@@ -490,7 +503,6 @@ body {
   margin-top: var(--space-sm);
   margin-left: var(--space-xl);
 }
-.param-table--full { width: calc(100% - var(--space-xl)); }
 .param-table th {
   text-align: left;
   padding: var(--space-sm) var(--space-md);
@@ -568,6 +580,10 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--text-muted);
+  /* The frame's code line below scrolls; this line is prose-like enough to
+     wrap instead, and has to — a frame location is an unbreakable path that a
+     narrow card would otherwise push past its edge and clip. */
+  overflow-wrap: anywhere;
 }
 .error-frame-code {
   margin: 2px 0 0 0;
@@ -652,15 +668,20 @@ span.param-highlight {
   padding: var(--space-sm) 0 var(--space-xs);
 }
 /* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks into
-   it; on the card colour it reads as the document it is. `width: 0` with
-   `min-width: 100%` keeps a wide payload from driving the whole table's
-   preferred width — it fills the row it is given and scrolls past it. */
+   it; on the card colour it reads as the document it is.
+
+   The payload sizes itself, and through its colspan cell it sizes the table:
+   a table with an attachment column ends up as wide as its widest content,
+   columns or payload, and no wider. Pinning it to the card instead (what
+   `width: 0; min-width: 100%` plus a full-width table used to do) cost every
+   such table the card's full width to fit a payload that rarely wants it —
+   the coffeeshop brew log needs 370px and was stretching its table to 1102px.
+   Only a payload wider than the card now hits the table's `max-width` and
+   scrolls inside its own box, which is the case that wanted the room. */
 .attachment-panel .attachment-content {
   background: var(--bg-card);
   border: 1px solid var(--border);
   margin-top: 0;
-  width: 0;
-  min-width: 100%;
 }
 @media (prefers-reduced-motion: reduce) {
   .attachment-expand { transition: none; }
@@ -694,6 +715,9 @@ span.param-highlight {
   color: var(--text-muted);
   padding: var(--space-xs) var(--space-md);
   text-align: right;
+  /* A source path is one unbreakable token, so a narrow card cannot fit it on
+     a line and would push it past the edge, where the card clips it. */
+  overflow-wrap: anywhere;
 }
 .scenario-source a {
   color: inherit;
@@ -704,21 +728,16 @@ span.param-highlight {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-.scenario-body-inner > .scenario-source,
+/* In a scenario card the link stays in flow, under whatever the card ends
+   with. Anchoring it to the corner instead put it in a fight with every
+   full-width last element: over a case table it covered the last row's
+   rightmost cells, and over an error box it needed a card-coloured chip to
+   stay legible against the reddish background. A refs panel ends in short
+   chip lines that never reach the corner, so there the anchor still pays for
+   itself. */
 .refs-content > .scenario-source {
   position: absolute;
   right: 0;
-  bottom: 0;
-}
-/* When the scenario has an error box, this link overlaps its reddish
-   background; a card-colored chip keeps it legible and looks intentional.
-   Over the plain card background (no error) the chip is the same color, so
-   it stays invisible. */
-.scenario-body-inner > .scenario-source {
-  background: var(--bg-card);
-  border-top-left-radius: var(--radius-md);
-}
-.refs-content > .scenario-source {
   bottom: var(--space-md);
   padding-block: 0;
 }
@@ -1358,7 +1377,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1417,7 +1436,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1461,7 +1480,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1507,7 +1526,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
       
     </div>
     </div>
@@ -1581,7 +1600,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
       
     </div>
     </div>
@@ -1682,7 +1701,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
       
     </div>
     </div>
@@ -1732,7 +1751,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
@@ -1788,7 +1807,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
       
     </div>
     </div>
@@ -1888,7 +1907,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
       
     </div>
     </div>
@@ -1931,7 +1950,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
       
     </div>
     </div>
@@ -1973,6 +1992,7 @@ Total:        $2.00</pre></div>
           </div></div>
 
       
+      <div class="param-table-scroll">
       <table class="param-table">
         <thead>
           <tr>
@@ -2073,12 +2093,13 @@ Total:        $2.00</pre></div>
           
         </tbody>
       </table>
+      </div>
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -2120,6 +2141,7 @@ Total:        $2.00</pre></div>
           </div></div>
 
       
+      <div class="param-table-scroll">
       <table class="param-table">
         <thead>
           <tr>
@@ -2171,12 +2193,13 @@ Total:        $2.00</pre></div>
           
         </tbody>
       </table>
+      </div>
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -2216,6 +2239,7 @@ Total:        $2.00</pre></div>
           </div></div>
 
       
+      <div class="param-table-scroll">
       <table class="param-table">
         <thead>
           <tr>
@@ -2267,12 +2291,13 @@ Total:        $2.00</pre></div>
           
         </tbody>
       </table>
+      </div>
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
       
     </div>
     </div>
@@ -2316,7 +2341,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -2362,7 +2387,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -2410,7 +2435,8 @@ Total:        $2.00</pre></div>
           </div></div>
 
       
-      <table class="param-table param-table--full">
+      <div class="param-table-scroll">
+      <table class="param-table">
         <thead>
           <tr>
             
@@ -2557,12 +2583,13 @@ Total:        $2.00</pre></div>
           
         </tbody>
       </table>
+      </div>
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
       
     </div>
     </div>
@@ -2596,6 +2623,7 @@ Total:        $2.00</pre></div>
       <div class="steps"></div>
 
       
+      <div class="param-table-scroll">
       <table class="param-table">
         <thead>
           <tr>
@@ -2647,12 +2675,13 @@ Total:        $2.00</pre></div>
           
         </tbody>
       </table>
+      </div>
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/3aed1fcc79c23a08abf6816321a30324043af48c/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
       
     </div>
     </div>
@@ -2683,10 +2712,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-21T18:14:34.657018+00:00",
+    "timestamp": "2026-08-21T21:03:00.087162+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "3aed1fcc79c23a08abf6816321a30324043af48c",
+    "commit_sha": "218fee1745c3453a8585815777fb80d055d87637",
     "title": "Coffee Shop Example"
   },
   "scenarios": [

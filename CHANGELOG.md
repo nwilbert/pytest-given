@@ -119,6 +119,13 @@ form `## [x.y.z] - YYYY-MM-DD`.
   blindness.
 - A scenario title carrying glossary terms no longer wraps early in Firefox,
   breaking to a second line with the rest of the row empty.
+- The source link in a scenario card no longer sits on top of the card's last
+  element, where it covered the final row and status column of a full-width case
+  table.
+- A case table too wide for its card now scrolls instead of being clipped with
+  no scrollbar.
+- A source path and a traceback's frame location now wrap rather than spilling
+  past a narrow card's edge.
 
 ## [0.1.0] - 2026-08-08
 
