@@ -741,14 +741,30 @@ span.param-highlight {
    their borders and their padding, not from the fill: "the Booking System
    sends the Confirmation to Alice and Bob" is five terms and three
    connectives, and bordered pills made the boxes the line. A wash with no
-   border, 3px of padding and a 1px negative margin marks the word without
-   changing where the line breaks. */
+   border and 3px of padding marks the word and costs the line 6px per term.
+
+   The padding carries no negative margin to pull those 6px back. `margin: 0
+   -1px` looks free — 2px a term, invisible — but Gecko subtracts negative
+   inline margins when it computes a block's max-content width and does not
+   apply them the same way when it breaks lines. A title is a flex item sized
+   to max-content, so the box came out 2px short per term ref and the last
+   word wrapped with the rest of the row empty: 51 of the self-report's 182
+   titles, at every viewport width, in Firefox only. Blink and WebKit size it
+   correctly, which is why this survived so long. Keep inline margins off the
+   wash; if the 6px ever needs pulling back, spend it on the padding instead.
+
+   A term ref sits next to another often enough to matter ("Kindless Term",
+   "actor slot" — 21 pairs in the self-report), and without the negative
+   margin the full space width separates their washes rather than 1.65px, so
+   adjacent terms read as two marks instead of one blob. For the same reason
+   the wash cannot move to a `box-shadow` spread to buy back its layout cost:
+   a 2px bleed would swallow that gap, and with 1px of leading each side
+   inside the 21px line box it would collide with the line above. */
 .term-ref-actor,
 .term-ref-object,
 .term-ref-verb,
 .term-ref-unknown {
   padding: 1px 3px;
-  margin: 0 -1px;
   border-radius: 3px;
   font-weight: 500;
   cursor: pointer;

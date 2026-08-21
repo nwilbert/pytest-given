@@ -83,6 +83,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Fixed
 
+#### Plugin and run behaviour
+
 - A fixture that raises after its `yield` now fails the scenario it tore down,
   instead of leaving it green in a report pytest counted as an error.
 - Every report-building failure — a suite reaching two glossaries, a term used in
@@ -90,8 +92,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
   terminal summary and a failing exit code, where only grouping errors did.
 - The sinks are now rendered in full before any is written, so a failing render
   can no longer leave this run's JSON beside the previous run's HTML.
-- Two test files sharing a basename across directories no longer abort the HTML
-  report; the scenarios' `#scenario=` slugs gain directory components instead.
+
+#### Report content (all formats)
+
 - A case-table cell now reads the way the step pointing at it read, carrying the
   interpolation's own format spec and, under `indirect=True`, the bound test
   argument; one parameter formatted two ways gets a column each.
@@ -99,6 +102,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
   search box and `jq` queries no longer match a spec the page never displays.
 - The grouped step tree now comes from the first case that *passed* — a skipped
   case 1 used to render an empty tree and hide later failures.
+
+#### HTML report
+
+- Two test files sharing a basename across directories no longer abort the HTML
+  report; the scenarios' `#scenario=` slugs gain directory components instead.
 - Attachment content now scrolls instead of being silently cut off, and
   attachment badges are keyboard-operable.
 - Jumping to a scenario from a story activity, or to a term's scenarios from the
@@ -109,6 +117,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - Accent-coloured text and the parametrize column colours in the HTML report now
   meet WCAG AA, and term kinds stay distinguishable for red-green colour
   blindness.
+- A scenario title carrying glossary terms no longer wraps early in Firefox,
+  breaking to a second line with the rest of the row empty.
 
 ## [0.1.0] - 2026-08-08
 

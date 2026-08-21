@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-20T18:37:00.349908+00:00",
+    "timestamp": "2026-08-21T18:14:44.235080+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "60287ad4be116ef8b4f72b09b8d04ac2eb57b948",
+    "commit_sha": "3aed1fcc79c23a08abf6816321a30324043af48c",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -14932,7 +14932,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 33,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -15016,6 +15016,23 @@
               },
               {
                 "value": " classes mark the grouped placeholder and the table headers"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the page carries one generated colour rule per column, after the stylesheet so a term ref bound to a column takes the column ink",
+            "parts": [
+              {
+                "value": "the page carries one generated colour rule per column, after the stylesheet so a term ref bound to a column takes the column ink"
               }
             ]
           },
