@@ -231,7 +231,7 @@ def test_sold_out_is_rejected(machine):
 
 @scenario(
     'Many tags (the report collapses them behind a +N pill)',
-    tags=['checkout', 'loyalty', 'discounts', 'pricing'],
+    tags=['checkout', 'loyalty', 'discounts', 'pricing', 'inventory'],
 )
 def test_discounted_purchase(machine):
     with given('a loyalty card good for a $1 discount'):

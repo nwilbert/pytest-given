@@ -99,7 +99,7 @@
 - **then** the machine reports it is sold out
 
 ## ✓ Many tags (the report collapses them behind a +N pill)
-`examples/coffeeshop/test_coffeeshop.py:232::test_discounted_purchase` · checkout, loyalty, discounts, pricing
+`examples/coffeeshop/test_coffeeshop.py:232::test_discounted_purchase` · checkout, loyalty, discounts, pricing, inventory
 
 - **given** a coffee machine
 - **given** a loyalty card good for a $1 discount
