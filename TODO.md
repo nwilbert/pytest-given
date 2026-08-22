@@ -6,12 +6,10 @@
 
 ## Next
 
-- [ ] Turn on branch coverage: `nox -s coverage` runs `coverage run` without `--branch`, so the 100% gate is line coverage only and a compound condition passes it with an untested False outcome. Found during the per-case columns work, where three unexercised conditions in one filter shipped inside a green 100% run. Enabling it (`--branch`, or `[tool.coverage.run] branch = true` in `pyproject.toml`) will surface partial branches in pre-existing code, so it needs its own pass rather than riding along with a feature branch.
 - [ ] check support for https://library-skills.io/
 - [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
 - [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
-- [ ] Attachment badges: pick the icon from `content_type` instead of always a paperclip — a document glyph for `text`, braces for `json`. Replaces the HTML report's paperclip SVG and the Markdown renderer's `📎`: a branch in the badge macro plus a second inline SVG, no new data. Split out of the [per-case columns spec](docs/specs/2026-08-14-parametrized-case-columns-design.md), which touches the same badge macro but doesn't need this; `AttachmentRef` there carries `content_type` for it to read.
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?

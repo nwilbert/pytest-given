@@ -74,6 +74,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
   where there is no kind; parametrize column colours are generated per column
   rather than drawn from a fixed list of six, so a seventh column no longer
   wraps back onto the first. The Glossary view keeps its pills.
+- An attachment badge in the HTML report now takes its icon from the payload's
+  content type — braces for JSON, a page for text — instead of a paperclip for
+  both. The Markdown report keeps its `📎`.
 
 ### Removed
 

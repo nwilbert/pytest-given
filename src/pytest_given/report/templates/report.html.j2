@@ -68,8 +68,16 @@
       of the string literal — HTML-escaping does not stop that. Anything
       data-derived goes in a `data-*` attribute and is read via
       `$el.dataset.*`, as `data-tag` and `data-term-id` do. -#}
-  {%- macro attachment_icon() -%}
-    <svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 1 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.98 8.83l-8.49 8.49a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>
+  {#- The glyph names what the payload is, rather than that there is one:
+      braces for JSON, a page for text. Anything but 'json' takes the page —
+      a content type this template has not met reads as text, which is what
+      an unrecognized payload is displayed as anyway. -#}
+  {%- macro attachment_icon(content_type) -%}
+    {%- if content_type == 'json' -%}
+    <svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>
+    {%- else -%}
+    <svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+    {%- endif -%}
   {%- endmacro -%}
 
   {#- Badge plus the payload it expands, keyed on `cell_id`. The step tree and
@@ -77,16 +85,16 @@
       having no payload of its own to expand. -#}
   {#- A badge opens a payload, so it is operable: reachable by keyboard and
       announced as a control, not as decorated text. -#}
-  {%- macro attachment_badge(cell_id, label) -%}
+  {%- macro attachment_badge(cell_id, label, content_type) -%}
     <span class="attachment-badge" role="button" tabindex="0"
           :aria-expanded="expandedAttachments['{{ cell_id }}'] ? 'true' : 'false'"
           @click="toggleAttachment('{{ cell_id }}')"
           @keydown.enter.prevent="toggleAttachment('{{ cell_id }}')"
-          @keydown.space.prevent="toggleAttachment('{{ cell_id }}')">{{ attachment_icon() }}{{ label }}</span>
+          @keydown.space.prevent="toggleAttachment('{{ cell_id }}')">{{ attachment_icon(content_type) }}{{ label }}</span>
   {%- endmacro -%}
 
-  {%- macro expandable_attachment(cell_id, label, content) -%}
-    {{ attachment_badge(cell_id, label) }}
+  {%- macro expandable_attachment(cell_id, label, content, content_type) -%}
+    {{ attachment_badge(cell_id, label, content_type) }}
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{{ content }}</pre></div>
@@ -120,11 +128,11 @@
     <div>
       <span class="attachment-badge" data-param="{{ att.column_id }}"
             @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-            @mouseleave="setHoverParam(null, $event.currentTarget)">{{ attachment_icon() }}{{ att.label }}</span>
+            @mouseleave="setHoverParam(null, $event.currentTarget)">{{ attachment_icon(att.content_type) }}{{ att.label }}</span>
     </div>
     {%- else -%}
     <div>
-      {{ expandable_attachment(step_id ~ '_att_' ~ loop.index0, att.label, att.content) }}
+      {{ expandable_attachment(step_id ~ '_att_' ~ loop.index0, att.label, att.content, att.content_type) }}
     </div>
     {%- endif -%}
     {%- endfor -%}
@@ -351,7 +359,7 @@
                 @mouseleave="setHoverParam(null, $event.currentTarget)">
               {% if val %}
               {# Keyed on the column's position, never on `col.id`: the id is report data and this lands inside an Alpine expression. #}
-              {{ attachment_badge('s' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0, col.name) }}
+              {{ attachment_badge('s' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0, col.name, val.content_type) }}
               {% endif %}
             </td>
             {% else %}
