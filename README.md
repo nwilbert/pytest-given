@@ -56,7 +56,7 @@ This produces `given-report/report.html` — one file you can open directly in a
 
 Classical BDD tools (Cucumber, behave, pytest-bdd) center on a natural-language DSL like Gherkin, designed so stakeholders can author tests themselves and engineers maintain the glue that binds each step to a Python function.
 
-pytest-given is for the opposite case: **engineers write normal tests, and the plugin turns them into readable documentation**. The HTML report is something stakeholders, domain experts, and engineers on adjacent teams can open and follow — without any of them needing to touch the test suite. For the engineers writing the tests, the same narrative gives a high-level, domain-focused view of behavior that's easier to scan than raw test code. Grouping by tag or module, text search across scenario names and tags, and status filters help zero in on what matters.
+pytest-given is for the opposite case: **engineers write normal tests, and the plugin turns them into readable documentation**. The HTML report is something stakeholders, domain experts, and engineers on adjacent teams can open and follow — without any of them needing to touch the test suite. For the engineers writing the tests, the same narrative gives a high-level, domain-focused view of behavior that's easier to scan than raw test code. Browsing by tag, glossary term, or module, text search across scenario names and tags, and status filters help zero in on what matters.
 
 - Plain Python — no Gherkin, no `.feature` files, no parser.
 - Tests stay first-class pytest tests; the report is a by-product.
@@ -132,7 +132,7 @@ def test_rejects_empty(text: Annotated[str, given(Template('the name {text}'))])
         id_derive(text)
 ```
 
-Use `Template('… {col} …')` for a per-case placeholder (substituted against the parametrize column, rendered `{col}` in the grouped view and the concrete value per row) or a plain string for a static label. A t-string is rejected here — the parameter value isn't in scope at definition time. `when`/`then` inside `Annotated` are rejected too; the action and outcome live in the test body.
+A `Template` placeholder renders as `{col}` in the grouped view and as the concrete value per row. A t-string is rejected here, and so are `when`/`then` — the parameter value isn't in scope at definition time, and the action and outcome live in the test body.
 
 As a helper-function decorator (any phase). The helper records its own step on each call; for dynamic narration, use `pytest_given.Template` and reference the helper's parameters:
 
@@ -236,9 +236,9 @@ Four things worth knowing:
 
 1. **`pytest_given.Template` only accepts bare identifiers** — `{name}`, `{name:spec}`, `{name!conv}`. Attribute access (`{obj.attr}`), indexing (`{d[key]}`), and arbitrary expressions (`{x + 1}`) raise `PytestGivenError` at construction. Workaround: parametrize by the attributes directly, or move the step into a test-body t-string (which supports full expression syntax).
 
-2. **`Template` vs. t-string is about scope.** `Template` defers substitution, so it belongs where values aren't yet bound — `@scenario(...)` and helper decorators (the table above). A t-string evaluates eagerly, so it belongs where values *are* bound: the test body. Each is rejected in the other's place — `with given(Template(...))` raises `PytestGivenError` at entry, as does a t-string on a fixture/helper decorator. The one exception: a t-string in `@scenario(...)` is allowed when every interpolation is a glossary handle, since terms are in scope at import.
+2. **`Template` and a t-string are each rejected in the other's place**, because the split above is about scope: `with given(Template(...))` raises `PytestGivenError` at entry, as does a t-string on a fixture or helper decorator. The one exception is the `@scenario(...)` t-string in the table — glossary handles, unlike values, *are* in scope at import.
 
-3. **A parametrized scenario is grouped into one narrated tree plus a case table.** The tree comes from a baseline case (the first that passed), and anything varying across cases is promoted into a column of the case table: a parametrize argument, a t-string interpolation whose value differs per case (the step keeps a `{name}` placeholder pointing at the column), and an attachment whose payload differs (the step keeps a content-less badge). What a column cannot carry is a case that narrates a *different sentence* — that is rule 6 below, and `group_parametrized=False` is its answer.
+3. **The grouped tree comes from a baseline case** (the first that passed), and anything varying across cases is promoted into a column of the case table: a parametrize argument, a t-string interpolation whose value differs per case (the step keeps a `{name}` placeholder pointing at the column), and an attachment whose payload differs (the step keeps a content-less badge). What a column cannot carry is a case that narrates a *different sentence* — that is rule 6 below, and `group_parametrized=False` is its answer.
 
 4. **Six authoring forms are rejected outright in a parametrized scenario**, because each would make the grouped tree lie. Every one fails the run and writes no report — the message names the fix:
 
@@ -320,7 +320,7 @@ g = FileGlossary('GLOSSARY.md', kind_column='Kind')   # explicit kinds from a "K
 g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning')
 ```
 
-Access terms by name — `g['Guest']` (case-insensitive). The returned handle is usable inline everywhere a code-defined handle is:
+Access terms by name — `g['Guest']` (case-insensitive). A `FileGlossary` is a **closed vocabulary**: unlike a code-defined `Glossary`, its `g('foo')` only looks up too, and both forms raise on an unknown name — new vocabulary is added as a row in the file. The returned handle is usable inline everywhere a code-defined handle is:
 
 ```python
 # In a story activity:
@@ -354,7 +354,7 @@ In a parametrized scenario the label must read the same in every case: a payload
 
 ## pytest options
 
-All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-*` flag enables its own sink independently, and they combine freely (e.g. pass both `--given-json` and `--given-html` to get both files from one run). `--given-html` no longer writes a JSON file alongside it.
+All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-*` flag enables its own sink independently, and they combine freely (e.g. pass both `--given-json` and `--given-html` to get both files from one run).
 
 | Flag | Default | Description |
 |------|---------|-------------|
@@ -458,7 +458,6 @@ Caveats:
 
 - Editor presets (`vscode` / `cursor` / `zed`) resolve `{path}` from the current working directory at render time. Re-rendering a CI-downloaded JSON from a different directory will produce broken links.
 - The GitHub-permalink template is SHA-pinned, so links remain stable after the line moves — what an archived CI report wants.
-- The `github` preset bakes the detected org/repo into the template at config-resolution time (session start / CLI invocation). If you later re-render the same JSON elsewhere, the org/repo in the link is the one detected on the original run.
 - Pytest 9 uses `[tool.pytest]`; older pytest used `[tool.pytest.ini_options]` (still accepted for back-compat).
 
 ## Standalone CLI

@@ -58,3 +58,5 @@ Rate an unnarrated branch below overstatement: silence understates, which mislea
 For each finding: file:line, what the narration claims, what the body actually does, why it matters. Rate truthfulness findings highest — a false spec misleads every future reader; language drift rates below that, because a drifted vocabulary erodes slowly rather than lying outright.
 
 **Report legibility is reviewable; taste is not.** The premise of the whole exercise is that the report is documentation, so how the document *reads* is in scope: inconsistent casing or phrasing of the same concept across step texts, a scenario name that doesn't parse as a sentence, two scenarios whose titles don't distinguish them. Rate these lowest and report them as one batched finding, not one per instance. Out of scope is what legibility doesn't reach — a wording you would simply have chosen differently.
+
+*These files are installed by `pytest-given skills install` and overwritten on reinstall — don't edit them in place.*

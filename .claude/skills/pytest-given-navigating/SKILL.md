@@ -10,7 +10,7 @@ The test suite narrates itself: rendered scenarios are a behavioural spec, the g
 ## Orientation — first contact
 
 1. **Glossary first.** Read `GLOSSARY.md` (or the `Glossary()` / `FileGlossary` declaration reachable from a `conftest.py`): the domain vocabulary, with definitions.
-2. **Render the spec.** `pytest <selection> --given-md` runs the selected tests and prints a Markdown spec of every scenario to stdout between `<!-- pytest-given:md:start -->` / `:end` fences — narration with `«term»` markers, tags after each node id, ✓/✗ status. Select with pytest's own args (`-k`, node ids, `--lf`); the renderer narrates whatever ran.
+2. **Render the spec.** `pytest <selection> --given-md` runs the selected tests and prints a Markdown spec of every scenario to stdout between `<!-- pytest-given:md:start -->` / `:end` fences — narration with `«term»` markers, tags after each node id, and a ✓ / ✗ / ⤼ status glyph per scenario (a skipped one also carries ` · skipped` and its reason). Select with pytest's own args (`-k`, node ids, `--lf`); the renderer narrates whatever ran.
 3. **Stories.** Read the `story(...)` definitions — actor-level flows the scenarios implement; `story=` on a `@scenario` links them.
 
 ## Structured questions — JSON + jq
@@ -24,7 +24,7 @@ jq -r '.scenarios[] | select(.tags | index("validation"))
 ```
 
 - By status: `select(.status == "failed")`; the failure message and frames are in `.error`.
-- By term: `select([.steps[].narration.parts[]?.term_id] | index("waitlist"))` — term ids are slugs (lowercased, non-alphanumeric → `-`, so `Late fee` → `late-fee`).
+- By term: `select([.. | .term_id? // empty] | index("waitlist"))` — recursive, because steps nest and a term ref at any depth counts. Term ids are slugs (lowercased, non-alphanumeric → `-`, so `Late fee` → `late-fee`).
 - By story: `select(.story_id == "lend-and-return-a-book")` (story ids are slugs too).
 
 ## Traps
@@ -38,3 +38,5 @@ jq -r '.scenarios[] | select(.tags | index("validation"))
 ## When to drop to the code
 
 To change behaviour, or to verify one scenario's narration against its body. Jump straight to the scenario's `source.relpath` + `source.line` from the JSON (or the ``file.py:line::test_name`` line under each Markdown heading) rather than searching for it.
+
+*These files are installed by `pytest-given skills install` and overwritten on reinstall — don't edit them in place.*

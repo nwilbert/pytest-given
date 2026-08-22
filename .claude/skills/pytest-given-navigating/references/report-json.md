@@ -3,7 +3,7 @@
 `pytest <selection> --given-json=report.json` writes one file with four top-level keys:
 
 ```
-metadata      project, timestamp, commit_sha, duration_ms
+metadata      project, title, timestamp, pytest_version, plugin_version, commit_sha
 scenarios[]   one entry per @scenario (parametrized cases grouped into one)
 glossary      {terms: [...]} — every declared term, referenced or not
 stories[]     one entry per story(...)
@@ -13,13 +13,16 @@ stories[]     one entry per story(...)
 
 | Field | Meaning |
 |---|---|
+| `id` | The pytest node id (`tests/test_x.py::test_y`), parametrize suffix dropped for a grouped scenario |
 | `narration.text` | The scenario name (grouped template for parametrized scenarios) — for a *step* in a grouped parametrized scenario this is the template too (`the drink costs {price} euros`), not the first case's rendering |
 | `module` | Python module the test lives in |
 | `tags[]` | `tags=` from `@scenario` — report metadata, **not** pytest marks |
 | `status` | `passed` / `failed` / `skipped` |
+| `skip_reason` | `null`, or the reason a skipped scenario carries instead of a traceback |
+| `duration_ms` | Wall-clock time for the test |
 | `steps[]` | Recursive step tree (see below) |
 | `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{values, status, error}]}` for parametrized scenarios. `kind` is `param` / `derived` / `attachment`; a case's `values` is positionally aligned with `columns`, and an `attachment` cell is an `{label, content, content_type}` object (or `null` for a case with no value). A scenario opted out of grouping with `group_parametrized=False` has `parameters: null` like any unparametrized one |
-| `error` | `null`, or `{message, frames: [{path, lineno, func, code}]}` |
+| `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}]}` — `is_internal` marks a `pluggy` / `_pytest` / pytest-given frame, kept only under `--given-all-frames` |
 | `source` | `{relpath, line}` — the test function's definition site |
 | `story_id` / `activity_ids` | Story binding from `@scenario(..., story=...)` |
 
@@ -29,9 +32,12 @@ stories[]     one entry per story(...)
 
 `narration.parts[]` is the structured step text; each part is one of:
 
-- `{value: "literal text"}` — plain text or an interpolated non-term value
+- `{value: "literal text"}` — plain text
+- `{rendered, expression, format_spec, conversion}` — a t-string interpolation whose value is constant across cases; `rendered` is the text shown, `expression` the source it came from
 - `{term_id, display, expression, param_column}` — a glossary term reference
-- `{name, column_id}` — a placeholder for the column `column_id` in a grouped parametrized scenario
+- `{name, column_id, format_spec, conversion}` — a placeholder for the column `column_id` in a grouped parametrized scenario
+
+Match on the keys, not on position: a step's text is the concatenation of `value` / `rendered` / `display` / `{name}` across its parts.
 
 Term ids and story ids are slugs: lowercased, non-alphanumeric runs → `-` (`Late fee` → `late-fee`).
 
@@ -41,7 +47,7 @@ Term ids and story ids are slugs: lowercased, non-alphanumeric runs → `-` (`La
 
 ## Story
 
-`{id, title, activities: [{id, paths: [{parts: [{term_id, display}]}]}], source}` — activity ids are what `activity_ids` on scenarios and steps point at.
+`{id, title, activities: [{id, paths: [{parts: [...]}]}], source}` — activity ids are what `activity_ids` on scenarios and steps point at. An activity part is either `{term_id, display}` (a glossary term) or `{text}` (a bare connective word, which carries no id and never counts for coverage), so filter parts on `term_id` rather than assuming every one has it.
 
 ## Recipes
 

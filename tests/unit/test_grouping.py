@@ -1435,7 +1435,7 @@ def _pill_step(
 
 
 @scenario(
-    t'A {pg["Term ref"].low} whose pill differs between {pg["Case"]("cases")} '
+    t'A {pg["Term ref"].low} whose display differs between {pg["Case"]("cases")} '
     t'is refused',
     tags=['parametrization', 'validation'],
 )
@@ -1452,12 +1452,12 @@ def test_a_varying_pill_display_raises_rule_four() -> None:
         pytest.raises(PytestGivenError) as excinfo,
     ):
         group_parametrized(scenarios, info)
-    with then(t'the error names the {pg["Term ref"]} and the split-the-pill fix'):
+    with then(t'the error names the {pg["Term ref"]} and the split-it-out fix'):
         message = str(excinfo.value)
         assert (
             "glossary term ref {pg['Customer'](name)} in 'test_brew' varies" in message
         )
-        assert 'Split the pill from the value' in message
+        assert 'Split the term ref from the value' in message
         assert message.endswith('(t.py:12)')
 
 
@@ -1496,7 +1496,9 @@ def test_an_identical_pill_stays_inline() -> None:
     tags=['parametrization'],
 )
 def test_a_pill_bound_to_a_parametrize_column_does_not_raise() -> None:
-    with given(t'two {pg["Case"]("cases")} whose pill is the parameter itself'):
+    with given(
+        t'two {pg["Case"]("cases")} whose {pg["Term ref"]} is the parameter itself'
+    ):
         scenarios, info = _two_case_group(
             [_pill_step('guest', 'Alice', expression='cup_size')],
             [_pill_step('guest', 'Bob', expression='cup_size')],

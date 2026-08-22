@@ -253,7 +253,7 @@ def test_tstring_with_actor_emits_term_ref(glossary: Glossary) -> None:
         guest = glossary.actor('Guest')  # idempotent re-fetch
     with when('the handle is interpolated into a t-string step'):
         _, parts = parse_tstring(t'a {guest} arrives')
-    with then(t'the step carries a {pg["Term ref"]} pill for that {pg["Actor"]}'):
+    with then(t'the step carries a {pg["Term ref"]} for that {pg["Actor"]}'):
         assert any(
             isinstance(p, NarrationTermRef)
             and p.term_id == 'guest'
@@ -405,7 +405,7 @@ def test_tstring_with_file_term_handle_emits_term_ref(
         guest = file_glossary['Guest']
     with when('it is interpolated into a t-string step', activity=4):
         _, parts = parse_tstring(t'a {guest} arrives')
-    with then(t'the step carries a single {pg["Term ref"]} pill'):
+    with then(t'the step carries a single {pg["Term ref"]}'):
         term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
         assert len(term_refs) == 1
         assert term_refs[0].term_id == 'guest'

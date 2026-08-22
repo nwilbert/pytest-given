@@ -133,7 +133,7 @@ def _part_key(part: NarrationPart) -> PartKey:
 
     Never `rendered`, which is exactly what grouping promotes into a column,
     and never a term ref's `display`, which rule 4 governs and which a
-    param-bound pill varies by design.
+    param-bound term ref varies by design.
     """
     match part:
         case NarrationLiteral(value=value):
@@ -287,17 +287,17 @@ def check_constant_term_ref(
     phase: Phase,
     ctx: GroupContext,
 ) -> None:
-    """Rule 4: a pill no parametrize column binds must read the same in every
+    """Rule 4: a term ref no parametrize column binds must read the same in every
     case.
 
-    Rejected rather than promoted: promotion would strip the pill out of the
+    Rejected rather than promoted: promotion would strip the term ref out of the
     grouped tree, and `compute_coverage` matches story activities on term-ref
     identities.
     """
     identity = (part.term_id, part.display)
     for case in ctx.comparable:
         # Rule 6 pins every comparable case to the baseline's template, so a
-        # pill here is a pill there; what may still differ is which term it
+        # term ref here is a term ref there; what may still differ is which term it
         # names and how it reads, which is this rule's subject.
         case_part = ctx.indexed[case.id][path].narration.parts[index]
         assert isinstance(case_part, NarrationTermRef), (
@@ -309,7 +309,7 @@ def check_constant_term_ref(
             ctx.anchor,
             f'glossary term ref {{{part.expression}}} in '
             f'{_test_name(ctx.anchor)!r} varies across parametrize '
-            f'cases — a term pill must name the same term and read the '
-            f'same in every case. Split the pill from the value: '
+            f'cases — a term ref must name the same term and read the '
+            f'same in every case. Split the term ref from the value: '
             f'{phase}(t"{{pg[\'Term\']}} {{value}} …").',
         )

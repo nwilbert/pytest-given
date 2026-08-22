@@ -463,7 +463,7 @@ def scenario(
     resolved_name: str | Template | Narration
     if isinstance(name, templatelib.Template):
         # @scenario runs at module-import time. Glossary handles are in scope
-        # then and render eagerly to term pills; a parametrize value is not,
+        # then and render eagerly to term refs; a parametrize value is not,
         # so it would be baked into the name frozen. Accept the first, reject
         # the second — mirrors the step-decorator rule.
         narration = narration_from(name)
@@ -475,7 +475,7 @@ def scenario(
                     f'@scenario runs at module-import time, so parametrize '
                     f'values are not in scope. Use pytest_given.Template(...) '
                     f'for a parametrized name, a glossary handle '
-                    f'(g.actor/g.work_object/g.verb) for a term pill, or a '
+                    f'(g.actor/g.work_object/g.verb) for a term ref, or a '
                     f'plain string for a static name.'
                 )
         resolved_name = narration

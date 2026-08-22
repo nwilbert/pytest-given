@@ -22,7 +22,7 @@ Two things make this more than a parser:
    variable required.
 
 This supersedes the "external glossary file formats (Markdown)" out-of-scope
-line in the [Domain Storytelling spec](../2026-06-07-domain-storytelling-design.md).
+line in the [Domain Storytelling spec](2026-06-07-domain-storytelling-design.md).
 
 ## Scope
 

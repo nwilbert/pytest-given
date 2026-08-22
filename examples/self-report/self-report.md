@@ -1007,7 +1007,7 @@
 
 - **given** an «Actor» handle from the glossary
 - **when** the handle is interpolated into a t-string step
-- **then** the step carries a «Term ref» pill for that «Actor»
+- **then** the step carries a «Term ref» for that «Actor»
 
 ## ✓ A «work object» handle in a t-string emits a «term ref»
 `tests/unit/capture/test_template.py:277::test_tstring_with_work_object_emits_term_ref`
@@ -1042,7 +1042,7 @@
 
 - **given** a «Deferred term» from a «File glossary»
 - **when** it is interpolated into a t-string step
-- **then** the step carries a single «Term ref» pill
+- **then** the step carries a single «Term ref»
 
 ## ✓ The «glossary» view aggregates «instances» and «verb» forms
 `tests/unit/report/test_aggregations.py:163::test_build_glossary_aggregations_collects_instances_and_forms`
@@ -1542,24 +1542,24 @@
 - **then** the grouping is refused
 - **then** the error names the column and what the case actually narrated
 
-## ✓ A «term ref» whose pill differs between «cases» is refused
+## ✓ A «term ref» whose display differs between «cases» is refused
 `tests/unit/test_grouping.py:1437::test_a_varying_pill_display_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» reads differently
 - **when** the «cases» are «grouped»
 - **then** the grouping is refused
-- **then** the error names the «Term ref» and the split-the-pill fix
+- **then** the error names the «Term ref» and the split-it-out fix
 
 ## ✓ A «term ref» that *is* the parametrize value stays supported
 `tests/unit/test_grouping.py:1494::test_a_pill_bound_to_a_parametrize_column_does_not_raise` · parametrization
 
-- **given** two «cases» whose pill is the parameter itself
+- **given** two «cases» whose «Term ref» is the parameter itself
 - **when** the «cases» are «grouped»
 - **then** the «Term ref» is kept, bound to its parametrize column
 - **then** no extra column is made — the parametrize one already holds it
 
 ## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py:1644::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+`tests/unit/test_grouping.py:1646::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
 
 - **given** two «cases» attaching a label with differing payloads
 - **when** «templatizing» walks the «cases»
@@ -1567,7 +1567,7 @@
 - **then** the «Step» keeps a content-less badge pointing at it
 
 ## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py:1700::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+`tests/unit/test_grouping.py:1702::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
 
 - **given** an «Attachment» label only one «Case» attaches
 - **when** the «cases» are «grouped»
@@ -1575,7 +1575,7 @@
 - **then** the error names the label and asks for a constant one
 
 ## ✓ A «parameter table» cell reads the way the «step» that points at it read
-`tests/unit/test_grouping.py:2248::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+`tests/unit/test_grouping.py:2250::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec
 - **when** «grouping» builds the «parameter table»
@@ -1583,7 +1583,7 @@
 - **then** the step keeps its placeholder, which that cell substitutes into
 
 ## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py:2386::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+`tests/unit/test_grouping.py:2388::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
 
 - **given** two «cases» whose «step» trees differ
 - **when** the «cases» are «grouped»

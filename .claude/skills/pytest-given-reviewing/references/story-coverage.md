@@ -43,5 +43,3 @@ for story in d['stories']:
 ```
 
 It matches on term ids alone, so it ignores the identity rule above: treat its output as a **floor**. It can call an instance-anchored activity covered when the report won't, so tighten it by comparing `display` values when the story under review uses instances.
-
-*These files are installed by `pytest-given skills install` and overwritten on reinstall — don't edit them in place.*

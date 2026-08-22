@@ -184,7 +184,7 @@ body {
 
 
 /* Segmented toggle — a connected single-select control. Shared by the
-   "Browse by" (Tags/Modules) toggle and the glossary "Definitions" filter so
+   "Browse by" (Tags/Terms/Modules) toggle and the glossary "Definitions" filter so
    the two read as the same idiom. (The Status pills above are deliberately
    separate: they are multi-select with per-status semantic colors.) */
 .seg-toggle {

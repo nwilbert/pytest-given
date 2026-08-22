@@ -2,7 +2,7 @@
 
 Canonical vocabulary for pytest-given. Use these terms in code, docs, commit messages, and conversation; flag inconsistencies in review.
 
-This glossary covers pytest-given's own bounded context. The terminology a *user's* test suite adopts (the domain the user is testing — e.g., the coffee domain in `examples/test_examples.py`) is a separate concern.
+This glossary covers pytest-given's own bounded context. The terminology a *user's* test suite adopts (the domain the user is testing — e.g., the coffee domain in `examples/coffeeshop/test_coffeeshop.py`) is a separate concern.
 
 **Update rule:** rename or repurpose a term → update this file in the same commit.
 
@@ -11,7 +11,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | Term | Meaning |
 |---|---|
 | **Scenario** | A test function decorated with `@scenario(...)`. Not every pytest test is a scenario — undecorated tests are tolerated but not collected. |
-| **Step** | A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest. Each carries a phase, text, status (`'passed'` by default; set to `'failed'` on the step where a scenario fails, for highlighting in the report), optional error, attachments, and children. |
+| **Step** | A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest. Each carries a phase, text, status, optional error, attachments, and children. A failure is recorded on the scenario, and the report renders a step's `error` where one is attached; step status stays `'passed'` unless a step is failed explicitly. |
 | **Narration** | The human-readable text on a step or scenario name. Modeled as a `Narration` dataclass bundling a flat rendered `text: str` with a `parts: list[NarrationPart]` (empty for plain-string authoring; populated when the source was a t-string or `pytest_given.Template`, with `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` pieces). The structured form lets the templatizer and renderer treat parametrize-bound values specially without regex tricks. |
 | **Phase** | The category of a step: `given`, `when`, or `then`. A step has exactly one phase. |
 | **when_then** | A step-authoring helper that emits a `when` action and its `then` outcome as two sibling steps from a single `with` block. Used mainly to narrate an expected raise (`with when_then('the action', 'the error is raised'), pytest.raises(...)`), so the action and its outcome stay distinct steps. |
@@ -25,7 +25,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Parametrized scenario** | A `@scenario`-decorated test that also carries `@pytest.mark.parametrize(...)`. Produces multiple scenario records during a run; pytest-given groups them. |
 | **Case** | One row of a parametrized scenario — a single tuple of parameter values, its status, and any error. |
 | **Parameter table** | The per-scenario grouping of typed columns + cases. A column is a `param` (a `@pytest.mark.parametrize` input), a `derived` (a narrated value that varies across cases) or an `attachment` (an attachment whose payload varies). Appears in the report below the grouped-template steps. |
-| **Group** | Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a parameter table. Scenarios group when they share the same name and module. `@scenario(group_parametrized=False)` declines the merge, so each case leaves as its own scenario. |
+| **Group** | Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a parameter table. Scenarios group when they share the same name and module. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario. |
 | **Templatize** | Derive the grouped-template step text by comparing every comparable case: what all of them share stays inline, and anything that varies becomes a `{name}` placeholder or attachment badge pointing at a parameter-table column. The baseline tree comes from the first passed case, and every other passed case must narrate that same template. |
 
 ## Fixtures and recording
@@ -51,7 +51,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | Term | Meaning |
 |---|---|
 | **Report** | The output artifact: a JSON data file and optional self-contained HTML and Markdown renderings derived from it. The JSON is the source of truth. |
-| **Renderer** | Converts a JSON report into a self-contained HTML page. |
+| **Renderer** | Converts a JSON report into a rendering — a self-contained HTML page or a Markdown document. |
 | **Parameter coloring** | Each parametrize column gets a stable highlight color; placeholders and matching values share that color wherever they appear in step text and the parameter table. |
 | **Value highlight** | A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column and are constant across every case (e.g., a computed expression like `price * 1.2`). One that varies becomes a `derived` column instead. |
 | **Source link** | A clickable file:line anchor on a scenario card, a story panel, or an expanded glossary term card. Resolved from the `given_source_link` config (preset name like `vscode` / `github`, or a raw URL template). Captured as a `SourceLocation` (POSIX relpath + 1-indexed line) — from `pytest.Item.location` for a scenario, from the declaration site for a *Story* or *Term*. Disabled by default. |
@@ -66,8 +66,8 @@ The Domain-Driven Design layer atop the core surface. All terms here are optiona
 | **File glossary** | A glossary loaded from a Markdown file, via the `FileGlossary(path)` class. It parses all GFM pipe tables in the file into the same inner `Glossary` model; terms are accessed by name (`g['Guest']`, case-insensitive). *Kind inference* fills in term kinds post-collection from activity *slot* positions when no explicit `kind_column` is configured. |
 | **Deferred term** | A term obtained before its kind is known — the `DeferredTermHandle` returned by the code glossary (`g('foo')` declare-or-get, `g['foo']` get-only) and by a *file glossary* (`g['Guest']`). One handle type serves all kinds (unlike the eager Actor/Work Object/Verb handles); the kind stays `None` until *kind inference* runs. |
 | **Term** | A registered glossary entry: an Actor, Work Object, Verb, or kindless term. Each carries an id (slug), a canonical name, a kind (`None` when kindless), and an optional definition (`str | None`, `None` when undefined). |
-| **Actor** | A glossary term for a participant in the domain (e.g., *Guest*). Renders with the actor pill style. |
-| **Work Object** | A glossary term for a thing acted on (e.g., *Room*, *Booking*). Renders with the work-object pill style. |
+| **Actor** | A glossary term for a participant in the domain (e.g., *Guest*). Carries the actor kind colour: a wash in narration, a pill in the Glossary view. |
+| **Work Object** | A glossary term for a thing acted on (e.g., *Room*, *Booking*). Carries the work-object kind colour: a wash in narration, a pill in the Glossary view. |
 | **Verb** | A glossary term for an action (e.g., *book*, *confirm*). Verbs accept inflections — calling `book('books')` records *books* as a surface form of the canonical *book*. |
 | **Term ref** | An occurrence of a term inside narration. Modelled as `NarrationTermRef` in step text and as `ActivityTermRef` inside activity prose. |
 | **Instance** | A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). Instances aggregate in the Glossary tab's refs block. |

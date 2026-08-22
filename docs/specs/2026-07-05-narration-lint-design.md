@@ -33,7 +33,7 @@ The linter **replaces** the standalone phase check: `--given-phase-check`, `give
 
 pytest-given's narration is **auditable, not verified**: the same author (increasingly, the same agent) writes both the code and the claim about the code, and nothing compares a step's text to its body. The report's proximity argument — narration in the same `with` block, same diff hunk, same review pane as the code — makes drift *visible*; this linter makes the structural subset of drift *detectable*.
 
-Most rules are the mechanical faces of narration rules already written down in [AGENTS.md](../../AGENTS.md#narration-rules-portable): "never write a placeholder step" (`empty-step`), "put the system-under-test call in `when`, not folded into the `then` assertion" (`action-in-then`, `check-outside-then`), "step structure must not depend on parameter values" (`divergent-case-structure`), "tag orthogonally to the glossary" (`tag-shadows-term`).
+Most rules are the mechanical faces of narration rules already written down in [AGENTS.md](../../.claude/skills/pytest-given-authoring/references/scenarios.md): "never write a placeholder step" (`empty-step`), "put the system-under-test call in `when`, not folded into the `then` assertion" (`action-in-then`, `check-outside-then`), "step structure must not depend on parameter values" (`divergent-case-structure`), "tag orthogonally to the glossary" (`tag-shadows-term`).
 
 ## What the linter cannot catch (non-goal)
 

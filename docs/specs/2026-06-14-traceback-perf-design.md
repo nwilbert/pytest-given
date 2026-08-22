@@ -34,7 +34,7 @@ The test file's AST size scales with the number of scenarios (`benchmarks/test_l
 
 Vanilla pytest with `--tb=no` does *not* pay this cost — pytest skips traceback formatting entirely when the user opts out. pytest-given calls `getrepr(style='short')` unconditionally to populate the JSON report, so it pays the cost regardless of `--tb`.
 
-The existing [Traceback Verbosity](../2026-06-07-traceback-verbosity-design.md) spec landed structured frames with an `is_internal` flag and a renderer toggle. Internal frames are classified but still stored. This spec proposes to drop them at capture time and, while we're at it, drop them *before* pytest formats them — which is what eliminates the AST cost.
+The existing [Traceback Verbosity](2026-06-07-traceback-verbosity-design.md) spec landed structured frames with an `is_internal` flag and a renderer toggle. Internal frames are classified but still stored. This spec proposes to drop them at capture time and, while we're at it, drop them *before* pytest formats them — which is what eliminates the AST cost.
 
 ## Approach
 

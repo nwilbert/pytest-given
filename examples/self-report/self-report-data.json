@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-21T18:14:44.235080+00:00",
+    "timestamp": "2026-08-22T09:46:12.197636+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "3aed1fcc79c23a08abf6816321a30324043af48c",
+    "commit_sha": "85c59bb3e5a3b4d0b13d1b7eb8a13fac4a47af27",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -11036,7 +11036,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the step carries a Term ref pill for that Actor",
+            "text": "the step carries a Term ref for that Actor",
             "parts": [
               {
                 "value": "the step carries a "
@@ -11048,7 +11048,7 @@
                 "param_column": null
               },
               {
-                "value": " pill for that "
+                "value": " for that "
               },
               {
                 "term_id": "actor",
@@ -11588,7 +11588,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the step carries a single Term ref pill",
+            "text": "the step carries a single Term ref",
             "parts": [
               {
                 "value": "the step carries a single "
@@ -11598,9 +11598,6 @@
                 "display": "Term ref",
                 "expression": "pg[\"Term ref\"]",
                 "param_column": null
-              },
-              {
-                "value": " pill"
               }
             ]
           },
@@ -16867,7 +16864,7 @@
     {
       "id": "tests/unit/test_grouping.py::test_a_varying_pill_display_raises_rule_four",
       "narration": {
-        "text": "A term ref whose pill differs between cases is refused",
+        "text": "A term ref whose display differs between cases is refused",
         "parts": [
           {
             "value": "A "
@@ -16879,7 +16876,7 @@
             "param_column": null
           },
           {
-            "value": " whose pill differs between "
+            "value": " whose display differs between "
           },
           {
             "term_id": "case",
@@ -16983,7 +16980,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the error names the Term ref and the split-the-pill fix",
+            "text": "the error names the Term ref and the split-it-out fix",
             "parts": [
               {
                 "value": "the error names the "
@@ -16995,7 +16992,7 @@
                 "param_column": null
               },
               {
-                "value": " and the split-the-pill fix"
+                "value": " and the split-it-out fix"
               }
             ]
           },
@@ -17046,7 +17043,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "two cases whose pill is the parameter itself",
+            "text": "two cases whose Term ref is the parameter itself",
             "parts": [
               {
                 "value": "two "
@@ -17058,7 +17055,16 @@
                 "param_column": null
               },
               {
-                "value": " whose pill is the parameter itself"
+                "value": " whose "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "Term ref",
+                "expression": "pg[\"Term ref\"]",
+                "param_column": null
+              },
+              {
+                "value": " is the parameter itself"
               }
             ]
           },
@@ -17299,7 +17305,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1644
+        "line": 1646
       },
       "story_id": null,
       "activity_ids": []
@@ -17448,7 +17454,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1700
+        "line": 1702
       },
       "story_id": null,
       "activity_ids": []
@@ -17575,7 +17581,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2248
+        "line": 2250
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -17718,7 +17724,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2386
+        "line": 2388
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -18621,7 +18627,7 @@
         "id": "step",
         "kind": "object",
         "canonical": "Step",
-        "definition": "A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest. Each carries a phase, text, status (`'passed'` by default; set to `'failed'` on the step where a scenario fails, for highlighting in the report), optional error, attachments, and children.",
+        "definition": "A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest. Each carries a phase, text, status, optional error, attachments, and children. A failure is recorded on the scenario, and the report renders a step's `error` where one is attached; step status stays `'passed'` unless a step is failed explicitly.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 14
@@ -18711,7 +18717,7 @@
         "id": "group",
         "kind": "verb",
         "canonical": "Group",
-        "definition": "Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a parameter table. Scenarios group when they share the same name and module. `@scenario(group_parametrized=False)` declines the merge, so each case leaves as its own scenario.",
+        "definition": "Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a parameter table. Scenarios group when they share the same name and module. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 28
@@ -18821,7 +18827,7 @@
         "id": "renderer",
         "kind": "actor",
         "canonical": "Renderer",
-        "definition": "Converts a JSON report into a self-contained HTML page.",
+        "definition": "Converts a JSON report into a rendering \u2014 a self-contained HTML page or a Markdown document.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 54
@@ -18901,7 +18907,7 @@
         "id": "actor",
         "kind": null,
         "canonical": "Actor",
-        "definition": "A glossary term for a participant in the domain (e.g., *Guest*). Renders with the actor pill style.",
+        "definition": "A glossary term for a participant in the domain (e.g., *Guest*). Carries the actor kind colour: a wash in narration, a pill in the Glossary view.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 69
@@ -18911,7 +18917,7 @@
         "id": "work-object",
         "kind": null,
         "canonical": "Work Object",
-        "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*). Renders with the work-object pill style.",
+        "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*). Carries the work-object kind colour: a wash in narration, a pill in the Glossary view.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 70

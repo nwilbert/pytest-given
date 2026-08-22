@@ -169,9 +169,9 @@ def try_term_ref(
     inflection — else None (fall back to NarrationValue). Also used by
     grouping to unwrap a parametrized term instance to its display.
 
-    Glossary handles render as kind-coloured pills carrying the term's
+    Glossary handles render as kind-coloured term refs carrying the term's
     canonical or instance display; format_spec and conversion have no
-    meaningful target on a pill, so a non-empty value is rejected at
+    meaningful target on a term ref, so a non-empty value is rejected at
     parse time rather than silently dropped.
     """
     match value:
@@ -197,7 +197,7 @@ def try_term_ref(
         raise PytestGivenError(
             f'glossary term interpolation {{{expression}{conv}{suffix}}} '
             f'cannot carry a format spec or conversion — glossary handles '
-            f'render as kind pills with a fixed display ({display!r}). '
+            f'render as kind-coloured term refs with a fixed display ({display!r}). '
             f'Drop the spec, or interpolate the underlying value separately.'
         )
     return NarrationTermRef(term_id=term_id, display=display, expression=expression)

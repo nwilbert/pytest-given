@@ -9,7 +9,7 @@ pytest-given skills install            # copies into ./.claude/skills/
 pytest-given skills install --check    # exit 1 if installed files drift from the bundled ones
 ```
 
-The portable narration rules in [AGENTS.md](../../AGENTS.md#narration-rules-portable) move into the authoring skill and this repo becomes the skills' first consumer: contributor agents auto-discover them from `.claude/skills/`, and AGENTS.md keeps only the repo-specific self-report mechanics. This resolves the "provide an agent skill" item in [TODO.md](../../TODO.md).
+The portable narration rules in [AGENTS.md](../../.claude/skills/pytest-given-authoring/references/scenarios.md) move into the authoring skill and this repo becomes the skills' first consumer: contributor agents auto-discover them from `.claude/skills/`, and AGENTS.md keeps only the repo-specific self-report mechanics. This resolves the "provide an agent skill" item in [TODO.md](../../TODO.md).
 
 ## Background
 
@@ -63,7 +63,7 @@ Always loaded when triggered, so it stays slim. Contents:
 
 ### `references/scenarios.md`
 
-The [portable narration rules](../../AGENTS.md#narration-rules-portable) from AGENTS.md, moved (not copied) and generalized:
+The [portable narration rules](../../.claude/skills/pytest-given-authoring/references/scenarios.md) from AGENTS.md, moved (not copied) and generalized:
 
 - Repo-specific references are replaced: the `pg` glossary handle, `tests/_vocab.py`, `test_story.py`/`test_glossary.py` pointers, the `self_report` nox session, and ruff `SIM117` notes give way to generic phrasing and coffeeshop-style examples.
 - Each rule keeps its structure: bolded imperative, then the reasoning. The rules are the product of real authoring iterations; the generalization must not flatten them into platitudes.
@@ -71,7 +71,7 @@ The [portable narration rules](../../AGENTS.md#narration-rules-portable) from AG
 
 ### `references/glossaries.md`, `references/stories.md`, `references/domain-storytelling.md`
 
-New content, written fresh from the README and design specs ([file-backed glossary](../2026-06-18-file-backed-glossary-design.md), [domain storytelling](../2026-06-07-domain-storytelling-design.md), [bare strings in activity paths](../2026-06-27-bare-strings-in-activity-paths-design.md)):
+New content, written fresh from the README and design specs ([file-backed glossary](2026-06-18-file-backed-glossary-design.md), [domain storytelling](2026-06-07-domain-storytelling-design.md), [bare strings in activity paths](2026-06-27-bare-strings-in-activity-paths-design.md)):
 
 - **glossaries.md** — `FileGlossary`/`GLOSSARY.md` as the recommended default (a Markdown table humans and agents both read), code-defined `Glossary` as the alternative; term naming (natural-language headers, not class names; the `id_derive` slug as the lookup key and why renames are code changes); kinds; keeping tags orthogonal to terms.
 - **stories.md** — `story()` mechanics: activity paths, actors, work objects, sentence grammar, linking scenarios to story steps; when a story earns its keep vs. scenarios alone.
@@ -109,7 +109,7 @@ Two mechanical layers plus the skill-content gate:
 ## Later phases (sketch)
 
 - **Phase 2, `pytest-given-navigating`:** how to read a codebase through its reports — `--given-md` for prose, `--given-json` + `jq` for filtering by tag/term/status, the glossary as the domain map, stories as the interaction map, source links back to code. Seed material: the "Handling report output" section of AGENTS.md, generalized.
-- **Phase 3, `pytest-given-reviewing`:** the narration lint as the structural gate; the semantic audit (does each step text match its body?) as a per-file fan-out to cheap fast-model subagents (TODO.md's haiku-reviewer idea; phrased harness-neutrally — audit inline where subagents aren't available). Semantic truth is exactly what the [lint spec](../2026-07-05-narration-lint-design.md) declared out of mechanical reach, and its anticipated `audit` command (serializing the already-captured `Step.source` ranges into (step text, body source) pairs) is the natural input feed — phase 3 may be what motivates building it. The judge takes the narration rules as its rubric (step text may abstract, never overstate), and findings are advisory review comments, not an exit code. Plus glossary/story review: term coverage, `tag-shadows-term`, dead terms. References the authoring skill's `scenarios.md` rather than restating it.
+- **Phase 3, `pytest-given-reviewing`:** the narration lint as the structural gate; the semantic audit (does each step text match its body?) as a per-file fan-out to cheap fast-model subagents (TODO.md's haiku-reviewer idea; phrased harness-neutrally — audit inline where subagents aren't available). Semantic truth is exactly what the [lint spec](2026-07-05-narration-lint-design.md) declared out of mechanical reach, and its anticipated `audit` command (serializing the already-captured `Step.source` ranges into (step text, body source) pairs) is the natural input feed — phase 3 may be what motivates building it. The judge takes the narration rules as its rubric (step text may abstract, never overstate), and findings are advisory review comments, not an exit code. Plus glossary/story review: term coverage, `tag-shadows-term`, dead terms. References the authoring skill's `scenarios.md` rather than restating it.
 - **Maybe later:** a Claude Code plugin-marketplace wrapper around the committed `.claude/skills/` copy, for `/plugin`-based updates.
 
 ## Out of scope

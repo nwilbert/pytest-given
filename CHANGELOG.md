@@ -68,6 +68,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
   tag should cut across modules and cover a minority of the suite.
 - The bundled authoring and reviewing skills gain the report mechanics their
   rules depend on, a symptom index, and a completeness audit.
+- The bundled skills are corrected against the shipped behaviour: the navigating
+  skill's term query now recurses into nested steps, its JSON reference matches
+  the emitted schema, and the authoring skill points divergent parametrize
+  narration at `group_parametrized=False` rather than at splitting the test.
 - The Scenarios sidebar and its header chips are visually tidied.
 - Glossary terms in a step or a scenario title now read as a word under a light
   wash rather than a bordered pill, with the kind in the ink and a neutral wash
