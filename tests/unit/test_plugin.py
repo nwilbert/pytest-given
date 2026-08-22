@@ -256,45 +256,64 @@ def test_sessionstart_gives_each_session_its_own_collector() -> None:
     assert outer_collector.active_scenario_id == NodeId('t::x')
 
 
+def _lifecycle_config(rootpath: Path) -> Any:
+    """A config double carrying what the config lifecycle touches: a stash, a
+    rootpath, and the cleanup stack pytest drains on shutdown."""
+    cleanups: list[Any] = []
+    return SimpleNamespace(
+        stash=pytest.Stash(),
+        rootpath=rootpath,
+        add_cleanup=cleanups.append,
+        cleanups=cleanups,
+    )
+
+
+def _drain_cleanups(config: Any) -> None:
+    """What `Config._ensure_unconfigure` does with the cleanup stack — run
+    whether or not the config ever reached `pytest_configure`."""
+    while config.cleanups:
+        config.cleanups.pop()()
+
+
 @pytest.mark.usefixtures('_reset_story_registry_plugin')
 def test_nested_session_restores_the_outer_story_registry(tmp_path: Any) -> None:
     """The story registry is displaced at `load_initial_conftests` time (before
     conftests import), so each session starts clean, but a nested in-process
-    session must put the outer session's registrations back when it
-    unconfigures — otherwise the outer session silently loses
+    session must put the outer session's registrations back when its config is
+    cleaned up — otherwise the outer session silently loses
     duplicate-declaration detection."""
-    outer = SimpleNamespace(stash=pytest.Stash(), rootpath=tmp_path / 'outer')
-    inner = SimpleNamespace(stash=pytest.Stash(), rootpath=tmp_path / 'inner')
+    outer = _lifecycle_config(tmp_path / 'outer')
+    inner = _lifecycle_config(tmp_path / 'inner')
     plugin.pytest_load_initial_conftests(cast(pytest.Config, outer))
     try:
         story_fn('Shared Title')
         plugin.pytest_load_initial_conftests(cast(pytest.Config, inner))
         story_fn('Shared Title')  # fresh registry per session: no duplicate error
-        plugin.pytest_unconfigure(cast(pytest.Config, inner))
+        _drain_cleanups(inner)
         with pytest.raises(PytestGivenError, match='already declared'):
             story_fn('Shared Title')  # the outer registration is back
     finally:
         # Puts back whatever rootdir the real surrounding session had.
-        plugin.pytest_unconfigure(cast(pytest.Config, outer))
+        _drain_cleanups(outer)
 
 
 def test_nested_config_lifecycle_restores_the_outer_rootdir(tmp_path: Any) -> None:
     """`pytest_load_initial_conftests` re-points the capture rootdir for a
-    nested in-process run; `pytest_unconfigure` must point it back so the
+    nested in-process run; the cleanup it registers must point it back so the
     outer session's path resolution keeps working after the nested run."""
-    outer_config = SimpleNamespace(stash=pytest.Stash(), rootpath=tmp_path / 'outer')
-    nested_config = SimpleNamespace(stash=pytest.Stash(), rootpath=tmp_path / 'nested')
+    outer_config = _lifecycle_config(tmp_path / 'outer')
+    nested_config = _lifecycle_config(tmp_path / 'nested')
     target = tmp_path / 'outer' / 'f.py'
     plugin.pytest_load_initial_conftests(cast(pytest.Config, outer_config))
     try:
         assert file_source(target, 1) is not None
         plugin.pytest_load_initial_conftests(cast(pytest.Config, nested_config))
         assert file_source(target, 1) is None  # re-pointed at the nested root
-        plugin.pytest_unconfigure(cast(pytest.Config, nested_config))
+        _drain_cleanups(nested_config)
         assert file_source(target, 1) is not None  # outer resolution restored
     finally:
         # Puts back whatever rootdir the real surrounding session had.
-        plugin.pytest_unconfigure(cast(pytest.Config, outer_config))
+        _drain_cleanups(outer_config)
 
 
 def test_get_scenario_marker_returns_none_for_item_without_function() -> None:

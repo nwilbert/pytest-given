@@ -88,6 +88,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Plugin and run behaviour
 
+- A nested in-process pytest run that dies while parsing its arguments no longer
+  strands the outer session's captured rootdir, which silently dropped every
+  later step's source anchor and with it the lint's whole AST-rule surface.
 - A fixture that raises after its `yield` now fails the scenario it tore down,
   instead of leaving it green in a report pytest counted as an error.
 - Every report-building failure — a suite reaching two glossaries, a term used in

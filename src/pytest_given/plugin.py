@@ -65,7 +65,6 @@ from .model import (
     Scenario,
     Step,
     Story,
-    StoryId,
     placeholder_mismatch,
     report_from_dict,
     report_to_dict,
@@ -88,14 +87,6 @@ def _collector(config: pytest.Config) -> Collector:
     and thereby clobbering — the outer session's.
     """
     return config.stash[_collector_key]
-
-
-# Module-global state this config displaced when it took over the process —
-# put back at `pytest_unconfigure` so a nested in-process run (pytester,
-# `pytest.main`) leaves the outer session's state as it found it.
-_displaced_rootdir_key: pytest.StashKey[Path | None] = pytest.StashKey()
-_displaced_stories_key: pytest.StashKey[dict[StoryId, str]] = pytest.StashKey()
-_displaced_active_collector_key: pytest.StashKey[Collector | None] = pytest.StashKey()
 
 
 _LINT_CHOICES = ('true', 'false')
@@ -265,14 +256,37 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
     clearing at sessionstart would leave the outer session's registrations
     visible (spurious `already declared` collisions) and let the nested run's
     own registrations leak back into the outer session."""
-    early_config.stash[_displaced_rootdir_key] = current_rootdir()
-    set_rootdir(Path(early_config.rootpath))
-    early_config.stash[_displaced_stories_key] = snapshot_story_registry()
-    clear_story_registry()
     # The active-collector ContextVar is process-global too: a nested run's
     # per-test teardown clears it, so remember the outer session's value (the
     # scenario mid-flight when the nested run began, if any) to restore it.
-    early_config.stash[_displaced_active_collector_key] = get_active_collector()
+    displaced_rootdir = current_rootdir()
+    displaced_stories = snapshot_story_registry()
+    displaced_collector = get_active_collector()
+
+    def restore_displaced_globals() -> None:
+        """Put back the module-global state this config displaced, so a nested
+        in-process run (pytester, `pytest.main`) leaves the outer session's
+        state as it found it.
+
+        A config cleanup rather than `pytest_unconfigure`: pytest drains the
+        cleanup stack from `Config._ensure_unconfigure` whether or not the run
+        ever configured, while `pytest_unconfigure` only fires for one that
+        did. A nested run that dies during argument parsing — an unrecognized
+        flag raises `UsageError` before `pytest_configure` — would otherwise
+        strand the outer session's rootdir at the nested run's, and every step
+        recorded afterwards would capture `source=None`, silently taking the
+        lint's whole AST-rule surface down with it.
+
+        Registered only once all three values are in hand, so a run that
+        aborted before this point has nothing to restore.
+        """
+        restore_rootdir(displaced_rootdir)
+        restore_story_registry(displaced_stories)
+        set_active_collector(displaced_collector)
+
+    early_config.add_cleanup(restore_displaced_globals)
+    set_rootdir(Path(early_config.rootpath))
+    clear_story_registry()
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
@@ -280,19 +294,6 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     collector = Collector()
     collector.capture_step_source = _lint_enabled(session.config)
     session.config.stash[_collector_key] = collector
-
-
-def pytest_unconfigure(config: pytest.Config) -> None:
-    """Put back the module-global state this config displaced, so a nested
-    in-process run leaves the outer session's rootdir and story registry as it
-    found them. Guarded per key: a run that aborted before the corresponding
-    save point has nothing to restore."""
-    if _displaced_rootdir_key in config.stash:
-        restore_rootdir(config.stash[_displaced_rootdir_key])
-    if _displaced_stories_key in config.stash:
-        restore_story_registry(config.stash[_displaced_stories_key])
-    if _displaced_active_collector_key in config.stash:
-        set_active_collector(config.stash[_displaced_active_collector_key])
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:

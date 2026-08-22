@@ -174,3 +174,43 @@ def test_active_collector_restored_after_nested_run_inside_step(pytester):
     pytester.makepyfile(test_outer=OUTER_NESTED_IN_STEP)
     result = pytester.runpytest()
     result.assert_outcomes(passed=1)
+
+
+OUTER_ABORTED_NESTED = """
+import pytest
+from pytest_given import scenario, given, when, then
+
+
+def test_before_runs_nested_pytest_that_aborts(tmp_path):
+    sub = tmp_path / "nested"
+    sub.mkdir()
+    (sub / "test_nested.py").write_text("def test_ok():\\n    assert True\\n")
+    # Dies while parsing arguments, before pytest_configure: the nested run
+    # never reaches pytest_unconfigure.
+    ret = pytest.main([str(sub), "--no-such-flag", "-p", "no:cacheprovider"])
+    assert ret == pytest.ExitCode.USAGE_ERROR
+
+
+@scenario("After the aborted nested run")
+def test_after():
+    with given("a value"):
+        pass
+    with when("computing"):
+        x = 2
+    with then("it is two"):
+        assert x == 2
+"""
+
+
+def test_lint_still_anchors_steps_after_nested_run_aborts_at_argparse(pytester):
+    """A nested run that dies during argument parsing never reaches
+    `pytest_unconfigure`, so the rootdir it displaced must be put back by a
+    config cleanup instead. Without that, every later step records
+    `source=None` and the whole AST-rule surface goes silently dark."""
+    pytester.makepyfile(test_outer=OUTER_ABORTED_NESTED)
+    result = pytester.runpytest('--given-lint=true')
+    result.assert_outcomes(passed=2)
+    assert result.ret == pytest.ExitCode.TESTS_FAILED
+    result.stdout.fnmatch_lines(
+        ["*ERROR*empty-step*test_outer.py::test_after*'a value'*has no code*"]
+    )
