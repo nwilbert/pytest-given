@@ -96,7 +96,7 @@ def _substituted_part(
 
 def _suffixed(narration: Narration, suffix: str) -> Narration:
     """The parametrize id appended as text and, when the narration is built
-    from parts, as one more literal — so a term pill survives the suffixing and
+    from parts, as one more literal — so a term ref survives the suffixing and
     the text still reads as what the parts render."""
     parts = list(narration.parts)
     if parts:

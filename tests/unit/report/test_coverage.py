@@ -611,7 +611,7 @@ def test_coverage_does_not_mix_displays_from_two_cases(
     assert compute_coverage(glossary, scenario, story) == {}
 
 
-def test_param_case_displays_is_empty_without_a_param_linked_pill(
+def test_param_case_displays_is_empty_without_a_param_linked_term_ref(
     guest_scenario: tuple[Glossary, Story, Scenario],
 ) -> None:
     _glossary, _story, scenario = guest_scenario
@@ -631,10 +631,10 @@ def test_param_case_displays_is_empty_for_an_unparametrized_scenario() -> None:
 def test_param_case_displays_skips_non_param_unlinked_and_none_cells() -> None:
     """The per-case filter has three independent reasons to drop a column
     from a case's substitution mapping: it isn't a `param` column even though
-    a pill is bound to it (`note`, below — a derived column can share a name
-    with a parametrize argname), it's a `param` column but no pill is bound to
+    a term ref is bound to it (`note`, below — a derived column can share a name
+    with a parametrize argname), it's a `param` column but no term ref is bound to
     it (`other`, below), or the cell is `None` for a case — a legitimate
-    parametrize value, not a missing one, but not something a pill display
+    parametrize value, not a missing one, but not something a term ref display
     substitutes in."""
     step = Step(
         phase='when',
@@ -679,7 +679,7 @@ def test_param_case_displays_skips_non_param_unlinked_and_none_cells() -> None:
 
 def test_param_case_displays_drops_a_case_that_did_not_pass() -> None:
     """A skipped case ran nothing, so its parametrize value must not stand in
-    for a pill: doing so lets it satisfy a story activity and lists it in the
+    for a term ref: doing so lets it satisfy a story activity and lists it in the
     Glossary as an observed instance of the term."""
     step = Step(
         phase='when',
@@ -712,8 +712,8 @@ def test_param_case_displays_drops_a_case_that_did_not_pass() -> None:
     assert param_case_displays(scenario) == [{'guest': 'Alice'}]
 
 
-def test_s_for_step_drops_a_pill_the_case_has_no_value_for(g) -> None:
-    """A pill bound to a parametrize column whose cell this case leaves empty
+def test_s_for_step_drops_a_term_ref_the_case_has_no_value_for(g) -> None:
+    """A term ref bound to a parametrize column whose cell this case leaves empty
     has no display *for this case*. Falling back to the one the grouped tree
     carries would hand the case another case's guest, and let it satisfy an
     activity naming that guest."""

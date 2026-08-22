@@ -142,8 +142,8 @@ def test_every_title_carries_its_parametrize_id() -> None:
     ]
 
 
-def test_suffixed_glossary_name_keeps_its_pill_and_carries_the_suffix() -> None:
-    """The suffix lands in the parts too, so the term pill survives and the
+def test_suffixed_glossary_name_keeps_its_term_ref_and_carries_the_suffix() -> None:
+    """The suffix lands in the parts too, so the term ref survives and the
     text still reads as what the parts render."""
     name = Narration(
         text='Barista brews',

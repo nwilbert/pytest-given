@@ -1417,7 +1417,7 @@ def test_a_single_case_group_cannot_raise_a_comparison_rule() -> None:
     )
 
 
-def _pill_step(
+def _term_ref_step(
     term_id: str, display: str, expression: str = "pg['Customer'](name)"
 ) -> Step:
     return Step(
@@ -1439,10 +1439,10 @@ def _pill_step(
     t'is refused',
     tags=['parametrization', 'validation'],
 )
-def test_a_varying_pill_display_raises_rule_four() -> None:
+def test_a_varying_term_ref_display_raises_rule_four() -> None:
     with given(t'two {pg["Case"]("cases")} whose {pg["Term ref"]} reads differently'):
         scenarios, info = _two_case_group(
-            [_pill_step('customer', 'Alice')], [_pill_step('customer', 'Bob')]
+            [_term_ref_step('customer', 'Alice')], [_term_ref_step('customer', 'Bob')]
         )
     with (
         when_then(
@@ -1461,9 +1461,9 @@ def test_a_varying_pill_display_raises_rule_four() -> None:
         assert message.endswith('(t.py:12)')
 
 
-def test_a_varying_pill_term_id_raises_rule_four() -> None:
+def test_a_varying_term_ref_term_id_raises_rule_four() -> None:
     scenarios, info = _two_case_group(
-        [_pill_step('customer', 'Alice')], [_pill_step('guest', 'Alice')]
+        [_term_ref_step('customer', 'Alice')], [_term_ref_step('guest', 'Alice')]
     )
     with pytest.raises(PytestGivenError, match='glossary term ref'):
         group_parametrized(scenarios, info)
@@ -1472,8 +1472,8 @@ def test_a_varying_pill_term_id_raises_rule_four() -> None:
 def test_rule_four_names_the_violating_steps_own_phase() -> None:
     """The hint must name the author's keyword, not the spec example's."""
     scenarios, info = _two_case_group(
-        [dataclasses.replace(_pill_step('customer', 'Alice'), phase='then')],
-        [dataclasses.replace(_pill_step('customer', 'Bob'), phase='then')],
+        [dataclasses.replace(_term_ref_step('customer', 'Alice'), phase='then')],
+        [dataclasses.replace(_term_ref_step('customer', 'Bob'), phase='then')],
     )
     with pytest.raises(PytestGivenError) as excinfo:
         group_parametrized(scenarios, info)
@@ -1481,9 +1481,9 @@ def test_rule_four_names_the_violating_steps_own_phase() -> None:
     assert 'then(t"{pg[\'Term\']} {value} …").' in message
 
 
-def test_an_identical_pill_stays_inline() -> None:
+def test_an_identical_term_ref_stays_inline() -> None:
     scenarios, info = _two_case_group(
-        [_pill_step('customer', 'Alice')], [_pill_step('customer', 'Alice')]
+        [_term_ref_step('customer', 'Alice')], [_term_ref_step('customer', 'Alice')]
     )
     grouped = group_parametrized(scenarios, info)[0]
     assert isinstance(grouped.steps[0].narration.parts[0], NarrationTermRef)
@@ -1495,13 +1495,13 @@ def test_an_identical_pill_stays_inline() -> None:
     t'A {pg["Term ref"].low} that *is* the parametrize value stays supported',
     tags=['parametrization'],
 )
-def test_a_pill_bound_to_a_parametrize_column_does_not_raise() -> None:
+def test_a_term_ref_bound_to_a_parametrize_column_does_not_raise() -> None:
     with given(
         t'two {pg["Case"]("cases")} whose {pg["Term ref"]} is the parameter itself'
     ):
         scenarios, info = _two_case_group(
-            [_pill_step('guest', 'Alice', expression='cup_size')],
-            [_pill_step('guest', 'Bob', expression='cup_size')],
+            [_term_ref_step('guest', 'Alice', expression='cup_size')],
+            [_term_ref_step('guest', 'Bob', expression='cup_size')],
         )
     with when(t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}'):
         grouped = group_parametrized(scenarios, info)[0]
@@ -1514,19 +1514,20 @@ def test_a_pill_bound_to_a_parametrize_column_does_not_raise() -> None:
         assert [c.kind for c in grouped.parameters.columns] == ['param']
 
 
-def test_a_differently_shaped_pill_refuses_the_merge_before_rule_four() -> None:
-    """A case carrying no parts where the baseline carries a pill is caught as
-    a shape difference — rule 4 speaks only for a pill that is still a pill in
+def test_a_differently_shaped_term_ref_refuses_the_merge_before_rule_four() -> None:
+    """A case carrying no parts where the baseline carries a term ref is caught
+    as a shape difference — rule 4 speaks only for a term ref that is still a
+    term ref in
     every case."""
     scenarios, info = _two_case_group(
-        [_pill_step('customer', 'Alice')],
+        [_term_ref_step('customer', 'Alice')],
         [Step(phase='given', narration=Narration(text='Bob places an order'))],
     )
     with pytest.raises(PytestGivenError, match='differently shaped'):
         group_parametrized(scenarios, info)
 
 
-def test_a_same_length_pill_with_a_different_part_kind_refuses_the_merge() -> None:
+def test_a_same_length_term_ref_with_a_different_part_kind_refuses_the_merge() -> None:
     other_step = Step(
         phase='given',
         narration=Narration(
@@ -1537,7 +1538,9 @@ def test_a_same_length_pill_with_a_different_part_kind_refuses_the_merge() -> No
             ],
         ),
     )
-    scenarios, info = _two_case_group([_pill_step('customer', 'Alice')], [other_step])
+    scenarios, info = _two_case_group(
+        [_term_ref_step('customer', 'Alice')], [other_step]
+    )
     with pytest.raises(PytestGivenError, match='differently shaped'):
         group_parametrized(scenarios, info)
 
@@ -1546,7 +1549,7 @@ def test_rule_four_checks_every_comparable_case_not_just_an_end_one() -> None:
     """Every other rule-4 fixture in this file is a two-case group with the
     varying case last, so nothing distinguishes "checks all cases" from
     "checks only the first" or "checks only the last". Case 1 and case 3
-    share an identical pill; only case 2's pill varies, so a raise can only
+    share an identical term ref; only case 2's varies, so a raise can only
     come from actually checking the middle case."""
     nid1, nid2, nid3 = (
         NodeId('t.py::test_brew[a]'),
@@ -1559,7 +1562,7 @@ def test_rule_four_checks_every_comparable_case_not_just_an_end_one() -> None:
             narration=Narration(text='brew'),
             module='m',
             status='passed',
-            steps=[_pill_step('customer', 'Alice')],
+            steps=[_term_ref_step('customer', 'Alice')],
             source=SourceLocation(relpath='tests/t.py', line=12),
         ),
         Scenario(
@@ -1567,7 +1570,7 @@ def test_rule_four_checks_every_comparable_case_not_just_an_end_one() -> None:
             narration=Narration(text='brew'),
             module='m',
             status='passed',
-            steps=[_pill_step('customer', 'Carol')],
+            steps=[_term_ref_step('customer', 'Carol')],
             source=SourceLocation(relpath='tests/t.py', line=12),
         ),
         Scenario(
@@ -1575,7 +1578,7 @@ def test_rule_four_checks_every_comparable_case_not_just_an_end_one() -> None:
             narration=Narration(text='brew'),
             module='m',
             status='passed',
-            steps=[_pill_step('customer', 'Alice')],
+            steps=[_term_ref_step('customer', 'Alice')],
             source=SourceLocation(relpath='tests/t.py', line=12),
         ),
     ]
@@ -1588,11 +1591,11 @@ def test_rule_four_checks_every_comparable_case_not_just_an_end_one() -> None:
         group_parametrized(scenarios, info)
 
 
-def test_a_varying_pill_in_a_nested_step_raises_rule_four() -> None:
+def test_a_varying_term_ref_in_a_nested_step_raises_rule_four() -> None:
     """`_term_at`'s comparison must read the case's step at the path it is
     actually walking, not always the first top-level step. The parent step's
-    own pill is identical across cases and, deliberately, shares the nested
-    baseline pill's identity too: a comparison that always read the parent
+    own term ref is identical across cases and, deliberately, shares the nested
+    baseline term ref's identity too: a comparison that always read the parent
     (rather than the nested child it is meant to check) would find that
     coincidental match on every case and swallow the nested violation
     entirely, rather than raising for it."""

@@ -29,7 +29,7 @@ from .coverage import (
     compute_coverage,
     is_coverage_eligible,
     param_case_displays,
-    pill_display,
+    term_ref_display,
 )
 
 type ActivityKey = str
@@ -219,10 +219,10 @@ def build_glossary_aggregations(
             for part in step.narration.parts:
                 if not isinstance(part, NarrationTermRef):
                     continue
-                # A pill bound to a parametrize column reads the baseline's
+                # A term ref bound to a parametrize column reads the baseline's
                 # display in the grouped tree; collect one instance per case so
                 # the Glossary view lists them all.
-                for display in _pill_displays(part, cases):
+                for display in _term_ref_displays(part, cases):
                     index.record_instance(
                         part.term_id, display, fixture_name=step.fixture_name
                     )
@@ -315,17 +315,19 @@ class _GlossaryIndex:
         return self._aggs.setdefault(term_id, GlossaryAggregation())
 
 
-def _pill_displays(part: NarrationTermRef, cases: list[dict[str, str]]) -> list[str]:
-    """Every display this pill takes: one per case when it is bound to a
+def _term_ref_displays(
+    part: NarrationTermRef, cases: list[dict[str, str]]
+) -> list[str]:
+    """Every display this term ref takes: one per case when it is bound to a
     parametrize column, otherwise just the one it carries.
 
-    `pill_display` decides each of them, so the Glossary lists exactly the
+    `term_ref_display` decides each of them, so the Glossary lists exactly the
     instances coverage credits — the two views reading one case differently is
     a report disagreeing with itself.
     """
     if part.param_column is None or not cases:
         return [part.display]
-    displays = (pill_display(part, case) for case in cases)
+    displays = (term_ref_display(part, case) for case in cases)
     return [display for display in displays if display is not None]
 
 

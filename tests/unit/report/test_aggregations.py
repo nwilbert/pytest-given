@@ -817,7 +817,7 @@ def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
     assert cov.skipped == 1
 
 
-def test_glossary_view_lists_every_case_instance_of_a_param_linked_pill(
+def test_glossary_view_lists_every_case_instance_of_a_param_linked_term_ref(
     guest_scenario: tuple[Glossary, Story, Scenario],
 ) -> None:
     glossary, _story, scenario = guest_scenario
@@ -832,8 +832,8 @@ def test_glossary_view_lists_every_case_instance_of_a_param_linked_pill(
     assert {i.display for i in aggs[TermId('guest')].instances} == {'Alice', 'Bob'}
 
 
-def test_a_pill_is_not_listed_for_a_case_that_has_no_value_for_it() -> None:
-    """A pill bound to a parametrize column reads one display per passed case.
+def test_a_term_ref_is_not_listed_for_a_case_that_has_no_value_for_it() -> None:
+    """A term ref bound to a parametrize column reads one display per passed case.
     A case whose cell for that column is empty has no display of its own —
     falling back to the grouped tree's puts a failed case's guest in the
     Glossary as though a passing case had used it."""

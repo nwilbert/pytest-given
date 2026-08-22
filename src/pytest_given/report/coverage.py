@@ -99,7 +99,7 @@ def s_for_step(
     both their specific identity and the canonical (term_id, None).
 
     `substitutions` maps a parametrize column name to the display that column
-    holds for one case; a pill bound to that column reads that display instead
+    holds for one case; a term ref bound to that column reads that display instead
     of the baseline's, so a grouped scenario can be matched case by case.
     """
     out: set[Identity] = set()
@@ -112,7 +112,7 @@ def s_for_step(
         if term.kind == 'verb':
             out.add(Identity(term_id=part.term_id, instance_id=None))
             continue
-        display = pill_display(part, substitutions)
+        display = term_ref_display(part, substitutions)
         if display is None:
             continue
         inst_id = instance_id_of(glossary, part.term_id, display)
@@ -145,7 +145,7 @@ def compute_coverage(
     O(|activities|) inner scan with O(|s_cache| + |candidates|).
 
     A grouped scenario is matched once per case (see `param_case_displays`),
-    so a term pill bound to a parametrize column is checked against every
+    so a term ref bound to a parametrize column is checked against every
     case's display, not only the baseline's.
     """
     scope = (
@@ -191,15 +191,15 @@ def compute_coverage(
     return result
 
 
-def pill_display(
+def term_ref_display(
     part: NarrationTermRef, substitutions: Mapping[str, str] | None
 ) -> str | None:
-    """The display this pill reads for one case, or None when the case has
+    """The display this term ref reads for one case, or None when the case has
     nothing to say about it.
 
-    A pill not bound to a parametrize column reads the same in every case. One
-    that is bound reads its column's cell — and when this case has no cell
-    there, the pill has no display at all: the grouped tree's belongs to
+    A term ref not bound to a parametrize column reads the same in every case.
+    One that is bound reads its column's cell — and when this case has no cell
+    there, the term ref has no display at all: the grouped tree's belongs to
     whichever case the tree came from, so lending it here would let this case
     satisfy an activity naming a guest it never had, or file that guest in the
     Glossary as one a passing case used.
@@ -218,7 +218,7 @@ def param_case_displays(scenario: Scenario) -> list[dict[str, str]]:
     single-pass path.
 
     A case that did not pass exercised nothing, so its value must not stand in
-    for a pill: it would satisfy a story activity and be listed in the Glossary
+    for a term ref: it would satisfy a story activity and be listed in the Glossary
     as an observed instance. A passed case always speaks for the tree walked
     here — rule 6 refuses to merge cases that narrate anything else.
 

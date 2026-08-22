@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-22T09:46:12.197636+00:00",
+    "timestamp": "2026-08-22T10:05:48.825847+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "85c59bb3e5a3b4d0b13d1b7eb8a13fac4a47af27",
+    "commit_sha": "61850ce44505e79cc4482950cea0c01ba6b15151",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -14929,7 +14929,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -16862,7 +16862,7 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/test_grouping.py::test_a_varying_pill_display_raises_rule_four",
+      "id": "tests/unit/test_grouping.py::test_a_varying_term_ref_display_raises_rule_four",
       "narration": {
         "text": "A term ref whose display differs between cases is refused",
         "parts": [
@@ -17015,7 +17015,7 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/test_grouping.py::test_a_pill_bound_to_a_parametrize_column_does_not_raise",
+      "id": "tests/unit/test_grouping.py::test_a_term_ref_bound_to_a_parametrize_column_does_not_raise",
       "narration": {
         "text": "A term ref that *is* the parametrize value stays supported",
         "parts": [
@@ -17305,7 +17305,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1646
+        "line": 1649
       },
       "story_id": null,
       "activity_ids": []
@@ -17454,7 +17454,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1702
+        "line": 1705
       },
       "story_id": null,
       "activity_ids": []
@@ -17581,7 +17581,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2250
+        "line": 2253
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -17724,7 +17724,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2388
+        "line": 2391
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []

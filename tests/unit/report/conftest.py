@@ -25,7 +25,7 @@ from pytest_given.model import (
 
 @pytest.fixture
 def guest_scenario() -> tuple[Glossary, Story, Scenario]:
-    """A grouped two-case scenario whose Guest pill is bound to the `guest`
+    """A grouped two-case scenario whose Guest term ref is bound to the `guest`
     parametrize column — the shape the per-case columns design fixes."""
     glossary = Glossary()
     glossary.actor('Guest')

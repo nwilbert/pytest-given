@@ -107,7 +107,7 @@ def _param_value(value: RawParamValue) -> ParamValue:
     """Coerce a raw parametrize argument into a table cell.
 
     A glossary term instance unwraps to its display — the `param` column is the
-    only place a case's display exists once the pill in the grouped tree reads
+    only place a case's display exists once the term ref in the grouped tree reads
     the baseline's, and `str()` on the instance would store a dataclass repr of
     the whole `Glossary`. JSON primitives pass through; everything else is its
     `str()`, since a cell only ever feeds display and the JSON sink.
