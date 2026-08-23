@@ -147,18 +147,6 @@ def test_sequential_different_phases_allowed() -> None:
     assert len(scenario.steps) == 3
 
 
-def test_current_phase() -> None:
-    """current_phase reflects the innermost active step."""
-    collector = Collector()
-    assert collector.current_phase is None
-    collector.start_scenario('id', 'name', 'mod', [])
-    assert collector.current_phase is None
-    collector.push_step('given', _n('a thing'))
-    assert collector.current_phase == 'given'
-    collector.pop_step()
-    assert collector.current_phase is None
-
-
 def test_collector_state_transitions_idle_test_idle() -> None:
     collector = Collector()
     assert collector.state == 'idle'

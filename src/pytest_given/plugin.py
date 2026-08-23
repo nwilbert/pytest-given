@@ -19,34 +19,31 @@ from _pytest.fixtures import SubRequest
 
 from .capture import (
     Collector,
+    FileGlossary,
     FixtureInstanceKey,
-    Template,
-    filter_internal_frames,
-    get_active_collector,
-    parse_short_repr,
-    set_active_collector,
-)
-from .capture.decorators import (
     ScenarioDecorator,
     StepDecorated,
     StepDescriptor,
-)
-from .capture.file_glossary import FileGlossary
-from .capture.kind_inference import infer_glossary_kinds
-from .capture.source import (
-    current_rootdir,
-    item_source,
-    restore_rootdir,
-    set_rootdir,
-)
-from .capture.story import (
+    Template,
     clear_story_registry,
+    current_rootdir,
+    filter_internal_frames,
+    get_active_collector,
+    infer_glossary_kinds,
+    item_source,
+    parse_short_repr,
+    restore_rootdir,
     restore_story_registry,
+    set_active_collector,
+    set_rootdir,
     snapshot_story_registry,
 )
 from .grouping import group_parametrized
 from .lint import (
     Finding,
+    IgnoreEntry,
+    Level,
+    RuleId,
     apply_config,
     parse_ignore_entries,
     parse_rule_levels,
@@ -96,6 +93,10 @@ _report_error_message: pytest.StashKey[str] = pytest.StashKey()
 # The source-link template, resolved once at configure time so a bad preset
 # fails before the suite runs rather than after it.
 _source_link_template: pytest.StashKey[str | None] = pytest.StashKey()
+# The lint config, parsed once at configure time for the same reason. Stashed
+# so session finish reads the parse rather than repeating it.
+_lint_rule_levels: pytest.StashKey[dict[RuleId, Level]] = pytest.StashKey()
+_lint_ignore_entries: pytest.StashKey[list[IgnoreEntry]] = pytest.StashKey()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -221,11 +222,15 @@ def _lint_enabled(config: pytest.Config) -> bool:
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    # Validate the lint rule config eagerly (fail fast), even when the lint
-    # itself is disabled for this run.
+    # Parse the lint rule config eagerly (fail fast), even when the lint itself
+    # is disabled for this run. Stashed, so session finish reuses the parse.
     try:
-        parse_rule_levels(config.getini('given_lint_rules'))
-        parse_ignore_entries(config.getini('given_lint_ignore'))
+        config.stash[_lint_rule_levels] = parse_rule_levels(
+            config.getini('given_lint_rules')
+        )
+        config.stash[_lint_ignore_entries] = parse_ignore_entries(
+            config.getini('given_lint_ignore')
+        )
     except ValueError as error:
         raise pytest.UsageError(str(error)) from error
     # Same reason, for the source-link config: an unknown preset is a typo in a
@@ -966,8 +971,8 @@ def _run_lint(
     findings = apply_config(
         run_runtime_rules(scenarios, glossary, stories)
         + run_ast_rules(scenarios, Path(config.rootpath)),
-        parse_rule_levels(config.getini('given_lint_rules')),
-        parse_ignore_entries(config.getini('given_lint_ignore')),
+        config.stash[_lint_rule_levels],
+        config.stash[_lint_ignore_entries],
     )
     if not findings:
         return

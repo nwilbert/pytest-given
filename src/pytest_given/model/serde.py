@@ -1,7 +1,8 @@
 """ReportData ↔ JSON-shaped dict (de)serialization.
 
 `report_to_dict` serializes a `ReportData` to a JSON-shaped dict, filtering
-out underscore-prefixed fields (e.g. `_by_id` on `Story`/`Glossary`).
+out underscore-prefixed fields (e.g. `_by_id` on `Glossary`, `_glossaries`
+on the story tree).
 `report_from_dict` is the inverse; the renderer reads the JSON, calls it
 once, and operates on typed dataclasses from there.
 

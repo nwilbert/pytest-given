@@ -314,23 +314,7 @@ def test_activity_holds_id_and_paths() -> None:
     assert act.paths == (p,)
 
 
-def test_story_indexes_activities_by_id() -> None:
-    p = ActivityPath(
-        parts=(
-            ActivityTermRef(term_id=TermId('g'), display='G'),
-            ActivityTermRef(term_id=TermId('s'), display='s'),
-            ActivityTermRef(term_id=TermId('o'), display='O'),
-        )
-    )
-    a1 = Activity(id=ActivityId(1), paths=(p,))
-    a2 = Activity(id=ActivityId(2), paths=(p,))
-    story = Story(id=StoryId('book'), title='Book', activities=(a1, a2))
-    assert story[ActivityId(1)] is a1
-    assert story[ActivityId(2)] is a2
-    assert story.get(ActivityId(99)) is None
-
-
-def test_story_index_excluded_from_repr_and_equality() -> None:
+def test_story_glossary_pin_excluded_from_repr_and_equality() -> None:
     p = ActivityPath(
         parts=(
             ActivityTermRef(term_id=TermId('g'), display='G'),
@@ -342,7 +326,7 @@ def test_story_index_excluded_from_repr_and_equality() -> None:
     s1 = Story(id=StoryId('x'), title='X', activities=(a,))
     s2 = Story(id=StoryId('x'), title='X', activities=(a,))
     assert s1 == s2
-    assert '_by_id' not in repr(s1)
+    assert '_glossaries' not in repr(s1)
 
 
 # --- Task 1.4: Glossary container with atomic write-through ---

@@ -10,7 +10,7 @@ from importlib.resources import files
 from importlib.resources.abc import Traversable
 from pathlib import Path, PurePosixPath
 
-from .report.cli import add_report_parser, run_report
+from .report import add_report_parser, run_report
 
 type SkillTree = dict[PurePosixPath, bytes]
 

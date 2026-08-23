@@ -21,10 +21,11 @@ from ..model import (
     SourceLocation,
     Story,
     narration_text,
+    placeholder_value,
 )
-from .collector import Collector, get_active_collector
+from .collector import Collector, get_active_collector, no_scenario_error
 from .source import capture_caller_source, code_source
-from .template import Template, narration_from, placeholder_value
+from .template import Template, narration_from
 
 
 @runtime_checkable
@@ -39,17 +40,6 @@ class StepDecorated(Protocol):
     """
 
     _step_descriptor: StepDescriptor
-
-
-@runtime_checkable
-class ScenarioMarked(Protocol):
-    """A test function carrying a `ScenarioDecorator` marker.
-
-    `ScenarioDecorator.__call__` stashes `self` as ``_scenario`` on the
-    wrapper; `_get_scenario_marker` reads it via this Protocol.
-    """
-
-    _scenario: ScenarioDecorator
 
 
 _TEMPLATE_PARAM_KINDS = frozenset(
@@ -111,10 +101,7 @@ class StepDescriptor:
                     stacklevel=2,
                 )
                 return self
-            raise PytestGivenError(
-                f"Cannot enter '{self.phase}: {self.narration.text}' — "
-                'no active scenario or fixture.'
-            )
+            raise no_scenario_error(f"enter '{self.phase}: {self.narration.text}'")
         source: SourceLocation | None = None
         if collector.capture_step_source:
             source = (
@@ -324,13 +311,15 @@ class ScenarioDecorator:
         self.activity_ids = activity_ids
         self.group_parametrized = group_parametrized
 
-    def __call__(self, func: Callable[..., object]) -> ScenarioMarked:
-        @functools.wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
-            return func(*args, **kwargs)
+    def __call__(self, func: Callable[..., object]) -> Callable[..., object]:
+        """Mark `func` and hand back the same object.
 
-        wrapper._scenario = self  # type: ignore[attr-defined]
-        return cast('ScenarioMarked', wrapper)
+        No pass-through wrapper: the marker attribute is the whole job, and a
+        `*args, **kwargs` shim only hides the real function — its signature,
+        and so its fixture requests — behind `functools.wraps`.
+        """
+        func._scenario = self  # type: ignore[attr-defined]
+        return func
 
 
 def _normalize_activity(
@@ -498,9 +487,7 @@ def attach(label: str, content: object) -> None:
                 stacklevel=2,
             )
             return
-        raise PytestGivenError(
-            f"Cannot attach '{label}' — no active scenario or fixture."
-        )
+        raise no_scenario_error(f"attach '{label}'")
     if isinstance(content, str):
         collector.attach(label, content, content_type='text')
     else:

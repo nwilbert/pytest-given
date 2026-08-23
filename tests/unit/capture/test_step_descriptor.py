@@ -13,7 +13,6 @@ from pytest_given.capture.collector import (
     set_active_collector,
 )
 from pytest_given.capture.decorators import (
-    ScenarioMarked,
     StepDecorated,
     StepDescriptor,
     _normalize_activity,
@@ -419,21 +418,27 @@ def test_scenario_with_plain_str_keeps_name() -> None:
     assert isinstance(deco.name, str)
 
 
-def test_marked_function_satisfies_scenario_marked_protocol() -> None:
-    """A function returned by ScenarioDecorator.__call__ structurally satisfies
-    the ScenarioMarked protocol — the typed contract `_get_scenario_marker`
-    reads through to recover the ScenarioDecorator without a type: ignore."""
+def test_scenario_marks_the_function_without_wrapping_it() -> None:
+    """`@scenario` hands back the very function it was given.
 
-    @scenario('Brew coffee')
-    def brew() -> None:
+    A pass-through wrapper would buy nothing — the marker attribute is the
+    whole job — and would hide the real signature, and so the fixtures the
+    test requests, behind a `*args, **kwargs` shim.
+    """
+
+    def brew(machine: object) -> None:
         pass
 
-    assert isinstance(brew, ScenarioMarked)
+    marked = scenario('Brew coffee')(brew)
+
+    assert marked is brew
+    assert brew._scenario.name == 'Brew coffee'  # type: ignore[attr-defined]
+    assert list(inspect.signature(marked).parameters) == ['machine']
 
     def plain() -> None:
         pass
 
-    assert not isinstance(plain, ScenarioMarked)
+    assert getattr(plain, '_scenario', None) is None
 
 
 def test_scenario_with_template_keeps_template() -> None:

@@ -9,7 +9,6 @@ walk, which is where the offending part is in hand.
 
 from typing import NamedTuple
 
-from ..capture import render_interpolation
 from ..model import (
     Narration,
     NarrationLiteral,
@@ -27,6 +26,7 @@ from ..model import (
     case_suffix,
     location_suffix,
     node_base,
+    render_interpolation,
     structure_signature,
     walk_steps,
 )

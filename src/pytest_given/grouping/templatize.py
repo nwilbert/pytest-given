@@ -9,7 +9,6 @@ so has nothing to be compared against.
 
 from dataclasses import replace
 
-from ..capture import render_interpolation
 from ..model import (
     Attachment,
     AttachmentRef,
@@ -27,6 +26,7 @@ from ..model import (
     StepPath,
     narration_text,
     placeholder_mismatch,
+    render_interpolation,
 )
 from .checks import (
     check_attachment_labels,

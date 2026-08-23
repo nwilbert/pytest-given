@@ -10,7 +10,7 @@ the other.
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 
-from ..capture import render_interpolation, try_term_ref
+from ..capture import try_term_ref
 from ..model import (
     Attachment,
     CellValue,
@@ -26,6 +26,7 @@ from ..model import (
     Scenario,
     Step,
     StepPath,
+    render_interpolation,
     walk_steps,
 )
 

@@ -1751,7 +1751,8 @@ def test_session_finish_with_no_stories_leaves_glossary_none(pytester):
 
 
 def test_report_json_excludes_underscore_fields(pytester):
-    """_by_id on Story/Glossary must not appear in the JSON output."""
+    """`_by_id` on Glossary and `_glossaries` on the story tree must not
+    appear in the JSON output."""
     pytester.makepyfile("""
         from pytest_given import Glossary, activity, scenario, story
 
@@ -1768,6 +1769,7 @@ def test_report_json_excludes_underscore_fields(pytester):
     pytester.runpytest('--given-json=report.json')
     raw = pytester.path.joinpath('report.json').read_text()
     assert '_by_id' not in raw
+    assert '_glossaries' not in raw
 
 
 # --- Task 7.5: Conftest-scan fallback ---

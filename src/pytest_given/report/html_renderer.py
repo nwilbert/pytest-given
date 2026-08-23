@@ -104,14 +104,21 @@ def render_html_string(
     writing any of them — a render that raises must not leave this run's JSON
     beside the previous run's HTML.
     """
-    env = _build_env(report, source_link_template)
-    html = env.get_template('report.html.j2').render(**_render_context(report))
+    # Built once and handed to both: the narration filter colors placeholders
+    # with it, and the template emits the matching `.param-color-N` rules.
+    param_color_map = _build_param_color_map(report.scenarios)
+    env = _build_env(report, source_link_template, param_color_map)
+    html = env.get_template('report.html.j2').render(
+        **_render_context(report, param_color_map)
+    )
     assert isinstance(html, str)
     return html
 
 
 def _build_env(
-    report: ReportData, source_link_template: str | None
+    report: ReportData,
+    source_link_template: str | None,
+    param_color_map: ParamColorMap,
 ) -> jinja2.Environment:
     """The Jinja environment: the template loader plus every filter and test
     the report templates call."""
@@ -129,7 +136,7 @@ def _build_env(
         commit_sha=report.metadata.commit_sha,
     )
     env.filters['narration'] = _make_narration_filter(
-        _build_param_color_map(report.scenarios),
+        param_color_map,
         glossary=report.glossary,
     )
     env.filters['activity_part'] = _make_activity_part_filter(report.glossary)
@@ -137,7 +144,9 @@ def _build_env(
     return env
 
 
-def _render_context(report: ReportData) -> dict[str, object]:
+def _render_context(
+    report: ReportData, param_color_map: ParamColorMap
+) -> dict[str, object]:
     """Everything `report.html.j2` reads, in three groups: the report model
     itself, the precomputed aggregations, and the JSON blobs the page's Alpine
     state is seeded from."""
@@ -147,7 +156,6 @@ def _render_context(report: ReportData) -> dict[str, object]:
     term_scenario_index = build_term_scenario_index(report)
     scenario_slugs = build_scenario_slug_index(report)
     term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
-    param_color_map = _build_param_color_map(report.scenarios)
     return {
         'metadata': report.metadata,
         'scenarios': report.scenarios,

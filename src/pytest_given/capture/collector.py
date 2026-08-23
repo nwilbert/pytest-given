@@ -55,6 +55,16 @@ def get_active_collector() -> Collector | None:
     return _collector_var.get()
 
 
+def no_scenario_error(action: str) -> PytestGivenError:
+    """The single wording for "nothing is being recorded right now".
+
+    Raised from the collector when a call reaches it in the idle state, and
+    from the front doors in `decorators` when there is no collector at all to
+    reach — the same situation to the author, so it says the same sentence.
+    """
+    return PytestGivenError(f'Cannot {action} — no active scenario or fixture.')
+
+
 class Collector:
     """Collects step data during test execution.
 
@@ -99,14 +109,6 @@ class Collector:
     @property
     def scenarios(self) -> list[Scenario]:
         return self._scenarios
-
-    @property
-    def current_phase(self) -> Phase | None:
-        """The phase of the innermost active step, or None."""
-        stack = self._target_stack()
-        if stack:
-            return stack[-1].phase
-        return None
 
     @property
     def active_fixture_descriptor(self) -> StepDescriptor | None:
@@ -264,10 +266,7 @@ class Collector:
         source: SourceLocation | None = None,
     ) -> Step:
         if self._state == 'idle':
-            raise PytestGivenError(
-                f"Cannot record '{phase}: {narration.text}' — "
-                'no active scenario or fixture.'
-            )
+            raise no_scenario_error(f"record '{phase}: {narration.text}'")
         if self._state == 'fixture_teardown':
             raise PytestGivenError(
                 f"Cannot record '{phase}: {narration.text}' from fixture "
@@ -342,9 +341,7 @@ class Collector:
         content_type: ContentType = 'text',
     ) -> None:
         if self._state == 'idle':
-            raise PytestGivenError(
-                f"Cannot attach '{label}' — no active scenario or fixture."
-            )
+            raise no_scenario_error(f"attach '{label}'")
         if self._state == 'fixture_teardown':
             raise PytestGivenError(
                 f"Cannot attach '{label}' from fixture teardown — "

@@ -93,6 +93,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
   where both renderers read it. A consumer reading `step.status` should read
   `scenario.status` instead.
 
+- `@scenario` now returns the test function itself rather than a wrapper, so the
+  test keeps its own signature and its traceback loses a frame.
+
 ### Removed
 
 - **Breaking.** The `divergent-case-structure` lint rule; delete any

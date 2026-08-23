@@ -101,64 +101,44 @@ type ActivityPart = ActivityTermRef | ActivityWord
 
 
 @dataclass(frozen=True, kw_only=True)
-class ActivityPath:
-    parts: tuple[ActivityPart, ...]
-    # The live `Glossary` objects this subtree references, keyed by `id()`.
-    # `story()` pins them at construction so `plugin._resolve_glossary` can pick
-    # the report's glossary off the story tree it was handed, rather than off a
-    # session-global that a nested run could clear. Declared here (not stashed
-    # by name at runtime) so it is typed and mypy sees every read; underscored,
-    # so serde drops it and it never reaches the JSON.
+class GlossaryPinned:
+    """A story-tree node that pins the live `Glossary` objects its subtree
+    references, keyed by `id()`.
+
+    `story()` pins them at construction so `plugin._resolve_glossary` can pick
+    the report's glossary off the story tree it was handed, rather than off a
+    session-global that a nested run could clear. A declared field (not a
+    name stashed at runtime) so it is typed and mypy sees every read;
+    underscored, so serde drops it and it never reaches the JSON.
+
+    Subclassed rather than repeated on each of `ActivityPath`, `Activity` and
+    `Story`: three copies of one invariant drift, and the comment explaining
+    it drifts first. Every field is `kw_only`, so inheriting one changes no
+    call site, and serde skips it either way — the JSON is unaffected.
+    """
+
     _glossaries: dict[int, Glossary] = field(
         init=False, repr=False, compare=False, default_factory=dict
     )
 
 
 @dataclass(frozen=True, kw_only=True)
-class Activity:
+class ActivityPath(GlossaryPinned):
+    parts: tuple[ActivityPart, ...]
+
+
+@dataclass(frozen=True, kw_only=True)
+class Activity(GlossaryPinned):
     id: ActivityId
     paths: tuple[ActivityPath, ...]
-    # The live `Glossary` objects this subtree references, keyed by `id()`.
-    # `story()` pins them at construction so `plugin._resolve_glossary` can pick
-    # the report's glossary off the story tree it was handed, rather than off a
-    # session-global that a nested run could clear. Declared here (not stashed
-    # by name at runtime) so it is typed and mypy sees every read; underscored,
-    # so serde drops it and it never reaches the JSON.
-    _glossaries: dict[int, Glossary] = field(
-        init=False, repr=False, compare=False, default_factory=dict
-    )
 
 
 @dataclass(frozen=True, kw_only=True)
-class Story:
+class Story(GlossaryPinned):
     id: StoryId
     title: str
     activities: tuple[Activity, ...]
     source: SourceLocation | None = None
-    _by_id: dict[ActivityId, Activity] = field(
-        init=False, repr=False, compare=False, default_factory=dict
-    )
-    # The live `Glossary` objects this subtree references, keyed by `id()`.
-    # `story()` pins them at construction so `plugin._resolve_glossary` can pick
-    # the report's glossary off the story tree it was handed, rather than off a
-    # session-global that a nested run could clear. Declared here (not stashed
-    # by name at runtime) so it is typed and mypy sees every read; underscored,
-    # so serde drops it and it never reaches the JSON.
-    _glossaries: dict[int, Glossary] = field(
-        init=False, repr=False, compare=False, default_factory=dict
-    )
-
-    def __post_init__(self) -> None:
-        index: dict[ActivityId, Activity] = {}
-        for activity in self.activities:
-            index[activity.id] = activity
-        object.__setattr__(self, '_by_id', index)
-
-    def __getitem__(self, key: ActivityId) -> Activity:
-        return self._by_id[key]
-
-    def get(self, key: ActivityId) -> Activity | None:
-        return self._by_id.get(key)
 
 
 @dataclass

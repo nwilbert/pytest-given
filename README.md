@@ -72,7 +72,7 @@ Increasingly those tests aren't hand-written at all: a human describes a scenari
 
 ### `@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)`
 
-Mark a test for inclusion in the report. Required for any test you want to appear. `story=` / `activities=` bind it to a domain story (see [Domain Storytelling](#domain-storytelling)) — `activities=` takes an `int` or a sequence of them, never a string; `group_parametrized=False` declines parametrize merging.
+Mark a test for inclusion in the report. Required for any test you want to appear. `story=` / `activities=` bind it to a domain story (see [Domain Storytelling](#domain-storytelling)) — `activities=` takes an `int` or a sequence of them, never a string; `group_parametrized=False` declines parametrize merging. The decorated function is returned unwrapped.
 
 ```python
 @scenario('Buy coffee', tags=['billing'])

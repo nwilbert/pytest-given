@@ -34,20 +34,15 @@ def group_parametrized(
     """Group parametrized scenarios into single scenarios with parameter tables."""
     result: list[Scenario] = []
     groups: dict[tuple[str, str], list[Scenario]] = {}
-    group_order: list[tuple[str, str]] = []
 
     for scenario in scenarios:
         if scenario.id in param_info:
             key = (node_base(scenario.id), scenario.narration.text)
-            if key not in groups:
-                groups[key] = []
-                group_order.append(key)
-            groups[key].append(scenario)
+            groups.setdefault(key, []).append(scenario)
         else:
             result.append(scenario)
 
-    for key in group_order:
-        cases = groups[key]
+    for cases in groups.values():
         if param_info[cases[0].id].group:
             result.append(_grouped_scenario(cases, param_info))
         else:

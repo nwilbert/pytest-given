@@ -8,7 +8,6 @@ column, this path renders as the case's own value.
 
 from dataclasses import replace
 
-from ..capture import placeholder_value
 from ..model import (
     Narration,
     NarrationLiteral,
@@ -22,6 +21,7 @@ from ..model import (
     case_suffix,
     narration_text,
     placeholder_mismatch,
+    placeholder_value,
 )
 
 

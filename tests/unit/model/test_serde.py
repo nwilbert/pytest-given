@@ -496,7 +496,7 @@ def test_narration_unknown_part_shape_raises() -> None:
 
 
 def test_report_to_dict_excludes_underscore_fields() -> None:
-    """report_to_dict skips fields whose names start with '_' (e.g. _by_id)."""
+    """report_to_dict skips fields whose names start with '_'."""
     report = ReportData(
         metadata=Metadata(
             project='p',
