@@ -64,6 +64,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
   `when` / `then` block it belongs to.
 - **Breaking.** `activity(..., id=N)` is now `activity(..., activity_id=N)`; the
   `Activity.id` field itself is unchanged.
+- `@scenario(activities=...)` now rejects a `str` and non-`int` members with a
+  `TypeError`; `activities='13'` previously became the ids 1 and 3 and failed
+  later against a story that listed both as valid.
 - An unknown `given_source_link` preset is now a `UsageError` raised before the
   suite runs.
 - The collection-time `@scenario` checks now report as a `UsageError` instead of

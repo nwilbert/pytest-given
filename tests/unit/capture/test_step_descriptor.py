@@ -834,6 +834,20 @@ def test_step_descriptor_rejects_non_sequence_activity():
         given('x', activity=1.5)  # type: ignore[arg-type]
 
 
+def test_scenario_rejects_a_string_activities_argument():
+    """`activities='13'` is a Sequence of str, so a bare comprehension would
+    yield ActivityId('1'), ActivityId('3') and fail at collection with
+    "activity id 1 not in story (valid: [1, 2])" — naming an id that visibly
+    is in the valid list. Rejected at the decorator instead."""
+    with pytest.raises(TypeError, match='activities'):
+        scenario('x', activities='13')  # type: ignore[arg-type]
+
+
+def test_scenario_rejects_non_int_activities_members():
+    with pytest.raises(TypeError, match='activities'):
+        scenario('x', activities=[1, '2'])  # type: ignore[list-item]
+
+
 # --- Task 7.1: ScenarioDecorator story= / activities= ---
 
 

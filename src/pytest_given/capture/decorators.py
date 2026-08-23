@@ -283,27 +283,35 @@ class ScenarioDecorator:
 
 def _normalize_activity(
     activity: int | Sequence[int] | None,
+    kwarg: str = 'activity',
 ) -> tuple[ActivityId, ...]:
-    """Normalize the ``activity=`` kwarg to a tuple of ActivityId values."""
+    """Normalize an ``activity=`` / ``activities=`` kwarg to ActivityId values.
+
+    `kwarg` names the argument the author actually wrote, so the step form and
+    the scenario form each report their own. Rejecting `str` matters most:
+    it is a `Sequence[int]` to no one but `isinstance`, and `activities='13'`
+    would otherwise yield ids 1 and 3 and fail later against a story that
+    visibly lists them as valid.
+    """
     if activity is None:
         return ()
     if isinstance(activity, bool | str):
         raise TypeError(
-            f'activity must be an int or a Sequence[int], got {type(activity)!r}'
+            f'{kwarg} must be an int or a Sequence[int], got {type(activity)!r}'
         )
     if isinstance(activity, int):
         return (ActivityId(activity),)
     if isinstance(activity, Sequence):
         result: list[ActivityId] = []
         for item in activity:
-            if not isinstance(item, int):
+            if not isinstance(item, int) or isinstance(item, bool):
                 raise TypeError(
-                    f'activity sequence must contain int values, got {type(item)!r}'
+                    f'{kwarg} sequence must contain int values, got {type(item)!r}'
                 )
             result.append(ActivityId(item))
         return tuple(result)
     raise TypeError(
-        f'activity must be an int or a Sequence[int], got {type(activity)!r}'
+        f'{kwarg} must be an int or a Sequence[int], got {type(activity)!r}'
     )
 
 
@@ -486,9 +494,7 @@ def scenario(
             f'@scenario(story=...) must be a Story instance; '
             f'got {type(story).__name__}: {story!r}'
         )
-    activity_ids: tuple[ActivityId, ...] = (
-        tuple(ActivityId(i) for i in activities) if activities else ()
-    )
+    activity_ids = _normalize_activity(activities, 'activities')
     return ScenarioDecorator(
         resolved_name,
         tags or [],
