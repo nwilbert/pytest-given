@@ -31,6 +31,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Changed
 
+#### Authoring API
+
 - **Breaking.** Step narration must now be uniform across parametrize cases;
   these fail the run with `PytestGivenError`, writing no report, instead of
   quietly reporting case 1:
@@ -50,13 +52,6 @@ form `## [x.y.z] - YYYY-MM-DD`.
   still vary freely, which is what the new `attachment` column is for. The last
   needs `@scenario(..., group_parametrized=False)`, giving each case its own
   scenario.
-- **Breaking (JSON report).** `parameters.names` becomes `parameters.columns`
-  (`{id, name, kind}`), cells may hold an attachment object, placeholder parts
-  gain `column_id`, and a grouped step's `narration.text` is the template rather
-  than case 1's rendering.
-- A glossary term placed in an activity slot its declared kind forbids now
-  raises `PytestGivenError` when `activity(...)` is built rather than at session
-  finish, naming the term and its kind instead of dumping handle reprs.
 - **Breaking.** `attach()` now takes a plain `str` label; a t-string label raises
   `PytestGivenError` — use an f-string.
 - **Breaking.** `attach()` called with no step open now raises `PytestGivenError`
@@ -64,37 +59,54 @@ form `## [x.y.z] - YYYY-MM-DD`.
   `when` / `then` block it belongs to.
 - **Breaking.** `activity(..., id=N)` is now `activity(..., activity_id=N)`; the
   `Activity.id` field itself is unchanged.
+- A glossary term placed in an activity slot its declared kind forbids now
+  raises `PytestGivenError` when `activity(...)` is built rather than at session
+  finish, naming the term and its kind instead of dumping handle reprs.
 - `@scenario(activities=...)` now rejects a `str` and non-`int` members with a
   `TypeError`; `activities='13'` previously became the ids 1 and 3 and failed
   later against a story that listed both as valid.
+- `@scenario` now returns the test function itself rather than a wrapper, so the
+  test keeps its own signature and its traceback loses a frame.
+
+#### Plugin and run behavior
+
 - An unknown `given_source_link` preset is now a `UsageError` raised before the
   suite runs.
 - The collection-time `@scenario` checks now report as a `UsageError` instead of
   an `INTERNALERROR` traceback.
-- The bundled authoring skill's tagging guidance now argues for sparse tagging: a
-  tag should cut across modules and cover a minority of the suite.
-- The bundled authoring and reviewing skills gain the report mechanics their
-  rules depend on, a symptom index, and a completeness audit.
+
+#### Report content (all formats)
+
+- **Breaking (JSON report).** `parameters.names` becomes `parameters.columns`
+  (`{id, name, kind}`), cells may hold an attachment object, placeholder parts
+  gain `column_id`, and a grouped step's `narration.text` is the template rather
+  than case 1's rendering.
+- **Breaking (JSON report).** A step no longer carries `status` or `error`;
+  failure lives on the scenario and on the parameter table's cases, which is
+  where both renderers read it. A consumer reading `step.status` should read
+  `scenario.status` instead.
+- The Markdown report now shows why a scenario failed: the message and the
+  failing frame, under the scenario and — for a parametrized run — under the
+  case table for each failed case. It previously showed the ✗ and no reason.
+
+#### HTML report
+
 - The Scenarios sidebar and its header chips are visually tidied.
 - The HTML report's colors are retuned into one system, so glossary term kinds,
   statuses and parametrize columns can no longer land on the same color: a term
   ref in a step or a scenario title reads as a word under a light wash rather
   than a bordered pill (the Glossary view keeps its pills), and column colors are
   generated per column, so a seventh column no longer wraps back onto the first.
-- An attachment badge in the HTML report now takes its icon from the payload's
-  content type — braces for JSON, a page for text — instead of a paperclip for
-  both. The Markdown report keeps its `📎`.
+- An attachment badge now takes its icon from the payload's content type —
+  braces for JSON, a page for text — instead of a paperclip for both. The
+  Markdown report keeps its `📎`.
 
-- The Markdown report now shows why a scenario failed: the message and the
-  failing frame, under the scenario and — for a parametrized run — under the
-  case table for each failed case. It previously showed the ✗ and no reason.
-- **Breaking (JSON report).** A step no longer carries `status` or `error`;
-  failure lives on the scenario and on the parameter table's cases, which is
-  where both renderers read it. A consumer reading `step.status` should read
-  `scenario.status` instead.
+#### Bundled skills
 
-- `@scenario` now returns the test function itself rather than a wrapper, so the
-  test keeps its own signature and its traceback loses a frame.
+- The authoring skill's tagging guidance now argues for sparse tagging: a tag
+  should cut across modules and cover a minority of the suite.
+- The authoring and reviewing skills gain the report mechanics their rules
+  depend on, a symptom index, and a completeness audit.
 
 ### Removed
 
