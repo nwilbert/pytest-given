@@ -172,7 +172,7 @@ def test_pytest_runtest_teardown_ignores_mismatched_item(
     fake_config: Any,
     fresh_collector: Collector,
 ) -> None:
-    fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
+    fresh_collector.published_for = NodeId('t::a')
     set_active_collector(fresh_collector)
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::b', config=fake_config))
     plugin.pytest_runtest_teardown(item)
@@ -184,8 +184,25 @@ def test_pytest_runtest_teardown_clears_collector_when_matched(
     fake_config: Any,
     fresh_collector: Collector,
 ) -> None:
-    fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
+    fresh_collector.published_for = NodeId('t::a')
     set_active_collector(fresh_collector)
+    item = cast(pytest.Item, SimpleNamespace(nodeid='t::a', config=fake_config))
+    plugin.pytest_runtest_teardown(item)
+    assert get_active_collector() is None
+
+
+def test_pytest_runtest_teardown_clears_a_finished_scenario(
+    fake_config: Any,
+    fresh_collector: Collector,
+) -> None:
+    """The call report runs `finish_scenario` before teardown, so
+    `active_scenario_id` is already None here. Teardown keys on
+    `published_for` instead, which still names the item."""
+    fresh_collector.published_for = NodeId('t::a')
+    fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
+    fresh_collector.finish_scenario(status='passed', duration_ms=0)
+    set_active_collector(fresh_collector)
+    assert fresh_collector.active_scenario_id is None
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::a', config=fake_config))
     plugin.pytest_runtest_teardown(item)
     assert get_active_collector() is None
@@ -196,6 +213,7 @@ def test_pytest_runtest_teardown_clears_unannotated_flag(
     fresh_collector: Collector,
 ) -> None:
     fresh_collector.inside_unannotated_test = True
+    fresh_collector.published_for = NodeId('t::x')
     set_active_collector(fresh_collector)
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::x', config=fake_config))
     plugin.pytest_runtest_teardown(item)

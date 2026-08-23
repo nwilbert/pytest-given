@@ -74,6 +74,11 @@ class Collector:
         self._active_fixture_descriptor: StepDescriptor | None = None
         self._recordings: dict[FixtureInstanceKey, FixtureRecording] = {}
         self.inside_unannotated_test: bool = False
+        # The item whose setup published this collector to the ContextVar, so
+        # teardown clears only what it published. Not `active_scenario_id`:
+        # that is already None by teardown (the call report finished the
+        # scenario), which is how the clear came to be skipped entirely.
+        self.published_for: NodeId | None = None
         # Whether steps record their body's source anchor (narration lint
         # only); off is the zero-cost default — no frame walking happens.
         self.capture_step_source: bool = False

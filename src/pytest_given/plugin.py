@@ -390,6 +390,7 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
         # Unannotated test: set the flag so `with given(...)` inside it warns
         # instead of raising. Teardown clears the flag and active collector.
         collector.inside_unannotated_test = True
+        collector.published_for = NodeId(item.nodeid)
         set_active_collector(collector)
         yield
         return
@@ -408,6 +409,7 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
         story=scenario_marker.story,
         activity_ids=scenario_marker.activity_ids,
     )
+    collector.published_for = node_id
     set_active_collector(collector)
     # Pre-fixture-setup work done; let pytest run fixture setup here.
     yield
@@ -712,13 +714,21 @@ def _graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
 
 @pytest.hookimpl(trylast=True)
 def pytest_runtest_teardown(item: pytest.Item) -> None:
+    """Undo what `pytest_runtest_setup` published for this item.
+
+    Keyed on `published_for`, not on `active_scenario_id`: the call-phase
+    logreport has already run `finish_scenario`, so an annotated scenario's id
+    is None here and a guard reading it never matched — leaving the finished
+    session's Collector, and every Scenario and Step it recorded, reachable
+    from the process-global ContextVar. `trylast` puts this after the
+    finalizers, which still need the collector; the teardown report reads
+    `item.config` rather than the ContextVar, so it is unaffected.
+    """
     collector = _collector(item.config)
-    if collector.inside_unannotated_test:
-        collector.inside_unannotated_test = False
-        set_active_collector(None)
+    if collector.published_for != NodeId(item.nodeid):
         return
-    if collector.active_scenario_id != NodeId(item.nodeid):
-        return
+    collector.inside_unannotated_test = False
+    collector.published_for = None
     set_active_collector(None)
 
 

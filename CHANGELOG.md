@@ -95,6 +95,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A nested in-process pytest run that dies while parsing its arguments no longer
   strands the outer session's captured rootdir, which silently dropped every
   later step's source anchor.
+- A finished scenario no longer leaves its collector — and every scenario and
+  step it recorded — reachable from a process-global for the rest of the
+  process.
 - A fixture that raises after its `yield` now fails the scenario it tore down,
   instead of leaving it green in a report pytest counted as an error.
 - Every report-building failure — a suite reaching two glossaries, a term used in

@@ -214,3 +214,50 @@ def test_lint_still_anchors_steps_after_nested_run_aborts_at_argparse(pytester):
     result.stdout.fnmatch_lines(
         ["*ERROR*empty-step*test_outer.py::test_after*'a value'*has no code*"]
     )
+
+
+COLLECTOR_LEAK_CONFTEST = """
+from pytest_given.capture import get_active_collector
+
+leaked = []
+
+
+def pytest_runtest_logfinish(nodeid):
+    if get_active_collector() is not None:
+        leaked.append(nodeid)
+
+
+def pytest_sessionfinish(session):
+    assert not leaked, f"active collector left set after: {leaked}"
+"""
+
+COLLECTOR_LEAK_TESTS = """
+from pytest_given import scenario, given
+
+
+@scenario("An annotated scenario")
+def test_annotated():
+    with given("a step"):
+        pass
+
+
+def test_unannotated():
+    assert True
+"""
+
+
+def test_teardown_clears_the_active_collector_after_an_annotated_scenario(pytester):
+    """`pytest_runtest_teardown` must clear the process-global active-collector
+    ContextVar for an annotated scenario, not only for an unannotated one.
+
+    The call-phase logreport has already run `finish_scenario` by teardown, so
+    `active_scenario_id` is None — a guard keyed on it never matches, and the
+    finished session\'s Collector, with every Scenario and Step it recorded,
+    stays reachable from the ContextVar for the rest of the process (and into
+    any later in-process run). Observed from `pytest_runtest_logfinish`, which
+    runs after teardown and outside any test\'s own setup."""
+    pytester.makeconftest(COLLECTOR_LEAK_CONFTEST)
+    pytester.makepyfile(test_outer=COLLECTOR_LEAK_TESTS)
+    result = pytester.runpytest()
+    result.assert_outcomes(passed=2)
+    assert result.ret == pytest.ExitCode.OK
