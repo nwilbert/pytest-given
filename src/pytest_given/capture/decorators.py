@@ -420,7 +420,7 @@ def attach(label: str, content: object) -> None:
     """Attach data to the current step.
 
     *label* is plain text — an f-string is the way to vary it. If *content* is a
-    ``str`` it is stored verbatim; any other type is serialised as indented JSON.
+    ``str`` it is stored verbatim; any other type is serialized as indented JSON.
     """
     if not isinstance(label, str):
         raise PytestGivenError(

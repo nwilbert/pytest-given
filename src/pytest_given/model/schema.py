@@ -22,7 +22,7 @@ class NarrationValue:
 class NarrationPlaceholder:
     """A deferred placeholder — resolved at render time from a per-case mapping.
 
-    `name` supplies the `{price}` token and the colour-palette entry; `column_id`
+    `name` supplies the `{price}` token and the color-palette entry; `column_id`
     identifies the parameter-table column the DOM keys on. For a `param` column
     the two coincide; a `derived` column's id is generated (`derived:0`), so the
     field is always populated rather than falling back to `name`.

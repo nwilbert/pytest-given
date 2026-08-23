@@ -19,7 +19,7 @@ So we keep the source on `/mnt/c`, but keep every virtual environment on the Lin
 
 ### 1. `uv` — via `UV_PROJECT_ENVIRONMENT` in `.zshrc`
 
-`uv` honours the `UV_PROJECT_ENVIRONMENT` environment variable to decide where a
+`uv` honors the `UV_PROJECT_ENVIRONMENT` environment variable to decide where a
 project's `.venv` goes. We set it from a `chpwd` hook so it is populated
 automatically whenever the shell enters a directory on the Windows mount, and
 cleared elsewhere (so native-Linux projects keep their default in-repo `.venv`):
@@ -77,7 +77,7 @@ applies:
 On a native Linux checkout (or macOS) none of this fires, so `nox` keeps its
 default in-repo `.nox/` directory and the noxfile stays portable for anyone else.
 
-## Source-path normalisation in `capture/source.py`
+## Source-path normalization in `capture/source.py`
 
 Running the same working tree from both Windows (PyCharm) and WSL has a second,
 subtler consequence: the **paths Python records for source frames are not always
@@ -104,7 +104,7 @@ tree from both Windows (PyCharm) and WSL means a single file can be recorded in
 In both cases `capture_caller_source` silently returns `None` and the source link
 just disappears from the report, with no error to explain why.
 
-The fix is a small **bidirectional** normalisation (`_co_filename_to_path`)
+The fix is a small **bidirectional** normalization (`_co_filename_to_path`)
 applied to every path before any `Path` math — both to captured `co_filename`s
 and, via `set_rootdir`, to the rootdir itself, so the two sides always share an
 anchor:

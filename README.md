@@ -266,7 +266,7 @@ room = g.work_object('Room', definition='A bookable hotel room.')
 search = g.verb('search', definition='Look up available options.')
 ```
 
-Use the captured handles directly in t-strings — `t'a {guest} {search("searches for")} a {room}'`. Each interpolation becomes a washed, kind-coloured word in the rendered step, with the term's definition as a tooltip. Glossary terms feed the Glossary tab.
+Use the captured handles directly in t-strings — `t'a {guest} {search("searches for")} a {room}'`. Each interpolation becomes a washed, kind-colored word in the rendered step, with the term's definition as a tooltip. Glossary terms feed the Glossary tab.
 
 Reference a term with the lightest surface form that fits the sentence — the same three forms on every handle (captured or looked up):
 

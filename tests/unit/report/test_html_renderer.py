@@ -281,7 +281,7 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
             r'<th[^>]*\bparam-color-1\b[^>]*\bdata-param="expect"', content
         )
     with then(
-        t'the page carries one generated colour rule per column, after the '
+        t'the page carries one generated color rule per column, after the '
         t'stylesheet so a term ref bound to a column takes the column ink'
     ):
         rules = re.findall(
@@ -1630,7 +1630,7 @@ def test_render_emits_term_scenario_index_global(tmp_path: Path) -> None:
 
 def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
     """The full pipeline — typed ReportData → report_to_dict → JSON → renderer
-    — must preserve the Glossary so term refs render as kind-coloured words, not as
+    — must preserve the Glossary so term refs render as kind-colored words, not as
     silent escape() fallbacks. Regression guard for the side-channel
     `_glossaries` stash that previously didn't round-trip."""
     g = Glossary()
@@ -2000,8 +2000,8 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
 
 
 def test_param_color_map_skips_attachment_columns() -> None:
-    """An attachment column needs no value colour, so it is excluded from the
-    colour map even while its sibling param column still gets one."""
+    """An attachment column needs no value color, so it is excluded from the
+    color map even while its sibling param column still gets one."""
     scenario = Scenario(
         id=NodeId('t.py::test_brew'),
         narration=Narration(text='brew'),
@@ -2020,12 +2020,12 @@ def test_param_color_map_skips_attachment_columns() -> None:
     assert color_map == {'cup_size': 0}
 
 
-def test_a_disambiguated_columns_token_takes_its_own_columns_colour(
+def test_a_disambiguated_columns_token_takes_its_own_columns_color(
     tmp_path: Path,
 ) -> None:
     """The palette is keyed on the column *name*, so a token naming the column
-    it points at reads the header's colour. A token still carrying the bare
-    expression would take the first `price` column's colour while sitting under
+    it points at reads the header's color. A token still carrying the bare
+    expression would take the first `price` column's color while sitting under
     the second one's header."""
     report = report_from_dict(
         {

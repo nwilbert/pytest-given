@@ -13,10 +13,10 @@
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] How to handle work objects appearing multiple times in Domain Storrytelling?
-- [ ] Narrate more backend tests into scenarios — continue the dogfood conversion, converting behaviour, not plumbing (leave schema/serde round-trips, metadata/protocol checks, and config parsing plain). In priority order:
+- [ ] Narrate more backend tests into scenarios — continue the dogfood conversion, converting behavior, not plumbing (leave schema/serde round-trips, metadata/protocol checks, and config parsing plain). In priority order:
   - lint rule tests (`tests/unit/lint/test_runtime_rules.py`, `test_ast_rules.py`, ~65) — each asserts a user-facing rule ("missing-phase fires on a two-phase scenario"); the report would document the lint's semantics
   - source-link preset resolution (`tests/unit/report/test_source_link.py`) — the preset rules earn narration; the URL-template internals stay plain
-  - integration-test spike (`tests/integration/`, 124 plain): the plugin's outermost behaviour — "when the suite runs with `--given-json` then the report shows …". Technically feasible (`test_plugin_session_isolation.py` proves narrated outer scenarios survive nested pytester runs) but needs its own spike for nested-session edge cases around open step stacks. Would retire the `Plain fixture` dead term (the last one).
+  - integration-test spike (`tests/integration/`, 124 plain): the plugin's outermost behavior — "when the suite runs with `--given-json` then the report shows …". Technically feasible (`test_plugin_session_isolation.py` proves narrated outer scenarios survive nested pytester runs) but needs its own spike for nested-session edge cases around open step stacks. Would retire the `Plain fixture` dead term (the last one).
 
 ## Later
 

@@ -24,7 +24,7 @@ This is the authoring-relevant surface, version-matched to the installed package
 
 ## Step text forms
 
-| Form | Where | Behaviour |
+| Form | Where | Behavior |
 |---|---|---|
 | Plain string / f-string | anywhere | Rendered verbatim; f-string values are not highlighted. |
 | T-string `t'a {cup_size} cup'` | test-body steps only | Interpolated at runtime; values color-coded when the expression matches a parametrize column. Full expression syntax allowed. |

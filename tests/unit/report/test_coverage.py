@@ -466,7 +466,7 @@ def test_is_coverage_eligible_false_for_all_bare_activity(g):
 def test_compute_coverage_excludes_under_anchored_activity(g):
     """An activity with fewer than two distinct terms is excluded from
     matching — it is never reported as covered (replaces the old
-    'empty refs matches every step' behaviour)."""
+    'empty refs matches every step' behavior)."""
     with given(t'a {pg["Story"]} whose {pg["Activity"]} is all bare words'):
         a = Activity(
             id=ActivityId(1),

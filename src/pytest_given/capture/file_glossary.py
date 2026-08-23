@@ -90,7 +90,7 @@ class FileGlossary:
         mapped = _KIND_ALIASES.get(raw.lower())
         if mapped is None:
             raise PytestGivenError(
-                f'{self._path}:{line}: unrecognised kind {raw!r}; expected one of '
+                f'{self._path}:{line}: unrecognized kind {raw!r}; expected one of '
                 f"'actor', 'object'/'work object', 'verb'."
             )
         return mapped

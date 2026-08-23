@@ -39,7 +39,7 @@ from .source_link import compile_source_link
 
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 
-# Maps parameter name to its color index. The index resolves to a colour via
+# Maps parameter name to its color index. The index resolves to a color via
 # `palette.param_column_colors`, which never runs out — the fixed list it
 # replaced wrapped at six.
 type ParamColorMap = dict[str, int]
@@ -161,7 +161,7 @@ def _render_context(report: ReportData) -> dict[str, object]:
         'term_scenario_index': term_scenario_index,
         'scenario_slugs': scenario_slugs,
         'param_color_map': param_color_map,
-        # The colours themselves, emitted as `.param-color-N` rules beside the
+        # The colors themselves, emitted as `.param-color-N` rules beside the
         # stylesheet. They are generated per report rather than sitting in
         # styles.css, because how many a report needs is a property of the
         # report.
@@ -199,9 +199,9 @@ def _bundled_assets() -> dict[str, Markup]:
 
 
 def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
-    """One colour per column *name* across the report, so a parameter reads the
-    same colour in every scenario. Attachment columns are excluded — a badge
-    needs no value colour."""
+    """One color per column *name* across the report, so a parameter reads the
+    same color in every scenario. Attachment columns are excluded — a badge
+    needs no value color."""
     color_map: ParamColorMap = {}
     color_idx = 0
     for scenario in scenarios:
@@ -257,7 +257,7 @@ def _make_narration_filter(
       - `NarrationLiteral` → escape `value`
       - `NarrationValue`   → `.value-highlight` around `rendered`
       - `NarrationPlaceholder` → color-coded `{name}` token
-      - `NarrationTermRef` → kind-coloured term ref resolved via glossary
+      - `NarrationTermRef` → kind-colored term ref resolved via glossary
     Empty parts → escape `text` and emit verbatim.
     """
 
@@ -293,7 +293,7 @@ def _render_narration_part(
             # — two steps can interpolate the same expression with different
             # values, which would cross-wire if the name were the key. The
             # palette keys on `name` instead, so one parameter reads the same
-            # colour everywhere. `data-subst` is row-hover substitution's own
+            # color everywhere. `data-subst` is row-hover substitution's own
             # attribute (see setHoverRow in app.js).
             #
             # Both go in data-* and are read back off the element: interpolating

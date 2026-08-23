@@ -162,7 +162,7 @@ def _resolve_github_preset() -> str:
 
 def _detect_github_repo() -> tuple[str, str] | None:
     """Return (org, repo) from GITHUB_REPOSITORY env or `git remote get-url
-    origin`; None if neither yields a recognisable GitHub remote."""
+    origin`; None if neither yields a recognizable GitHub remote."""
     env = os.environ.get('GITHUB_REPOSITORY')
     if env and '/' in env:
         org, _, repo = env.partition('/')

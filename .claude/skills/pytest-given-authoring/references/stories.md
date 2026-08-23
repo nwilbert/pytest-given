@@ -49,7 +49,7 @@ Two corollaries of "per step":
 
 A step can also **pin** an activity explicitly — `given(text, activity=3)`, taking the 1-based activity number in the story (or a sequence of numbers). A pinned step covers the activity regardless of what its narration references; use a pin when the activity is phrased above the vocabulary the step narrates (e.g. a process-level activity implemented by a technical test), and keep it on the one step that genuinely demonstrates the activity.
 
-An uncovered activity is a signal, not an error — it marks vocabulary and behaviour no test exercises yet.
+An uncovered activity is a signal, not an error — it marks vocabulary and behavior no test exercises yet.
 
 ## When a story earns its keep
 

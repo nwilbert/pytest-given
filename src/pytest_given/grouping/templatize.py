@@ -125,7 +125,7 @@ def _promote_occurrence(
     column = ctx.new_column('attachment', attachment.label)
     for node_id, other in theirs.items():
         ctx.set_cell(column.id, node_id, other)
-    # The badge is labelled with the *column* name, not the attachment's own
+    # The badge is labeled with the *column* name, not the attachment's own
     # label: a label attached twice gives two columns, and a badge repeating
     # the bare label points the reader at the wrong one.
     return AttachmentRef(

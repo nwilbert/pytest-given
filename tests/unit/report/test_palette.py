@@ -21,7 +21,7 @@ def _relative_luminance(hex_color: str) -> float:
 
 
 def _chromaticity(hex_color: str) -> tuple[float, float, float]:
-    """Linear RGB normalised to sum 1 — the colour with its brightness divided
+    """Linear RGB normalized to sum 1 — the color with its brightness divided
     out, so distance here is separation in hue and saturation alone."""
     channels = [
         c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
@@ -51,7 +51,7 @@ def test_param_column_colors_are_lowercase_six_digit_hex() -> None:
 
 
 def test_param_column_colors_are_distinct() -> None:
-    # The colours exist only to be told apart; two equal ones would silently
+    # The colors exist only to be told apart; two equal ones would silently
     # merge two columns. The old fixed list wrapped at six.
     for count in range(1, 25):
         colors = param_column_colors(count)
@@ -63,9 +63,9 @@ def test_param_column_colors_are_deterministic() -> None:
 
 
 def test_param_column_colors_of_a_count_extend_the_shorter_ones() -> None:
-    # An index resolves to the same colour whatever the count, so a longer list
+    # An index resolves to the same color whatever the count, so a longer list
     # is the shorter list plus more. Without this, adding a parametrized
-    # scenario anywhere in the suite would recolour every column in the report.
+    # scenario anywhere in the suite would recolor every column in the report.
     for count in range(1, 24):
         assert param_column_colors(count + 1)[:count] == param_column_colors(count)
 

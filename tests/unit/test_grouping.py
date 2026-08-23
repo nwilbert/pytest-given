@@ -1056,7 +1056,7 @@ def test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column() -> None:
 
 class _SpecRefusing:
     """A value that renders bare but rejects any format spec — `datetime`'s
-    behaviour for a nonsense spec, in miniature."""
+    behavior for a nonsense spec, in miniature."""
 
     def __format__(self, spec: str) -> str:
         if spec:
@@ -2151,7 +2151,7 @@ def test_a_second_derived_column_of_one_expression_reads_its_suffixed_name() -> 
     """Two steps interpolating the same expression give two columns, and the
     second step's token has to say which one it means — `{price}` in both steps
     points the reader at the first column twice, and the HTML palette (keyed on
-    the column name) hands the token a colour belonging to the other column."""
+    the column name) hands the token a color belonging to the other column."""
     scenarios, info = _two_case_group(
         [_value_step('2.0'), _value_step('9.0')],
         [_value_step('3.5'), _value_step('9.9')],

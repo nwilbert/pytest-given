@@ -1,6 +1,6 @@
 # Authoring glossaries
 
-A glossary declares the ubiquitous language your tests speak: actors, work objects, and verbs, each with a definition. Steps, stories, and scenario titles reference terms through handles; every reference renders as a kind-coloured word with the definition as tooltip and feeds the report's Glossary tab (with per-term scenario filtering).
+A glossary declares the ubiquitous language your tests speak: actors, work objects, and verbs, each with a definition. Steps, stories, and scenario titles reference terms through handles; every reference renders as a kind-colored word with the definition as tooltip and feeds the report's Glossary tab (with per-term scenario filtering).
 
 ## Two ways to declare a glossary
 

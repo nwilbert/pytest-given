@@ -126,7 +126,7 @@ def _dead_term_findings(
 ) -> list[Finding]:
     """Rule `dead-term`: a glossary term is referenced by no step and no
     story. Default `off`: for a file-backed glossary, unreferenced terms are
-    often intentionally present (documented behaviour)."""
+    often intentionally present (documented behavior)."""
     referenced: set[TermId] = set()
     for scenario in grouped:
         for narration in _iter_narrations(scenario):

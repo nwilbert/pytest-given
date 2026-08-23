@@ -584,7 +584,7 @@ def _extract_skip_reason(longrepr: object) -> str | None:
     typically "Skipped: <reason>" (mark-based) or "<reason>" (call-time).
     Returns None for empty messages, the reasonless `<Skipped instance>`
     placeholder, pytest's default "unconditional skip" (emitted when
-    @pytest.mark.skip is used with no reason), or any shape we don't recognise.
+    @pytest.mark.skip is used with no reason), or any shape we don't recognize.
     """
     if not isinstance(longrepr, tuple) or len(longrepr) != 3:
         return None

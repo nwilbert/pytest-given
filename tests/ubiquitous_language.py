@@ -2,8 +2,8 @@
 
 The project's own ``GLOSSARY.md`` is the ubiquitous language of pytest-given's
 bounded context. Loading it as a :class:`FileGlossary` lets the backend tests
-narrate their behaviour in that vocabulary, so ``pytest --given-html`` renders a
-living, filterable behavioural spec of the plugin itself.
+narrate their behavior in that vocabulary, so ``pytest --given-html`` renders a
+living, filterable behavioral spec of the plugin itself.
 
 Term handles are referenced as ``pg['Scenario']`` inside t-string steps. The
 name ``pg`` (pytest-given) is deliberately distinct from the throwaway ``g``

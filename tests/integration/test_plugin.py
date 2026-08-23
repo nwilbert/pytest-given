@@ -2210,7 +2210,7 @@ def test_given_title_cli_flag_names_the_report(pytester, tmp_path):
 
 def test_given_title_absent_leaves_the_title_unset(pytester, tmp_path):
     """Without the flag the title stays None and the rootdir name still names
-    the report — the pre-title behaviour, unchanged."""
+    the report — the pre-title behavior, unchanged."""
     pytester.makepyfile(
         """
         from pytest_given import scenario, when

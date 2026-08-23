@@ -107,7 +107,7 @@ class Collector:
     def active_fixture_descriptor(self) -> StepDescriptor | None:
         """The descriptor pytest_fixture_setup pinned for the current fixture call.
 
-        Used by StepDescriptor's helper-decorator wrapper to recognise the case
+        Used by StepDescriptor's helper-decorator wrapper to recognize the case
         where pytest is invoking it as a fixture body (in which case
         pytest_fixture_setup has already created the recording's root step from
         the descriptor's narration, and the wrapper must not push a duplicate).

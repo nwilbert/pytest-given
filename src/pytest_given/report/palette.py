@@ -1,20 +1,20 @@
-"""Generated text colours for the HTML report's parametrize columns.
+"""Generated text colors for the HTML report's parametrize columns.
 
-A report needs one colour per parametrize column, for a count it only learns at
-render time. The fixed six-colour list this replaces capped that count — a
-seventh column wrapped back onto the first colour — and it had to be *ordered*
+A report needs one color per parametrize column, for a count it only learns at
+render time. The fixed six-color list this replaces capped that count — a
+seventh column wrapped back onto the first color — and it had to be *ordered*
 by hand so that every prefix stayed well spread, since a two-column table only
 ever sees the first two entries.
 
-Colours come off a ring: one lightness at full chroma, stepped by colourfulness
+Colors come off a ring: one lightness at full chroma, stepped by colorfulness
 rather than by angle (see `_hue_at`, which is where the interesting part is,
 and `_LIGHTNESS`, where an earlier version went wrong). An index picks its
 place on that ring by the golden ratio (`_GOLDEN_RATIO_CONJUGATE`), which is
 what makes every prefix spread by itself.
 
-Columns are the report's one *arbitrary* colour vocabulary — the index means
-nothing, the colours only have to be told apart — which is why they can take
-the whole ring. The colours that carry meaning are spent elsewhere: the term
+Columns are the report's one *arbitrary* color vocabulary — the index means
+nothing, the colors only have to be told apart — which is why they can take
+the whole ring. The colors that carry meaning are spent elsewhere: the term
 kinds mark the word with a wash behind it rather than with ink, so a column
 sharing a hue with a kind still cannot be mistaken for one, and the statuses
 sit in their own slot beside a glyph.
@@ -25,9 +25,9 @@ import functools
 import math
 
 # Where column 0 sits on the ring, as a fraction of the ring's circumference.
-# Swept against everything a column colour has to stay clear of — the term-kind
+# Swept against everything a column color has to stay clear of — the term-kind
 # inks, the three statuses and the accent. Nothing in the first four columns
-# comes within dE00 11 of a reserved colour, which matters most for the hue
+# comes within dE00 11 of a reserved color, which matters most for the hue
 # that reads as "failed": a red column value inside a failed row's red tint is
 # the one confusion worth designing out.
 _HUE_OFFSET = 0.395
@@ -37,25 +37,25 @@ _HUE_OFFSET = 0.395
 # prefix of the sequence is spread near-evenly and no two indices coincide.
 #
 # The alternative — dividing the ring into exactly `count` equal steps — is
-# better on paper, since it maximises the closest pair for that one count. It
+# better on paper, since it maximizes the closest pair for that one count. It
 # is worse in the report, for two reasons. Columns are numbered in the order
 # they are first seen, so the columns of any one scenario get *consecutive*
 # indices, and consecutive indices are precisely the neighbours an even
 # division places closest together: at eight columns their separation collapses
 # to a quarter of what it holds here, and the pairs that collapse are exactly
 # the pairs that appear side by side in a table. And an even division makes
-# every colour depend on the report's total count, so adding a parametrized
-# scenario anywhere in the suite recolours every column in it.
+# every color depend on the report's total count, so adding a parametrized
+# scenario anywhere in the suite recolors every column in it.
 _GOLDEN_RATIO_CONJUGATE = 0.6180339887498949
 
 # CIELAB lightness, shared by every column. It is as light as WCAG AA allows —
 # a parameter value renders over the card, the page, the hovered row's blue
 # tint and the failed row's red tint, and the worst case anywhere on the ring
 # is 4.72:1 — and light is what the ring wants, because chroma collapses as a
-# colour darkens. An earlier version alternated a second, darker band to buy
+# color darkens. An earlier version alternated a second, darker band to buy
 # separation; it bought near-black instead, and the columns became hard to tell
 # apart. Lightness is the wrong axis for this: at 13px you identify a word's
-# colour by its hue, and darkening only drains the hue away.
+# color by its hue, and darkening only drains the hue away.
 _LIGHTNESS = 43.0
 
 # How finely the ring is sampled when measuring its circumference. One degree
@@ -77,9 +77,9 @@ _KAPPA = 24389 / 27
 
 
 def param_column_colors(count: int) -> list[str]:
-    """`count` hex colours for the parametrize columns, column 0 first.
+    """`count` hex colors for the parametrize columns, column 0 first.
 
-    An index always resolves to the same colour, whatever the count — the count
+    An index always resolves to the same color, whatever the count — the count
     only says how many of them this report needs."""
     return [_column_color(index) for index in range(count)]
 
@@ -90,7 +90,7 @@ def _column_color(index: int) -> str:
 
 
 def _hue_at(fraction: float) -> float:
-    """The hue this far around the ring, measured in colourfulness rather than
+    """The hue this far around the ring, measured in colorfulness rather than
     in degrees.
 
     Splitting the circle into equal *angles* looks right and reads wrong,
@@ -148,7 +148,7 @@ def _lch_to_hex(lightness: float, chroma: float, hue: float) -> str:
 def _lch_to_rgb(
     lightness: float, chroma: float, hue: float
 ) -> tuple[float, float, float]:
-    """CIELCh(ab) to sRGB, unclamped — a component outside 0..1 means the colour
+    """CIELCh(ab) to sRGB, unclamped — a component outside 0..1 means the color
     is outside the gamut, which is what `_max_chroma` bisects on."""
     radians = math.radians(hue)
     return _lab_to_rgb(
@@ -183,7 +183,7 @@ def _inverse_f(value: float) -> float:
 
 def _gamma_encode(channel: float) -> float:
     # The linear branch also absorbs the negative channels an out-of-gamut
-    # colour produces: it keeps them negative, which is what `_in_gamut` reads.
+    # color produces: it keeps them negative, which is what `_in_gamut` reads.
     if channel <= 0.0031308:
         return 12.92 * channel
     return 1.055 * math.pow(channel, 1 / 2.4) - 0.055

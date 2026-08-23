@@ -9,7 +9,7 @@
 {# One rule per parametrize column, generated for this report's column count.
    See report/palette.py for how the ring is derived; styles.css holds only the
    properties every column shares. The `th` half of each selector is there to
-   outrank `.param-table th`, which sets a colour of its own. #}
+   outrank `.param-table th`, which sets a color of its own. #}
 {%- for color in param_colors %}
 .param-color-{{ loop.index0 }}, th.param-color-{{ loop.index0 }} { color: {{ color }}; }
 {%- endfor %}

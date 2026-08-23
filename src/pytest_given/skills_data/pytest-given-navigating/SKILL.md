@@ -1,11 +1,11 @@
 ---
 name: pytest-given-navigating
-description: Use when exploring or onboarding to a codebase whose tests use pytest-given (@scenario tests, a glossary, domain stories) — to learn what the system does, find which scenarios cover a behaviour, tag, or glossary term, or see what currently fails
+description: Use when exploring or onboarding to a codebase whose tests use pytest-given (@scenario tests, a glossary, domain stories) — to learn what the system does, find which scenarios cover a behavior, tag, or glossary term, or see what currently fails
 ---
 
 # Navigating a codebase through its pytest-given artifacts
 
-The test suite narrates itself: rendered scenarios are a behavioural spec, the glossary is the domain map, stories are the interaction map. Render the narration instead of reverse-engineering test bodies, and answer every "which scenarios …?" question from the structured report instead of grepping — term references flow through glossary handles (often variables imported from a vocab module), so text search misses or double-counts them.
+The test suite narrates itself: rendered scenarios are a behavioral spec, the glossary is the domain map, stories are the interaction map. Render the narration instead of reverse-engineering test bodies, and answer every "which scenarios …?" question from the structured report instead of grepping — term references flow through glossary handles (often variables imported from a vocab module), so text search misses or double-counts them.
 
 ## Orientation — first contact
 
@@ -37,6 +37,6 @@ jq -r '.scenarios[] | select(.tags | index("validation"))
 
 ## When to drop to the code
 
-To change behaviour, or to verify one scenario's narration against its body. Jump straight to the scenario's `source.relpath` + `source.line` from the JSON (or the ``file.py:line::test_name`` line under each Markdown heading) rather than searching for it.
+To change behavior, or to verify one scenario's narration against its body. Jump straight to the scenario's `source.relpath` + `source.line` from the JSON (or the ``file.py:line::test_name`` line under each Markdown heading) rather than searching for it.
 
 *These files are installed by `pytest-given skills install` and overwritten on reinstall — don't edit them in place.*

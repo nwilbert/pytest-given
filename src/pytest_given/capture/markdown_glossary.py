@@ -1,7 +1,7 @@
 """Minimal GFM pipe-table parser for file-backed glossaries.
 
 Parses every pipe table in a Markdown document into GlossaryRow records.
-Not a full CommonMark parser — it recognises pipe tables, honours `\\|`
+Not a full CommonMark parser — it recognizes pipe tables, honors `\\|`
 escapes, and skips fenced code blocks. Column selection accepts a header
 name (case-insensitive) or a 0-based index.
 """
@@ -98,7 +98,7 @@ def parse_glossary_tables(
 def _strip_emphasis(cell: str) -> str:
     """Unwrap inline Markdown emphasis (**bold**, *italic*, `code`, __bold__)
     from a cell, leaving its text content. Applied to term and kind cells so a
-    glossary written with emphasised term names renders clean pills."""
+    glossary written with emphasized term names renders clean pills."""
     prev = None
     text = cell
     while prev != text:

@@ -32,7 +32,7 @@ _IS_WINDOWS = sys.platform == 'win32'
 
 
 def _co_filename_to_path(filename: str) -> Path:
-    """Normalise a path string to the running platform's native convention.
+    """Normalize a path string to the running platform's native convention.
 
     The same file can reach us in either convention regardless of platform: a
     frame's `co_filename` (or a stored rootdir) may be a Windows path
@@ -93,7 +93,7 @@ def current_rootdir() -> Path | None:
 
 def restore_rootdir(previous: Path | None) -> None:
     """Reinstate a rootdir captured with `current_rootdir`. Unlike
-    `set_rootdir`, the value is used as-is — it was already normalised and
+    `set_rootdir`, the value is used as-is — it was already normalized and
     resolved when first set. Clears the relpath cache, whose entries are only
     valid for the rootdir they were computed against."""
     global _rootdir
@@ -111,7 +111,7 @@ def _reset_rootdir() -> None:
 def _relativize(abs_path: Path) -> str | None:
     """rootdir-relative POSIX string for an absolute path. Returns None if
     rootdir is unset or the path lies outside it. Callers that start from a
-    `co_filename` must normalise via `_co_filename_to_path` first.
+    `co_filename` must normalize via `_co_filename_to_path` first.
     """
     if _rootdir is None:
         return None
@@ -152,7 +152,7 @@ def capture_caller_source(skip: int = 1) -> SourceLocation | None:
 
 
 def to_relpath(raw: str) -> str:
-    """Normalise a path string and make it rootdir-relative when possible.
+    """Normalize a path string and make it rootdir-relative when possible.
 
     Folds the path into the native convention (see `_co_filename_to_path`) and,
     if it is then an absolute path inside rootdir, returns it relative to rootdir;
@@ -180,7 +180,7 @@ def item_source(relpath_raw: str, line: int) -> SourceLocation:
     re-relativizes against rootdir. Unlike `capture_caller_source`, this always
     returns a location: an absolute path outside rootdir (or unset rootdir)
     degrades to the path as given rather than to "no link", matching the prior
-    behaviour where every scenario carried a source.
+    behavior where every scenario carried a source.
     """
     return SourceLocation(relpath=to_relpath(relpath_raw), line=line)
 

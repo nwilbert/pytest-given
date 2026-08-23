@@ -174,10 +174,10 @@ def test_work_object_underscore_alias(tmp_path):
 
 
 @scenario(
-    'An unrecognised kind value is rejected',
+    'An unrecognized kind value is rejected',
     tags=['diagnostics', 'validation'],
 )
-def test_unrecognised_kind_value_raises(tmp_path):
+def test_unrecognized_kind_value_raises(tmp_path):
     with given('a glossary whose Kind cell holds an unknown value'):
         doc = '| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | Wizard |\n'
         attach('Glossary file', doc)
@@ -186,7 +186,7 @@ def test_unrecognised_kind_value_raises(tmp_path):
     with (
         when_then(
             t'the {pg["File glossary"]} loads the file',
-            'a PytestGivenError names the unrecognised kind',
+            'a PytestGivenError names the unrecognized kind',
         ),
         pytest.raises(PytestGivenError, match='Wizard'),
     ):
