@@ -22,7 +22,7 @@ from ..model import (
     Story,
     narration_text,
 )
-from .collector import get_active_collector
+from .collector import Collector, get_active_collector
 from .source import capture_caller_source, code_source
 from .template import Template, narration_from, placeholder_value
 
@@ -156,44 +156,96 @@ class StepDescriptor:
             if isinstance(self._source, Template)
             else None
         )
+        # A generator function is a fixture body: `pytest_fixture_setup` has
+        # already made the recording's root from this descriptor, so the
+        # wrapper only carries the marker. Both flavors, since an async
+        # generator is neither `isgeneratorfunction` nor `iscoroutinefunction`
+        # and would otherwise fall through to the call-time wrapper below.
         if inspect.isgeneratorfunction(func):
 
             @functools.wraps(func)
             def gen_wrapper(*args: Any, **kwargs: Any) -> Any:
                 yield from func(*args, **kwargs)
 
-            gen_wrapper._step_descriptor = self  # type: ignore[attr-defined]
-            return cast('StepDecorated', gen_wrapper)
+            return self._marked(gen_wrapper)
+
+        if inspect.isasyncgenfunction(func):
+
+            @functools.wraps(func)
+            async def async_gen_wrapper(*args: Any, **kwargs: Any) -> Any:
+                async for value in func(*args, **kwargs):
+                    yield value
+
+            return self._marked(async_gen_wrapper)
+
+        # A coroutine function needs its own wrapper: the sync one would call
+        # `func(...)`, get back an un-awaited coroutine, and pop in `finally`
+        # — closing the step before a line of the body had run.
+        if inspect.iscoroutinefunction(func):
+
+            @functools.wraps(func)
+            async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
+                collector = self._push_call_step(func, sig, args, kwargs)
+                if collector is None:
+                    return await func(*args, **kwargs)
+                try:
+                    return await func(*args, **kwargs)
+                finally:
+                    collector.pop_step()
+
+            return self._marked(async_wrapper)
 
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            collector = get_active_collector()
-            if (
-                collector is None
-                or collector.state == 'idle'
-                or collector.active_fixture_descriptor is self
-            ):
+            collector = self._push_call_step(func, sig, args, kwargs)
+            if collector is None:
                 return func(*args, **kwargs)
-            narration = (
-                self._narration_for_call(sig, args, kwargs)
-                if sig is not None
-                else self.narration
-            )
-            # The helper's FunctionDef *is* the step body — anchor there, no
-            # frame walk needed.
-            source = (
-                code_source(func.__code__) if collector.capture_step_source else None
-            )
-            collector.push_step(
-                self.phase, narration, activity_ids=self.activity_ids, source=source
-            )
             try:
                 return func(*args, **kwargs)
             finally:
                 collector.pop_step()
 
+        return self._marked(wrapper)
+
+    def _marked(self, wrapper: Callable[..., object]) -> StepDecorated:
+        """Hang this descriptor on the wrapper, where the read sites find it."""
         wrapper._step_descriptor = self  # type: ignore[attr-defined]
         return cast('StepDecorated', wrapper)
+
+    def _push_call_step(
+        self,
+        func: Callable[..., object],
+        sig: inspect.Signature | None,
+        args: tuple[Any, ...],
+        kwargs: Mapping[str, Any],
+    ) -> Collector | None:
+        """Open this step for one helper call, returning the collector to pop
+        it with — or None when the call passes straight through.
+
+        None covers the three transparent cases: no collector, an idle one,
+        and pytest invoking this very descriptor as a fixture body (where
+        `pytest_fixture_setup` already created the root from its narration and
+        a second push would duplicate it).
+        """
+        collector = get_active_collector()
+        if (
+            collector is None
+            or collector.state == 'idle'
+            or collector.active_fixture_descriptor is self
+        ):
+            return None
+        narration = (
+            self._narration_for_call(sig, args, kwargs)
+            if sig is not None
+            else self.narration
+        )
+        # The helper's FunctionDef *is* the step body — anchor there, no frame
+        # walk needed.
+        source = code_source(func.__code__) if collector.capture_step_source else None
+        collector.push_step(
+            self.phase, narration, activity_ids=self.activity_ids, source=source
+        )
+        return collector
 
     def _check_tstring_decorator_safety(self) -> None:
         """A t-string passed to a decorator is evaluated once at module load;

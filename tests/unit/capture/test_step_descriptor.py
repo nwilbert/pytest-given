@@ -1,4 +1,6 @@
+import asyncio
 import inspect
+from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import cast
 
@@ -1020,3 +1022,88 @@ def test_helper_decorator_anchors_at_the_function_definition() -> None:
     assert scenario.steps[0].source == SourceLocation(
         relpath='test_step_descriptor.py', line=base + 2
     )
+
+
+# --- async helper bodies ---
+
+
+def test_decorator_keeps_an_async_helpers_step_open_for_its_body() -> None:
+    """A decorated `async def` must record around the awaited body.
+
+    Branching on `isgeneratorfunction` alone routes a coroutine function to
+    the sync wrapper: `func(...)` returns an un-awaited coroutine, the
+    `finally` pops, and the step closes before a single line of the body runs
+    — so anything the body records lands on whatever is open by then.
+    """
+    desc = StepDescriptor('given', 'brewing')
+
+    @desc
+    async def brew() -> str:
+        with given('grinding beans'):
+            pass
+        return 'done'
+
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        assert asyncio.run(brew()) == 'done'
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert [s.narration.text for s in scenario.steps] == ['brewing']
+    assert [c.narration.text for c in scenario.steps[0].children] == ['grinding beans']
+
+
+def test_decorator_passes_an_async_helper_through_when_idle() -> None:
+    desc = StepDescriptor('given', 'brewing')
+
+    @desc
+    async def brew() -> str:
+        return 'done'
+
+    assert asyncio.run(brew()) == 'done'
+
+
+def test_decorator_pops_an_async_helpers_step_when_its_body_raises() -> None:
+    desc = StepDescriptor('given', 'brewing')
+
+    @desc
+    async def brew() -> None:
+        raise ValueError('boom')
+
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with pytest.raises(ValueError, match='boom'):
+            asyncio.run(brew())
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert [s.narration.text for s in scenario.steps] == ['brewing']
+
+
+def test_decorator_leaves_an_async_generator_fixture_body_to_the_hook() -> None:
+    """An async generator fixture gets the same marker-only wrapper a sync
+    generator fixture gets: `pytest_fixture_setup` drives the recording, so
+    the wrapper must not push a step of its own — and must still yield."""
+    desc = StepDescriptor('given', 'a session')
+
+    @desc
+    async def session() -> AsyncIterator[str]:
+        yield 'open'
+
+    async def drain() -> list[str]:
+        return [value async for value in session()]
+
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        assert asyncio.run(drain()) == ['open']
+        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    assert scenario.steps == []
+    assert cast(StepDecorated, session)._step_descriptor is desc

@@ -98,6 +98,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A nested in-process pytest run that dies while parsing its arguments no longer
   strands the outer session's captured rootdir, which silently dropped every
   later step's source anchor.
+- `@given`/`@when`/`@then` on an `async def` helper now records around the
+  awaited body; the step previously closed before the body ran, so anything it
+  recorded landed elsewhere. Async generator fixtures are handled too.
 - A finished scenario no longer leaves its collector — and every scenario and
   step it recorded — reachable from a process-global for the rest of the
   process.
