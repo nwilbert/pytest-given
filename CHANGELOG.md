@@ -15,15 +15,15 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - `--given-title=TEXT` (or the `given_title` ini) names the report, replacing the
   rootdir name.
-- A parametrized scenario's cases now share one narrated step tree above a typed
-  case table.
-- `@scenario(group_parametrized=False)` declines that merge and emits each case
-  as its own scenario, titled by its parametrize id.
+- A parametrized scenario's case table now carries a typed column per varying
+  value — `param`, `derived` or `attachment` — rather than one column per
+  parametrize name.
 - A varying attachment payload becomes an `attachment` column of its own.
-- The HTML report's sidebar gains **Terms** as a third browse axis beside Tags
-  and Modules.
-- All three browse axes — Tags, Terms, Modules — now filter the Scenarios view
-  the same way, with each active filter carried in the sharable URL.
+- `@scenario(group_parametrized=False)` declines the grouping and emits each case
+  as its own scenario, titled by its parametrize id.
+- The HTML report's sidebar gains **Terms** as a third browse axis, and all three
+  axes — Tags, Terms, Modules — now filter the Scenarios view the same way, with
+  each active filter carried in the sharable URL.
 - The sidebar's browse list can be ordered by group size as well as by name, via
   an **A–Z / Count** toggle.
 - A selected activity in the Stories view offers **Open in Scenarios**, filtering
@@ -40,7 +40,6 @@ form `## [x.y.z] - YYYY-MM-DD`.
     `t"{m.balance}"`);
   - a t-string narrating a parametrize name that no longer holds the case's
     value — either a local rebound it, or the body mutated it in place;
-  - a t-string `attach` label — `attach` now takes a plain `str`;
   - a step whose set of `attach` labels differs between cases;
   - a glossary term ref that names a different term or reads differently
     between cases. A term ref that *is* a parametrize value stays supported;
@@ -57,9 +56,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
   than case 1's rendering.
 - A glossary term placed in an activity slot its declared kind forbids now
   raises `PytestGivenError` when `activity(...)` is built rather than at session
-  finish, and the message names the term and its kind instead of dumping handle
-  reprs. This reaches `kind_column` terms, which previously went unchecked until
-  a scenario bound the story.
+  finish, naming the term and its kind instead of dumping handle reprs.
+- **Breaking.** `attach()` now takes a plain `str` label; a t-string label raises
+  `PytestGivenError` — use an f-string.
 - **Breaking.** `attach()` called with no step open now raises `PytestGivenError`
   instead of silently discarding the payload; move the call inside the `given` /
   `when` / `then` block it belongs to.
@@ -74,11 +73,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled authoring and reviewing skills gain the report mechanics their
   rules depend on, a symptom index, and a completeness audit.
 - The Scenarios sidebar and its header chips are visually tidied.
-- Glossary terms in a step or a scenario title now read as a word under a light
-  wash rather than a bordered pill, with the kind in the ink and a neutral wash
-  where there is no kind; parametrize column colours are generated per column
-  rather than drawn from a fixed list of six, so a seventh column no longer
-  wraps back onto the first. The Glossary view keeps its pills.
+- The HTML report's colors are retuned into one system, so glossary term kinds,
+  statuses and parametrize columns can no longer land on the same color: a term
+  ref in a step or a scenario title reads as a word under a light wash rather
+  than a bordered pill (the Glossary view keeps its pills), and column colors are
+  generated per column, so a seventh column no longer wraps back onto the first.
 - An attachment badge in the HTML report now takes its icon from the payload's
   content type — braces for JSON, a page for text — instead of a paperclip for
   both. The Markdown report keeps its `📎`.
@@ -95,7 +94,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - A nested in-process pytest run that dies while parsing its arguments no longer
   strands the outer session's captured rootdir, which silently dropped every
-  later step's source anchor and with it the lint's whole AST-rule surface.
+  later step's source anchor.
 - A fixture that raises after its `yield` now fails the scenario it tore down,
   instead of leaving it green in a report pytest counted as an error.
 - Every report-building failure — a suite reaching two glossaries, a term used in
@@ -110,45 +109,32 @@ form `## [x.y.z] - YYYY-MM-DD`.
   interpolation's own format spec and, under `indirect=True`, the bound test
   argument; one parameter formatted two ways gets a column each.
 - A `Template` narration's `text` is now what its parts render, so the report's
-  search box and `jq` queries no longer match a spec the page never displays.
-- The grouped step tree now comes from the first case that *passed* — a skipped
-  case 1 used to render an empty tree and hide later failures.
+  search box and `jq` queries match what the page displays.
+- The grouped step tree now comes from the first case that *passed*, where a
+  skipped case 1 used to render an empty tree.
 
 #### HTML report
 
 - Two test files sharing a basename across directories no longer abort the HTML
   report; the scenarios' `#scenario=` slugs gain directory components instead.
-- Attachment content now scrolls instead of being silently cut off, and
-  attachment badges are keyboard-operable.
+- Content reaching past a scenario card's right edge is no longer clipped beyond
+  reach: a wide case table and an attachment payload scroll, a source path and a
+  traceback's frame location wrap, and the source link sits under the card's last
+  element instead of on top of it.
 - Jumping to a scenario from a story activity, or to a term's scenarios from the
   Glossary tab, now clears filters that would hide the target; the filters in a
   `#scenario=` deep link still win.
-- The HTML report's colours are retuned into one system, so glossary term kinds,
-  statuses and parametrize columns can no longer land on the same colour.
-- Accent-coloured text and the parametrize column colours in the HTML report now
-  meet WCAG AA, and term kinds stay distinguishable for red-green colour
-  blindness.
-- A scenario title carrying glossary terms no longer wraps early in Firefox,
-  breaking to a second line with the rest of the row empty.
-- The source link in a scenario card no longer sits on top of the card's last
-  element, where it covered the final row and status column of a full-width case
-  table.
-- A case table too wide for its card now scrolls instead of being clipped with
-  no scrollbar.
-- A source path and a traceback's frame location now wrap rather than spilling
-  past a narrow card's edge.
+- Accent-colored text and the parametrize column colors now meet WCAG AA, term
+  kinds stay distinguishable for red-green color blindness, and attachment badges
+  are keyboard-operable.
 
 #### Bundled skills
 
 - The bundled skills are corrected against the shipped behavior: the navigating
-  skill's term query now recurses into nested steps, its JSON reference matches
-  the emitted schema, the authoring skill points divergent parametrize narration
-  at `group_parametrized=False` rather than at splitting the test, glossary
-  discovery is described as the story tree first and the `conftest.py` scan as
-  its fallback, `@scenario`'s `story` / `activities` / `group_parametrized` are
-  shown keyword-only, a pinned step is documented as covering only the
-  activities it names, and the oversized-glossary advice no longer recommends a
-  per-context split that one glossary per suite cannot support.
+  skill's term query and JSON reference, the authoring skill's guidance for
+  divergent parametrize narration, glossary discovery order, `@scenario`'s
+  keyword-only arguments, the scope of a pinned step, and the oversized-glossary
+  advice.
 
 ## [0.1.0] - 2026-08-08
 
