@@ -42,8 +42,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
     value — either a local rebound it, or the body mutated it in place;
   - a t-string `attach` label — `attach` now takes a plain `str`;
   - a step whose set of `attach` labels differs between cases;
-  - a glossary term ref whose term varies. A term ref that *is* a parametrize
-    value stays supported;
+  - a glossary term ref that names a different term or reads differently
+    between cases. A term ref that *is* a parametrize value stays supported;
   - passed cases that narrate different templates altogether.
 
   Every one but the last has the same fix: bind the varying part to a local and
@@ -73,10 +73,6 @@ form `## [x.y.z] - YYYY-MM-DD`.
   tag should cut across modules and cover a minority of the suite.
 - The bundled authoring and reviewing skills gain the report mechanics their
   rules depend on, a symptom index, and a completeness audit.
-- The bundled skills are corrected against the shipped behaviour: the navigating
-  skill's term query now recurses into nested steps, its JSON reference matches
-  the emitted schema, and the authoring skill points divergent parametrize
-  narration at `group_parametrized=False` rather than at splitting the test.
 - The Scenarios sidebar and its header chips are visually tidied.
 - Glossary terms in a step or a scenario title now read as a word under a light
   wash rather than a bordered pill, with the kind in the ink and a neutral wash
@@ -95,7 +91,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Fixed
 
-#### Plugin and run behaviour
+#### Plugin and run behavior
 
 - A nested in-process pytest run that dies while parsing its arguments no longer
   strands the outer session's captured rootdir, which silently dropped every
@@ -141,6 +137,18 @@ form `## [x.y.z] - YYYY-MM-DD`.
   no scrollbar.
 - A source path and a traceback's frame location now wrap rather than spilling
   past a narrow card's edge.
+
+#### Bundled skills
+
+- The bundled skills are corrected against the shipped behavior: the navigating
+  skill's term query now recurses into nested steps, its JSON reference matches
+  the emitted schema, the authoring skill points divergent parametrize narration
+  at `group_parametrized=False` rather than at splitting the test, glossary
+  discovery is described as the story tree first and the `conftest.py` scan as
+  its fallback, `@scenario`'s `story` / `activities` / `group_parametrized` are
+  shown keyword-only, a pinned step is documented as covering only the
+  activities it names, and the oversized-glossary advice no longer recommends a
+  per-context split that one glossary per suite cannot support.
 
 ## [0.1.0] - 2026-08-08
 

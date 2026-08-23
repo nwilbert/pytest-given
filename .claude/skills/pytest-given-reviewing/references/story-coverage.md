@@ -9,7 +9,7 @@ An activity is covered when **one single step's** term refs include **all** of t
 - Refs spread across several steps never add up — matching is per step, not against their union.
 - Terms in the `@scenario` name don't count; only step narration does.
 - An activity with fewer than two distinct terms is not coverage-tracked at all, and renders as such.
-- A step pinned with `activity=` covers its activity regardless of what the narration references.
+- A step pinned with `activity=` covers exactly the activities it names, regardless of what the narration references — and *only* those: a pinned step is skipped by narration matching entirely, so it cannot also cover a different activity its text happens to fit.
 - A scenario carrying `activity_ids` is scoped to those activities and can cover no others.
 - Matching is on *identities*, not bare term ids: a verb contributes its canonical identity whatever its inflection, while an actor or work object written as an instance (`guest('Alice')`) contributes that instance. A step's instance ref also contributes the canonical, but not the reverse — so a canonical step ref does **not** cover an instance-anchored activity.
 
@@ -42,4 +42,4 @@ for story in d['stories']:
             print(f'UNCOVERED {story["id"]}#{a["id"]}')
 ```
 
-It matches on term ids alone, so it ignores the identity rule above: treat its output as a **floor**. It can call an instance-anchored activity covered when the report won't, so tighten it by comparing `display` values when the story under review uses instances.
+It matches on term ids alone, and it lets a pinned step match by narration as well as by its pin — two ways it can call an activity covered when the report won't. Treat its output as a **floor** on what is uncovered. Tighten it by comparing `display` values when the story under review uses instances.

@@ -70,7 +70,7 @@ Increasingly those tests aren't hand-written at all: a human describes a scenari
 
 ## Public API
 
-### `@scenario(name, tags=None, story=None, activities=None, group_parametrized=True)`
+### `@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)`
 
 Mark a test for inclusion in the report. Required for any test you want to appear. `story=` / `activities=` bind it to a domain story (see [Domain Storytelling](#domain-storytelling)); `group_parametrized=False` declines parametrize merging.
 
@@ -219,7 +219,7 @@ def test_brew(cup_size):
     ...
 ```
 
-Each case then becomes its own scenario with no case table, titled by its parametrize id — `Brew coffee [200]`, and `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first. Every case carries the id, including one whose name already renders its values: a `Template` naming only some of the columns would otherwise give two cases the same title, and suffixing only the clashes would make a title depend on which cases the run collected. On a test that isn't parametrized the argument raises at collection.
+Each case then becomes its own scenario with no case table, titled by its parametrize id — `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first (a plain-string name is suffixed the same way). Every case carries the id, including one whose name already renders its values: a `Template` naming only some of the columns would otherwise give two cases the same title, and suffixing only the clashes would make a title depend on which cases the run collected. On a test that isn't parametrized the argument raises at collection.
 
 #### Step text & placeholders
 
@@ -367,9 +367,9 @@ All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-
 | `--given-html[=PATH]` | off | Write the HTML report (bare → `given-report/report.html`). |
 | `--given-md[=PATH]` | off | Write the Markdown report; **bare renders to stdout** (fenced). |
 | `--given-title=TEXT` | rootdir name | Name the report, shown as the Markdown heading and the HTML tab title and topbar. Also settable as the `given_title` ini. |
-| `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. See [Source links](#source-links). |
+| `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. Also settable as the `given_source_link` ini. See [Source links](#source-links). |
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
-| `--given-lint=BOOL` | `false` | Run the narration lint (`true` \| `false`); an error-level finding fails the run. See [Narration lint](#narration-lint). |
+| `--given-lint=BOOL` | `false` | Run the narration lint (`true` \| `false`); an error-level finding fails the run. Also settable as the `given_lint` ini. See [Narration lint](#narration-lint). |
 
 Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection.
 
@@ -493,9 +493,7 @@ Run `nox -s examples` to regenerate the first three, and `nox -s self_report` fo
 
 ## Working with AI agents
 
-pytest-given fits agent-driven development, where the scarce resource is human review attention rather than typing effort. A human describes a scenario in plain prose — more flexible than a rigid Gherkin DSL — and an agent generates the full test: scaffolding, steps, and assertions. As more implementation is generated rather than hand-written, the human's attention shifts from line-by-line code review to a domain-level view of behavior — which is exactly the artifact pytest-given produces.
-
-The `with given(...)` / `with when(...)` / `with then(...)` blocks keep the *claim* about behavior directly adjacent to the code that implements it. That proximity is the point: auditing "does the code under `with when('I insert $2')` actually insert $2?" is cheaper and higher-leverage than reading raw test code, and far less prone to drift than documentation kept in separate files.
+The `with given(...)` / `with when(...)` / `with then(...)` blocks keep the *claim* about behavior directly adjacent to the code that implements it. That proximity is what makes the loop above work: auditing "does the code under `with when('I insert $2')` actually insert $2?" is cheaper and higher-leverage than reading raw test code, and far less prone to drift than documentation kept in separate files.
 
 **Know what the narration is and isn't.** Narration is *auditable, not verified*: in an agentic workflow the same agent writes both the code and the claim about the code, and nothing mechanically checks that a step's text matches its body. The [narration lint](#narration-lint) catches structural lies (an empty step, a `then` that checks nothing, a missing phase), never semantic truth. The report is worth as much as your review process's habit of reading step text against step bodies — treat it as a review aid, not as evidence.
 
@@ -510,7 +508,7 @@ Adopt selectively: decorate the tests that assert behavior, and leave plumbing (
 
 ### Agent skills
 
-`pytest-given skills install` copies the bundled [Agent Skills](https://agentskills.io) into your repo's `.claude/skills/`, where Claude Code (and other harnesses following the same format) auto-discover them. It ships three skills: **`pytest-given-authoring`** — a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories; **`pytest-given-navigating`** — how to explore a codebase through its rendered reports (`--given-md` for the prose spec, `--given-json` + `jq` for filtering by tag, term, or status) instead of grepping test bodies; and **`pytest-given-reviewing`** — a two-layer review of narrated tests (the narration lint as the structural gate, then a semantic audit of step text against step bodies: may abstract, never overstate). The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` detects drift in CI. Use `--dest` for a non-default skills directory.
+`pytest-given skills install` copies the bundled [Agent Skills](https://agentskills.io) into your repo's `.claude/skills/`, where Claude Code (and other harnesses following the same format) auto-discover them. It ships three skills: **`pytest-given-authoring`** — a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories; **`pytest-given-navigating`** — how to explore a codebase through its rendered reports (`--given-md` for the prose spec, `--given-json` + `jq` for filtering by tag, term, or status) instead of grepping test bodies; and **`pytest-given-reviewing`** — a three-layer review of narrated tests (the narration lint as the structural gate, a semantic audit of step text against step bodies — may abstract, never overstate — then a completeness audit of what the report leaves out). The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` detects drift in CI. Use `--dest` for a non-default skills directory.
 
 ```bash
 pytest-given skills install            # copies into ./.claude/skills/
