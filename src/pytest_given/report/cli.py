@@ -3,7 +3,7 @@ import json
 import sys
 from pathlib import Path
 
-from ..model import report_from_dict
+from ..model import PytestGivenError, report_from_dict
 from .html_renderer import render_html
 from .md_renderer import render_md
 from .source_link import resolve_template
@@ -40,9 +40,29 @@ def add_report_parser(
 
 
 def run_report(args: argparse.Namespace) -> int:
+    """Render a saved JSON report to HTML or Markdown.
+
+    Every foreseeable failure here is a problem with the *inputs* — a report
+    written by an older pytest-given, a hand-edited or truncated file, a typo
+    in a `--source-link` preset — so each is reported as a CLI error rather
+    than a traceback. This is what `serde`'s stale-report messages are for,
+    and it matches the plugin path, which maps the same errors to
+    `pytest.UsageError`.
+    """
     if not args.json_file.exists():
         print(f'Error: {args.json_file} not found', file=sys.stderr)
         return 1
+    try:
+        return _render_report(args)
+    except json.JSONDecodeError as error:
+        print(f'Error: {args.json_file} is not valid JSON — {error}', file=sys.stderr)
+        return 1
+    except PytestGivenError as error:
+        print(f'Error: {error}', file=sys.stderr)
+        return 1
+
+
+def _render_report(args: argparse.Namespace) -> int:
     report_dict = json.loads(args.json_file.read_text(encoding='utf-8'))
     report = report_from_dict(report_dict)
     fmt = args.format or _infer_format(args.output)

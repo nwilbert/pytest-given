@@ -176,3 +176,74 @@ def test_cli_md_creates_missing_parent_dirs(tmp_path) -> None:
     rc = main(['report', str(json_path), '--format', 'md', '-o', str(out)])
     assert rc == 0
     assert out.read_text(encoding='utf-8').startswith('# pytest-given — cli')
+
+
+def _minimal_report() -> dict:
+    return {
+        'metadata': {
+            'project': 'cli-test',
+            'timestamp': '2026-04-09',
+            'pytest_version': '9',
+            'plugin_version': '0.1',
+        },
+        'scenarios': [],
+    }
+
+
+def test_cli_reports_malformed_json_without_a_traceback(tmp_path: Path, capsys) -> None:
+    """A truncated or hand-edited report is a file problem, not a crash."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text('{"metadata": ', encoding='utf-8')
+    rc = main(['report', str(json_path)])
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert 'Error' in err
+    assert 'Traceback' not in err
+
+
+def test_cli_reports_a_stale_report_without_a_traceback(tmp_path: Path, capsys) -> None:
+    """`serde` raises PytestGivenError for a report written by an older
+    pytest-given precisely so this path can say so — the message exists to
+    avoid a bare KeyError surfacing out of `pytest-given report`."""
+    data = _minimal_report()
+    data['scenarios'] = [
+        {
+            'id': 'i',
+            'narration': {'text': 'S', 'parts': []},
+            'module': 'm',
+            'tags': [],
+            'status': 'passed',
+            'duration_ms': 0,
+            'steps': [],
+            # A pre-`columns` parameter table: the shape serde rejects.
+            'parameters': {'names': ['a'], 'cases': []},
+        }
+    ]
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(data), encoding='utf-8')
+    rc = main(['report', str(json_path)])
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert 'Error' in err
+    assert 'Traceback' not in err
+
+
+def test_cli_reports_an_unknown_source_link_preset_without_a_traceback(
+    tmp_path: Path, capsys
+) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(_minimal_report()), encoding='utf-8')
+    rc = main(
+        [
+            'report',
+            str(json_path),
+            '-o',
+            str(tmp_path / 'o.html'),
+            '--source-link',
+            'no-such-editor',
+        ]
+    )
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert 'Error' in err
+    assert 'Traceback' not in err

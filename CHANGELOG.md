@@ -104,6 +104,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A finished scenario no longer leaves its collector — and every scenario and
   step it recorded — reachable from a process-global for the rest of the
   process.
+- `pytest-given report` now reports a malformed, stale, or unreadable input as a
+  CLI error instead of a traceback, as does an unknown `--source-link` preset.
 - A fixture that raises after its `yield` now fails the scenario it tore down,
   instead of leaving it green in a report pytest counted as an error.
 - Every report-building failure — a suite reaching two glossaries, a term used in
