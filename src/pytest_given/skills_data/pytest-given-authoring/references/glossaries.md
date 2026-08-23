@@ -32,14 +32,16 @@ search = g.verb('search', definition='Look up available options.')
 
 Either way, **give the language a public home**: define the glossary — and the stories, once there are some — in one dedicated, publicly named module, e.g. `tests/ubiquitous_language.py`. The module *is* the suite's ubiquitous language, not a private helper — don't underscore-prefix it; test modules import their handles from it. Glossary-only mode is fine — you get the Glossary tab without writing any stories.
 
-**Discovery needs the glossary bound *by name* in `conftest.py`** — the plugin scans conftest module attributes for a `Glossary`/`FileGlossary` instance:
+**Discovery** works one of two ways. The plugin first reads the glossary off any `story(...)` that references it — a story records its glossary at construction, so a suite with bound stories needs no further wiring. Failing that, it scans `conftest.py` module attributes for a `Glossary`/`FileGlossary` instance. A suite with no stories therefore has to bind the instance *by name*:
 
 ```python
 # conftest.py
 from tests.ubiquitous_language import g  # noqa: F401 — plugin discovery
 ```
 
-`import tests.ubiquitous_language` binds a module, not a glossary: the scan finds nothing and the Glossary tab renders empty.
+`import tests.ubiquitous_language` binds a module, not a glossary: the scan finds nothing and the Glossary tab renders empty. Binding it anyway is the safe habit — it costs one line and survives a later refactor that drops the last story.
+
+**One glossary per suite.** Two distinct `Glossary` instances reaching the report — via stories or via conftests — raise `PytestGivenError`. Splitting vocabulary across bounded contexts means splitting the test suite too.
 
 ## Using terms in narration
 
@@ -66,12 +68,13 @@ Pick the lightest surface form for the word you need — the same three forms on
 Terms are actors, verbs, or work objects. Three ways a term gets its kind:
 
 1. **Explicit** — `g.actor(...)` / `g.verb(...)` / `g.work_object(...)`, or a `kind_column` in the glossary file.
-2. **Inferred from stories** — when a file glossary has no kind column, kinds are inferred from story activity-slot positions: position 0 → actor, odd positions → verb, even positions ≥ 2 → work object. A term seen in both actor and noun slots resolves to actor (an actor can be the target of a hand-off); a term seen in a verb slot *and* any other slot raises — add a kind column to disambiguate. A term used only in steps stays kindless (neutral wash).
+2. **Inferred from stories** — a term with no declared kind takes one from its story activity-slot positions: position 0 → actor, odd positions → verb, even positions ≥ 2 → work object. A term seen in both actor and noun slots resolves to actor (an actor can be the target of a hand-off); a term seen in a verb slot *and* any other slot raises — add a kind column to disambiguate. A term used only in steps stays kindless (neutral wash).
+   **A declared kind is checked against those same positions, never overridden** — whether it came from a typed handle (`g.work_object(...)`) or a `kind_column` row, putting the term in a slot its kind forbids raises `PytestGivenError` at `activity(...)` construction, naming the term and its declared kind. Inference then handles only the undeclared terms. So an explicit kind settles ambiguity but does not license a mismatch. Note `kind_column` is opt-in: a column headed "Kind" is ignored unless you pass `kind_column=`, and those terms fall back to slot inference.
 3. **Deliberately deferred** — `g('foo')` declares a term the team hasn't classified yet: it lands in the *Uncategorized* bucket and shows an *Undefined* badge until a definition arrives. Use it as a triage bucket, not a resting place. Code-defined glossaries only: a `FileGlossary` is a **closed vocabulary** — `g('foo')` and `g['foo']` both merely look up and raise on unknown names; new vocabulary is added as a row in the file.
 
 ## Keeping the glossary honest
 
 - **Don't dilute the glossary — keep it sharp.** A term earns its row by being vocabulary the team actually speaks: something someone would look up, with a meaning specific to the domain. Never add terms to make activities render more term refs or to improve lint metrics; a generic word in an activity is better left a bare string, and the honest fix for a dead term is as often deleting it as manufacturing a reference.
-- **Watch the size — a glossary is read whole, never sampled.** Authors and reviewers absorb every term in one pass; that is how a near-duplicate term gets caught before it is coined. A glossary that outgrows one comfortable reading is speaking for more than one bounded context: alert the user and propose one glossary per context, rather than starting to read it piecemeal.
-- **Tags never duplicate terms** — filter a feature area via its term, and keep tags for what the glossary can't carry (behaviour, mechanism). The `tag-shadows-term` lint rule enforces this.
+- **Watch the size — a glossary is read whole, never sampled.** Authors and reviewers absorb every term in one pass; that is how a near-duplicate term gets caught before it is coined. A glossary that outgrows one comfortable reading is speaking for more than one bounded context: alert the user rather than start reading it piecemeal. The structural fix is one glossary per context — but a suite supports only one glossary, so that means splitting the suite as well; raise it as a design question, not a mechanical edit.
+- **Tags never duplicate terms** — filter a feature area via its term, and keep tags for what the glossary can't carry (behavior, mechanism). The `tag-shadows-term` lint rule enforces this.
 - **Every file term appears in the report**, even one no step or story references. On suites whose glossary should be fully exercised, opt into the `dead-term` lint rule to flag unreferenced terms.

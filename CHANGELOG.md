@@ -55,6 +55,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
   (`{id, name, kind}`), cells may hold an attachment object, placeholder parts
   gain `column_id`, and a grouped step's `narration.text` is the template rather
   than case 1's rendering.
+- A glossary term placed in an activity slot its declared kind forbids now
+  raises `PytestGivenError` when `activity(...)` is built rather than at session
+  finish, and the message names the term and its kind instead of dumping handle
+  reprs. This reaches `kind_column` terms, which previously went unchecked until
+  a scenario bound the story.
 - **Breaking.** `attach()` called with no step open now raises `PytestGivenError`
   instead of silently discarding the payload; move the call inside the `given` /
   `when` / `then` block it belongs to.

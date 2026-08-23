@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from pytest_given import (
+    FileGlossary,
     Glossary,
     PytestGivenError,
     given,
@@ -647,3 +648,114 @@ def test_top_level_imports():
     a = activity(p)
     s = story('Smoke', [a])
     assert s.title == 'Smoke'
+
+
+# --- Declared-kind slot checking at construction ---
+
+
+@scenario(
+    t'A declared {pg["Work Object"].low} in a {pg["Verb"].low} {pg["Slot"].low} '
+    t'is rejected at construction',
+    tags=['validation'],
+)
+def test_file_glossary_declared_kind_in_wrong_slot_raises(tmp_path):
+    with given(t'a {pg["File glossary"]} declaring Room a work object'):
+        glossary_file = tmp_path / 'GLOSSARY.md'
+        glossary_file.write_text(
+            '| Term | Meaning | Kind |\n'
+            '|---|---|---|\n'
+            '| Guest | A person | actor |\n'
+            '| Room | A place | object |\n',
+            encoding='utf-8',
+        )
+        fg = FileGlossary(glossary_file, kind_column='Kind')
+    with (
+        when_then(
+            t'Room is placed in the {pg["Verb"].low} {pg["Slot"].low}',
+            'a PytestGivenError names the term and its declared kind',
+        ),
+        pytest.raises(PytestGivenError, match=r"'Room'.*declared a work object"),
+    ):
+        path(fg['Guest'], fg['Room'], fg['Guest'])
+
+
+@scenario(
+    t'A {pg["Slot"].low} error names the {pg["Term"].low}, not its repr',
+    tags=['diagnostics'],
+)
+def test_slot_error_message_stays_compact(guest, room, search):
+    with (
+        when_then(
+            t'a {pg["Work Object"].low} is placed in the {pg["Verb"].low} slot',
+            'the message names the term without dumping the glossary',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
+        path(guest, room, room)
+    with then('the message is short and free of dataclass reprs'):
+        message = str(excinfo.value)
+        assert 'Glossary(terms=' not in message
+        assert 'GlossaryTerm(' not in message
+        assert len(message) < 300
+        assert "'Room'" in message
+
+
+@scenario(
+    t'A kindless {pg["Term"].low} stays valid in any {pg["Slot"].low}',
+    tags=['validation'],
+)
+def test_kindless_term_is_accepted_in_either_slot(g):
+    with given(t'a {pg["Kindless"]} {pg["Term"]} declared with g(...)'):
+        loyalty = g('loyalty points')
+    with when(t'it is placed in a node {pg["Slot"].low} and a verb slot'):
+        node_path = path(loyalty, 'given to', loyalty)
+        verb_path = path(loyalty, loyalty, loyalty)
+    with then('both paths construct, leaving the kind to inference'):
+        assert len(node_path.parts) == 3
+        assert len(verb_path.parts) == 3
+
+
+@scenario(
+    t'A non-handle {pg["Activity Part"].low} names its type',
+    tags=['validation', 'diagnostics'],
+)
+def test_non_handle_part_names_its_type(guest, room):
+    with (
+        when_then(
+            t'an int is passed where a {pg["Verb"].low} handle belongs',
+            'a PytestGivenError names the offending type and the path',
+        ),
+        pytest.raises(PytestGivenError, match=r'must be a verb: got int'),
+    ):
+        path(guest, 42, room)
+
+
+def test_misplaced_instances_name_their_canonical_term(g, tmp_path):
+    # Plain, not narrated: one rule ("a misplaced part names its term") is
+    # already covered above; these are its surface forms, and a scenario each
+    # would be report noise.
+    guest = g.actor('Guest')
+    room = g.work_object('Room')
+    search = g.verb('search')
+    deferred = g('loyalty points')
+    cases = [
+        # Each puts one instance form in a slot its kind cannot fill.
+        ((guest, guest('Alice'), room), r"'Guest' is declared an actor"),
+        ((guest, search, search('searches for')), r"'search' is declared a verb"),
+        ((guest, room('Suite'), room), r"'Room' is declared a work object"),
+    ]
+    for parts, expected in cases:
+        with pytest.raises(PytestGivenError, match=expected):
+            path(*parts)
+    # A deferred instance carries no declared kind, so it stays valid anywhere.
+    assert len(path(deferred('points'), deferred, deferred).parts) == 3
+    # But a deferred handle from a kind_column glossary does carry one, so its
+    # instance form is checked the same way an eager instance is.
+    glossary_file = tmp_path / 'GLOSSARY.md'
+    glossary_file.write_text(
+        '| Term | Meaning | Kind |\n|---|---|---|\n| Room | A place | object |\n',
+        encoding='utf-8',
+    )
+    fg = FileGlossary(glossary_file, kind_column='Kind')
+    with pytest.raises(PytestGivenError, match=r"'Room' is declared a work object"):
+        path(fg['Room'], fg['Room']('Suite'), fg['Room'])

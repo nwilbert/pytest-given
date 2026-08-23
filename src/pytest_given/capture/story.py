@@ -22,6 +22,7 @@ from .glossary import (
     DeferredTermHandle,
     DeferredTermInstance,
     InflectedVerb,
+    TermHandle,
     Verb,
     WorkObject,
     WorkObjectInstance,
@@ -41,9 +42,10 @@ type _PathArg = (
 )
 
 # Even positions are graph nodes (entities); odd positions are edges (a verb
-# arrow or a bare-string connective). A DeferredTermHandle/Instance has no eager
-# kind, so it is structurally valid at either kind of position and resolved by
-# kind inference + _slot_for later.
+# arrow or a bare-string connective). A DeferredTermHandle/Instance is
+# structurally valid at either kind of position; whether it actually fits is
+# decided by `_check_position` when the glossary declared a kind, and deferred
+# to kind inference + _slot_for when it did not.
 _ACTOR_TYPES = (Actor, ActorInstance, DeferredTermHandle, DeferredTermInstance)
 _VERB_TYPES = (Verb, InflectedVerb, DeferredTermHandle, DeferredTermInstance)
 _NODE_TYPES = (
@@ -262,6 +264,68 @@ def _check_single_glossary(title: str, glossaries: dict[int, Glossary]) -> None:
         )
 
 
+# What each slot role accepts, as declared kinds. A term whose kind is not yet
+# known (`g("…")`, or a file glossary with no kind column) declares nothing and
+# is valid anywhere — `infer_glossary_kinds` classifies it from these same slot
+# positions later.
+_ROLE_ACCEPTS: dict[str, tuple[str, ...]] = {
+    'actor': ('actor',),
+    'verb': ('verb',),
+    'noun': ('actor', 'object'),
+}
+
+_KIND_LABEL = {'actor': 'an actor', 'object': 'a work object', 'verb': 'a verb'}
+
+# The slot itself, phrased for the message ('must be …'). Slot names are the
+# canonical GLOSSARY.md vocabulary: actor / verb / noun.
+_ROLE_LABEL = {'actor': 'an actor', 'verb': 'a verb', 'noun': 'a noun'}
+
+
+def _declared_kind(value: object) -> str | None:
+    """The kind a part already claims, or None when it is still deferred.
+
+    Eager handles carry their kind in the Python type; a deferred handle carries
+    whatever the glossary declared (a `kind_column` row), which is `None` until
+    inference runs. Reading both here is what lets one check cover both glossary
+    flavors at construction time."""
+    match value:
+        case Actor() | ActorInstance():
+            return 'actor'
+        case WorkObject() | WorkObjectInstance():
+            return 'object'
+        case Verb() | InflectedVerb():
+            return 'verb'
+        case DeferredTermHandle():
+            return value.term.kind
+        case DeferredTermInstance(handle=handle):
+            return handle.term.kind
+    return None
+
+
+def _term_name(value: object) -> str:
+    """The canonical term name behind a handle or instance, for error text."""
+    match value:
+        case TermHandle():
+            return value.term.canonical
+        case (
+            ActorInstance(actor=h)
+            | WorkObjectInstance(work_object=h)
+            | InflectedVerb(verb=h)
+        ):
+            return h.term.canonical
+        case DeferredTermInstance(handle=handle):
+            return handle.term.canonical
+    return type(value).__name__
+
+
+def _render_path(parts: tuple[object, ...]) -> str:
+    """The offending path as names, so the message keeps its context without
+    dumping handle reprs (each of which embeds the whole Glossary)."""
+    return ' → '.join(
+        part if isinstance(part, str) else _term_name(part) for part in parts
+    )
+
+
 def _check_position(
     value: object,
     pos: int,
@@ -269,12 +333,24 @@ def _check_position(
     accepted: tuple[type, ...],
     full_parts: tuple[object, ...],
 ) -> None:
-    if isinstance(value, accepted):
+    """Reject a part whose kind cannot fill this slot.
+
+    One check for both glossary flavors: a declared kind (eager handle or
+    `kind_column` row) is verified here, at construction; only a genuinely
+    undeclared kind is deferred to `infer_glossary_kinds`.
+    """
+    declared = _declared_kind(value)
+    if declared is not None:
+        if declared in _ROLE_ACCEPTS[role]:
+            return
+        problem = f'{_term_name(value)!r} is declared {_KIND_LABEL[declared]}'
+    elif isinstance(value, accepted):
         return
+    else:
+        problem = f'got {type(value).__name__}'
     raise PytestGivenError(
-        f'activity path position {pos} must be a glossary {role} handle or a '
-        f'bare string; got {type(value).__name__}: {value!r}. '
-        f'{_suggestion_for(role)} Full parts: {full_parts!r}'
+        f'activity path position {pos} must be {_ROLE_LABEL[role]}: {problem}. '
+        f'{_suggestion_for(role)} Path: {_render_path(full_parts)}.'
     )
 
 

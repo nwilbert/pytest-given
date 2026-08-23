@@ -274,37 +274,7 @@ Reference a term with the lightest surface form that fits the sentence — the s
 - **`.low`** — `{guest.low}` renders the canonical lowercased, the common mid-sentence form, instead of the equivalent `guest('guest')`.
 - **Callable override** — `guest('Alice')` supplies any other surface: a verb inflection (`search('searches for')`), a plural (`room('rooms')`), or a concrete instance.
 
-**2. Domain Stories** — model a flow as a sequence of `activity(...)` rows tied together by `story(...)`:
-
-```python
-from pytest_given import activity, story
-
-book_a_group_trip = story('Book a Group Trip', [
-    activity(organizer, search('searches for'), room),
-    activity(organizer('Carol'), select('selects'), room('Deluxe Suite')),
-])
-```
-
-An activity reads left-to-right: actor → verb → work object (with optional connective words). Any part may be a bare string instead of a glossary handle — but an activity needs at least two distinct glossary terms to be tracked for coverage; under-anchored activities render as "not coverage-tracked". `path(...)` lets a story branch where alternate activity sequences share a prefix.
-
-**3. Scenario ↔ activity binding** — link a scenario (and individual steps) to the story it implements:
-
-```python
-@scenario('Carol selects a suite', story=book_a_group_trip)
-def test_select_suite(carol):
-    with when(t'{organizer("Carol")} {search("searches for")} a {room}'):
-        ...
-```
-
-Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it; selecting an activity offers *Open in Scenarios*, which filters the Scenarios view down to those scenarios. A step can also bind explicitly with `given(text, activity=...)`. `@scenario(..., activities=[2, 3])` narrows a scenario to those 1-based activity numbers, so it can cover no others.
-
-**Kindless and undefined terms** — use `g('foo')` to declare a term that the team hasn't classified yet. It registers under the *Uncategorized* bucket in the Glossary view (no kind pill) and shows an *Undefined* badge until `definition=` is supplied. Use `g['foo']` to look up an already-declared term by name (raises if unknown). Both forms return a `DeferredTermHandle` usable in t-strings and story activities, with the same bare / `.low` / callable surface forms as any other handle.
-
-**Glossary-only mode** — if you want the Glossary tab without writing stories yet, put `g = Glossary()` in a `conftest.py` so the plugin discovers it.
-
-See the [domain-storytelling design spec](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-07-domain-storytelling-design.md) for the full surface and the [hotel-booking example](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/test_hotel_booking.py) for an end-to-end usage.
-
-**`FileGlossary` — load a Markdown glossary file** — if your project already keeps a `GLOSSARY.md`, point `FileGlossary` at it instead of declaring terms in code:
+**Loading a Markdown glossary file instead** — if your project already keeps a `GLOSSARY.md`, point `FileGlossary` at it rather than declaring terms in code:
 
 ```python
 from pathlib import Path
@@ -320,7 +290,7 @@ g = FileGlossary('GLOSSARY.md', kind_column='Kind')   # explicit kinds from a "K
 g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning')
 ```
 
-Access terms by name — `g['Guest']` (case-insensitive). A `FileGlossary` is a **closed vocabulary**: unlike a code-defined `Glossary`, its `g('foo')` only looks up too, and both forms raise on an unknown name — new vocabulary is added as a row in the file. The returned handle is usable inline everywhere a code-defined handle is:
+Access terms by name — `g['Guest']` (case-insensitive). A `FileGlossary` is a **closed vocabulary**: unlike a code-defined `Glossary`, both `g['foo']` and `g('foo')` only look up, and both raise on an unknown name — new vocabulary is added as a row in the file. The returned handle is usable inline everywhere a code-defined handle is:
 
 ```python
 # In a story activity:
@@ -331,11 +301,46 @@ with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
     ...
 ```
 
-When no `kind_column` is present, term kinds are **inferred from story activity-slot positions** at session finish: slot 0 → actor, slot 1 → verb, slot ≥ 2 → work object. A term used only in t-string steps (never in any story activity) stays kindless and renders under a neutral wash instead of a kind colour.
+**Kinds** — a term's kind is either declared (`g.actor(...)` / `g.work_object(...)` / `g.verb(...)`, or a `kind_column`) or **inferred from story activity-slot positions** at session finish: position 0 → actor, odd positions → verb, even positions ≥ 2 → work object. A term used only in t-string steps, never in any story activity, stays kindless and renders under a neutral wash instead of a kind color. A kind is never silently overridden. A term that already declares one — a typed handle (`g.work_object(...)`) or a `kind_column` row — is checked against its slot when `activity(...)` is constructed, so misplacing it raises `PytestGivenError` naming the term and its declared kind. Only a genuinely undeclared kind is left to inference, which raises at session finish if the same term turns up in both a verb slot and a noun slot; add a `kind_column` to disambiguate that.
 
-**Every term in the glossary file is included in the report**, even one referenced by no story and no step. Terms whose kind could not be identified are listed under the **Uncategorized** section in the Glossary tab (and filterable via its own toggle).
+**Kindless and undefined terms** — on a code-defined glossary, `g('foo')` declares a term the team hasn't classified yet. It registers under the *Uncategorized* bucket in the Glossary view (no kind pill) and shows an *Undefined* badge until `definition=` is supplied. `g['foo']` looks up an already-declared term by name (raises if unknown). Both forms return a handle usable in t-strings and story activities, with the same bare / `.low` / callable surface forms as any other handle.
 
-See the [file-backed glossary design spec](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-18-file-backed-glossary-design.md) and the [file-glossary-booking example](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/test_file_glossary_booking.py) for a worked end-to-end usage.
+**Every declared term is included in the report**, even one referenced by no story and no step. Terms whose kind could not be identified are listed under the **Uncategorized** section in the Glossary tab (and filterable via its own toggle).
+
+**Discovery** — the plugin finds the glossary in one of two ways: off any `story(...)` that references it (a story records its glossary at construction), or, failing that, by scanning `conftest.py` module attributes for a `Glossary` / `FileGlossary` instance. A suite with no stories — glossary-only mode — therefore has to bind the instance **by name** in a `conftest.py`:
+
+```python
+# conftest.py
+from tests.ubiquitous_language import g  # noqa: F401 — plugin discovery
+```
+
+`import tests.ubiquitous_language` binds a module, not a glossary, so the scan finds nothing and the Glossary tab renders empty. Note that a suite supports **one glossary**: two distinct instances reaching the report raise `PytestGivenError`.
+
+**2. Domain Stories** — model a flow as a sequence of `activity(...)` rows tied together by `story(...)`:
+
+```python
+from pytest_given import activity, story
+
+book_a_group_trip = story('Book a Group Trip', [
+    activity(organizer('Carol'), search('searches for'), room),
+    activity(organizer('Carol'), select('selects'), room('Deluxe Suite')),
+])
+```
+
+An activity reads left-to-right: actor → verb → work object (with optional connective words). Any part may be a bare string instead of a glossary handle — but an activity needs at least two distinct glossary terms to be tracked for coverage; under-anchored activities render as "not coverage-tracked". `path(...)` lets a story branch where alternate activity sequences share a prefix.
+
+**3. Scenario ↔ activity binding** — link a scenario (and individual steps) to the story it implements:
+
+```python
+@scenario('Carol selects a suite', story=book_a_group_trip)
+def test_select_suite(carol):
+    with when(t'{organizer("Carol")} {select("selects")} the {room("Deluxe Suite")}'):
+        ...
+```
+
+Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it; selecting an activity offers *Open in Scenarios*, which filters the Scenarios view down to those scenarios. A step can also bind explicitly with `given(text, activity=...)`. `@scenario(..., activities=[2, 3])` narrows a scenario to those 1-based activity numbers, so it can cover no others.
+
+See the [domain-storytelling design spec](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-07-domain-storytelling-design.md) and the [file-backed glossary design spec](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-18-file-backed-glossary-design.md) for the full surface, and the [hotel-booking](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/test_hotel_booking.py) and [file-glossary-booking](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/test_file_glossary_booking.py) examples for end-to-end usage.
 
 ### `attach(label, content)`
 
