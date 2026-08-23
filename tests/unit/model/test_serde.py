@@ -191,7 +191,13 @@ def test_step_source_is_not_serialized() -> None:
     assert _round_trip(report).scenarios[0].steps[0].source is None
 
 
-def test_step_with_attachment_and_error_and_children() -> None:
+def test_step_with_attachment_and_children_drops_a_legacy_status_and_error() -> None:
+    """A report written before step-level failure was removed still loads.
+
+    Failure lives on the scenario (and, for a parametrized run, on the case);
+    a step's `status` / `error` are dropped rather than migrated, since no
+    real run ever set them to anything but the defaults.
+    """
     report = report_from_dict(
         {
             'metadata': _minimal_metadata_dict(),
@@ -248,11 +254,11 @@ def test_step_with_attachment_and_error_and_children() -> None:
     step = s.steps[0]
     assert isinstance(step, Step)
     assert step.phase == 'then'
-    assert step.status == 'failed'
+    assert not hasattr(step, 'status')
+    assert not hasattr(step, 'error')
     assert step.attachments == [
         Attachment(label='log', content='x', content_type='text')
     ]
-    assert step.error == ErrorInfo(message='boom')
     assert len(step.children) == 1
     assert step.children[0].narration.text == 'inner'
 

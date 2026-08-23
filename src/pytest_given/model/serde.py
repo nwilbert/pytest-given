@@ -177,14 +177,19 @@ def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
 
 
 def _step_from_dict(d: dict[str, Any]) -> Step:
+    """A step, dropping any `status` / `error` an older report carries.
+
+    Failure lives on the scenario and — for a parametrized run — on the case,
+    which is where both renderers show it. Steps never carried one that a real
+    run had set, so an old report's `"status": "passed"` is noise to discard,
+    not data to migrate.
+    """
     phase: Phase = d['phase']
     return Step(
         phase=phase,
         narration=_narration_from_dict(d['narration']),
-        status=d.get('status', 'passed'),
         children=[_step_from_dict(c) for c in d.get('children', [])],
         attachments=[_step_attachment_from_dict(a) for a in d.get('attachments', [])],
-        error=_error_from_dict(d.get('error')),
         activity_ids=tuple(ActivityId(i) for i in d.get('activity_ids') or ()),
         fixture_name=d.get('fixture_name'),
     )

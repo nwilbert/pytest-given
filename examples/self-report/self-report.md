@@ -15,77 +15,77 @@
 - **then** each «Step» carries its «Phase»
 
 ## ✓ «Steps» pushed during fixture setup record into the «fixture recording»
-`tests/unit/capture/test_collector.py:211::test_push_step_during_fixture_setup_records_into_recording`
+`tests/unit/capture/test_collector.py:198::test_push_step_during_fixture_setup_records_into_recording`
 
 - **given** a «Fixture recording» under setup
 - **when** a «Step» is pushed inside the fixture body
 - **then** it is recorded as a child of the recording root
 
 ## ✓ An «attachment» lands on the «step» being recorded
-`tests/unit/capture/test_collector.py:231::test_attach_during_fixture_setup_records_into_recording`
+`tests/unit/capture/test_collector.py:218::test_attach_during_fixture_setup_records_into_recording`
 
 - **given** a «Fixture recording» under setup
 - **when** an «Attachment» is attached inside the fixture body
 - **then** the «Attachment» lands on the recording root
 
 ## ✓ Fixture-body «steps» do not leak into the «active scenario»
-`tests/unit/capture/test_collector.py:249::test_push_step_routing_isolates_recording_from_scenario`
+`tests/unit/capture/test_collector.py:236::test_push_step_routing_isolates_recording_from_scenario`
 
 - **given** an «Active scenario» with a «Fixture recording»
 - **when** a «Step» is pushed inside the fixture body
 - **then** the step lives only in the recording, not the scenario
 
 ## ✓ An «attachment» outside every «step» is refused
-`tests/unit/capture/test_collector.py:303::test_attach_outside_any_step_raises`
+`tests/unit/capture/test_collector.py:290::test_attach_outside_any_step_raises`
 
 - **given** an «Active scenario» with no «Step» open
 - **when** an «attachment» is made from the test body
 - **then** it is refused rather than dropped
 
 ## ✓ A «fixture recording» is deep-copied when «grafted»
-`tests/unit/capture/test_collector.py:332::test_graft_recording_deep_copies_into_scenario`
+`tests/unit/capture/test_collector.py:319::test_graft_recording_deep_copies_into_scenario`
 
 - **given** a «Fixture recording» with a nested child «Step»
 - **when** a «Graft» copies it into the «Active scenario»
 - **then** the scenario gains a deep copy of the recorded steps
 
 ## ✓ A «step fixture» failing in teardown fails its finished «scenario»
-`tests/unit/capture/test_collector.py:473::test_fail_recorded_scenario_marks_a_finished_scenario_failed`
+`tests/unit/capture/test_collector.py:460::test_fail_recorded_scenario_marks_a_finished_scenario_failed`
 
 - **given** a «Scenario» that already finished as passed
 - **when** a fixture raises past its yield, after the scenario finished
 - **then** the recorded «scenario» carries the failure
 
 ## ✓ A teardown failure keeps the error the «scenario» already carries
-`tests/unit/capture/test_collector.py:492::test_fail_recorded_scenario_keeps_an_existing_error`
+`tests/unit/capture/test_collector.py:479::test_fail_recorded_scenario_keeps_an_existing_error`
 
 - **given** a «Scenario» that already failed in its body
 - **when** its fixture then also fails in teardown
 - **then** the body failure is what the report shows
 
 ## ✓ A teardown failure under an unknown «Node ID» is ignored
-`tests/unit/capture/test_collector.py:510::test_fail_recorded_scenario_ignores_unknown_node_id`
+`tests/unit/capture/test_collector.py:497::test_fail_recorded_scenario_ignores_unknown_node_id`
 
 - **given** a «Collector» that recorded one «scenario»
 - **when** a teardown fails under a node id no scenario claimed
 - **then** the recorded scenario is untouched
 
 ## ✓ A leaf given is «grafted» as a childless given «step»
-`tests/unit/capture/test_collector.py:525::test_graft_leaf_given_appends_childless_given_step`
+`tests/unit/capture/test_collector.py:512::test_graft_leaf_given_appends_childless_given_step`
 
 - **given** an «Active scenario» is being recorded
 - **when** a leaf «Graft» appends a childless «Step»
 - **then** the step is a given with no children
 
 ## ✓ «Grafting» with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:543::test_graft_recording_override_replaces_root_narration_keeps_children`
+`tests/unit/capture/test_collector.py:530::test_graft_recording_override_replaces_root_narration_keeps_children`
 
 - **given** a «Fixture recording» whose root has a label and a child
 - **when** a «Graft» supplies an override «Narration»
 - **then** the grafted root shows the override text and keeps its children
 
 ## ✓ «Grafting» with no «active scenario» is a no-op
-`tests/unit/capture/test_collector.py:568::test_graft_leaf_given_without_scenario_is_noop`
+`tests/unit/capture/test_collector.py:555::test_graft_leaf_given_without_scenario_is_noop`
 
 - **given** a collector with no «Active scenario»
 - **when** a leaf «Graft» runs
@@ -729,34 +729,34 @@
 - **then** only the real pipe table produces rows
 
 ## ✓ A «step» pairs its «narration» with a «phase»
-`tests/unit/capture/test_step_descriptor.py:56::test_context_manager_basic`
+`tests/unit/capture/test_step_descriptor.py:58::test_context_manager_basic`
 
 - **when** a given «Step» descriptor is created
 - **then** it carries the given «Phase» and its «Narration»
 
 ## ✓ «when_then» records the action and its outcome as siblings
-`tests/unit/capture/test_step_descriptor.py:249::test_when_then_records_two_sibling_steps_on_clean_exit`
+`tests/unit/capture/test_step_descriptor.py:251::test_when_then_records_two_sibling_steps_on_clean_exit`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a «when_then» block exits cleanly
 - **then** a when and a sibling then «Step» are recorded
 
 ## ✓ «when_then» pairs with an inner pytest.raises
-`tests/unit/capture/test_step_descriptor.py:275::test_when_then_pairs_with_inner_pytest_raises`
+`tests/unit/capture/test_step_descriptor.py:276::test_when_then_pairs_with_inner_pytest_raises`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises and an inner pytest.raises swallows it
 - **then** both sibling steps are still recorded
 
 ## ✓ «when_then» omits the then when the body raises uncaught
-`tests/unit/capture/test_step_descriptor.py:303::test_when_then_omits_then_when_body_raises_uncaught` · validation
+`tests/unit/capture/test_step_descriptor.py:304::test_when_then_omits_then_when_body_raises_uncaught` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises with nothing catching inside
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ A nested when becomes a child of the «when_then» action
-`tests/unit/capture/test_step_descriptor.py:377::test_when_then_allows_nested_when_as_child_sub_step`
+`tests/unit/capture/test_step_descriptor.py:378::test_when_then_allows_nested_when_as_child_sub_step`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a when opens inside the «when_then» body
@@ -1128,10 +1128,8 @@
                   }
                 ]
               },
-              "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             }
@@ -1402,10 +1400,8 @@
             "text": "a machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1415,10 +1411,8 @@
             "text": "I insert $2",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1428,10 +1422,8 @@
             "text": "I get a coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1469,9 +1461,9 @@
 - **then** the heading counts the cases and the «Parameter table» lists each row
 
 ## ✓ A failing «step» is marked with a minimal error digest
-`tests/unit/report/test_md_renderer.py:259::test_failing_step_is_marked_with_minimal_error`
+`tests/unit/report/test_md_renderer.py:259::test_failing_scenario_renders_a_minimal_error`
 
-- **given** a failed «Scenario» whose then «Step» carries a two-line error and an internal frame
+- **given** a failed «Scenario» carrying a two-line error and an internal frame
   - 📎 Error record:
     ```
     {
@@ -1496,18 +1488,18 @@
     }
     ```
 - **when** the Markdown «Report» is rendered
-- **then** the heading is crossed and the failed step is marked
+- **then** the heading is crossed and the error follows the steps
 - **then** only the first message line and the non-internal frame are quoted
 
 ## ✓ A multi-line «attachment» renders as a fenced block
-`tests/unit/report/test_md_renderer.py:330::test_multiline_attachment_renders_fenced_block`
+`tests/unit/report/test_md_renderer.py:329::test_multiline_attachment_renders_fenced_block`
 
 - **given** a «Step» carrying a multi-line «Attachment»
 - **when** the Markdown «Report» is rendered
 - **then** the «Attachment» content sits in an indented fence, not inline
 
 ## ✓ A skipped scenario shows its skip reason
-`tests/unit/report/test_md_renderer.py:450::test_skipped_scenario_shows_reason`
+`tests/unit/report/test_md_renderer.py:491::test_skipped_scenario_shows_reason`
 
 - **given** a skipped «Scenario» with a reason
 - **when** the Markdown «Report» is rendered
@@ -1662,7 +1654,7 @@
 | ### | ✓ |
 
 ## ✓ A cross-phase «step» cannot open inside a «when_then» body · 2 cases
-`tests/unit/capture/test_step_descriptor.py:345::test_when_then_rejects_cross_phase_nested_step` · validation
+`tests/unit/capture/test_step_descriptor.py:346::test_when_then_rejects_cross_phase_nested_step` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a given or then opens inside the «when_then» body
@@ -1675,7 +1667,7 @@
 | then | ✓ |
 
 ## ✓ An «attachment» label must be plain text · 3 cases
-`tests/unit/capture/test_step_descriptor.py:480::test_attach_rejects_a_non_str_label` · validation
+`tests/unit/capture/test_step_descriptor.py:481::test_attach_rejects_a_non_str_label` · validation
 
 - **given** a non-str «Attachment» label of kind {label_kind}
 - **when** it is attached

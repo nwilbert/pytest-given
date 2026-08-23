@@ -113,6 +113,9 @@
 - **given** a coffee machine
 - **then** the machine has 20 coffees
 
+> assert 10 == 20
+> test_coffeeshop.py:251 in test_failing
+
 ## ⤼ Skipped scenario rendering · skipped
 `examples/coffeeshop/test_coffeeshop.py:254::test_skipped` — reason: demonstrates skipped status
 

@@ -46,10 +46,8 @@ def test_step_defaults() -> None:
     assert step.phase == 'given'
     assert step.narration.text == 'a coffee machine'
     assert step.narration.parts == []
-    assert step.status == 'passed'
     assert step.children == []
     assert step.attachments == []
-    assert step.error is None
     assert step.fixture_name is None
 
 

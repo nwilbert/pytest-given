@@ -318,10 +318,8 @@ class ErrorInfo:
 class Step:
     phase: Phase
     narration: Narration
-    status: str = 'passed'
     children: list[Step] = field(default_factory=list)
     attachments: list[StepAttachment] = field(default_factory=list)
-    error: ErrorInfo | None = None
     activity_ids: tuple[ActivityId, ...] = ()
     fixture_name: str | None = None
     # Anchor of the step's body for the narration lint; captured only when

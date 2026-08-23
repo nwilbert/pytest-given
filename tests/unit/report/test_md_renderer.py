@@ -259,10 +259,9 @@ def test_parametrized_scenario_renders_table() -> None:
 @scenario(
     t'A failing {pg["Step"].low} is marked with a minimal error digest',
 )
-def test_failing_step_is_marked_with_minimal_error() -> None:
+def test_failing_scenario_renders_a_minimal_error() -> None:
     with given(
-        t'a failed {pg["Scenario"]} whose then {pg["Step"]} carries a two-line '
-        t'error and an internal frame'
+        t'a failed {pg["Scenario"]} carrying a two-line error and an internal frame'
     ):
         scn = Scenario(
             id='tests/t.py::test_sold_out',
@@ -273,36 +272,36 @@ def test_failing_step_is_marked_with_minimal_error() -> None:
                 Step(
                     phase='then',
                     narration=Narration(text='reports sold out'),
-                    status='failed',
-                    error=ErrorInfo(
-                        message='ValueError: not sold out\nassert 1 == 0',
-                        frames=[
-                            TracebackFrame(
-                                path='/x/_pytest/runner.py',
-                                lineno=1,
-                                func='run',
-                                code='',
-                                is_internal=True,
-                            ),
-                            TracebackFrame(
-                                path='/x/tests/test_shop.py',
-                                lineno=88,
-                                func='test_sold_out',
-                                code='buy(m)',
-                                is_internal=False,
-                            ),
-                        ],
-                    ),
                 )
             ],
+            error=ErrorInfo(
+                message='ValueError: not sold out\nassert 1 == 0',
+                frames=[
+                    TracebackFrame(
+                        path='/x/_pytest/runner.py',
+                        lineno=1,
+                        func='run',
+                        code='',
+                        is_internal=True,
+                    ),
+                    TracebackFrame(
+                        path='/x/tests/test_shop.py',
+                        lineno=88,
+                        func='test_sold_out',
+                        code='buy(m)',
+                        is_internal=False,
+                    ),
+                ],
+            ),
         )
         rd = _report(scn)
-        attach('Error record', report_to_dict(rd)['scenarios'][0]['steps'][0]['error'])
+        attach('Error record', report_to_dict(rd)['scenarios'][0]['error'])
     with when(t'the Markdown {pg["Report"]} is rendered'):
         md = render_md(rd)
-    with then('the heading is crossed and the failed step is marked'):
+    with then('the heading is crossed and the error follows the steps'):
         assert '## ✗ Sold out' in md
-        assert '- **then** reports sold out  **← FAILED**' in md
+        assert '- **then** reports sold out' in md
+        assert md.index('reports sold out') < md.index('> ValueError')
     with then('only the first message line and the non-internal frame are quoted'):
         assert '> ValueError: not sold out' in md
         assert '> test_shop.py:88 in test_sold_out' in md
@@ -392,6 +391,48 @@ def test_attachment_with_triple_backtick_uses_longer_fence() -> None:
     md = render_md(_report(scn))
     assert '````' in md
     assert '\n    ````\n' in md
+
+
+def test_failing_case_renders_its_error_below_the_table() -> None:
+    """A grouped scenario carries no error of its own — every failure is on a
+    case. Without a per-case block a failed row shows a ✗ and no reason
+    anywhere in the Markdown report."""
+    scn = Scenario(
+        id='tests/t.py::test_price',
+        narration=Narration(text='Pricing'),
+        module='tests/t.py',
+        status='failed',
+        steps=[Step(phase='when', narration=Narration(text='insert'))],
+        parameters=ParameterTable(
+            columns=[ParameterColumn(id='coin', name='coin', kind='param')],
+            cases=[
+                ParameterCase(values=['euro'], status='passed'),
+                ParameterCase(
+                    values=['token'],
+                    status='failed',
+                    error=ErrorInfo(
+                        message='assert 0 == 1',
+                        frames=[
+                            TracebackFrame(
+                                path='/x/tests/test_shop.py',
+                                lineno=12,
+                                func='test_price',
+                                code='assert 0 == 1',
+                                is_internal=False,
+                            )
+                        ],
+                    ),
+                ),
+            ],
+        ),
+    )
+    md = render_md(_report(scn))
+    assert '| token | ✗ |' in md
+    assert '- **token** — failed:' in md
+    assert '  > assert 0 == 1' in md
+    assert '  > test_shop.py:12 in test_price' in md
+    # Below the table, never inside it.
+    assert md.index('| token | ✗ |') < md.index('- **token** — failed:')
 
 
 def test_param_table_escapes_pipe_in_value() -> None:

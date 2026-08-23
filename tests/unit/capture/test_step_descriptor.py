@@ -270,7 +270,6 @@ def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
             ('when', 'the action runs'),
             ('then', 'the outcome holds'),
         ]
-        assert all(s.status == 'passed' for s in recorded.steps)
         assert all(s.children == [] for s in recorded.steps)
 
 

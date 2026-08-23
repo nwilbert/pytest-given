@@ -28,10 +28,10 @@
   --color-accent: #2563eb;
   --color-accent-bg: #dbeafe;
   /* Accent as *text*. The brand accent is only 4.24:1 on its own tint, under
-     AA, so anything that sets accent-coloured text uses this darker value
+     AA, so anything that sets accent-colored text uses this darker value
      (5.49:1 on the tint, 6.41:1 on --bg-page) — the way the status
      pills pair #166534 with a green tint rather than reusing --color-passed.
-     --color-accent itself stays the border/glyph colour, where the 3:1
+     --color-accent itself stays the border/glyph color, where the 3:1
      threshold for UI components applies. */
   --color-accent-text: #1d4ed8;
 
@@ -191,7 +191,7 @@ body {
 
 
 /* Segmented toggle — a connected single-select control. Shared by the
-   "Browse by" (Tags/Modules) toggle and the glossary "Definitions" filter so
+   "Browse by" (Tags/Terms/Modules) toggle and the glossary "Definitions" filter so
    the two read as the same idiom. (The Status pills above are deliberately
    separate: they are multi-select with per-status semantic colors.) */
 .seg-toggle {
@@ -668,7 +668,7 @@ span.param-highlight {
   padding: var(--space-sm) 0 var(--space-xs);
 }
 /* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks into
-   it; on the card colour it reads as the document it is.
+   it; on the card color it reads as the document it is.
 
    The payload sizes itself, and through its colspan cell it sizes the table:
    a table with an attachment column ends up as wide as its widest content,
@@ -703,7 +703,7 @@ span.param-highlight {
 .dot-failed { color: var(--color-failed); }
 .dot-skipped { color: var(--color-skipped); }
 
-/* Parameter colors. The colour of each column is generated per report — see
+/* Parameter colors. The color of each column is generated per report — see
    report/palette.py, which splits the hue circle into as many steps as the
    report has columns — and emitted as `.param-color-N` rules after this
    sheet. Only what every column shares lives here. */
@@ -731,7 +731,7 @@ span.param-highlight {
 /* In a scenario card the link stays in flow, under whatever the card ends
    with. Anchoring it to the corner instead put it in a fight with every
    full-width last element: over a case table it covered the last row's
-   rightmost cells, and over an error box it needed a card-coloured chip to
+   rightmost cells, and over an error box it needed a card-colored chip to
    stay legible against the reddish background. A refs panel ends in short
    chip lines that never reach the corner, so there the anchor still pays for
    itself. */
@@ -749,7 +749,7 @@ span.param-highlight {
    word lands in.
 
    That split is what fixed the hard case. A term with no kind has no hue, and
-   there is no fourth hue to give it — a colour clearing the three kinds, the
+   there is no fourth hue to give it — a color clearing the three kinds, the
    body text, the statuses, the accent and the generated column ring while
    holding AA on white does not exist at readable lightness. Standing weight in
    for hue did not work either: weight only reads against its container, so a
@@ -757,9 +757,9 @@ span.param-highlight {
    a third of the kindless refs sit in titles. A neutral wash is legible in
    both, because it is measured against the card, which does not change.
 
-   The washes are equalised perceptually, not by a fixed chroma: at equal
+   The washes are equalized perceptually, not by a fixed chroma: at equal
    chroma the violet all but disappears while the teal reads strongly, so each
-   is placed at dE00 12 from the card instead. A neutral needs less — a grey
+   is placed at dE00 12 from the card instead. A neutral needs less — a gray
    wash is never mistaken for paper tone the way a pale hue is — so the
    kindless one sits lighter and still reads the strongest of the four.
 
@@ -816,7 +816,7 @@ span.param-highlight {
   cursor: default;
 }
 .term-ref--link { cursor: pointer; }
-/* Coloured text underlining on hover is the plain link idiom, which is what
+/* Colored text underlining on hover is the plain link idiom, which is what
    lets the resting state spend nothing on a click affordance. */
 .term-ref--link:hover { text-decoration: underline; }
 .activity-word {
@@ -1050,12 +1050,12 @@ span.param-highlight {
 }
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
 
-/* Kind colour classes for kind headers and term pills. Kindless carries the
-   stone the narration gives it, so one kind is one colour across both views —
+/* Kind color classes for kind headers and term pills. Kindless carries the
+   stone the narration gives it, so one kind is one color across both views —
    the catalog would otherwise read cool slate for what prose reads warm stone.
    Stone-100/300 keep it on the same ramp-100 fill / ramp-300 border pattern as
    the three kinds; the border stays dashed, which is the catalog's own mark
-   for "not a kind" and is about the bucket, not the colour. */
+   for "not a kind" and is about the bucket, not the color. */
 .term-actor { color: #92400e; }
 .term-obj { color: #0f766e; }
 .term-verb { color: #6d28d9; }
@@ -1375,7 +1375,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
       
     </div>
     </div>
@@ -1421,7 +1421,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
       
     </div>
     </div>
@@ -1594,7 +1594,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -1742,7 +1742,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
                 
               </div>
             </div>
@@ -1818,7 +1818,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
                 
               </div>
             </div>
@@ -1879,7 +1879,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
                 
               </div>
             </div>
@@ -1962,7 +1962,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
                 
               </div>
             </div>
@@ -2028,7 +2028,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
                 
               </div>
             </div>
@@ -2069,7 +2069,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/218fee1745c3453a8585815777fb80d055d87637/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
                 
               </div>
             </div>
@@ -2097,10 +2097,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-21T21:03:00.594068+00:00",
+    "timestamp": "2026-08-23T13:32:51.477581+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "218fee1745c3453a8585815777fb80d055d87637",
+    "commit_sha": "a947a2cfbfa063261f6ae0ed6f426bfe01616f19",
     "title": "File Glossary Example"
   },
   "scenarios": [
@@ -2134,10 +2134,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2172,10 +2170,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2204,10 +2200,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2236,10 +2230,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2284,10 +2276,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2322,10 +2312,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2348,10 +2336,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2374,10 +2360,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }

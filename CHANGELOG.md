@@ -85,6 +85,14 @@ form `## [x.y.z] - YYYY-MM-DD`.
   content type — braces for JSON, a page for text — instead of a paperclip for
   both. The Markdown report keeps its `📎`.
 
+- The Markdown report now shows why a scenario failed: the message and the
+  failing frame, under the scenario and — for a parametrized run — under the
+  case table for each failed case. It previously showed the ✗ and no reason.
+- **Breaking (JSON report).** A step no longer carries `status` or `error`;
+  failure lives on the scenario and on the parameter table's cases, which is
+  where both renderers read it. A consumer reading `step.status` should read
+  `scenario.status` instead.
+
 ### Removed
 
 - **Breaking.** The `divergent-case-structure` lint rule; delete any

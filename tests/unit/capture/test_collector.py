@@ -88,19 +88,6 @@ def test_attach_to_current_step() -> None:
     assert step.attachments[0].content == 'line1\nline2'
 
 
-def test_step_failure() -> None:
-    collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
-    collector.push_step('then', _n('should fail'))
-    collector.fail_current_step('assert 1 == 2', error_tail='E   assert 1 == 2')
-    collector.pop_step()
-    scenario = collector.finish_scenario(status='failed', duration_ms=0)
-    step = scenario.steps[0]
-    assert step.status == 'failed'
-    assert step.error is not None
-    assert step.error.message == 'assert 1 == 2'
-
-
 def test_no_active_scenario_returns_none() -> None:
     collector = Collector()
     assert collector.active_scenario_id is None

@@ -28,7 +28,7 @@ stories[]     one entry per story(...)
 
 ## Step
 
-`{phase, narration, status, children[], attachments[], error, activity_ids, fixture_name}` — `phase` is `given`/`when`/`then`; `children` nests sub-steps; `fixture_name` is set when the step came from a `@given`-decorated fixture. An entry in `attachments[]` is either `{label, content, content_type}` or, when the payload varies across parametrize cases, `{label, content_type, column_id}` — a content-less pointer at the column that holds every case's payload.
+`{phase, narration, children[], attachments[], activity_ids, fixture_name}` — `phase` is `given`/`when`/`then`; `children` nests sub-steps; `fixture_name` is set when the step came from a `@given`-decorated fixture. A step carries no status or error of its own: failure lives on the scenario, and per case in `parameters.cases[]`. An entry in `attachments[]` is either `{label, content, content_type}` or, when the payload varies across parametrize cases, `{label, content_type, column_id}` — a content-less pointer at the column that holds every case's payload.
 
 `narration.parts[]` is the structured step text; each part is one of:
 

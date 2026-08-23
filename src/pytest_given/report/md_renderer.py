@@ -52,6 +52,12 @@ def _scenario_md(scenario: Scenario) -> str:
     if scenario.parameters is not None:
         lines.append('')
         lines.append(_param_table_md(scenario.parameters))
+    # After the steps and the table, where the HTML renderer puts it. A
+    # grouped scenario never carries one — its cases do, and `_param_table_md`
+    # renders those below the table instead.
+    if scenario.error is not None:
+        lines.append('')
+        lines.extend(_error_lines(scenario.error))
     return '\n'.join(lines)
 
 
@@ -92,8 +98,25 @@ def _param_table_md(table: ParameterTable) -> str:
         rows.append(
             '| ' + ' | '.join([*cells, _STATUS_GLYPH.get(case.status, '✗')]) + ' |'
         )
+        blocks.extend(_case_error_block(table, case))
         blocks.extend(_case_attachment_blocks(table, case))
     return '\n'.join([header, separator, *rows, *blocks])
+
+
+def _case_error_block(table: ParameterTable, case: ParameterCase) -> list[str]:
+    """A failing case's error, keyed by its parametrize values.
+
+    Below the table rather than in the row: Markdown has no way to nest a
+    block inside a table cell. A grouped scenario carries no error of its own,
+    so without this a failed case shows a ✗ and no reason anywhere.
+    """
+    if case.error is None:
+        return []
+    return [
+        '',
+        f'- **{_case_key(table, case)}** — failed:',
+        *_error_lines(case.error, '  '),
+    ]
 
 
 def _case_cell(column: ParameterColumn, value: CellValue | None) -> str:
@@ -193,12 +216,7 @@ def _cell(value: object) -> str:
 
 def _step_md(step: Step, depth: int) -> str:
     indent = '  ' * depth
-    bullet = f'{indent}- **{step.phase}** {_narration_md(step.narration)}'
-    if step.status == 'failed':
-        bullet += '  **← FAILED**'
-    lines = [bullet]
-    if step.error is not None:
-        lines.extend(_error_lines(step.error, indent))
+    lines = [f'{indent}- **{step.phase}** {_narration_md(step.narration)}']
     for attachment in step.attachments:
         lines.extend(_attachment_lines(attachment, indent))
     lines.extend(_step_md(child, depth + 1) for child in step.children)
@@ -220,15 +238,19 @@ def _attachment_lines(attachment: StepAttachment, indent: str) -> list[str]:
     ]
 
 
-def _error_lines(error: ErrorInfo, indent: str) -> list[str]:
+def _error_lines(error: ErrorInfo, prefix: str = '') -> list[str]:
+    """A failure as blockquote lines: its first message line, then the
+    innermost non-internal frame. `prefix` is the full leading indent, so a
+    case's block can sit under a table bullet and a scenario's at the margin.
+    """
     lines = []
     first = error.message.splitlines()[0] if error.message else ''
     if first:
-        lines.append(f'{indent}  > {first}')
+        lines.append(f'{prefix}> {first}')
     for frame in reversed(error.frames):
         if not frame.is_internal:
             lines.append(
-                f'{indent}  > {Path(frame.path).name}:{frame.lineno} in {frame.func}'
+                f'{prefix}> {Path(frame.path).name}:{frame.lineno} in {frame.func}'
             )
             break
     return lines

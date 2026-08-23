@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-21T21:18:54.908178+00:00",
+    "timestamp": "2026-08-23T13:32:50.972492+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "0b940fda72a6071d862c98cff0305fa9296048c6",
+    "commit_sha": "a947a2cfbfa063261f6ae0ed6f426bfe01616f19",
     "title": "Coffee Shop Example"
   },
   "scenarios": [
@@ -27,10 +27,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -40,10 +38,8 @@
             "text": "I insert $2",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -53,7 +49,6 @@
             "text": "I get a coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -62,7 +57,6 @@
               "content_type": "json"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -94,10 +88,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -107,7 +99,6 @@
             "text": "a printed receipt",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -116,7 +107,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -126,10 +116,8 @@
             "text": "the total line is read back",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -139,10 +127,8 @@
             "text": "it shows the $2.00 total",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -174,10 +160,8 @@
             "text": "a database connection",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "db"
         },
@@ -187,10 +171,8 @@
             "text": "I run a query",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -200,10 +182,8 @@
             "text": "the connection is open and the query was logged",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -235,10 +215,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -248,10 +226,8 @@
             "text": "I have some coins in hand",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -271,10 +247,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -297,10 +271,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -335,10 +307,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -348,7 +318,6 @@
             "text": "I insert $2",
             "parts": []
           },
-          "status": "passed",
           "children": [
             {
               "phase": "when",
@@ -366,10 +335,8 @@
                   }
                 ]
               },
-              "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             },
@@ -383,16 +350,13 @@
                   }
                 ]
               },
-              "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -402,10 +366,8 @@
             "text": "the coin is accepted",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -415,7 +377,6 @@
             "text": "a coffee is dispensed",
             "parts": []
           },
-          "status": "passed",
           "children": [
             {
               "phase": "then",
@@ -423,7 +384,6 @@
                 "text": "the machine state is consistent",
                 "parts": []
               },
-              "status": "passed",
               "children": [],
               "attachments": [
                 {
@@ -432,13 +392,11 @@
                   "content_type": "json"
                 }
               ],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -474,10 +432,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -487,10 +443,8 @@
             "text": "a loyalty card with 5 points",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -500,7 +454,6 @@
             "text": "I place a large order",
             "parts": []
           },
-          "status": "passed",
           "children": [
             {
               "phase": "when",
@@ -508,10 +461,8 @@
                 "text": "I select 3 coffees",
                 "parts": []
               },
-              "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             },
@@ -521,7 +472,6 @@
                 "text": "I apply loyalty discount",
                 "parts": []
               },
-              "status": "passed",
               "children": [
                 {
                   "phase": "when",
@@ -529,10 +479,8 @@
                     "text": "the loyalty card is validated",
                     "parts": []
                   },
-                  "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null,
                   "activity_ids": [],
                   "fixture_name": null
                 },
@@ -542,22 +490,18 @@
                     "text": "the discount is calculated",
                     "parts": []
                   },
-                  "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null,
                   "activity_ids": [],
                   "fixture_name": null
                 }
               ],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -567,7 +511,6 @@
             "text": "the order is processed correctly",
             "parts": []
           },
-          "status": "passed",
           "children": [
             {
               "phase": "then",
@@ -575,10 +518,8 @@
                 "text": "the coffee count is updated",
                 "parts": []
               },
-              "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             },
@@ -588,7 +529,6 @@
                 "text": "the loyalty points are deducted",
                 "parts": []
               },
-              "status": "passed",
               "children": [
                 {
                   "phase": "then",
@@ -596,7 +536,6 @@
                     "text": "the remaining points are valid",
                     "parts": []
                   },
-                  "status": "passed",
                   "children": [],
                   "attachments": [
                     {
@@ -605,19 +544,16 @@
                       "content_type": "json"
                     }
                   ],
-                  "error": null,
                   "activity_ids": [],
                   "fixture_name": null
                 }
               ],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -627,7 +563,6 @@
             "text": "the machine state is consistent",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -636,7 +571,6 @@
               "content_type": "json"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -671,10 +605,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -684,10 +616,8 @@
             "text": "a machine that has sold its last coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -697,10 +627,8 @@
             "text": "a customer tries to buy a coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -710,10 +638,8 @@
             "text": "the machine reports it is sold out",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -751,10 +677,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -764,10 +688,8 @@
             "text": "a loyalty card good for a $1 discount",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -777,10 +699,8 @@
             "text": "I buy a coffee with the discount",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -790,10 +710,8 @@
             "text": "I pay $1",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -803,10 +721,8 @@
             "text": "a coffee is dispensed",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -830,7 +746,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 61,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -838,10 +754,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -851,10 +765,8 @@
             "text": "the machine has 20 coffees",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -949,7 +861,7 @@
           },
           {
             "path": "src/pytest_given/capture/decorators.py",
-            "lineno": 278,
+            "lineno": 330,
             "func": "wrapper",
             "code": "    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
@@ -1012,10 +924,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -1035,10 +945,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1058,10 +966,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1132,10 +1038,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -1158,10 +1062,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1171,10 +1073,8 @@
             "text": "I brew the cup",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1184,10 +1084,8 @@
             "text": "the machine has one fewer coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1256,10 +1154,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -1282,10 +1178,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1295,10 +1189,8 @@
             "text": "the machine has one fewer coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1370,10 +1262,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -1396,10 +1286,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1409,10 +1297,8 @@
             "text": "the machine has one fewer coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1460,10 +1346,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -1473,10 +1357,8 @@
             "text": "the barista reaches for a takeaway cup",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1499,10 +1381,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1512,10 +1392,8 @@
             "text": "the machine has one fewer coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1562,10 +1440,8 @@
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -1585,7 +1461,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -1594,7 +1469,6 @@
               "column_id": "attachment:0"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1617,10 +1491,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1643,10 +1515,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }

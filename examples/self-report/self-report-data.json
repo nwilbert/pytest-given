@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-23T11:20:19.362826+00:00",
+    "timestamp": "2026-08-23T13:32:53.461194+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "d116864a98a6f9749096faf97a631f862997bd85",
+    "commit_sha": "a947a2cfbfa063261f6ae0ed6f426bfe01616f19",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -54,10 +54,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -89,10 +87,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -121,10 +117,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -191,10 +185,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -217,10 +209,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             7
           ],
@@ -251,10 +241,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -315,10 +303,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -341,10 +327,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             7
           ],
@@ -356,10 +340,8 @@
             "text": "it is recorded as a child of the recording root",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -369,7 +351,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 211
+        "line": 198
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -426,10 +408,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -452,10 +432,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             6
           ],
@@ -480,10 +458,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -493,7 +469,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 231
+        "line": 218
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -553,10 +529,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -579,10 +553,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             7
           ],
@@ -594,10 +566,8 @@
             "text": "the step lives only in the recording, not the scenario",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -607,7 +577,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 249
+        "line": 236
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -673,10 +643,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -699,10 +667,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -716,10 +682,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -729,7 +693,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 303
+        "line": 290
       },
       "story_id": null,
       "activity_ids": []
@@ -789,10 +753,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -821,10 +783,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             8
           ],
@@ -836,10 +796,8 @@
             "text": "the scenario gains a deep copy of the recorded steps",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -849,7 +807,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 332
+        "line": 319
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -903,10 +861,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -916,10 +872,8 @@
             "text": "a fixture raises past its yield, after the scenario finished",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -942,10 +896,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -955,7 +907,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 473
+        "line": 460
       },
       "story_id": null,
       "activity_ids": []
@@ -1003,10 +955,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1016,10 +966,8 @@
             "text": "its fixture then also fails in teardown",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1029,10 +977,8 @@
             "text": "the body failure is what the report shows",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1042,7 +988,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 492
+        "line": 479
       },
       "story_id": null,
       "activity_ids": []
@@ -1096,10 +1042,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1109,10 +1053,8 @@
             "text": "a teardown fails under a node id no scenario claimed",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1122,10 +1064,8 @@
             "text": "the recorded scenario is untouched",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1135,7 +1075,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 510
+        "line": 497
       },
       "story_id": null,
       "activity_ids": []
@@ -1189,10 +1129,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1221,10 +1159,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             8
           ],
@@ -1236,10 +1172,8 @@
             "text": "the step is a given with no children",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1249,7 +1183,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 525
+        "line": 512
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -1294,10 +1228,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1326,10 +1258,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             8
           ],
@@ -1341,10 +1271,8 @@
             "text": "the grafted root shows the override text and keeps its children",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1354,7 +1282,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 543
+        "line": 530
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -1405,10 +1333,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1431,10 +1357,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1444,10 +1368,8 @@
             "text": "no scenario is recorded",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1457,7 +1379,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 568
+        "line": 555
       },
       "story_id": null,
       "activity_ids": []
@@ -1502,7 +1424,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -1511,7 +1432,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1534,10 +1454,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1547,10 +1465,8 @@
             "text": "every lookup resolves to one handle type and the same id",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1595,7 +1511,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -1604,7 +1519,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1627,10 +1541,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1640,10 +1552,8 @@
             "text": "both lookups return the one memoized handle",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1694,7 +1604,6 @@
             "text": "a Markdown glossary file with no kind column",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -1703,7 +1612,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1726,10 +1634,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1770,10 +1676,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1821,7 +1725,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -1830,7 +1733,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1853,10 +1755,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1866,10 +1766,8 @@
             "text": "a PytestGivenError is raised with a spelling hint",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -1924,7 +1822,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -1933,7 +1830,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1953,10 +1849,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1976,10 +1870,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2024,7 +1916,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -2033,7 +1924,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2053,10 +1943,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2079,10 +1967,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2131,7 +2017,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -2140,7 +2025,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2163,10 +2047,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2189,10 +2071,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2224,7 +2104,6 @@
             "text": "a Markdown glossary with the kind in the third column",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -2233,7 +2112,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2256,10 +2134,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2269,10 +2145,8 @@
             "text": "the kinds are read from that column",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2321,7 +2195,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -2330,7 +2203,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2353,10 +2225,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2379,10 +2249,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2417,7 +2285,6 @@
             "text": "a glossary whose Kind cell holds an unknown value",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -2426,7 +2293,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2449,10 +2315,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2462,10 +2326,8 @@
             "text": "a PytestGivenError names the unrecognized kind",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2512,10 +2374,8 @@
             "text": "a path to a file that does not exist",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2538,10 +2398,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2551,10 +2409,8 @@
             "text": "a PytestGivenError reports the file is not found",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2615,7 +2471,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -2624,7 +2479,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2647,10 +2501,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2660,10 +2512,8 @@
             "text": "a PytestGivenError is raised with file:line context",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2710,7 +2560,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -2719,7 +2568,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2742,10 +2590,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2755,10 +2601,8 @@
             "text": "a PytestGivenError reports the conflicting rows",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2804,7 +2648,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -2813,7 +2656,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2836,10 +2678,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2868,10 +2708,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2923,7 +2761,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -2932,7 +2769,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2955,10 +2791,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2978,10 +2812,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3045,7 +2877,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -3054,7 +2885,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3077,10 +2907,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3103,10 +2931,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3163,7 +2989,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -3172,7 +2997,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3182,10 +3006,8 @@
             "text": "an unknown name is called",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3195,10 +3017,8 @@
             "text": "a PytestGivenError is raised",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3221,10 +3041,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3288,10 +3106,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3314,10 +3130,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3340,10 +3154,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3416,10 +3228,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3442,10 +3252,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3468,10 +3276,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3516,10 +3322,8 @@
             "text": "an empty glossary",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3542,10 +3346,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             3
           ],
@@ -3579,10 +3381,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3640,10 +3440,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3653,10 +3451,8 @@
             "text": "the same name and definition are registered again",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             3
           ],
@@ -3678,10 +3474,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3741,10 +3535,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3754,10 +3546,8 @@
             "text": "the name is registered again with a different definition",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3767,10 +3557,8 @@
             "text": "a PytestGivenError reports the conflict with the prior registration",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3814,10 +3602,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3837,10 +3623,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3850,10 +3634,8 @@
             "text": "a PytestGivenError reports the conflict with the prior registration",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3898,10 +3680,8 @@
             "text": "a rootdir-aware glossary",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3924,10 +3704,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3959,10 +3737,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4022,10 +3798,8 @@
             "text": "an empty glossary",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4048,10 +3822,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             3
           ],
@@ -4082,10 +3854,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4137,10 +3907,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4150,10 +3918,8 @@
             "text": "the name is looked up by subscript",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4176,10 +3942,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4224,10 +3988,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4237,10 +3999,8 @@
             "text": "a near-miss name is subscripted",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4250,10 +4010,8 @@
             "text": "a PytestGivenError is raised with a spelling hint",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4317,10 +4075,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4346,10 +4102,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4390,10 +4144,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4475,10 +4227,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4510,10 +4260,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4533,10 +4281,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4615,10 +4361,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4638,10 +4382,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4670,10 +4412,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4761,10 +4501,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4774,10 +4512,8 @@
             "text": "kind resolution runs over both stories",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4787,10 +4523,8 @@
             "text": "a PytestGivenError names the conflicting term",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4848,10 +4582,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4877,10 +4609,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4890,10 +4620,8 @@
             "text": "the declared kinds are verified and preserved",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4978,10 +4706,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5004,10 +4730,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5017,10 +4741,8 @@
             "text": "a PytestGivenError names the misplaced term",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -5108,10 +4830,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5121,10 +4841,8 @@
             "text": "kind resolution runs over both stories",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5134,10 +4852,8 @@
             "text": "a PytestGivenError names the conflicting term",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -5222,10 +4938,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5248,10 +4962,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5261,10 +4973,8 @@
             "text": "a PytestGivenError names the misplaced term",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -5348,10 +5058,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5361,10 +5069,8 @@
             "text": "kind resolution places it at position 1 (the verb slot)",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5374,10 +5080,8 @@
             "text": "a PytestGivenError says an actor cannot fill the verb slot",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -5444,10 +5148,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5457,10 +5159,8 @@
             "text": "kind resolution raises",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5470,10 +5170,8 @@
             "text": "only the offending story is named in the message",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -5549,10 +5247,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5562,10 +5258,8 @@
             "text": "the verb-vs-actor conflict is raised",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5575,10 +5269,8 @@
             "text": "only the verb and actor stories are named, not the noun one",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -5653,10 +5345,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5666,10 +5356,8 @@
             "text": "kind resolution places it at position \u22652 (a noun slot)",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5679,10 +5367,8 @@
             "text": "a PytestGivenError says a verb cannot fill the noun slot",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -5730,10 +5416,8 @@
             "text": "the five positions of a short activity path",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5756,10 +5440,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5782,10 +5464,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -5832,7 +5512,6 @@
             "text": "a Markdown document with one pipe table",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -5841,7 +5520,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "simple_doc"
         },
@@ -5861,10 +5539,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5887,10 +5563,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -5924,7 +5598,6 @@
             "text": "a document containing two separate pipe tables",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -5933,7 +5606,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5943,10 +5615,8 @@
             "text": "the parser reads the whole document",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -5969,10 +5639,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6006,7 +5674,6 @@
             "text": "a table with custom, differently-cased header names",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6015,7 +5682,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6025,10 +5691,8 @@
             "text": "the parser selects columns by header name",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6038,10 +5702,8 @@
             "text": "the named columns are matched case-insensitively",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6075,7 +5737,6 @@
             "text": "cells containing escaped pipe characters (\\|)",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6084,7 +5745,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6094,10 +5754,8 @@
             "text": "the parser splits the row",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6107,10 +5765,8 @@
             "text": "the escaped pipe survives as a literal pipe",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6144,7 +5800,6 @@
             "text": "a fenced code block that contains a look-alike table",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6153,7 +5808,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6163,10 +5817,8 @@
             "text": "the parser reads the document",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6176,10 +5828,8 @@
             "text": "only the real table outside the fence contributes rows",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6214,7 +5864,6 @@
             "text": "a document with no pipe table",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6223,7 +5872,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6243,10 +5891,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6256,10 +5902,8 @@
             "text": "a PytestGivenError reports that the file has no pipe table",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6295,7 +5939,6 @@
             "text": "a Markdown document with one pipe table",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6304,7 +5947,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "simple_doc"
         },
@@ -6314,10 +5956,8 @@
             "text": "the parser selects a header name that is absent",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6327,10 +5967,8 @@
             "text": "a PytestGivenError names the missing column",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6366,7 +6004,6 @@
             "text": "a Markdown document with one pipe table",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6375,7 +6012,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "simple_doc"
         },
@@ -6385,10 +6021,8 @@
             "text": "the parser selects a column index past the table width",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6398,10 +6032,8 @@
             "text": "a PytestGivenError names the out-of-range column",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6437,7 +6069,6 @@
             "text": "a table with a data row narrower than its header",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6446,7 +6077,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6456,10 +6086,8 @@
             "text": "the parser reads the short row",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6469,10 +6097,8 @@
             "text": "a PytestGivenError points at the short row",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6538,7 +6164,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6547,7 +6172,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6557,10 +6181,8 @@
             "text": "the parser reads the term cell",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6570,10 +6192,8 @@
             "text": "the emphasis is unwrapped to the plain canonical",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6630,7 +6250,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6639,7 +6258,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6649,10 +6267,8 @@
             "text": "the parser reads the term cells",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6662,10 +6278,8 @@
             "text": "each unwraps to its plain text",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6712,7 +6326,6 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6721,7 +6334,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6731,10 +6343,8 @@
             "text": "the parser reads the term cell",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6744,10 +6354,8 @@
             "text": "the single underscores are not treated as emphasis",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6781,7 +6389,6 @@
             "text": "a Kind cell written with bold emphasis",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6790,7 +6397,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6800,10 +6406,8 @@
             "text": "the parser reads the kind cell",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6813,10 +6417,8 @@
             "text": "the kind is unwrapped to plain text",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6850,7 +6452,6 @@
             "text": "a definition cell rich with inline code",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6859,7 +6460,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6869,10 +6469,8 @@
             "text": "the parser reads the row",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6882,10 +6480,8 @@
             "text": "the definition keeps its markup for the tooltip",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -6919,7 +6515,6 @@
             "text": "prose containing a stray pipe, then a real table",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -6928,7 +6523,6 @@
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6938,10 +6532,8 @@
             "text": "the parser reads the document",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -6951,10 +6543,8 @@
             "text": "only the real pipe table produces rows",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -7027,10 +6617,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             5
           ],
@@ -7061,10 +6649,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -7074,7 +6660,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 56
+        "line": 58
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -7125,10 +6711,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -7151,10 +6735,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             5
           ],
@@ -7179,10 +6761,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -7192,7 +6772,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 249
+        "line": 251
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -7243,10 +6823,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -7269,10 +6847,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -7282,10 +6858,8 @@
             "text": "both sibling steps are still recorded",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -7295,7 +6869,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 275
+        "line": 276
       },
       "story_id": null,
       "activity_ids": []
@@ -7348,10 +6922,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -7374,10 +6946,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -7387,10 +6957,8 @@
             "text": "only the when step is recorded \u2014 the outcome never held",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -7400,7 +6968,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 303
+        "line": 304
       },
       "story_id": null,
       "activity_ids": []
@@ -7454,10 +7022,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -7480,10 +7046,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             5
           ],
@@ -7495,10 +7059,8 @@
             "text": "the sub-action is a child of the action and the then still follows",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -7508,7 +7070,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 377
+        "line": 378
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -7558,10 +7120,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -7571,10 +7131,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -7584,10 +7142,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -7610,10 +7166,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -7642,10 +7196,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -7705,10 +7257,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -7718,10 +7268,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -7731,10 +7279,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -7763,10 +7309,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -7786,10 +7330,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -7818,10 +7360,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -7866,10 +7406,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -7879,10 +7417,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -7892,10 +7428,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -7918,10 +7452,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -7950,10 +7482,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -8018,10 +7548,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -8031,10 +7559,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -8057,10 +7583,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -8070,10 +7594,8 @@
             "text": "a PytestGivenError rejects it as too short",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -8126,10 +7648,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -8139,10 +7659,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -8174,10 +7692,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -8200,10 +7716,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -8256,10 +7770,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -8269,10 +7781,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -8282,10 +7792,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -8314,10 +7822,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -8340,10 +7846,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -8394,10 +7898,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -8407,10 +7909,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -8430,10 +7930,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -8456,10 +7954,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -8512,10 +8008,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -8525,10 +8019,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -8557,10 +8049,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -8583,10 +8073,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -8648,10 +8136,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -8661,10 +8147,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -8693,10 +8177,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -8719,10 +8201,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -8769,10 +8249,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -8782,10 +8260,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -8814,10 +8290,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -8827,10 +8301,8 @@
             "text": "a PytestGivenError says position 2 is the noun slot",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -8875,10 +8347,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -8888,10 +8358,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -8920,10 +8388,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -8933,10 +8399,8 @@
             "text": "the entities are term refs and the verb stays a bare word",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -8981,10 +8445,8 @@
             "text": "three plain words with no glossary handles",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -9007,10 +8469,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -9033,10 +8493,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -9099,10 +8557,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -9125,10 +8581,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -9138,10 +8592,8 @@
             "text": "even positions are term-ref nodes and the connective stays a word",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -9219,10 +8671,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -9232,10 +8682,8 @@
             "text": "a path ending on a connective edge is built",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -9245,10 +8693,8 @@
             "text": "a PytestGivenError rejects the dangling edge",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -9299,10 +8745,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -9312,10 +8756,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -9325,10 +8767,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -9351,10 +8791,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             2
           ],
@@ -9376,10 +8814,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -9430,10 +8866,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -9443,10 +8877,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -9456,10 +8888,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -9482,10 +8912,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -9505,10 +8933,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             2
           ],
@@ -9520,10 +8946,8 @@
             "text": "the activity carries both paths",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -9570,10 +8994,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -9583,10 +9005,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -9596,10 +9016,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -9619,10 +9037,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -9642,10 +9058,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -9655,10 +9069,8 @@
             "text": "a PytestGivenError rejects the mix",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -9702,10 +9114,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -9715,10 +9125,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -9728,10 +9136,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -9754,10 +9160,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -9767,10 +9171,8 @@
             "text": "a PytestGivenError says activity_id=0 is reserved",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -9824,10 +9226,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -9837,10 +9237,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -9850,10 +9248,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -9885,10 +9281,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             2
           ],
@@ -9900,10 +9294,8 @@
             "text": "the activities are numbered 1 and 2",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -9935,10 +9327,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -9948,10 +9338,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -9961,10 +9349,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -9987,10 +9373,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10010,10 +9394,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10023,10 +9405,8 @@
             "text": "auto picks skip the ids already used explicitly",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -10082,10 +9462,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -10095,10 +9473,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -10108,10 +9484,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -10134,10 +9508,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10157,10 +9529,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10170,10 +9540,8 @@
             "text": "a PytestGivenError reports the duplicate activity id",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -10218,10 +9586,8 @@
             "text": "a human-readable story title",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10244,10 +9610,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10257,10 +9621,8 @@
             "text": "its id is the slugified title",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -10313,10 +9675,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -10326,10 +9686,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -10339,10 +9697,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -10352,10 +9708,8 @@
             "text": "two activities that reach two different glossaries",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10378,10 +9732,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10391,10 +9743,8 @@
             "text": "a PytestGivenError says a story spans multiple glossaries",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -10454,10 +9804,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10467,10 +9815,8 @@
             "text": "a second story is declared with the same slug",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10480,10 +9826,8 @@
             "text": "a PytestGivenError reports the id was already declared",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -10559,10 +9903,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10585,10 +9927,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10611,10 +9951,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -10692,10 +10030,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10724,10 +10060,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10737,10 +10071,8 @@
             "text": "a PytestGivenError names the term and its declared kind",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -10796,10 +10128,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -10809,10 +10139,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -10822,10 +10150,8 @@
             "text": "a search verb",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "search"
         },
@@ -10857,10 +10183,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10870,10 +10194,8 @@
             "text": "the message names the term without dumping the glossary",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10883,10 +10205,8 @@
             "text": "the message is short and free of dataclass reprs",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -10961,10 +10281,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -10987,10 +10305,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11000,10 +10316,8 @@
             "text": "both paths construct, leaving the kind to inference",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -11051,10 +10365,8 @@
             "text": "a Guest actor",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "guest"
         },
@@ -11064,10 +10376,8 @@
             "text": "a Room work object",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "room"
         },
@@ -11090,10 +10400,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11103,10 +10411,8 @@
             "text": "a PytestGivenError names the offending type and the path",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -11153,10 +10459,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11166,10 +10470,8 @@
             "text": "the template is parsed",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11192,10 +10494,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -11251,10 +10551,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11277,10 +10575,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11290,10 +10586,8 @@
             "text": "the placeholder is filled with that value",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -11325,10 +10619,8 @@
             "text": "a t-string step with one interpolated value",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11338,10 +10630,8 @@
             "text": "the t-string is parsed at runtime",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11364,10 +10654,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -11399,10 +10687,8 @@
             "text": "a t-string step interpolating a computed expression",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11412,10 +10698,8 @@
             "text": "the t-string is parsed",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11438,10 +10722,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -11505,10 +10787,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11518,10 +10798,8 @@
             "text": "the handle is interpolated into a t-string step",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11550,10 +10828,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -11617,10 +10893,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11630,10 +10904,8 @@
             "text": "it is interpolated into a t-string step",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11662,10 +10934,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -11729,10 +10999,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11742,10 +11010,8 @@
             "text": "it is interpolated into a t-string step",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11768,10 +11034,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -11841,10 +11105,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11854,10 +11116,8 @@
             "text": "it is interpolated into a t-string step",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11880,10 +11140,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -11943,10 +11201,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11956,10 +11212,8 @@
             "text": "the t-string is parsed",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -11982,10 +11236,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -12055,10 +11307,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12068,10 +11318,8 @@
             "text": "it is interpolated into a t-string step",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             4
           ],
@@ -12093,10 +11341,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -12205,16 +11451,14 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
               "label": "Report data",
-              "content": "{\n  \"metadata\": {\n    \"project\": \"p\",\n    \"timestamp\": \"t\",\n    \"pytest_version\": \"8\",\n    \"plugin_version\": \"0\",\n    \"commit_sha\": null,\n    \"title\": null\n  },\n  \"scenarios\": [\n    {\n      \"id\": \"t\",\n      \"narration\": {\n        \"text\": \"s\",\n        \"parts\": []\n      },\n      \"module\": \"m\",\n      \"tags\": [],\n      \"status\": \"passed\",\n      \"duration_ms\": 0,\n      \"steps\": [\n        {\n          \"phase\": \"when\",\n          \"narration\": {\n            \"text\": \"x\",\n            \"parts\": [\n              {\n                \"term_id\": \"guest\",\n                \"display\": \"Alice\",\n                \"expression\": \"\",\n                \"param_column\": null\n              },\n              {\n                \"term_id\": \"search\",\n                \"display\": \"searches\",\n                \"expression\": \"\",\n                \"param_column\": null\n              },\n              {\n                \"term_id\": \"room\",\n                \"display\": \"Deluxe Suite\",\n                \"expression\": \"\",\n                \"param_column\": null\n              }\n            ]\n          },\n          \"status\": \"passed\",\n          \"children\": [],\n          \"attachments\": [],\n          \"error\": null,\n          \"activity_ids\": [],\n          \"fixture_name\": null\n        }\n      ],\n      \"parameters\": null,\n      \"error\": null,\n      \"skip_reason\": null,\n      \"source\": null,\n      \"story_id\": \"book\",\n      \"activity_ids\": []\n    }\n  ],\n  \"glossary\": {\n    \"terms\": [\n      {\n        \"id\": \"guest\",\n        \"kind\": \"actor\",\n        \"canonical\": \"Guest\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"room\",\n        \"kind\": \"object\",\n        \"canonical\": \"Room\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"search\",\n        \"kind\": \"verb\",\n        \"canonical\": \"search\",\n        \"definition\": null,\n        \"source\": null\n      }\n    ]\n  },\n  \"stories\": [\n    {\n      \"id\": \"book\",\n      \"title\": \"Book\",\n      \"activities\": [\n        {\n          \"id\": 1,\n          \"paths\": [\n            {\n              \"parts\": [\n                {\n                  \"term_id\": \"guest\",\n                  \"display\": \"Alice\"\n                },\n                {\n                  \"term_id\": \"search\",\n                  \"display\": \"searches for\"\n                },\n                {\n                  \"term_id\": \"room\",\n                  \"display\": \"Deluxe Suite\"\n                }\n              ]\n            }\n          ]\n        }\n      ],\n      \"source\": null\n    }\n  ]\n}",
+              "content": "{\n  \"metadata\": {\n    \"project\": \"p\",\n    \"timestamp\": \"t\",\n    \"pytest_version\": \"8\",\n    \"plugin_version\": \"0\",\n    \"commit_sha\": null,\n    \"title\": null\n  },\n  \"scenarios\": [\n    {\n      \"id\": \"t\",\n      \"narration\": {\n        \"text\": \"s\",\n        \"parts\": []\n      },\n      \"module\": \"m\",\n      \"tags\": [],\n      \"status\": \"passed\",\n      \"duration_ms\": 0,\n      \"steps\": [\n        {\n          \"phase\": \"when\",\n          \"narration\": {\n            \"text\": \"x\",\n            \"parts\": [\n              {\n                \"term_id\": \"guest\",\n                \"display\": \"Alice\",\n                \"expression\": \"\",\n                \"param_column\": null\n              },\n              {\n                \"term_id\": \"search\",\n                \"display\": \"searches\",\n                \"expression\": \"\",\n                \"param_column\": null\n              },\n              {\n                \"term_id\": \"room\",\n                \"display\": \"Deluxe Suite\",\n                \"expression\": \"\",\n                \"param_column\": null\n              }\n            ]\n          },\n          \"children\": [],\n          \"attachments\": [],\n          \"activity_ids\": [],\n          \"fixture_name\": null\n        }\n      ],\n      \"parameters\": null,\n      \"error\": null,\n      \"skip_reason\": null,\n      \"source\": null,\n      \"story_id\": \"book\",\n      \"activity_ids\": []\n    }\n  ],\n  \"glossary\": {\n    \"terms\": [\n      {\n        \"id\": \"guest\",\n        \"kind\": \"actor\",\n        \"canonical\": \"Guest\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"room\",\n        \"kind\": \"object\",\n        \"canonical\": \"Room\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"search\",\n        \"kind\": \"verb\",\n        \"canonical\": \"search\",\n        \"definition\": null,\n        \"source\": null\n      }\n    ]\n  },\n  \"stories\": [\n    {\n      \"id\": \"book\",\n      \"title\": \"Book\",\n      \"activities\": [\n        {\n          \"id\": 1,\n          \"paths\": [\n            {\n              \"parts\": [\n                {\n                  \"term_id\": \"guest\",\n                  \"display\": \"Alice\"\n                },\n                {\n                  \"term_id\": \"search\",\n                  \"display\": \"searches for\"\n                },\n                {\n                  \"term_id\": \"room\",\n                  \"display\": \"Deluxe Suite\"\n                }\n              ]\n            }\n          ]\n        }\n      ],\n      \"source\": null\n    }\n  ]\n}",
               "content_type": "json"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12237,10 +11481,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12263,10 +11505,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12289,10 +11529,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -12371,10 +11609,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12397,10 +11633,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12420,10 +11654,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -12514,10 +11746,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12540,10 +11770,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12575,10 +11803,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -12642,10 +11868,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12668,10 +11892,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12691,10 +11913,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -12788,10 +12008,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12814,10 +12032,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12864,10 +12080,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -12949,10 +12163,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -12975,10 +12187,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13001,10 +12211,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -13089,10 +12297,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13102,10 +12308,8 @@
             "text": "the term-scenario index is built",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13128,10 +12332,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -13195,10 +12397,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13208,10 +12408,8 @@
             "text": "the story rollups are built",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13243,10 +12441,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -13325,10 +12521,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13351,10 +12545,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13377,10 +12569,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -13459,10 +12649,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13491,10 +12679,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13504,10 +12690,8 @@
             "text": "both collapse to the one canonical verb identity",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -13580,10 +12764,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13612,10 +12794,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13638,10 +12818,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -13714,10 +12892,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13743,10 +12919,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13769,10 +12943,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -13845,10 +13017,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13868,10 +13038,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13881,10 +13049,8 @@
             "text": "the identity ignores the surface form and stays canonical",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -13953,10 +13119,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13976,10 +13140,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -13989,10 +13151,8 @@
             "text": "the unknown ref contributes nothing to the identity set",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -14071,10 +13231,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14103,10 +13261,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14135,10 +13291,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -14217,10 +13371,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14249,10 +13401,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14272,10 +13422,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -14357,10 +13505,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14392,10 +13538,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14421,10 +13565,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14447,10 +13589,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14473,10 +13613,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -14549,10 +13687,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14584,10 +13720,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14613,10 +13747,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -14701,10 +13833,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14727,10 +13857,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14753,10 +13881,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -14829,10 +13955,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14855,10 +13979,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14881,10 +14003,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -14951,10 +14071,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14964,10 +14082,8 @@
             "text": "coverage is computed against a scenario",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -14993,10 +14109,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -15066,10 +14180,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15098,10 +14210,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15133,10 +14243,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -15206,10 +14314,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15241,10 +14347,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15264,10 +14368,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -15323,10 +14425,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15358,10 +14458,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15384,10 +14482,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -15421,7 +14517,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -15457,10 +14553,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15483,10 +14577,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             10
           ],
@@ -15508,10 +14600,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15525,10 +14615,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -15604,16 +14692,14 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
               "label": "Scenario record",
-              "content": "{\n  \"id\": \"tests/t.py::test_buy\",\n  \"narration\": {\n    \"text\": \"Buy coffee\",\n    \"parts\": []\n  },\n  \"module\": \"tests/t.py\",\n  \"tags\": [\n    \"billing\",\n    \"happy-path\"\n  ],\n  \"status\": \"passed\",\n  \"duration_ms\": 0,\n  \"steps\": [\n    {\n      \"phase\": \"given\",\n      \"narration\": {\n        \"text\": \"a machine\",\n        \"parts\": []\n      },\n      \"status\": \"passed\",\n      \"children\": [],\n      \"attachments\": [],\n      \"error\": null,\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    },\n    {\n      \"phase\": \"when\",\n      \"narration\": {\n        \"text\": \"I insert $2\",\n        \"parts\": []\n      },\n      \"status\": \"passed\",\n      \"children\": [],\n      \"attachments\": [],\n      \"error\": null,\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    },\n    {\n      \"phase\": \"then\",\n      \"narration\": {\n        \"text\": \"I get a coffee\",\n        \"parts\": []\n      },\n      \"status\": \"passed\",\n      \"children\": [],\n      \"attachments\": [],\n      \"error\": null,\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    }\n  ],\n  \"parameters\": null,\n  \"error\": null,\n  \"skip_reason\": null,\n  \"source\": null,\n  \"story_id\": null,\n  \"activity_ids\": []\n}",
+              "content": "{\n  \"id\": \"tests/t.py::test_buy\",\n  \"narration\": {\n    \"text\": \"Buy coffee\",\n    \"parts\": []\n  },\n  \"module\": \"tests/t.py\",\n  \"tags\": [\n    \"billing\",\n    \"happy-path\"\n  ],\n  \"status\": \"passed\",\n  \"duration_ms\": 0,\n  \"steps\": [\n    {\n      \"phase\": \"given\",\n      \"narration\": {\n        \"text\": \"a machine\",\n        \"parts\": []\n      },\n      \"children\": [],\n      \"attachments\": [],\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    },\n    {\n      \"phase\": \"when\",\n      \"narration\": {\n        \"text\": \"I insert $2\",\n        \"parts\": []\n      },\n      \"children\": [],\n      \"attachments\": [],\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    },\n    {\n      \"phase\": \"then\",\n      \"narration\": {\n        \"text\": \"I get a coffee\",\n        \"parts\": []\n      },\n      \"children\": [],\n      \"attachments\": [],\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    }\n  ],\n  \"parameters\": null,\n  \"error\": null,\n  \"skip_reason\": null,\n  \"source\": null,\n  \"story_id\": null,\n  \"activity_ids\": []\n}",
               "content_type": "json"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15636,10 +14722,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15662,10 +14746,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -15732,10 +14814,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15758,10 +14838,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15771,10 +14849,8 @@
             "text": "the child bullet indents under its parent",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -15859,10 +14935,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15885,10 +14959,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -15911,10 +14983,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -15995,10 +15065,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16021,10 +15089,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16047,10 +15113,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -16066,7 +15130,7 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_md_renderer.py::test_failing_step_is_marked_with_minimal_error",
+      "id": "tests/unit/report/test_md_renderer.py::test_failing_scenario_renders_a_minimal_error",
       "narration": {
         "text": "A failing step is marked with a minimal error digest",
         "parts": [
@@ -16092,7 +15156,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a failed Scenario whose then Step carries a two-line error and an internal frame",
+            "text": "a failed Scenario carrying a two-line error and an internal frame",
             "parts": [
               {
                 "value": "a failed "
@@ -16104,20 +15168,10 @@
                 "param_column": null
               },
               {
-                "value": " whose then "
-              },
-              {
-                "term_id": "step",
-                "display": "Step",
-                "expression": "pg[\"Step\"]",
-                "param_column": null
-              },
-              {
-                "value": " carries a two-line error and an internal frame"
+                "value": " carrying a two-line error and an internal frame"
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -16126,7 +15180,6 @@
               "content_type": "json"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16149,23 +15202,19 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
         {
           "phase": "then",
           "narration": {
-            "text": "the heading is crossed and the failed step is marked",
+            "text": "the heading is crossed and the error follows the steps",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16175,10 +15224,8 @@
             "text": "only the first message line and the non-internal frame are quoted",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -16242,10 +15289,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16268,10 +15313,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16294,10 +15337,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -16307,7 +15348,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 330
+        "line": 329
       },
       "story_id": null,
       "activity_ids": []
@@ -16342,10 +15383,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16368,10 +15407,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16381,10 +15418,8 @@
             "text": "the heading is marked skipped and the reason follows the node id",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -16394,7 +15429,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 450
+        "line": 491
       },
       "story_id": null,
       "activity_ids": []
@@ -16462,10 +15497,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16488,10 +15521,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             9
           ],
@@ -16516,10 +15547,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -16576,10 +15605,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16608,10 +15635,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16634,10 +15659,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -16707,10 +15730,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16739,10 +15760,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16752,10 +15771,8 @@
             "text": "the grouping is refused",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16765,10 +15782,8 @@
             "text": "the error names the test, the missing parts and the t-string fix",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -16828,10 +15843,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16857,10 +15870,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16870,10 +15881,8 @@
             "text": "the value becomes a derived column beside the parametrize one",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16896,10 +15905,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -16952,10 +15959,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16984,10 +15989,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -16997,10 +16000,8 @@
             "text": "the grouping is refused",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17010,10 +16011,8 @@
             "text": "the error quotes the expression and shows the bind-a-local fix",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -17060,10 +16059,8 @@
             "text": "a Template scenario name formatting its parameter",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17092,10 +16089,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17105,10 +16100,8 @@
             "text": "the cells carry the formatting the name declared",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -17155,10 +16148,8 @@
             "text": "a name formatting the parameter and a step reading it plainly",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17187,10 +16178,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17200,10 +16189,8 @@
             "text": "the name points at a column holding what it renders",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17213,10 +16200,8 @@
             "text": "the name renders the disambiguated token, text and parts agreeing",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -17277,10 +16262,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17309,10 +16292,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17322,10 +16303,8 @@
             "text": "the grouping is refused",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17335,10 +16314,8 @@
             "text": "the error names the column and what the case actually narrated",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -17417,10 +16394,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17449,10 +16424,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17462,10 +16435,8 @@
             "text": "the grouping is refused",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17488,10 +16459,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -17560,10 +16529,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17592,10 +16559,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17618,10 +16583,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17631,10 +16594,8 @@
             "text": "no extra column is made \u2014 the parametrize one already holds it",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -17703,10 +16664,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17732,10 +16691,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17758,10 +16715,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17784,10 +16739,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -17875,10 +16828,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17907,10 +16858,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17920,10 +16869,8 @@
             "text": "the grouping is refused",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17933,10 +16880,8 @@
             "text": "the error names the label and asks for a constant one",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18005,10 +16950,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18034,10 +16977,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18047,10 +16988,8 @@
             "text": "each cell carries the formatted text, under one column",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18060,10 +16999,8 @@
             "text": "the step keeps its placeholder, which that cell substitutes into",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18145,10 +17082,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18177,10 +17112,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18190,10 +17123,8 @@
             "text": "the grouping is refused",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18203,10 +17134,8 @@
             "text": "the error names the divergence and the opt-out that answers it",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18290,10 +17219,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18316,10 +17243,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [
             9
           ],
@@ -18350,10 +17275,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18405,10 +17328,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18431,10 +17352,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18454,10 +17373,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18580,10 +17497,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18606,10 +17521,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18619,10 +17532,8 @@
             "text": "a PytestGivenError reports the derived id is empty",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18735,10 +17646,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18761,10 +17670,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18774,10 +17681,8 @@
             "text": "a PytestGivenError reports the cross-phase nesting",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18800,10 +17705,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18837,7 +17740,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 345
+        "line": 346
       },
       "story_id": null,
       "activity_ids": []
@@ -18893,10 +17796,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18910,10 +17811,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18936,10 +17835,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18980,7 +17877,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 480
+        "line": 481
       },
       "story_id": null,
       "activity_ids": []
@@ -19014,10 +17911,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -19040,10 +17935,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -19053,10 +17946,8 @@
             "text": "a PytestGivenError says bare identifiers only",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }

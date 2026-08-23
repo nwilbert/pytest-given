@@ -415,18 +415,3 @@ class Collector:
                 frames=frames or [],
                 error_tail=error_tail,
             )
-
-    def fail_current_step(
-        self,
-        message: str,
-        frames: list[TracebackFrame] | None = None,
-        error_tail: str | None = None,
-    ) -> None:
-        if self._step_stack:
-            step = self._step_stack[-1]
-            step.status = 'failed'
-            step.error = ErrorInfo(
-                message=message,
-                frames=frames or [],
-                error_tail=error_tail,
-            )

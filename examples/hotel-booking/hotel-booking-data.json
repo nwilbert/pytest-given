@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-21T18:14:34.918786+00:00",
+    "timestamp": "2026-08-23T13:32:51.232694+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "3aed1fcc79c23a08abf6816321a30324043af48c",
+    "commit_sha": "a947a2cfbfa063261f6ae0ed6f426bfe01616f19",
     "title": "Hotel Booking Example"
   },
   "scenarios": [
@@ -35,10 +35,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "carol"
         },
@@ -61,10 +59,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -99,10 +95,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -137,10 +131,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -169,10 +161,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -214,10 +204,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "carol"
         },
@@ -237,10 +225,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "alice"
         },
@@ -260,10 +246,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "bob"
         },
@@ -298,10 +282,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -354,10 +336,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -401,10 +381,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -442,10 +420,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -501,10 +477,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -546,10 +520,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "alice"
         },
@@ -578,10 +550,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -616,10 +586,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -666,10 +634,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -716,10 +682,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -743,7 +707,7 @@
       "module": "test_hotel_booking",
       "tags": [],
       "status": "failed",
-      "duration_ms": 9,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -761,10 +725,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "carol"
         },
@@ -784,10 +746,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "alice"
         },
@@ -807,10 +767,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "bob"
         },
@@ -863,10 +821,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -919,10 +875,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -969,10 +923,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -1019,10 +971,8 @@
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }

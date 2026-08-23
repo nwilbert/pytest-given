@@ -47,3 +47,7 @@
 | debit card | expired card | ✓ |
 | bank transfer | fraud check failed | ✓ |
 | gift card | partial balance | ✗ |
+
+- **gift card, partial balance** — failed:
+  > assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}
+  > test_hotel_booking.py:230 in test_payment_declined

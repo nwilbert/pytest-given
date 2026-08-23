@@ -28,10 +28,10 @@
   --color-accent: #2563eb;
   --color-accent-bg: #dbeafe;
   /* Accent as *text*. The brand accent is only 4.24:1 on its own tint, under
-     AA, so anything that sets accent-coloured text uses this darker value
+     AA, so anything that sets accent-colored text uses this darker value
      (5.49:1 on the tint, 6.41:1 on --bg-page) — the way the status
      pills pair #166534 with a green tint rather than reusing --color-passed.
-     --color-accent itself stays the border/glyph colour, where the 3:1
+     --color-accent itself stays the border/glyph color, where the 3:1
      threshold for UI components applies. */
   --color-accent-text: #1d4ed8;
 
@@ -191,7 +191,7 @@ body {
 
 
 /* Segmented toggle — a connected single-select control. Shared by the
-   "Browse by" (Tags/Modules) toggle and the glossary "Definitions" filter so
+   "Browse by" (Tags/Terms/Modules) toggle and the glossary "Definitions" filter so
    the two read as the same idiom. (The Status pills above are deliberately
    separate: they are multi-select with per-status semantic colors.) */
 .seg-toggle {
@@ -668,7 +668,7 @@ span.param-highlight {
   padding: var(--space-sm) 0 var(--space-xs);
 }
 /* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks into
-   it; on the card colour it reads as the document it is.
+   it; on the card color it reads as the document it is.
 
    The payload sizes itself, and through its colspan cell it sizes the table:
    a table with an attachment column ends up as wide as its widest content,
@@ -703,7 +703,7 @@ span.param-highlight {
 .dot-failed { color: var(--color-failed); }
 .dot-skipped { color: var(--color-skipped); }
 
-/* Parameter colors. The colour of each column is generated per report — see
+/* Parameter colors. The color of each column is generated per report — see
    report/palette.py, which splits the hue circle into as many steps as the
    report has columns — and emitted as `.param-color-N` rules after this
    sheet. Only what every column shares lives here. */
@@ -731,7 +731,7 @@ span.param-highlight {
 /* In a scenario card the link stays in flow, under whatever the card ends
    with. Anchoring it to the corner instead put it in a fight with every
    full-width last element: over a case table it covered the last row's
-   rightmost cells, and over an error box it needed a card-coloured chip to
+   rightmost cells, and over an error box it needed a card-colored chip to
    stay legible against the reddish background. A refs panel ends in short
    chip lines that never reach the corner, so there the anchor still pays for
    itself. */
@@ -749,7 +749,7 @@ span.param-highlight {
    word lands in.
 
    That split is what fixed the hard case. A term with no kind has no hue, and
-   there is no fourth hue to give it — a colour clearing the three kinds, the
+   there is no fourth hue to give it — a color clearing the three kinds, the
    body text, the statuses, the accent and the generated column ring while
    holding AA on white does not exist at readable lightness. Standing weight in
    for hue did not work either: weight only reads against its container, so a
@@ -757,9 +757,9 @@ span.param-highlight {
    a third of the kindless refs sit in titles. A neutral wash is legible in
    both, because it is measured against the card, which does not change.
 
-   The washes are equalised perceptually, not by a fixed chroma: at equal
+   The washes are equalized perceptually, not by a fixed chroma: at equal
    chroma the violet all but disappears while the teal reads strongly, so each
-   is placed at dE00 12 from the card instead. A neutral needs less — a grey
+   is placed at dE00 12 from the card instead. A neutral needs less — a gray
    wash is never mistaken for paper tone the way a pale hue is — so the
    kindless one sits lighter and still reads the strongest of the four.
 
@@ -816,7 +816,7 @@ span.param-highlight {
   cursor: default;
 }
 .term-ref--link { cursor: pointer; }
-/* Coloured text underlining on hover is the plain link idiom, which is what
+/* Colored text underlining on hover is the plain link idiom, which is what
    lets the resting state spend nothing on a click affordance. */
 .term-ref--link:hover { text-decoration: underline; }
 .activity-word {
@@ -1050,12 +1050,12 @@ span.param-highlight {
 }
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
 
-/* Kind colour classes for kind headers and term pills. Kindless carries the
-   stone the narration gives it, so one kind is one colour across both views —
+/* Kind color classes for kind headers and term pills. Kindless carries the
+   stone the narration gives it, so one kind is one color across both views —
    the catalog would otherwise read cool slate for what prose reads warm stone.
    Stone-100/300 keep it on the same ramp-100 fill / ramp-300 border pattern as
    the three kinds; the border stays dashed, which is the catalog's own mark
-   for "not a kind" and is about the bucket, not the colour. */
+   for "not a kind" and is about the bucket, not the color. */
 .term-actor { color: #92400e; }
 .term-obj { color: #0f766e; }
 .term-verb { color: #6d28d9; }
@@ -1377,7 +1377,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1436,7 +1436,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1480,7 +1480,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1526,7 +1526,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
       
     </div>
     </div>
@@ -1600,7 +1600,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
       
     </div>
     </div>
@@ -1701,7 +1701,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
       
     </div>
     </div>
@@ -1751,7 +1751,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
@@ -1811,7 +1811,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
       
     </div>
     </div>
@@ -1835,7 +1835,7 @@ Total:        $2.00</pre></div>
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">65ms</span>
+        <span class="scenario-duration">60ms</span>
       </span>
     </div>
 
@@ -1901,7 +1901,7 @@ Total:        $2.00</pre></div>
               <pre class="error-frame-code">    result = testfunction(**testargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame error-frame-internal" x-show="showInternal" x-cloak>
-              <div class="error-frame-loc">src/pytest_given/capture/decorators.py:278: in wrapper</div>
+              <div class="error-frame-loc">src/pytest_given/capture/decorators.py:330: in wrapper</div>
               <pre class="error-frame-code">    return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^</pre>
             </div><div class="error-frame">
@@ -1911,7 +1911,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
       
     </div>
     </div>
@@ -1954,7 +1954,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
       
     </div>
     </div>
@@ -2103,7 +2103,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -2203,7 +2203,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -2301,7 +2301,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
       
     </div>
     </div>
@@ -2345,7 +2345,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -2391,7 +2391,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -2593,7 +2593,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
       
     </div>
     </div>
@@ -2685,7 +2685,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6a7e8c73d921af662a536c3572f62db81f020951/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a947a2cfbfa063261f6ae0ed6f426bfe01616f19/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
       
     </div>
     </div>
@@ -2716,10 +2716,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-22T08:01:34.906753+00:00",
+    "timestamp": "2026-08-23T13:32:50.972492+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "6a7e8c73d921af662a536c3572f62db81f020951",
+    "commit_sha": "a947a2cfbfa063261f6ae0ed6f426bfe01616f19",
     "title": "Coffee Shop Example"
   },
   "scenarios": [
@@ -2742,10 +2742,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -2755,10 +2753,8 @@ window.__REPORT_DATA__ = {
             "text": "I insert $2",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2768,7 +2764,6 @@ window.__REPORT_DATA__ = {
             "text": "I get a coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -2777,7 +2772,6 @@ window.__REPORT_DATA__ = {
               "content_type": "json"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2809,10 +2803,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -2822,7 +2814,6 @@ window.__REPORT_DATA__ = {
             "text": "a printed receipt",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -2831,7 +2822,6 @@ window.__REPORT_DATA__ = {
               "content_type": "text"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2841,10 +2831,8 @@ window.__REPORT_DATA__ = {
             "text": "the total line is read back",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2854,10 +2842,8 @@ window.__REPORT_DATA__ = {
             "text": "it shows the $2.00 total",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2889,10 +2875,8 @@ window.__REPORT_DATA__ = {
             "text": "a database connection",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "db"
         },
@@ -2902,10 +2886,8 @@ window.__REPORT_DATA__ = {
             "text": "I run a query",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2915,10 +2897,8 @@ window.__REPORT_DATA__ = {
             "text": "the connection is open and the query was logged",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -2950,10 +2930,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -2963,10 +2941,8 @@ window.__REPORT_DATA__ = {
             "text": "I have some coins in hand",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -2986,10 +2962,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3012,10 +2986,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3050,10 +3022,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -3063,7 +3033,6 @@ window.__REPORT_DATA__ = {
             "text": "I insert $2",
             "parts": []
           },
-          "status": "passed",
           "children": [
             {
               "phase": "when",
@@ -3081,10 +3050,8 @@ window.__REPORT_DATA__ = {
                   }
                 ]
               },
-              "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             },
@@ -3098,16 +3065,13 @@ window.__REPORT_DATA__ = {
                   }
                 ]
               },
-              "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3117,10 +3081,8 @@ window.__REPORT_DATA__ = {
             "text": "the coin is accepted",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3130,7 +3092,6 @@ window.__REPORT_DATA__ = {
             "text": "a coffee is dispensed",
             "parts": []
           },
-          "status": "passed",
           "children": [
             {
               "phase": "then",
@@ -3138,7 +3099,6 @@ window.__REPORT_DATA__ = {
                 "text": "the machine state is consistent",
                 "parts": []
               },
-              "status": "passed",
               "children": [],
               "attachments": [
                 {
@@ -3147,13 +3107,11 @@ window.__REPORT_DATA__ = {
                   "content_type": "json"
                 }
               ],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3189,10 +3147,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -3202,10 +3158,8 @@ window.__REPORT_DATA__ = {
             "text": "a loyalty card with 5 points",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3215,7 +3169,6 @@ window.__REPORT_DATA__ = {
             "text": "I place a large order",
             "parts": []
           },
-          "status": "passed",
           "children": [
             {
               "phase": "when",
@@ -3223,10 +3176,8 @@ window.__REPORT_DATA__ = {
                 "text": "I select 3 coffees",
                 "parts": []
               },
-              "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             },
@@ -3236,7 +3187,6 @@ window.__REPORT_DATA__ = {
                 "text": "I apply loyalty discount",
                 "parts": []
               },
-              "status": "passed",
               "children": [
                 {
                   "phase": "when",
@@ -3244,10 +3194,8 @@ window.__REPORT_DATA__ = {
                     "text": "the loyalty card is validated",
                     "parts": []
                   },
-                  "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null,
                   "activity_ids": [],
                   "fixture_name": null
                 },
@@ -3257,22 +3205,18 @@ window.__REPORT_DATA__ = {
                     "text": "the discount is calculated",
                     "parts": []
                   },
-                  "status": "passed",
                   "children": [],
                   "attachments": [],
-                  "error": null,
                   "activity_ids": [],
                   "fixture_name": null
                 }
               ],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3282,7 +3226,6 @@ window.__REPORT_DATA__ = {
             "text": "the order is processed correctly",
             "parts": []
           },
-          "status": "passed",
           "children": [
             {
               "phase": "then",
@@ -3290,10 +3233,8 @@ window.__REPORT_DATA__ = {
                 "text": "the coffee count is updated",
                 "parts": []
               },
-              "status": "passed",
               "children": [],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             },
@@ -3303,7 +3244,6 @@ window.__REPORT_DATA__ = {
                 "text": "the loyalty points are deducted",
                 "parts": []
               },
-              "status": "passed",
               "children": [
                 {
                   "phase": "then",
@@ -3311,7 +3251,6 @@ window.__REPORT_DATA__ = {
                     "text": "the remaining points are valid",
                     "parts": []
                   },
-                  "status": "passed",
                   "children": [],
                   "attachments": [
                     {
@@ -3320,19 +3259,16 @@ window.__REPORT_DATA__ = {
                       "content_type": "json"
                     }
                   ],
-                  "error": null,
                   "activity_ids": [],
                   "fixture_name": null
                 }
               ],
               "attachments": [],
-              "error": null,
               "activity_ids": [],
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3342,7 +3278,6 @@ window.__REPORT_DATA__ = {
             "text": "the machine state is consistent",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -3351,7 +3286,6 @@ window.__REPORT_DATA__ = {
               "content_type": "json"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3386,10 +3320,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -3399,10 +3331,8 @@ window.__REPORT_DATA__ = {
             "text": "a machine that has sold its last coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3412,10 +3342,8 @@ window.__REPORT_DATA__ = {
             "text": "a customer tries to buy a coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3425,10 +3353,8 @@ window.__REPORT_DATA__ = {
             "text": "the machine reports it is sold out",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3466,10 +3392,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -3479,10 +3403,8 @@ window.__REPORT_DATA__ = {
             "text": "a loyalty card good for a $1 discount",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3492,10 +3414,8 @@ window.__REPORT_DATA__ = {
             "text": "I buy a coffee with the discount",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3505,10 +3425,8 @@ window.__REPORT_DATA__ = {
             "text": "I pay $1",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3518,10 +3436,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee is dispensed",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3545,7 +3461,7 @@ window.__REPORT_DATA__ = {
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 65,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -3553,10 +3469,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -3566,10 +3480,8 @@ window.__REPORT_DATA__ = {
             "text": "the machine has 20 coffees",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3664,7 +3576,7 @@ window.__REPORT_DATA__ = {
           },
           {
             "path": "src/pytest_given/capture/decorators.py",
-            "lineno": 278,
+            "lineno": 330,
             "func": "wrapper",
             "code": "    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
@@ -3727,10 +3639,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -3750,10 +3660,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3773,10 +3681,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3847,10 +3753,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -3873,10 +3777,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3886,10 +3788,8 @@ window.__REPORT_DATA__ = {
             "text": "I brew the cup",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -3899,10 +3799,8 @@ window.__REPORT_DATA__ = {
             "text": "the machine has one fewer coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -3971,10 +3869,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -3997,10 +3893,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4010,10 +3904,8 @@ window.__REPORT_DATA__ = {
             "text": "the machine has one fewer coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4085,10 +3977,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -4111,10 +4001,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4124,10 +4012,8 @@ window.__REPORT_DATA__ = {
             "text": "the machine has one fewer coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4175,10 +4061,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -4188,10 +4072,8 @@ window.__REPORT_DATA__ = {
             "text": "the barista reaches for a takeaway cup",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4214,10 +4096,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4227,10 +4107,8 @@ window.__REPORT_DATA__ = {
             "text": "the machine has one fewer coffee",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
@@ -4277,10 +4155,8 @@ window.__REPORT_DATA__ = {
             "text": "a coffee machine",
             "parts": []
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": "machine"
         },
@@ -4300,7 +4176,6 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [
             {
@@ -4309,7 +4184,6 @@ window.__REPORT_DATA__ = {
               "column_id": "attachment:0"
             }
           ],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4332,10 +4206,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         },
@@ -4358,10 +4230,8 @@ window.__REPORT_DATA__ = {
               }
             ]
           },
-          "status": "passed",
           "children": [],
           "attachments": [],
-          "error": null,
           "activity_ids": [],
           "fixture_name": null
         }
