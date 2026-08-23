@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-22T10:05:48.825847+00:00",
+    "timestamp": "2026-08-23T11:20:19.362826+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "61850ce44505e79cc4482950cea0c01ba6b15151",
+    "commit_sha": "d116864a98a6f9749096faf97a631f862997bd85",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -2398,9 +2398,9 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_file_glossary.py::test_unrecognised_kind_value_raises",
+      "id": "tests/unit/capture/test_file_glossary.py::test_unrecognized_kind_value_raises",
       "narration": {
-        "text": "An unrecognised kind value is rejected",
+        "text": "An unrecognized kind value is rejected",
         "parts": []
       },
       "module": "tests.unit.capture.test_file_glossary",
@@ -2459,7 +2459,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a PytestGivenError names the unrecognised kind",
+            "text": "a PytestGivenError names the unrecognized kind",
             "parts": []
           },
           "status": "passed",
@@ -7655,7 +7655,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 61
+        "line": 62
       },
       "story_id": null,
       "activity_ids": []
@@ -7831,7 +7831,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 104
+        "line": 105
       },
       "story_id": null,
       "activity_ids": []
@@ -7963,7 +7963,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 121
+        "line": 122
       },
       "story_id": null,
       "activity_ids": []
@@ -8083,7 +8083,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 136
+        "line": 137
       },
       "story_id": null,
       "activity_ids": []
@@ -8213,7 +8213,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 152
+        "line": 153
       },
       "story_id": null,
       "activity_ids": []
@@ -8353,7 +8353,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 167
+        "line": 168
       },
       "story_id": null,
       "activity_ids": []
@@ -8469,7 +8469,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 182
+        "line": 183
       },
       "story_id": null,
       "activity_ids": []
@@ -8596,7 +8596,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 192
+        "line": 193
       },
       "story_id": null,
       "activity_ids": []
@@ -8732,7 +8732,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 207
+        "line": 208
       },
       "story_id": null,
       "activity_ids": []
@@ -8840,7 +8840,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 222
+        "line": 223
       },
       "story_id": null,
       "activity_ids": []
@@ -8946,7 +8946,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 237
+        "line": 238
       },
       "story_id": null,
       "activity_ids": []
@@ -9046,7 +9046,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 252
+        "line": 253
       },
       "story_id": null,
       "activity_ids": []
@@ -9151,7 +9151,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 271
+        "line": 272
       },
       "story_id": null,
       "activity_ids": []
@@ -9258,7 +9258,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 296
+        "line": 297
       },
       "story_id": null,
       "activity_ids": []
@@ -9389,7 +9389,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 321
+        "line": 322
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -9533,7 +9533,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 334
+        "line": 335
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -9668,7 +9668,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 348
+        "line": 349
       },
       "story_id": null,
       "activity_ids": []
@@ -9780,7 +9780,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 365
+        "line": 366
       },
       "story_id": null,
       "activity_ids": []
@@ -9913,7 +9913,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 383
+        "line": 384
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -10036,7 +10036,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 398
+        "line": 399
       },
       "story_id": null,
       "activity_ids": []
@@ -10183,7 +10183,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 415
+        "line": 416
       },
       "story_id": null,
       "activity_ids": []
@@ -10270,7 +10270,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 435
+        "line": 436
       },
       "story_id": null,
       "activity_ids": []
@@ -10404,7 +10404,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 447
+        "line": 448
       },
       "story_id": null,
       "activity_ids": []
@@ -10493,7 +10493,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 493
+        "line": 494
       },
       "story_id": null,
       "activity_ids": []
@@ -10624,7 +10624,499 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 563
+        "line": 564
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_story.py::test_file_glossary_declared_kind_in_wrong_slot_raises",
+      "narration": {
+        "text": "A declared work object in a verb slot is rejected at construction",
+        "parts": [
+          {
+            "value": "A declared "
+          },
+          {
+            "term_id": "work-object",
+            "display": "work object",
+            "expression": "pg[\"Work Object\"].low",
+            "param_column": null
+          },
+          {
+            "value": " in a "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low",
+            "param_column": null
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          },
+          {
+            "value": " is rejected at construction"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_story",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a File glossary declaring Room a work object",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "file-glossary",
+                "display": "File glossary",
+                "expression": "pg[\"File glossary\"]",
+                "param_column": null
+              },
+              {
+                "value": " declaring Room a work object"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Room is placed in the verb slot",
+            "parts": [
+              {
+                "value": "Room is placed in the "
+              },
+              {
+                "term_id": "verb",
+                "display": "verb",
+                "expression": "pg[\"Verb\"].low",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "slot",
+                "display": "slot",
+                "expression": "pg[\"Slot\"].low",
+                "param_column": null
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError names the term and its declared kind",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_story.py",
+        "line": 656
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_story.py::test_slot_error_message_stays_compact",
+      "narration": {
+        "text": "A slot error names the term, not its repr",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          },
+          {
+            "value": " error names the "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": ", not its repr"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_story",
+      "tags": [
+        "diagnostics"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Guest actor",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "guest"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Room work object",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "room"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a search verb",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "search"
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a work object is placed in the verb slot",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "work-object",
+                "display": "work object",
+                "expression": "pg[\"Work Object\"].low",
+                "param_column": null
+              },
+              {
+                "value": " is placed in the "
+              },
+              {
+                "term_id": "verb",
+                "display": "verb",
+                "expression": "pg[\"Verb\"].low",
+                "param_column": null
+              },
+              {
+                "value": " slot"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the message names the term without dumping the glossary",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the message is short and free of dataclass reprs",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_story.py",
+        "line": 682
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_story.py::test_kindless_term_is_accepted_in_either_slot",
+      "narration": {
+        "text": "A kindless term stays valid in any slot",
+        "parts": [
+          {
+            "value": "A kindless "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low",
+            "param_column": null
+          },
+          {
+            "value": " stays valid in any "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].low",
+            "param_column": null
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_story",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Kindless Term declared with g(...)",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "kindless",
+                "display": "Kindless",
+                "expression": "pg[\"Kindless\"]",
+                "param_column": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]",
+                "param_column": null
+              },
+              {
+                "value": " declared with g(...)"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "it is placed in a node slot and a verb slot",
+            "parts": [
+              {
+                "value": "it is placed in a node "
+              },
+              {
+                "term_id": "slot",
+                "display": "slot",
+                "expression": "pg[\"Slot\"].low",
+                "param_column": null
+              },
+              {
+                "value": " and a verb slot"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "both paths construct, leaving the kind to inference",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_story.py",
+        "line": 703
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_story.py::test_non_handle_part_names_its_type",
+      "narration": {
+        "text": "A non-handle activity part names its type",
+        "parts": [
+          {
+            "value": "A non-handle "
+          },
+          {
+            "term_id": "activity-part",
+            "display": "activity part",
+            "expression": "pg[\"Activity Part\"].low",
+            "param_column": null
+          },
+          {
+            "value": " names its type"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_story",
+      "tags": [
+        "validation",
+        "diagnostics"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Guest actor",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "guest"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Room work object",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": "room"
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "an int is passed where a verb handle belongs",
+            "parts": [
+              {
+                "value": "an int is passed where a "
+              },
+              {
+                "term_id": "verb",
+                "display": "verb",
+                "expression": "pg[\"Verb\"].low",
+                "param_column": null
+              },
+              {
+                "value": " handle belongs"
+              }
+            ]
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError names the offending type and the path",
+            "parts": []
+          },
+          "status": "passed",
+          "children": [],
+          "attachments": [],
+          "error": null,
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_story.py",
+        "line": 718
       },
       "story_id": null,
       "activity_ids": []
@@ -12772,7 +13264,7 @@
     {
       "id": "tests/unit/report/test_aggregations.py::test_build_activity_labels_joins_parts_into_prose",
       "narration": {
-        "text": "An Activity is labelled by the prose of its paths",
+        "text": "An Activity is labeled by the prose of its paths",
         "parts": [
           {
             "value": "An "
@@ -12784,7 +13276,7 @@
             "param_column": null
           },
           {
-            "value": " is labelled by the prose of its "
+            "value": " is labeled by the prose of its "
           },
           {
             "term_id": "path",
@@ -14929,7 +15421,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -15026,10 +15518,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the page carries one generated colour rule per column, after the stylesheet so a term ref bound to a column takes the column ink",
+            "text": "the page carries one generated color rule per column, after the stylesheet so a term ref bound to a column takes the column ink",
             "parts": [
               {
-                "value": "the page carries one generated colour rule per column, after the stylesheet so a term ref bound to a column takes the column ink"
+                "value": "the page carries one generated color rule per column, after the stylesheet so a term ref bound to a column takes the column ink"
               }
             ]
           },
@@ -18907,7 +19399,7 @@
         "id": "actor",
         "kind": null,
         "canonical": "Actor",
-        "definition": "A glossary term for a participant in the domain (e.g., *Guest*). Carries the actor kind colour: a wash in narration, a pill in the Glossary view.",
+        "definition": "A glossary term for a participant in the domain (e.g., *Guest*). Carries the actor kind color: a wash in narration, a pill in the Glossary view.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 69
@@ -18917,7 +19409,7 @@
         "id": "work-object",
         "kind": null,
         "canonical": "Work Object",
-        "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*). Carries the work-object kind colour: a wash in narration, a pill in the Glossary view.",
+        "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*). Carries the work-object kind color: a wash in narration, a pill in the Glossary view.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 70
@@ -18937,7 +19429,7 @@
         "id": "term-ref",
         "kind": null,
         "canonical": "Term ref",
-        "definition": "An occurrence of a term inside narration. Modelled as `NarrationTermRef` in step text and as `ActivityTermRef` inside activity prose.",
+        "definition": "An occurrence of a term inside narration. Modeled as `NarrationTermRef` in step text and as `ActivityTermRef` inside activity prose.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 72
@@ -18967,7 +19459,7 @@
         "id": "story",
         "kind": "object",
         "canonical": "Story",
-        "definition": "A named flow modelled as a sequence of activities. Constructed by `story('Title', [activity(...), ...])`. Stories are first-class report tabs and the unit of coverage.",
+        "definition": "A named flow modeled as a sequence of activities. Constructed by `story('Title', [activity(...), ...])`. Stories are first-class report tabs and the unit of coverage.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 75

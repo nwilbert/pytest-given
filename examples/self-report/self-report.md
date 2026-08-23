@@ -234,8 +234,8 @@
 - **when** the «File glossary» parses the kind
 - **then** it normalizes to the «Work Object» kind
 
-## ✓ An unrecognised kind value is rejected
-`tests/unit/capture/test_file_glossary.py:176::test_unrecognised_kind_value_raises` · diagnostics, validation
+## ✓ An unrecognized kind value is rejected
+`tests/unit/capture/test_file_glossary.py:176::test_unrecognized_kind_value_raises` · diagnostics, validation
 
 - **given** a glossary whose Kind cell holds an unknown value
   - 📎 Glossary file:
@@ -245,7 +245,7 @@
     | Guest | x | Wizard |
     ```
 - **when** the «File glossary» loads the file
-- **then** a PytestGivenError names the unrecognised kind
+- **then** a PytestGivenError names the unrecognized kind
 
 ## ✓ A missing «glossary» file is reported clearly
 `tests/unit/capture/test_file_glossary.py:196::test_missing_file_raises` · validation
@@ -763,7 +763,7 @@
 - **then** the sub-action is a child of the action and the then still follows
 
 ## ✓ An «actor» handle in a «path» becomes a «term ref»
-`tests/unit/capture/test_story.py:61::test_path_dispatches_actor_to_activity_term_ref`
+`tests/unit/capture/test_story.py:62::test_path_dispatches_actor_to_activity_term_ref`
 
 - **given** a Guest actor
 - **given** a search verb
@@ -772,7 +772,7 @@
 - **then** the «Actor» slot becomes a «Term ref»
 
 ## ✓ An inflected «verb» keeps its «term» identity but shows the «inflection»
-`tests/unit/capture/test_story.py:104::test_path_dispatches_inflected_verb_to_activity_term_ref_with_inflected_display`
+`tests/unit/capture/test_story.py:105::test_path_dispatches_inflected_verb_to_activity_term_ref_with_inflected_display`
 
 - **given** a Guest actor
 - **given** a search verb
@@ -782,7 +782,7 @@
 - **then** the «Term ref» shows the inflection over the same «Verb»
 
 ## ✓ A bare string in a «path» becomes a connective word
-`tests/unit/capture/test_story.py:121::test_path_dispatches_bare_string_to_activity_word`
+`tests/unit/capture/test_story.py:122::test_path_dispatches_bare_string_to_activity_word`
 
 - **given** a Guest actor
 - **given** a search verb
@@ -791,7 +791,7 @@
 - **then** the bare word becomes an «Activity Part» word, not a «Term ref»
 
 ## ✓ A «path» needs at least an «actor», a «verb» and a node
-`tests/unit/capture/test_story.py:136::test_path_rejects_path_with_fewer_than_three_parts` · validation
+`tests/unit/capture/test_story.py:137::test_path_rejects_path_with_fewer_than_three_parts` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -799,7 +799,7 @@
 - **then** a PytestGivenError rejects it as too short
 
 ## ✓ Position 0 of a «path» must be an «actor»
-`tests/unit/capture/test_story.py:152::test_path_rejects_work_object_in_position_0` · validation
+`tests/unit/capture/test_story.py:153::test_path_rejects_work_object_in_position_0` · validation
 
 - **given** a search verb
 - **given** a Room work object
@@ -807,7 +807,7 @@
 - **then** a PytestGivenError says position 0 is the «Actor» slot
 
 ## ✓ A «verb» cannot open a «path»
-`tests/unit/capture/test_story.py:167::test_path_rejects_verb_in_position_0` · validation
+`tests/unit/capture/test_story.py:168::test_path_rejects_verb_in_position_0` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -816,7 +816,7 @@
 - **then** a PytestGivenError says position 0 is the «Actor» slot
 
 ## ✓ A bare string may stand in for the «actor» «slot»
-`tests/unit/capture/test_story.py:182::test_path_allows_bare_string_in_position_0`
+`tests/unit/capture/test_story.py:183::test_path_allows_bare_string_in_position_0`
 
 - **given** a search verb
 - **given** a Room work object
@@ -824,7 +824,7 @@
 - **then** it is accepted as an «Activity Part» word
 
 ## ✓ Position 1 of a «path» must be a «verb»
-`tests/unit/capture/test_story.py:192::test_path_rejects_actor_in_position_1` · validation
+`tests/unit/capture/test_story.py:193::test_path_rejects_actor_in_position_1` · validation
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -832,7 +832,7 @@
 - **then** a PytestGivenError says position 1 is the «Verb» slot
 
 ## ✓ A «work object» cannot fill the «verb» «slot»
-`tests/unit/capture/test_story.py:207::test_path_rejects_work_object_in_position_1` · validation
+`tests/unit/capture/test_story.py:208::test_path_rejects_work_object_in_position_1` · validation
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -840,7 +840,7 @@
 - **then** a PytestGivenError says position 1 is the «Verb» slot
 
 ## ✓ Position 2 of a «path» must be a noun
-`tests/unit/capture/test_story.py:222::test_path_rejects_verb_in_position_2` · validation
+`tests/unit/capture/test_story.py:223::test_path_rejects_verb_in_position_2` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -848,7 +848,7 @@
 - **then** a PytestGivenError says position 2 is the noun slot
 
 ## ✓ A bare «verb» may sit between two real entity nodes
-`tests/unit/capture/test_story.py:237::test_path_allows_bare_verb_between_term_nodes`
+`tests/unit/capture/test_story.py:238::test_path_allows_bare_verb_between_term_nodes`
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -856,28 +856,28 @@
 - **then** the entities are term refs and the verb stays a bare word
 
 ## ✓ A «path» may be fully bare words
-`tests/unit/capture/test_story.py:252::test_path_allows_fully_bare_path`
+`tests/unit/capture/test_story.py:253::test_path_allows_fully_bare_path`
 
 - **given** three plain words with no glossary handles
 - **when** a «Path» is built from them
 - **then** every part is an «Activity Part» word
 
 ## ✓ Node/edge alternation allows a trailing connective node
-`tests/unit/capture/test_story.py:271::test_path_allows_node_edge_alternation_with_connective`
+`tests/unit/capture/test_story.py:272::test_path_allows_node_edge_alternation_with_connective`
 
 - **given** an «Actor», a «Verb», a «Work Object» and a second actor
 - **when** they form a five-part «Path» joined by a connective
 - **then** even positions are term-ref nodes and the connective stays a word
 
 ## ✓ A «path» may not end on a dangling edge
-`tests/unit/capture/test_story.py:296::test_path_rejects_dangling_edge` · validation
+`tests/unit/capture/test_story.py:297::test_path_rejects_dangling_edge` · validation
 
 - **given** an «Actor», «Verb» and «Work Object» plus a connective
 - **when** a path ending on a connective edge is built
 - **then** a PytestGivenError rejects the dangling edge
 
 ## ✓ A single-path «activity» synthesizes one «path»
-`tests/unit/capture/test_story.py:321::test_activity_single_path_synthesizes_one_path`
+`tests/unit/capture/test_story.py:322::test_activity_single_path_synthesizes_one_path`
 
 - **given** a Guest actor
 - **given** a search verb
@@ -886,7 +886,7 @@
 - **then** it wraps a single «Path»
 
 ## ✓ An «activity» may branch into multiple «paths»
-`tests/unit/capture/test_story.py:334::test_activity_multi_path_accepts_multiple_paths`
+`tests/unit/capture/test_story.py:335::test_activity_multi_path_accepts_multiple_paths`
 
 - **given** a Guest actor
 - **given** a search verb
@@ -896,7 +896,7 @@
 - **then** the activity carries both paths
 
 ## ✓ Mixing loose parts and prebuilt «paths» is rejected
-`tests/unit/capture/test_story.py:348::test_activity_mixing_parts_and_paths_raises` · validation
+`tests/unit/capture/test_story.py:349::test_activity_mixing_parts_and_paths_raises` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -906,7 +906,7 @@
 - **then** a PytestGivenError rejects the mix
 
 ## ✓ «Activity» id 0 is reserved
-`tests/unit/capture/test_story.py:365::test_activity_explicit_id_zero_raises` · validation
+`tests/unit/capture/test_story.py:366::test_activity_explicit_id_zero_raises` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -915,7 +915,7 @@
 - **then** a PytestGivenError says activity_id=0 is reserved
 
 ## ✓ A «story» auto-numbers its «activities» from one
-`tests/unit/capture/test_story.py:383::test_story_auto_numbers_activities_from_one`
+`tests/unit/capture/test_story.py:384::test_story_auto_numbers_activities_from_one`
 
 - **given** a Guest actor
 - **given** a search verb
@@ -924,7 +924,7 @@
 - **then** the activities are numbered 1 and 2
 
 ## ✓ Auto-numbering skips ids already taken explicitly
-`tests/unit/capture/test_story.py:398::test_story_auto_numbering_skips_taken_explicit_ids`
+`tests/unit/capture/test_story.py:399::test_story_auto_numbering_skips_taken_explicit_ids`
 
 - **given** a Guest actor
 - **given** a search verb
@@ -934,7 +934,7 @@
 - **then** auto picks skip the ids already used explicitly
 
 ## ✓ Duplicate «activity» ids in a «story» are rejected
-`tests/unit/capture/test_story.py:415::test_story_rejects_duplicate_activity_ids` · validation
+`tests/unit/capture/test_story.py:416::test_story_rejects_duplicate_activity_ids` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -944,14 +944,14 @@
 - **then** a PytestGivenError reports the duplicate activity id
 
 ## ✓ A «story» derives its id from its title
-`tests/unit/capture/test_story.py:435::test_story_derives_id_from_title`
+`tests/unit/capture/test_story.py:436::test_story_derives_id_from_title`
 
 - **given** a human-readable story title
 - **when** a «Story» is built from it
 - **then** its id is the slugified title
 
 ## ✓ A «story» may span only one «glossary»
-`tests/unit/capture/test_story.py:447::test_story_rejects_two_glossaries` · validation
+`tests/unit/capture/test_story.py:448::test_story_rejects_two_glossaries` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -961,18 +961,50 @@
 - **then** a PytestGivenError says a story spans multiple glossaries
 
 ## ✓ Two «stories» with the same id collide
-`tests/unit/capture/test_story.py:493::test_story_id_collision_raises_with_both_sites` · validation
+`tests/unit/capture/test_story.py:494::test_story_id_collision_raises_with_both_sites` · validation
 
 - **given** a «Story» already declared under an id
 - **when** a second story is declared with the same slug
 - **then** a PytestGivenError reports the id was already declared
 
 ## ✓ A «path» may chain a second verb-object pair
-`tests/unit/capture/test_story.py:563::test_path_allows_second_verb_edge`
+`tests/unit/capture/test_story.py:564::test_path_allows_second_verb_edge`
 
 - **given** an «Actor», two «Verb» and two «Work Object» handles
 - **when** they form a five-node «Path» (actor verb object verb object)
 - **then** every slot is a «Term ref», with no bare words
+
+## ✓ A declared «work object» in a «verb» «slot» is rejected at construction
+`tests/unit/capture/test_story.py:656::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
+
+- **given** a «File glossary» declaring Room a work object
+- **when** Room is placed in the «verb» «slot»
+- **then** a PytestGivenError names the term and its declared kind
+
+## ✓ A «slot» error names the «term», not its repr
+`tests/unit/capture/test_story.py:682::test_slot_error_message_stays_compact` · diagnostics
+
+- **given** a Guest actor
+- **given** a Room work object
+- **given** a search verb
+- **when** a «work object» is placed in the «verb» slot
+- **then** the message names the term without dumping the glossary
+- **then** the message is short and free of dataclass reprs
+
+## ✓ A kindless «term» stays valid in any «slot»
+`tests/unit/capture/test_story.py:703::test_kindless_term_is_accepted_in_either_slot` · validation
+
+- **given** a «Kindless» «Term» declared with g(...)
+- **when** it is placed in a node «slot» and a verb slot
+- **then** both paths construct, leaving the kind to inference
+
+## ✓ A non-handle «activity part» names its type
+`tests/unit/capture/test_story.py:718::test_non_handle_part_names_its_type` · validation, diagnostics
+
+- **given** a Guest actor
+- **given** a Room work object
+- **when** an int is passed where a «verb» handle belongs
+- **then** a PytestGivenError names the offending type and the path
 
 ## ✓ A Template parses a bare placeholder
 `tests/unit/capture/test_template.py:36::test_template_parses_single_placeholder` · parametrization
@@ -1222,7 +1254,7 @@
 - **when** the story rollups are built
 - **then** only the anchored «Activity» is «Coverage»-eligible
 
-## ✓ An «Activity» is labelled by the prose of its «paths»
+## ✓ An «Activity» is labeled by the prose of its «paths»
 `tests/unit/report/test_aggregations.py:873::test_build_activity_labels_joins_parts_into_prose`
 
 - **given** a «Story» with a two-«path» «activity»
@@ -1342,7 +1374,7 @@
 - **given** a «Report» holding a «Parametrized scenario» with a «Parameter table»
 - **when** the «Renderer» renders the HTML page
 - **then** «Parameter coloring» classes mark the grouped placeholder and the table headers
-- **then** the page carries one generated colour rule per column, after the stylesheet so a term ref bound to a column takes the column ink
+- **then** the page carries one generated color rule per column, after the stylesheet so a term ref bound to a column takes the column ink
 
 ## ✓ A passed «scenario» renders as a checked heading with «step» bullets
 `tests/unit/report/test_md_renderer.py:46::test_passed_scenario_heading_and_steps`
