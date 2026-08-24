@@ -105,6 +105,12 @@ def test_no_private_imports(imports):
 - **Intra-package relative imports.** `must_not_import(internal(), via='absolute')` fires when any module inside `pytest_given` absolutely imports any other module that resolves under the configured source roots. This is the upstream README's documented idiom for "all internal imports must be relative" and is strictly stronger than the original `descendants('pytest_given')` formulation: it also catches a bare absolute import of the root package (`import pytest_given`) from within. `scope('pytest_given')` covers the whole source tree uniformly; `tests/` is excluded because we have a `src/` layout (see Configuration in the upstream README), preserving the existing test-side convention of absolute imports.
 - **No private imports.** `project()` scopes globally. With our `src/` layout, `project()` covers only `src/pytest_given/` and excludes `tests/`. The codebase currently has zero `_foo` imports; the rule acts as a forward-looking guard.
 
+### TODO: external-dependency rules
+
+The four rules above are all internal-facing — they say which *first-party* modules may import which. Nothing here covers which **third-party** packages a subpackage may import, and there is at least one such rule worth enforcing: `report/`, `lint/`, `grouping/` and `model/` do not import `pytest`. That is what lets them be exercised without a pytest session, and what forces `plugin.py` to resolve options into plain shapes (`SinkConfig`, plain module objects) before calling in — but it is convention only today.
+
+When implementing this spec, add that rule, and sweep the other external dependencies for the same question rather than stopping at `pytest`: `jinja2` and `markupsafe` are confined to `report/` (in fact to `html_renderer.py` and `inline_markdown.py`), and `model/` currently imports no third-party package at all. Whether `must_not_import('pytest')` works against a package outside the source roots needs checking — every target helper used above (`descendants`, `internal`, `project`) is internal-facing.
+
 ## `plugin.py` / `__init__.py` import-style change
 
 **Already landed in commit `9163e42`** as a standalone refactor on `main`:

@@ -28,6 +28,7 @@ from .config import (
     parse_rule_levels,
 )
 from .runtime_rules import run_runtime_rules
+from .summary import error_count, summary_rows, summary_title
 
 __all__ = [
     'LEVELS',
@@ -40,8 +41,11 @@ __all__ = [
     'RuleId',
     'Surface',
     'apply_config',
+    'error_count',
     'parse_ignore_entries',
     'parse_rule_levels',
     'run_ast_rules',
     'run_runtime_rules',
+    'summary_rows',
+    'summary_title',
 ]

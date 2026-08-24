@@ -4,7 +4,6 @@ import contextlib
 import copy
 import functools
 import inspect
-import json
 import time
 from collections.abc import Callable, Generator
 from dataclasses import dataclass
@@ -19,24 +18,21 @@ from _pytest.fixtures import SubRequest
 
 from .capture import (
     Collector,
-    FileGlossary,
     FixtureInstanceKey,
     ScenarioDecorator,
     StepDecorated,
     StepDescriptor,
     Template,
-    clear_story_registry,
-    current_rootdir,
+    begin_capture_session,
+    capture_snapshot,
     filter_internal_frames,
     get_active_collector,
     infer_glossary_kinds,
     item_source,
     parse_short_repr,
-    restore_rootdir,
-    restore_story_registry,
+    resolve_glossary,
+    restore_capture_state,
     set_active_collector,
-    set_rootdir,
-    snapshot_story_registry,
 )
 from .grouping import group_parametrized
 from .lint import (
@@ -45,10 +41,13 @@ from .lint import (
     Level,
     RuleId,
     apply_config,
+    error_count,
     parse_ignore_entries,
     parse_rule_levels,
     run_ast_rules,
     run_runtime_rules,
+    summary_rows,
+    summary_title,
 )
 from .model import (
     FixtureRecording,
@@ -67,10 +66,13 @@ from .model import (
     report_to_dict,
 )
 from .report import (
+    RenderedSinks,
+    SinkConfig,
     detect_commit_sha,
-    render_html_string,
-    render_md,
+    discard_stale_sinks,
+    render_sinks,
     resolve_template,
+    write_sinks,
 )
 
 _collector_key: pytest.StashKey[Collector] = pytest.StashKey()
@@ -261,17 +263,12 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
     clearing at sessionstart would leave the outer session's registrations
     visible (spurious `already declared` collisions) and let the nested run's
     own registrations leak back into the outer session."""
-    # The active-collector ContextVar is process-global too: a nested run's
-    # per-test teardown clears it, so remember the outer session's value (the
-    # scenario mid-flight when the nested run began, if any) to restore it.
-    displaced_rootdir = current_rootdir()
-    displaced_stories = snapshot_story_registry()
-    displaced_collector = get_active_collector()
+    displaced = capture_snapshot()
 
-    def restore_displaced_globals() -> None:
-        """Put back the module-global state this config displaced, so a nested
-        in-process run (pytester, `pytest.main`) leaves the outer session's
-        state as it found it.
+    def restore_displaced_state() -> None:
+        """Put back the process-global capture state this config displaced, so
+        a nested in-process run (pytester, `pytest.main`) leaves the outer
+        session's as it found it.
 
         A config cleanup rather than `pytest_unconfigure`: pytest drains the
         cleanup stack from `Config._ensure_unconfigure` whether or not the run
@@ -282,16 +279,13 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
         recorded afterwards would capture `source=None`, silently taking the
         lint's whole AST-rule surface down with it.
 
-        Registered only once all three values are in hand, so a run that
-        aborted before this point has nothing to restore.
+        Registered only once the snapshot is in hand, so a run that aborted
+        before this point has nothing to restore.
         """
-        restore_rootdir(displaced_rootdir)
-        restore_story_registry(displaced_stories)
-        set_active_collector(displaced_collector)
+        restore_capture_state(displaced)
 
-    early_config.add_cleanup(restore_displaced_globals)
-    set_rootdir(Path(early_config.rootpath))
-    clear_story_registry()
+    early_config.add_cleanup(restore_displaced_state)
+    begin_capture_session(Path(early_config.rootpath))
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
@@ -826,8 +820,7 @@ class _SessionReport:
     scenarios: list[Scenario]
     glossary: Glossary | None
     stories: list[Story]
-    files: list[tuple[Path, str]]
-    md_stdout: str | None
+    sinks: RenderedSinks
 
 
 def pytest_sessionfinish(session: pytest.Session) -> None:
@@ -853,7 +846,7 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         built = _build_report(session, collector)
     except PytestGivenError as error:
         session.config.stash[_report_error_message] = '\n'.join(
-            [str(error), *_discard_stale_sinks(session.config)]
+            [str(error), *discard_stale_sinks(_sink_config(session.config))]
         )
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
         return
@@ -861,11 +854,9 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         # Every way out drops the captured parametrize values: they are read
         # only here, and a nested in-process run must not inherit them.
         collector.param_info.clear()
-    for path, text in built.files:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding='utf-8')
-    if built.md_stdout is not None:
-        session.config.stash[_md_stdout] = built.md_stdout
+    write_sinks(built.sinks)
+    if built.sinks.md_stdout is not None:
+        session.config.stash[_md_stdout] = built.sinks.md_stdout
     _run_lint(session, built.scenarios, built.glossary, built.stories)
 
 
@@ -874,7 +865,7 @@ def _build_report(session: pytest.Session, collector: Collector) -> _SessionRepo
     touches the filesystem."""
     scenarios = group_parametrized(collector.scenarios, collector.param_info)
     stories = list(collector._discovered_stories.values())
-    glossary = _resolve_glossary(stories, session)
+    glossary = resolve_glossary(stories, session.config.pluginmanager.get_plugins())
     if glossary is not None:
         glossary = infer_glossary_kinds(glossary, stories)
     report = ReportData(
@@ -892,69 +883,34 @@ def _build_report(session: pytest.Session, collector: Collector) -> _SessionRepo
     )
     report_dict = report_to_dict(report)
     rendered = report_from_dict(report_dict)  # serde round-trip = fidelity guarantee
-    files, md_stdout = _render_sinks(session.config, rendered, report_dict)
+    sinks = render_sinks(rendered, report_dict, _sink_config(session.config))
     return _SessionReport(
         scenarios=scenarios,
         glossary=glossary,
         stories=stories,
-        files=files,
-        md_stdout=md_stdout,
+        sinks=sinks,
     )
 
 
-def _render_sinks(
-    config: pytest.Config, report: ReportData, report_dict: dict[str, Any]
-) -> tuple[list[tuple[Path, str]], str | None]:
-    """The configured sinks rendered to text, plus the Markdown bound for
-    stdout when `--given-md` was given bare."""
-    files: list[tuple[Path, str]] = []
-    json_opt = config.getoption('given_json')
-    if json_opt is not None:
-        files.append((Path(json_opt), json.dumps(report_dict, indent=2)))
-    html_opt = config.getoption('given_html')
-    if html_opt is not None:
-        files.append(
-            (
-                Path(html_opt),
-                render_html_string(report, source_link_template=_source_link(config)),
-            )
-        )
-    md_stdout: str | None = None
-    md_opt = config.getoption('given_md')
-    if md_opt is not None:
-        md = render_md(report)
-        if md_opt == '-':
-            md_stdout = md
-        else:
-            files.append((Path(md_opt), md))
-    return files, md_stdout
+def _sink_config(config: pytest.Config) -> SinkConfig:
+    """This run's sink options, resolved into the pytest-free shape `report/`
+    reads.
 
-
-def _source_link(config: pytest.Config) -> str | None:
-    """The template `pytest_configure` resolved. Only an HTML run resolves one,
-    and only an HTML run asks for it."""
-    return config.stash[_source_link_template]
-
-
-def _discard_stale_sinks(config: pytest.Config) -> list[str]:
-    """Delete the sinks this run would have written, and say which.
-
-    Writing no report leaves the *previous* run's report in place, where it
-    reads as current — the one outcome worse than no report at all. Only the
-    paths this run was told to write are touched, and each was going to be
-    overwritten anyway.
+    The source-link template is the one `pytest_configure` already resolved —
+    only an HTML run resolves one, and only an HTML run asks for it.
     """
-    removed = []
-    for option in ('given_json', 'given_html', 'given_md'):
-        value = config.getoption(option)
-        if value is None or value == '-':
-            continue
-        path = Path(value)
-        if not path.is_file():
-            continue
-        path.unlink()
-        removed.append(f'Removed the previous {path} — it would read as current.')
-    return removed
+    md_opt = config.getoption('given_md')
+    json_opt = config.getoption('given_json')
+    html_opt = config.getoption('given_html')
+    return SinkConfig(
+        json_path=Path(json_opt) if json_opt is not None else None,
+        html_path=Path(html_opt) if html_opt is not None else None,
+        md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
+        md_to_stdout=md_opt == '-',
+        source_link_template=(
+            config.stash[_source_link_template] if html_opt is not None else None
+        ),
+    )
 
 
 def _run_lint(
@@ -988,83 +944,14 @@ def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
         terminalreporter.line(report_error)
     findings = terminalreporter.config.stash.get(_lint_findings, [])
     if findings:
-        errors = sum(1 for f in findings if f.severity == 'error')
-        title = (
-            f'pytest-given: narration lint '
-            f'({_count(len(findings), "finding")}, {_count(errors, "error")})'
-        )
+        errors = error_count(findings)
+        title = summary_title(findings)
         terminalreporter.write_sep('=', title, red=errors > 0, yellow=errors == 0)
-        rule_width = max(len(f.rule) for f in findings)
-        subject_width = max(len(f.subject) for f in findings)
-        for f in findings:
-            terminalreporter.line(
-                f'{f.severity.upper():<5} {f.rule:<{rule_width}}  '
-                f'{f.subject:<{subject_width}}  {f.message}'
-            )
+        for row in summary_rows(findings):
+            terminalreporter.line(row)
     md = terminalreporter.config.stash.get(_md_stdout, None)
     if md is not None:
         terminalreporter.write_line('<!-- pytest-given:md:start -->')
         for line in md.splitlines():
             terminalreporter.write_line(line)
         terminalreporter.write_line('<!-- pytest-given:md:end -->')
-
-
-def _count(n: int, noun: str) -> str:
-    return f'{n} {noun}' if n == 1 else f'{n} {noun}s'
-
-
-def _resolve_glossary(stories: list[Story], session: pytest.Session) -> Glossary | None:
-    """Pick the Glossary for the report.
-
-    1. If any collected story references a Glossary, read it straight off the
-       story tree — `story()` stashes the owning Glossary object(s) there at
-       construction time. This is deterministic: it depends only on the live
-       Story objects we were handed, not on any mutable session-global that
-       could be cleared per-test or shared across the process. (The stash is a
-       side-channel that does not survive JSON, but resolution runs on the live
-       in-memory stories, never on deserialized ones — the renderer reads the
-       serialized `glossary` field instead.)
-    2. With no stories (or stories that reference no glossary), fall back to a
-       conftest scan — that catches the case where the user declares a Glossary
-       at conftest level but only uses term refs in narrations (no stories yet).
-    """
-    reaching: dict[int, Glossary] = {}
-    for story in stories:
-        reaching.update(story._glossaries)
-    if len(reaching) > 1:
-        raise PytestGivenError(
-            f'stories reach {len(reaching)} distinct Glossary instances; '
-            f'v1 supports at most one.'
-        )
-    if reaching:
-        return next(iter(reaching.values()))
-    return _scan_conftests_for_glossary(session)
-
-
-def _scan_conftests_for_glossary(session: pytest.Session) -> Glossary | None:
-    """Scan registered conftest plugins for Glossary instances."""
-    found: list[tuple[str, Glossary]] = []
-    for plugin_obj in session.config.pluginmanager.get_plugins():
-        plugin_file = getattr(plugin_obj, '__file__', None)
-        if plugin_file is None or Path(plugin_file).name != 'conftest.py':
-            continue
-        for attr_name in dir(plugin_obj):
-            attr = getattr(plugin_obj, attr_name, None)
-            if isinstance(attr, FileGlossary):
-                found.append((plugin_file, attr.glossary))
-            elif isinstance(attr, Glossary):
-                found.append((plugin_file, attr))
-    distinct: dict[int, tuple[str, Glossary]] = {}
-    for fpath, g in found:
-        distinct.setdefault(id(g), (fpath, g))
-    if len(distinct) > 1:
-        details = ', '.join(
-            f'{fpath} ({len(g.terms)} term(s))' for fpath, g in distinct.values()
-        )
-        raise PytestGivenError(
-            f'multiple Glossary instances found in conftests ({len(distinct)}): '
-            f'{details}. v1 supports at most one glossary per suite.'
-        )
-    if distinct:
-        return next(iter(distinct.values()))[1]
-    return None

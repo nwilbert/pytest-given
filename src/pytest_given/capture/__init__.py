@@ -15,29 +15,33 @@ from .decorators import (
     when,
     when_then,
 )
+from .discovery import resolve_glossary
 from .file_glossary import FileGlossary
 from .glossary import Glossary
 from .kind_inference import infer_glossary_kinds
+from .process_state import (
+    CaptureState,
+    begin_capture_session,
+    capture_snapshot,
+    restore_capture_state,
+)
 from .source import (
     capture_caller_source,
     code_source,
-    current_rootdir,
     item_source,
-    restore_rootdir,
     set_rootdir,
 )
 from .story import (
     activity,
     clear_story_registry,
     path,
-    restore_story_registry,
-    snapshot_story_registry,
     story,
 )
 from .template import Template, narration_from, try_term_ref
 from .traceback import filter_internal_frames, parse_short_repr
 
 __all__ = [
+    'CaptureState',
     'Collector',
     'FileGlossary',
     'FixtureInstanceKey',
@@ -48,10 +52,11 @@ __all__ = [
     'Template',
     'activity',
     'attach',
+    'begin_capture_session',
     'capture_caller_source',
+    'capture_snapshot',
     'clear_story_registry',
     'code_source',
-    'current_rootdir',
     'filter_internal_frames',
     'get_active_collector',
     'given',
@@ -60,12 +65,11 @@ __all__ = [
     'narration_from',
     'parse_short_repr',
     'path',
-    'restore_rootdir',
-    'restore_story_registry',
+    'resolve_glossary',
+    'restore_capture_state',
     'scenario',
     'set_active_collector',
     'set_rootdir',
-    'snapshot_story_registry',
     'story',
     'then',
     'try_term_ref',

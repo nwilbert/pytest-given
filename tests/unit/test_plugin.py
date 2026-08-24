@@ -10,18 +10,14 @@ from typing import Annotated, Any, cast
 
 import pytest
 
-from pytest_given import Glossary, Template, given, plugin, then, when
+from pytest_given import Template, given, plugin, then, when
 from pytest_given.capture.collector import (
     Collector,
     get_active_collector,
     set_active_collector,
 )
 from pytest_given.capture.decorators import ScenarioDecorator, StepDescriptor
-from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.source import file_source
-from pytest_given.capture.story import (
-    activity as activity_fn,
-)
 from pytest_given.capture.story import (
     clear_story_registry,
 )
@@ -393,50 +389,6 @@ def test_validate_scenario_story_binding_activities_without_story_raises() -> No
     item = cast(pytest.Item, SimpleNamespace(nodeid='test_mod.py::test_x'))
     with pytest.raises(PytestGivenError, match='requires story='):
         plugin._validate_scenario_story_binding(item, marker)
-
-
-@pytest.mark.usefixtures('_reset_story_registry_plugin')
-def test_resolve_glossary_raises_with_two_distinct_glossaries_via_stories() -> None:
-    """_resolve_glossary must raise when two stories reach different Glossary
-    instances via their activity paths — read straight off the story tree."""
-    g1 = Glossary()
-    guest1 = g1.actor('Guest One')
-    search1 = g1.verb('search')
-    room1 = g1.work_object('Room')
-
-    g2 = Glossary()
-    guest2 = g2.actor('Guest Two')
-    search2 = g2.verb('book')
-    room2 = g2.work_object('Suite')
-
-    s1 = story_fn('Coverage Story A', [activity_fn(guest1, search1, room1)])
-    s2 = story_fn('Coverage Story B', [activity_fn(guest2, search2, room2)])
-
-    fake_session = SimpleNamespace(
-        config=SimpleNamespace(pluginmanager=SimpleNamespace(get_plugins=list))
-    )
-    with pytest.raises(PytestGivenError, match='distinct Glossary'):
-        plugin._resolve_glossary([s1, s2], cast(pytest.Session, fake_session))
-
-
-def test_scan_conftests_discovers_file_glossary(tmp_path: Any) -> None:
-    """_scan_conftests_for_glossary returns the inner Glossary from a FileGlossary
-    attribute on a conftest plugin object (plugin.py line 494)."""
-    md_path = tmp_path / 'conftest_glossary.md'
-    md_path.write_text(
-        '| Term | Meaning |\n|---|---|\n| Guest | A person booking. |\n',
-        encoding='utf-8',
-    )
-    fg = FileGlossary(md_path)
-
-    fake_conftest = SimpleNamespace(__file__='/x/conftest.py', g=fg)
-    fake_session = SimpleNamespace(
-        config=SimpleNamespace(
-            pluginmanager=SimpleNamespace(get_plugins=lambda: [fake_conftest])
-        )
-    )
-    result = plugin._scan_conftests_for_glossary(cast(pytest.Session, fake_session))
-    assert result is fg.glossary
 
 
 def test_extract_given_descriptor_from_parametrize_param() -> None:
