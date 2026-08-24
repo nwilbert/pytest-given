@@ -42,6 +42,27 @@ class StepDecorated(Protocol):
     _step_descriptor: StepDescriptor
 
 
+def _recording_collector(action: str, warning: str) -> Collector | None:
+    """The collector to record into, or None when the caller should do nothing.
+
+    None means an unannotated test, where `with given(...)` and `attach(...)`
+    are both legal and both no-ops: a test without `@scenario` is not a
+    mistake, it simply has no report to appear in, so it warns once instead of
+    raising. With nothing recording anywhere else there is no such reading, and
+    the call raises.
+
+    `stacklevel=3` reaches past this helper and its caller to the user's own
+    line — the two front doors are called directly from user code.
+    """
+    collector = get_active_collector()
+    if collector is not None and collector.state != 'idle':
+        return collector
+    if collector is not None and collector.inside_unannotated_test:
+        warnings.warn(warning, pytest.PytestWarning, stacklevel=3)
+        return None
+    raise no_scenario_error(action)
+
+
 _TEMPLATE_PARAM_KINDS = frozenset(
     {
         inspect.Parameter.POSITIONAL_OR_KEYWORD,
@@ -91,17 +112,13 @@ class StepDescriptor:
                 f'function decorators, where deferred substitution is the only '
                 f'sensible option.'
             )
-        collector = get_active_collector()
-        if collector is None or collector.state == 'idle':
-            if collector is not None and collector.inside_unannotated_test:
-                warnings.warn(
-                    f"'{self.phase}: {self.narration.text}' recorded in a test "
-                    'without @scenario — step will not appear in the report.',
-                    pytest.PytestWarning,
-                    stacklevel=2,
-                )
-                return self
-            raise no_scenario_error(f"enter '{self.phase}: {self.narration.text}'")
+        collector = _recording_collector(
+            f"enter '{self.phase}: {self.narration.text}'",
+            f"'{self.phase}: {self.narration.text}' recorded in a test without "
+            '@scenario — step will not appear in the report.',
+        )
+        if collector is None:
+            return self
         source: SourceLocation | None = None
         if collector.capture_step_source:
             source = (
@@ -477,17 +494,13 @@ def attach(label: str, content: object) -> None:
             'attach(f"{kind} log", …). In a parametrized scenario keep the '
             'label the same in every case and let the content vary.'
         )
-    collector = get_active_collector()
-    if collector is None or collector.state == 'idle':
-        if collector is not None and collector.inside_unannotated_test:
-            warnings.warn(
-                f"attach('{label}') called in a test without @scenario — "
-                'attachment will not appear in the report.',
-                pytest.PytestWarning,
-                stacklevel=2,
-            )
-            return
-        raise no_scenario_error(f"attach '{label}'")
+    collector = _recording_collector(
+        f"attach '{label}'",
+        f"attach('{label}') called in a test without @scenario — "
+        'attachment will not appear in the report.',
+    )
+    if collector is None:
+        return
     if isinstance(content, str):
         collector.attach(label, content, content_type='text')
     else:

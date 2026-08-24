@@ -265,13 +265,7 @@ class Collector:
         activity_ids: tuple[ActivityId, ...] = (),
         source: SourceLocation | None = None,
     ) -> Step:
-        if self._state == 'idle':
-            raise no_scenario_error(f"record '{phase}: {narration.text}'")
-        if self._state == 'fixture_teardown':
-            raise PytestGivenError(
-                f"Cannot record '{phase}: {narration.text}' from fixture "
-                'teardown — teardown is technical, not narrative.'
-            )
+        self._require_recordable(f"record '{phase}: {narration.text}'")
         stack = self._target_stack()
         if stack and stack[-1].phase != phase:
             raise PytestGivenError(
@@ -340,13 +334,7 @@ class Collector:
         *,
         content_type: ContentType = 'text',
     ) -> None:
-        if self._state == 'idle':
-            raise no_scenario_error(f"attach '{label}'")
-        if self._state == 'fixture_teardown':
-            raise PytestGivenError(
-                f"Cannot attach '{label}' from fixture teardown — "
-                'teardown is technical, not narrative.'
-            )
+        self._require_recordable(f"attach '{label}'")
         stack = self._target_stack()
         if not stack:
             # An attachment binds to the step being recorded, so a test body
@@ -362,6 +350,23 @@ class Collector:
         stack[-1].attachments.append(
             Attachment(label=label, content=content, content_type=content_type)
         )
+
+    def _require_recordable(self, action: str) -> None:
+        """Refuse a recording the current state cannot take.
+
+        Two refusals, and they say different things: idle means nothing is
+        being recorded at all, while fixture teardown *is* recording-capable
+        and simply has nothing narrative to say. `action` phrases the attempt
+        ("record 'given: a machine'", "attach 'log'"), so both messages name
+        what the author actually wrote.
+        """
+        if self._state == 'idle':
+            raise no_scenario_error(action)
+        if self._state == 'fixture_teardown':
+            raise PytestGivenError(
+                f'Cannot {action} from fixture teardown — teardown is '
+                'technical, not narrative.'
+            )
 
     def _target_stack(self) -> list[Step]:
         """Return the step stack that push/pop/attach should mutate, per state."""
