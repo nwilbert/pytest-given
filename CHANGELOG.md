@@ -131,6 +131,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
   CLI error instead of a traceback, as does an unknown `--source-link` preset.
 - A fixture that raises after its `yield` now fails the scenario it tore down,
   instead of leaving it green in a report pytest counted as an error.
+- An error-level narration-lint finding now counts as an error in the run's
+  summary line, which previously read green over the non-zero exit code.
 - Every report-building failure — a suite reaching two glossaries, a term used in
   incompatible slots, an unusable source-link template — now surfaces as a
   terminal summary and a failing exit code, where only grouping errors did.

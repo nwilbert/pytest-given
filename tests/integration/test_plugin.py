@@ -456,6 +456,33 @@ def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):
     assert not html_path.exists()
 
 
+def test_an_unwritable_report_shows_in_the_summary_line(pytester, tmp_path):
+    """A run that writes no report must not print a green summary.
+
+    Same reason as the lint's — see
+    `test_an_error_finding_shows_in_the_summary_line`. `-ra` is passed because
+    the short summary renders whatever the failure was registered as, so this
+    covers that path too.
+    """
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario('brews')
+        def test_brew():
+            with when('it brews'):
+                pass
+        """
+    )
+    result = pytester.runpytest(
+        '-ra',
+        f'--given-html={tmp_path / "report.html"}',
+        '--given-source-link={bogus}',
+    )
+    assert result.ret == pytest.ExitCode.TESTS_FAILED
+    result.stdout.fnmatch_lines(['*1 passed*1 error*'])
+
+
 def test_parametrized_with_failure(pytester, tmp_path):
     """A parametrized test with a failing case marks the scenario as failed."""
     pytester.makepyfile(

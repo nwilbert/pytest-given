@@ -93,9 +93,25 @@ def test_disabled_by_default_records_no_sources_and_reports_nothing(pytester):
     assert all(step.source is None for step in steps)
 
 
+def test_an_error_finding_shows_in_the_summary_line(pytester):
+    """The run must not read green while it exits non-zero.
+
+    `session.exitstatus` is assigned from `pytest_sessionfinish`, which is too
+    late for the terminal reporter's already-bound `exitstatus` argument — so
+    the failure has to reach the summary line through the reporter's stats
+    instead. A CI log that shows `1 passed` in green over exit 1 is worse than
+    no summary at all.
+    """
+    result = _run(pytester, EMPTY_GIVEN, '--given-lint=true')
+    assert result.ret == pytest.ExitCode.TESTS_FAILED
+    result.stdout.fnmatch_lines(['*1 passed*1 error*'])
+
+
 def test_enabled_error_finding_fails_the_run(pytester):
     result = _run(pytester, EMPTY_GIVEN, '--given-lint=true')
-    result.assert_outcomes(passed=1)  # the test itself passed
+    # The test itself passed; the error is pytest-given's own, registered so
+    # the summary line cannot read green over a non-zero exit.
+    result.assert_outcomes(passed=1, errors=1)
     assert result.ret == pytest.ExitCode.TESTS_FAILED
     result.stdout.fnmatch_lines(
         [
@@ -171,7 +187,7 @@ def test_stale_ignore_entry_fails_the_run(pytester):
         '-o',
         'given_lint_ignore=*::test_nothing',
     )
-    result.assert_outcomes(passed=1)
+    result.assert_outcomes(passed=1, errors=1)
     assert result.ret == pytest.ExitCode.TESTS_FAILED
     result.stdout.fnmatch_lines(['*stale-ignore*suppressed no finding*'])
 
@@ -307,7 +323,7 @@ def test_missing_phase_error_override_fails_the_run(pytester):
         '-o',
         'given_lint_rules=missing-phase=error',
     )
-    result.assert_outcomes(passed=1)
+    result.assert_outcomes(passed=1, errors=1)
     assert result.ret == pytest.ExitCode.TESTS_FAILED
 
 

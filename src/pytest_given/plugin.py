@@ -942,10 +942,13 @@ def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
     if report_error is not None:
         terminalreporter.write_sep('=', 'pytest-given: report not written', red=True)
         terminalreporter.line(report_error)
+        _count_as_error(terminalreporter, 'pytest-given: report not written')
     findings = terminalreporter.config.stash.get(_lint_findings, [])
     if findings:
         errors = error_count(findings)
         title = summary_title(findings)
+        if errors:
+            _count_as_error(terminalreporter, title)
         terminalreporter.write_sep('=', title, red=errors > 0, yellow=errors == 0)
         for row in summary_rows(findings):
             terminalreporter.line(row)
@@ -955,3 +958,24 @@ def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
         for line in md.splitlines():
             terminalreporter.write_line(line)
         terminalreporter.write_line('<!-- pytest-given:md:end -->')
+
+
+def _count_as_error(terminalreporter: pytest.TerminalReporter, summary: str) -> None:
+    """Register a pytest-given failure with the reporter, so the summary line
+    counts it and turns red.
+
+    `pytest_sessionfinish` is where the exit code is set, and by then the
+    terminal reporter has already bound the `exitstatus` it was called with —
+    the summary line is built from `stats` alone. Without this, a run that
+    writes no report (or fails its lint) prints `N passed` in green and exits
+    non-zero, which is the one combination a CI log cannot be read through.
+
+    A real `CollectReport` rather than a stand-in: `short_test_summary` renders
+    whatever lands in `stats` under `-ra`, and a `str` longrepr is the shape it
+    reads a message off.
+    """
+    terminalreporter.stats.setdefault('error', []).append(
+        pytest.CollectReport(
+            nodeid='pytest-given', outcome='failed', longrepr=summary, result=[]
+        )
+    )
