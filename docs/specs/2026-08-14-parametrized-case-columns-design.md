@@ -142,12 +142,13 @@ forcing varying labels into t-strings.
 
 ### Term refs bound to a parametrize column
 
-A term ref whose `expression` is a parametrize name is exempt from rule 4: its display varies
-by construction, and `_templatize_narration` already tags it with `param_column`
-(`plugin.py:951-953`) so `_render_term_ref` colours the pill from that column
-(`html_renderer.py:323-324`). This is the `param` split applied to a pill — the tree keeps
-the pill, the column already holds the values. It arises when the *parameter itself* is a
-term instance:
+**Rejected (2026-08-24).** This section originally exempted a term ref whose `expression` is a
+parametrize name from rule 4, on the grounds that its display varies by construction and the
+`param` column already holds every case's value. The exemption is gone: rule 4 now holds for
+every term ref, bound or not, and a scenario whose pill reads differently per case fails the
+run and names `@scenario(..., group_parametrized=False)` as the fix.
+
+What the exemption was for, and why it was not worth it:
 
 ```python
 @pytest.mark.parametrize('guest', [pg['Guest']('Alice'), pg['Guest']('Bob')])
@@ -156,31 +157,38 @@ def test_check_in(guest):
     with when(t"{guest} arrives"):
 ```
 
-The pill in the grouped tree reads the baseline display and the column carries the rest;
-substituting the pill on row hover is out of scope for v1. Three consumers read `display` and
-all three currently see only the baseline — today's bugs, but this design makes the pattern
-more likely, so they are fixed here:
+Grouped, the tree keeps one pill. It reads `Alice`, and the column holds both values — so
+`display` in the grouped tree is the baseline's, and everything downstream that reads it sees
+one case out of two. Three consumers had to be taught to read per case instead:
 
-- **`_param_value` unwraps a term instance to its display.** Today the instance hits the
-  non-scalar branch and the cell stores `str(instance)` — a dataclass repr embedding the
-  entire `Glossary` (410 characters for a two-term glossary), in the table and the JSON
-  report. The `param` column is now the only place a case's display exists, so it has to hold
-  `Alice`.
-- **Coverage matches per case, then unions the matches.** `s_for_step`
-  (`report/coverage.py:90`) derives an instance identity from `display`, so the grouped
-  scenario matches on the baseline's `Alice` alone and silently loses coverage of a
-  `Bob`-anchored activity. Evaluate each step once per case, substituting that case's cell
-  value for every param-linked pill, and union the *matches* — never the identity sets:
-  matching is `refs_by_activity[aid].issubset(s_cache)`, so a grouped identity set would let a
-  step satisfy an activity by combining `Alice` from one case with `latte` from another,
-  which no single case satisfies. A scenario with no param-linked pill — every scenario today
-  — keeps the single-pass path.
-- **Glossary aggregation unions the same way.** `build_glossary_aggregations`
-  (`report/aggregations.py`) collects one `TermInstance` per `(term_id, display)`, so without
-  it `Bob` never appears under `Guest` in the Glossary view.
+- **`param_column` on `NarrationTermRef`,** naming the column a pill takes its colour and its
+  per-case display from — a schema field, its serde, and a branch in `_render_term_ref`.
+- **Coverage matched per case, unioning the *matches*.** `compute_coverage` walked the grouped
+  tree once per passed case, substituting that case's cell for every bound pill. Never the
+  identity sets: matching is `refs_by_activity[aid].issubset(s_cache)`, so a merged set would
+  let one step satisfy an activity by combining `Alice` from one case with `latte` from
+  another, which no single case satisfies. That trap, `param_case_displays`, and
+  `term_ref_display` all existed only for this.
+- **Glossary aggregation unioned the same way,** so `Bob` appeared under `Guest` at all.
 
-Activities anchored on a canonical term are unaffected: `s_for_step`'s canonical fallback
-already contributes `(term_id, None)` for every case.
+That is ~140 lines across six modules, and the subtlest invariant in `report/`. Against it:
+`param_column` was non-null in **zero** of the four example reports, the 899-test self-report
+included — nothing exercised the feature outside its own unit tests. And the capability
+survives without it. `@scenario(..., group_parametrized=False)` emits one scenario per case,
+each with its own pill carrying its own display, so an `Alice`-anchored and a `Bob`-anchored
+activity are both covered, correctly, through the ordinary single-pass path. What the author
+gives up is having that *while* the cases stay grouped into one case table.
+
+Two pieces of the original design outlive the exemption, because neither depends on it:
+
+- **`_param_value` unwraps a term instance to its display.** A term instance is still a legal
+  parametrize value — only *narrating* it as a varying pill is refused — and without the
+  unwrap the cell stores `str(instance)`, a dataclass repr embedding the entire `Glossary`
+  (410 characters for a two-term glossary), in the table and the JSON report.
+- **`s_for_step`'s canonical fallback.** An entity instance ref contributes both
+  `(term_id, instance_id)` and `(term_id, None)`, so an activity anchored on the canonical
+  term is covered by a step narrating any instance of it. This is what makes a *constant*
+  pill useful, and it never had anything to do with parametrize columns.
 
 ### Baseline case
 

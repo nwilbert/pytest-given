@@ -154,7 +154,13 @@ def test_a_non_scalar_parametrize_value_still_reaches_the_cell_as_a_string() -> 
     assert grouped[0].parameters.cases[0].values == [str(moment)]
 
 
-def test_templatize_sets_param_column_when_term_ref_expression_matches() -> None:
+def test_templatize_keeps_a_scenario_name_term_ref_verbatim() -> None:
+    """Whether or not the ref's expression names a parametrize argument.
+
+    A scenario name is evaluated once at decoration time, so nothing in it can
+    vary per case — and a term ref in a *step* no longer varies either, so a
+    parametrize name matching its expression means nothing here.
+    """
     narration = Narration(
         text='Alice arrives',
         parts=[
@@ -166,26 +172,10 @@ def test_templatize_sets_param_column_when_term_ref_expression_matches() -> None
             NarrationLiteral(value=' arrives'),
         ],
     )
-    out = templatize.templatize_narration(narration, param_names=['guest'])
-    ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
-    assert ref.param_column == 'guest'
-    assert ref.display == 'Alice'
-
-
-def test_templatize_term_ref_param_column_stays_none_when_no_column_match() -> None:
-    narration = Narration(
-        text='Alice arrives',
-        parts=[
-            NarrationTermRef(
-                term_id=TermId('guest'),
-                display='Alice',
-                expression='guest',
-            ),
-        ],
-    )
-    out = templatize.templatize_narration(narration, param_names=['euros'])
-    ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
-    assert ref.param_column is None
+    for param_names in (['guest'], ['euros']):
+        out = templatize.templatize_narration(narration, param_names=param_names)
+        ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
+        assert ref == narration.parts[0]
 
 
 @scenario(
@@ -908,11 +898,10 @@ def test_a_same_length_case_with_a_different_part_kind_refuses_the_merge() -> No
 def test_a_grouped_steps_text_rebuild_covers_every_part_kind() -> None:
     """A step mixing all four part kinds, where only one interpolation
     promotes: the rebuilt text must still carry the constant NarrationValue's
-    rendered text and both NarrationTermRefs' displays verbatim. The first
-    term ref's expression matches `cup_size` (the group's own param name) and
-    gets `param_column` set; the second's doesn't match anything and passes
-    through untouched — a glossary term unrelated to the parametrize column,
-    the common case."""
+    rendered text and both NarrationTermRefs' displays verbatim. One term ref's
+    expression matches `cup_size` (the group's own param name) and the other's
+    matches nothing; both pass through untouched, since rule 4 holds a term ref
+    constant either way."""
 
     def step(price: str) -> Step:
         return Step(
@@ -941,12 +930,8 @@ def test_a_grouped_steps_text_rebuild_covers_every_part_kind() -> None:
     grouped = group_parametrized(scenarios, info)[0]
     step_out = grouped.steps[0]
     assert step_out.narration.text == 'cost {price} for Alice at 1.2 with Bob tax'
-    matched_ref = step_out.narration.parts[3]
-    assert isinstance(matched_ref, NarrationTermRef)
-    assert matched_ref.param_column == 'cup_size'
-    unmatched_ref = step_out.narration.parts[7]
-    assert isinstance(unmatched_ref, NarrationTermRef)
-    assert unmatched_ref.param_column is None
+    assert step_out.narration.parts[3] == step('2.0').narration.parts[3]
+    assert step_out.narration.parts[7] == step('2.0').narration.parts[7]
 
 
 def test_templatize_narration_converts_a_matching_value_to_a_placeholder() -> None:
@@ -1052,6 +1037,72 @@ def test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column() -> None:
         assert isinstance(slot, NarrationPlaceholder)
         assert (slot.name, slot.column_id) == ('cup_size #2', 'derived:0')
         assert grouped[0].narration.text == 'charge {cup_size #2} ml'
+
+
+def _placeholder_step(spec: str) -> Step:
+    """A step whose narration is a `Template` slot — what an
+    `Annotated[..., given(Template(...))]` label grafts in."""
+    parts: list[NarrationPart] = [
+        NarrationLiteral(value='a cup of '),
+        NarrationPlaceholder(name='cup_size', column_id='cup_size', format_spec=spec),
+        NarrationLiteral(value=' ml'),
+    ]
+    return Step(
+        phase='given', narration=Narration(text=narration_text(parts), parts=parts)
+    )
+
+
+@scenario(
+    t'A {pg["Step"].low} formatting a parameter the scenario name reads plainly '
+    t'gets its own column',
+    tags=['parametrization'],
+)
+def test_a_step_slot_disagreeing_with_the_name_gets_its_own_column() -> None:
+    """The mirror of the scenario-name case: a `Template` slot in a *step* is a
+    hover-substitution slot too, so a cell it cannot serve has to become a
+    column of its own rather than leave the slot reading a value no case
+    narrated.
+    """
+    with given('a step formatting the parameter and a name reading it plainly'):
+        scenarios, info = _named_group(
+            _price_name(''),
+            [_placeholder_step('.2f')],
+            [_placeholder_step('.2f')],
+        )
+    with when(t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}'):
+        grouped = group_parametrized(scenarios, info)
+    with then('the step points at a column holding what it renders'):
+        table = grouped[0].parameters
+        assert table is not None
+        assert [(c.id, c.name) for c in table.columns] == [
+            ('cup_size', 'cup_size'),
+            ('derived:0', 'cup_size #2'),
+        ]
+        assert [c.values for c in table.cases] == [
+            [200, '200.00'],
+            [350, '350.00'],
+        ]
+    with then('the step renders the disambiguated token, text and parts agreeing'):
+        slot = grouped[0].steps[0].narration.parts[1]
+        assert isinstance(slot, NarrationPlaceholder)
+        assert (slot.name, slot.column_id) == ('cup_size #2', 'derived:0')
+        assert grouped[0].steps[0].narration.text == 'a cup of {cup_size #2} ml'
+
+
+def test_a_step_slot_agreeing_with_its_cell_keeps_pointing_at_it() -> None:
+    """The ordinary case: the column already carries the one formatting every
+    slot agreed on, so no second column is made."""
+    scenarios, info = _named_group(
+        _price_name('.2f'), [_placeholder_step('.2f')], [_placeholder_step('.2f')]
+    )
+    grouped = group_parametrized(scenarios, info)[0]
+    table = grouped.parameters
+    assert table is not None
+    assert [c.kind for c in table.columns] == ['param']
+    assert [c.values for c in table.cases] == [['200.00'], ['350.00']]
+    slot = grouped.steps[0].narration.parts[1]
+    assert isinstance(slot, NarrationPlaceholder)
+    assert slot.column_id == 'cup_size'
 
 
 class _SpecRefusing:
@@ -1478,7 +1529,7 @@ def test_rule_four_names_the_violating_steps_own_phase() -> None:
     with pytest.raises(PytestGivenError) as excinfo:
         group_parametrized(scenarios, info)
     message = str(excinfo.value)
-    assert 'then(t"{pg[\'Term\']} {value} …").' in message
+    assert 'then(t"{pg[\'Term\']} {value} …")' in message
 
 
 def test_an_identical_term_ref_stays_inline() -> None:
@@ -1492,10 +1543,16 @@ def test_an_identical_term_ref_stays_inline() -> None:
 
 
 @scenario(
-    t'A {pg["Term ref"].low} that *is* the parametrize value stays supported',
-    tags=['parametrization'],
+    t'A {pg["Term ref"].low} that *is* the parametrize value is refused too',
+    tags=['parametrization', 'validation'],
 )
-def test_a_term_ref_bound_to_a_parametrize_column_does_not_raise() -> None:
+def test_a_param_bound_term_ref_that_varies_raises_rule_four() -> None:
+    """Rule 4 admits no exemption for a term ref a parametrize column binds.
+
+    Letting its display vary bought a `param_column` on the pill and a per-case
+    pass over the grouped tree in `compute_coverage`; `group_parametrized=False`
+    gives each case its own term ref and covers the same ground with neither.
+    """
     with given(
         t'two {pg["Case"]("cases")} whose {pg["Term ref"]} is the parameter itself'
     ):
@@ -1503,15 +1560,18 @@ def test_a_term_ref_bound_to_a_parametrize_column_does_not_raise() -> None:
             [_term_ref_step('guest', 'Alice', expression='cup_size')],
             [_term_ref_step('guest', 'Bob', expression='cup_size')],
         )
-    with when(t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}'):
-        grouped = group_parametrized(scenarios, info)[0]
-    with then(t'the {pg["Term ref"]} is kept, bound to its parametrize column'):
-        part = grouped.steps[0].narration.parts[0]
-        assert isinstance(part, NarrationTermRef)
-        assert part.param_column == 'cup_size'
-    with then('no extra column is made — the parametrize one already holds it'):
-        assert grouped.parameters is not None
-        assert [c.kind for c in grouped.parameters.columns] == ['param']
+    with (
+        when_then(
+            t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}',
+            'the grouping is refused',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
+        group_parametrized(scenarios, info)
+    with then(t'the error points at the per-case {pg["Scenario"].low} opt-out'):
+        message = str(excinfo.value)
+        assert 'must name the same term and read the same in every case' in message
+        assert 'group_parametrized=False' in message
 
 
 def test_a_differently_shaped_term_ref_refuses_the_merge_before_rule_four() -> None:

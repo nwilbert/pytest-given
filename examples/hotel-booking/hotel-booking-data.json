@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-23T13:32:51.232694+00:00",
+    "timestamp": "2026-08-24T09:01:14.078005+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "a947a2cfbfa063261f6ae0ed6f426bfe01616f19",
+    "commit_sha": "eb6d2982a9eeaa42ac29e8b54e40e8dfd9f1226f",
     "title": "Hotel Booking Example"
   },
   "scenarios": [
@@ -30,8 +30,7 @@
               {
                 "term_id": "organizer",
                 "display": "Carol",
-                "expression": "organizer(\"Carol\")",
-                "param_column": null
+                "expression": "organizer(\"Carol\")"
               }
             ]
           },
@@ -51,8 +50,7 @@
               {
                 "term_id": "room",
                 "display": "Deluxe Suite",
-                "expression": "room(\"Deluxe Suite\")",
-                "param_column": null
+                "expression": "room(\"Deluxe Suite\")"
               },
               {
                 "value": " is listed as available"
@@ -72,8 +70,7 @@
               {
                 "term_id": "organizer",
                 "display": "Carol",
-                "expression": "organizer(\"Carol\")",
-                "param_column": null
+                "expression": "organizer(\"Carol\")"
               },
               {
                 "value": " "
@@ -81,8 +78,7 @@
               {
                 "term_id": "search",
                 "display": "searches for",
-                "expression": "search(\"searches for\")",
-                "param_column": null
+                "expression": "search(\"searches for\")"
               },
               {
                 "value": " a "
@@ -90,8 +86,7 @@
               {
                 "term_id": "room",
                 "display": "Room",
-                "expression": "room",
-                "param_column": null
+                "expression": "room"
               }
             ]
           },
@@ -108,8 +103,7 @@
               {
                 "term_id": "organizer",
                 "display": "Carol",
-                "expression": "organizer(\"Carol\")",
-                "param_column": null
+                "expression": "organizer(\"Carol\")"
               },
               {
                 "value": " "
@@ -117,8 +111,7 @@
               {
                 "term_id": "select",
                 "display": "selects",
-                "expression": "select(\"selects\")",
-                "param_column": null
+                "expression": "select(\"selects\")"
               },
               {
                 "value": " the "
@@ -126,8 +119,7 @@
               {
                 "term_id": "room",
                 "display": "Deluxe Suite",
-                "expression": "room(\"Deluxe Suite\")",
-                "param_column": null
+                "expression": "room(\"Deluxe Suite\")"
               }
             ]
           },
@@ -147,8 +139,7 @@
               {
                 "term_id": "room",
                 "display": "Deluxe Suite",
-                "expression": "room(\"Deluxe Suite\")",
-                "param_column": null
+                "expression": "room(\"Deluxe Suite\")"
               },
               {
                 "value": " is held for "
@@ -156,8 +147,7 @@
               {
                 "term_id": "organizer",
                 "display": "Carol",
-                "expression": "organizer(\"Carol\")",
-                "param_column": null
+                "expression": "organizer(\"Carol\")"
               }
             ]
           },
@@ -199,8 +189,7 @@
               {
                 "term_id": "organizer",
                 "display": "Carol",
-                "expression": "organizer(\"Carol\")",
-                "param_column": null
+                "expression": "organizer(\"Carol\")"
               }
             ]
           },
@@ -220,8 +209,7 @@
               {
                 "term_id": "guest",
                 "display": "Alice",
-                "expression": "guest(\"Alice\")",
-                "param_column": null
+                "expression": "guest(\"Alice\")"
               }
             ]
           },
@@ -241,8 +229,7 @@
               {
                 "term_id": "guest",
                 "display": "Bob",
-                "expression": "guest(\"Bob\")",
-                "param_column": null
+                "expression": "guest(\"Bob\")"
               }
             ]
           },
@@ -259,8 +246,7 @@
               {
                 "term_id": "organizer",
                 "display": "Carol",
-                "expression": "organizer(\"Carol\")",
-                "param_column": null
+                "expression": "organizer(\"Carol\")"
               },
               {
                 "value": " has "
@@ -268,8 +254,7 @@
               {
                 "term_id": "select",
                 "display": "selected",
-                "expression": "select(\"selected\")",
-                "param_column": null
+                "expression": "select(\"selected\")"
               },
               {
                 "value": " the "
@@ -277,8 +262,7 @@
               {
                 "term_id": "room",
                 "display": "Deluxe Suite",
-                "expression": "room(\"Deluxe Suite\")",
-                "param_column": null
+                "expression": "room(\"Deluxe Suite\")"
               }
             ]
           },
@@ -295,8 +279,7 @@
               {
                 "term_id": "organizer",
                 "display": "Carol",
-                "expression": "organizer(\"Carol\")",
-                "param_column": null
+                "expression": "organizer(\"Carol\")"
               },
               {
                 "value": " "
@@ -304,8 +287,7 @@
               {
                 "term_id": "add",
                 "display": "adds",
-                "expression": "add(\"adds\")",
-                "param_column": null
+                "expression": "add(\"adds\")"
               },
               {
                 "value": " "
@@ -313,8 +295,7 @@
               {
                 "term_id": "guest",
                 "display": "Alice",
-                "expression": "guest(\"Alice\")",
-                "param_column": null
+                "expression": "guest(\"Alice\")"
               },
               {
                 "value": " and "
@@ -322,8 +303,7 @@
               {
                 "term_id": "guest",
                 "display": "Bob",
-                "expression": "guest(\"Bob\")",
-                "param_column": null
+                "expression": "guest(\"Bob\")"
               },
               {
                 "value": " to the "
@@ -331,8 +311,7 @@
               {
                 "term_id": "booking",
                 "display": "Booking",
-                "expression": "booking",
-                "param_column": null
+                "expression": "booking"
               }
             ]
           },
@@ -349,8 +328,7 @@
               {
                 "term_id": "organizer",
                 "display": "Carol",
-                "expression": "organizer(\"Carol\")",
-                "param_column": null
+                "expression": "organizer(\"Carol\")"
               },
               {
                 "value": " "
@@ -358,8 +336,7 @@
               {
                 "term_id": "submit",
                 "display": "submits",
-                "expression": "submit(\"submits\")",
-                "param_column": null
+                "expression": "submit(\"submits\")"
               },
               {
                 "value": " the "
@@ -367,8 +344,7 @@
               {
                 "term_id": "payment",
                 "display": "Payment",
-                "expression": "payment",
-                "param_column": null
+                "expression": "payment"
               },
               {
                 "value": " for the "
@@ -376,8 +352,7 @@
               {
                 "term_id": "booking",
                 "display": "Booking",
-                "expression": "booking",
-                "param_column": null
+                "expression": "booking"
               }
             ]
           },
@@ -397,8 +372,7 @@
               {
                 "term_id": "booking-system",
                 "display": "Booking System",
-                "expression": "booking_system",
-                "param_column": null
+                "expression": "booking_system"
               },
               {
                 "value": " "
@@ -406,8 +380,7 @@
               {
                 "term_id": "confirm",
                 "display": "confirms",
-                "expression": "confirm(\"confirms\")",
-                "param_column": null
+                "expression": "confirm(\"confirms\")"
               },
               {
                 "value": " the "
@@ -415,8 +388,7 @@
               {
                 "term_id": "booking",
                 "display": "Booking",
-                "expression": "booking",
-                "param_column": null
+                "expression": "booking"
               }
             ]
           },
@@ -436,8 +408,7 @@
               {
                 "term_id": "booking-system",
                 "display": "Booking System",
-                "expression": "booking_system",
-                "param_column": null
+                "expression": "booking_system"
               },
               {
                 "value": " "
@@ -445,8 +416,7 @@
               {
                 "term_id": "send",
                 "display": "sends",
-                "expression": "send(\"sends\")",
-                "param_column": null
+                "expression": "send(\"sends\")"
               },
               {
                 "value": " the "
@@ -454,8 +424,7 @@
               {
                 "term_id": "confirmation",
                 "display": "Confirmation",
-                "expression": "confirmation",
-                "param_column": null
+                "expression": "confirmation"
               },
               {
                 "value": " to "
@@ -463,8 +432,7 @@
               {
                 "term_id": "guest",
                 "display": "Alice",
-                "expression": "guest(\"Alice\")",
-                "param_column": null
+                "expression": "guest(\"Alice\")"
               },
               {
                 "value": " and "
@@ -472,8 +440,7 @@
               {
                 "term_id": "guest",
                 "display": "Bob",
-                "expression": "guest(\"Bob\")",
-                "param_column": null
+                "expression": "guest(\"Bob\")"
               }
             ]
           },
@@ -515,8 +482,7 @@
               {
                 "term_id": "guest",
                 "display": "Alice",
-                "expression": "guest(\"Alice\")",
-                "param_column": null
+                "expression": "guest(\"Alice\")"
               }
             ]
           },
@@ -533,8 +499,7 @@
               {
                 "term_id": "guest",
                 "display": "Alice",
-                "expression": "guest(\"Alice\")",
-                "param_column": null
+                "expression": "guest(\"Alice\")"
               },
               {
                 "value": " has a confirmed "
@@ -542,8 +507,7 @@
               {
                 "term_id": "booking",
                 "display": "Booking",
-                "expression": "booking",
-                "param_column": null
+                "expression": "booking"
               },
               {
                 "value": " she paid for"
@@ -563,8 +527,7 @@
               {
                 "term_id": "guest",
                 "display": "Alice",
-                "expression": "guest(\"Alice\")",
-                "param_column": null
+                "expression": "guest(\"Alice\")"
               },
               {
                 "value": " "
@@ -572,8 +535,7 @@
               {
                 "term_id": "cancel",
                 "display": "cancels",
-                "expression": "cancel(\"cancels\")",
-                "param_column": null
+                "expression": "cancel(\"cancels\")"
               },
               {
                 "value": " the "
@@ -581,8 +543,7 @@
               {
                 "term_id": "booking",
                 "display": "Booking",
-                "expression": "booking",
-                "param_column": null
+                "expression": "booking"
               }
             ]
           },
@@ -602,8 +563,7 @@
               {
                 "term_id": "booking-system",
                 "display": "Booking System",
-                "expression": "booking_system",
-                "param_column": null
+                "expression": "booking_system"
               },
               {
                 "value": " "
@@ -611,8 +571,7 @@
               {
                 "term_id": "refund",
                 "display": "refunds",
-                "expression": "refund(\"refunds\")",
-                "param_column": null
+                "expression": "refund(\"refunds\")"
               },
               {
                 "value": " the "
@@ -620,8 +579,7 @@
               {
                 "term_id": "payment",
                 "display": "Payment",
-                "expression": "payment",
-                "param_column": null
+                "expression": "payment"
               },
               {
                 "value": " for the "
@@ -629,8 +587,7 @@
               {
                 "term_id": "booking",
                 "display": "Booking",
-                "expression": "booking",
-                "param_column": null
+                "expression": "booking"
               }
             ]
           },
@@ -650,8 +607,7 @@
               {
                 "term_id": "booking-system",
                 "display": "Booking System",
-                "expression": "booking_system",
-                "param_column": null
+                "expression": "booking_system"
               },
               {
                 "value": " "
@@ -659,8 +615,7 @@
               {
                 "term_id": "send",
                 "display": "sends",
-                "expression": "send(\"sends\")",
-                "param_column": null
+                "expression": "send(\"sends\")"
               },
               {
                 "value": " a "
@@ -668,8 +623,7 @@
               {
                 "term_id": "confirmation",
                 "display": "Confirmation",
-                "expression": "confirmation",
-                "param_column": null
+                "expression": "confirmation"
               },
               {
                 "value": " to "
@@ -677,8 +631,7 @@
               {
                 "term_id": "guest",
                 "display": "Alice",
-                "expression": "guest(\"Alice\")",
-                "param_column": null
+                "expression": "guest(\"Alice\")"
               }
             ]
           },
@@ -720,8 +673,7 @@
               {
                 "term_id": "organizer",
                 "display": "Carol",
-                "expression": "organizer(\"Carol\")",
-                "param_column": null
+                "expression": "organizer(\"Carol\")"
               }
             ]
           },
@@ -741,8 +693,7 @@
               {
                 "term_id": "guest",
                 "display": "Alice",
-                "expression": "guest(\"Alice\")",
-                "param_column": null
+                "expression": "guest(\"Alice\")"
               }
             ]
           },
@@ -762,8 +713,7 @@
               {
                 "term_id": "guest",
                 "display": "Bob",
-                "expression": "guest(\"Bob\")",
-                "param_column": null
+                "expression": "guest(\"Bob\")"
               }
             ]
           },
@@ -780,8 +730,7 @@
               {
                 "term_id": "organizer",
                 "display": "Carol",
-                "expression": "organizer(\"Carol\")",
-                "param_column": null
+                "expression": "organizer(\"Carol\")"
               },
               {
                 "value": " has "
@@ -789,8 +738,7 @@
               {
                 "term_id": "add",
                 "display": "added",
-                "expression": "add(\"added\")",
-                "param_column": null
+                "expression": "add(\"added\")"
               },
               {
                 "value": " "
@@ -798,8 +746,7 @@
               {
                 "term_id": "guest",
                 "display": "Alice",
-                "expression": "guest(\"Alice\")",
-                "param_column": null
+                "expression": "guest(\"Alice\")"
               },
               {
                 "value": " and "
@@ -807,8 +754,7 @@
               {
                 "term_id": "guest",
                 "display": "Bob",
-                "expression": "guest(\"Bob\")",
-                "param_column": null
+                "expression": "guest(\"Bob\")"
               },
               {
                 "value": " to the "
@@ -816,8 +762,7 @@
               {
                 "term_id": "booking",
                 "display": "Booking",
-                "expression": "booking",
-                "param_column": null
+                "expression": "booking"
               }
             ]
           },
@@ -834,8 +779,7 @@
               {
                 "term_id": "organizer",
                 "display": "Carol",
-                "expression": "organizer(\"Carol\")",
-                "param_column": null
+                "expression": "organizer(\"Carol\")"
               },
               {
                 "value": " "
@@ -843,8 +787,7 @@
               {
                 "term_id": "submit",
                 "display": "submits",
-                "expression": "submit(\"submits\")",
-                "param_column": null
+                "expression": "submit(\"submits\")"
               },
               {
                 "value": " the "
@@ -852,8 +795,7 @@
               {
                 "term_id": "payment",
                 "display": "Payment",
-                "expression": "payment",
-                "param_column": null
+                "expression": "payment"
               },
               {
                 "value": " by "
@@ -870,8 +812,7 @@
               {
                 "term_id": "booking",
                 "display": "Booking",
-                "expression": "booking",
-                "param_column": null
+                "expression": "booking"
               }
             ]
           },
@@ -891,8 +832,7 @@
               {
                 "term_id": "booking-system",
                 "display": "Booking System",
-                "expression": "booking_system",
-                "param_column": null
+                "expression": "booking_system"
               },
               {
                 "value": " "
@@ -900,8 +840,7 @@
               {
                 "term_id": "reject",
                 "display": "rejects",
-                "expression": "reject(\"rejects\")",
-                "param_column": null
+                "expression": "reject(\"rejects\")"
               },
               {
                 "value": " the "
@@ -909,8 +848,7 @@
               {
                 "term_id": "payment",
                 "display": "Payment",
-                "expression": "payment",
-                "param_column": null
+                "expression": "payment"
               },
               {
                 "value": " because of "
@@ -939,8 +877,7 @@
               {
                 "term_id": "booking",
                 "display": "Booking",
-                "expression": "booking",
-                "param_column": null
+                "expression": "booking"
               },
               {
                 "value": " stays pending and no "
@@ -948,8 +885,7 @@
               {
                 "term_id": "confirmation",
                 "display": "Confirmation",
-                "expression": "confirmation",
-                "param_column": null
+                "expression": "confirmation"
               },
               {
                 "value": " is sent to "
@@ -957,8 +893,7 @@
               {
                 "term_id": "guest",
                 "display": "Alice",
-                "expression": "guest(\"Alice\")",
-                "param_column": null
+                "expression": "guest(\"Alice\")"
               },
               {
                 "value": " or "
@@ -966,8 +901,7 @@
               {
                 "term_id": "guest",
                 "display": "Bob",
-                "expression": "guest(\"Bob\")",
-                "param_column": null
+                "expression": "guest(\"Bob\")"
               }
             ]
           },

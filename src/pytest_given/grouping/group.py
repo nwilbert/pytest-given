@@ -11,7 +11,6 @@ from ..model import (
     ParameterCase,
     ParameterTable,
     ParamInfo,
-    RawParamValue,
     Scenario,
     Step,
     StepPath,
@@ -62,6 +61,7 @@ def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
         comparable=comparable,
         indexed=indexed,
         anchor=first,
+        case_params={s.id: param_info[s.id].mapping() for s in group},
     )
     check_same_template(baseline, ctx)
     check_varying_str_narration(baseline, ctx)
@@ -75,15 +75,13 @@ def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
     formats = param_cell_formats(
         [first.narration, *step_narrations(baseline.steps)], param_names
     )
-    case_params: dict[NodeId, dict[str, RawParamValue]] = {}
     for scenario in group:
         spec = param_info[scenario.id]
-        case_params[scenario.id] = spec.mapping()
         for name, value in zip(spec.names, spec.values, strict=True):
             ctx.set_cell(name, scenario.id, param_cell(value, formats.get(name)))
     template_steps = templatize_steps(baseline.steps, (), ctx)
     grouped_narration = reconcile_name_slots(
-        templatize_narration(first.narration, param_names), ctx, case_params
+        templatize_narration(first.narration, param_names), ctx
     )
 
     cases: list[ParameterCase] = []

@@ -295,7 +295,6 @@ def _narration_part_from_dict(d: dict[str, Any]) -> NarrationPart:
             term_id=TermId(d['term_id']),
             display=d['display'],
             expression=d.get('expression', ''),
-            param_column=d.get('param_column'),
         )
     if 'rendered' in d:
         return NarrationValue(

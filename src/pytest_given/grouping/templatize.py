@@ -206,6 +206,12 @@ def _templatize_part(
             independent, NarrationPlaceholder
         ):
             return _templatize_param_value(part, independent, index, path, ctx)
+        if isinstance(independent, NarrationPlaceholder):
+            # A `Template` slot in a step body (an `Annotated[..., given(...)]`
+            # label). It records no per-case rendering, so it reconciles the
+            # way the scenario name's slots do rather than the way a
+            # `NarrationValue` does.
+            return _reconciled_slot(independent, ctx)
         return independent
     if isinstance(part, NarrationValue):
         return _templatize_value(part, index, path, phase, ctx)
@@ -287,13 +293,14 @@ def _case_independent_part(
     """The part as it stands when no other case has a say in it, or None when
     it has to be compared against them first.
 
-    A literal is one by definition, and so is anything a parametrize column
-    binds — the column already holds every case's value. That makes this the
-    whole of templatizing a *scenario* name, which is evaluated once at
-    decoration time and cannot vary; a step's narration reaches its own
-    comparison work only past it. One definition, so the placeholder contract
-    (`name` and `column_id` both the parametrize name) and the term-ref
-    exemption cannot drift between the two callers.
+    A literal is one by definition, and so is a *value* a parametrize column
+    binds — the column already holds every case's. A term ref never is: rule 4
+    requires it to read identically across cases whether a column binds it or
+    not, so it always goes on to be compared. That makes this the whole of
+    templatizing a *scenario* name, which is evaluated once at decoration time
+    and cannot vary; a step's narration reaches its own comparison work only
+    past it. One definition, so the placeholder contract (`name` and `column_id`
+    both the parametrize name) cannot drift between the two callers.
     """
     match part:
         case NarrationLiteral():
@@ -311,11 +318,6 @@ def _case_independent_part(
             if name not in param_names:
                 raise placeholder_mismatch(name, param_names)
             return part
-        case NarrationTermRef(expression=expression) if expression in param_names:
-            # Exempt: its display varies by construction and the `param` column
-            # already holds every case's value. This is what keeps
-            # `param_column` alive.
-            return replace(part, param_column=expression)
     return None
 
 
@@ -356,7 +358,6 @@ def templatize_narration(
 def reconcile_name_slots(
     narration: Narration,
     ctx: GroupContext,
-    case_params: dict[NodeId, dict[str, RawParamValue]],
 ) -> Narration:
     """The scenario name's slots re-pointed at columns that read the way they do.
 
@@ -376,18 +377,21 @@ def reconcile_name_slots(
     """
     if not narration.parts:
         return narration
-    out = [_reconciled_name_part(part, ctx, case_params) for part in narration.parts]
+    out = [_reconciled_slot(part, ctx) for part in narration.parts]
     return Narration(text=narration_text(out), parts=out)
 
 
-def _reconciled_name_part(
-    part: NarrationPart,
-    ctx: GroupContext,
-    case_params: dict[NodeId, dict[str, RawParamValue]],
-) -> NarrationPart:
+def _reconciled_slot(part: NarrationPart, ctx: GroupContext) -> NarrationPart:
+    """One `Template` slot re-pointed at a column that reads the way it does.
+
+    Shared by the scenario name and by a step's `Template` slots: neither
+    records a per-case rendering to compare against, so both recompute what the
+    slot renders from each case's raw parameter — exactly as `param_cell`
+    builds the cell being compared with.
+    """
     if not isinstance(part, NarrationPlaceholder) or part.column_id not in ctx.cells:
         return part
-    rendered = _name_slot_renderings(part, case_params)
+    rendered = _slot_renderings(part, ctx.case_params)
     if rendered is None or all(
         text == cell_text(ctx.cells[part.column_id][case_id])
         for case_id, text in rendered.items()
@@ -399,7 +403,7 @@ def _reconciled_name_part(
     return replace(part, name=column.name, column_id=column.id)
 
 
-def _name_slot_renderings(
+def _slot_renderings(
     part: NarrationPlaceholder,
     case_params: dict[NodeId, dict[str, RawParamValue]],
 ) -> dict[NodeId, str] | None:

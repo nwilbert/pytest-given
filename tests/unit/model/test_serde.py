@@ -597,7 +597,6 @@ def test_narration_term_ref_round_trips():
                 term_id=TermId('guest'),
                 display='Alice',
                 expression='guest',
-                param_column='guest',
             ),
         ],
     )

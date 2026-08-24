@@ -39,6 +39,11 @@ class GroupContext:
     comparable: list[Scenario]
     indexed: dict[NodeId, dict[StepPath, Step]]
     anchor: Scenario
+    # Each case's raw parametrize arguments by name. A `Template` slot — in a
+    # step or in the scenario name — records no per-case rendering to compare
+    # against, so what it renders has to be recomputed from these; see
+    # `templatize._reconciled_slot`.
+    case_params: dict[NodeId, dict[str, RawParamValue]] = field(default_factory=dict)
     columns: list[ParameterColumn] = field(default_factory=list)
     cells: dict[str, dict[NodeId, CellValue | None]] = field(default_factory=dict)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
@@ -107,11 +112,10 @@ class GroupContext:
 def _param_value(value: RawParamValue) -> ParamValue:
     """Coerce a raw parametrize argument into a table cell.
 
-    A glossary term instance unwraps to its display — the `param` column is the
-    only place a case's display exists once the term ref in the grouped tree reads
-    the baseline's, and `str()` on the instance would store a dataclass repr of
-    the whole `Glossary`. JSON primitives pass through; everything else is its
-    `str()`, since a cell only ever feeds display and the JSON sink.
+    A glossary term instance unwraps to its display: `str()` on one would store
+    a dataclass repr of the whole `Glossary` — hundreds of characters — in the
+    table and the JSON report. JSON primitives pass through; everything else is
+    its `str()`, since a cell only ever feeds display and the JSON sink.
     """
     term_ref = try_term_ref(value)
     if term_ref is not None:

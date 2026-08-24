@@ -44,14 +44,16 @@ form `## [x.y.z] - YYYY-MM-DD`.
     value — either a local rebound it, or the body mutated it in place;
   - a step whose set of `attach` labels differs between cases;
   - a glossary term ref that names a different term or reads differently
-    between cases. A term ref that *is* a parametrize value stays supported;
+    between cases — including one bound to a parametrize column, which the
+    grouped tree cannot show per case;
   - passed cases that narrate different templates altogether.
 
   Every one but the last has the same fix: bind the varying part to a local and
   narrate it with a t-string, keeping labels and term refs constant; content may
-  still vary freely, which is what the new `attachment` column is for. The last
-  needs `@scenario(..., group_parametrized=False)`, giving each case its own
-  scenario.
+  still vary freely, which is what the new `attachment` column is for. A term ref
+  that *is* the parametrize value has no such split available — parametrize over
+  instances of one term, or take the last one's fix. The last needs
+  `@scenario(..., group_parametrized=False)`, giving each case its own scenario.
 - **Breaking.** `attach()` now takes a plain `str` label; a t-string label raises
   `PytestGivenError` — use an f-string.
 - **Breaking.** `attach()` called with no step open now raises `PytestGivenError`

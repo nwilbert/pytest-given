@@ -136,7 +136,7 @@ plus, per step, the shape of its narration parts:
 | `NarrationLiteral` | `('lit', value)` — the literal text, which is what shape 3 varies |
 | `NarrationValue` | `('val', expression, conversion, format_spec)` — never `rendered`, which is exactly what grouping promotes |
 | `NarrationPlaceholder` | `('ph', name, conversion, format_spec)` |
-| `NarrationTermRef` | `('term', expression)` — not `display`, which rule 4 governs and which a param-bound pill varies by design |
+| `NarrationTermRef` | `('term', expression)` — not `display`, which rule 4 governs: a difference there is a run-failing error, not a reason to refuse the merge |
 
 A `str` narration contributes an empty part list in every case, so rule 6 stays silent on it
 and **rule 1 keeps its own better diagnosis** ("a plain str bakes case 1's values"). The two

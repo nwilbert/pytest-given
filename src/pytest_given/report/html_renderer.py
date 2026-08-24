@@ -319,7 +319,7 @@ def _render_narration_part(
                 f'>{escape(label)}</span>'
             )
         case NarrationTermRef():
-            return _render_term_ref(part, glossary, param_color_map)
+            return _render_term_ref(part, glossary)
         case _:
             assert_never(part)
 
@@ -364,20 +364,12 @@ def _term_ref_span(
     return f'<span {" ".join(attrs)}>{escape(display)}</span>'
 
 
-def _render_term_ref(
-    part: NarrationTermRef,
-    glossary: Glossary | None,
-    param_color_map: ParamColorMap,
-) -> str:
+def _render_term_ref(part: NarrationTermRef, glossary: Glossary | None) -> str:
     term = glossary.get(part.term_id) if glossary is not None else None
     if term is None:
         return str(escape(part.display))
-    classes = [_term_kind_class(term.kind)]
-    if part.param_column is not None:
-        color_idx = param_color_map.get(part.param_column, 0)
-        classes.append(f'param-color-{color_idx}')
     return _term_ref_span(
-        classes=classes,
+        classes=[_term_kind_class(term.kind)],
         display=part.display,
         term_id=part.term_id,
         tooltip_name=term.canonical,

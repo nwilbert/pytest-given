@@ -1350,25 +1350,6 @@ def test_narration_filter_emits_tooltip_definition_when_term_has_one() -> None:
     assert 'data-term-def="A person staying at the hotel."' in out
 
 
-def test_narration_filter_includes_param_color_when_term_ref_has_param_column() -> None:
-    g = _glossary()
-    color_map = {'guest_name': 2}
-    f = _make_narration_filter(param_color_map=color_map, glossary=g)
-    n = Narration(
-        text='Alice',
-        parts=[
-            NarrationTermRef(
-                term_id=TermId('guest'),
-                display='Alice',
-                param_column='guest_name',
-            ),
-        ],
-    )
-    out = str(f(n))
-    assert 'term-ref-actor' in out
-    assert 'param-color-2' in out
-
-
 def test_narration_filter_handles_term_ref_with_no_glossary_match() -> None:
     g = _glossary()
     f = _make_narration_filter(param_color_map={}, glossary=g)

@@ -368,16 +368,16 @@ def test_glossary_post_init_indexes_terms_passed_at_construction() -> None:
 # --- Task 1.5: NarrationTermRef + extended NarrationPart union ---
 
 
-def test_narration_term_ref_carries_term_id_display_and_optional_param_column() -> None:
+def test_narration_term_ref_carries_term_id_display_and_expression() -> None:
     part = NarrationTermRef(term_id=TermId('guest'), display='Alice')
     assert part.term_id == 'guest'
     assert part.display == 'Alice'
-    assert part.param_column is None
+    assert part.expression == ''
 
     part2 = NarrationTermRef(
-        term_id=TermId('guest'), display='Alice', param_column='guest_name'
+        term_id=TermId('guest'), display='Alice', expression='guest_name'
     )
-    assert part2.param_column == 'guest_name'
+    assert part2.expression == 'guest_name'
 
 
 def test_narration_term_ref_is_assignable_to_narration_part() -> None:

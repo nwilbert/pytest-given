@@ -28,8 +28,6 @@ from .coverage import (
     StepRef,
     compute_coverage,
     is_coverage_eligible,
-    param_case_displays,
-    term_ref_display,
 )
 
 type ActivityKey = str
@@ -214,18 +212,13 @@ def build_glossary_aggregations(
         return {}
     index = _GlossaryIndex(glossary)
     for scenario in report.scenarios:
-        cases = param_case_displays(scenario)
         for _path, step in walk_steps(scenario.steps):
             for part in step.narration.parts:
                 if not isinstance(part, NarrationTermRef):
                     continue
-                # A term ref bound to a parametrize column reads the baseline's
-                # display in the grouped tree; collect one instance per case so
-                # the Glossary view lists them all.
-                for display in _term_ref_displays(part, cases):
-                    index.record_instance(
-                        part.term_id, display, fixture_name=step.fixture_name
-                    )
+                index.record_instance(
+                    part.term_id, part.display, fixture_name=step.fixture_name
+                )
     for story in report.stories:
         for ref in _story_term_refs(story):
             # Each `record_*` no-ops for a term of the wrong kind, so the walk
@@ -313,22 +306,6 @@ class _GlossaryIndex:
 
     def _agg(self, term_id: TermId) -> GlossaryAggregation:
         return self._aggs.setdefault(term_id, GlossaryAggregation())
-
-
-def _term_ref_displays(
-    part: NarrationTermRef, cases: list[dict[str, str]]
-) -> list[str]:
-    """Every display this term ref takes: one per case when it is bound to a
-    parametrize column, otherwise just the one it carries.
-
-    `term_ref_display` decides each of them, so the Glossary lists exactly the
-    instances coverage credits — the two views reading one case differently is
-    a report disagreeing with itself.
-    """
-    if part.param_column is None or not cases:
-        return [part.display]
-    displays = (term_ref_display(part, case) for case in cases)
-    return [display for display in displays if display is not None]
 
 
 def build_term_scenario_index(report: ReportData) -> dict[TermId, list[NodeId]]:

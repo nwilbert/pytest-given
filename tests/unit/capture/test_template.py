@@ -258,7 +258,6 @@ def test_tstring_with_actor_emits_term_ref(glossary: Glossary) -> None:
             isinstance(p, NarrationTermRef)
             and p.term_id == 'guest'
             and p.display == 'Guest'
-            and p.param_column is None
             for p in parts
         )
 
@@ -340,7 +339,7 @@ def test_tstring_rendered_text_uses_display_for_term_refs(glossary: Glossary) ->
     assert text == 'the Alice arrives'
 
 
-# --- Task 5.3: expression field populated; param_column via _templatize_narration ---
+# --- Task 5.3: expression field populated ---
 
 
 def test_tstring_with_term_ref_populates_expression(glossary: Glossary) -> None:

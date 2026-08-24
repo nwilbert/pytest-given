@@ -7,6 +7,7 @@ checked up front, against the whole group; 2, 4 and 5 fire from the baseline
 walk, which is where the offending part is in hand.
 """
 
+from collections.abc import Iterator
 from typing import NamedTuple
 
 from ..model import (
@@ -287,22 +288,17 @@ def check_constant_term_ref(
     phase: Phase,
     ctx: GroupContext,
 ) -> None:
-    """Rule 4: a term ref no parametrize column binds must read the same in every
-    case.
+    """Rule 4: a term ref must name the same term and read the same in every case.
 
-    Rejected rather than promoted: promotion would strip the term ref out of the
-    grouped tree, and `compute_coverage` matches story activities on term-ref
-    identities.
+    No exemption for one a parametrize column binds. Rejected rather than
+    promoted, because promotion would strip the term ref out of the grouped tree
+    and `compute_coverage` matches story activities on term-ref identities — and
+    a grouped tree keeps a single `term_id` and a single display, so a varying
+    ref would leave every case's value filed under the first case's, in the
+    Glossary view and in story coverage alike.
     """
     identity = (part.term_id, part.display)
-    for case in ctx.comparable:
-        # Rule 6 pins every comparable case to the baseline's template, so a
-        # term ref here is a term ref there; what may still differ is which term it
-        # names and how it reads, which is this rule's subject.
-        case_part = ctx.indexed[case.id][path].narration.parts[index]
-        assert isinstance(case_part, NarrationTermRef), (
-            'rule 6 admits only cases shaped like the baseline'
-        )
+    for case_part in _case_term_refs(index, path, ctx):
         if (case_part.term_id, case_part.display) == identity:
             continue
         raise grouping_error(
@@ -311,5 +307,23 @@ def check_constant_term_ref(
             f'{_test_name(ctx.anchor)!r} varies across parametrize '
             f'cases — a term ref must name the same term and read the '
             f'same in every case. Split the term ref from the value: '
-            f'{phase}(t"{{pg[\'Term\']}} {{value}} …").',
+            f'{phase}(t"{{pg[\'Term\']}} {{value}} …"), or use @scenario(..., '
+            f'group_parametrized=False) to emit one scenario per case.',
         )
+
+
+def _case_term_refs(
+    index: int, path: StepPath, ctx: GroupContext
+) -> Iterator[NarrationTermRef]:
+    """The part at the baseline's position in each comparable case.
+
+    Rule 6 pins every comparable case to the baseline's template, so a term ref
+    here is a term ref there; what may still differ is which term it names and
+    how it reads, which is what rule 4 is about.
+    """
+    for case in ctx.comparable:
+        case_part = ctx.indexed[case.id][path].narration.parts[index]
+        assert isinstance(case_part, NarrationTermRef), (
+            'rule 6 admits only cases shaped like the baseline'
+        )
+        yield case_part
