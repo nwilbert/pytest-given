@@ -3,7 +3,7 @@ import json
 import sys
 from pathlib import Path
 
-from ..model import PytestGivenError, report_from_dict
+from ..model import PytestGivenError, ReportData, report_from_dict
 from .html_renderer import render_html
 from .md_renderer import render_md
 from .source_link import resolve_template
@@ -42,12 +42,7 @@ def add_report_parser(
 def run_report(args: argparse.Namespace) -> int:
     """Render a saved JSON report to HTML or Markdown.
 
-    Every foreseeable failure here is a problem with the *inputs* — a report
-    written by an older pytest-given, a hand-edited or truncated file, a typo
-    in a `--source-link` preset — so each is reported as a CLI error rather
-    than a traceback. This is what `serde`'s stale-report messages are for,
-    and it matches the plugin path, which maps the same errors to
-    `pytest.UsageError`.
+    Input problems are reported as CLI errors rather than tracebacks.
     """
     if not args.json_file.exists():
         print(f'Error: {args.json_file} not found', file=sys.stderr)
@@ -62,9 +57,28 @@ def run_report(args: argparse.Namespace) -> int:
         return 1
 
 
+def _load_report(json_file: Path) -> ReportData:
+    """Deserialize the input file, mapping a shape mismatch to a
+    `PytestGivenError`.
+
+    `report_from_dict` indexes whatever it is handed, so a file that parses as
+    JSON but is not a pytest-given report surfaces as a builtin from deep inside
+    serde. Converting here rather than widening the handler in `run_report`
+    keeps the same builtins raised by a *renderer* visible as the bugs they
+    would be.
+    """
+    report_dict = json.loads(json_file.read_text(encoding='utf-8'))
+    try:
+        return report_from_dict(report_dict)
+    except (AttributeError, KeyError, TypeError) as error:
+        raise PytestGivenError(
+            f'{json_file} is not a pytest-given report, or was written by an '
+            f'incompatible version ({type(error).__name__}: {error}).'
+        ) from error
+
+
 def _render_report(args: argparse.Namespace) -> int:
-    report_dict = json.loads(args.json_file.read_text(encoding='utf-8'))
-    report = report_from_dict(report_dict)
+    report = _load_report(args.json_file)
     fmt = args.format or _infer_format(args.output)
     if fmt == 'md':
         md = render_md(report)

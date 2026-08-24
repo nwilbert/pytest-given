@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from pytest_given.cli import main
 
 
@@ -225,6 +227,35 @@ def test_cli_reports_a_stale_report_without_a_traceback(tmp_path: Path, capsys) 
     assert rc == 1
     err = capsys.readouterr().err
     assert 'Error' in err
+    assert 'Traceback' not in err
+
+
+@pytest.mark.parametrize(
+    'payload',
+    [
+        pytest.param({'scenarios': []}, id='missing-key'),
+        pytest.param([1, 2], id='not-an-object'),
+        pytest.param({**_minimal_report(), 'glossary': 7}, id='member-of-wrong-type'),
+        pytest.param(
+            {**_minimal_report(), 'scenarios': ['nope']}, id='scenario-not-an-object'
+        ),
+    ],
+)
+def test_cli_reports_a_report_of_the_wrong_shape_without_a_traceback(
+    payload: object, tmp_path: Path, capsys
+) -> None:
+    """JSON that parses but is not a pytest-given report.
+
+    `report_from_dict` indexes what it is handed, so each of these surfaces as a
+    different builtin from deep inside serde — `KeyError`, `TypeError`,
+    `AttributeError`. The CLI owes the user one message either way.
+    """
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(payload), encoding='utf-8')
+    rc = main(['report', str(json_path), '-o', str(tmp_path / 'o.html')])
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert 'not a pytest-given report' in err
     assert 'Traceback' not in err
 
 
