@@ -1,0 +1,131 @@
+{#
+  Macros shared by the report's three views.
+
+  Kept out of report.html.j2 so the page reads as its own structure — header,
+  tabs, the three views — rather than opening with 120 lines of helpers.
+  Imported `with context`, so the environment's filters (`narration`,
+  `source_url`, `inline_md`) and the render context resolve exactly as they
+  did inline.
+
+  The two-space indent is deliberate: these lines moved here verbatim, which
+  is what makes the rendered HTML byte-identical to before the split.
+#}
+  {%- macro source_link(source) -%}
+    {%- if source -%}
+      {%- set url = source | source_url -%}
+      {%- if url -%}
+      <a href="{{ url }}">{{ source.relpath }}:{{ source.line }}</a>
+      {%- else -%}
+      <span>{{ source.relpath }}:{{ source.line }}</span>
+      {%- endif -%}
+    {%- endif -%}
+  {%- endmacro -%}
+
+  {%- macro anchor_link(hash) -%}
+    <button type="button" class="anchor-link" title="Copy link"
+            data-anchor="{{ hash }}"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+  {%- endmacro -%}
+
+  {%- macro render_error(error) -%}
+    {%- set internal_count = error.frames | selectattr('is_internal') | list | length -%}
+    <div class="error-block"{% if internal_count %} x-data="{ showInternal: false }"{% endif %}>
+      <div class="error-message">{{ error.message }}</div>
+      {%- if internal_count -%}
+        <button class="error-toggle" type="button" @click="showInternal = !showInternal">
+          <span x-show="!showInternal">Show {{ internal_count }} internal frame{{ '' if internal_count == 1 else 's' }}</span>
+          <span x-show="showInternal" x-cloak>Hide internal frames</span>
+        </button>
+      {%- endif -%}
+      {%- if error.frames -%}
+        <div class="error-frames">
+          {%- for f in error.frames -%}
+            <div class="error-frame{% if f.is_internal %} error-frame-internal{% endif %}"
+                 {%- if f.is_internal %} x-show="showInternal" x-cloak{% endif -%}>
+              <div class="error-frame-loc">{{ f.path }}:{{ f.lineno }}: in {{ f.func }}</div>
+              <pre class="error-frame-code">{{ f.code }}</pre>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+      {%- if error.error_tail -%}<pre class="error-tail">{{ error.error_tail }}</pre>{%- endif -%}
+    </div>
+  {%- endmacro -%}
+
+  {#- `step_id` is interpolated straight into the Alpine expressions below,
+      which is only safe because every caller builds it from loop indices
+      ('s0_1_2') and never from report data. Alpine compiles a directive's
+      decoded attribute text as JS, so a value carrying a `'` would break out
+      of the string literal — HTML-escaping does not stop that. Anything
+      data-derived goes in a `data-*` attribute and is read via
+      `$el.dataset.*`, as `data-tag` and `data-term-id` do. -#}
+  {#- The glyph names what the payload is, rather than that there is one:
+      braces for JSON, a page for text. Anything but 'json' takes the page —
+      a content type this template has not met reads as text, which is what
+      an unrecognized payload is displayed as anyway. -#}
+  {%- macro attachment_icon(content_type) -%}
+    {%- if content_type == 'json' -%}
+    <svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>
+    {%- else -%}
+    <svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+    {%- endif -%}
+  {%- endmacro -%}
+
+  {#- Badge plus the payload it expands, keyed on `cell_id`. The step tree and
+      the case table both attach this way; only a promoted attachment differs,
+      having no payload of its own to expand. -#}
+  {#- A badge opens a payload, so it is operable: reachable by keyboard and
+      announced as a control, not as decorated text. -#}
+  {%- macro attachment_badge(cell_id, label, content_type) -%}
+    <span class="attachment-badge" role="button" tabindex="0"
+          :aria-expanded="expandedAttachments['{{ cell_id }}'] ? 'true' : 'false'"
+          @click="toggleAttachment('{{ cell_id }}')"
+          @keydown.enter.prevent="toggleAttachment('{{ cell_id }}')"
+          @keydown.space.prevent="toggleAttachment('{{ cell_id }}')">{{ attachment_icon(content_type) }}{{ label }}</span>
+  {%- endmacro -%}
+
+  {%- macro expandable_attachment(cell_id, label, content, content_type) -%}
+    {{ attachment_badge(cell_id, label, content_type) }}
+    <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
+      <div class="attachment-expand-inner">
+        <div class="attachment-content"><pre>{{ content }}</pre></div>
+      </div>
+    </div>
+  {%- endmacro -%}
+
+  {%- macro render_step(step, step_id) -%}
+  <div class="step-text">
+    {%- if step.children and step.children | length > 0 -%}
+      <span class="step-toggle" @click="toggleStep('{{ step_id }}')">
+        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['{{ step_id }}'] }"></span>
+        {{ step.narration | narration }}
+      </span>
+    {%- else -%}
+      {{ step.narration | narration }}
+    {%- endif -%}
+  </div>
+  {%- if step.children and step.children | length > 0 -%}
+    <div class="step-expand" :class="{ expanded: expandedSteps['{{ step_id }}'] }">
+      <div class="step-children">
+        {%- for child in step.children -%}
+          {{ render_step(child, step_id ~ '_' ~ loop.index0) }}
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+  {%- if step.attachments -%}
+    {%- for att in step.attachments -%}
+    {%- if att is attachment_ref -%}
+    <div>
+      <span class="attachment-badge" data-param="{{ att.column_id }}"
+            @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
+            @mouseleave="setHoverParam(null, $event.currentTarget)">{{ attachment_icon(att.content_type) }}{{ att.label }}</span>
+    </div>
+    {%- else -%}
+    <div>
+      {{ expandable_attachment(step_id ~ '_att_' ~ loop.index0, att.label, att.content, att.content_type) }}
+    </div>
+    {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {%- endmacro -%}
