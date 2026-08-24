@@ -11,16 +11,7 @@ from ..model import (
     narration_text,
     render_interpolation,
 )
-from .glossary import (
-    Actor,
-    ActorInstance,
-    DeferredTermHandle,
-    DeferredTermInstance,
-    InflectedVerb,
-    Verb,
-    WorkObject,
-    WorkObjectInstance,
-)
+from .glossary import TermHandle, TermInstance
 
 _FORMATTER = Formatter()
 
@@ -144,19 +135,10 @@ def try_term_ref(
     parse time rather than silently dropped.
     """
     match value:
-        case Actor() | WorkObject() | Verb():
+        case TermHandle():
             display = value.canonical
             term_id = value.id
-        case ActorInstance(actor=h, display=display):
-            term_id = h.id
-        case WorkObjectInstance(work_object=h, display=display):
-            term_id = h.id
-        case InflectedVerb(verb=h, display=display):
-            term_id = h.id
-        case DeferredTermHandle():
-            display = value.canonical
-            term_id = value.id
-        case DeferredTermInstance(handle=handle, display=display):
+        case TermInstance(handle=handle, display=display):
             term_id = handle.id
         case _:
             return None

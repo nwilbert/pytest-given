@@ -16,46 +16,17 @@ from ..model import (
     StoryId,
     id_derive,
 )
-from .glossary import (
-    Actor,
-    ActorInstance,
-    DeferredTermHandle,
-    DeferredTermInstance,
-    InflectedVerb,
-    TermHandle,
-    Verb,
-    WorkObject,
-    WorkObjectInstance,
-)
+from .glossary import TermHandle, TermInstance
 from .source import capture_caller_source
 
-type _PathArg = (
-    Actor
-    | WorkObject
-    | Verb
-    | ActorInstance
-    | WorkObjectInstance
-    | InflectedVerb
-    | DeferredTermHandle
-    | DeferredTermInstance
-    | str
-)
+type _PathArg = TermHandle | TermInstance | str
 
-# Even positions are graph nodes (entities); odd positions are edges (a verb
-# arrow or a bare-string connective). A DeferredTermHandle/Instance is
-# structurally valid at either kind of position; whether it actually fits is
-# decided by `_check_position` when the glossary declared a kind, and deferred
-# to kind inference + _slot_for when it did not.
-_ACTOR_TYPES = (Actor, ActorInstance, DeferredTermHandle, DeferredTermInstance)
-_VERB_TYPES = (Verb, InflectedVerb, DeferredTermHandle, DeferredTermInstance)
-_NODE_TYPES = (
-    Actor,
-    ActorInstance,
-    WorkObject,
-    WorkObjectInstance,
-    DeferredTermHandle,
-    DeferredTermInstance,
-)
+# What every slot accepts structurally: a glossary reference of some sort, or a
+# bare connective. Which *kind* of reference fits a given position is a
+# separate question, answered by `_check_position` from the term's declared
+# kind — and, for a term that declares none, deferred to kind inference and
+# `_slot_for`.
+_TERM_TYPES = (TermHandle, TermInstance)
 
 
 def path(*parts: _PathArg) -> ActivityPath:
@@ -77,11 +48,11 @@ def path(*parts: _PathArg) -> ActivityPath:
         if isinstance(part, str):
             continue  # a bare word carries no role; valid at any position
         if position == 0:
-            _check_position(part, 0, 'actor', _ACTOR_TYPES, parts)
+            _check_position(part, 0, 'actor', parts)
         elif position % 2 == 1:
-            _check_position(part, position, 'verb', _VERB_TYPES, parts)
+            _check_position(part, position, 'verb', parts)
         else:
-            _check_position(part, position, 'noun', _NODE_TYPES, parts)
+            _check_position(part, position, 'noun', parts)
     schema_parts = tuple(_to_part(part) for part in parts)
     # Stash the live Glossary objects the path references, keyed by object id —
     # read by activity() and _check_single_glossary to enforce the v1 "one
@@ -113,19 +84,8 @@ def _pin_glossaries(
 
 
 def _glossary_of(value: object) -> Glossary | None:
-    match value:
-        case Actor() | WorkObject() | Verb():
-            return value.glossary
-        case ActorInstance(actor=h):
-            return h.glossary
-        case WorkObjectInstance(work_object=h):
-            return h.glossary
-        case InflectedVerb(verb=h):
-            return h.glossary
-        case DeferredTermHandle():
-            return value.glossary
-        case DeferredTermInstance(handle=handle):
-            return handle.glossary
+    if isinstance(value, _TERM_TYPES):
+        return value.glossary
     return None
 
 
@@ -284,37 +244,19 @@ _ROLE_LABEL = {'actor': 'an actor', 'verb': 'a verb', 'noun': 'a noun'}
 def _declared_kind(value: object) -> str | None:
     """The kind a part already claims, or None when it is still deferred.
 
-    Eager handles carry their kind in the Python type; a deferred handle carries
-    whatever the glossary declared (a `kind_column` row), which is `None` until
-    inference runs. Reading both here is what lets one check cover both glossary
-    flavors at construction time."""
-    match value:
-        case Actor() | ActorInstance():
-            return 'actor'
-        case WorkObject() | WorkObjectInstance():
-            return 'object'
-        case Verb() | InflectedVerb():
-            return 'verb'
-        case DeferredTermHandle():
-            return value.term.kind
-        case DeferredTermInstance(handle=handle):
-            return handle.term.kind
+    One reading for both glossary flavors — `g.actor(...)` wrote its kind into
+    the term at registration, and a file-glossary row carries whatever its kind
+    column said — which is what lets one check cover both at construction
+    time."""
+    if isinstance(value, _TERM_TYPES):
+        return value.declared_kind
     return None
 
 
 def _term_name(value: object) -> str:
     """The canonical term name behind a handle or instance, for error text."""
-    match value:
-        case TermHandle():
-            return value.term.canonical
-        case (
-            ActorInstance(actor=h)
-            | WorkObjectInstance(work_object=h)
-            | InflectedVerb(verb=h)
-        ):
-            return h.term.canonical
-        case DeferredTermInstance(handle=handle):
-            return handle.term.canonical
+    if isinstance(value, _TERM_TYPES):
+        return value.term.canonical
     return type(value).__name__
 
 
@@ -330,7 +272,6 @@ def _check_position(
     value: object,
     pos: int,
     role: str,
-    accepted: tuple[type, ...],
     full_parts: tuple[object, ...],
 ) -> None:
     """Reject a part whose kind cannot fill this slot.
@@ -344,7 +285,9 @@ def _check_position(
         if declared in _ROLE_ACCEPTS[role]:
             return
         problem = f'{_term_name(value)!r} is declared {_KIND_LABEL[declared]}'
-    elif isinstance(value, accepted):
+    elif isinstance(value, _TERM_TYPES):
+        # A term that declares no kind fits any slot here; which one it really
+        # belongs to is `infer_glossary_kinds`' answer, from these positions.
         return
     else:
         problem = f'got {type(value).__name__}'
@@ -373,17 +316,9 @@ def _suggestion_for(role: str) -> str:
 
 def _to_part(value: _PathArg) -> ActivityPart:
     match value:
-        case Actor() | WorkObject() | Verb():
+        case TermHandle():
             return ActivityTermRef(term_id=value.id, display=value.canonical)
-        case ActorInstance(actor=actor, display=display):
-            return ActivityTermRef(term_id=actor.id, display=display)
-        case WorkObjectInstance(work_object=wo, display=display):
-            return ActivityTermRef(term_id=wo.id, display=display)
-        case InflectedVerb(verb=verb, display=display):
-            return ActivityTermRef(term_id=verb.id, display=display)
-        case DeferredTermHandle():
-            return ActivityTermRef(term_id=value.id, display=value.canonical)
-        case DeferredTermInstance(handle=handle, display=display):
+        case TermInstance(handle=handle, display=display):
             return ActivityTermRef(term_id=handle.id, display=display)
         case str():
             return ActivityWord(text=value)

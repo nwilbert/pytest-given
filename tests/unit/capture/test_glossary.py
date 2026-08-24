@@ -16,14 +16,11 @@ from pytest_given.capture import glossary as gloss_mod
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.glossary import (
     Actor,
-    ActorInstance,
     DeferredTermHandle,
-    DeferredTermInstance,
     Glossary,
-    InflectedVerb,
+    TermInstance,
     Verb,
     WorkObject,
-    WorkObjectInstance,
     id_derive,
 )
 from pytest_given.model import GlossaryTerm, SourceLocation, TermId
@@ -115,8 +112,8 @@ def test_actor_call_returns_instance_with_distinct_display():
     with when(t'the {pg["Actor"]} is called with a name'):
         inst = a('Alice')
     with then(t'an {pg["Instance"]} with a distinct display is returned'):
-        assert isinstance(inst, ActorInstance)
-        assert inst.actor is a
+        assert isinstance(inst, TermInstance)
+        assert inst.handle is a
         assert inst.display == 'Alice'
 
 
@@ -125,8 +122,8 @@ def test_work_object_call_returns_instance_with_distinct_display():
     t = GlossaryTerm(id=TermId('room'), kind='object', canonical='Room')
     w = WorkObject(_term=t, _glossary=g)
     inst = w('Deluxe Suite')
-    assert isinstance(inst, WorkObjectInstance)
-    assert inst.work_object is w
+    assert isinstance(inst, TermInstance)
+    assert inst.handle is w
     assert inst.display == 'Deluxe Suite'
 
 
@@ -142,8 +139,8 @@ def test_verb_call_returns_inflection_sharing_term_identity():
     with when(t'the {pg["Verb"]} is called with a surface form'):
         infl = v('confirms')
     with then(t'an {pg["Inflection"]} sharing the verb identity is returned'):
-        assert isinstance(infl, InflectedVerb)
-        assert infl.verb is v
+        assert isinstance(infl, TermInstance)
+        assert infl.handle is v
         assert infl.display == 'confirms'
 
 
@@ -367,7 +364,7 @@ def test_low_yields_lowercased_display_instance():
     g = Glossary()
     handle = g('Loyalty Points')
     low = handle.low
-    assert isinstance(low, DeferredTermInstance)
+    assert isinstance(low, TermInstance)
     assert low.handle is handle
     assert low.display == 'loyalty points'
 
@@ -379,8 +376,8 @@ def test_actor_low_yields_lowercased_instance():
         _glossary=g,
     )
     low = a.low
-    assert isinstance(low, ActorInstance)
-    assert low.actor is a
+    assert isinstance(low, TermInstance)
+    assert low.handle is a
     assert low.display == 'guest'
 
 
@@ -391,8 +388,8 @@ def test_work_object_low_yields_lowercased_instance():
         _glossary=g,
     )
     low = w.low
-    assert isinstance(low, WorkObjectInstance)
-    assert low.work_object is w
+    assert isinstance(low, TermInstance)
+    assert low.handle is w
     assert low.display == 'room'
 
 
@@ -403,8 +400,8 @@ def test_verb_low_yields_lowercased_inflection():
         _glossary=g,
     )
     low = v.low
-    assert isinstance(low, InflectedVerb)
-    assert low.verb is v
+    assert isinstance(low, TermInstance)
+    assert low.handle is v
     assert low.display == 'confirm'
 
 

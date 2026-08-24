@@ -28,10 +28,33 @@ def _normalize_definition(definition: str | None) -> str | None:
 
 @dataclass(frozen=True)
 class TermHandle:
-    """Common base: a GlossaryTerm + back-ref to its owning Glossary."""
+    """A `GlossaryTerm` plus a back-ref to its owning `Glossary`.
+
+    The whole behavior of a handle lives here: calling one names a surface form
+    for the term, and `declared_kind` reads whatever kind the registration
+    settled on. The subclasses below add nothing but their name — which is the
+    point, since `g.actor(...)` returning an `Actor` is what makes the kind
+    visible at the call site and in a type annotation.
+    """
 
     _term: GlossaryTerm
     _glossary: BaseGlossary
+
+    def __call__(self, display: str) -> TermInstance:
+        """This term as one call site reads it (``guest('Alice')``).
+
+        Whether that reads as a distinct entity or as a mere inflection is the
+        *term's* business, decided from `declared_kind` where it matters (see
+        `report.coverage.identity_of_part`) — an actor's `Alice` is its own
+        identity, a verb's `books` is the same verb in another form.
+        """
+        return TermInstance(handle=self, display=display)
+
+    @property
+    def low(self) -> TermInstance:
+        """The canonical term lowercased — the common mid-sentence form
+        (``guest.low`` instead of ``guest('guest')``)."""
+        return self(self.canonical.lower())
 
     @property
     def term(self) -> GlossaryTerm:
@@ -49,65 +72,63 @@ class TermHandle:
     def canonical(self) -> str:
         return self._term.canonical
 
+    @property
+    def declared_kind(self) -> Literal['actor', 'object', 'verb'] | None:
+        """The kind the term claims, or None while it is still deferred.
+
+        One reading for every flavor: an eager handle's kind was written into
+        the term by `_register_kind`, and a deferred one carries whatever the
+        glossary declared — `None` until `infer_glossary_kinds` settles it.
+        """
+        return self._term.kind
+
+
+@dataclass(frozen=True)
+class TermInstance:
+    """A term wearing one surface form: the handle it came from, plus display.
+
+    One type for every kind. The three it replaces (`ActorInstance`,
+    `WorkObjectInstance`, `InflectedVerb`) differed only in the name of this
+    field, which bought nothing — every consumer had to enumerate all three,
+    and the identity rule they were supposed to encode is read off the term's
+    kind at use time regardless.
+    """
+
+    handle: TermHandle
+    display: str
+
+    @property
+    def term(self) -> GlossaryTerm:
+        return self.handle.term
+
+    @property
+    def glossary(self) -> BaseGlossary:
+        return self.handle.glossary
+
+    @property
+    def declared_kind(self) -> Literal['actor', 'object', 'verb'] | None:
+        return self.handle.declared_kind
+
 
 @dataclass(frozen=True)
 class Actor(TermHandle):
-    def __call__(self, display: str) -> ActorInstance:
-        return ActorInstance(actor=self, display=display)
-
-    @property
-    def low(self) -> ActorInstance:
-        """Instance whose surface is the canonical term lowercased -- the common
-        mid-sentence form (``guest.low`` instead of ``guest('guest')``)."""
-        return self(self.canonical.lower())
+    """A participant in the domain."""
 
 
 @dataclass(frozen=True)
 class WorkObject(TermHandle):
-    def __call__(self, display: str) -> WorkObjectInstance:
-        return WorkObjectInstance(work_object=self, display=display)
-
-    @property
-    def low(self) -> WorkObjectInstance:
-        """Instance whose surface is the canonical term lowercased -- the common
-        mid-sentence form (``room.low`` instead of ``room('room')``)."""
-        return self(self.canonical.lower())
+    """A thing acted on."""
 
 
 @dataclass(frozen=True)
 class Verb(TermHandle):
-    def __call__(self, display: str) -> InflectedVerb:
-        return InflectedVerb(verb=self, display=display)
-
-    @property
-    def low(self) -> InflectedVerb:
-        """Inflection whose surface is the canonical term lowercased -- the common
-        mid-sentence form (``book.low`` instead of ``book('book')``)."""
-        return self(self.canonical.lower())
-
-
-@dataclass(frozen=True)
-class DeferredTermInstance:
-    handle: DeferredTermHandle
-    display: str
+    """An action."""
 
 
 @dataclass(frozen=True)
 class DeferredTermHandle(TermHandle):
-    """Deferred-kind handle for a term whose kind is resolved post-collection
-    (file-glossary terms and code-glossary g(...) / g[...] terms). One type for
-    all kinds, unlike the eager Actor/WorkObject/Verb handles. Callable to
-    override display."""
-
-    def __call__(self, display: str) -> DeferredTermInstance:
-        return DeferredTermInstance(handle=self, display=display)
-
-    @property
-    def low(self) -> DeferredTermInstance:
-        """Instance whose surface is the canonical term lowercased -- the common
-        mid-sentence form (``pg['Attachment'].low`` instead of
-        ``pg['Attachment']('attachment')``)."""
-        return self(self.canonical.lower())
+    """A term whose kind is settled post-collection — a file-glossary row with
+    no kind column, or a code-glossary `g(...)` / `g[...]` lookup."""
 
 
 def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:
@@ -120,24 +141,6 @@ def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:
         and existing.canonical == candidate.canonical
         and existing.definition == candidate.definition
     )
-
-
-@dataclass(frozen=True)
-class ActorInstance:
-    actor: Actor
-    display: str
-
-
-@dataclass(frozen=True)
-class WorkObjectInstance:
-    work_object: WorkObject
-    display: str
-
-
-@dataclass(frozen=True)
-class InflectedVerb:
-    verb: Verb
-    display: str
 
 
 def _register_kind(
