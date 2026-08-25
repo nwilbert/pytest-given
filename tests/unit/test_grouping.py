@@ -2614,3 +2614,26 @@ def test_a_scenario_name_slot_over_a_term_instance_keeps_pointing_at_its_cell() 
     slot = grouped.narration.parts[1]
     assert isinstance(slot, NarrationPlaceholder)
     assert slot.column_id == 'who'
+
+
+def test_a_formatted_step_slot_over_a_term_instance_falls_back_to_the_display() -> None:
+    """A slot carrying a format spec does not unwrap the term itself — but the
+    term instance refuses the spec, so cell and slot both fall back to the
+    plain coercion, agree, and the slot keeps the shared column."""
+    parts: list[NarrationPart] = [
+        NarrationLiteral(value='the '),
+        NarrationPlaceholder(name='who', column_id='who', format_spec='>8'),
+        NarrationLiteral(value=' arrives'),
+    ]
+    step = Step(
+        phase='given', narration=Narration(text=narration_text(parts), parts=parts)
+    )
+    scenarios, info = _term_group([step], [dataclasses.replace(step)])
+    grouped = group_parametrized(scenarios, info)[0]
+    table = grouped.parameters
+    assert table is not None
+    assert [(c.id, c.kind) for c in table.columns] == [('who', 'param')]
+    assert [c.values for c in table.cases] == [['Alice'], ['Bob']]
+    slot = grouped.steps[0].narration.parts[1]
+    assert isinstance(slot, NarrationPlaceholder)
+    assert slot.column_id == 'who'

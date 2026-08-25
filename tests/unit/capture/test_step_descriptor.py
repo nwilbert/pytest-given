@@ -1111,3 +1111,30 @@ def test_decorator_leaves_an_async_generator_fixture_body_to_the_hook() -> None:
         set_active_collector(None)
     assert scenario.steps == []
     assert cast(StepDecorated, session)._step_descriptor is desc
+
+
+def test_decorator_template_slot_records_a_term_instance_as_a_term_ref() -> None:
+    """A `Template` label bound to a glossary term instance narrates the
+    instance's display as a real term ref.
+
+    Resolving the slot with `str()` alone would record the whole `Glossary`
+    dataclass repr — hundreds of characters — as the step's text.
+    """
+    g = Glossary()
+    guest = g.actor('Guest', definition='')
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+
+        @given(Template('the {who} checks in'))
+        def arrive(who: object) -> None: ...
+
+        arrive(guest('Alice'))
+        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+    finally:
+        set_active_collector(None)
+    step = recorded.steps[0]
+    assert step.narration.text == 'the Alice checks in'
+    ref = next(p for p in step.narration.parts if isinstance(p, NarrationTermRef))
+    assert (ref.term_id, ref.display) == (guest.id, 'Alice')
