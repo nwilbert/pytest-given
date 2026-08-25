@@ -43,7 +43,7 @@ class GroupContext:
     # step or in the scenario name — records no per-case rendering to compare
     # against, so what it renders has to be recomputed from these; see
     # `templatize._reconciled_slot`.
-    case_params: dict[NodeId, dict[str, RawParamValue]] = field(default_factory=dict)
+    case_params: dict[NodeId, dict[str, RawParamValue]]
     columns: list[ParameterColumn] = field(default_factory=list)
     cells: dict[str, dict[NodeId, CellValue | None]] = field(default_factory=dict)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)

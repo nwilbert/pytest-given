@@ -2,7 +2,7 @@
 
 import pytest
 
-from pytest_given import Template, given, scenario, then, when
+from pytest_given import Glossary, Template, given, scenario, then, when
 from pytest_given.capture import narration_from
 from pytest_given.grouping import group_parametrized
 from pytest_given.model import (
@@ -196,3 +196,26 @@ def test_a_placeholder_naming_no_parameter_raises() -> None:
 
     with pytest.raises(PytestGivenError, match='cup_zize'):
         group_parametrized(scenarios, param_info)
+
+
+def test_a_declined_scenario_name_slot_resolves_a_term_instance_to_a_term_ref() -> None:
+    """`group_parametrized=False` is what rule 4 tells an author to reach for
+    when a term ref has to vary per case, so the slot it substitutes has to
+    resolve a term instance the way the grouped path's cell does — to the
+    instance's display, not to the whole `Glossary` dataclass repr.
+    """
+    glossary = Glossary()
+    guest = glossary.actor('Guest')
+    scenarios, param_info = _opted_out_group(
+        Template('{who} books'),
+        values=(guest('Alice'),),
+        names=('who',),
+        statuses=('passed',),
+    )
+
+    narration = group_parametrized(scenarios, param_info)[0].narration
+
+    assert narration.text.startswith('Alice books')
+    part = narration.parts[0]
+    assert isinstance(part, NarrationTermRef)
+    assert (part.term_id, part.display) == (TermId('guest'), 'Alice')

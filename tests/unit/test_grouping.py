@@ -2541,3 +2541,76 @@ def test_a_varying_str_narration_keeps_rule_ones_diagnosis() -> None:
     )
     with pytest.raises(PytestGivenError, match='records no parts'):
         group_parametrized(scenarios, info)
+
+
+def _term_group(
+    steps1: list[Step], steps2: list[Step]
+) -> tuple[list[Scenario], ParamInfo]:
+    """`_two_case_group` over a glossary term instance rather than an int."""
+    glossary = Glossary()
+    guest = glossary.actor('Guest')
+    scenarios, info = _two_case_group(steps1, steps2)
+    return scenarios, {
+        nid: ParamSpec(names=['who'], values=[guest(display)])
+        for nid, display in zip(info, ('Alice', 'Bob'), strict=True)
+    }
+
+
+def _who_slot(text_before: str) -> list[NarrationPart]:
+    return [
+        NarrationLiteral(value=text_before),
+        NarrationPlaceholder(name='who', column_id='who'),
+        NarrationLiteral(value=' arrives'),
+    ]
+
+
+def _who_step() -> Step:
+    parts = _who_slot('the ')
+    return Step(
+        phase='given', narration=Narration(text=narration_text(parts), parts=parts)
+    )
+
+
+def _who_name() -> Narration:
+    parts = _who_slot('')
+    return Narration(text=narration_text(parts), parts=parts)
+
+
+@scenario(
+    t'A {pg["Step"].low} narrating a glossary term parameter keeps pointing at '
+    t'its {pg["Parameter table"].low} column',
+    tags=['parametrization'],
+)
+def test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell() -> None:
+    """The cell unwraps a term instance to its display, so what the slot
+    renders has to be built the same way. Compared against a bare
+    `format(value, '')` — the whole `Glossary` dataclass repr — it never
+    matches, and that repr lands in a `derived` column the report then shows.
+    """
+    with given('a step narrating a parameter bound to a glossary term instance'):
+        scenarios, info = _term_group([_who_step()], [_who_step()])
+    with when(t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}'):
+        grouped = group_parametrized(scenarios, info)[0]
+    with then(t'the {pg["Parameter table"].low} holds the term displays alone'):
+        table = grouped.parameters
+        assert table is not None
+        assert [(c.id, c.kind) for c in table.columns] == [('who', 'param')]
+        assert [c.values for c in table.cases] == [['Alice'], ['Bob']]
+    with then('the step still points at that column'):
+        slot = grouped.steps[0].narration.parts[1]
+        assert isinstance(slot, NarrationPlaceholder)
+        assert slot.column_id == 'who'
+
+
+def test_a_scenario_name_slot_over_a_term_instance_keeps_pointing_at_its_cell() -> None:
+    """The name half of the same rule."""
+    scenarios, info = _term_group([], [])
+    for case in scenarios:
+        case.narration = _who_name()
+    grouped = group_parametrized(scenarios, info)[0]
+    table = grouped.parameters
+    assert table is not None
+    assert [(c.id, c.kind) for c in table.columns] == [('who', 'param')]
+    slot = grouped.narration.parts[1]
+    assert isinstance(slot, NarrationPlaceholder)
+    assert slot.column_id == 'who'

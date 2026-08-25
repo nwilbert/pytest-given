@@ -1619,6 +1619,14 @@
 - **then** the grouping is refused
 - **then** the error names the divergence and the opt-out that answers it
 
+## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
+`tests/unit/test_grouping.py:2579::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
+
+- **given** a step narrating a parameter bound to a glossary term instance
+- **when** the «cases» are «grouped»
+- **then** the «parameter table» holds the term displays alone
+- **then** the step still points at that column
+
 ## ✓ A «parametrized scenario» can decline the «grouping» and keep one «scenario» per «case»
 `tests/unit/test_percase.py:59::test_opted_out_group_emits_one_scenario_per_case` · parametrization
 

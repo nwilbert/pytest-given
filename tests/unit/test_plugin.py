@@ -16,7 +16,12 @@ from pytest_given.capture.collector import (
     get_active_collector,
     set_active_collector,
 )
-from pytest_given.capture.decorators import ScenarioDecorator, StepDescriptor
+from pytest_given.capture.decorators import (
+    ScenarioDecorator,
+    StepDescriptor,
+    annotated_given_descriptors,
+)
+from pytest_given.capture.params import snapshot_param_value
 from pytest_given.capture.source import file_source
 from pytest_given.capture.story import (
     clear_story_registry,
@@ -394,7 +399,7 @@ def test_validate_scenario_story_binding_activities_without_story_raises() -> No
 def test_extract_given_descriptor_from_parametrize_param() -> None:
     def f(text: Annotated[str, given(Template('the name {text}'))]) -> None: ...
 
-    descs = plugin._annotated_given_descriptors(f)
+    descs = annotated_given_descriptors(f)
     assert set(descs) == {'text'}
     assert descs['text'].phase == 'given'
 
@@ -402,14 +407,14 @@ def test_extract_given_descriptor_from_parametrize_param() -> None:
 def test_extract_ignores_unannotated_and_plain_annotated_params() -> None:
     def f(a: int, b: Annotated[str, 'just a string'], c: str) -> None: ...
 
-    assert plugin._annotated_given_descriptors(f) == {}
+    assert annotated_given_descriptors(f) == {}
 
 
 def test_extract_skips_self() -> None:
     class T:
         def m(self, text: Annotated[str, given('a name')]) -> None: ...
 
-    descs = plugin._annotated_given_descriptors(T.m)
+    descs = annotated_given_descriptors(T.m)
     assert set(descs) == {'text'}
 
 
@@ -417,14 +422,14 @@ def test_extract_rejects_when_in_annotated() -> None:
     def f(x: Annotated[int, when('an action')]) -> None: ...
 
     with pytest.raises(PytestGivenError, match='only given'):
-        plugin._annotated_given_descriptors(f)
+        annotated_given_descriptors(f)
 
 
 def test_extract_rejects_then_in_annotated() -> None:
     def f(x: Annotated[int, then('an outcome')]) -> None: ...
 
     with pytest.raises(PytestGivenError, match='only given'):
-        plugin._annotated_given_descriptors(f)
+        annotated_given_descriptors(f)
 
 
 def test_extract_rejects_tstring_label() -> None:
@@ -433,14 +438,14 @@ def test_extract_rejects_tstring_label() -> None:
     def f(x: Annotated[int, given(t'a {name} label')]) -> None: ...
 
     with pytest.raises(PytestGivenError, match='t-string'):
-        plugin._annotated_given_descriptors(f)
+        annotated_given_descriptors(f)
 
 
 def test_extract_rejects_multiple_descriptors_on_one_param() -> None:
     def f(x: Annotated[int, given('one'), given('two')]) -> None: ...
 
     with pytest.raises(PytestGivenError, match='multiple'):
-        plugin._annotated_given_descriptors(f)
+        annotated_given_descriptors(f)
 
 
 def test_extract_returns_empty_on_unresolvable_annotations() -> None:
@@ -450,7 +455,7 @@ def test_extract_returns_empty_on_unresolvable_annotations() -> None:
     ) -> None: ...
 
     # Best-effort: an unresolvable sibling annotation must not raise.
-    assert plugin._annotated_given_descriptors(f) == {}
+    assert annotated_given_descriptors(f) == {}
 
 
 def test_graft_skips_recording_not_belonging_to_item(
@@ -507,13 +512,13 @@ def test_an_uncopyable_parametrize_value_is_kept_as_it_is() -> None:
     mutation could not have been guarded against anyway, and refusing to copy
     it must not take the run down with it."""
     value = _Uncopyable()
-    assert plugin._snapshot(value) is value
+    assert snapshot_param_value(value) is value
 
 
 def test_a_copyable_parametrize_value_is_snapshotted() -> None:
     """The copy is what keeps a later in-place mutation out of the table."""
     value = ['latte']
-    snapshot = plugin._snapshot(value)
+    snapshot = snapshot_param_value(value)
     value.append('cup')
     assert snapshot == ['latte']
 
@@ -529,7 +534,7 @@ def test_a_value_rendering_by_identity_is_kept_as_it_is() -> None:
     the rebound-parameter rule as a rebinding that never happened. Mutation
     cannot change such a rendering, so the copy protects nothing."""
     value = _IdentityRepr()
-    assert plugin._snapshot(value) is value
+    assert snapshot_param_value(value) is value
 
 
 class _StrByValueReprByIdentity:
@@ -543,4 +548,4 @@ class _StrByValueReprByIdentity:
 def test_a_value_rendering_by_identity_under_repr_only_is_kept_as_it_is() -> None:
     """Both renderings are checked: an interpolation may ask for either."""
     value = _StrByValueReprByIdentity()
-    assert plugin._snapshot(value) is value
+    assert snapshot_param_value(value) is value

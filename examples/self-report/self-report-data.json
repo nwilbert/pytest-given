@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-24T09:01:42.816283+00:00",
+    "timestamp": "2026-08-25T09:37:38.545641+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "eb6d2982a9eeaa42ac29e8b54e40e8dfd9f1226f",
+    "commit_sha": "0d6b77a841718bfe188fab72272496217f48ad91",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -13941,7 +13941,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -16557,6 +16557,123 @@
         "line": 2451
       },
       "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/test_grouping.py::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell",
+      "narration": {
+        "text": "A step narrating a glossary term parameter keeps pointing at its parameter table column",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low"
+          },
+          {
+            "value": " narrating a glossary term parameter keeps pointing at its "
+          },
+          {
+            "term_id": "parameter-table",
+            "display": "parameter table",
+            "expression": "pg[\"Parameter table\"].low"
+          },
+          {
+            "value": " column"
+          }
+        ]
+      },
+      "module": "tests.unit.test_grouping",
+      "tags": [
+        "parametrization"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a step narrating a parameter bound to a glossary term instance",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the cases are grouped",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"](\"cases\")"
+              },
+              {
+                "value": " are "
+              },
+              {
+                "term_id": "group",
+                "display": "grouped",
+                "expression": "pg[\"Group\"](\"grouped\")"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the parameter table holds the term displays alone",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "parameter-table",
+                "display": "parameter table",
+                "expression": "pg[\"Parameter table\"].low"
+              },
+              {
+                "value": " holds the term displays alone"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the step still points at that column",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/test_grouping.py",
+        "line": 2579
+      },
+      "story_id": null,
       "activity_ids": []
     },
     {

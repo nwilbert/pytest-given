@@ -5,7 +5,7 @@ import types
 import warnings
 from collections.abc import Callable, Mapping, Sequence
 from string import templatelib
-from typing import Any, Protocol, Self, cast, runtime_checkable
+from typing import Any, Protocol, Self, cast, get_type_hints, runtime_checkable
 
 import pytest
 
@@ -21,11 +21,10 @@ from ..model import (
     SourceLocation,
     Story,
     narration_text,
-    placeholder_value,
 )
 from .collector import Collector, get_active_collector, no_scenario_error
 from .source import capture_caller_source, code_source
-from .template import Template, narration_from
+from .template import Template, narration_from, resolved_placeholder_part
 
 
 @runtime_checkable
@@ -478,7 +477,7 @@ def _resolve_template_parts(
             case NarrationLiteral():
                 out.append(part)
             case NarrationPlaceholder(name=name):
-                out.append(placeholder_value(part, mapping[name]))
+                out.append(resolved_placeholder_part(part, mapping[name]))
     return out
 
 
@@ -554,3 +553,52 @@ def scenario(
         activity_ids=activity_ids,
         group_parametrized=group_parametrized,
     )
+
+
+def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
+    """Map each parameter carrying ``Annotated[..., given(...)]`` to its
+    descriptor.
+
+    Reads type hints off the unwrapped function (past the ``@scenario``
+    wrapper). Best-effort: if the annotations cannot be resolved, returns an
+    empty mapping rather than failing the test. Rejects the forbidden forms —
+    ``when(...)`` / ``then(...)``, a t-string label, or more than one
+    descriptor on a single parameter.
+    """
+    target = inspect.unwrap(cast(Any, func))
+    try:
+        hints = get_type_hints(target, include_extras=True)
+    except Exception:  # noqa: BLE001 — annotations are arbitrary user code; see the docstring
+        return {}
+    out: dict[str, StepDescriptor] = {}
+    for name, hint in hints.items():
+        if name in ('self', 'cls', 'return'):
+            continue
+        metadata = getattr(hint, '__metadata__', None)
+        if metadata is None:
+            continue
+        descriptors = [m for m in metadata if isinstance(m, StepDescriptor)]
+        if not descriptors:
+            continue
+        if len(descriptors) > 1:
+            raise PytestGivenError(
+                f'multiple given()/when()/then() in Annotated metadata for '
+                f'parameter {name!r} — use exactly one.'
+            )
+        desc = descriptors[0]
+        if desc.phase != 'given':
+            raise PytestGivenError(
+                f'only given() is supported inside Annotated; parameter '
+                f"{name!r} carries {desc.phase}(). Use 'with when(...)' / "
+                f"'with then(...)' in the test body for the action and outcome."
+            )
+        if isinstance(desc._source, templatelib.Template):
+            raise PytestGivenError(
+                f'Annotated given(t"...") on parameter {name!r} is not '
+                f'supported: a t-string evaluates at function-definition time, '
+                f'where the parameter value is not in scope. Use '
+                f'given(Template("... {{{name}}} ...")) for a per-case '
+                f'placeholder, or a plain string label.'
+            )
+        out[name] = desc
+    return out

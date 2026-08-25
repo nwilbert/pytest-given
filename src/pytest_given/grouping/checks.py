@@ -133,8 +133,9 @@ def _part_key(part: NarrationPart) -> PartKey:
     """A part reduced to its template.
 
     Never `rendered`, which is exactly what grouping promotes into a column,
-    and never a term ref's `display`, which rule 4 governs and which a
-    param-bound term ref varies by design.
+    and never a term ref's `display`, which rule 4 governs: no term ref may
+    vary across cases, and rule 4 names that as the authoring error it is
+    where a template divergence would only report that two cases disagree.
     """
     match part:
         case NarrationLiteral(value=value):

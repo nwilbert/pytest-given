@@ -50,10 +50,17 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
   Every one but the last has the same fix: bind the varying part to a local and
   narrate it with a t-string, keeping labels and term refs constant; content may
-  still vary freely, which is what the new `attachment` column is for. A term ref
-  that *is* the parametrize value has no such split available — parametrize over
-  instances of one term, or take the last one's fix. The last needs
-  `@scenario(..., group_parametrized=False)`, giving each case its own scenario.
+  still vary freely, which is what the new `attachment` column is for. The last
+  needs `@scenario(..., group_parametrized=False)`, giving each case its own
+  scenario.
+
+  Parametrizing over glossary term instances trips the term-ref rule too: with
+  `parametrize('who', [g['Guest']('Alice'), g['Guest']('Bob')])`, the term ref
+  `t"the {who} arrives"` reads `Alice` in one case and `Bob` in the next. The fix
+  is to keep the term out of the parametrize list — parametrize over the plain
+  value (`['Alice', 'Bob']`) and narrate the handle next to it, as in
+  `t"the {g['Guest']} {name} arrives"`. The term ref is then constant in every
+  case and `name` becomes an ordinary `param` column.
 - **Breaking.** `attach()` now takes a plain `str` label; a t-string label raises
   `PytestGivenError` — use an f-string.
 - **Breaking.** `attach()` called with no step open now raises `PytestGivenError`
@@ -81,8 +88,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - **Breaking (JSON report).** `parameters.names` becomes `parameters.columns`
   (`{id, name, kind}`), cells may hold an attachment object, placeholder parts
-  gain `column_id`, and a grouped step's `narration.text` is the template rather
-  than case 1's rendering.
+  gain `column_id`, term-ref parts lose `param_column` (no term ref may vary
+  across cases, so none is bound to a column), and a grouped step's
+  `narration.text` is the template rather than case 1's rendering.
 - **Breaking (JSON report).** A step no longer carries `status` or `error`;
   failure lives on the scenario and on the parameter table's cases, which is
   where both renderers read it. A consumer reading `step.status` should read
@@ -152,6 +160,14 @@ form `## [x.y.z] - YYYY-MM-DD`.
   search box and `jq` queries match what the page displays.
 - The grouped step tree now comes from the first case that *passed*, where a
   skipped case 1 used to render an empty tree.
+- A `Template` slot bound to a glossary term instance now narrates the
+  instance's display. The slot's rendering was compared against the cell
+  without the cell's own term unwrapping, so it never matched: the comparison
+  invented a `derived` column and filled it — and the step text, the scenario
+  name and the JSON report — with the whole `Glossary` dataclass repr. The same
+  repr reached the title of every scenario under
+  `@scenario(..., group_parametrized=False)`, and the label of an
+  `Annotated[..., given(Template(...))]` parameter.
 
 #### HTML report
 

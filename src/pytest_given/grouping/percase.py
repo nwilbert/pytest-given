@@ -8,6 +8,7 @@ column, this path renders as the case's own value.
 
 from dataclasses import replace
 
+from ..capture import resolved_placeholder_part
 from ..model import (
     Narration,
     NarrationLiteral,
@@ -21,7 +22,6 @@ from ..model import (
     case_suffix,
     narration_text,
     placeholder_mismatch,
-    placeholder_value,
 )
 
 
@@ -91,7 +91,7 @@ def _substituted_part(
         return part
     if part.name not in params:
         raise placeholder_mismatch(part.name, names)
-    return placeholder_value(part, params[part.name])
+    return resolved_placeholder_part(part, params[part.name])
 
 
 def _suffixed(narration: Narration, suffix: str) -> Narration:

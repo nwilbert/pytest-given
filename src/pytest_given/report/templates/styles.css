@@ -792,11 +792,6 @@ span.param-highlight {
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
-/* A term ref that is *also* a parametrize value carries a `.param-color-N`
-   alongside its kind class, and those rules are emitted after this sheet, so
-   the column takes the ink and the kind keeps the wash. That is the split
-   working as intended rather than a collision: the reader still sees which
-   kind the word is, and gains the line to its column in the case table. */
 .term-ref-actor { background: #ffe4d6; color: #92400e; }
 .term-ref-object { background: #d9f7f3; color: #0f766e; }
 .term-ref-verb { background: #f4e8ff; color: #6d28d9; }

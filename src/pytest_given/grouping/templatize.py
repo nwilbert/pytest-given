@@ -19,6 +19,7 @@ from ..model import (
     NarrationTermRef,
     NarrationValue,
     NodeId,
+    ParameterColumn,
     Phase,
     RawParamValue,
     Step,
@@ -26,14 +27,13 @@ from ..model import (
     StepPath,
     narration_text,
     placeholder_mismatch,
-    render_interpolation,
 )
 from .checks import (
     check_attachment_labels,
     check_constant_term_ref,
     check_promotable_expression,
 )
-from .columns import GroupContext, cell_text
+from .columns import Format, GroupContext, cell_text, param_cell
 
 
 def templatize_steps(
@@ -243,14 +243,9 @@ def _templatize_param_value(
     rendered = {
         case.id: _value_at(ctx.indexed[case.id][path], index) for case in ctx.comparable
     }
-    if all(
-        text == cell_text(ctx.cells[part.expression][case_id])
-        for case_id, text in rendered.items()
-    ):
+    column = _promoted_column(rendered, part.expression, part.expression, ctx)
+    if column is None:
         return placeholder
-    column = ctx.new_column('derived', part.expression)
-    for case_id, text in rendered.items():
-        ctx.set_cell(column.id, case_id, text)
     return NarrationPlaceholder(
         name=column.name,
         column_id=column.id,
@@ -392,37 +387,70 @@ def _reconciled_slot(part: NarrationPart, ctx: GroupContext) -> NarrationPart:
     if not isinstance(part, NarrationPlaceholder) or part.column_id not in ctx.cells:
         return part
     rendered = _slot_renderings(part, ctx.case_params)
-    if rendered is None or all(
-        text == cell_text(ctx.cells[part.column_id][case_id])
-        for case_id, text in rendered.items()
-    ):
+    column = _promoted_column(rendered, part.column_id, part.name, ctx)
+    if column is None:
         return part
-    column = ctx.new_column('derived', part.name)
-    for case_id, text in rendered.items():
-        ctx.set_cell(column.id, case_id, text)
     return replace(part, name=column.name, column_id=column.id)
 
 
 def _slot_renderings(
     part: NarrationPlaceholder,
     case_params: dict[NodeId, dict[str, RawParamValue]],
-) -> dict[NodeId, str] | None:
-    """What this slot renders for each case, or None when any case cannot
-    produce that rendering at all.
+) -> dict[NodeId, str]:
+    """What this slot renders for each case, built exactly as `param_cell`
+    builds the cell it will be compared with.
 
-    None leaves the slot pointing at the shared column: a value whose own
-    `__format__` refuses this spec never rendered here either, so there is
-    nothing better to point it at.
+    Going through `param_cell` rather than `render_interpolation` is what
+    makes the comparison meaningful: it unwraps a glossary term instance to
+    its display, and it already carries the rule for a value whose own
+    `__format__` refuses this spec — such a value falls back to the same plain
+    coercion the cell falls back to, so the two agree and the slot keeps
+    pointing at the shared column, which is what a slot that never rendered
+    wants.
     """
     out: dict[NodeId, str] = {}
     for case_id, params in case_params.items():
         assert part.name in params, (
             f'{part.name!r} points at a param column, so every case binds it'
         )
-        try:
-            out[case_id] = render_interpolation(
-                params[part.name], part.conversion, part.format_spec
-            )
-        except Exception:  # noqa: BLE001 — a value whose own rendering raises
-            return None
+        out[case_id] = cell_text(param_cell(params[part.name], _slot_format(part)))
     return out
+
+
+def _slot_format(part: NarrationPlaceholder) -> Format | None:
+    """The formatting this slot renders its value with, or None when it carries
+    none.
+
+    None is what `param_cell` needs to take its unformatted path: a slot with
+    no conversion and an empty spec has to reach the cell's plain coercion —
+    which unwraps a glossary term instance to its display — rather than
+    `format(value, '')`, which would render the whole `Glossary` repr and
+    never match the cell it is compared with.
+    """
+    if not part.conversion and not part.format_spec:
+        return None
+    return (part.conversion, part.format_spec)
+
+
+def _promoted_column(
+    rendered: dict[NodeId, str], column_id: str, name: str, ctx: GroupContext
+) -> ParameterColumn | None:
+    """The `derived` column a slot needs when the cell it points at does not
+    read the way the slot renders — or None when that cell already serves it.
+
+    The one compare-and-promote rule, shared by the two slot kinds that reach
+    it: a `NarrationValue` bound to a `param` column, whose renderings come off
+    the recorded tree, and a `Template` slot, whose renderings are recomputed
+    from each case's raw parameter. Only where the renderings come from
+    differs, so keeping the decision in one place is what stops the two from
+    drifting into disagreeing about what "reads the same" means.
+    """
+    if all(
+        text == cell_text(ctx.cells[column_id][case_id])
+        for case_id, text in rendered.items()
+    ):
+        return None
+    column = ctx.new_column('derived', name)
+    for case_id, text in rendered.items():
+        ctx.set_cell(column.id, case_id, text)
+    return column

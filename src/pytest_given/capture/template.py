@@ -9,6 +9,7 @@ from ..model import (
     NarrationValue,
     PytestGivenError,
     narration_text,
+    placeholder_value,
     render_interpolation,
 )
 from .glossary import TermHandle, TermInstance
@@ -152,3 +153,26 @@ def try_term_ref(
             f'Drop the spec, or interpolate the underlying value separately.'
         )
     return NarrationTermRef(term_id=term_id, display=display, expression=expression)
+
+
+def resolved_placeholder_part(
+    part: NarrationPlaceholder, value: object
+) -> NarrationPart:
+    """One `Template` slot resolved against the value bound to its name.
+
+    A glossary term instance becomes a real term ref — the same thing a
+    t-string interpolation of that handle records — so the declined-merge path
+    and the helper-decorator path narrate a term the way the grouped path's
+    cell does. `placeholder_value` alone would render the whole `Glossary`
+    dataclass repr, since `model` is the leaf and cannot reach `try_term_ref`.
+
+    Only an unformatted slot unwraps. A term ref carries a fixed display and
+    can hold no spec, and the grouped path renders a spec'd slot through
+    `render_interpolation` too — gating here keeps the two paths agreeing
+    rather than making one of them raise where the other formats.
+    """
+    if not part.conversion and not part.format_spec:
+        term_ref = try_term_ref(value, part.name)
+        if term_ref is not None:
+            return term_ref
+    return placeholder_value(part, value)

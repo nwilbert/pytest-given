@@ -1,17 +1,15 @@
 """pytest-given plugin entry point."""
 
 import contextlib
-import copy
 import functools
 import inspect
 import time
 from collections.abc import Callable, Generator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from importlib.metadata import version
 from pathlib import Path
-from string import templatelib
-from typing import Any, cast, get_type_hints
+from typing import cast
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -23,6 +21,7 @@ from .capture import (
     StepDecorated,
     StepDescriptor,
     Template,
+    annotated_given_descriptors,
     begin_capture_session,
     capture_snapshot,
     filter_internal_frames,
@@ -33,6 +32,7 @@ from .capture import (
     resolve_glossary,
     restore_capture_state,
     set_active_collector,
+    snapshot_param_value,
 )
 from .grouping import group_parametrized
 from .lint import (
@@ -56,7 +56,6 @@ from .model import (
     NodeId,
     ParamSpec,
     PytestGivenError,
-    RawParamValue,
     ReportData,
     Scenario,
     Step,
@@ -89,16 +88,40 @@ def _collector(config: pytest.Config) -> Collector:
 
 
 _LINT_CHOICES = ('true', 'false')
-_lint_findings: pytest.StashKey[list[Finding]] = pytest.StashKey()
-_md_stdout: pytest.StashKey[str] = pytest.StashKey()
-_report_error_message: pytest.StashKey[str] = pytest.StashKey()
-# The source-link template, resolved once at configure time so a bad preset
-# fails before the suite runs rather than after it.
-_source_link_template: pytest.StashKey[str | None] = pytest.StashKey()
-# The lint config, parsed once at configure time for the same reason. Stashed
-# so session finish reads the parse rather than repeating it.
-_lint_rule_levels: pytest.StashKey[dict[RuleId, Level]] = pytest.StashKey()
-_lint_ignore_entries: pytest.StashKey[list[IgnoreEntry]] = pytest.StashKey()
+
+
+@dataclass(frozen=True, kw_only=True)
+class _GivenConfig:
+    """This run's pytest-given options, parsed once.
+
+    Parsed eagerly in `pytest_configure` — a typo in a rule name or a
+    source-link preset is a `UsageError` before the suite runs, not a surprise
+    after it — and read at session finish. One bundle rather than a key
+    apiece, so the parse seam is a single object with a single writer.
+    """
+
+    rule_levels: dict[RuleId, Level]
+    ignore_entries: list[IgnoreEntry]
+    source_link_template: str | None
+
+
+@dataclass(kw_only=True)
+class _SessionOutcome:
+    """What session finish leaves for the terminal summary to print.
+
+    Filled at up to three points on the way out — a report that could not be
+    written, the lint's findings, the Markdown destined for stdout — and read
+    in one place. Mutable and stashed once at configure time, so the summary
+    never has to distinguish "nothing happened" from "the hook never ran".
+    """
+
+    report_error: str | None = None
+    md_stdout: str | None = None
+    findings: list[Finding] = field(default_factory=list)
+
+
+_given_config: pytest.StashKey[_GivenConfig] = pytest.StashKey()
+_session_outcome: pytest.StashKey[_SessionOutcome] = pytest.StashKey()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -224,29 +247,32 @@ def _lint_enabled(config: pytest.Config) -> bool:
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    # Parse the lint rule config eagerly (fail fast), even when the lint itself
-    # is disabled for this run. Stashed, so session finish reuses the parse.
+    # Parsed eagerly (fail fast), even when the lint itself is disabled for
+    # this run, so session finish reuses the parse.
     try:
-        config.stash[_lint_rule_levels] = parse_rule_levels(
-            config.getini('given_lint_rules')
-        )
-        config.stash[_lint_ignore_entries] = parse_ignore_entries(
-            config.getini('given_lint_ignore')
-        )
+        rule_levels = parse_rule_levels(config.getini('given_lint_rules'))
+        ignore_entries = parse_ignore_entries(config.getini('given_lint_ignore'))
     except ValueError as error:
         raise pytest.UsageError(str(error)) from error
     # Same reason, for the source-link config: an unknown preset is a typo in a
     # flag, and learning about it only once the suite has finished is the worst
-    # moment to learn it. Resolved here and stashed, so `github` runs its
-    # org/repo detection once rather than once per resolution.
-    if config.getoption('given_html') is None:
-        return
-    try:
-        config.stash[_source_link_template] = resolve_template(
-            config.getoption('given_source_link') or config.getini('given_source_link')
-        )
-    except PytestGivenError as error:
-        raise pytest.UsageError(str(error)) from error
+    # moment to learn it. Only an HTML run resolves one — `github` would
+    # otherwise run its org/repo detection for a run that never asks.
+    source_link_template = None
+    if config.getoption('given_html') is not None:
+        try:
+            source_link_template = resolve_template(
+                config.getoption('given_source_link')
+                or config.getini('given_source_link')
+            )
+        except PytestGivenError as error:
+            raise pytest.UsageError(str(error)) from error
+    config.stash[_given_config] = _GivenConfig(
+        rule_levels=rule_levels,
+        ignore_entries=ignore_entries,
+        source_link_template=source_link_template,
+    )
+    config.stash[_session_outcome] = _SessionOutcome()
 
 
 def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
@@ -443,33 +469,12 @@ def _capture_param_spec(
     names = list(callspec.params.keys())
     collector.param_info[node_id] = ParamSpec(
         names=names,
-        values=[_snapshot(funcargs.get(name, callspec.params[name])) for name in names],
+        values=[
+            snapshot_param_value(funcargs.get(name, callspec.params[name]))
+            for name in names
+        ],
         group=group,
     )
-
-
-def _snapshot(value: RawParamValue) -> RawParamValue:
-    """A shallow copy of a parametrize value, or the value itself when its type
-    refuses to be copied or the copy would not render the way it does.
-
-    Best effort by nature: a value that cannot be copied is one whose mutation
-    cannot be guarded against either.
-
-    A copy that renders differently is worse than no copy at all. An object
-    inheriting the default `__repr__` — or a `MagicMock` — renders its own
-    address, so the copy puts a value in the cell that no case ever narrated
-    and reads to the rebound-parameter rule as a rebinding that never happened.
-    Mutation cannot change such a rendering anyway, so keeping the original
-    gives up nothing the copy was there to protect.
-    """
-    with contextlib.suppress(Exception):
-        snapshot = copy.copy(value)
-        # Both renderings, since an interpolation may ask for either: `!r`
-        # takes `repr` and a bare `{x}` takes `str`, and a type can define one
-        # by value and inherit the other from `object`.
-        if (str(snapshot), repr(snapshot)) == (str(value), repr(value)):
-            return snapshot
-    return value
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -598,55 +603,6 @@ def _extract_skip_reason(longrepr: object) -> str | None:
     return message
 
 
-def _annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
-    """Map each parameter carrying ``Annotated[..., given(...)]`` to its
-    descriptor.
-
-    Reads type hints off the unwrapped function (past the ``@scenario``
-    wrapper). Best-effort: if the annotations cannot be resolved, returns an
-    empty mapping rather than failing the test. Rejects the forbidden forms —
-    ``when(...)`` / ``then(...)``, a t-string label, or more than one
-    descriptor on a single parameter.
-    """
-    target = inspect.unwrap(cast(Any, func))
-    try:
-        hints = get_type_hints(target, include_extras=True)
-    except Exception:  # noqa: BLE001 — annotations are arbitrary user code; see the docstring
-        return {}
-    out: dict[str, StepDescriptor] = {}
-    for name, hint in hints.items():
-        if name in ('self', 'cls', 'return'):
-            continue
-        metadata = getattr(hint, '__metadata__', None)
-        if metadata is None:
-            continue
-        descriptors = [m for m in metadata if isinstance(m, StepDescriptor)]
-        if not descriptors:
-            continue
-        if len(descriptors) > 1:
-            raise PytestGivenError(
-                f'multiple given()/when()/then() in Annotated metadata for '
-                f'parameter {name!r} — use exactly one.'
-            )
-        desc = descriptors[0]
-        if desc.phase != 'given':
-            raise PytestGivenError(
-                f'only given() is supported inside Annotated; parameter '
-                f"{name!r} carries {desc.phase}(). Use 'with when(...)' / "
-                f"'with then(...)' in the test body for the action and outcome."
-            )
-        if isinstance(desc._source, templatelib.Template):
-            raise PytestGivenError(
-                f'Annotated given(t"...") on parameter {name!r} is not '
-                f'supported: a t-string evaluates at function-definition time, '
-                f'where the parameter value is not in scope. Use '
-                f'given(Template("... {{{name}}} ...")) for a per-case '
-                f'placeholder, or a plain string label.'
-            )
-        out[name] = desc
-    return out
-
-
 def _graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
     """Graft this item's fixture step-recordings and Annotated `given` labels.
 
@@ -660,7 +616,7 @@ def _graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
     """
     assert hasattr(item, 'fixturenames'), f'expected fixturenames on {item!r}'
     func = getattr(item, 'function', None)
-    descriptors = _annotated_given_descriptors(func) if func is not None else {}
+    descriptors = annotated_given_descriptors(func) if func is not None else {}
 
     fm = item.session._fixturemanager
     expected: dict[FixtureInstanceKey, str] = {}
@@ -845,7 +801,7 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     try:
         built = _build_report(session, collector)
     except PytestGivenError as error:
-        session.config.stash[_report_error_message] = '\n'.join(
+        session.config.stash[_session_outcome].report_error = '\n'.join(
             [str(error), *discard_stale_sinks(_sink_config(session.config))]
         )
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
@@ -856,7 +812,7 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         collector.param_info.clear()
     write_sinks(built.sinks)
     if built.sinks.md_stdout is not None:
-        session.config.stash[_md_stdout] = built.sinks.md_stdout
+        session.config.stash[_session_outcome].md_stdout = built.sinks.md_stdout
     _run_lint(session, built.scenarios, built.glossary, built.stories)
 
 
@@ -907,9 +863,7 @@ def _sink_config(config: pytest.Config) -> SinkConfig:
         html_path=Path(html_opt) if html_opt is not None else None,
         md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
         md_to_stdout=md_opt == '-',
-        source_link_template=(
-            config.stash[_source_link_template] if html_opt is not None else None
-        ),
+        source_link_template=config.stash[_given_config].source_link_template,
     )
 
 
@@ -927,23 +881,24 @@ def _run_lint(
     findings = apply_config(
         run_runtime_rules(scenarios, glossary, stories)
         + run_ast_rules(scenarios, Path(config.rootpath)),
-        config.stash[_lint_rule_levels],
-        config.stash[_lint_ignore_entries],
+        config.stash[_given_config].rule_levels,
+        config.stash[_given_config].ignore_entries,
     )
     if not findings:
         return
-    config.stash[_lint_findings] = findings
+    config.stash[_session_outcome].findings = findings
     if any(finding.severity == 'error' for finding in findings):
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
-    report_error = terminalreporter.config.stash.get(_report_error_message, None)
+    outcome = terminalreporter.config.stash.get(_session_outcome, _SessionOutcome())
+    report_error = outcome.report_error
     if report_error is not None:
         terminalreporter.write_sep('=', 'pytest-given: report not written', red=True)
         terminalreporter.line(report_error)
         _count_as_error(terminalreporter, 'pytest-given: report not written')
-    findings = terminalreporter.config.stash.get(_lint_findings, [])
+    findings = outcome.findings
     if findings:
         errors = error_count(findings)
         title = summary_title(findings)
@@ -952,7 +907,7 @@ def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
         terminalreporter.write_sep('=', title, red=errors > 0, yellow=errors == 0)
         for row in summary_rows(findings):
             terminalreporter.line(row)
-    md = terminalreporter.config.stash.get(_md_stdout, None)
+    md = outcome.md_stdout
     if md is not None:
         terminalreporter.write_line('<!-- pytest-given:md:start -->')
         for line in md.splitlines():
