@@ -79,7 +79,7 @@ def _source_md(scenario: Scenario) -> str:
 
 
 def _param_table_md(table: ParameterTable) -> str:
-    """The case table, plus a fenced block per attachment cell too big to inline.
+    """The parameter table, plus a fenced block per attachment cell too big to inline.
 
     Long cells follow the split `_attachment_lines` uses: short single-line
     content sits inline in backticks; multiline or backtick-bearing content
@@ -181,7 +181,7 @@ def _fits_inline(content: str) -> bool:
     A newline or a backtick would break the surrounding structure outright.
     Length breaks it just as effectively without being malformed: a
     300-character cell — one `json.dumps` without `indent` — pushes every other
-    column of the case table off the terminal. `_MAX_INLINE` is the width of a
+    column of the parameter table off the terminal. `_MAX_INLINE` is the width of a
     payload that still leaves room for the columns beside it.
     """
     return (
@@ -228,7 +228,7 @@ def _attachment_lines(attachment: StepAttachment, indent: str) -> list[str]:
     if isinstance(attachment, AttachmentRef):
         # A promoted attachment carries no content — the payload is in the
         # column its badge points at.
-        return [f'{indent}  - 📎 {label} — *see case table*']
+        return [f'{indent}  - 📎 {label} — *see parameter table*']
     if _fits_inline(attachment.content):
         return [f'{indent}  - 📎 {label} — `{attachment.content}`']
     body_indent = f'{indent}    '

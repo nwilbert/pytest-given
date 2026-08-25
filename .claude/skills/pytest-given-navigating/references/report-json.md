@@ -13,7 +13,7 @@ stories[]     one entry per story(...)
 
 | Field | Meaning |
 |---|---|
-| `id` | The pytest node id (`tests/test_x.py::test_y`), parametrize suffix dropped for a grouped scenario |
+| `id` | The pytest node id. A grouped parametrized scenario **keeps the first collected case's suffix** (`tests/test_x.py::test_y[1-False]`) — it is not stripped, so match on a prefix rather than on equality |
 | `narration.text` | The scenario name (grouped template for parametrized scenarios) — for a *step* in a grouped parametrized scenario this is the template too (`the drink costs {price} euros`), not the first case's rendering |
 | `module` | Python module the test lives in |
 | `tags[]` | `tags=` from `@scenario` — report metadata, **not** pytest marks |
@@ -25,6 +25,12 @@ stories[]     one entry per story(...)
 | `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}]}` — `is_internal` marks a `pluggy` / `_pytest` / pytest-given frame, kept only under `--given-all-frames` |
 | `source` | `{relpath, line}` — the test function's definition site |
 | `story_id` / `activity_ids` | Story binding from `@scenario(..., story=...)` |
+
+In a grouped scenario `id`, `module`, `tags` and `source` come from the first
+*collected* case, while `steps` are templatized from the first case that
+*passed* — so a run whose first case was skipped has an `id` and a step tree
+from two different cases. Neither identifies a case: read `parameters.cases[]`
+for per-case status.
 
 ## Step
 

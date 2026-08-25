@@ -1,9 +1,11 @@
 """The grouping pass: the N scenario records of a parametrized test collapsed
 into one logical scenario carrying a parameter table.
 
-Scenarios group when they share the same name and module. Everything else in
-the run passes through untouched, and a group's own assembly — baseline,
-comparable cases, cells, cases — happens here; the promoting is `templatize`'s.
+Cases group on `(node_base(id), narration.text)` — one test function, one name.
+Two same-named scenarios on different test functions therefore stay separate.
+Everything else in the run passes through untouched, and a group's own assembly
+— baseline, comparable cases, cells, cases — happens here; the promoting is
+`templatize`'s.
 """
 
 from ..model import (

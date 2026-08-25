@@ -474,7 +474,7 @@ def test_scenario_with_glossary_tstring_preserves_surface_text() -> None:
 
 
 # Parametrized over a *description* rather than the label object itself: the
-# case table prints the parameter, and a `Template` renders as its address —
+# parameter table prints the parameter, and a `Template` renders as its address —
 # non-deterministic, so the committed report would churn on every regeneration.
 _BAD_LABELS: dict[str, object] = {
     'deferred-template': Template('{flavor} log'),
@@ -870,6 +870,13 @@ def test_scenario_decorator_accepts_story_kwarg():
 def test_scenario_decorator_accepts_activities_kwarg():
     deco = scenario('test activities', activities=[1, 2, 3])
     assert deco.activity_ids == (ActivityId(1), ActivityId(2), ActivityId(3))
+
+
+def test_scenario_decorator_accepts_a_bare_int_activities_argument():
+    """`activities=` takes the same `int | Sequence[int]` as a step's
+    `activity=`, so a scenario narrowed to one activity needs no list."""
+    deco = scenario('test one activity', activities=2)
+    assert deco.activity_ids == (ActivityId(2),)
 
 
 def test_scenario_decorator_defaults_story_none_and_activities_empty():

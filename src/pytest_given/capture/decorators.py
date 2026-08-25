@@ -515,7 +515,7 @@ def scenario(
     tags: list[str] | None = None,
     *,
     story: Story | None = None,
-    activities: Sequence[int] | None = None,
+    activities: int | Sequence[int] | None = None,
     group_parametrized: bool = True,
 ) -> ScenarioDecorator:
     """Mark a test for inclusion in the report."""

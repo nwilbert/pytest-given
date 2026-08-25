@@ -178,7 +178,7 @@
 
 - **given** a coffee machine
 - **given** the machine is primed for {flavor}
-  - 📎 brew log — *see case table*
+  - 📎 brew log — *see parameter table*
 - **when** I brew a {flavor} coffee
 - **then** the drink costs {price} euros
 

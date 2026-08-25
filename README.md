@@ -219,7 +219,7 @@ def test_brew(cup_size):
     ...
 ```
 
-Each case then becomes its own scenario with no case table, titled by its parametrize id — `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first (a plain-string name is suffixed the same way). Every case carries the id, including one whose name already renders its values: a `Template` naming only some of the columns would otherwise give two cases the same title, and suffixing only the clashes would make a title depend on which cases the run collected. On a test that isn't parametrized the argument raises at collection.
+Each case then becomes its own scenario with no parameter table, titled by its parametrize id — `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first (a plain-string name is suffixed the same way). Every case carries the id, including one whose name already renders its values: a `Template` naming only some of the columns would otherwise give two cases the same title, and suffixing only the clashes would make a title depend on which cases the run collected. On a test that isn't parametrized the argument raises at collection.
 
 #### Step text & placeholders
 
@@ -238,7 +238,7 @@ Four things worth knowing:
 
 2. **`Template` and a t-string are each rejected in the other's place**, because the split above is about scope: `with given(Template(...))` raises `PytestGivenError` at entry, as does a t-string on a fixture or helper decorator. The one exception is the `@scenario(...)` t-string in the table — glossary handles, unlike values, *are* in scope at import.
 
-3. **The grouped tree comes from a baseline case** (the first that passed), and anything varying across cases is promoted into a column of the case table: a parametrize argument, a t-string interpolation whose value differs per case (the step keeps a `{name}` placeholder pointing at the column), and an attachment whose payload differs (the step keeps a content-less badge). What a column cannot carry is a case that narrates a *different sentence* — that is rule 6 below, and `group_parametrized=False` is its answer.
+3. **The grouped tree comes from a baseline case** (the first that passed), and anything varying across cases is promoted into a column of the parameter table: a parametrize argument, a t-string interpolation whose value differs per case (the step keeps a `{name}` placeholder pointing at the column), and an attachment whose payload differs (the step keeps a content-less badge). What a column cannot carry is a case that narrates a *different sentence* — that is rule 6 below, and `group_parametrized=False` is its answer.
 
 4. **Six authoring forms are rejected outright in a parametrized scenario**, because each would make the grouped tree lie. Every one fails the run and writes no report — the message names the fix:
 
@@ -355,7 +355,7 @@ An attachment binds to the step being recorded, so the call belongs inside a `gi
 
 The label is a plain `str`; a `Template` or t-string label raises — build it with an f-string if it needs interpolating.
 
-In a parametrized scenario the label must read the same in every case: a payload that varies across cases becomes a case-table column headed by that label, and the step keeps a badge pointing at it. A label that differs between cases raises — the varying part belongs in the content.
+In a parametrized scenario the label must read the same in every case: a payload that varies across cases becomes a parameter-table column headed by that label, and the step keeps a badge pointing at it. A label that differs between cases raises — the varying part belongs in the content.
 
 ## pytest options
 

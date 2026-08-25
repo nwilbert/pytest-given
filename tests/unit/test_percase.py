@@ -104,7 +104,7 @@ def test_template_name_substitutes_this_case_values() -> None:
 
 def test_step_placeholders_substitute_this_case_values() -> None:
     """An `Annotated[..., given(Template(...))]` label reaches grouping
-    unresolved; with no case table to fill it, this path renders it."""
+    unresolved; with no parameter table to fill it, this path renders it."""
     label = narration_from(Template('a {cup_size} ml cup'))
     scenarios, param_info = _opted_out_group(
         'Brew coffee',

@@ -39,8 +39,8 @@ Hard rules (each raises `PytestGivenError`):
 ## Parametrized tests
 
 - All cases group into **one scenario with a parameter table**. T-string interpolations naming a parametrize column render as colored values per row.
-- **The baseline case's steps are the template for every row** (the first case that passed) — but only their *structure*: a narrated value or an attachment payload that varies across cases becomes its own case-table column. Six authoring forms cannot be rendered honestly against that template and raise `PytestGivenError` instead of shipping a wrong report; each message names its fix. The catalog and the authoring habits that avoid it: [scenarios.md](scenarios.md).
-- **Narration that genuinely branches per case**: `@scenario(..., group_parametrized=False)` declines the merge and emits one scenario per case, each titled `<name> [<parametrize id>]` with any `Template` placeholders substituted per case first. No case table. On an unparametrized test it raises at collection.
+- **The baseline case's steps are the template for every row** (the first case that passed) — but only their *structure*: a narrated value or an attachment payload that varies across cases becomes its own parameter-table column. Six authoring forms cannot be rendered honestly against that template and raise `PytestGivenError` instead of shipping a wrong report; each message names its fix. The catalog and the authoring habits that avoid it: [scenarios.md](scenarios.md).
+- **Narration that genuinely branches per case**: `@scenario(..., group_parametrized=False)` declines the merge and emits one scenario per case, each titled `<name> [<parametrize id>]` with any `Template` placeholders substituted per case first. No parameter table. On an unparametrized test it raises at collection.
 - Parametrized **scenario name**: `@scenario(Template('Brew {cup_size} ml'))`.
 - Surface a parametrize value as a `given`: `Annotated[int, given(Template('a {cup_size} ml cup'))]` on the parameter.
 
@@ -56,7 +56,7 @@ Hard rules (each raises `PytestGivenError`):
 ## Stories
 
 - `story('Name', [activity(...), ...])` — a flow of `activity(actor, verb, work_object, ...)` rows, read left-to-right; parts may be bare strings, but an activity needs **two distinct glossary terms** to be coverage-tracked. `path(...)` branches alternate sequences off a shared prefix.
-- Bind a scenario with `@scenario(..., story=the_story)` — the only way a story reaches the report. Coverage matches **per step**: an activity is covered when a single step's term refs include all the activity's terms. A step can pin an activity explicitly with `given(text, activity=3)` (1-based activity number or sequence); a pinned step covers regardless of its narration. What that costs you when authoring: [stories.md](stories.md).
+- Bind a scenario with `@scenario(..., story=the_story)` — the only way a story reaches the report. Coverage matches **per step**, and `given(text, activity=3)` (a 1-based activity number or a sequence) pins a step to an activity regardless of its narration. The matching rule and what it costs you when authoring: [stories.md](stories.md).
 
 ## Verifying
 

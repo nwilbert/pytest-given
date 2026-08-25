@@ -1970,7 +1970,7 @@ def test_the_extra_occurrence_trigger_fires_once_per_label() -> None:
 def test_an_extra_occurrence_beside_an_identical_one_makes_an_orphan_column() -> None:
     """Deliberate shape, pinned so it is not mistaken for a regression: when
     occurrence 0 is byte-identical across cases it stays inline and gets no
-    badge, yet the extra occurrence still emits a column — a case-table column
+    badge, yet the extra occurrence still emits a column — a parameter-table column
     nothing in the grouped tree points at.
 
     Promoting occurrence 0 just to manufacture a badge was considered and

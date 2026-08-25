@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-25T09:37:38.545641+00:00",
+    "timestamp": "2026-08-25T10:50:05.592060+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "0d6b77a841718bfe188fab72272496217f48ad91",
+    "commit_sha": "ec09add505632c6316fcc241de6b7c537fad40d2",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -13941,7 +13941,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -17515,7 +17515,7 @@
         "id": "step",
         "kind": "object",
         "canonical": "Step",
-        "definition": "A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest. Each carries a phase, text, status, optional error, attachments, and children. A failure is recorded on the scenario, and the report renders a step's `error` where one is attached; step status stays `'passed'` unless a step is failed explicitly.",
+        "definition": "A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest. Each carries a phase, narration, attachments, and children \u2014 but no status and no error of its own: a failure is recorded on the *Scenario*, and per *Case* on the *Parameter table*, which is where both renderers read it.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 14
@@ -17525,7 +17525,7 @@
         "id": "narration",
         "kind": null,
         "canonical": "Narration",
-        "definition": "The human-readable text on a step or scenario name. Modeled as a `Narration` dataclass bundling a flat rendered `text: str` with a `parts: list[NarrationPart]` (empty for plain-string authoring; populated when the source was a t-string or `pytest_given.Template`, with `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` pieces). The structured form lets the templatizer and renderer treat parametrize-bound values specially without regex tricks.",
+        "definition": "The human-readable text on a step or scenario name. Modeled as a `Narration` dataclass bundling a flat rendered `text: str` with a `parts: list[NarrationPart]` (empty for plain-string authoring; populated when the source was a t-string or `pytest_given.Template`, with `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationTermRef` pieces). The structured form lets the templatizer and renderer treat parametrize-bound values specially without regex tricks.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 15
@@ -17605,7 +17605,7 @@
         "id": "group",
         "kind": "verb",
         "canonical": "Group",
-        "definition": "Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a parameter table. Scenarios group when they share the same name and module. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario.",
+        "definition": "Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a *Parameter table*. Cases group when they share the same *Node ID* without its parametrize tail \u2014 one test function \u2014 and the same name; two same-named scenarios on different test functions stay separate. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 28

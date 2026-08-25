@@ -3,7 +3,7 @@
 ## Problem
 
 Grouping collapses the N scenario records of a parametrized test into one narrated tree plus
-a case table (`grouping/`). The tree is one case's — the baseline's — and every column the
+a parameter table (`grouping/`). The tree is one case's — the baseline's — and every column the
 [per-case columns work](2026-08-14-parametrized-case-columns-design.md) added exists to carry
 what *varies between* cases: a parameter value, a narrated derived value, an attachment
 payload. What no column can carry is a case that narrates a **different sentence**, or a
@@ -38,7 +38,7 @@ The opt-out is also the missing consumer for machinery that is already built. A 
 scenario name records its placeholders and is rendered in the grouped title as `{cup_size}`
 tokens; nothing in the product ever substitutes a case's values into them. The same holds for
 the `Annotated[..., given(Template('a {cup_size} ml cup'))]` step label, which reaches
-grouping as a `NarrationPlaceholder` for the case table to fill on hover.
+grouping as a `NarrationPlaceholder` for the parameter table to fill on hover.
 
 ## Goal
 
@@ -247,7 +247,7 @@ then driven, not test-driven).
   divergent test fails the run and writes no sink.
 - `uv run nox -s examples self_report`, reading the `.md` diff first.
 - Playwright on the regenerated `examples/coffeeshop/coffeeshop.html` for the `≠` removal:
-  console clean after init, then a parametrized scenario's case table still expands, hovers
+  console clean after init, then a parametrized scenario's parameter table still expands, hovers
   and highlights.
 
 ## Out of scope

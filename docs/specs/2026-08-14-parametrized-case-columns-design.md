@@ -57,7 +57,7 @@ cases ran and recorded a full tree.
 ## Goal
 
 One rule: **the grouped step tree shows only what every case shares; anything that varies
-becomes a column in the case table.**
+becomes a column in the parameter table.**
 
 This is the split the table already embodies for parametrize inputs — `{cup_size}` in the
 narration, values in the column — extended to varying attachments and varying narrated
@@ -177,7 +177,7 @@ included — nothing exercised the feature outside its own unit tests. And the c
 survives without it. `@scenario(..., group_parametrized=False)` emits one scenario per case,
 each with its own pill carrying its own display, so an `Alice`-anchored and a `Bob`-anchored
 activity are both covered, correctly, through the ordinary single-pass path. What the author
-gives up is having that *while* the cases stay grouped into one case table.
+gives up is having that *while* the cases stay grouped into one parameter table.
 
 Two pieces of the original design outlive the exemption, because neither depends on it:
 
@@ -576,7 +576,7 @@ to inline or fence, so it renders as badge and label alone, pointing at the tabl
 
 ```markdown
 - **when** the machine brews {flavor}
-  - 📎 machine state — *see case table*
+  - 📎 machine state — *see parameter table*
 ```
 
 ## HTML rendering

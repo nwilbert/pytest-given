@@ -49,4 +49,6 @@ The natural adoption order depends on the project:
 - Render the touched scenarios and read the output as a spec — every step text must be something its body actually does: `pytest <selection> --given-md`
 - If the project enables the narration lint, run it: `pytest <selection> --given-lint=true`. It catches structural lies (empty steps, a `then` that checks nothing); it cannot check semantic truth — that is the author's job.
 
+Auditing someone else's narration rather than writing your own? That is the `pytest-given-reviewing` skill, which restates these rules as a review rubric.
+
 *These files are installed by `pytest-given skills install` and overwritten on reinstall — don't edit them in place.*

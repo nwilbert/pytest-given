@@ -723,7 +723,7 @@ span.param-highlight {
 }
 /* In a scenario card the link stays in flow, under whatever the card ends
    with. Anchoring it to the corner instead put it in a fight with every
-   full-width last element: over a case table it covered the last row's
+   full-width last element: over a parameter table it covered the last row's
    rightmost cells, and over an error box it needed a card-colored chip to
    stay legible against the reddish background. A refs panel ends in short
    chip lines that never reach the corner, so there the anchor still pays for

@@ -509,7 +509,7 @@ def test_skipped_scenario_shows_reason() -> None:
 
 
 def _attachment_table(*, short: str | None, long: str | None) -> ParameterTable:
-    """A one-case table with one attachment cell.
+    """A one-parameter table with one attachment cell.
 
     The column's name and the attachment's label are deliberately *different*:
     with both called `state`, a `'| state |'` needle is satisfied by the header
@@ -633,7 +633,7 @@ def test_an_attachment_ref_renders_as_badge_and_label_alone() -> None:
         ],
     )
     md = render_md(_report_with_step(step))
-    assert '- 📎 machine state — *see case table*' in md
+    assert '- 📎 machine state — *see parameter table*' in md
 
 
 def test_a_generated_column_with_no_value_for_a_case_renders_blank() -> None:

@@ -31,7 +31,9 @@ the release workflow re-runs the whole gate in `verify` and `build` before
 anything is published.
 
 No local `nox` run is listed here, on purpose. CI's `quality`, `test`, `package`
-and `audit` jobs already cover the full five-session gate plus `nox -s build`, and
+and `audit` jobs already run `lint`, `mypy`, `test`, `coverage` and `audit` — the
+default `nox` gate minus `format`, which rewrites files where `lint`'s
+`ruff format --check` already fails on the same drift — plus `nox -s build`, and
 the release workflow then runs the same set again. A local run before dispatching
 would be the third. The usual "run `uv run nox` before committing" rule from
 [AGENTS.md](../AGENTS.md) applies to the bump commit like any other — it just

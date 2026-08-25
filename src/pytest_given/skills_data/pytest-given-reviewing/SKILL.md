@@ -23,7 +23,7 @@ pytest <selection> --given-lint=true -o "given_lint_rules=dead-term=warn"
 
 **No base report to diff against?** On an adoption branch the base has no scenarios, so the diff *is* the whole report — the normal case for a first-adoption review, not a reason to skip the layer. Drop the diff and audit the full suite, ordered by risk: scenarios whose bodies the branch touched first, then the rest file by file (fan out as below). `--given-md` is a plain pytest flag and needs no project wiring — run `pytest <selection> --given-md=<file>` yourself even when CI only configures the HTML/JSON sinks.
 
-For each scenario under review, read the step texts against their bodies (jump via the ``file.py:line`` anchor under each `--given-md` heading, or `.source` in the JSON report) and judge with one rubric:
+For each scenario under review, read the step texts against their bodies (jump via the ``file.py:line`` anchor under each `--given-md` heading, or `.source` in the JSON report) and judge with one rubric. It is deliberately restated here rather than linked: the fan-out below hands one file to one reviewer, and each has to carry the rubric without loading a second skill. Its authoring-time counterpart is the authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) ("Keeping it truthful", "Expected raises", "Vocabulary and tags") — change one, change both.
 
 **Step text may abstract; it must never overstate.**
 
@@ -46,6 +46,8 @@ Layers 1 and 2 start from the narration and ask whether it is true; neither catc
 Rate an unnarrated branch below overstatement: silence understates, which misleads less than a false claim. A glossary row asserting untested behavior is not silence — it rates with layer 2.
 
 ## 4. Glossary, tags, stories
+
+These four mirror the authoring skill's [glossaries.md](../pytest-given-authoring/references/glossaries.md) ("Keeping the glossary honest") for the same reason as the layer-2 rubric — change one, change both.
 
 - A **dead term** (layer 1, opt-in rule) that describes unimplemented behavior is misleading domain documentation — flag it. The fix is as often deleting the term as adding a reference; don't accept references manufactured to appease the rule.
 - **Dilution** is the inverse finding: a row nothing would miss — a generic verb minted to fill a story slot (a bare word belongs there), a concept duplicated under a second name, a term added only to render as a term ref. A sharp, lean glossary outranks an impressive-looking one.

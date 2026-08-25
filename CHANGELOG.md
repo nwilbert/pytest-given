@@ -15,7 +15,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - `--given-title=TEXT` (or the `given_title` ini) names the report, replacing the
   rootdir name.
-- A parametrized scenario's case table now carries a typed column per varying
+- A parametrized scenario's parameter table now carries a typed column per varying
   value — `param`, `derived` or `attachment` — rather than one column per
   parametrize name.
 - A varying attachment payload becomes an `attachment` column of its own.
@@ -52,15 +52,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
   narrate it with a t-string, keeping labels and term refs constant; content may
   still vary freely, which is what the new `attachment` column is for. The last
   needs `@scenario(..., group_parametrized=False)`, giving each case its own
-  scenario.
-
-  Parametrizing over glossary term instances trips the term-ref rule too: with
-  `parametrize('who', [g['Guest']('Alice'), g['Guest']('Bob')])`, the term ref
-  `t"the {who} arrives"` reads `Alice` in one case and `Bob` in the next. The fix
-  is to keep the term out of the parametrize list — parametrize over the plain
-  value (`['Alice', 'Bob']`) and narrate the handle next to it, as in
-  `t"the {g['Guest']} {name} arrives"`. The term ref is then constant in every
-  case and `name` becomes an ordinary `param` column.
+  scenario. Each message names its own fix.
 - **Breaking.** `attach()` now takes a plain `str` label; a t-string label raises
   `PytestGivenError` — use an f-string.
 - **Breaking.** `attach()` called with no step open now raises `PytestGivenError`
@@ -97,7 +89,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
   `scenario.status` instead.
 - The Markdown report now shows why a scenario failed: the message and the
   failing frame, under the scenario and — for a parametrized run — under the
-  case table for each failed case. It previously showed the ✗ and no reason.
+  parameter table for each failed case. It previously showed the ✗ and no reason.
 
 #### HTML report
 
@@ -126,6 +118,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Fixed
 
+#### Authoring API
+
+- `@scenario(activities=...)` is now typed `int | Sequence[int] | None`, matching
+  a step's `activity=` and the documented "an int or a sequence of them"; a bare
+  `activities=2` already worked at runtime but failed type checking.
+
 #### Plugin and run behavior
 
 - A nested in-process pytest run that dies while parsing its arguments no longer
@@ -153,7 +151,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Report content (all formats)
 
-- A case-table cell now reads the way the step pointing at it read, carrying the
+- A parameter-table cell now reads the way the step pointing at it read, carrying the
   interpolation's own format spec and, under `indirect=True`, the bound test
   argument; one parameter formatted two ways gets a column each.
 - A `Template` narration's `text` is now what its parts render, so the report's
@@ -174,7 +172,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - Two test files sharing a basename across directories no longer abort the HTML
   report; the scenarios' `#scenario=` slugs gain directory components instead.
 - Content reaching past a scenario card's right edge is no longer clipped beyond
-  reach: a wide case table and an attachment payload scroll, a source path and a
+  reach: a wide parameter table and an attachment payload scroll, a source path and a
   traceback's frame location wrap, and the source link sits under the card's last
   element instead of on top of it.
 - Jumping to a scenario from a story activity, or to a term's scenarios from the
