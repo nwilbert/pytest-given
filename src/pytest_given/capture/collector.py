@@ -18,6 +18,7 @@ from ..model import (
     RecordingState,
     Scenario,
     SourceLocation,
+    Status,
     Step,
     Story,
     StoryId,
@@ -162,7 +163,7 @@ class Collector:
 
     def finish_scenario(
         self,
-        status: str,
+        status: Status,
         skip_reason: str | None = None,
     ) -> Scenario:
         """Close the active scenario and return it.

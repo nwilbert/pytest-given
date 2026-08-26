@@ -1,13 +1,13 @@
 """File-backed glossary: parse a Markdown file into a Glossary, accessed by name."""
 
 from pathlib import Path
-from typing import Literal
 
 from ..model import (
     Glossary,
     GlossaryTerm,
     PytestGivenError,
     TermId,
+    TermKind,
     id_derive,
 )
 from .glossary import (
@@ -19,7 +19,7 @@ from .glossary import (
 from .markdown_glossary import ColumnSpec, GlossaryRow, parse_glossary_tables
 from .source import file_source
 
-_KIND_ALIASES: dict[str, Literal['actor', 'object', 'verb']] = {
+_KIND_ALIASES: dict[str, TermKind] = {
     'actor': 'actor',
     'object': 'object',
     'work object': 'object',
@@ -82,9 +82,7 @@ class FileGlossary:
             return
         self._glossary._register(term)
 
-    def _parse_kind(
-        self, raw: str | None, line: int
-    ) -> Literal['actor', 'object', 'verb'] | None:
+    def _parse_kind(self, raw: str | None, line: int) -> TermKind | None:
         if raw is None:
             return None
         mapped = _KIND_ALIASES.get(raw.lower())

@@ -2,7 +2,6 @@
 
 import difflib
 from dataclasses import dataclass
-from typing import Literal
 
 from ..model import (
     Glossary as BaseGlossary,
@@ -12,6 +11,7 @@ from ..model import (
     PytestGivenError,
     SourceLocation,
     TermId,
+    TermKind,
     id_derive,
 )
 from .source import capture_caller_source
@@ -73,7 +73,7 @@ class TermHandle:
         return self._term.canonical
 
     @property
-    def declared_kind(self) -> Literal['actor', 'object', 'verb'] | None:
+    def declared_kind(self) -> TermKind | None:
         """The kind the term claims, or None while it is still deferred.
 
         One reading for every flavor: an eager handle's kind was written into
@@ -106,7 +106,7 @@ class TermInstance:
         return self.handle.glossary
 
     @property
-    def declared_kind(self) -> Literal['actor', 'object', 'verb'] | None:
+    def declared_kind(self) -> TermKind | None:
         return self.handle.declared_kind
 
 
@@ -145,7 +145,7 @@ def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:
 
 def _register_kind(
     glossary: BaseGlossary,
-    kind: Literal['actor', 'object', 'verb'] | None,
+    kind: TermKind | None,
     name: str,
     definition: str | None,
     source: SourceLocation | None = None,

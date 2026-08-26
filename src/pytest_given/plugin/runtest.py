@@ -20,6 +20,7 @@ from ..capture import (
 from ..model import (
     NodeId,
     ParamSpec,
+    Status,
 )
 from .collection import _get_scenario_marker
 from .fixtures import _graft_fixture_recordings
@@ -180,7 +181,9 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
     setup_fail = report.when == 'setup' and report.failed
     if report.when != 'call' and not setup_skip and not setup_fail:
         return
-    status = 'passed' if report.passed else 'failed' if report.failed else 'skipped'
+    status: Status = (
+        'passed' if report.passed else 'failed' if report.failed else 'skipped'
+    )
     skip_reason = _extract_skip_reason(report.longrepr) if status == 'skipped' else None
     collector.finish_scenario(status=status, skip_reason=skip_reason)
 

@@ -15,7 +15,7 @@ discriminated by `content`-vs-`column_id` (a promoted attachment carries no
 """
 
 import dataclasses
-from typing import Any
+from typing import Any, cast
 
 from .errors import PytestGivenError
 from .schema import (
@@ -48,6 +48,7 @@ from .schema import (
     ReportData,
     Scenario,
     SourceLocation,
+    Status,
     Step,
     StepAttachment,
     Story,
@@ -165,7 +166,7 @@ def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
         narration=_narration_from_dict(d['narration']),
         module=d['module'],
         tags=list(d.get('tags', [])),
-        status=d.get('status', 'passed'),
+        status=cast('Status', d.get('status', 'passed')),
         duration_ms=d.get('duration_ms', 0),
         steps=[_step_from_dict(s) for s in d.get('steps', [])],
         parameters=_param_table_from_dict(d.get('parameters')),
@@ -264,7 +265,7 @@ def _param_column_from_dict(d: dict[str, Any]) -> ParameterColumn:
 def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
     return ParameterCase(
         values=[_cell_from_json(v) for v in d['values']],
-        status=d.get('status', 'passed'),
+        status=cast('Status', d.get('status', 'passed')),
         error=_error_from_dict(d.get('error')),
     )
 

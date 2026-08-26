@@ -13,6 +13,7 @@ from ..model import (
     ParameterTable,
     ParamInfo,
     Scenario,
+    Status,
     node_base,
     step_narrations,
 )
@@ -135,7 +136,7 @@ def _comparable(group: list[Scenario]) -> list[Scenario]:
     return [s for s in group if s.status == 'passed']
 
 
-def _grouped_status(cases: list[ParameterCase]) -> str:
+def _grouped_status(cases: list[ParameterCase]) -> Status:
     if any(c.status == 'failed' for c in cases):
         return 'failed'
     if all(c.status == 'skipped' for c in cases):

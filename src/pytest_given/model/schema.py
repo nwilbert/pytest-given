@@ -69,10 +69,15 @@ class Narration:
     parts: list[NarrationPart] = field(default_factory=list)
 
 
+# What a glossary term is: who acts, what is acted on, or the action itself.
+# None while a term's kind is still deferred to `infer_glossary_kinds`.
+type TermKind = Literal['actor', 'object', 'verb']
+
+
 @dataclass(frozen=True, kw_only=True)
 class GlossaryTerm:
     id: TermId
-    kind: Literal['actor', 'object', 'verb'] | None
+    kind: TermKind | None
     canonical: str
     definition: str | None = None
     source: SourceLocation | None = None
@@ -174,6 +179,11 @@ class Glossary:
 
 # Step phase
 type Phase = Literal['given', 'when', 'then']
+
+# How a scenario or one parametrize case came out. A `str` here would let a
+# typo ('pass') through every comparison site in grouping, lint and both
+# renderers; serde casts at the JSON boundary, which is the only untrusted one.
+type Status = Literal['passed', 'failed', 'skipped']
 
 # Lifecycle state of the collector — determines where push_step/attach route.
 type RecordingState = Literal['idle', 'test', 'fixture_setup', 'fixture_teardown']
@@ -359,7 +369,7 @@ class ParameterCase:
     columns."""
 
     values: list[CellValue | None]
-    status: str = 'passed'
+    status: Status = 'passed'
     error: ErrorInfo | None = None
 
 
@@ -375,7 +385,7 @@ class Scenario:
     narration: Narration
     module: str
     tags: list[str] = field(default_factory=list)
-    status: str = 'passed'
+    status: Status = 'passed'
     duration_ms: int = 0
     steps: list[Step] = field(default_factory=list)
     parameters: ParameterTable | None = None

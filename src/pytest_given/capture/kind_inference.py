@@ -16,9 +16,9 @@ from ..model import (
     PytestGivenError,
     Story,
     TermId,
+    TermKind,
 )
 
-type _Kind = Literal['actor', 'object', 'verb']
 type _Slot = Literal['actor', 'verb', 'noun']
 
 
@@ -52,7 +52,7 @@ def _slot_for(position: int) -> _Slot:
 def _infer_one(
     term: GlossaryTerm,
     stories_by_slot: dict[_Slot, set[str]],
-) -> _Kind | None:
+) -> TermKind | None:
     slots = set(stories_by_slot)
     if term.kind is not None:
         _verify_declared(term, stories_by_slot)
