@@ -1,6 +1,6 @@
 """Command-line entry point for the ``pytest-given`` console script.
 
-Top-level orchestrator like ``plugin.py``: allowed to import from any
+Top-level orchestrator like the ``plugin`` package: allowed to import from any
 subpackage. Owns the argparse root; subcommands register themselves here.
 """
 

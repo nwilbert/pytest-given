@@ -1,9 +1,10 @@
 """What a session keeps in `config.stash`, and the accessors that read it.
 
-Three values, one writer each: `_GivenConfig` is this run's options, parsed
-once at configure time; `_SessionState` is the bookkeeping the per-item hooks
-pass between each other; `_SessionOutcome` is what session finish leaves for
-the terminal summary. The stash rather than module globals throughout, so a
+Four values, one writer each: `Collector` is the recorder itself, created at
+session start; `_GivenConfig` is this run's options, parsed once at configure
+time; `_SessionState` is the bookkeeping the per-item hooks pass between each
+other; `_SessionOutcome` is what session finish leaves for the terminal
+summary. The stash rather than module globals throughout, so a
 nested in-process run (pytester, `pytest.main`) gets its own set instead of
 rebinding — and thereby clobbering — the outer session's.
 """

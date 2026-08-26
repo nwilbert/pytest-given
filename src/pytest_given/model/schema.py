@@ -109,9 +109,9 @@ class GlossaryPinned:
     """A story-tree node that pins the live `Glossary` objects its subtree
     references, keyed by `id()`.
 
-    `story()` pins them at construction so `plugin._resolve_glossary` can pick
-    the report's glossary off the story tree it was handed, rather than off a
-    session-global that a nested run could clear. A declared field (not a
+    `story()` pins them at construction so `capture.discovery.resolve_glossary`
+    can pick the report's glossary off the story tree it was handed, rather than
+    off a session-global that a nested run could clear. A declared field (not a
     name stashed at runtime) so it is typed and mypy sees every read;
     underscored, so serde drops it and it never reaches the JSON.
 

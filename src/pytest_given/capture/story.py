@@ -57,7 +57,7 @@ def path(*parts: _PathArg) -> ActivityPath:
     # Stash the live Glossary objects the path references, keyed by object id —
     # read by activity() and _check_single_glossary to enforce the v1 "one
     # glossary per story" invariant at construction time, and by story() so the
-    # owning Glossary travels on the Story tree itself. plugin._resolve_glossary
+    # owning Glossary travels on the Story tree itself. discovery.resolve_glossary
     # reads that stash to pick the report's glossary deterministically, without
     # consulting any session-global. Keying by id() dedups by identity (Glossary
     # is unhashable) while keeping the object. Not serialized.
@@ -178,7 +178,7 @@ def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     glossaries = _merge_glossaries(a._glossaries for a in numbered)
     _check_single_glossary(title, glossaries)
     result = Story(id=sid, title=title, activities=numbered, source=source)
-    # Carry the story's glossary on the tree so plugin._resolve_glossary can
+    # Carry the story's glossary on the tree so discovery.resolve_glossary can
     # pick it deterministically from the collected stories themselves.
     _pin_glossaries(result, glossaries)
     return result
