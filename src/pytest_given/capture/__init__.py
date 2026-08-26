@@ -26,21 +26,14 @@ from .process_state import (
     capture_snapshot,
     restore_capture_state,
 )
-from .source import (
-    capture_caller_source,
-    code_source,
-    item_source,
-    set_rootdir,
-)
+from .source import item_source
 from .story import (
     activity,
-    clear_story_registry,
     path,
     story,
 )
 from .template import (
     Template,
-    narration_from,
     resolved_placeholder_part,
     try_term_ref,
 )
@@ -59,16 +52,12 @@ __all__ = [
     'annotated_given_descriptors',
     'attach',
     'begin_capture_session',
-    'capture_caller_source',
     'capture_snapshot',
-    'clear_story_registry',
-    'code_source',
     'filter_internal_frames',
     'get_active_collector',
     'given',
     'infer_glossary_kinds',
     'item_source',
-    'narration_from',
     'parse_short_repr',
     'path',
     'resolve_glossary',
@@ -76,7 +65,6 @@ __all__ = [
     'restore_capture_state',
     'scenario',
     'set_active_collector',
-    'set_rootdir',
     'snapshot_param_value',
     'story',
     'then',

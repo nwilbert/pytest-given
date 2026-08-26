@@ -9,11 +9,11 @@ from pytest_given import Glossary
 from pytest_given.capture import (
     FileGlossary,
     activity,
-    clear_story_registry,
     path,
     resolve_glossary,
     story,
 )
+from pytest_given.capture.story import clear_story_registry
 from pytest_given.model import PytestGivenError
 
 

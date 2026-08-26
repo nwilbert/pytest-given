@@ -3,7 +3,7 @@
 import pytest
 
 from pytest_given import Glossary, Template, given, scenario, then, when
-from pytest_given.capture import narration_from
+from pytest_given.capture.template import narration_from
 from pytest_given.grouping import group_parametrized
 from pytest_given.model import (
     Narration,
