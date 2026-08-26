@@ -2,6 +2,7 @@
 
 import dataclasses
 from datetime import UTC, datetime
+from typing import Any, cast
 
 import pytest
 
@@ -2637,3 +2638,11 @@ def test_a_formatted_step_slot_over_a_term_instance_falls_back_to_the_display() 
     slot = grouped.steps[0].narration.parts[1]
     assert isinstance(slot, NarrationPlaceholder)
     assert slot.column_id == 'who'
+
+
+def test_part_key_rejects_unknown_variant() -> None:
+    # The exhaustive match guards against a NarrationPart variant being added
+    # without a template-key branch, which would make rule 6 compare two
+    # narrations on a key that ignores the new part entirely.
+    with pytest.raises(AssertionError):
+        checks._part_key(cast(Any, object()))

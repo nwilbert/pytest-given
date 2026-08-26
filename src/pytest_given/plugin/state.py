@@ -1,0 +1,108 @@
+"""What a session keeps in `config.stash`, and the accessors that read it.
+
+Three values, one writer each: `_GivenConfig` is this run's options, parsed
+once at configure time; `_SessionState` is the bookkeeping the per-item hooks
+pass between each other; `_SessionOutcome` is what session finish leaves for
+the terminal summary. The stash rather than module globals throughout, so a
+nested in-process run (pytester, `pytest.main`) gets its own set instead of
+rebinding — and thereby clobbering — the outer session's.
+"""
+
+from dataclasses import dataclass, field
+
+import pytest
+
+from ..capture import (
+    Collector,
+)
+from ..lint import (
+    Finding,
+    IgnoreEntry,
+    Level,
+    RuleId,
+)
+from ..model import (
+    NodeId,
+    ParamInfo,
+)
+
+_collector_key: pytest.StashKey[Collector] = pytest.StashKey()
+
+
+def _collector(config: pytest.Config) -> Collector:
+    """The collector owned by this session, created at `pytest_sessionstart`.
+
+    Lives in `config.stash` rather than a module global so a nested in-process
+    run (pytester, `pytest.main`) gets its own instance instead of rebinding —
+    and thereby clobbering — the outer session's.
+    """
+    return config.stash[_collector_key]
+
+
+@dataclass(frozen=True, kw_only=True)
+class _GivenConfig:
+    """This run's pytest-given options, parsed once.
+
+    Parsed eagerly in `pytest_configure` — a typo in a rule name or a
+    source-link preset is a `UsageError` before the suite runs, not a surprise
+    after it — and read from session start onwards. One bundle rather than a
+    key apiece, so the parse seam is a single object with a single writer:
+    every option this plugin takes is resolved here once, including the two
+    that read a CLI flag over an ini value (`title`, `lint_enabled`). Resolving
+    either at its read site instead would put the precedence rule in as many
+    places as there are readers — `lint_enabled` alone has two.
+    """
+
+    rule_levels: dict[RuleId, Level]
+    ignore_entries: list[IgnoreEntry]
+    source_link_template: str | None
+    title: str | None
+    lint_enabled: bool
+
+
+@dataclass(kw_only=True)
+class _SessionOutcome:
+    """What session finish leaves for the terminal summary to print.
+
+    Filled at up to three points on the way out — a report that could not be
+    written, the lint's findings, the Markdown destined for stdout — and read
+    in one place. Mutable and stashed once at configure time, so the summary
+    never has to distinguish "nothing happened" from "the hook never ran".
+    """
+
+    report_error: str | None = None
+    md_stdout: str | None = None
+    findings: list[Finding] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class _SessionState:
+    """The per-item bookkeeping the hooks pass between each other.
+
+    Neither field is the collector's business — nothing in `capture/` reads
+    them — so they live in the session's stash beside it rather than as
+    attributes on the recorder, which keeps `Collector` to what it records.
+
+    `published_for` is the item whose setup published the collector to the
+    ContextVar, so teardown clears only what it published. Not
+    `active_scenario_id`: that is already None by teardown (the call report
+    finished the scenario), which is how the clear came to be skipped entirely.
+    """
+
+    param_info: ParamInfo = field(default_factory=dict)
+    published_for: NodeId | None = None
+
+
+_given_config: pytest.StashKey[_GivenConfig] = pytest.StashKey()
+
+
+_session_outcome: pytest.StashKey[_SessionOutcome] = pytest.StashKey()
+
+
+_session_state: pytest.StashKey[_SessionState] = pytest.StashKey()
+
+
+def _state(config: pytest.Config) -> _SessionState:
+    """This session's hook bookkeeping, created at `pytest_sessionstart`
+    alongside its collector."""
+    return config.stash[_session_state]

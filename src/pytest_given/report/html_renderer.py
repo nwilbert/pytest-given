@@ -28,13 +28,13 @@ from .aggregations import (
     build_coverage_maps,
     build_glossary_aggregations,
     build_scenario_activity_index,
-    build_scenario_slug_index,
     build_story_rollups,
     build_term_scenario_index,
     tab_visibility,
 )
 from .inline_markdown import render_inline_markdown
 from .palette import param_column_colors
+from .slugs import build_scenario_slug_index
 from .source_link import compile_source_link
 
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
@@ -61,13 +61,18 @@ def _neutralize_script_data(text: str) -> str:
     return text.replace('</', '<\\/').replace('<!--', '\\u003C!--')
 
 
-def _script_json(value: object) -> Markup:
+def _script_json(value: object, *, indent: int | None = None) -> Markup:
     """Serialize `value` to JSON for embedding in an inline `<script>`, with the
     tokenizer-steering sequences neutralized. `json.dumps` escapes neither `</`
     nor `<!--` inside string literals, and these blobs carry user-controlled
-    node ids — so a parametrize id containing `</script>` would otherwise break
-    out of the tag (stored XSS)."""
-    return Markup(_neutralize_script_data(json.dumps(value)))
+    node ids and attachment payloads — so one containing `</script>` would
+    otherwise break out of the tag (stored XSS), and one containing
+    `<!--<script` would swallow the rest of the document.
+
+    `indent` is the only thing that ever varied between call sites; it rides
+    here rather than justifying a second, hand-rolled spelling of the escape.
+    """
+    return Markup(_neutralize_script_data(json.dumps(value, indent=indent)))
 
 
 def _inline_md(text: str | None) -> Markup:
@@ -80,17 +85,6 @@ def _inline_md(text: str | None) -> Markup:
     return Markup(render_inline_markdown(text))
 
 
-def render_html(
-    report: ReportData,
-    html_path: Path,
-    source_link_template: str | None = None,
-) -> None:
-    """Render a report model to a self-contained HTML file."""
-    html = render_html_string(report, source_link_template=source_link_template)
-    html_path.parent.mkdir(parents=True, exist_ok=True)
-    html_path.write_text(html, encoding='utf-8')
-
-
 def render_html_string(
     report: ReportData,
     source_link_template: str | None = None,
@@ -100,9 +94,10 @@ def render_html_string(
     `source_link_template` is the already-resolved template string (preset
     expansion happens before this point). None disables source linking.
 
-    Separate from `render_html` so the plugin can render every sink before
-    writing any of them — a render that raises must not leave this run's JSON
-    beside the previous run's HTML.
+    Returns the document rather than writing it: every caller goes through
+    `sinks`, which renders all of a run's sinks before writing any of them, so
+    a render that raises cannot leave this run's JSON beside the previous
+    run's HTML.
     """
     # Built once and handed to both: the narration filter colors placeholders
     # with it, and the template emits the matching `.param-color-N` rules.
@@ -182,13 +177,7 @@ def _render_context(
         'scenario_slugs_json': _script_json(
             {slug: node_id for node_id, slug in scenario_slugs.items()}
         ),
-        # JSON escapes neither `</` nor `<!--` inside string literals, but this
-        # is embedded in an inline <script>; an attachment containing
-        # `</script>` would close the tag and yield stored XSS, and one
-        # containing `<!--<script` would swallow the rest of the document.
-        'report_json': Markup(
-            _neutralize_script_data(json.dumps(report_to_dict(report), indent=2))
-        ),
+        'report_json': _script_json(report_to_dict(report), indent=2),
         **_bundled_assets(),
     }
 

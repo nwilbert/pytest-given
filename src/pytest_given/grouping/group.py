@@ -9,15 +9,11 @@ Everything else in the run passes through untouched, and a group's own assembly
 """
 
 from ..model import (
-    NodeId,
     ParameterCase,
     ParameterTable,
     ParamInfo,
     Scenario,
-    Step,
-    StepPath,
     node_base,
-    walk_steps,
 )
 from .checks import (
     check_rebound_params,
@@ -56,12 +52,9 @@ def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
     first = group[0]
     param_names = list(param_info[first.id].names)
     baseline = _baseline(group)
-    comparable = _comparable(group)
-    indexed = _indexed(comparable)
     ctx = GroupContext(
         param_names=param_names,
-        comparable=comparable,
-        indexed=indexed,
+        comparable=_comparable(group),
         anchor=first,
         case_params={s.id: param_info[s.id].mapping() for s in group},
     )
@@ -139,12 +132,6 @@ def _comparable(group: list[Scenario]) -> list[Scenario]:
     failed one may abort mid-tree.
     """
     return [s for s in group if s.status == 'passed']
-
-
-def _indexed(scenarios: list[Scenario]) -> dict[NodeId, dict[StepPath, Step]]:
-    """Each case's tree keyed by position, so "the same position in every other
-    case" is a lookup rather than a parallel descent through several trees."""
-    return {s.id: dict(walk_steps(s.steps)) for s in scenarios}
 
 
 def _grouped_status(cases: list[ParameterCase]) -> str:

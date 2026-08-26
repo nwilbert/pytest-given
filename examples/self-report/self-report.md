@@ -1077,7 +1077,7 @@
 - **then** the step carries a single «Term ref»
 
 ## ✓ The «glossary» view aggregates «instances» and «verb» forms
-`tests/unit/report/test_aggregations.py:160::test_build_glossary_aggregations_collects_instances_and_forms`
+`tests/unit/report/test_aggregations.py:159::test_build_glossary_aggregations_collects_instances_and_forms`
 
 - **given** a «Report» whose «Story» and «Scenario» reference entity «Instance»s and an «Inflection»
   - 📎 Report data:
@@ -1201,56 +1201,56 @@
 - **then** the verb collects its «Inflection» but not its canonical form
 
 ## ✓ «Terms» referenced by an «activity» record the «story»
-`tests/unit/report/test_aggregations.py:264::test_build_glossary_aggregations_records_story_refs_via_activities`
+`tests/unit/report/test_aggregations.py:263::test_build_glossary_aggregations_records_story_refs_via_activities`
 
 - **given** a «Story» whose «Activity» references an actor and a verb
 - **when** the «Glossary» aggregations are built
 - **then** the actor and the verb each list that «Story»
 
 ## ✓ A «story» referencing a «term» twice lists it once
-`tests/unit/report/test_aggregations.py:294::test_repeated_references_within_one_story_are_recorded_once`
+`tests/unit/report/test_aggregations.py:293::test_repeated_references_within_one_story_are_recorded_once`
 
 - **given** a «Story» whose two «activities» repeat the same «Term» and the same «Inflection»
 - **when** the «Glossary» aggregations are built
 - **then** the «Story» and the «Inflection» appear once each
 
 ## ✓ A canonical entity reference is not an «instance»
-`tests/unit/report/test_aggregations.py:364::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
+`tests/unit/report/test_aggregations.py:363::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
 
 - **given** a «Story» activity and a «Step» referencing entities by canonical name only
 - **when** the «Glossary» aggregations are built
 - **then** neither entity term records an «Instance»
 
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_aggregations.py:450::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
+`tests/unit/report/test_aggregations.py:449::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
 
 - **given** a «Kindless» «Term» referenced by a «Story» activity
 - **when** the «Glossary» aggregations are built
 - **then** the «Term» lists the «Story» but no «Instance» and no «Inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_aggregations.py:483::test_glossary_aggregations_annotates_fixture_provenance`
+`tests/unit/report/test_aggregations.py:482::test_glossary_aggregations_annotates_fixture_provenance`
 
 - **given** a «Scenario» whose fixture-sourced «Step» names an «Instance»
 - **when** the «Glossary» aggregations are built
 - **then** the «Instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_aggregations.py:576::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
+`tests/unit/report/test_aggregations.py:575::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
 
 - **given** a «Scenario» referencing one «Term» in two steps and another in its name
 - **when** the term-scenario index is built
 - **then** each «Term» maps to the scenario exactly once
 
 ## ✓ An under-anchored «activity» is flagged ineligible in rollups
-`tests/unit/report/test_aggregations.py:719::test_build_story_rollups_flags_under_anchored_activity_ineligible`
+`tests/unit/report/test_aggregations.py:616::test_build_story_rollups_flags_under_anchored_activity_ineligible`
 
 - **given** a «Story» with an anchored and an under-anchored «Activity»
 - **when** the story rollups are built
 - **then** only the anchored «Activity» is «Coverage»-eligible
 
 ## ✓ An «Activity» is labeled by the prose of its «paths»
-`tests/unit/report/test_aggregations.py:817::test_build_activity_labels_joins_parts_into_prose`
+`tests/unit/report/test_aggregations.py:714::test_build_activity_labels_joins_parts_into_prose`
 
 - **given** a «Story» with a two-«path» «activity»
 - **when** the «activity» labels are built
@@ -1364,7 +1364,7 @@
 - **then** eligibility gates the binding, so «Coverage» stays empty
 
 ## ✓ «Parameter coloring» marks placeholders and table headers
-`tests/unit/report/test_html_renderer.py:194::test_render_parametrized_step_with_structured_narration`
+`tests/unit/report/test_html_renderer.py:212::test_render_parametrized_step_with_structured_narration`
 
 - **given** a «Report» holding a «Parametrized scenario» with a «Parameter table»
 - **when** the «Renderer» renders the HTML page
@@ -1372,7 +1372,7 @@
 - **then** the page carries one generated color rule per column, after the stylesheet so a term ref bound to a column takes the column ink
 
 ## ✓ A passed «scenario» renders as a checked heading with «step» bullets
-`tests/unit/report/test_md_renderer.py:46::test_passed_scenario_heading_and_steps`
+`tests/unit/report/test_md_renderer.py:50::test_passed_scenario_heading_and_steps`
 
 - **given** a «Report» holding a passed «Scenario» with three steps
   - 📎 Scenario record:
@@ -1437,28 +1437,28 @@
 - **then** the heading is checked and each «Step» is a phase bullet
 
 ## ✓ Nested «steps» indent under their parent
-`tests/unit/report/test_md_renderer.py:145::test_nested_steps_indent`
+`tests/unit/report/test_md_renderer.py:149::test_nested_steps_indent`
 
 - **given** a «Scenario» whose when «Step» has a nested child
 - **when** the Markdown «Report» is rendered
 - **then** the child bullet indents under its parent
 
 ## ✓ Structured «narration» renders «terms», values and placeholders
-`tests/unit/report/test_md_renderer.py:169::test_narration_parts_resolve_terms_and_values`
+`tests/unit/report/test_md_renderer.py:173::test_narration_parts_resolve_terms_and_values`
 
 - **given** a «Step» whose «Narration» carries a «Term ref», a value and a placeholder
 - **when** the Markdown «Report» is rendered
 - **then** the «Term ref» renders in guillemets, the value verbatim and the placeholder in braces
 
 ## ✓ A «parametrized scenario» renders its «parameter table»
-`tests/unit/report/test_md_renderer.py:223::test_parametrized_scenario_renders_table` · parametrization
+`tests/unit/report/test_md_renderer.py:227::test_parametrized_scenario_renders_table` · parametrization
 
 - **given** a «Parametrized scenario» with a two-«Case» «Parameter table»
 - **when** the Markdown «Report» is rendered
 - **then** the heading counts the cases and the «Parameter table» lists each row
 
 ## ✓ A failing «step» is marked with a minimal error digest
-`tests/unit/report/test_md_renderer.py:259::test_failing_scenario_renders_a_minimal_error`
+`tests/unit/report/test_md_renderer.py:263::test_failing_scenario_renders_a_minimal_error`
 
 - **given** a failed «Scenario» carrying a two-line error and an internal frame
   - 📎 Error record:
@@ -1489,35 +1489,35 @@
 - **then** only the first message line and the non-internal frame are quoted
 
 ## ✓ A multi-line «attachment» renders as a fenced block
-`tests/unit/report/test_md_renderer.py:329::test_multiline_attachment_renders_fenced_block`
+`tests/unit/report/test_md_renderer.py:333::test_multiline_attachment_renders_fenced_block`
 
 - **given** a «Step» carrying a multi-line «Attachment»
 - **when** the Markdown «Report» is rendered
 - **then** the «Attachment» content sits in an indented fence, not inline
 
 ## ✓ A skipped scenario shows its skip reason
-`tests/unit/report/test_md_renderer.py:491::test_skipped_scenario_shows_reason`
+`tests/unit/report/test_md_renderer.py:495::test_skipped_scenario_shows_reason`
 
 - **given** a skipped «Scenario» with a reason
 - **when** the Markdown «Report» is rendered
 - **then** the heading is marked skipped and the reason follows the node id
 
 ## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
-`tests/unit/test_grouping.py:74::test_group_parametrized_any_failed_groups_as_failed` · parametrization
+`tests/unit/test_grouping.py:75::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
 - **given** three «Case» records of one «Parametrized scenario»
 - **when** the «grouping» pass collapses them
 - **then** one scenario remains and any failed «Case» fails it
 
 ## ✓ The grouped tree comes from the first passed «case»
-`tests/unit/test_grouping.py:181::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
+`tests/unit/test_grouping.py:182::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
 
 - **given** a skipped first «Case» and a second one that ran
 - **when** the «cases» are «grouped»
 - **then** the tree is the one the passed «Case» recorded
 
 ## ✓ A plain-str «narration» that varies across «cases» is refused
-`tests/unit/test_grouping.py:402::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
+`tests/unit/test_grouping.py:403::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
 
 - **given** two «cases» whose text differs but records no parts
 - **when** the «cases» are «grouped»
@@ -1525,7 +1525,7 @@
 - **then** the error names the test, the missing parts and the t-string fix
 
 ## ✓ A narrated value that varies becomes a derived «parameter table» column
-`tests/unit/test_grouping.py:519::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
+`tests/unit/test_grouping.py:520::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
 
 - **given** two «cases» narrating a value that differs
 - **when** «templatizing» walks the «cases»
@@ -1533,7 +1533,7 @@
 - **then** the «Step» keeps a placeholder pointing at that column
 
 ## ✓ A varying interpolation that is not a bare name is refused
-`tests/unit/test_grouping.py:631::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
+`tests/unit/test_grouping.py:632::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
 
 - **given** two «cases» narrating a computed expression
 - **when** the «cases» are «grouped»
@@ -1541,14 +1541,14 @@
 - **then** the error quotes the expression and shows the bind-a-local fix
 
 ## ✓ A «parameter table» cell reads the way the scenario name formats it
-`tests/unit/test_grouping.py:997::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
+`tests/unit/test_grouping.py:998::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
 
 - **given** a Template scenario name formatting its parameter
 - **when** the «cases» are «grouped»
 - **then** the cells carry the formatting the name declared
 
 ## ✓ A scenario name formatting a parameter a «step» reads plainly gets its own column
-`tests/unit/test_grouping.py:1012::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1013::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
 
 - **given** a name formatting the parameter and a step reading it plainly
 - **when** the «cases» are «grouped»
@@ -1556,7 +1556,7 @@
 - **then** the name renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» formatting a parameter the scenario name reads plainly gets its own column
-`tests/unit/test_grouping.py:1055::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1056::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
 
 - **given** a step formatting the parameter and a name reading it plainly
 - **when** the «cases» are «grouped»
@@ -1564,7 +1564,7 @@
 - **then** the step renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» narrating a parameter its column no longer holds is refused
-`tests/unit/test_grouping.py:1137::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
+`tests/unit/test_grouping.py:1138::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
 
 - **given** two «cases» narrating a value their column lacks
 - **when** the «cases» are «grouped»
@@ -1572,7 +1572,7 @@
 - **then** the error names the column and what the case actually narrated
 
 ## ✓ A «term ref» whose display differs between «cases» is refused
-`tests/unit/test_grouping.py:1488::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1489::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» reads differently
 - **when** the «cases» are «grouped»
@@ -1580,7 +1580,7 @@
 - **then** the error names the «Term ref» and the split-it-out fix
 
 ## ✓ A «term ref» that *is* the parametrize value is refused too
-`tests/unit/test_grouping.py:1545::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1546::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» is the parameter itself
 - **when** the «cases» are «grouped»
@@ -1588,7 +1588,7 @@
 - **then** the error points at the per-case «scenario» opt-out
 
 ## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py:1709::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+`tests/unit/test_grouping.py:1710::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
 
 - **given** two «cases» attaching a label with differing payloads
 - **when** «templatizing» walks the «cases»
@@ -1596,7 +1596,7 @@
 - **then** the «Step» keeps a content-less badge pointing at it
 
 ## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py:1765::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+`tests/unit/test_grouping.py:1766::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
 
 - **given** an «Attachment» label only one «Case» attaches
 - **when** the «cases» are «grouped»
@@ -1604,7 +1604,7 @@
 - **then** the error names the label and asks for a constant one
 
 ## ✓ A «parameter table» cell reads the way the «step» that points at it read
-`tests/unit/test_grouping.py:2313::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+`tests/unit/test_grouping.py:2314::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec
 - **when** «grouping» builds the «parameter table»
@@ -1612,7 +1612,7 @@
 - **then** the step keeps its placeholder, which that cell substitutes into
 
 ## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py:2451::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+`tests/unit/test_grouping.py:2452::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
 
 - **given** two «cases» whose «step» trees differ
 - **when** the «cases» are «grouped»
@@ -1620,7 +1620,7 @@
 - **then** the error names the divergence and the opt-out that answers it
 
 ## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
-`tests/unit/test_grouping.py:2579::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
+`tests/unit/test_grouping.py:2580::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
 
 - **given** a step narrating a parameter bound to a glossary term instance
 - **when** the «cases» are «grouped»

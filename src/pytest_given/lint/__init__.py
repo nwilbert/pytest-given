@@ -11,16 +11,7 @@ spec (docs/specs/2026-07-05-narration-lint-design.md).
 """
 
 from .ast_rules import run_ast_rules
-from .base import (
-    LEVELS,
-    RULES,
-    STALE_IGNORE,
-    Finding,
-    Level,
-    LintRule,
-    RuleId,
-    Surface,
-)
+from .base import Finding, Level, RuleId
 from .config import (
     IgnoreEntry,
     apply_config,
@@ -31,15 +22,10 @@ from .runtime_rules import run_runtime_rules
 from .summary import error_count, summary_rows, summary_title
 
 __all__ = [
-    'LEVELS',
-    'RULES',
-    'STALE_IGNORE',
     'Finding',
     'IgnoreEntry',
     'Level',
-    'LintRule',
     'RuleId',
-    'Surface',
     'apply_config',
     'error_count',
     'parse_ignore_entries',

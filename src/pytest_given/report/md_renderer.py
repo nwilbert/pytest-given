@@ -1,5 +1,7 @@
 import re
+from collections.abc import Iterator
 from pathlib import Path
+from typing import assert_never
 
 from ..model import (
     Attachment,
@@ -91,10 +93,7 @@ def _param_table_md(table: ParameterTable) -> str:
     rows: list[str] = []
     blocks: list[str] = []
     for case in table.cases:
-        cells = [
-            _case_cell(column, value)
-            for column, value in zip(table.columns, case.values, strict=True)
-        ]
+        cells = [_case_cell(column, value) for column, value in _cells(table, case)]
         rows.append(
             '| ' + ' | '.join([*cells, _STATUS_GLYPH.get(case.status, '✗')]) + ' |'
         )
@@ -153,7 +152,7 @@ def _case_attachment_blocks(table: ParameterTable, case: ParameterCase) -> list[
     """
     key = _case_key(table, case)
     lines: list[str] = []
-    for column, value in zip(table.columns, case.values, strict=True):
+    for column, value in _cells(table, case):
         if not isinstance(value, Attachment) or _fits_inline(value.content):
             continue
         lines.append('')
@@ -166,10 +165,21 @@ def _case_key(table: ParameterTable, case: ParameterCase) -> str:
     """A case's parametrize values, joined — how a note below the table names
     the row it belongs to."""
     return ', '.join(
-        _cell(value)
-        for column, value in zip(table.columns, case.values, strict=True)
-        if column.kind == 'param'
+        _cell(value) for column, value in _cells(table, case) if column.kind == 'param'
     )
+
+
+def _cells(
+    table: ParameterTable, case: ParameterCase
+) -> Iterator[tuple[ParameterColumn, CellValue | None]]:
+    """A case's cells paired with the columns they sit under.
+
+    `ParameterCase.values` is positionally aligned with `table.columns` and
+    nothing below reads one without the other, so the pairing — and the
+    `strict=True` that asserts the alignment — is stated once here rather than
+    at each of the three sites that walk a row.
+    """
+    return zip(table.columns, case.values, strict=True)
 
 
 _MAX_INLINE = 72
@@ -272,3 +282,5 @@ def _part_md(part: NarrationPart) -> str:
             return '{' + name + '}'
         case NarrationTermRef(display=display):
             return f'«{display}»'
+        case _:
+            assert_never(part)

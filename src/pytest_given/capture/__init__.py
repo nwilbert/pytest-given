@@ -22,7 +22,6 @@ from .glossary import Glossary
 from .kind_inference import infer_glossary_kinds
 from .params import snapshot_param_value
 from .process_state import (
-    CaptureState,
     begin_capture_session,
     capture_snapshot,
     restore_capture_state,
@@ -48,7 +47,6 @@ from .template import (
 from .traceback import filter_internal_frames, parse_short_repr
 
 __all__ = [
-    'CaptureState',
     'Collector',
     'FileGlossary',
     'FixtureInstanceKey',

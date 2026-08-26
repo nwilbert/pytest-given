@@ -38,9 +38,27 @@ from pytest_given.report.html_renderer import (
     _make_narration_filter,
     _neutralize_script_data,
     _render_narration_part,
-    render_html,
+    render_html_string,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
+
+
+def render_html(
+    report: ReportData,
+    html_path: Path,
+    source_link_template: str | None = None,
+) -> None:
+    """Render a report to a file, for the assertions below that read one back.
+
+    A test fixture rather than production code: `render_sinks` is what actually
+    writes the HTML sink, and a render-and-write convenience in `html_renderer`
+    existed only to spare these tests two lines.
+    """
+    html_path.parent.mkdir(parents=True, exist_ok=True)
+    html_path.write_text(
+        render_html_string(report, source_link_template=source_link_template),
+        encoding='utf-8',
+    )
 
 
 def _narration(text: str, parts: list | None = None) -> dict:

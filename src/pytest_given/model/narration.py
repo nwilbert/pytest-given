@@ -13,7 +13,7 @@ Only rules that need nothing but the parts. `try_term_ref` stays in
 """
 
 from string import Formatter
-from typing import Any
+from typing import Any, assert_never
 
 from .schema import (
     NarrationLiteral,
@@ -45,6 +45,8 @@ def narration_text(parts: list[NarrationPart]) -> str:
                 out.append('{' + name + '}')
             case NarrationTermRef(display=display):
                 out.append(display)
+            case _:
+                assert_never(part)
     return ''.join(out)
 
 

@@ -1,3 +1,7 @@
+from typing import Any, cast
+
+import pytest
+
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import (
     Attachment,
@@ -19,7 +23,7 @@ from pytest_given.model import (
     TracebackFrame,
     report_to_dict,
 )
-from pytest_given.report.md_renderer import render_md
+from pytest_given.report.md_renderer import _part_md, render_md
 from tests.ubiquitous_language import pg
 
 
@@ -688,3 +692,10 @@ def test_an_attachment_cell_at_the_inline_limit_still_sits_inline() -> None:
 def test_header_prefers_the_title_over_the_project() -> None:
     md = render_md(_report(project='pytest-given', title='Coffee Shop Example'))
     assert md.startswith('# pytest-given — Coffee Shop Example')
+
+
+def test_part_md_rejects_unknown_variant() -> None:
+    # The exhaustive match guards against a NarrationPart variant being added
+    # without a Markdown branch (silent drop). assert_never fires at runtime.
+    with pytest.raises(AssertionError):
+        _part_md(cast(Any, object()))

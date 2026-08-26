@@ -10,7 +10,7 @@ from typing import Annotated, Any, cast
 
 import pytest
 
-from pytest_given import Template, given, plugin, then, when
+from pytest_given import Template, given, then, when
 from pytest_given.capture.collector import (
     Collector,
     get_active_collector,
@@ -37,26 +37,34 @@ from pytest_given.model import (
     PytestGivenError,
     Step,
 )
+from pytest_given.plugin import collection, fixtures, runtest, session, state
 
 
 @pytest.fixture
 def fake_config() -> Any:
-    """A config double carrying a real Stash with a session collector, as
-    `pytest_sessionstart` leaves it."""
+    """A config double carrying a real Stash with a session collector and its
+    hook bookkeeping, as `pytest_sessionstart` leaves it."""
     config = SimpleNamespace(stash=pytest.Stash())
-    config.stash[plugin._collector_key] = Collector()
+    config.stash[state._collector_key] = Collector()
+    config.stash[state._session_state] = state._SessionState()
     return config
 
 
 @pytest.fixture
 def fresh_collector(fake_config: Any) -> Collector:
     """The collector owned by `fake_config`'s session."""
-    return fake_config.stash[plugin._collector_key]
+    return fake_config.stash[state._collector_key]
+
+
+@pytest.fixture
+def fresh_state(fake_config: Any) -> state._SessionState:
+    """The hook bookkeeping owned by `fake_config`'s session."""
+    return fake_config.stash[state._session_state]
 
 
 def _drive_fixture_setup(fixturedef: Any, request: Any) -> None:
     """Step the pytest_fixture_setup hookwrapper generator as pluggy would."""
-    gen = plugin.pytest_fixture_setup(fixturedef, request)
+    gen = fixtures.pytest_fixture_setup(fixturedef, request)
     next(gen)
     with pytest.raises(StopIteration):
         next(gen)
@@ -106,17 +114,17 @@ def test_ensure_teardown_wrapped_is_idempotent() -> None:
 
     gen_fixture._step_descriptor = desc  # type: ignore[attr-defined]
     fixturedef = SimpleNamespace(func=gen_fixture)
-    plugin._ensure_teardown_wrapped(fixturedef, Collector())
+    fixtures._ensure_teardown_wrapped(fixturedef, Collector())
     first_wrap = fixturedef.func
     assert first_wrap is not gen_fixture
-    plugin._ensure_teardown_wrapped(fixturedef, Collector())
+    fixtures._ensure_teardown_wrapped(fixturedef, Collector())
     assert fixturedef.func is first_wrap
 
 
 def test_ensure_teardown_wrapped_skips_non_generator() -> None:
     plain = _fake_func(StepDescriptor('given', 'a thing'))
     fixturedef = SimpleNamespace(func=plain)
-    plugin._ensure_teardown_wrapped(fixturedef, Collector())
+    fixtures._ensure_teardown_wrapped(fixturedef, Collector())
     assert fixturedef.func is plain
 
 
@@ -130,7 +138,7 @@ def test_wrapped_generator_handles_no_yield() -> None:
 
     degenerate._step_descriptor = desc  # type: ignore[attr-defined]
     fixturedef = SimpleNamespace(func=degenerate)
-    plugin._ensure_teardown_wrapped(fixturedef, Collector())
+    fixtures._ensure_teardown_wrapped(fixturedef, Collector())
     wrapped = fixturedef.func
     assert inspect.isgeneratorfunction(wrapped)
     assert list(wrapped()) == []
@@ -142,7 +150,7 @@ def test_graft_fixture_recordings_skips_plain_fixtures(
     fixturedef = SimpleNamespace(func=lambda: None, cached_result=('v', None, None))
     item = _fake_item({'plain': [fixturedef]})
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
-    plugin._graft_fixture_recordings(item, fresh_collector)
+    fixtures._graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
 
@@ -154,7 +162,7 @@ def test_graft_fixture_recordings_skips_uncached_fixtures(
     fixturedef = SimpleNamespace(func=deco, cached_result=None)
     item = _fake_item({'deco': [fixturedef]})
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
-    plugin._graft_fixture_recordings(item, fresh_collector)
+    fixtures._graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
 
@@ -164,7 +172,7 @@ def test_graft_fixture_recordings_skips_unknown_fixturename(
 ) -> None:
     item = _fake_item({'missing': None})
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
-    plugin._graft_fixture_recordings(item, fresh_collector)
+    fixtures._graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
 
@@ -172,11 +180,12 @@ def test_graft_fixture_recordings_skips_unknown_fixturename(
 def test_pytest_runtest_teardown_ignores_mismatched_item(
     fake_config: Any,
     fresh_collector: Collector,
+    fresh_state: state._SessionState,
 ) -> None:
-    fresh_collector.published_for = NodeId('t::a')
+    fresh_state.published_for = NodeId('t::a')
     set_active_collector(fresh_collector)
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::b', config=fake_config))
-    plugin.pytest_runtest_teardown(item)
+    runtest.pytest_runtest_teardown(item)
     assert get_active_collector() is fresh_collector
     set_active_collector(None)
 
@@ -184,40 +193,43 @@ def test_pytest_runtest_teardown_ignores_mismatched_item(
 def test_pytest_runtest_teardown_clears_collector_when_matched(
     fake_config: Any,
     fresh_collector: Collector,
+    fresh_state: state._SessionState,
 ) -> None:
-    fresh_collector.published_for = NodeId('t::a')
+    fresh_state.published_for = NodeId('t::a')
     set_active_collector(fresh_collector)
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::a', config=fake_config))
-    plugin.pytest_runtest_teardown(item)
+    runtest.pytest_runtest_teardown(item)
     assert get_active_collector() is None
 
 
 def test_pytest_runtest_teardown_clears_a_finished_scenario(
     fake_config: Any,
     fresh_collector: Collector,
+    fresh_state: state._SessionState,
 ) -> None:
     """The call report runs `finish_scenario` before teardown, so
     `active_scenario_id` is already None here. Teardown keys on
     `published_for` instead, which still names the item."""
-    fresh_collector.published_for = NodeId('t::a')
+    fresh_state.published_for = NodeId('t::a')
     fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
     fresh_collector.finish_scenario(status='passed', duration_ms=0)
     set_active_collector(fresh_collector)
     assert fresh_collector.active_scenario_id is None
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::a', config=fake_config))
-    plugin.pytest_runtest_teardown(item)
+    runtest.pytest_runtest_teardown(item)
     assert get_active_collector() is None
 
 
 def test_pytest_runtest_teardown_clears_unannotated_flag(
     fake_config: Any,
     fresh_collector: Collector,
+    fresh_state: state._SessionState,
 ) -> None:
     fresh_collector.inside_unannotated_test = True
-    fresh_collector.published_for = NodeId('t::x')
+    fresh_state.published_for = NodeId('t::x')
     set_active_collector(fresh_collector)
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::x', config=fake_config))
-    plugin.pytest_runtest_teardown(item)
+    runtest.pytest_runtest_teardown(item)
     assert fresh_collector.inside_unannotated_test is False
     assert get_active_collector() is None
 
@@ -244,18 +256,26 @@ def test_makereport_ignores_a_failure_outside_the_active_scenario(
     fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
     call = SimpleNamespace(when='call', excinfo=SimpleNamespace())
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::b', config=fake_config))
-    plugin.pytest_runtest_makereport(item, cast(Any, call))
+    runtest.pytest_runtest_makereport(item, cast(Any, call))
     recorded = fresh_collector.finish_scenario(status='passed', duration_ms=0)
     assert recorded.status == 'passed'
     assert recorded.error is None
 
 
 def _fake_session() -> Any:
-    """A session double with just enough config for `pytest_sessionstart`."""
-    config = SimpleNamespace(
-        stash=pytest.Stash(),
-        getoption=lambda name: None,
-        getini=lambda name: False,
+    """A session double with just enough config for `pytest_sessionstart`.
+
+    The stash carries a `_GivenConfig` because the real lifecycle always runs
+    `pytest_configure` first — that is where every option is resolved, and
+    `pytest_sessionstart` reads the result rather than re-deriving it.
+    """
+    config = SimpleNamespace(stash=pytest.Stash())
+    config.stash[state._given_config] = state._GivenConfig(
+        rule_levels={},
+        ignore_entries=[],
+        source_link_template=None,
+        title=None,
+        lint_enabled=False,
     )
     return SimpleNamespace(config=config)
 
@@ -266,12 +286,12 @@ def test_sessionstart_gives_each_session_its_own_collector() -> None:
     fresh collector without disturbing the outer session's."""
     outer = _fake_session()
     inner = _fake_session()
-    plugin.pytest_sessionstart(cast(pytest.Session, outer))
-    outer_collector = plugin._collector(outer.config)
+    session.pytest_sessionstart(cast(pytest.Session, outer))
+    outer_collector = state._collector(outer.config)
     outer_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
-    plugin.pytest_sessionstart(cast(pytest.Session, inner))
-    assert plugin._collector(outer.config) is outer_collector
-    assert plugin._collector(inner.config) is not outer_collector
+    session.pytest_sessionstart(cast(pytest.Session, inner))
+    assert state._collector(outer.config) is outer_collector
+    assert state._collector(inner.config) is not outer_collector
     assert outer_collector.active_scenario_id == NodeId('t::x')
 
 
@@ -303,10 +323,10 @@ def test_nested_session_restores_the_outer_story_registry(tmp_path: Any) -> None
     duplicate-declaration detection."""
     outer = _lifecycle_config(tmp_path / 'outer')
     inner = _lifecycle_config(tmp_path / 'inner')
-    plugin.pytest_load_initial_conftests(cast(pytest.Config, outer))
+    session.pytest_load_initial_conftests(cast(pytest.Config, outer))
     try:
         story_fn('Shared Title')
-        plugin.pytest_load_initial_conftests(cast(pytest.Config, inner))
+        session.pytest_load_initial_conftests(cast(pytest.Config, inner))
         story_fn('Shared Title')  # fresh registry per session: no duplicate error
         _drain_cleanups(inner)
         with pytest.raises(PytestGivenError, match='already declared'):
@@ -323,10 +343,10 @@ def test_nested_config_lifecycle_restores_the_outer_rootdir(tmp_path: Any) -> No
     outer_config = _lifecycle_config(tmp_path / 'outer')
     nested_config = _lifecycle_config(tmp_path / 'nested')
     target = tmp_path / 'outer' / 'f.py'
-    plugin.pytest_load_initial_conftests(cast(pytest.Config, outer_config))
+    session.pytest_load_initial_conftests(cast(pytest.Config, outer_config))
     try:
         assert file_source(target, 1) is not None
-        plugin.pytest_load_initial_conftests(cast(pytest.Config, nested_config))
+        session.pytest_load_initial_conftests(cast(pytest.Config, nested_config))
         assert file_source(target, 1) is None  # re-pointed at the nested root
         _drain_cleanups(nested_config)
         assert file_source(target, 1) is not None  # outer resolution restored
@@ -339,41 +359,43 @@ def test_get_scenario_marker_returns_none_for_item_without_function() -> None:
     """DoctestItem and other non-Function items lack `.function`; the marker
     lookup must tolerate that rather than asserting."""
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::doctest'))
-    assert plugin._get_scenario_marker(item) is None
+    assert collection._get_scenario_marker(item) is None
 
 
 def test_extract_skip_reason_parses_canonical_tuple() -> None:
-    assert plugin._extract_skip_reason(('t.py', 12, 'Skipped: because')) == 'because'
+    assert runtest._extract_skip_reason(('t.py', 12, 'Skipped: because')) == 'because'
 
 
 def test_extract_skip_reason_strips_prefix_when_present() -> None:
-    assert plugin._extract_skip_reason(('t.py', 12, 'Skipped: mid-test')) == 'mid-test'
+    assert runtest._extract_skip_reason(('t.py', 12, 'Skipped: mid-test')) == 'mid-test'
 
 
 def test_extract_skip_reason_handles_no_prefix() -> None:
-    assert plugin._extract_skip_reason(('t.py', 12, 'mid-test')) == 'mid-test'
+    assert runtest._extract_skip_reason(('t.py', 12, 'mid-test')) == 'mid-test'
 
 
 def test_extract_skip_reason_returns_none_for_placeholder() -> None:
     assert (
-        plugin._extract_skip_reason(('t.py', 12, 'Skipped: <Skipped instance>')) is None
+        runtest._extract_skip_reason(('t.py', 12, 'Skipped: <Skipped instance>'))
+        is None
     )
     # pytest 9+: @pytest.mark.skip with no reason emits 'unconditional skip'
     assert (
-        plugin._extract_skip_reason(('t.py', 12, 'Skipped: unconditional skip')) is None
+        runtest._extract_skip_reason(('t.py', 12, 'Skipped: unconditional skip'))
+        is None
     )
 
 
 def test_extract_skip_reason_returns_none_for_empty_message() -> None:
-    assert plugin._extract_skip_reason(('t.py', 12, 'Skipped: ')) is None
-    assert plugin._extract_skip_reason(('t.py', 12, '')) is None
+    assert runtest._extract_skip_reason(('t.py', 12, 'Skipped: ')) is None
+    assert runtest._extract_skip_reason(('t.py', 12, '')) is None
 
 
 def test_extract_skip_reason_returns_none_for_unrecognized_shapes() -> None:
-    assert plugin._extract_skip_reason(None) is None
-    assert plugin._extract_skip_reason('just a string') is None
-    assert plugin._extract_skip_reason(('only', 'two')) is None
-    assert plugin._extract_skip_reason(('t.py', 12, 42)) is None
+    assert runtest._extract_skip_reason(None) is None
+    assert runtest._extract_skip_reason('just a string') is None
+    assert runtest._extract_skip_reason(('only', 'two')) is None
+    assert runtest._extract_skip_reason(('t.py', 12, 42)) is None
 
 
 # --- Task 7.2 / 7.4 unit coverage ---
@@ -393,7 +415,7 @@ def test_validate_scenario_story_binding_activities_without_story_raises() -> No
     marker = ScenarioDecorator('x', [], activity_ids=(ActivityId(1),))
     item = cast(pytest.Item, SimpleNamespace(nodeid='test_mod.py::test_x'))
     with pytest.raises(PytestGivenError, match='requires story='):
-        plugin._validate_scenario_story_binding(item, marker)
+        collection._validate_scenario_story_binding(item, marker)
 
 
 def test_extract_given_descriptor_from_parametrize_param() -> None:
@@ -469,7 +491,7 @@ def test_graft_skips_recording_not_belonging_to_item(
     )
     fresh_collector.store_recording((object(), None), stale)
     item = _fake_item({})
-    plugin._graft_fixture_recordings(item, fresh_collector)
+    fixtures._graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
 
@@ -494,7 +516,7 @@ def test_graft_phase2_skips_decorated_fixture_without_recording(
         SimpleNamespace(fixturenames=['machine'], session=session, function=testfn),
     )
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
-    plugin._graft_fixture_recordings(item, fresh_collector)
+    fixtures._graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
 

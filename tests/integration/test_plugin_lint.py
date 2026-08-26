@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from pytest_given import plugin
+from pytest_given.plugin import state
 
 CLEAN = """
 from pytest_given import scenario, given, when, then
@@ -79,7 +79,7 @@ def _run_observed(pytester, source, *args):
             yield step
             yield from walk(step.children)
 
-    collector = plugin._collector(capture.config)
+    collector = state._collector(capture.config)
     steps = [step for scenario in collector.scenarios for step in walk(scenario.steps)]
     return result, steps
 

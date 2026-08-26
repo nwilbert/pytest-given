@@ -2,10 +2,10 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 from ..model import PytestGivenError, ReportData, report_from_dict
-from .html_renderer import render_html
-from .md_renderer import render_md
+from .sinks import SinkConfig, render_sinks, write_sinks
 from .source_link import resolve_template
 
 
@@ -57,9 +57,14 @@ def run_report(args: argparse.Namespace) -> int:
         return 1
 
 
-def _load_report(json_file: Path) -> ReportData:
+def _load_report(json_file: Path) -> tuple[ReportData, dict[str, Any]]:
     """Deserialize the input file, mapping a shape mismatch to a
     `PytestGivenError`.
+
+    Returns the model *and* the dict it was built from: `render_sinks` takes
+    both, and this file is already the serialized report — re-deriving it with
+    `report_to_dict` would be work the caller has in hand, and would hand the
+    JSON sink a round-tripped copy rather than what was actually read.
 
     `report_from_dict` indexes whatever it is handed, so a file that parses as
     JSON but is not a pytest-given report surfaces as a builtin from deep inside
@@ -69,7 +74,7 @@ def _load_report(json_file: Path) -> ReportData:
     """
     report_dict = json.loads(json_file.read_text(encoding='utf-8'))
     try:
-        return report_from_dict(report_dict)
+        return report_from_dict(report_dict), report_dict
     except (AttributeError, KeyError, TypeError) as error:
         raise PytestGivenError(
             f'{json_file} is not a pytest-given report, or was written by an '
@@ -78,22 +83,37 @@ def _load_report(json_file: Path) -> ReportData:
 
 
 def _render_report(args: argparse.Namespace) -> int:
-    report = _load_report(args.json_file)
-    fmt = args.format or _infer_format(args.output)
-    if fmt == 'md':
-        md = render_md(report)
-        if args.output is None:
-            print(md)
-        else:
-            args.output.parent.mkdir(parents=True, exist_ok=True)
-            args.output.write_text(md, encoding='utf-8')
-            print(f'Report generated: {args.output}')
-    else:
-        template = resolve_template(args.source_link)
-        output = args.output or Path('given-report/report.html')
-        render_html(report, output, source_link_template=template)
-        print(f'Report generated: {output}')
+    """Render the requested sink through the same render-then-write path the
+    plugin uses.
+
+    Going through `SinkConfig` rather than calling a renderer and writing the
+    result here is what keeps the two entry points honest with each other: a
+    render that raises leaves no half-written file, and the rules about which
+    sink a flag selects live in one place. Only one sink is ever configured —
+    this command renders one format per invocation.
+    """
+    report, report_dict = _load_report(args.json_file)
+    rendered = render_sinks(report, report_dict, _sink_config(args))
+    write_sinks(rendered)
+    if rendered.md_stdout is not None:
+        print(rendered.md_stdout)
+    for path, _text in rendered.files:
+        print(f'Report generated: {path}')
     return 0
+
+
+def _sink_config(args: argparse.Namespace) -> SinkConfig:
+    """The one sink this invocation writes.
+
+    Markdown with no `-o` goes to stdout; HTML always needs a file, so it falls
+    back to the default path rather than to stdout.
+    """
+    if (args.format or _infer_format(args.output)) == 'md':
+        return SinkConfig(md_path=args.output, md_to_stdout=args.output is None)
+    return SinkConfig(
+        html_path=args.output or Path('given-report/report.html'),
+        source_link_template=resolve_template(args.source_link),
+    )
 
 
 def _infer_format(output: Path | None) -> str:

@@ -46,7 +46,7 @@ from .schema import (
     location_suffix,
 )
 from .serde import report_from_dict, report_to_dict
-from .steps import StepPath, StepSignature, iter_steps, structure_signature, walk_steps
+from .steps import StepPath, iter_steps, structure_signature, walk_steps
 
 __all__ = [
     'Activity',
@@ -88,7 +88,6 @@ __all__ = [
     'Step',
     'StepAttachment',
     'StepPath',
-    'StepSignature',
     'Story',
     'StoryId',
     'TermId',

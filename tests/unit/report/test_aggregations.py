@@ -24,7 +24,6 @@ from pytest_given.report.aggregations import (
     build_activity_labels,
     build_coverage_maps,
     build_glossary_aggregations,
-    build_scenario_slug_index,
     build_story_rollups,
     build_term_scenario_index,
     tab_visibility,
@@ -612,108 +611,6 @@ def test_build_term_scenario_index_dedups_and_includes_scenario_narration() -> N
     with then(t'each {pg["Term"]} maps to the scenario exactly once'):
         assert index[TermId('guest')] == [NodeId('test::a')]  # dedup across steps
         assert index[TermId('room')] == [NodeId('test::a')]  # narration counts
-
-
-def _scn(node_id: str) -> Scenario:
-    return Scenario(
-        id=NodeId(node_id),
-        narration=Narration(text='s'),
-        module='m',
-    )
-
-
-def test_scenario_slug_strips_test_prefix_and_py_and_dir() -> None:
-    rd = ReportData(
-        metadata=_meta(),
-        scenarios=[
-            _scn('examples/hotel-booking/test_hotel_booking.py::test_complete_booking')
-        ],
-    )
-    index = build_scenario_slug_index(rd)
-    assert index == {
-        NodeId(
-            'examples/hotel-booking/test_hotel_booking.py::test_complete_booking'
-        ): 'hotel_booking/complete_booking',
-    }
-
-
-def test_scenario_slug_drops_parametrization_tail_when_unique() -> None:
-    rd = ReportData(
-        metadata=_meta(), scenarios=[_scn('pkg/test_pour.py::test_pour[water]')]
-    )
-    index = build_scenario_slug_index(rd)
-    assert index[NodeId('pkg/test_pour.py::test_pour[water]')] == 'pour/pour'
-
-
-def test_scenario_slug_keeps_tail_only_for_colliding_scenarios() -> None:
-    # Two scenarios from the same parametrized function (narration varies per
-    # case, so they don't merge) would share a slug — both keep their tails.
-    rd = ReportData(
-        metadata=_meta(),
-        scenarios=[
-            _scn('pkg/test_pour.py::test_pour[water]'),
-            _scn('pkg/test_pour.py::test_pour[fire]'),
-            _scn('pkg/test_pour.py::test_drain[once]'),  # unique base → no tail
-        ],
-    )
-    index = build_scenario_slug_index(rd)
-    assert index[NodeId('pkg/test_pour.py::test_pour[water]')] == 'pour/pour[water]'
-    assert index[NodeId('pkg/test_pour.py::test_pour[fire]')] == 'pour/pour[fire]'
-    assert index[NodeId('pkg/test_pour.py::test_drain[once]')] == 'pour/drain'
-
-
-def test_scenario_slug_file_without_test_prefix_kept_verbatim() -> None:
-    rd = ReportData(metadata=_meta(), scenarios=[_scn('checks.py::test_run')])
-    index = build_scenario_slug_index(rd)
-    assert index[NodeId('checks.py::test_run')] == 'checks/run'
-
-
-def test_scenario_slug_empty_report_is_empty() -> None:
-    rd = ReportData(metadata=_meta())
-    assert build_scenario_slug_index(rd) == {}
-
-
-def test_scenario_slug_duplicate_basename_gains_its_directory() -> None:
-    """Two test files sharing a basename is an ordinary layout, not an error."""
-    rd = ReportData(
-        metadata=_meta(),
-        scenarios=[
-            _scn('a/test_booking.py::test_make'),
-            _scn('b/test_booking.py::test_make'),
-        ],
-    )
-    index = build_scenario_slug_index(rd)
-    assert index[NodeId('a/test_booking.py::test_make')] == 'a/booking/make'
-    assert index[NodeId('b/test_booking.py::test_make')] == 'b/booking/make'
-
-
-def test_scenario_slug_escalates_only_as_far_as_it_must() -> None:
-    """Directories come back one level at a time, and only for the colliding
-    scenarios — a scenario that is already unique keeps its short slug."""
-    rd = ReportData(
-        metadata=_meta(),
-        scenarios=[
-            _scn('t/u/a/test_x.py::test_y'),
-            _scn('t/v/a/test_x.py::test_y'),
-            _scn('other/test_z.py::test_w'),
-        ],
-    )
-    index = build_scenario_slug_index(rd)
-    assert index[NodeId('t/u/a/test_x.py::test_y')] == 'u/a/x/y'
-    assert index[NodeId('t/v/a/test_x.py::test_y')] == 'v/a/x/y'
-    assert index[NodeId('other/test_z.py::test_w')] == 'z/w'
-
-
-def test_scenario_slug_falls_back_to_the_node_id_when_paths_cannot_separate() -> None:
-    """`test_x.py` beside `x.py` in one directory reads the same at every
-    depth; the node id is the only thing left that is unique."""
-    rd = ReportData(
-        metadata=_meta(),
-        scenarios=[_scn('a/test_x.py::test_y'), _scn('a/x.py::test_y')],
-    )
-    index = build_scenario_slug_index(rd)
-    assert index[NodeId('a/test_x.py::test_y')] == 'a/test_x.py::test_y'
-    assert index[NodeId('a/x.py::test_y')] == 'a/x.py::test_y'
 
 
 @scenario(

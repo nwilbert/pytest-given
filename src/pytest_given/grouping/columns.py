@@ -37,7 +37,6 @@ class GroupContext:
 
     param_names: list[str]
     comparable: list[Scenario]
-    indexed: dict[NodeId, dict[StepPath, Step]]
     anchor: Scenario
     # Each case's raw parametrize arguments by name. A `Template` slot — in a
     # step or in the scenario name — records no per-case rendering to compare
@@ -46,10 +45,19 @@ class GroupContext:
     case_params: dict[NodeId, dict[str, RawParamValue]]
     columns: list[ParameterColumn] = field(default_factory=list)
     cells: dict[str, dict[NodeId, CellValue | None]] = field(default_factory=dict)
+    # Each comparable case's tree keyed by position, so "the same position in
+    # every other case" is a lookup rather than a parallel descent through
+    # several trees. Derived from `comparable` rather than passed alongside it:
+    # the two must agree on which cases are in play, and a caller that built
+    # one from the other could only ever get that wrong.
+    indexed: dict[NodeId, dict[StepPath, Step]] = field(init=False)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
     _taken_names: set[str] = field(default_factory=set)
 
     def __post_init__(self) -> None:
+        self.indexed = {
+            case.id: dict(walk_steps(case.steps)) for case in self.comparable
+        }
         # The parametrize columns come first and keep their argname as id: a
         # step's placeholder points at them by name (`column_id=expression`),
         # and every generated column is emitted after them by the baseline

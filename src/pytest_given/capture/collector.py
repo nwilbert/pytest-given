@@ -1,4 +1,5 @@
 import copy
+import time
 from collections.abc import Iterator
 from contextvars import ContextVar
 from dataclasses import dataclass
@@ -12,7 +13,6 @@ from ..model import (
     FixtureRecording,
     Narration,
     NodeId,
-    ParamInfo,
     Phase,
     PytestGivenError,
     RecordingState,
@@ -77,18 +77,16 @@ class Collector:
         self._scenarios_by_id: dict[NodeId, Scenario] = {}
         self._current_scenario: Scenario | None = None
         self._step_stack: list[Step] = []
-        self.start_times: dict[NodeId, float] = {}
-        self.param_info: ParamInfo = {}
+        # When the active scenario's clock was started, or None before it is.
+        # A single slot rather than a dict keyed by node id: scenarios never
+        # overlap, and a dict keeps an entry for every scenario that started
+        # but never finished.
+        self._started_at: float | None = None
         self._state: RecordingState = 'idle'
         self._active_recording: FixtureRecording | None = None
         self._active_fixture_descriptor: StepDescriptor | None = None
         self._recordings: dict[FixtureInstanceKey, FixtureRecording] = {}
         self.inside_unannotated_test: bool = False
-        # The item whose setup published this collector to the ContextVar, so
-        # teardown clears only what it published. Not `active_scenario_id`:
-        # that is already None by teardown (the call report finished the
-        # scenario), which is how the clear came to be skipped entirely.
-        self.published_for: NodeId | None = None
         # Whether steps record their body's source anchor (narration lint
         # only); off is the zero-cost default — no frame walking happens.
         self.capture_step_source: bool = False
@@ -142,6 +140,7 @@ class Collector:
             activity_ids=activity_ids,
         )
         self._step_stack = []
+        self._started_at = None
         self._state = 'test'
         self.inside_unannotated_test = False
         self.active_scenario_story = story
@@ -149,25 +148,52 @@ class Collector:
         if story is not None:
             self._discovered_stories[story.id] = story
 
+    def begin_timing(self) -> None:
+        """Start the active scenario's clock.
+
+        Called once the arrangement pytest owns is done, so the recorded
+        duration is the scenario's own and not its fixtures'. Timing lives here
+        rather than in the plugin because the hook that closes a scenario
+        (`pytest_runtest_logreport`) is handed neither a config nor an item —
+        this collector, reached through the ContextVar, is the only thing both
+        ends of the measurement can see.
+        """
+        self._started_at = time.monotonic()
+
     def finish_scenario(
         self,
         status: str,
-        duration_ms: int,
+        duration_ms: int | None = None,
         skip_reason: str | None = None,
     ) -> Scenario:
+        """Close the active scenario and return it.
+
+        `duration_ms` defaults to what `begin_timing` measured — 0 when the
+        scenario never got that far, which is what a setup failure or a
+        mark-based skip looks like.
+        """
         assert self._current_scenario is not None
         self._current_scenario.status = status
-        self._current_scenario.duration_ms = duration_ms
+        self._current_scenario.duration_ms = (
+            self._elapsed_ms() if duration_ms is None else duration_ms
+        )
         self._current_scenario.skip_reason = skip_reason
         scenario = self._current_scenario
         self._scenarios.append(scenario)
         self._scenarios_by_id[scenario.id] = scenario
         self._current_scenario = None
         self._step_stack = []
+        self._started_at = None
         self._state = 'idle'
         self.active_scenario_story = None
         self.active_scenario_activity_ids = ()
         return scenario
+
+    def _elapsed_ms(self) -> int:
+        """Milliseconds since `begin_timing`, or 0 when it was never called."""
+        if self._started_at is None:
+            return 0
+        return int((time.monotonic() - self._started_at) * 1000)
 
     def enter_fixture_setup(
         self,
