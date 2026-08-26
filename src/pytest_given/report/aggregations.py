@@ -21,6 +21,7 @@ from ..model import (
     Story,
     StoryId,
     TermId,
+    iter_narrations,
     walk_steps,
 )
 from .coverage import (
@@ -316,10 +317,7 @@ def build_term_scenario_index(report: ReportData) -> dict[TermId, list[NodeId]]:
     index: dict[TermId, list[NodeId]] = {}
     for scenario in report.scenarios:
         seen: set[TermId] = set()
-        narrations = [scenario.narration] + [
-            step.narration for _, step in walk_steps(scenario.steps)
-        ]
-        for narration in narrations:
+        for narration in iter_narrations(scenario):
             for part in narration.parts:
                 if not isinstance(part, NarrationTermRef):
                     continue

@@ -14,13 +14,14 @@ from ..model import (
     ParamInfo,
     Scenario,
     node_base,
+    step_narrations,
 )
 from .checks import (
     check_rebound_params,
     check_same_template,
     check_varying_str_narration,
 )
-from .columns import GroupContext, param_cell, param_cell_formats, step_narrations
+from .columns import GroupContext, param_cell, param_cell_formats
 from .percase import per_case_scenarios
 from .templatize import reconcile_name_slots, templatize_narration, templatize_steps
 

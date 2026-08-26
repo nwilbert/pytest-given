@@ -46,7 +46,14 @@ from .schema import (
     location_suffix,
 )
 from .serde import report_from_dict, report_to_dict
-from .steps import StepPath, iter_steps, structure_signature, walk_steps
+from .steps import (
+    StepPath,
+    iter_narrations,
+    iter_steps,
+    step_narrations,
+    structure_signature,
+    walk_steps,
+)
 
 __all__ = [
     'Activity',
@@ -94,6 +101,7 @@ __all__ = [
     'TracebackFrame',
     'case_suffix',
     'id_derive',
+    'iter_narrations',
     'iter_steps',
     'location_suffix',
     'narration_text',
@@ -103,6 +111,7 @@ __all__ = [
     'render_interpolation',
     'report_from_dict',
     'report_to_dict',
+    'step_narrations',
     'structure_signature',
     'walk_steps',
 ]

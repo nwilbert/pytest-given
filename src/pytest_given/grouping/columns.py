@@ -7,7 +7,7 @@ placeholder pointing at it rendered, since row hover substitutes the one into
 the other.
 """
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 from ..capture import try_term_ref
@@ -188,11 +188,6 @@ def _bound_slot(
     if isinstance(part, NarrationPlaceholder) and part.name in param_names:
         return part.name, (part.conversion, part.format_spec)
     return None
-
-
-def step_narrations(steps: list[Step]) -> Iterator[Narration]:
-    """Every narration in a step tree, for the format scan."""
-    return (step.narration for _path, step in walk_steps(steps))
 
 
 def param_cell(value: RawParamValue, fmt: Format | None) -> ParamValue:

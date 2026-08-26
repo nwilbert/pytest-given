@@ -1,13 +1,11 @@
 """Runtime-surface rules: pure inspection of the recorded report model, no
 source access needed."""
 
-from collections.abc import Iterator
 from dataclasses import dataclass
 
 from ..model import (
     ActivityTermRef,
     Glossary,
-    Narration,
     NarrationTermRef,
     NodeId,
     Phase,
@@ -16,6 +14,7 @@ from ..model import (
     Story,
     TermId,
     id_derive,
+    iter_narrations,
     iter_steps,
     location_suffix,
 )
@@ -129,7 +128,7 @@ def _dead_term_findings(
     often intentionally present (documented behavior)."""
     referenced: set[TermId] = set()
     for scenario in grouped:
-        for narration in _iter_narrations(scenario):
+        for narration in iter_narrations(scenario):
             for part in narration.parts:
                 if isinstance(part, NarrationTermRef):
                     referenced.add(part.term_id)
@@ -150,12 +149,6 @@ def _dead_term_findings(
         for term in glossary.terms
         if term.id not in referenced
     ]
-
-
-def _iter_narrations(scenario: Scenario) -> Iterator[Narration]:
-    yield scenario.narration
-    for step in iter_steps(scenario.steps):
-        yield step.narration
 
 
 def _scenario_finding(rule: RuleId, scenario: Scenario, text: str) -> Finding:
