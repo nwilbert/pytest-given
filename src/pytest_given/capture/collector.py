@@ -163,20 +163,20 @@ class Collector:
     def finish_scenario(
         self,
         status: str,
-        duration_ms: int | None = None,
         skip_reason: str | None = None,
     ) -> Scenario:
         """Close the active scenario and return it.
 
-        `duration_ms` defaults to what `begin_timing` measured — 0 when the
-        scenario never got that far, which is what a setup failure or a
-        mark-based skip looks like.
+        The duration is what `begin_timing` measured — 0 when the scenario
+        never got that far, which is what a setup failure or a mark-based skip
+        looks like. Not injectable: the one production caller never passed a
+        duration, so an override parameter existed only for tests, and every
+        test taking it left `_elapsed_ms` — the code that actually runs —
+        unasserted.
         """
         assert self._current_scenario is not None
         self._current_scenario.status = status
-        self._current_scenario.duration_ms = (
-            self._elapsed_ms() if duration_ms is None else duration_ms
-        )
+        self._current_scenario.duration_ms = self._elapsed_ms()
         self._current_scenario.skip_reason = skip_reason
         scenario = self._current_scenario
         self._scenarios.append(scenario)

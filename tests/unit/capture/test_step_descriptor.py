@@ -117,7 +117,7 @@ def test_context_manager_records_step_in_collector() -> None:
         desc = StepDescriptor('given', 'a coffee machine')
         with desc:
             pass
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
         assert len(scenario.steps) == 1
         assert scenario.steps[0].narration.text == 'a coffee machine'
     finally:
@@ -188,7 +188,7 @@ def test_attach_non_string_content_serializes_as_json() -> None:
     finally:
         set_active_collector(None)
     collector.pop_step()
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     att = scenario.steps[-1].attachments[0]
     assert att.label == 'payload'
     assert att.content_type == 'json'
@@ -261,7 +261,7 @@ def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
         try:
             with when_then('the action runs', 'the outcome holds'):
                 pass
-            recorded = collector.finish_scenario(status='passed', duration_ms=0)
+            recorded = collector.finish_scenario(status='passed')
         finally:
             set_active_collector(session_collector)
     with then(t'a when and a sibling then {pg["Step"]} are recorded'):
@@ -290,7 +290,7 @@ def test_when_then_pairs_with_inner_pytest_raises() -> None:
                 pytest.raises(ValueError, match='boom'),
             ):
                 raise ValueError('boom')
-            recorded = collector.finish_scenario(status='passed', duration_ms=0)
+            recorded = collector.finish_scenario(status='passed')
         finally:
             set_active_collector(session_collector)
     with then('both sibling steps are still recorded'):
@@ -314,7 +314,7 @@ def test_when_then_omits_then_when_body_raises_uncaught() -> None:
         try:
             with pytest.raises(RuntimeError, match='nope'), when_then('act', 'result'):
                 raise RuntimeError('nope')
-            recorded = collector.finish_scenario(status='passed', duration_ms=0)
+            recorded = collector.finish_scenario(status='passed')
         finally:
             set_active_collector(session_collector)
     with then('only the when step is recorded — the outcome never held'):
@@ -333,7 +333,7 @@ def test_when_then_accepts_tstrings_for_glossary_refs() -> None:
     try:
         with when_then(t'booking a {room}', t'the {room} is held'):
             pass
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     assert [s.narration.text for s in scenario.steps] == [
@@ -389,7 +389,7 @@ def test_when_then_allows_nested_when_as_child_sub_step() -> None:
             with when_then('the action runs', 'the outcome holds'):
                 with when('a sub-action runs'):
                     pass
-            recorded = collector.finish_scenario(status='passed', duration_ms=0)
+            recorded = collector.finish_scenario(status='passed')
         finally:
             set_active_collector(session_collector)
     with then('the sub-action is a child of the action and the then still follows'):
@@ -556,7 +556,7 @@ def test_decorator_records_step_when_called_inside_scenario() -> None:
             return amount * 2
 
         assert insert(5) == 10
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     assert len(scenario.steps) == 1
@@ -599,7 +599,7 @@ def test_decorator_pops_step_on_exception() -> None:
             boom()
         with given('after'):
             pass
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     assert [s.narration.text for s in scenario.steps] == ['boom', 'after']
@@ -618,7 +618,7 @@ def test_decorator_nested_inside_active_step_becomes_child() -> None:
 
         with when('outer'):
             inner()
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     assert len(scenario.steps) == 1
@@ -706,7 +706,7 @@ def test_decorator_template_records_substituted_narration_per_call() -> None:
 
         assert insert(2) == 4
         assert insert(5) == 10
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     texts = [s.narration.text for s in scenario.steps]
@@ -724,7 +724,7 @@ def test_decorator_template_records_structured_value_parts() -> None:
         def insert(amount: int) -> None: ...
 
         insert(7)
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     [step] = scenario.steps
@@ -751,7 +751,7 @@ def test_decorator_template_uses_default_when_caller_omits_arg() -> None:
         def insert(amount: int = 1) -> None: ...
 
         insert()
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     assert scenario.steps[0].narration.text == 'I insert $1'
@@ -772,7 +772,7 @@ def test_decorator_template_preserves_format_spec_and_conversion() -> None:
 
         setup(3.5)
         assert_receipt('paid')
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     texts = [s.narration.text for s in scenario.steps]
@@ -983,7 +983,7 @@ def test_step_source_stays_none_when_capture_disabled() -> None:
     try:
         with given('a machine'):
             pass
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     assert scenario.steps[0].source is None
@@ -995,7 +995,7 @@ def test_context_manager_captures_the_with_line() -> None:
     try:
         with given('a machine'):
             with_line = inspect.currentframe().f_lineno - 1
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     assert scenario.steps[0].source == SourceLocation(
@@ -1009,7 +1009,7 @@ def test_when_then_steps_share_the_with_statement_anchor() -> None:
     try:
         with when_then('act', 'outcome'):
             with_line = inspect.currentframe().f_lineno - 1
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     expected = SourceLocation(relpath='test_step_descriptor.py', line=with_line)
@@ -1026,7 +1026,7 @@ def test_helper_decorator_anchors_at_the_function_definition() -> None:
         def insert() -> None: ...
 
         insert()
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     # co_firstlineno of a decorated function is its first decorator line.
@@ -1059,7 +1059,7 @@ def test_decorator_keeps_an_async_helpers_step_open_for_its_body() -> None:
     set_active_collector(collector)
     try:
         assert asyncio.run(brew()) == 'done'
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     assert [s.narration.text for s in scenario.steps] == ['brewing']
@@ -1089,7 +1089,7 @@ def test_decorator_pops_an_async_helpers_step_when_its_body_raises() -> None:
     try:
         with pytest.raises(ValueError, match='boom'):
             asyncio.run(brew())
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     assert [s.narration.text for s in scenario.steps] == ['brewing']
@@ -1113,7 +1113,7 @@ def test_decorator_leaves_an_async_generator_fixture_body_to_the_hook() -> None:
     set_active_collector(collector)
     try:
         assert asyncio.run(drain()) == ['open']
-        scenario = collector.finish_scenario(status='passed', duration_ms=0)
+        scenario = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     assert scenario.steps == []
@@ -1138,7 +1138,7 @@ def test_decorator_template_slot_records_a_term_instance_as_a_term_ref() -> None
         def arrive(who: object) -> None: ...
 
         arrive(guest('Alice'))
-        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        recorded = collector.finish_scenario(status='passed')
     finally:
         set_active_collector(None)
     step = recorded.steps[0]

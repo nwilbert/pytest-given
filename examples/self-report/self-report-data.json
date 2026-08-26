@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-26T08:25:02.093810+00:00",
+    "timestamp": "2026-08-26T08:52:36.789993+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "6b0a15c155df0c55b4727eec9ead7481628e66cd",
+    "commit_sha": "ed41867c5d0af4372753aee814ab058b6e4e2f4c",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -90,7 +90,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "it carries its Node ID, name, status, duration and Tag",
+            "text": "it carries its Node ID, name, status and Tag",
             "parts": [
               {
                 "value": "it carries its "
@@ -101,7 +101,7 @@
                 "expression": "pg[\"Node ID\"]"
               },
               {
-                "value": ", name, status, duration and "
+                "value": ", name, status and "
               },
               {
                 "term_id": "tag",
@@ -121,7 +121,94 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 23
+        "line": 26
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_collector.py::test_duration_excludes_fixture_setup",
+      "narration": {
+        "text": "A scenario is timed from past its step fixture setup",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].low"
+          },
+          {
+            "value": " is timed from past its "
+          },
+          {
+            "term_id": "step-fixture",
+            "display": "step fixture",
+            "expression": "pg[\"Step fixture\"].low"
+          },
+          {
+            "value": " setup"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_collector",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Collector whose clock reads 100.3s once setup is done",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "collector",
+                "display": "Collector",
+                "expression": "pg[\"Collector\"]"
+              },
+              {
+                "value": " whose clock reads 100.3s once setup is done"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the clock is started past setup and the body runs 0.2s",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the recorded duration is the body alone, not the setup before it",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_collector.py",
+        "line": 42
       },
       "story_id": null,
       "activity_ids": []
@@ -238,7 +325,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 42
+        "line": 64
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -333,7 +420,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 186
+        "line": 208
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -446,7 +533,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 206
+        "line": 228
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -549,7 +636,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 224
+        "line": 246
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -660,7 +747,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 278
+        "line": 300
       },
       "story_id": null,
       "activity_ids": []
@@ -768,7 +855,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 307
+        "line": 329
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -864,7 +951,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 448
+        "line": 470
       },
       "story_id": null,
       "activity_ids": []
@@ -943,7 +1030,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 467
+        "line": 489
       },
       "story_id": null,
       "activity_ids": []
@@ -1027,7 +1114,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 485
+        "line": 507
       },
       "story_id": null,
       "activity_ids": []
@@ -1130,7 +1217,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 500
+        "line": 522
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -1225,7 +1312,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 518
+        "line": 540
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -1318,7 +1405,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 543
+        "line": 565
       },
       "story_id": null,
       "activity_ids": []
@@ -13941,7 +14028,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",

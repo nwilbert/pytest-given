@@ -212,7 +212,7 @@ def test_pytest_runtest_teardown_clears_a_finished_scenario(
     `published_for` instead, which still names the item."""
     fresh_state.published_for = NodeId('t::a')
     fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
-    fresh_collector.finish_scenario(status='passed', duration_ms=0)
+    fresh_collector.finish_scenario(status='passed')
     set_active_collector(fresh_collector)
     assert fresh_collector.active_scenario_id is None
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::a', config=fake_config))
@@ -257,7 +257,7 @@ def test_makereport_ignores_a_failure_outside_the_active_scenario(
     call = SimpleNamespace(when='call', excinfo=SimpleNamespace())
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::b', config=fake_config))
     runtest.pytest_runtest_makereport(item, cast(Any, call))
-    recorded = fresh_collector.finish_scenario(status='passed', duration_ms=0)
+    recorded = fresh_collector.finish_scenario(status='passed')
     assert recorded.status == 'passed'
     assert recorded.error is None
 

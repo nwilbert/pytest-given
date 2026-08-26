@@ -1,6 +1,9 @@
+from types import SimpleNamespace
+
 import pytest
 
 from pytest_given import Template, given, scenario, then, when, when_then
+from pytest_given.capture import collector as collector_mod
 from pytest_given.capture.collector import Collector
 from pytest_given.model import (
     FixtureRecording,
@@ -28,15 +31,34 @@ def test_start_and_finish_scenario() -> None:
         collector = Collector()
     with when(t'a {pg["Scenario"]} starts under its {pg["Node ID"]} and finishes'):
         collector.start_scenario('test.py::test_x', 'Test X', 'test_module', ['tag1'])
-        recorded = collector.finish_scenario(status='passed', duration_ms=10)
-    with then(
-        t'it carries its {pg["Node ID"]}, name, status, duration and {pg["Tag"]}'
-    ):
+        recorded = collector.finish_scenario(status='passed')
+    with then(t'it carries its {pg["Node ID"]}, name, status and {pg["Tag"]}'):
         assert recorded.id == 'test.py::test_x'
         assert recorded.narration.text == 'Test X'
         assert recorded.status == 'passed'
-        assert recorded.duration_ms == 10
         assert recorded.tags == ['tag1']
+
+
+@scenario(
+    t'A {pg["Scenario"].low} is timed from past its {pg["Step fixture"].low} setup',
+)
+def test_duration_excludes_fixture_setup(monkeypatch: pytest.MonkeyPatch) -> None:
+    with given(t'a {pg["Collector"]} whose clock reads 100.3s once setup is done'):
+        readings = iter([100.3, 100.5])
+        collector = Collector()
+        collector.start_scenario(NodeId('t::x'), name='x', module='m', tags=[])
+    with when('the clock is started past setup and the body runs 0.2s'):
+        monkeypatch.setattr(
+            collector_mod, 'time', SimpleNamespace(monotonic=lambda: next(readings))
+        )
+        collector.begin_timing()
+        recorded = collector.finish_scenario(status='passed')
+        # Undone here rather than at teardown: this session's own Collector
+        # finishes *this* scenario before teardown runs, and would otherwise
+        # drain the fake clock and abort the run.
+        monkeypatch.undo()
+    with then('the recorded duration is the body alone, not the setup before it'):
+        assert recorded.duration_ms == 200
 
 
 @scenario(
@@ -52,7 +74,7 @@ def test_collect_steps() -> None:
         collector.pop_step()
         collector.push_step('when', _n('I press start'))
         collector.pop_step()
-        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        recorded = collector.finish_scenario(status='passed')
     with then(t'each {pg["Step"]} carries its {pg["Phase"]}'):
         assert len(recorded.steps) == 2
         assert recorded.steps[0].phase == 'given'
@@ -67,7 +89,7 @@ def test_nested_steps() -> None:
     collector.push_step('when', _n('inner'))
     collector.pop_step()
     collector.pop_step()
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     assert len(scenario.steps) == 1
     outer = scenario.steps[0]
     assert outer.narration.text == 'outer'
@@ -81,7 +103,7 @@ def test_attach_to_current_step() -> None:
     collector.push_step('then', _n('check result'))
     collector.attach('Log output', 'line1\nline2')
     collector.pop_step()
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     step = scenario.steps[0]
     assert len(step.attachments) == 1
     assert step.attachments[0].label == 'Log output'
@@ -102,7 +124,7 @@ def test_active_scenario_id_set() -> None:
     collector = Collector()
     collector.start_scenario('test.py::test_x', 'X', 'mod', [])
     assert collector.active_scenario_id == 'test.py::test_x'
-    collector.finish_scenario(status='passed', duration_ms=0)
+    collector.finish_scenario(status='passed')
     assert collector.active_scenario_id is None
 
 
@@ -128,7 +150,7 @@ def test_same_phase_nesting_allowed() -> None:
     collector.push_step('when', _n('inner step'))
     collector.pop_step()
     collector.pop_step()
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     assert len(scenario.steps) == 1
     assert len(scenario.steps[0].children) == 1
 
@@ -143,7 +165,7 @@ def test_sequential_different_phases_allowed() -> None:
     collector.pop_step()
     collector.push_step('then', _n('check'))
     collector.pop_step()
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     assert len(scenario.steps) == 3
 
 
@@ -152,7 +174,7 @@ def test_collector_state_transitions_idle_test_idle() -> None:
     assert collector.state == 'idle'
     collector.start_scenario('id', 'name', 'mod', [])
     assert collector.state == 'test'
-    collector.finish_scenario(status='passed', duration_ms=0)
+    collector.finish_scenario(status='passed')
     assert collector.state == 'idle'
 
 
@@ -237,7 +259,7 @@ def test_push_step_routing_isolates_recording_from_scenario() -> None:
         collector.push_step('given', _n('fixture-internal'))
         collector.pop_step()
         collector.exit_fixture_setup(token)
-        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        recorded = collector.finish_scenario(status='passed')
     with then('the step lives only in the recording, not the scenario'):
         assert recorded.steps == []
         assert root.children[0].narration.text == 'fixture-internal'
@@ -319,7 +341,7 @@ def test_graft_recording_deep_copies_into_scenario() -> None:
         t'a {pg["Graft"]} copies it into the {pg["Active scenario"]}', activity=8
     ):
         collector.graft_recording(recording)
-        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        recorded = collector.finish_scenario(status='passed')
     with then('the scenario gains a deep copy of the recorded steps'):
         assert recorded.steps[0].narration.text == 'a shop'
         assert recorded.steps[0].children[0].narration.text == 'with 3 items'
@@ -370,7 +392,7 @@ def test_push_step_with_structured_narration() -> None:
     narration = Narration(text='a 200 ml cup', parts=parts)
     collector.push_step('given', narration)
     collector.pop_step()
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     assert scenario.steps[0].narration.text == 'a 200 ml cup'
     assert scenario.steps[0].narration.parts == parts
 
@@ -380,7 +402,7 @@ def test_push_step_with_plain_narration_has_empty_parts() -> None:
     collector.start_scenario('id', 'name', 'mod', [])
     collector.push_step('given', _n('plain'))
     collector.pop_step()
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     assert scenario.steps[0].narration.parts == []
 
 
@@ -390,7 +412,7 @@ def test_start_scenario_with_template_stores_structured_narration() -> None:
     collector.start_scenario('id', tmpl, 'mod', [])
     collector.push_step('given', _n('a step'))
     collector.pop_step()
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     assert scenario.narration.text == 'Brew {cup_size} ml'  # raw template string
     assert scenario.narration.parts == list(tmpl.parts)
 
@@ -400,7 +422,7 @@ def test_start_scenario_with_plain_str_has_empty_parts() -> None:
     collector.start_scenario('id', 'plain name', 'mod', [])
     collector.push_step('given', _n('a step'))
     collector.pop_step()
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     assert scenario.narration.text == 'plain name'
     assert scenario.narration.parts == []
 
@@ -408,14 +430,14 @@ def test_start_scenario_with_plain_str_has_empty_parts() -> None:
 def test_finish_scenario_records_skip_reason() -> None:
     c = Collector()
     c.start_scenario(NodeId('t::x'), name='x', module='m', tags=[])
-    s = c.finish_scenario(status='skipped', duration_ms=0, skip_reason='because')
+    s = c.finish_scenario(status='skipped', skip_reason='because')
     assert s.skip_reason == 'because'
 
 
 def test_finish_scenario_skip_reason_defaults_to_none() -> None:
     c = Collector()
     c.start_scenario(NodeId('t::x'), name='x', module='m', tags=[])
-    s = c.finish_scenario(status='passed', duration_ms=0)
+    s = c.finish_scenario(status='passed')
     assert s.skip_reason is None
 
 
@@ -429,7 +451,7 @@ def test_start_scenario_stores_source() -> None:
         tags=[],
         source=src,
     )
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     assert scenario.source == src
 
 
@@ -441,7 +463,7 @@ def test_start_scenario_source_defaults_to_none() -> None:
         module='m',
         tags=[],
     )
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     assert scenario.source is None
 
 
@@ -453,7 +475,7 @@ def test_fail_recorded_scenario_marks_a_finished_scenario_failed() -> None:
     with given(t'a {pg["Scenario"]} that already finished as passed'):
         collector = Collector()
         collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
-        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        recorded = collector.finish_scenario(status='passed')
     with when('a fixture raises past its yield, after the scenario finished'):
         collector.fail_recorded_scenario(
             NodeId('test.py::test_x'), message='teardown boom'
@@ -472,7 +494,7 @@ def test_fail_recorded_scenario_keeps_an_existing_error() -> None:
         collector = Collector()
         collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
         collector.fail_scenario(message='body boom')
-        recorded = collector.finish_scenario(status='failed', duration_ms=0)
+        recorded = collector.finish_scenario(status='failed')
     with when('its fixture then also fails in teardown'):
         collector.fail_recorded_scenario(
             NodeId('test.py::test_x'), message='teardown boom'
@@ -489,7 +511,7 @@ def test_fail_recorded_scenario_ignores_unknown_node_id() -> None:
     with given(t'a {pg["Collector"]} that recorded one {pg["Scenario"].low}'):
         collector = Collector()
         collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
-        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        recorded = collector.finish_scenario(status='passed')
     with when('a teardown fails under a node id no scenario claimed'):
         collector.fail_recorded_scenario(NodeId('test.py::test_other'), message='boom')
     with then('the recorded scenario is untouched'):
@@ -507,7 +529,7 @@ def test_graft_leaf_given_appends_childless_given_step() -> None:
         collector.start_scenario('id', 'name', 'mod', [])
     with when(t'a leaf {pg["Graft"]} appends a childless {pg["Step"]}', activity=8):
         collector.graft_leaf_given(_n('the name {text}'))
-        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        recorded = collector.finish_scenario(status='passed')
     with then('the step is a given with no children'):
         leaf = recorded.steps[0]
         assert leaf.phase == 'given'
@@ -531,7 +553,7 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
         recording = FixtureRecording(root=root)
     with when(t'a {pg["Graft"]} supplies an override {pg["Narration"]}', activity=8):
         collector.graft_recording(recording, override_narration=_n('a fancy machine'))
-        recorded = collector.finish_scenario(status='passed', duration_ms=0)
+        recorded = collector.finish_scenario(status='passed')
     with then('the grafted root shows the override text and keeps its children'):
         grafted = recorded.steps[0]
         assert grafted.narration.text == 'a fancy machine'
@@ -557,7 +579,7 @@ def test_graft_recording_without_override_is_unchanged() -> None:
     collector.start_scenario('id', 'name', 'mod', [])
     recording = FixtureRecording(root=Step(phase='given', narration=_n('kept label')))
     collector.graft_recording(recording)
-    scenario = collector.finish_scenario(status='passed', duration_ms=0)
+    scenario = collector.finish_scenario(status='passed')
     assert scenario.steps[0].narration.text == 'kept label'
 
 

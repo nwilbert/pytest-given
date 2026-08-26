@@ -1,91 +1,98 @@
 # pytest-given — pytest-given Self-Report
 
 ## ✓ A «scenario» records under its «node ID»
-`tests/unit/capture/test_collector.py:23::test_start_and_finish_scenario`
+`tests/unit/capture/test_collector.py:26::test_start_and_finish_scenario`
 
 - **given** a fresh «Collector»
 - **when** a «Scenario» starts under its «Node ID» and finishes
-- **then** it carries its «Node ID», name, status, duration and «Tag»
+- **then** it carries its «Node ID», name, status and «Tag»
+
+## ✓ A «scenario» is timed from past its «step fixture» setup
+`tests/unit/capture/test_collector.py:42::test_duration_excludes_fixture_setup`
+
+- **given** a «Collector» whose clock reads 100.3s once setup is done
+- **when** the clock is started past setup and the body runs 0.2s
+- **then** the recorded duration is the body alone, not the setup before it
 
 ## ✓ «Steps» record with their «phases»
-`tests/unit/capture/test_collector.py:42::test_collect_steps`
+`tests/unit/capture/test_collector.py:64::test_collect_steps`
 
 - **given** an «Active scenario» in a fresh «Collector»
 - **when** a given and a when «Step» are pushed
 - **then** each «Step» carries its «Phase»
 
 ## ✓ «Steps» pushed during fixture setup record into the «fixture recording»
-`tests/unit/capture/test_collector.py:186::test_push_step_during_fixture_setup_records_into_recording`
+`tests/unit/capture/test_collector.py:208::test_push_step_during_fixture_setup_records_into_recording`
 
 - **given** a «Fixture recording» under setup
 - **when** a «Step» is pushed inside the fixture body
 - **then** it is recorded as a child of the recording root
 
 ## ✓ An «attachment» lands on the «step» being recorded
-`tests/unit/capture/test_collector.py:206::test_attach_during_fixture_setup_records_into_recording`
+`tests/unit/capture/test_collector.py:228::test_attach_during_fixture_setup_records_into_recording`
 
 - **given** a «Fixture recording» under setup
 - **when** an «Attachment» is attached inside the fixture body
 - **then** the «Attachment» lands on the recording root
 
 ## ✓ Fixture-body «steps» do not leak into the «active scenario»
-`tests/unit/capture/test_collector.py:224::test_push_step_routing_isolates_recording_from_scenario`
+`tests/unit/capture/test_collector.py:246::test_push_step_routing_isolates_recording_from_scenario`
 
 - **given** an «Active scenario» with a «Fixture recording»
 - **when** a «Step» is pushed inside the fixture body
 - **then** the step lives only in the recording, not the scenario
 
 ## ✓ An «attachment» outside every «step» is refused
-`tests/unit/capture/test_collector.py:278::test_attach_outside_any_step_raises`
+`tests/unit/capture/test_collector.py:300::test_attach_outside_any_step_raises`
 
 - **given** an «Active scenario» with no «Step» open
 - **when** an «attachment» is made from the test body
 - **then** it is refused rather than dropped
 
 ## ✓ A «fixture recording» is deep-copied when «grafted»
-`tests/unit/capture/test_collector.py:307::test_graft_recording_deep_copies_into_scenario`
+`tests/unit/capture/test_collector.py:329::test_graft_recording_deep_copies_into_scenario`
 
 - **given** a «Fixture recording» with a nested child «Step»
 - **when** a «Graft» copies it into the «Active scenario»
 - **then** the scenario gains a deep copy of the recorded steps
 
 ## ✓ A «step fixture» failing in teardown fails its finished «scenario»
-`tests/unit/capture/test_collector.py:448::test_fail_recorded_scenario_marks_a_finished_scenario_failed`
+`tests/unit/capture/test_collector.py:470::test_fail_recorded_scenario_marks_a_finished_scenario_failed`
 
 - **given** a «Scenario» that already finished as passed
 - **when** a fixture raises past its yield, after the scenario finished
 - **then** the recorded «scenario» carries the failure
 
 ## ✓ A teardown failure keeps the error the «scenario» already carries
-`tests/unit/capture/test_collector.py:467::test_fail_recorded_scenario_keeps_an_existing_error`
+`tests/unit/capture/test_collector.py:489::test_fail_recorded_scenario_keeps_an_existing_error`
 
 - **given** a «Scenario» that already failed in its body
 - **when** its fixture then also fails in teardown
 - **then** the body failure is what the report shows
 
 ## ✓ A teardown failure under an unknown «Node ID» is ignored
-`tests/unit/capture/test_collector.py:485::test_fail_recorded_scenario_ignores_unknown_node_id`
+`tests/unit/capture/test_collector.py:507::test_fail_recorded_scenario_ignores_unknown_node_id`
 
 - **given** a «Collector» that recorded one «scenario»
 - **when** a teardown fails under a node id no scenario claimed
 - **then** the recorded scenario is untouched
 
 ## ✓ A leaf given is «grafted» as a childless given «step»
-`tests/unit/capture/test_collector.py:500::test_graft_leaf_given_appends_childless_given_step`
+`tests/unit/capture/test_collector.py:522::test_graft_leaf_given_appends_childless_given_step`
 
 - **given** an «Active scenario» is being recorded
 - **when** a leaf «Graft» appends a childless «Step»
 - **then** the step is a given with no children
 
 ## ✓ «Grafting» with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:518::test_graft_recording_override_replaces_root_narration_keeps_children`
+`tests/unit/capture/test_collector.py:540::test_graft_recording_override_replaces_root_narration_keeps_children`
 
 - **given** a «Fixture recording» whose root has a label and a child
 - **when** a «Graft» supplies an override «Narration»
 - **then** the grafted root shows the override text and keeps its children
 
 ## ✓ «Grafting» with no «active scenario» is a no-op
-`tests/unit/capture/test_collector.py:543::test_graft_leaf_given_without_scenario_is_noop`
+`tests/unit/capture/test_collector.py:565::test_graft_leaf_given_without_scenario_is_noop`
 
 - **given** a collector with no «Active scenario»
 - **when** a leaf «Graft» runs
