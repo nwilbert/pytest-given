@@ -298,3 +298,29 @@ def test_pipe_line_without_separator_is_skipped():
         )
     with then('only the real pipe table produces rows'):
         assert [row.term for row in rows] == ['Real']
+
+
+@scenario(
+    t'A code-span {pg["Term"].low} cell keeps the markup inside it',
+    tags=['markdown'],
+)
+def test_code_span_term_cell_keeps_inner_markup():
+    with given(t'a {pg["Term"]} cell written as a code span around an asterisk pair'):
+        text = '| Term | Meaning |\n|---|---|\n| `a*b*c` | a literal. |\n'
+        attach('Markdown document', text)
+    with when('the parser reads the term cell'):
+        rows = parse_glossary_tables(
+            text, term_column=0, description_column=1, kind_column=None
+        )
+    with then('the span unwraps once and its contents stay literal'):
+        # Inside a code span `*` is text, which is how the same markup renders
+        # in a definition cell — the canonical name has to agree with the pill.
+        assert rows[0].term == 'a*b*c'
+
+
+def test_nested_emphasis_unwraps_all_the_way():
+    text = '| Term | Meaning |\n|---|---|\n| **`Scenario`** | nested. |\n'
+    rows = parse_glossary_tables(
+        text, term_column=0, description_column=1, kind_column=None
+    )
+    assert rows[0].term == 'Scenario'

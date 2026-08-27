@@ -154,6 +154,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Report content (all formats)
 
+- A glossary term written as a code span keeps the markup inside it, so
+  `` `a*b*c` `` canonicalizes to `a*b*c` and matches how a definition cell
+  renders the same span.
 - A parameter-table cell now reads the way the step pointing at it read, carrying the
   interpolation's own format spec and, under `indirect=True`, the bound test
   argument; one parameter formatted two ways gets a column each.
