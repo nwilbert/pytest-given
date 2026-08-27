@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-27T11:09:27.613158+00:00",
+    "timestamp": "2026-08-27T20:14:49.651092+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "ba4059e020de62e2c3876cb7b2ce42f425405527",
+    "commit_sha": "2c91b0e98aa10a0046c3ff876a37031e5149d5f9",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -14107,7 +14107,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 68,
       "steps": [
         {
           "phase": "given",
@@ -17941,7 +17941,7 @@
         "id": "deferred-term",
         "kind": null,
         "canonical": "Deferred term",
-        "definition": "A term obtained before its kind is known \u2014 the `DeferredTermHandle` returned by the code glossary (`g('foo')` declare-or-get, `g['foo']` get-only) and by a *file glossary* (`g['Guest']`). One handle type serves all kinds (unlike the eager Actor/Work Object/Verb handles); the kind stays `None` until *kind inference* runs.",
+        "definition": "A term obtained before its kind is known \u2014 the `DeferredTermHandle` returned by the code glossary (`g('foo')` declare-or-get, `g['foo']` get-only) and by a *file glossary* (`g['Guest']`). It is the one `TermHandle` type every term is handed as, refined only by what defers: the kind stays `None` until *kind inference* runs.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 67
