@@ -1,6 +1,6 @@
 from pathlib import Path
 from string import templatelib
-from typing import Annotated
+from typing import Annotated, Any, cast
 
 import pytest
 
@@ -15,6 +15,7 @@ from pytest_given.model import (
     NarrationTermRef,
     NarrationValue,
     PytestGivenError,
+    TermId,
     narration_text,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
@@ -420,3 +421,18 @@ def test_tstring_with_file_term_instance_emits_term_ref_with_override_display(
     assert len(term_refs) == 1
     assert term_refs[0].term_id == 'guest'
     assert term_refs[0].display == 'Alice'
+
+
+def test_resolve_template_parts_passes_a_term_ref_through() -> None:
+    # Template parses only literals and placeholders today, so a term ref
+    # cannot arrive from it — but it is in the NarrationPart union, and the
+    # match dropping it silently would lose the word from the narration.
+    ref = NarrationTermRef(term_id=TermId('guest'), display='Guest', expression='g')
+    assert _resolve_template_parts([ref], {}) == [ref]
+
+
+def test_resolve_template_parts_rejects_unknown_variant() -> None:
+    # The exhaustive match guards against a NarrationPart variant being added
+    # without a branch here. assert_never fires at runtime.
+    with pytest.raises(AssertionError):
+        _resolve_template_parts([cast(Any, object())], {})

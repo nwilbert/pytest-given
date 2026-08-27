@@ -5,7 +5,15 @@ import types
 import warnings
 from collections.abc import Callable, Mapping, Sequence
 from string import templatelib
-from typing import Any, Protocol, Self, cast, get_type_hints, runtime_checkable
+from typing import (
+    Any,
+    Protocol,
+    Self,
+    assert_never,
+    cast,
+    get_type_hints,
+    runtime_checkable,
+)
 
 import pytest
 
@@ -15,6 +23,7 @@ from ..model import (
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
+    NarrationTermRef,
     NarrationValue,
     Phase,
     PytestGivenError,
@@ -478,6 +487,14 @@ def _resolve_template_parts(
                 out.append(part)
             case NarrationPlaceholder(name=name):
                 out.append(resolved_placeholder_part(part, mapping[name]))
+            case NarrationTermRef():
+                # Not reachable while `Template` parses only literals and
+                # placeholders, but a term ref carries its own display and has
+                # nothing to resolve — passing it through is what keeps the
+                # word in the narration if `Template` ever learns to hold one.
+                out.append(part)
+            case _:
+                assert_never(part)
     return out
 
 
