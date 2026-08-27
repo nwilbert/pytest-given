@@ -146,6 +146,19 @@ def _resolve_lint_enabled(config: pytest.Config) -> bool:
     return bool(config.getini('given_lint'))
 
 
+def _resolve_source_link(config: pytest.Config) -> str:
+    """The source-link template: CLI flag (when given) wins over the ini value.
+
+    Tested with `is not None` like the other two rather than for truthiness, so
+    an explicit `--given-source-link=` means what it says — no links — instead
+    of falling through to whatever the ini declares.
+    """
+    cli = config.getoption('given_source_link')
+    if cli is not None:
+        return cast('str', cli)
+    return cast('str', config.getini('given_source_link'))
+
+
 def pytest_configure(config: pytest.Config) -> None:
     # Parsed eagerly (fail fast), even when the lint itself is disabled for
     # this run, so session finish reuses the parse.
@@ -161,10 +174,7 @@ def pytest_configure(config: pytest.Config) -> None:
     source_link_template = None
     if config.getoption('given_html') is not None:
         try:
-            source_link_template = resolve_template(
-                config.getoption('given_source_link')
-                or config.getini('given_source_link')
-            )
+            source_link_template = resolve_template(_resolve_source_link(config))
         except PytestGivenError as error:
             raise pytest.UsageError(str(error)) from error
     config.stash[_given_config] = _GivenConfig(

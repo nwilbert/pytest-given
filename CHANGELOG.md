@@ -135,6 +135,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The narration lint now inspects `async def` step helpers, whose bodies were
   invisible to every AST rule — and an unresolved async `when` additionally
   disabled `action-in-then` for the whole scenario around it.
+- An explicit `--given-source-link=` now disables source links instead of
+  falling through to the `given_source_link` ini.
 - A finished scenario no longer leaves its collector — and every scenario and
   step it recorded — reachable from a process-global for the rest of the
   process.
