@@ -23,7 +23,7 @@ from pytest_given.capture.decorators import (
     when,
     when_then,
 )
-from pytest_given.capture.source import _reset_rootdir, set_rootdir
+from pytest_given.capture.source import restore_rootdir, set_rootdir
 from pytest_given.capture.story import (
     activity as activity_fn,
 )
@@ -961,10 +961,10 @@ def test_push_step_requires_story_when_activity_ids_given() -> None:
 
 @pytest.fixture
 def _rootdir_here():
-    _reset_rootdir()
+    restore_rootdir(None)
     set_rootdir(Path(__file__).parent)
     yield
-    _reset_rootdir()
+    restore_rootdir(None)
 
 
 def _capturing_collector() -> Collector:

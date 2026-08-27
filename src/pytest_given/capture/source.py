@@ -101,13 +101,6 @@ def restore_rootdir(previous: Path | None) -> None:
     _relpath_cache.clear()
 
 
-def _reset_rootdir() -> None:
-    """Test-only — reset module state between cases."""
-    global _rootdir
-    _rootdir = None
-    _relpath_cache.clear()
-
-
 def _relativize(abs_path: Path) -> str | None:
     """rootdir-relative POSIX string for an absolute path. Returns None if
     rootdir is unset or the path lies outside it. Callers that start from a

@@ -249,7 +249,7 @@ def test_glossary_actor_captures_source():
             assert a.term.source.relpath.endswith('test_glossary.py')
             assert a.term.source.line > 0
     finally:
-        source_mod._reset_rootdir()
+        source_mod.restore_rootdir(None)
 
 
 def test_glossary_work_object_captures_source():
@@ -260,7 +260,7 @@ def test_glossary_work_object_captures_source():
         assert w.term.source is not None
         assert w.term.source.relpath.endswith('test_glossary.py')
     finally:
-        source_mod._reset_rootdir()
+        source_mod.restore_rootdir(None)
 
 
 def test_glossary_verb_captures_source():
@@ -271,7 +271,7 @@ def test_glossary_verb_captures_source():
         assert v.term.source is not None
         assert v.term.source.relpath.endswith('test_glossary.py')
     finally:
-        source_mod._reset_rootdir()
+        source_mod.restore_rootdir(None)
 
 
 def test_glossary_re_registration_preserves_first_source(monkeypatch):
@@ -291,7 +291,7 @@ def test_glossary_re_registration_preserves_first_source(monkeypatch):
         assert a2.term is a1.term
         assert a2.term.source == first_source
     finally:
-        source_mod._reset_rootdir()
+        source_mod.restore_rootdir(None)
 
 
 def test_glossary_re_registration_matching_fields_ok_when_source_differs(monkeypatch):

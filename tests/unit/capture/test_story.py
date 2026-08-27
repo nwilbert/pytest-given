@@ -485,7 +485,7 @@ def test_story_captures_source_from_call_site(g):
         assert s.source.relpath.endswith('test_story.py')
         assert s.source.line > 0
     finally:
-        source_mod._reset_rootdir()
+        source_mod.restore_rootdir(None)
 
 
 # --- Task 4.5: story-id duplicate detection ---

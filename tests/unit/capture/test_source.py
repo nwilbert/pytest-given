@@ -5,11 +5,11 @@ import pytest
 
 from pytest_given.capture.source import (
     _co_filename_to_path,
-    _reset_rootdir,
     capture_caller_source,
     code_source,
     file_source,
     item_source,
+    restore_rootdir,
     set_rootdir,
 )
 from pytest_given.model import SourceLocation
@@ -17,9 +17,9 @@ from pytest_given.model import SourceLocation
 
 @pytest.fixture(autouse=True)
 def _isolate_rootdir():
-    _reset_rootdir()
+    restore_rootdir(None)
     yield
-    _reset_rootdir()
+    restore_rootdir(None)
 
 
 def test_returns_none_when_rootdir_unset():
