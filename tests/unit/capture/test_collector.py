@@ -350,10 +350,13 @@ def test_graft_recording_deep_copies_into_scenario() -> None:
         assert recorded.steps[0].children[0].narration.text == 'with 3 items'
 
 
-def test_graft_recording_with_no_scenario_is_noop() -> None:
+def test_graft_recording_without_scenario_is_refused() -> None:
+    # Grafting only ever runs with a scenario open; the guard is an invariant,
+    # not a tolerated case — a silent return would drop the fixture's subtree.
     collector = Collector()
     recording = FixtureRecording(root=Step(phase='given', narration=_n('x')))
-    collector.graft_recording(recording)  # should not raise
+    with pytest.raises(AssertionError):
+        collector.graft_recording(recording)
 
 
 def test_pop_step_protects_recording_root() -> None:
@@ -563,15 +566,19 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
 
 
 @scenario(
-    t'{pg["Graft"]("Grafting")} with no {pg["Active scenario"].low} is a no-op',
+    t'{pg["Graft"]("Grafting")} with no {pg["Active scenario"].low} is refused',
 )
-def test_graft_leaf_given_without_scenario_is_noop() -> None:
+def test_graft_leaf_given_without_scenario_is_refused() -> None:
     with given(t'a collector with no {pg["Active scenario"]}'):
         collector = Collector()
-    with when(t'a leaf {pg["Graft"]} runs'):
+    with (
+        when_then(
+            t'a leaf {pg["Graft"]} runs',
+            'the invariant is asserted rather than silently dropping the step',
+        ),
+        pytest.raises(AssertionError),
+    ):
         collector.graft_leaf_given(_n('orphan'))
-    with then('no scenario is recorded'):
-        assert collector.scenarios == []
 
 
 def test_graft_recording_without_override_is_unchanged() -> None:

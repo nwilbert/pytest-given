@@ -276,8 +276,9 @@ class Collector:
         parameter), it replaces the grafted root's narration; the recorded
         children and attachments are preserved.
         """
-        if self._current_scenario is None:
-            return
+        # Grafting runs from the setup hook of an annotated item, which opened
+        # the scenario before fixtures ran; nothing closes it until logreport.
+        assert self._current_scenario is not None
         root = copy.deepcopy(recording.root)
         if override_narration is not None:
             root.narration = override_narration
@@ -289,8 +290,7 @@ class Collector:
         Used for Annotated labels on parametrize values and undecorated /
         built-in fixtures — arrangements with no recorded body.
         """
-        if self._current_scenario is None:
-            return
+        assert self._current_scenario is not None
         self._current_scenario.steps.append(Step(phase='given', narration=narration))
 
     def push_step(
@@ -315,7 +315,13 @@ class Collector:
         )
         if stack:
             stack[-1].children.append(step)
-        elif self._state == 'test' and self._current_scenario is not None:
+        elif self._state == 'test':
+            # `_require_recordable` has ruled out idle and teardown, and the
+            # two are set and cleared together, so a recordable 'test' state
+            # always has a scenario. Asserted rather than re-tested: the step
+            # is already on the stack, so a miss records it and then drops it
+            # from the report silently.
+            assert self._current_scenario is not None
             self._current_scenario.steps.append(step)
         stack.append(step)
         return step
