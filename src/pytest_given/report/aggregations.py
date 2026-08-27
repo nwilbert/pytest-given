@@ -44,8 +44,13 @@ def activity_key(story_id: StoryId, activity_id: ActivityId) -> ActivityKey:
 
 
 @dataclass
-class TermInstance:
-    """One concrete entity occurrence collected across all scenario steps."""
+class TermOccurrence:
+    """One sighting of a term in the recorded steps, as the Glossary shows it.
+
+    Not `capture`'s `TermInstance`, which is the authored thing — a term
+    wearing one surface form. This is the report-side tally of where that
+    surface form turned up, so the two must not share a name.
+    """
 
     display: str
     fixture_name: str | None = None
@@ -62,7 +67,7 @@ class TermForm:
 class GlossaryAggregation:
     """Aggregated cross-reference data for a single glossary term."""
 
-    instances: list[TermInstance] = field(default_factory=list)
+    instances: list[TermOccurrence] = field(default_factory=list)
     forms: list[TermForm] = field(default_factory=list)
     stories: list[StoryId] = field(default_factory=list)
 
@@ -278,7 +283,7 @@ class _GlossaryIndex:
         if display == term.canonical or (term_id, display) in self._instances:
             return
         self._instances.add((term_id, display))
-        agg.instances.append(TermInstance(display=display, fixture_name=fixture_name))
+        agg.instances.append(TermOccurrence(display=display, fixture_name=fixture_name))
 
     def record_form(self, term_id: TermId, display: str) -> None:
         """Note one surface form of a verb term.
