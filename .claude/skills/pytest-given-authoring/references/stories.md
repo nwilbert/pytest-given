@@ -47,7 +47,7 @@ Two corollaries of "per step":
 - **Only step narration counts.** Term refs in the `@scenario` name never contribute. A scenario titled with both actors stays uncovered until those refs also appear in a `given`/`when`/`then`.
 - **Growing an activity's terms raises its coverage bar.** Adding a term — or narrowing one to an instance (`room` → `room('Deluxe Suite')`) — makes every covering step carry the new identity too, so editing a story can silently uncover a scenario that used to cover it (a pinned step is immune). Re-render the Stories tab after touching an activity.
 
-A step can also **pin** an activity explicitly — `given(text, activity=3)`, taking the 1-based activity number in the story (or a sequence of numbers). A pinned step covers the activity regardless of what its narration references; use a pin when the activity is phrased above the vocabulary the step narrates (e.g. a process-level activity implemented by a technical test), and keep it on the one step that genuinely demonstrates the activity.
+A step can also **pin** an activity explicitly — `given(text, activity=3)`, taking the 1-based activity number in the story (or a sequence of numbers). A pin *replaces* narration matching for that step rather than adding to it: the step covers exactly the activities it names and no others, however well its text fits them. Use a pin when the activity is phrased above the vocabulary the step narrates (e.g. a process-level activity implemented by a technical test), and keep it on the one step that genuinely demonstrates the activity.
 
 An uncovered activity is a signal, not an error — it marks vocabulary and behavior no test exercises yet.
 

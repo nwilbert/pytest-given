@@ -10,7 +10,7 @@ The test suite narrates itself: rendered scenarios are a behavioral spec, the gl
 ## Orientation — first contact
 
 1. **Glossary first.** Read `GLOSSARY.md` (or the `Glossary()` / `FileGlossary` declaration reachable from a `conftest.py`): the domain vocabulary, with definitions.
-2. **Render the spec.** `pytest <selection> --given-md` runs the selected tests and prints a Markdown spec of every scenario to stdout between `<!-- pytest-given:md:start -->` / `:end` fences — narration with `«term»` markers, tags after each node id, and a ✓ / ✗ / ⤼ status glyph per scenario (a skipped one also carries ` · skipped` and its reason). Select with pytest's own args (`-k`, node ids, `--lf`); the renderer narrates whatever ran.
+2. **Render the spec.** `pytest <selection> --given-md` runs the selected tests and prints a Markdown spec of every scenario to stdout between `<!-- pytest-given:md:start -->` / `:end` fences — narration with `«term»` markers, a ``file.py:line::test_name`` anchor under each heading with the scenario's tags after it, and a ✓ / ✗ / ⤼ status glyph per scenario (a skipped one also carries ` · skipped` and its reason). Select with pytest's own args (`-k`, node ids, `--lf`); the renderer narrates whatever ran.
 3. **Stories.** Read the `story(...)` definitions — actor-level flows the scenarios implement; `story=` on a `@scenario` links them.
 
 ## Structured questions — JSON + jq

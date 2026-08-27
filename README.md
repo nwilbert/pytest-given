@@ -124,12 +124,17 @@ As a call-site label with `Annotated` (**only `given` is allowed**) — attach a
 ```python
 from typing import Annotated
 
-@scenario('A name with no id-able characters is rejected')
-@pytest.mark.parametrize('text', ['---', '', '###'])
-def test_rejects_empty(text: Annotated[str, given(Template('the name {text}'))]):
-    with when_then('it is slugified', 'a PytestGivenError is raised'), \
-            pytest.raises(PytestGivenError):
-        id_derive(text)
+@scenario('Underpayment is rejected')
+@pytest.mark.parametrize('cents', [0, 50, 199])
+def test_rejects_underpayment(
+    machine, cents: Annotated[int, given(Template('{cents} cents inserted'))]
+):
+    with (
+        when_then('a customer tries to buy a coffee',
+                  'the machine reports the shortfall'),
+        pytest.raises(ValueError, match='insufficient'),
+    ):
+        buy_coffee(machine, cents)
 ```
 
 A `Template` placeholder renders as `{col}` in the grouped view and as the concrete value per row. A t-string is rejected here, and so are `when`/`then` — the parameter value isn't in scope at definition time, and the action and outcome live in the test body.
@@ -177,6 +182,8 @@ def test_sold_out(machine):
 
 The body runs inside the `when`; the sibling `then` is emitted once the body exits cleanly (e.g. after the inner `pytest.raises` catches the error). If the body raises uncaught, the `when` is recorded, the `then` is skipped, and the exception propagates.
 
+### Parametrized scenarios
+
 Parametrized tests are automatically grouped into a single scenario with a parameter table. Use **t-strings** (`t'...'`) to interpolate parameter values into step text — the plugin recognizes parameter names in t-string interpolations and color-codes them in the report:
 
 ```python
@@ -219,9 +226,9 @@ def test_brew(cup_size):
     ...
 ```
 
-Each case then becomes its own scenario with no parameter table, titled by its parametrize id — `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first (a plain-string name is suffixed the same way). Every case carries the id, including one whose name already renders its values: a `Template` naming only some of the columns would otherwise give two cases the same title, and suffixing only the clashes would make a title depend on which cases the run collected. On a test that isn't parametrized the argument raises at collection.
+Each case then becomes its own scenario with no parameter table, titled by its parametrize id — `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first (a plain-string name is suffixed the same way). Every case carries the id, including one whose name already renders its values. On a test that isn't parametrized the argument raises at collection.
 
-#### Step text & placeholders
+### Step text & placeholders
 
 | Form | Example | How it renders |
 |---|---|---|
@@ -242,14 +249,14 @@ Four things worth knowing:
 
 4. **Six authoring forms are rejected outright in a parametrized scenario**, because each would make the grouped tree lie. Every one fails the run and writes no report — the message names the fix:
 
-   | Rejected | Fix |
-   |---|---|
-   | A plain `str` (usually an f-string) whose text differs per case | Narrate with a t-string so the varying part is a placeholder, not case 1's text |
-   | A varying interpolation that isn't a bare name — `t'{cup_size * 0.01}'`, `t'{m.balance}'` | Bind it to a local and narrate that local |
-   | An interpolation naming a parametrize column that no longer holds the case's value | Rename the local that rebound the name — or, if the body mutated the value in place before narrating it, bind the result to its own name and narrate that |
-   | A step whose set of `attach` labels differs between cases | Keep the label constant and let the content vary — that's what the attachment column is for |
-   | A glossary term ref whose display differs between cases (unless the term ref *is* the parametrize value) | Split the term ref from the value: `given(t"{pg['Customer']} {name} places an order")` |
-   | Passed cases that narrate different templates — a different step structure, a differently shaped narration, different wording, or a different interpolated expression | Decline the merge with `@scenario(..., group_parametrized=False)` and let each case be its own scenario |
+   | # | Rejected | Fix |
+   |---|---|---|
+   | 1 | A plain `str` (usually an f-string) whose text differs per case | Narrate with a t-string so the varying part is a placeholder, not case 1's text |
+   | 2 | A varying interpolation that isn't a bare name — `t'{cup_size * 0.01}'`, `t'{m.balance}'` | Bind it to a local and narrate that local |
+   | 3 | An interpolation naming a parametrize column that no longer holds the case's value | Rename the local that rebound the name — or, if the body mutated the value in place before narrating it, bind the result to its own name and narrate that |
+   | 4 | A glossary term ref whose display differs between cases (unless the term ref *is* the parametrize value) | Split the term ref from the value: `given(t"{pg['Customer']} {name} places an order")` |
+   | 5 | A step whose set of `attach` labels differs between cases | Keep the label constant and let the content vary — that's what the attachment column is for |
+   | 6 | Passed cases that narrate different templates — a different step structure, a differently shaped narration, different wording, or a different interpolated expression | Decline the merge with `@scenario(..., group_parametrized=False)` and let each case be its own scenario |
 
 ### Domain Storytelling
 
@@ -411,7 +418,7 @@ The lint is zero-cost when off: nothing extra is captured, and report artifacts 
 
 ## Traceback frames
 
-When a scenario fails, its traceback is captured into the report. By default only your own frames are kept — the `pluggy` dispatcher, `_pytest` runner, and pytest-given's own `@scenario` wrapper frames are dropped, since they're implementation noise you rarely need. This also keeps failing suites fast: pytest's per-frame source analysis is the dominant cost when many scenarios fail, so dropping those frames before they're formatted keeps large failing suites from crawling.
+When a scenario fails, its traceback is captured into the report. By default only your own frames are kept — the `pluggy` dispatcher, `_pytest` runner, and pytest-given's own `@scenario` wrapper frames are dropped, since they're implementation noise you rarely need. Dropping them before they are formatted also keeps large failing suites fast — pytest's per-frame source analysis is the dominant cost when many scenarios fail.
 
 Pass `--given-all-frames` to retain every frame (each stored with an `is_internal` flag; the HTML report then shows a **"Show internal frames"** toggle on each failure). It's a debugging escape hatch for when you're troubleshooting the plugin or pytest itself — it re-introduces the per-frame cost, so leave it off for normal runs on large failing suites.
 
