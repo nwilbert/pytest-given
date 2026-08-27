@@ -37,7 +37,7 @@ from .template import (
     resolved_placeholder_part,
     try_term_ref,
 )
-from .traceback import filter_internal_frames, parse_short_repr
+from .traceback import is_internal_path, parse_short_repr
 
 __all__ = [
     'Collector',
@@ -53,10 +53,10 @@ __all__ = [
     'attach',
     'begin_capture_session',
     'capture_snapshot',
-    'filter_internal_frames',
     'get_active_collector',
     'given',
     'infer_glossary_kinds',
+    'is_internal_path',
     'item_source',
     'parse_short_repr',
     'path',

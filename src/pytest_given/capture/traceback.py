@@ -7,20 +7,16 @@ with `E   ` carry the exception summary.
 
 The renderer wants frames classified into "user" vs "internal" — pluggy
 dispatchers, pytest's own runner, and pytest-given's `@scenario` wrapper are
-implementation noise the reader almost never needs.
+implementation noise the reader almost never needs. `is_internal_path` is that
+classifier; the plugin applies it to pytest's own traceback entries before
+`getrepr` runs, so the pre-filter and this post-parse pass agree.
 """
 
 import re
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
-
-import pytest
 
 from ..model import TracebackFrame
 from .source import to_relpath
-
-if TYPE_CHECKING:
-    from _pytest._code.code import TracebackEntry
 
 _FRAME_HEADER_RE = re.compile(r'^(?P<path>.+?):(?P<lineno>\d+): in (?P<func>.+)$')
 
@@ -35,30 +31,6 @@ _INTERNAL_SUBSTRINGS = (
 _INTERNAL_SUFFIXES = ('/pytest_given/capture/decorators.py',)
 
 _SITE_PACKAGES_MARKER = '/site-packages/'
-
-
-def filter_internal_frames(excinfo: pytest.ExceptionInfo[BaseException]) -> None:
-    """Drop internal frames from ``excinfo.traceback`` before ``getrepr`` runs.
-
-    ``getrepr(style='short')`` runs pytest's per-frame AST statement-range scan
-    once per surviving entry, so pruning the pluggy/``_pytest``/decorator frames
-    here — rather than after parsing — is what removes the O(N²) traceback cost
-    on large failing suites. Only pytest's view of the traceback is rewritten;
-    the exception's native ``__traceback__`` is left intact.
-
-    Reuses ``_is_internal`` (the classifier ``parse_short_repr`` applies to the
-    formatted output) so the pre-filter and post-parse classification agree. If
-    every entry classifies as internal — e.g. a failure raised entirely within
-    plugin/library code — the original traceback is kept so ``getrepr`` still has
-    a crash frame to format.
-    """
-    filtered = excinfo.traceback.filter(lambda entry: not _is_internal_entry(entry))
-    if len(filtered) > 0:
-        excinfo.traceback = filtered
-
-
-def _is_internal_entry(entry: TracebackEntry) -> bool:
-    return _is_internal(str(entry.path).replace('\\', '/'))
 
 
 @dataclass
@@ -91,7 +63,7 @@ def parse_short_repr(text: str) -> tuple[list[TracebackFrame], str | None]:
                 lineno=p.lineno,
                 func=p.func,
                 code='\n'.join(p.code),
-                is_internal=_is_internal(normalized),
+                is_internal=is_internal_path(normalized),
             )
         )
 
@@ -151,7 +123,7 @@ def _portable_path(normalized_path: str) -> str:
     return to_relpath(normalized_path)
 
 
-def _is_internal(normalized_path: str) -> bool:
+def is_internal_path(normalized_path: str) -> bool:
     if any(s in normalized_path for s in _INTERNAL_SUBSTRINGS):
         return True
     return any(normalized_path.endswith(s) for s in _INTERNAL_SUFFIXES)

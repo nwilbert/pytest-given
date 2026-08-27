@@ -6,12 +6,13 @@ scenario out.
 """
 
 from collections.abc import Generator
+from typing import TYPE_CHECKING
 
 import pytest
 
 from ..capture import (
-    filter_internal_frames,
     get_active_collector,
+    is_internal_path,
     item_source,
     parse_short_repr,
     set_active_collector,
@@ -25,6 +26,9 @@ from ..model import (
 from .collection import _get_scenario_marker
 from .fixtures import _graft_fixture_recordings
 from .state import _collector, _state
+
+if TYPE_CHECKING:
+    from _pytest._code.code import TracebackEntry
 
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
@@ -144,7 +148,7 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
     if call.excinfo.errisinstance(pytest.skip.Exception):
         return
     if not item.config.getoption('given_all_frames'):
-        filter_internal_frames(call.excinfo)
+        _filter_internal_frames(call.excinfo)
     error_repr = call.excinfo.getrepr(style='short')
     message = str(call.excinfo.value)
     frames, error_tail = parse_short_repr(str(error_repr))
@@ -186,6 +190,32 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
     )
     skip_reason = _extract_skip_reason(report.longrepr) if status == 'skipped' else None
     collector.finish_scenario(status=status, skip_reason=skip_reason)
+
+
+def _filter_internal_frames(excinfo: pytest.ExceptionInfo[BaseException]) -> None:
+    """Drop internal frames from ``excinfo.traceback`` before ``getrepr`` runs.
+
+    ``getrepr(style='short')`` runs pytest's per-frame AST statement-range scan
+    once per surviving entry, so pruning the pluggy/``_pytest``/decorator frames
+    here — rather than after parsing — is what removes the O(N²) traceback cost
+    on large failing suites. Only pytest's view of the traceback is rewritten;
+    the exception's native ``__traceback__`` is left intact.
+
+    Lives here rather than beside the parser because rewriting a pytest object
+    is runner surgery, and it is what would otherwise make ``capture/`` import
+    pytest and the private ``_pytest`` traceback type. It applies ``capture``'s
+    own ``is_internal_path``, so the pre-filter and the post-parse
+    classification stay one rule. If every entry classifies as internal — e.g.
+    a failure raised entirely within plugin/library code — the original
+    traceback is kept so ``getrepr`` still has a crash frame to format.
+    """
+    filtered = excinfo.traceback.filter(lambda entry: not _is_internal_entry(entry))
+    if len(filtered) > 0:
+        excinfo.traceback = filtered
+
+
+def _is_internal_entry(entry: TracebackEntry) -> bool:
+    return is_internal_path(str(entry.path).replace('\\', '/'))
 
 
 def _extract_skip_reason(longrepr: object) -> str | None:

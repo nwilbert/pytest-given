@@ -59,7 +59,7 @@ def filter_internal_frames(excinfo: ExceptionInfo) -> None:
     )
 ```
 
-`_is_internal` (already in `capture/traceback.py`) is the single source of truth for both pre-filtering and post-parsing classification. `filter_internal_frames` lives in the same module, so `_is_internal` stays module-private — only `filter_internal_frames` is imported by `plugin.py`. Both callers pass a full normalized path: `_flush` already classifies on the pre-`_portable_path` path, and the pre-filter classifies on `entry.path`, so the two views agree.
+`is_internal_path` (already in `capture/traceback.py`) is the single source of truth for both pre-filtering and post-parsing classification. (As implemented, the filter lives in `plugin/runtest.py` as `_filter_internal_frames` rather than beside the parser — rewriting a pytest object is runner surgery, and keeping it out of `capture/` is what lets that module stay pytest-free; `is_internal_path` is exported from `capture/` for it.) Both callers pass a full normalized path: `_flush` already classifies on the pre-`_portable_path` path, and the pre-filter classifies on `entry.path`, so the two views agree.
 
 Call from `pytest_runtest_makereport` before `getrepr`:
 

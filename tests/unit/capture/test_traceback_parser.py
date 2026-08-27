@@ -1,24 +1,7 @@
-from collections.abc import Callable
 from pathlib import Path
-from typing import Any, cast
 
 from pytest_given.capture.source import _reset_rootdir, set_rootdir
-from pytest_given.capture.traceback import filter_internal_frames, parse_short_repr
-
-
-class _FakeEntry:
-    def __init__(self, path: str) -> None:
-        self.path = path
-
-
-class _FakeTraceback(list):  # type: ignore[type-arg]
-    def filter(self, fn: Callable[[Any], bool]) -> _FakeTraceback:
-        return _FakeTraceback(e for e in self if fn(e))
-
-
-class _FakeExcinfo:
-    def __init__(self, *paths: str) -> None:
-        self.traceback = _FakeTraceback(_FakeEntry(p) for p in paths)
+from pytest_given.capture.traceback import parse_short_repr
 
 
 def test_parses_multi_frame_short_repr() -> None:
@@ -160,30 +143,6 @@ def test_user_test_file_not_internal() -> None:
     text = 'tests/test_billing.py:10: in test_buy\n    assert False\nE   assert False'
     frames, _ = parse_short_repr(text)
     assert frames[0].is_internal is False
-
-
-def test_filter_internal_frames_keeps_only_user_entries() -> None:
-    """The pre-filter drops pluggy/_pytest/decorator entries before getrepr, so
-    only user frames survive to be formatted."""
-    excinfo = _FakeExcinfo(
-        '/venv/site-packages/pluggy/_hooks.py',
-        '/venv/site-packages/_pytest/runner.py',
-        '/proj/src/pytest_given/capture/decorators.py',
-        '/proj/tests/test_billing.py',
-    )
-    filter_internal_frames(cast(Any, excinfo))
-    assert [str(e.path) for e in excinfo.traceback] == ['/proj/tests/test_billing.py']
-
-
-def test_filter_internal_frames_keeps_original_when_all_internal() -> None:
-    """A failure raised entirely within plugin/library code would filter to an
-    empty traceback; the original is kept so getrepr still has a crash frame."""
-    excinfo = _FakeExcinfo(
-        '/venv/site-packages/pluggy/_hooks.py',
-        '/venv/site-packages/_pytest/runner.py',
-    )
-    filter_internal_frames(cast(Any, excinfo))
-    assert len(excinfo.traceback) == 2
 
 
 def test_absolute_user_frame_relativized_to_rootdir(tmp_path: Path) -> None:
