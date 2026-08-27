@@ -81,7 +81,7 @@ def parse_tstring(
 
     Iterates the t-string yielding str | Interpolation. Each interpolation
     is inspected:
-    - Glossary handles (Actor, WorkObject, Verb, and their instances/inflections)
+    - Glossary handles (any kind, and their instances/inflections)
       become NarrationTermRef carrying term_id, display, and the source expression.
     - All other values become NarrationValue as before.
     """

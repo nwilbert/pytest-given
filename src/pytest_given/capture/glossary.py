@@ -32,9 +32,9 @@ class TermHandle:
 
     The whole behavior of a handle lives here: calling one names a surface form
     for the term, and `declared_kind` reads whatever kind the registration
-    settled on. The subclasses below add nothing but their name — which is the
-    point, since `g.actor(...)` returning an `Actor` is what makes the kind
-    visible at the call site and in a type annotation.
+    settled on. One type for all three kinds — `g.actor(...)`, `g.work_object(...)`
+    and `g.verb(...)` differ in what they register, not in what they hand back,
+    and the kind is read off the term at use time.
     """
 
     _term: GlossaryTerm
@@ -108,21 +108,6 @@ class TermInstance:
     @property
     def declared_kind(self) -> TermKind | None:
         return self.handle.declared_kind
-
-
-@dataclass(frozen=True)
-class Actor(TermHandle):
-    """A participant in the domain."""
-
-
-@dataclass(frozen=True)
-class WorkObject(TermHandle):
-    """A thing acted on."""
-
-
-@dataclass(frozen=True)
-class Verb(TermHandle):
-    """An action."""
 
 
 @dataclass(frozen=True)
@@ -216,26 +201,26 @@ class Glossary(BaseGlossary):
     `skip=2` throughout: this method, then the user's call site.
     """
 
-    def actor(self, name: str, definition: str | None = None) -> Actor:
+    def actor(self, name: str, definition: str | None = None) -> TermHandle:
         """Register (or fetch) an actor — a participant in the domain."""
         term = _register_kind(
             self, 'actor', name, definition, capture_caller_source(skip=2)
         )
-        return Actor(_term=term, _glossary=self)
+        return TermHandle(_term=term, _glossary=self)
 
-    def work_object(self, name: str, definition: str | None = None) -> WorkObject:
+    def work_object(self, name: str, definition: str | None = None) -> TermHandle:
         """Register (or fetch) a work object — a thing acted on."""
         term = _register_kind(
             self, 'object', name, definition, capture_caller_source(skip=2)
         )
-        return WorkObject(_term=term, _glossary=self)
+        return TermHandle(_term=term, _glossary=self)
 
-    def verb(self, name: str, definition: str | None = None) -> Verb:
+    def verb(self, name: str, definition: str | None = None) -> TermHandle:
         """Register (or fetch) a verb — an action."""
         term = _register_kind(
             self, 'verb', name, definition, capture_caller_source(skip=2)
         )
-        return Verb(_term=term, _glossary=self)
+        return TermHandle(_term=term, _glossary=self)
 
     def __call__(self, name: str, definition: str | None = None) -> DeferredTermHandle:
         """Declare-or-get a term whose kind inference will settle later."""

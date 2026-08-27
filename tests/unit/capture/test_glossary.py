@@ -15,12 +15,10 @@ from pytest_given import (
 from pytest_given.capture import glossary as gloss_mod
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.glossary import (
-    Actor,
     DeferredTermHandle,
     Glossary,
+    TermHandle,
     TermInstance,
-    Verb,
-    WorkObject,
     id_derive,
 )
 from pytest_given.model import GlossaryTerm, SourceLocation, TermId
@@ -78,7 +76,7 @@ def _term(kind, name='X'):
 def test_actor_carries_term_and_glossary_back_ref():
     g = Glossary()
     t = _term('actor')
-    a = Actor(_term=t, _glossary=g)
+    a = TermHandle(_term=t, _glossary=g)
     assert a.term is t
     assert a.glossary is g
     assert a.canonical == 'X'
@@ -88,7 +86,7 @@ def test_actor_carries_term_and_glossary_back_ref():
 def test_work_object_carries_term_and_glossary_back_ref():
     g = Glossary()
     t = _term('object')
-    w = WorkObject(_term=t, _glossary=g)
+    w = TermHandle(_term=t, _glossary=g)
     assert w.term is t
     assert w.glossary is g
 
@@ -96,7 +94,7 @@ def test_work_object_carries_term_and_glossary_back_ref():
 def test_verb_carries_term_and_glossary_back_ref():
     g = Glossary()
     t = _term('verb')
-    v = Verb(_term=t, _glossary=g)
+    v = TermHandle(_term=t, _glossary=g)
     assert v.term is t
     assert v.glossary is g
 
@@ -108,7 +106,7 @@ def test_actor_call_returns_instance_with_distinct_display():
     with given(t'an {pg["Actor"]} handle for Guest'):
         g = Glossary()
         t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
-        a = Actor(_term=t, _glossary=g)
+        a = TermHandle(_term=t, _glossary=g)
     with when(t'the {pg["Actor"]} is called with a name'):
         inst = a('Alice')
     with then(t'an {pg["Instance"]} with a distinct display is returned'):
@@ -120,7 +118,7 @@ def test_actor_call_returns_instance_with_distinct_display():
 def test_work_object_call_returns_instance_with_distinct_display():
     g = Glossary()
     t = GlossaryTerm(id=TermId('room'), kind='object', canonical='Room')
-    w = WorkObject(_term=t, _glossary=g)
+    w = TermHandle(_term=t, _glossary=g)
     inst = w('Deluxe Suite')
     assert isinstance(inst, TermInstance)
     assert inst.handle is w
@@ -135,7 +133,7 @@ def test_verb_call_returns_inflection_sharing_term_identity():
     with given(t'a {pg["Verb"]} handle for confirm'):
         g = Glossary()
         t = GlossaryTerm(id=TermId('confirm'), kind='verb', canonical='confirm')
-        v = Verb(_term=t, _glossary=g)
+        v = TermHandle(_term=t, _glossary=g)
     with when(t'the {pg["Verb"]} is called with a surface form'):
         infl = v('confirms')
     with then(t'an {pg["Inflection"]} sharing the verb identity is returned'):
@@ -156,8 +154,9 @@ def test_glossary_actor_registers_and_returns_handle():
         g = Glossary()
     with when(t'an {pg["Actor"]} is registered with a definition', activity=3):
         a = g.actor('Guest', definition='Person booking accommodation.')
-    with then(t'a typed {pg["Actor"]} handle with the {pg["Actor"]} kind is returned'):
-        assert isinstance(a, Actor)
+    with then(t'a handle carrying the {pg["Actor"]} kind is returned'):
+        assert isinstance(a, TermHandle)
+        assert a.declared_kind == 'actor'
         assert a.id == 'guest'
         assert a.canonical == 'Guest'
         assert a.term.definition == 'Person booking accommodation.'
@@ -167,14 +166,14 @@ def test_glossary_actor_registers_and_returns_handle():
 def test_glossary_work_object_registers_and_returns_handle():
     g = Glossary()
     w = g.work_object('Room')
-    assert isinstance(w, WorkObject)
+    assert w.declared_kind == 'object'
     assert g.get(TermId('room')).kind == 'object'
 
 
 def test_glossary_verb_registers_and_returns_handle():
     g = Glossary()
     v = g.verb('confirm')
-    assert isinstance(v, Verb)
+    assert v.declared_kind == 'verb'
     assert g.get(TermId('confirm')).kind == 'verb'
 
 
@@ -371,7 +370,7 @@ def test_low_yields_lowercased_display_instance():
 
 def test_actor_low_yields_lowercased_instance():
     g = Glossary()
-    a = Actor(
+    a = TermHandle(
         _term=GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'),
         _glossary=g,
     )
@@ -383,7 +382,7 @@ def test_actor_low_yields_lowercased_instance():
 
 def test_work_object_low_yields_lowercased_instance():
     g = Glossary()
-    w = WorkObject(
+    w = TermHandle(
         _term=GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'),
         _glossary=g,
     )
@@ -395,7 +394,7 @@ def test_work_object_low_yields_lowercased_instance():
 
 def test_verb_low_yields_lowercased_inflection():
     g = Glossary()
-    v = Verb(
+    v = TermHandle(
         _term=GlossaryTerm(id=TermId('confirm'), kind='verb', canonical='Confirm'),
         _glossary=g,
     )
