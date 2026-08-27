@@ -67,7 +67,7 @@ def pytest_fixture_setup(
         yield
     finally:
         collector.exit_fixture_setup(token)
-        key = _fixture_instance_key(fixturedef, request)
+        key = _setup_instance_key(fixturedef, request)
         collector.store_recording(key, recording)
 
 
@@ -113,11 +113,42 @@ def _ensure_teardown_wrapped(
     fixturedef.func = wrapped  # type: ignore[misc]
 
 
-def _fixture_instance_key(
+def _setup_instance_key(
     fixturedef: pytest.FixtureDef[object],
     request: pytest.FixtureRequest,
 ) -> FixtureInstanceKey:
-    return (id(fixturedef), fixturedef.cache_key(cast(SubRequest, request)))
+    """The key at setup time, deriving the cache key from the live request."""
+    return _fixture_instance_key(
+        fixturedef, fixturedef.cache_key(cast(SubRequest, request))
+    )
+
+
+def _cached_instance_key(
+    fixturedef: pytest.FixtureDef[object],
+) -> FixtureInstanceKey:
+    """The key at graft time, reading back the cache key pytest stored.
+
+    `cached_result` is `(value, cache_key, exc)`; taking element 1 rather than
+    re-deriving it is deliberate — the request that produced it is gone by now,
+    and the stored value is by definition the one `_setup_instance_key` saw.
+    """
+    assert fixturedef.cached_result is not None
+    return _fixture_instance_key(fixturedef, fixturedef.cached_result[1])
+
+
+def _fixture_instance_key(
+    fixturedef: pytest.FixtureDef[object],
+    cache_key: object,
+) -> FixtureInstanceKey:
+    """One fixture *instance*: the def it came from, plus its cache key.
+
+    Both ends of the graft build this key, and they reach the cache key two
+    ways — at setup from the request, at graft from what pytest cached. The
+    shape lives here rather than at either end so the two cannot drift into
+    keys that no longer meet; a miss is silent, and costs the fixture's whole
+    recorded subtree.
+    """
+    return (id(fixturedef), cache_key)
 
 
 def _graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
@@ -146,7 +177,7 @@ def _graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
             continue
         if fixturedef.cached_result is None:
             continue
-        key: FixtureInstanceKey = (id(fixturedef), fixturedef.cached_result[1])
+        key = _cached_instance_key(fixturedef)
         expected[key] = fixturedef.scope
 
     # Phase 1: fixture recordings in setup order, with optional override.
