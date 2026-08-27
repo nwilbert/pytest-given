@@ -57,46 +57,46 @@
 - **then** the scenario gains a deep copy of the recorded steps
 
 ## ✓ A «step fixture» failing in teardown fails its finished «scenario»
-`tests/unit/capture/test_collector.py:470::test_fail_recorded_scenario_marks_a_finished_scenario_failed`
+`tests/unit/capture/test_collector.py:473::test_fail_recorded_scenario_marks_a_finished_scenario_failed`
 
 - **given** a «Scenario» that already finished as passed
 - **when** a fixture raises past its yield, after the scenario finished
 - **then** the recorded «scenario» carries the failure
 
 ## ✓ A teardown failure keeps the error the «scenario» already carries
-`tests/unit/capture/test_collector.py:489::test_fail_recorded_scenario_keeps_an_existing_error`
+`tests/unit/capture/test_collector.py:492::test_fail_recorded_scenario_keeps_an_existing_error`
 
 - **given** a «Scenario» that already failed in its body
 - **when** its fixture then also fails in teardown
 - **then** the body failure is what the report shows
 
 ## ✓ A teardown failure under an unknown «Node ID» is ignored
-`tests/unit/capture/test_collector.py:507::test_fail_recorded_scenario_ignores_unknown_node_id`
+`tests/unit/capture/test_collector.py:510::test_fail_recorded_scenario_ignores_unknown_node_id`
 
 - **given** a «Collector» that recorded one «scenario»
 - **when** a teardown fails under a node id no scenario claimed
 - **then** the recorded scenario is untouched
 
 ## ✓ A leaf given is «grafted» as a childless given «step»
-`tests/unit/capture/test_collector.py:522::test_graft_leaf_given_appends_childless_given_step`
+`tests/unit/capture/test_collector.py:525::test_graft_leaf_given_appends_childless_given_step`
 
 - **given** an «Active scenario» is being recorded
 - **when** a leaf «Graft» appends a childless «Step»
 - **then** the step is a given with no children
 
 ## ✓ «Grafting» with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:540::test_graft_recording_override_replaces_root_narration_keeps_children`
+`tests/unit/capture/test_collector.py:543::test_graft_recording_override_replaces_root_narration_keeps_children`
 
 - **given** a «Fixture recording» whose root has a label and a child
 - **when** a «Graft» supplies an override «Narration»
 - **then** the grafted root shows the override text and keeps its children
 
-## ✓ «Grafting» with no «active scenario» is a no-op
-`tests/unit/capture/test_collector.py:565::test_graft_leaf_given_without_scenario_is_noop`
+## ✓ «Grafting» with no «active scenario» is refused
+`tests/unit/capture/test_collector.py:568::test_graft_leaf_given_without_scenario_is_refused`
 
 - **given** a collector with no «Active scenario»
 - **when** a leaf «Graft» runs
-- **then** no scenario is recorded
+- **then** the invariant is asserted rather than silently dropping the step
 
 ## ✓ «FileGlossary» lookup is case-insensitive
 `tests/unit/capture/test_file_glossary.py:27::test_lookup_is_case_insensitive`
@@ -351,70 +351,70 @@
 - **then** no new «Term» was created
 
 ## ✓ Calling an «actor» names a distinct «instance»
-`tests/unit/capture/test_glossary.py:104::test_actor_call_returns_instance_with_distinct_display`
+`tests/unit/capture/test_glossary.py:102::test_actor_call_returns_instance_with_distinct_display`
 
 - **given** an «Actor» handle for Guest
 - **when** the «Actor» is called with a name
 - **then** an «Instance» with a distinct display is returned
 
 ## ✓ Calling a «verb» records an «inflection» of the same «term»
-`tests/unit/capture/test_glossary.py:130::test_verb_call_returns_inflection_sharing_term_identity`
+`tests/unit/capture/test_glossary.py:128::test_verb_call_returns_inflection_sharing_term_identity`
 
 - **given** a «Verb» handle for confirm
 - **when** the «Verb» is called with a surface form
 - **then** an «Inflection» sharing the verb identity is returned
 
 ## ✓ Registering an «actor» returns a typed handle
-`tests/unit/capture/test_glossary.py:150::test_glossary_actor_registers_and_returns_handle`
+`tests/unit/capture/test_glossary.py:148::test_glossary_actor_registers_and_returns_handle`
 
 - **given** an empty glossary
 - **when** an «Actor» is registered with a definition
-- **then** a typed «Actor» handle with the «Actor» kind is returned
+- **then** a handle carrying the «Actor» kind is returned
 
 ## ✓ Re-registering a «term» with matching fields is idempotent
-`tests/unit/capture/test_glossary.py:181::test_glossary_re_registration_with_matching_fields_is_idempotent`
+`tests/unit/capture/test_glossary.py:180::test_glossary_re_registration_with_matching_fields_is_idempotent`
 
 - **given** an «Actor» already registered with a definition
 - **when** the same name and definition are registered again
 - **then** both handles share the one «Term»
 
 ## ✓ Re-registering a «term» with a different definition is rejected
-`tests/unit/capture/test_glossary.py:195::test_glossary_re_registration_with_mismatched_definition_raises` · validation
+`tests/unit/capture/test_glossary.py:194::test_glossary_re_registration_with_mismatched_definition_raises` · validation
 
 - **given** an «Actor» already registered with one definition
 - **when** the name is registered again with a different definition
 - **then** a PytestGivenError reports the conflict with the prior registration
 
 ## ✓ The same name cannot be two different kinds
-`tests/unit/capture/test_glossary.py:213::test_glossary_cross_kind_collision_raises` · validation
+`tests/unit/capture/test_glossary.py:212::test_glossary_cross_kind_collision_raises` · validation
 
 - **given** a name already registered as an «Actor»
 - **when** the same name is registered as a «Verb»
 - **then** a PytestGivenError reports the conflict with the prior registration
 
 ## ✓ Registering an «actor» captures its definition site
-`tests/unit/capture/test_glossary.py:237::test_glossary_actor_captures_source`
+`tests/unit/capture/test_glossary.py:236::test_glossary_actor_captures_source`
 
 - **given** a rootdir-aware glossary
 - **when** an «Actor» is registered
 - **then** the «Term» records a «Source link» to this file
 
 ## ✓ Calling the «glossary» declares a «kindless» «term»
-`tests/unit/capture/test_glossary.py:329::test_call_declares_kindless_term`
+`tests/unit/capture/test_glossary.py:328::test_call_declares_kindless_term`
 
 - **given** an empty glossary
 - **when** a «Term» is declared by call, without a kind
 - **then** the «Term» is registered as «Kindless»
 
 ## ✓ Subscript looks up an already-declared «term»
-`tests/unit/capture/test_glossary.py:408::test_subscript_get_only_returns_handle`
+`tests/unit/capture/test_glossary.py:407::test_subscript_get_only_returns_handle`
 
 - **given** a glossary with one declared «Term»
 - **when** the name is looked up by subscript
 - **then** the returned «Term» is the declared one
 
 ## ✓ Subscripting an unknown name raises with a hint
-`tests/unit/capture/test_glossary.py:421::test_subscript_unknown_name_raises_with_hint` · diagnostics, validation
+`tests/unit/capture/test_glossary.py:420::test_subscript_unknown_name_raises_with_hint` · diagnostics, validation
 
 - **given** a glossary with one declared «Term»
 - **when** a near-miss name is subscripted
@@ -735,6 +735,19 @@
 - **when** the parser reads the document
 - **then** only the real pipe table produces rows
 
+## ✓ A code-span «term» cell keeps the markup inside it
+`tests/unit/capture/test_markdown_glossary.py:303::test_code_span_term_cell_keeps_inner_markup` · markdown
+
+- **given** a «Term» cell written as a code span around an asterisk pair
+  - 📎 Markdown document:
+    ```
+    | Term | Meaning |
+    |---|---|
+    | `a*b*c` | a literal. |
+    ```
+- **when** the parser reads the term cell
+- **then** the span unwraps once and its contents stay literal
+
 ## ✓ A «step» pairs its «narration» with a «phase»
 `tests/unit/capture/test_step_descriptor.py:57::test_context_manager_basic`
 
@@ -1014,70 +1027,70 @@
 - **then** a PytestGivenError names the offending type and the path
 
 ## ✓ A Template parses a bare placeholder
-`tests/unit/capture/test_template.py:36::test_template_parses_single_placeholder` · parametrization
+`tests/unit/capture/test_template.py:37::test_template_parses_single_placeholder` · parametrization
 
 - **given** a deferred «Templatize» template with one placeholder
 - **when** the template is parsed
 - **then** it splits into literal and placeholder «Narration» parts
 
 ## ✓ A Template substitutes parametrize values
-`tests/unit/capture/test_template.py:80::test_template_substitute_basic` · parametrization
+`tests/unit/capture/test_template.py:81::test_template_substitute_basic` · parametrization
 
 - **given** a «Templatize» template referencing a «Case» column
 - **when** a «Parameter table» value is substituted in
 - **then** the placeholder is filled with that value
 
 ## ✓ A t-string interpolation becomes a value part
-`tests/unit/capture/test_template.py:146::test_parse_tstring_single_interpolation`
+`tests/unit/capture/test_template.py:147::test_parse_tstring_single_interpolation`
 
 - **given** a t-string step with one interpolated value
 - **when** the t-string is parsed at runtime
 - **then** the interpolation becomes a «Narration» value part
 
 ## ✓ A t-string can interpolate an arbitrary expression
-`tests/unit/capture/test_template.py:209::test_parse_tstring_expression`
+`tests/unit/capture/test_template.py:210::test_parse_tstring_expression`
 
 - **given** a t-string step interpolating a computed expression
 - **when** the t-string is parsed
 - **then** the «Value highlight» part records the full expression
 
 ## ✓ A «glossary» handle in a t-string emits a «term ref»
-`tests/unit/capture/test_template.py:248::test_tstring_with_actor_emits_term_ref`
+`tests/unit/capture/test_template.py:249::test_tstring_with_actor_emits_term_ref`
 
 - **given** an «Actor» handle from the glossary
 - **when** the handle is interpolated into a t-string step
 - **then** the step carries a «Term ref» for that «Actor»
 
 ## ✓ A «work object» handle in a t-string emits a «term ref»
-`tests/unit/capture/test_template.py:276::test_tstring_with_work_object_emits_term_ref`
+`tests/unit/capture/test_template.py:277::test_tstring_with_work_object_emits_term_ref`
 
 - **given** a «Work Object» handle from the glossary
 - **when** it is interpolated into a t-string step
 - **then** the step carries a «Term ref» for that «Work Object»
 
 ## ✓ A bare «verb» handle keeps its canonical display
-`tests/unit/capture/test_template.py:297::test_tstring_with_verb_emits_term_ref_with_canonical_display`
+`tests/unit/capture/test_template.py:298::test_tstring_with_verb_emits_term_ref_with_canonical_display`
 
 - **given** a «Verb» handle used without an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the canonical verb
 
 ## ✓ An inflected «verb» in a t-string shows the «inflection»
-`tests/unit/capture/test_template.py:312::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display`
+`tests/unit/capture/test_template.py:313::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display`
 
 - **given** a «Verb» handle called with an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the inflection but keeps the verb id
 
 ## ✓ A «term ref» may not carry a format spec
-`tests/unit/capture/test_template.py:352::test_tstring_term_ref_with_format_spec_raises` · validation
+`tests/unit/capture/test_template.py:353::test_tstring_term_ref_with_format_spec_raises` · validation
 
 - **given** an «Actor» handle interpolated with a format spec
 - **when** the t-string is parsed
 - **then** a PytestGivenError says a «Term ref» takes no format spec
 
 ## ✓ A «FileGlossary» handle works in a t-string «step»
-`tests/unit/capture/test_template.py:395::test_tstring_with_file_term_handle_emits_term_ref`
+`tests/unit/capture/test_template.py:396::test_tstring_with_file_term_handle_emits_term_ref`
 
 - **given** a «Deferred term» from a «File glossary»
 - **when** it is interpolated into a t-string step
@@ -1642,7 +1655,7 @@
 - **then** each «case» stands alone, with no «parameter table»
 
 ## ✓ «Term» ids are derived as URL-safe slugs · 8 cases
-`tests/unit/capture/test_glossary.py:30::test_id_derive_produces_expected_slug`
+`tests/unit/capture/test_glossary.py:28::test_id_derive_produces_expected_slug`
 
 - **given** the name {text}
 - **when** it is slugified into a «Term» id
@@ -1660,7 +1673,7 @@
 | booking system | 'booking-system' | ✓ |
 
 ## ✓ A name with no id-able characters is rejected · 4 cases
-`tests/unit/capture/test_glossary.py:56::test_id_derive_raises_on_empty_result` · validation
+`tests/unit/capture/test_glossary.py:54::test_id_derive_raises_on_empty_result` · validation
 
 - **given** the name {text}
 - **when** it is slugified into a «Term» id
@@ -1700,7 +1713,7 @@
 | not-a-string | ✓ |
 
 ## ✓ A Template accepts bare identifiers only · 3 cases
-`tests/unit/capture/test_template.py:117::test_template_non_identifier_raises_pytest_given_error` · validation
+`tests/unit/capture/test_template.py:118::test_template_non_identifier_raises_pytest_given_error` · validation
 
 - **given** the placeholder {text}
 - **when** a «Templatize» template is built from it

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-26T08:52:36.789993+00:00",
+    "timestamp": "2026-08-27T11:09:27.613158+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "ed41867c5d0af4372753aee814ab058b6e4e2f4c",
+    "commit_sha": "ba4059e020de62e2c3876cb7b2ce42f425405527",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -951,7 +951,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 470
+        "line": 473
       },
       "story_id": null,
       "activity_ids": []
@@ -1030,7 +1030,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 489
+        "line": 492
       },
       "story_id": null,
       "activity_ids": []
@@ -1114,7 +1114,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 507
+        "line": 510
       },
       "story_id": null,
       "activity_ids": []
@@ -1217,7 +1217,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 522
+        "line": 525
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -1312,15 +1312,15 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 540
+        "line": 543
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_collector.py::test_graft_leaf_given_without_scenario_is_noop",
+      "id": "tests/unit/capture/test_collector.py::test_graft_leaf_given_without_scenario_is_refused",
       "narration": {
-        "text": "Grafting with no active scenario is a no-op",
+        "text": "Grafting with no active scenario is refused",
         "parts": [
           {
             "term_id": "graft",
@@ -1336,7 +1336,7 @@
             "expression": "pg[\"Active scenario\"].low"
           },
           {
-            "value": " is a no-op"
+            "value": " is refused"
           }
         ]
       },
@@ -1391,7 +1391,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "no scenario is recorded",
+            "text": "the invariant is asserted rather than silently dropping the step",
             "parts": []
           },
           "children": [],
@@ -1405,7 +1405,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 565
+        "line": 568
       },
       "story_id": null,
       "activity_ids": []
@@ -3135,7 +3135,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 104
+        "line": 102
       },
       "story_id": null,
       "activity_ids": []
@@ -3251,7 +3251,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 130
+        "line": 128
       },
       "story_id": null,
       "activity_ids": []
@@ -3318,18 +3318,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a typed Actor handle with the Actor kind is returned",
+            "text": "a handle carrying the Actor kind is returned",
             "parts": [
               {
-                "value": "a typed "
-              },
-              {
-                "term_id": "actor",
-                "display": "Actor",
-                "expression": "pg[\"Actor\"]"
-              },
-              {
-                "value": " handle with the "
+                "value": "a handle carrying the "
               },
               {
                 "term_id": "actor",
@@ -3352,7 +3344,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 150
+        "line": 148
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -3442,7 +3434,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 181
+        "line": 180
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -3523,7 +3515,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 195
+        "line": 194
       },
       "story_id": null,
       "activity_ids": []
@@ -3598,7 +3590,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 213
+        "line": 212
       },
       "story_id": null,
       "activity_ids": []
@@ -3697,7 +3689,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 237
+        "line": 236
       },
       "story_id": null,
       "activity_ids": []
@@ -3808,7 +3800,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 329
+        "line": 328
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -3893,7 +3885,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 408
+        "line": 407
       },
       "story_id": null,
       "activity_ids": []
@@ -3960,7 +3952,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 421
+        "line": 420
       },
       "story_id": null,
       "activity_ids": []
@@ -6413,6 +6405,93 @@
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
         "line": 280
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_markdown_glossary.py::test_code_span_term_cell_keeps_inner_markup",
+      "narration": {
+        "text": "A code-span term cell keeps the markup inside it",
+        "parts": [
+          {
+            "value": "A code-span "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low"
+          },
+          {
+            "value": " cell keeps the markup inside it"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_markdown_glossary",
+      "tags": [
+        "markdown"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Term cell written as a code span around an asterisk pair",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]"
+              },
+              {
+                "value": " cell written as a code span around an asterisk pair"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content": "| Term | Meaning |\n|---|---|\n| `a*b*c` | a literal. |\n",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the parser reads the term cell",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the span unwraps once and its contents stay literal",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_markdown_glossary.py",
+        "line": 303
       },
       "story_id": null,
       "activity_ids": []
@@ -10221,7 +10300,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 36
+        "line": 37
       },
       "story_id": null,
       "activity_ids": []
@@ -10310,7 +10389,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 80
+        "line": 81
       },
       "story_id": null,
       "activity_ids": []
@@ -10377,7 +10456,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 146
+        "line": 147
       },
       "story_id": null,
       "activity_ids": []
@@ -10444,7 +10523,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 209
+        "line": 210
       },
       "story_id": null,
       "activity_ids": []
@@ -10545,7 +10624,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 248
+        "line": 249
       },
       "story_id": null,
       "activity_ids": []
@@ -10646,7 +10725,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 276
+        "line": 277
       },
       "story_id": null,
       "activity_ids": []
@@ -10742,7 +10821,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 297
+        "line": 298
       },
       "story_id": null,
       "activity_ids": []
@@ -10843,7 +10922,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 312
+        "line": 313
       },
       "story_id": null,
       "activity_ids": []
@@ -10936,7 +11015,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 352
+        "line": 353
       },
       "story_id": null,
       "activity_ids": []
@@ -11036,7 +11115,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 395
+        "line": 396
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14028,7 +14107,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -17066,7 +17145,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 30
+        "line": 28
       },
       "story_id": null,
       "activity_ids": []
@@ -17183,7 +17262,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 56
+        "line": 54
       },
       "story_id": null,
       "activity_ids": []
@@ -17580,7 +17659,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 117
+        "line": 118
       },
       "story_id": null,
       "activity_ids": []
