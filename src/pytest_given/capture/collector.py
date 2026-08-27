@@ -168,12 +168,16 @@ class Collector:
     ) -> Scenario:
         """Close the active scenario and return it.
 
-        The duration is what `begin_timing` measured — 0 when the scenario
-        never got that far, which is what a setup failure or a mark-based skip
-        looks like. Not injectable: the one production caller never passed a
-        duration, so an override parameter existed only for tests, and every
-        test taking it left `_elapsed_ms` — the code that actually runs —
-        unasserted.
+        The duration is what `begin_timing` measured. The setup hook is a
+        hookwrapper, so pluggy captures a fixture exception or a mark-based
+        skip into the `Result` and resumes the generator anyway — the clock
+        starts even for a scenario that never ran a step, and what it times
+        there is the hook overhead past setup rather than work of the
+        scenario's: sub-millisecond for a skip, a few ms when a failure repr
+        had to be built. Not injectable: the one production caller never
+        passed a duration, so an override parameter existed only for tests,
+        and every test taking it left `_elapsed_ms` — the code that actually
+        runs — unasserted.
         """
         assert self._current_scenario is not None
         self._current_scenario.status = status

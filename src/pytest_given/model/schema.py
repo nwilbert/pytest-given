@@ -182,7 +182,9 @@ type Phase = Literal['given', 'when', 'then']
 
 # How a scenario or one parametrize case came out. A `str` here would let a
 # typo ('pass') through every comparison site in grouping, lint and both
-# renderers; serde casts at the JSON boundary, which is the only untrusted one.
+# renderers. Static checking only: serde's `cast` at the JSON boundary is a
+# runtime no-op, so a foreign or hand-edited report.json can still carry any
+# string — the glyph lookup falls back and every `== 'passed'` reads false.
 type Status = Literal['passed', 'failed', 'skipped']
 
 # Lifecycle state of the collector — determines where push_step/attach route.
