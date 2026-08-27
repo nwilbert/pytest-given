@@ -166,7 +166,7 @@ def _build_report(
     """Group, resolve, and render — everything that can fail, and nothing that
     touches the filesystem."""
     scenarios = group_parametrized(collector.scenarios, param_info)
-    stories = list(collector._discovered_stories.values())
+    stories = collector.stories
     glossary = resolve_glossary(stories, session.config.pluginmanager.get_plugins())
     if glossary is not None:
         glossary = infer_glossary_kinds(glossary, stories)

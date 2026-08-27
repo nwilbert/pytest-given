@@ -110,6 +110,11 @@ class Collector:
         return self._scenarios
 
     @property
+    def stories(self) -> list[Story]:
+        """Every story a scenario declared this session, in discovery order."""
+        return list(self._discovered_stories.values())
+
+    @property
     def active_fixture_descriptor(self) -> StepDescriptor | None:
         """The descriptor pytest_fixture_setup pinned for the current fixture call.
 
