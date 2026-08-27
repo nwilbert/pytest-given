@@ -987,3 +987,46 @@ def test_action_in_then_plain_when_acts_via_subscript(tmp_path) -> None:
         ]
     )
     assert _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then') == []
+
+
+def test_empty_step_fires_on_empty_async_helper_function(tmp_path) -> None:
+    # `async def` is an AsyncFunctionDef, not a FunctionDef subclass, so it
+    # needs its own arm in the index — a decorated coroutine step is anchored
+    # exactly like a sync one and must reach the same rules.
+    src = _write(
+        tmp_path,
+        """\
+        @when('inserting money')
+        async def insert():
+            ...
+        """,
+    )
+    scenario = _scenario([_step('when', 'inserting money', _line(src, '@when'))])
+    [finding] = run_ast_rules([scenario], tmp_path)
+    assert finding.rule == RuleId('empty-step')
+
+
+def test_action_in_then_sees_through_an_async_when(tmp_path) -> None:
+    # An unresolved `when` returns None for the whole scenario, so an async
+    # helper that failed to anchor used to disable this rule for every step
+    # beside it. This `when` does not act, so the rule must fire on the then.
+    src = _write(
+        tmp_path,
+        """\
+        @when('inserting money')
+        async def insert():
+            pass
+
+        def test_a():
+            with then('it dispenses'):
+                assert machine.dispense() == 1
+        """,
+    )
+    scenario = _scenario(
+        [
+            _step('when', 'inserting money', _line(src, '@when')),
+            _step('then', 'it dispenses', _line(src, 'with then(')),
+        ]
+    )
+    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then')
+    assert len(findings) == 1

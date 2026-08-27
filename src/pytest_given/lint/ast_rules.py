@@ -21,8 +21,11 @@ from ..model import (
 from .base import RULES_BY_ID, Finding, RuleId
 
 # A step body's anchored AST node: the `with` statement of an inline step, or
-# the decorated helper function whose body is the step body.
-type _BodyNode = ast.With | ast.FunctionDef
+# the decorated helper function whose body is the step body. `AsyncFunctionDef`
+# is not a `FunctionDef` subclass and needs naming separately — the step
+# decorators wrap coroutines and async generators too, so a helper narrating
+# async code anchors exactly like a sync one.
+type _BodyNode = ast.With | ast.FunctionDef | ast.AsyncFunctionDef
 
 
 def run_ast_rules(scenarios: list[Scenario], rootdir: Path) -> list[Finding]:
@@ -127,7 +130,7 @@ def _index_body_nodes(path: Path) -> dict[int, _BodyNode] | None:
                 expr = item.context_expr
                 for line in range(expr.lineno, (expr.end_lineno or expr.lineno) + 1):
                     index.setdefault(line, node)
-        elif isinstance(node, ast.FunctionDef):
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             index.setdefault(node.lineno, node)
             for deco in node.decorator_list:
                 for line in range(deco.lineno, (deco.end_lineno or deco.lineno) + 1):
