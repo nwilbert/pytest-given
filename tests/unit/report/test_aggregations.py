@@ -207,7 +207,7 @@ def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
         assert 'Alice' in [i.display for i in aggs[TermId('guest')].instances]
         assert 'Deluxe Suite' in [i.display for i in aggs[TermId('room')].instances]
     with then(t'the verb collects its {pg["Inflection"]} but not its canonical form'):
-        forms = [f.display for f in aggs[TermId('search')].forms]
+        forms = list(aggs[TermId('search')].forms)
         assert 'searches for' in forms
         assert 'search' not in forms
 
@@ -317,7 +317,7 @@ def test_repeated_references_within_one_story_are_recorded_once() -> None:
         aggs = build_glossary_aggregations(rd)
     with then(t'the {pg["Story"]} and the {pg["Inflection"]} appear once each'):
         assert aggs[TermId('guest')].stories == [StoryId('book')]
-        assert [f.display for f in aggs[TermId('search')].forms] == ['searches for']
+        assert list(aggs[TermId('search')].forms) == ['searches for']
 
 
 def test_build_coverage_maps_empty_for_scenario_with_unknown_story_id() -> None:

@@ -8,6 +8,7 @@ are `slugs.py`'s.
 
 from collections.abc import Iterator
 from dataclasses import dataclass, field
+from typing import NewType
 
 from ..model import (
     ActivityId,
@@ -56,11 +57,18 @@ class TermOccurrence:
     fixture_name: str | None = None
 
 
-@dataclass
-class TermForm:
-    """One verb surface form collected from story activity parts."""
+TermForm = NewType('TermForm', str)
+"""One verb surface form collected from story activity parts.
 
-    display: str
+The inflection as story prose spells it (`books` for `book`), never the term's
+own canonical name — `record_form` drops that one.
+
+A `NewType` over `str` rather than a one-field dataclass: the form *is* the
+word, and wrapping it bought only a `.display` hop for the template that
+renders it. The distinct type still separates it from the canonical name and
+from a `TermId` at every call site, which is the whole of what the dataclass
+was carrying.
+"""
 
 
 @dataclass
@@ -310,7 +318,7 @@ class _GlossaryIndex:
             return
         self._forms.add((term_id, display))
         if display != term.canonical:
-            self._agg(term_id).forms.append(TermForm(display=display))
+            self._agg(term_id).forms.append(TermForm(display))
 
     def record_story_ref(self, term_id: TermId, story_id: StoryId) -> None:
         """Note that `story_id` references this term. Every kind participates."""
