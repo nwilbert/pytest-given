@@ -648,7 +648,7 @@ def test_decorator_skips_push_when_active_fixture_descriptor_matches() -> None:
         assert recording.stack == [root]
         assert root.children == []
     finally:
-        collector.exit_fixture_setup(token)
+        collector.exit_fixture(token)
         set_active_collector(None)
 
 
@@ -811,7 +811,7 @@ def test_decorator_records_when_called_from_inside_fixture_body() -> None:
     try:
         insert()
     finally:
-        collector.exit_fixture_setup(token)
+        collector.exit_fixture(token)
         set_active_collector(None)
     assert [c.narration.text for c in root.children] == ['inserting money']
 

@@ -65,7 +65,7 @@ def pytest_fixture_setup(
     try:
         yield
     finally:
-        collector.exit_fixture_setup(token)
+        collector.exit_fixture(token)
         key = _setup_instance_key(fixturedef, request)
         collector.store_recording(key, recording)
 
@@ -104,7 +104,7 @@ def _ensure_teardown_wrapped(
             with contextlib.suppress(StopIteration):
                 next(gen)
         finally:
-            collector.exit_fixture_teardown(token)
+            collector.exit_fixture(token)
 
     wrapped_typed = cast('StepDecorated', wrapped)
     wrapped_typed._pytest_given_teardown_wrapped = True  # type: ignore[attr-defined]

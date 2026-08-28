@@ -183,7 +183,7 @@ def test_enter_fixture_setup_transitions_state() -> None:
     recording = FixtureRecording(root=Step(phase='given', narration=_n('a shop')))
     token = collector.enter_fixture_setup(recording)
     assert collector.state == 'fixture_setup'
-    collector.exit_fixture_setup(token)
+    collector.exit_fixture(token)
     assert collector.state == 'idle'
 
 
@@ -193,7 +193,7 @@ def test_enter_fixture_setup_nests_inside_test() -> None:
     recording = FixtureRecording(root=Step(phase='given', narration=_n('a shop')))
     token = collector.enter_fixture_setup(recording)
     assert collector.state == 'fixture_setup'
-    collector.exit_fixture_setup(token)
+    collector.exit_fixture(token)
     assert collector.state == 'test'  # restored
 
 
@@ -201,7 +201,7 @@ def test_enter_fixture_teardown_transitions_state() -> None:
     collector = Collector()
     token = collector.enter_fixture_teardown()
     assert collector.state == 'fixture_teardown'
-    collector.exit_fixture_teardown(token)
+    collector.exit_fixture(token)
     assert collector.state == 'idle'
 
 
@@ -219,7 +219,7 @@ def test_push_step_during_fixture_setup_records_into_recording() -> None:
     with when(t'a {pg["Step"]} is pushed inside the fixture body', activity=7):
         collector.push_step('given', _n('with 3 items'))
         collector.pop_step()
-        collector.exit_fixture_setup(token)
+        collector.exit_fixture(token)
     with then('it is recorded as a child of the recording root'):
         assert len(root.children) == 1
         assert root.children[0].narration.text == 'with 3 items'
@@ -237,7 +237,7 @@ def test_attach_during_fixture_setup_records_into_recording() -> None:
         token = collector.enter_fixture_setup(recording)
     with when(t'an {pg["Attachment"]} is attached inside the fixture body', activity=6):
         collector.attach('snapshot', 'data')
-        collector.exit_fixture_setup(token)
+        collector.exit_fixture(token)
     with then(t'the {pg["Attachment"]} lands on the recording root'):
         assert len(root.attachments) == 1
         assert root.attachments[0].label == 'snapshot'
@@ -258,7 +258,7 @@ def test_push_step_routing_isolates_recording_from_scenario() -> None:
     with when(t'a {pg["Step"]} is pushed inside the fixture body', activity=7):
         collector.push_step('given', _n('fixture-internal'))
         collector.pop_step()
-        collector.exit_fixture_setup(token)
+        collector.exit_fixture(token)
         recorded = collector.finish_scenario(status='passed')
     with then('the step lives only in the recording, not the scenario'):
         assert recorded.steps == []
@@ -278,7 +278,7 @@ def test_push_step_during_teardown_raises() -> None:
         with pytest.raises(PytestGivenError, match='fixture teardown'):
             collector.push_step('given', _n('teardown step'))
     finally:
-        collector.exit_fixture_teardown(token)
+        collector.exit_fixture(token)
 
 
 def test_attach_during_teardown_raises() -> None:
@@ -288,7 +288,7 @@ def test_attach_during_teardown_raises() -> None:
         with pytest.raises(PytestGivenError, match='fixture teardown'):
             collector.attach('label', 'content')
     finally:
-        collector.exit_fixture_teardown(token)
+        collector.exit_fixture(token)
 
 
 def test_attach_during_idle_raises() -> None:
@@ -375,7 +375,7 @@ def test_pop_step_protects_recording_root() -> None:
         assert popped is not None
         assert popped.narration.text == 'child'
     finally:
-        collector.exit_fixture_setup(token)
+        collector.exit_fixture(token)
 
 
 def test_pop_step_with_empty_stack_returns_none() -> None:

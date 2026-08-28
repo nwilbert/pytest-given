@@ -213,9 +213,6 @@ class Collector:
         """Route recording into `recording` until the matching exit."""
         return self._enter('fixture_setup', recording=recording, descriptor=descriptor)
 
-    def exit_fixture_setup(self, token: StateToken) -> None:
-        self._exit(token)
-
     def enter_fixture_teardown(self) -> StateToken:
         """Enter the state that refuses steps and attachments.
 
@@ -224,8 +221,17 @@ class Collector:
         """
         return self._enter('fixture_teardown')
 
-    def exit_fixture_teardown(self, token: StateToken) -> None:
-        self._exit(token)
+    def exit_fixture(self, token: StateToken) -> None:
+        """Put back whatever the matching `enter_*` displaced.
+
+        One exit for both entries: the token carries the whole of what was
+        displaced, so leaving setup and leaving teardown are the same act. The
+        `enter_*` pair stays split because they genuinely differ — setup pins a
+        recording and a descriptor, teardown pins neither.
+        """
+        self._state = token.previous_state
+        self._active_recording = token.previous_recording
+        self._active_fixture_descriptor = token.previous_fixture_descriptor
 
     def _enter(
         self,
@@ -246,11 +252,6 @@ class Collector:
             self._active_recording = recording
             self._active_fixture_descriptor = descriptor
         return token
-
-    def _exit(self, token: StateToken) -> None:
-        self._state = token.previous_state
-        self._active_recording = token.previous_recording
-        self._active_fixture_descriptor = token.previous_fixture_descriptor
 
     def store_recording(
         self, key: FixtureInstanceKey, recording: FixtureRecording
