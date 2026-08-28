@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-28T08:20:31.004351+00:00",
+    "timestamp": "2026-08-28T09:02:33.137664+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "1fe8743eba24a0d97756048f3552875c5285a7f2",
+    "commit_sha": "88355ae0de6d40798cd0a4524586afe0c5c63756",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -6591,7 +6591,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 57
+        "line": 58
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -6698,7 +6698,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 250
+        "line": 251
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -6791,7 +6791,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 275
+        "line": 276
       },
       "story_id": null,
       "activity_ids": []
@@ -6886,7 +6886,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 303
+        "line": 304
       },
       "story_id": null,
       "activity_ids": []
@@ -6984,7 +6984,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 377
+        "line": 378
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -13760,7 +13760,7 @@
     {
       "id": "tests/unit/report/test_coverage.py::test_compute_coverage_excludes_under_anchored_activity",
       "narration": {
-        "text": "An under-anchored activity is never reported as covered",
+        "text": "An under-anchored activity is never covered by narration matching",
         "parts": [
           {
             "value": "An under-anchored "
@@ -13771,7 +13771,7 @@
             "expression": "pg[\"Activity\"].low"
           },
           {
-            "value": " is never reported as covered"
+            "value": " is never covered by narration matching"
           }
         ]
       },
@@ -13979,7 +13979,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 482
+        "line": 483
       },
       "story_id": null,
       "activity_ids": []
@@ -14097,7 +14097,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 517
+        "line": 518
       },
       "story_id": null,
       "activity_ids": []
@@ -14210,7 +14210,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 545
+        "line": 546
       },
       "story_id": null,
       "activity_ids": []
@@ -17541,7 +17541,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 345
+        "line": 346
       },
       "story_id": null,
       "activity_ids": []
@@ -17675,7 +17675,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 486
+        "line": 487
       },
       "story_id": null,
       "activity_ids": []

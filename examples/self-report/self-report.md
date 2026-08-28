@@ -749,34 +749,34 @@
 - **then** the span unwraps once and its contents stay literal
 
 ## ✓ A «step» pairs its «narration» with a «phase»
-`tests/unit/capture/test_step_descriptor.py:57::test_context_manager_basic`
+`tests/unit/capture/test_step_descriptor.py:58::test_context_manager_basic`
 
 - **when** a given «Step» descriptor is created
 - **then** it carries the given «Phase» and its «Narration»
 
 ## ✓ «when_then» records the action and its outcome as siblings
-`tests/unit/capture/test_step_descriptor.py:250::test_when_then_records_two_sibling_steps_on_clean_exit`
+`tests/unit/capture/test_step_descriptor.py:251::test_when_then_records_two_sibling_steps_on_clean_exit`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a «when_then» block exits cleanly
 - **then** a when and a sibling then «Step» are recorded
 
 ## ✓ «when_then» pairs with an inner pytest.raises
-`tests/unit/capture/test_step_descriptor.py:275::test_when_then_pairs_with_inner_pytest_raises`
+`tests/unit/capture/test_step_descriptor.py:276::test_when_then_pairs_with_inner_pytest_raises`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises and an inner pytest.raises swallows it
 - **then** both sibling steps are still recorded
 
 ## ✓ «when_then» omits the then when the body raises uncaught
-`tests/unit/capture/test_step_descriptor.py:303::test_when_then_omits_then_when_body_raises_uncaught` · validation
+`tests/unit/capture/test_step_descriptor.py:304::test_when_then_omits_then_when_body_raises_uncaught` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises with nothing catching inside
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ A nested when becomes a child of the «when_then» action
-`tests/unit/capture/test_step_descriptor.py:377::test_when_then_allows_nested_when_as_child_sub_step`
+`tests/unit/capture/test_step_descriptor.py:378::test_when_then_allows_nested_when_as_child_sub_step`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a when opens inside the «when_then» body
@@ -1363,7 +1363,7 @@
 - **when** its «Coverage» eligibility is checked
 - **then** it is ineligible — «Coverage» needs at least two anchors
 
-## ✓ An under-anchored «activity» is never reported as covered
+## ✓ An under-anchored «activity» is never covered by narration matching
 `tests/unit/report/test_coverage.py:459::test_compute_coverage_excludes_under_anchored_activity`
 
 - **given** a «Story» whose «Activity» is all bare words
@@ -1371,21 +1371,21 @@
 - **then** «Coverage» excludes the under-anchored «Activity»
 
 ## ✓ Nested «steps» are walked for «coverage»
-`tests/unit/report/test_coverage.py:482::test_compute_coverage_nested_steps_are_walked`
+`tests/unit/report/test_coverage.py:483::test_compute_coverage_nested_steps_are_walked`
 
 - **given** a «Story» with one canonical «Activity»
 - **when** the covering «Term ref»s live in a nested child «Step»
 - **then** the nested «Step» still counts and the «Activity» is covered
 
 ## ✓ An explicit «step» binding covers an eligible «activity»
-`tests/unit/report/test_coverage.py:517::test_compute_coverage_explicit_step_binding_covers_eligible_activity`
+`tests/unit/report/test_coverage.py:518::test_compute_coverage_explicit_step_binding_covers_eligible_activity`
 
 - **given** a «Story» with a coverage-eligible «Activity»
 - **when** a «Step» «binds» to it explicitly by id
 - **then** «Coverage» counts it directly, without identity matching
 
 ## ✓ An explicit binding covers an under-anchored «activity»
-`tests/unit/report/test_coverage.py:545::test_compute_coverage_explicit_binding_covers_under_anchored_activity`
+`tests/unit/report/test_coverage.py:546::test_compute_coverage_explicit_binding_covers_under_anchored_activity`
 
 - **given** a «Story» whose «Activity» is under-anchored
 - **when** a «Step» «binds» to it explicitly by id
@@ -1695,7 +1695,7 @@
 | ### | ✓ |
 
 ## ✓ A cross-phase «step» cannot open inside a «when_then» body · 2 cases
-`tests/unit/capture/test_step_descriptor.py:345::test_when_then_rejects_cross_phase_nested_step` · validation
+`tests/unit/capture/test_step_descriptor.py:346::test_when_then_rejects_cross_phase_nested_step` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a given or then opens inside the «when_then» body
@@ -1708,7 +1708,7 @@
 | then | ✓ |
 
 ## ✓ An «attachment» label must be plain text · 3 cases
-`tests/unit/capture/test_step_descriptor.py:486::test_attach_rejects_a_non_str_label` · validation
+`tests/unit/capture/test_step_descriptor.py:487::test_attach_rejects_a_non_str_label` · validation
 
 - **given** a non-str «Attachment» label of kind {label_kind}
 - **when** it is attached
