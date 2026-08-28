@@ -135,11 +135,17 @@ def _cli_over_ini(config: pytest.Config, name: str) -> str | bool:
     reason `_GivenConfig` exists is that no read site should re-derive it, and
     three copies of the rule in this module was the same problem one scope in.
 
-    Presence is `is not None`, never truthiness: the flags all default to None
-    and an explicitly empty one means what it says. `--given-source-link=`
-    disables links rather than falling through to whatever the ini declares.
-    The ini value is returned as pytest typed it (`str` for a string ini,
-    `bool` for a bool one), so each caller below converts its own.
+    Presence is `is not None`, never truthiness: the flags all default to None,
+    so an explicitly empty one is still a flag that was given and still wins
+    over the ini. `--given-source-link=` therefore disables links rather than
+    falling through to whatever the ini declares. The ini value is returned as
+    pytest typed it (`str` for a string ini, `bool` for a bool one), so each
+    caller below converts its own.
+
+    Only *which source wins* is settled here. What an empty value then means is
+    the option's own business, since the sources cannot answer it differently
+    — see `_resolve_title`, where empty means "unset" whichever one supplied
+    it.
     """
     cli = config.getoption(name)
     if cli is not None:
@@ -148,8 +154,16 @@ def _cli_over_ini(config: pytest.Config, name: str) -> str | bool:
 
 
 def _resolve_title(config: pytest.Config) -> str | None:
-    """The report title. None when neither flag nor ini is set, which leaves
-    renderers on the rootdir name."""
+    """The report title, or None when it is empty from whichever source won.
+
+    None leaves the renderers on the rootdir name, which is also what an empty
+    title would display — so the two spellings of "no title" (`--given-title=`
+    and `given_title = ""`) resolve alike rather than reaching the JSON's
+    `metadata.title` as `null` from one and `""` from the other. Coalescing
+    after `_cli_over_ini` rather than inside it is what keeps that an option's
+    rule instead of a precedence rule: `--given-source-link=` means the
+    opposite, and reads its empty value as given.
+    """
     return cast('str', _cli_over_ini(config, 'given_title')) or None
 
 
