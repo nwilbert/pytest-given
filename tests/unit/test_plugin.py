@@ -45,21 +45,21 @@ def fake_config() -> Any:
     """A config double carrying a real Stash with a session collector and its
     hook bookkeeping, as `pytest_sessionstart` leaves it."""
     config = SimpleNamespace(stash=pytest.Stash())
-    config.stash[state._collector_key] = Collector()
-    config.stash[state._session_state] = state._SessionState()
+    config.stash[state.collector_key] = Collector()
+    config.stash[state.session_state_key] = state.SessionState()
     return config
 
 
 @pytest.fixture
 def fresh_collector(fake_config: Any) -> Collector:
     """The collector owned by `fake_config`'s session."""
-    return fake_config.stash[state._collector_key]
+    return fake_config.stash[state.collector_key]
 
 
 @pytest.fixture
-def fresh_state(fake_config: Any) -> state._SessionState:
+def fresh_state(fake_config: Any) -> state.SessionState:
     """The hook bookkeeping owned by `fake_config`'s session."""
-    return fake_config.stash[state._session_state]
+    return fake_config.stash[state.session_state_key]
 
 
 def _drive_fixture_setup(fixturedef: Any, request: Any) -> None:
@@ -180,7 +180,7 @@ def test_graft_fixture_recordings_skips_unknown_fixturename(
 def test_pytest_runtest_teardown_ignores_mismatched_item(
     fake_config: Any,
     fresh_collector: Collector,
-    fresh_state: state._SessionState,
+    fresh_state: state.SessionState,
 ) -> None:
     fresh_state.published_for = NodeId('t::a')
     set_active_collector(fresh_collector)
@@ -193,7 +193,7 @@ def test_pytest_runtest_teardown_ignores_mismatched_item(
 def test_pytest_runtest_teardown_clears_collector_when_matched(
     fake_config: Any,
     fresh_collector: Collector,
-    fresh_state: state._SessionState,
+    fresh_state: state.SessionState,
 ) -> None:
     fresh_state.published_for = NodeId('t::a')
     set_active_collector(fresh_collector)
@@ -205,7 +205,7 @@ def test_pytest_runtest_teardown_clears_collector_when_matched(
 def test_pytest_runtest_teardown_clears_a_finished_scenario(
     fake_config: Any,
     fresh_collector: Collector,
-    fresh_state: state._SessionState,
+    fresh_state: state.SessionState,
 ) -> None:
     """The call report runs `finish_scenario` before teardown, so
     `active_scenario_id` is already None here. Teardown keys on
@@ -223,7 +223,7 @@ def test_pytest_runtest_teardown_clears_a_finished_scenario(
 def test_pytest_runtest_teardown_clears_unannotated_flag(
     fake_config: Any,
     fresh_collector: Collector,
-    fresh_state: state._SessionState,
+    fresh_state: state.SessionState,
 ) -> None:
     fresh_collector.inside_unannotated_test = True
     fresh_state.published_for = NodeId('t::x')
@@ -265,12 +265,12 @@ def test_makereport_ignores_a_failure_outside_the_active_scenario(
 def _fake_session() -> Any:
     """A session double with just enough config for `pytest_sessionstart`.
 
-    The stash carries a `_GivenConfig` because the real lifecycle always runs
+    The stash carries a `GivenConfig` because the real lifecycle always runs
     `pytest_configure` first — that is where every option is resolved, and
     `pytest_sessionstart` reads the result rather than re-deriving it.
     """
     config = SimpleNamespace(stash=pytest.Stash())
-    config.stash[state._given_config] = state._GivenConfig(
+    config.stash[state.given_config_key] = state.GivenConfig(
         rule_levels={},
         ignore_entries=[],
         source_link_template=None,
@@ -287,11 +287,11 @@ def test_sessionstart_gives_each_session_its_own_collector() -> None:
     outer = _fake_session()
     inner = _fake_session()
     session.pytest_sessionstart(cast(pytest.Session, outer))
-    outer_collector = state._collector(outer.config)
+    outer_collector = state.session_collector(outer.config)
     outer_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
     session.pytest_sessionstart(cast(pytest.Session, inner))
-    assert state._collector(outer.config) is outer_collector
-    assert state._collector(inner.config) is not outer_collector
+    assert state.session_collector(outer.config) is outer_collector
+    assert state.session_collector(inner.config) is not outer_collector
     assert outer_collector.active_scenario_id == NodeId('t::x')
 
 

@@ -1,12 +1,20 @@
 """What a session keeps in `config.stash`, and the accessors that read it.
 
 Four values, one writer each: `Collector` is the recorder itself, created at
-session start; `_GivenConfig` is this run's options, parsed once at configure
-time; `_SessionState` is the bookkeeping the per-item hooks pass between each
-other; `_SessionOutcome` is what session finish leaves for the terminal
+session start; `GivenConfig` is this run's options, parsed once at configure
+time; `SessionState` is the bookkeeping the per-item hooks pass between each
+other; `SessionOutcome` is what session finish leaves for the terminal
 summary. The stash rather than module globals throughout, so a
 nested in-process run (pytester, `pytest.main`) gets its own set instead of
 rebinding — and thereby clobbering — the outer session's.
+
+Nothing here is underscored. Every name in this module is read by a sibling —
+that is what the module is for — so a leading underscore would claim a privacy
+none of them has and that every import already contradicts. Package-internal
+is what they are, and the package boundary is what states it: `plugin/` has no
+`__all__` beyond its hook surface, and nothing outside it imports from here.
+Names genuinely private to one module (`_sink_config`, `_run_lint`) keep the
+underscore, which is then worth something.
 """
 
 from dataclasses import dataclass, field
@@ -27,21 +35,21 @@ from ..model import (
     ParamInfo,
 )
 
-_collector_key: pytest.StashKey[Collector] = pytest.StashKey()
+collector_key: pytest.StashKey[Collector] = pytest.StashKey()
 
 
-def _collector(config: pytest.Config) -> Collector:
+def session_collector(config: pytest.Config) -> Collector:
     """The collector owned by this session, created at `pytest_sessionstart`.
 
     Lives in `config.stash` rather than a module global so a nested in-process
     run (pytester, `pytest.main`) gets its own instance instead of rebinding —
     and thereby clobbering — the outer session's.
     """
-    return config.stash[_collector_key]
+    return config.stash[collector_key]
 
 
 @dataclass(frozen=True, kw_only=True)
-class _GivenConfig:
+class GivenConfig:
     """This run's pytest-given options, parsed once.
 
     Parsed eagerly in `pytest_configure` — a typo in a rule name or a
@@ -62,7 +70,7 @@ class _GivenConfig:
 
 
 @dataclass(kw_only=True)
-class _SessionOutcome:
+class SessionOutcome:
     """What session finish leaves for the terminal summary to print.
 
     Filled at up to three points on the way out — a report that could not be
@@ -77,7 +85,7 @@ class _SessionOutcome:
 
 
 @dataclass(kw_only=True)
-class _SessionState:
+class SessionState:
     """The per-item bookkeeping the hooks pass between each other.
 
     Neither field is the collector's business — nothing in `capture/` reads
@@ -94,16 +102,16 @@ class _SessionState:
     published_for: NodeId | None = None
 
 
-_given_config: pytest.StashKey[_GivenConfig] = pytest.StashKey()
+given_config_key: pytest.StashKey[GivenConfig] = pytest.StashKey()
 
 
-_session_outcome: pytest.StashKey[_SessionOutcome] = pytest.StashKey()
+session_outcome_key: pytest.StashKey[SessionOutcome] = pytest.StashKey()
 
 
-_session_state: pytest.StashKey[_SessionState] = pytest.StashKey()
+session_state_key: pytest.StashKey[SessionState] = pytest.StashKey()
 
 
-def _state(config: pytest.Config) -> _SessionState:
+def session_state(config: pytest.Config) -> SessionState:
     """This session's hook bookkeeping, created at `pytest_sessionstart`
     alongside its collector."""
-    return config.stash[_session_state]
+    return config.stash[session_state_key]

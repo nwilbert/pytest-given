@@ -23,7 +23,7 @@ from ..model import (
     PytestGivenError,
     Step,
 )
-from .state import _collector
+from .state import session_collector
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -47,7 +47,7 @@ def pytest_fixture_setup(
             'yet supported; use a plain string label, or move the step into a '
             'helper function.'
         )
-    collector = _collector(request.config)
+    collector = session_collector(request.config)
     if collector.state == 'idle':
         # Fixture is being set up outside any tracked scenario (e.g. unannotated
         # test pulling in a step fixture). Don't record.

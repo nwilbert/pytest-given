@@ -17,7 +17,7 @@ from ..model import (
 from .source import capture_caller_source
 
 
-def _normalize_definition(definition: str | None) -> str | None:
+def normalize_definition(definition: str | None) -> str | None:
     """Collapse an empty or whitespace-only definition to None so 'undefined'
     has exactly one representation."""
     if definition is None:
@@ -147,7 +147,7 @@ def _register_kind(
         id=id_derive(name),
         kind=kind,
         canonical=name,
-        definition=_normalize_definition(definition),
+        definition=normalize_definition(definition),
         source=source,
     )
     existing = glossary.get(new.id)

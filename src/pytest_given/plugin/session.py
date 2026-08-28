@@ -48,14 +48,14 @@ from ..report import (
     write_sinks,
 )
 from .state import (
-    _collector,
-    _collector_key,
-    _given_config,
-    _session_outcome,
-    _session_state,
-    _SessionOutcome,
-    _SessionState,
-    _state,
+    SessionOutcome,
+    SessionState,
+    collector_key,
+    given_config_key,
+    session_collector,
+    session_outcome_key,
+    session_state,
+    session_state_key,
 )
 
 
@@ -101,9 +101,9 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
 def pytest_sessionstart(session: pytest.Session) -> None:
     """Give the session its own collector."""
     collector = Collector()
-    collector.capture_step_source = session.config.stash[_given_config].lint_enabled
-    session.config.stash[_collector_key] = collector
-    session.config.stash[_session_state] = _SessionState()
+    collector.capture_step_source = session.config.stash[given_config_key].lint_enabled
+    session.config.stash[collector_key] = collector
+    session.config.stash[session_state_key] = SessionState()
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -145,13 +145,13 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     second leaves exactly that pair, and only discarding both puts the run back
     to having no report rather than half of one.
     """
-    collector = _collector(session.config)
-    state = _state(session.config)
+    collector = session_collector(session.config)
+    state = session_state(session.config)
     try:
         built = _build_report(session, collector, state.param_info)
         write_sinks(built.sinks)
     except (PytestGivenError, OSError) as error:
-        session.config.stash[_session_outcome].report_error = '\n'.join(
+        session.config.stash[session_outcome_key].report_error = '\n'.join(
             [str(error), *discard_stale_sinks(_sink_config(session.config))]
         )
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
@@ -161,7 +161,7 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         # only here, and a nested in-process run must not inherit them.
         state.param_info.clear()
     if built.sinks.md_stdout is not None:
-        session.config.stash[_session_outcome].md_stdout = built.sinks.md_stdout
+        session.config.stash[session_outcome_key].md_stdout = built.sinks.md_stdout
     _run_lint(session, built.scenarios, built.glossary, built.stories)
 
 
@@ -182,7 +182,7 @@ def _build_report(
             pytest_version=pytest.__version__,
             plugin_version=version('pytest-given'),
             commit_sha=detect_commit_sha(),
-            title=session.config.stash[_given_config].title,
+            title=session.config.stash[given_config_key].title,
         ),
         scenarios=scenarios,
         stories=stories,
@@ -214,7 +214,7 @@ def _sink_config(config: pytest.Config) -> SinkConfig:
         html_path=Path(html_opt) if html_opt is not None else None,
         md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
         md_to_stdout=md_opt == '-',
-        source_link_template=config.stash[_given_config].source_link_template,
+        source_link_template=config.stash[given_config_key].source_link_template,
     )
 
 
@@ -227,7 +227,7 @@ def _run_lint(
     """Run the narration lint; stash the findings for the terminal summary
     and fail the run when any is error-level."""
     config = session.config
-    given = config.stash[_given_config]
+    given = config.stash[given_config_key]
     if not given.lint_enabled:
         return
     findings = apply_config(
@@ -238,13 +238,13 @@ def _run_lint(
     )
     if not findings:
         return
-    config.stash[_session_outcome].findings = findings
+    config.stash[session_outcome_key].findings = findings
     if any(finding.severity == 'error' for finding in findings):
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
-    outcome = terminalreporter.config.stash.get(_session_outcome, _SessionOutcome())
+    outcome = terminalreporter.config.stash.get(session_outcome_key, SessionOutcome())
     report_error = outcome.report_error
     if report_error is not None:
         terminalreporter.write_sep('=', 'pytest-given: report not written', red=True)

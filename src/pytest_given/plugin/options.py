@@ -1,6 +1,6 @@
 """The plugin's options: declaration, and the one place they are resolved.
 
-`pytest_configure` parses every option into a single `_GivenConfig` before the
+`pytest_configure` parses every option into a single `GivenConfig` before the
 suite runs, so a typo in a rule name or a source-link preset is a `UsageError`
 up front rather than a surprise after the last test.
 """
@@ -19,7 +19,7 @@ from ..model import (
 from ..report import (
     resolve_template,
 )
-from .state import _given_config, _GivenConfig, _session_outcome, _SessionOutcome
+from .state import GivenConfig, SessionOutcome, given_config_key, session_outcome_key
 
 _LINT_CHOICES = ('true', 'false')
 
@@ -132,7 +132,7 @@ def _cli_over_ini(config: pytest.Config, name: str) -> str | bool:
     otherwise the ini.
 
     The precedence rule for every option carrying both, stated once — the
-    reason `_GivenConfig` exists is that no read site should re-derive it, and
+    reason `GivenConfig` exists is that no read site should re-derive it, and
     three copies of the rule in this module was the same problem one scope in.
 
     Presence is `is not None`, never truthiness: the flags all default to None,
@@ -197,11 +197,11 @@ def pytest_configure(config: pytest.Config) -> None:
             source_link_template = resolve_template(_resolve_source_link(config))
         except PytestGivenError as error:
             raise pytest.UsageError(str(error)) from error
-    config.stash[_given_config] = _GivenConfig(
+    config.stash[given_config_key] = GivenConfig(
         rule_levels=rule_levels,
         ignore_entries=ignore_entries,
         source_link_template=source_link_template,
         title=_resolve_title(config),
         lint_enabled=_resolve_lint_enabled(config),
     )
-    config.stash[_session_outcome] = _SessionOutcome()
+    config.stash[session_outcome_key] = SessionOutcome()

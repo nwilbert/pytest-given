@@ -79,7 +79,7 @@ def _run_observed(pytester, source, *args):
             yield step
             yield from walk(step.children)
 
-    collector = state._collector(capture.config)
+    collector = state.session_collector(capture.config)
     steps = [step for scenario in collector.scenarios for step in walk(scenario.steps)]
     return result, steps
 

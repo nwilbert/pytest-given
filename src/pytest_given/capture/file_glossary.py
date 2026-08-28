@@ -12,8 +12,8 @@ from ..model import (
 )
 from .glossary import (
     DeferredTermHandle,
-    _normalize_definition,
     deferred_handle_or_raise,
+    normalize_definition,
     terms_match,
 )
 from .markdown_glossary import ColumnSpec, GlossaryRow, parse_glossary_tables
@@ -69,7 +69,7 @@ class FileGlossary:
             id=term_id,
             kind=kind,
             canonical=row.term,
-            definition=_normalize_definition(row.definition),
+            definition=normalize_definition(row.definition),
             source=file_source(self._path, row.line),
         )
         existing = self._glossary.get(term_id)

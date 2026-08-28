@@ -25,7 +25,7 @@ from ..model import (
 )
 from .collection import _get_scenario_marker
 from .fixtures import _graft_fixture_recordings
-from .state import _collector, _state
+from .state import session_collector, session_state
 
 if TYPE_CHECKING:
     from _pytest._code.code import TracebackEntry
@@ -33,13 +33,13 @@ if TYPE_CHECKING:
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
 def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
-    collector = _collector(item.config)
+    collector = session_collector(item.config)
     scenario_marker = _get_scenario_marker(item)
     if scenario_marker is None:
         # Unannotated test: set the flag so `with given(...)` inside it warns
         # instead of raising. Teardown clears the flag and active collector.
         collector.inside_unannotated_test = True
-        _state(item.config).published_for = NodeId(item.nodeid)
+        session_state(item.config).published_for = NodeId(item.nodeid)
         set_active_collector(collector)
         yield
         return
@@ -58,7 +58,7 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
         story=scenario_marker.story,
         activity_ids=scenario_marker.activity_ids,
     )
-    _state(item.config).published_for = node_id
+    session_state(item.config).published_for = node_id
     set_active_collector(collector)
     # Pre-fixture-setup work done; let pytest run fixture setup here.
     yield
@@ -88,7 +88,7 @@ def _capture_param_spec(item: pytest.Item, node_id: NodeId, *, group: bool) -> N
         return
     funcargs = getattr(item, 'funcargs', {})
     names = list(callspec.params.keys())
-    _state(item.config).param_info[node_id] = ParamSpec(
+    session_state(item.config).param_info[node_id] = ParamSpec(
         names=names,
         values=[
             snapshot_param_value(funcargs.get(name, callspec.params[name]))
@@ -110,10 +110,10 @@ def pytest_runtest_teardown(item: pytest.Item) -> None:
     finalizers, which still need the collector; the teardown report reads
     `item.config` rather than the ContextVar, so it is unaffected.
     """
-    state = _state(item.config)
+    state = session_state(item.config)
     if state.published_for != NodeId(item.nodeid):
         return
-    _collector(item.config).inside_unannotated_test = False
+    session_collector(item.config).inside_unannotated_test = False
     state.published_for = None
     set_active_collector(None)
 
@@ -134,7 +134,7 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
     """
     if call.excinfo is None or call.when not in ('setup', 'call', 'teardown'):
         return
-    collector = _collector(item.config)
+    collector = session_collector(item.config)
     node_id = NodeId(item.nodeid)
     teardown = call.when == 'teardown'
     if not teardown and collector.active_scenario_id != node_id:
