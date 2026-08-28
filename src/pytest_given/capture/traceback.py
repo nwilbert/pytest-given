@@ -6,10 +6,19 @@ line of the form `<path>:<lineno>: in <funcname>`, followed by indented code
 with `E   ` carry the exception summary.
 
 The renderer wants frames classified into "user" vs "internal" — pluggy
-dispatchers, pytest's own runner, and pytest-given's `@scenario` wrapper are
-implementation noise the reader almost never needs. `is_internal_path` is that
-classifier; the plugin applies it to pytest's own traceback entries before
-`getrepr` runs, so the pre-filter and this post-parse pass agree.
+dispatchers, pytest's own runner, and pytest-given's own step and scenario
+machinery are implementation noise the reader almost never needs.
+`is_internal_path` is that classifier; the plugin applies it to pytest's own
+traceback entries before `getrepr` runs, so the pre-filter and this post-parse
+pass agree.
+
+`_INTERNAL_SUFFIXES` names whole modules, so a function that raises at test
+time belongs in one of them or its frame reaches the reader. Both halves of
+the former `decorators.py` are listed for that reason: `steps.py` for the
+wrappers and `__enter__` / `__exit__`, `scenario.py` for
+`annotated_given_descriptors`, which runs from `pytest_runtest_setup` and
+rejects three authoring forms from there. Moving such a function to a new
+module means adding that module here.
 """
 
 import re
@@ -28,7 +37,10 @@ _INTERNAL_SUBSTRINGS = (
     '/site-packages/_pytest/',
     '/site-packages/pluggy/',
 )
-_INTERNAL_SUFFIXES = ('/pytest_given/capture/steps.py',)
+_INTERNAL_SUFFIXES = (
+    '/pytest_given/capture/steps.py',
+    '/pytest_given/capture/scenario.py',
+)
 
 _SITE_PACKAGES_MARKER = '/site-packages/'
 

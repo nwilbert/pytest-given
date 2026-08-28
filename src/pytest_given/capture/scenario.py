@@ -5,8 +5,12 @@ that is `steps.py`, which this module imports for the descriptor an
 `Annotated[..., given(...)]` parameter carries.
 
 `ScenarioDecorator` hands the function straight back rather than wrapping it,
-so nothing here can appear in a failure traceback; unlike `steps.py`, this
-module is deliberately absent from `capture.traceback`'s internal-frame list.
+so the marker itself can never appear in a failure traceback. Reading the
+`Annotated` labels can: `annotated_given_descriptors` runs from
+`pytest_runtest_setup` and raises on three authoring forms, which is why
+`capture.traceback` names this module in `_INTERNAL_SUFFIXES` alongside
+`steps.py` — the reader wants the offending test signature, not our scanner's
+frame.
 """
 
 import inspect

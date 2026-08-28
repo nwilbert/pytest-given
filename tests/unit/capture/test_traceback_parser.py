@@ -120,6 +120,23 @@ def test_pytest_given_wrapper_frame_classified_internal() -> None:
     assert frames[0].is_internal is True
 
 
+def test_pytest_given_annotated_reader_frame_classified_internal() -> None:
+    """`annotated_given_descriptors` lives in `capture/scenario.py` and raises
+    from `pytest_runtest_setup`, so its frame is ours to hide.
+
+    Both halves of the former `decorators.py` are named in
+    `_INTERNAL_SUFFIXES`; the split moved this reader into the half that was
+    not, which put the frame back in front of the reader.
+    """
+    text = (
+        'src/pytest_given/capture/scenario.py:134: in annotated_given_descriptors\n'
+        '    raise PytestGivenError(...)\n'
+        'E   PytestGivenError: only given() is supported inside Annotated'
+    )
+    frames, _ = parse_short_repr(text)
+    assert frames[0].is_internal is True
+
+
 def test_third_party_library_not_internal() -> None:
     text = (
         '.venv/lib/site-packages/hypothesis/strategies.py:42: in draw\n'
