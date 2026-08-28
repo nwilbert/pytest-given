@@ -32,8 +32,6 @@ from typing import (
     runtime_checkable,
 )
 
-import pytest
-
 from ..model import (
     ActivityId,
     Narration,
@@ -44,6 +42,7 @@ from ..model import (
     NarrationValue,
     Phase,
     PytestGivenError,
+    PytestGivenWarning,
     SourceLocation,
     narration_text,
 )
@@ -82,7 +81,7 @@ def _recording_collector(action: str, warning: str) -> Collector | None:
     if collector is not None and collector.state != 'idle':
         return collector
     if collector is not None and collector.inside_unannotated_test:
-        warnings.warn(warning, pytest.PytestWarning, stacklevel=3)
+        warnings.warn(warning, PytestGivenWarning, stacklevel=3)
         return None
     raise no_scenario_error(action)
 

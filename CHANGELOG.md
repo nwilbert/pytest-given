@@ -13,6 +13,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
+- `pytest_given.PytestGivenWarning` is a top-level export. A step or `attach()`
+  recorded in a test without `@scenario` warns with it instead of
+  `pytest.PytestWarning`, so a suite can filter it by name and `capture/`
+  no longer imports pytest at all.
 - `--given-title=TEXT` (or the `given_title` ini) names the report, replacing the
   rootdir name.
 - A parametrized scenario's parameter table now carries a typed column per varying

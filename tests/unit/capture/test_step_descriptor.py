@@ -41,6 +41,7 @@ from pytest_given.model import (
     NarrationTermRef,
     NarrationValue,
     PytestGivenError,
+    PytestGivenWarning,
     SourceLocation,
     Step,
 )
@@ -153,7 +154,7 @@ def test_context_manager_unannotated_test_warns_instead_of_raises() -> None:
     set_active_collector(collector)
     try:
         with (
-            pytest.warns(pytest.PytestWarning, match='without @scenario'),
+            pytest.warns(PytestGivenWarning, match='without @scenario'),
             StepDescriptor('given', 'noisy'),
         ):
             pass
@@ -172,7 +173,7 @@ def test_attach_unannotated_test_warns_instead_of_raises() -> None:
     collector.inside_unannotated_test = True
     set_active_collector(collector)
     try:
-        with pytest.warns(pytest.PytestWarning, match='without @scenario'):
+        with pytest.warns(PytestGivenWarning, match='without @scenario'):
             attach('label', 'content')
     finally:
         set_active_collector(None)

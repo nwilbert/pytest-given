@@ -1,4 +1,4 @@
-from .errors import PytestGivenError, placeholder_mismatch
+from .errors import PytestGivenError, PytestGivenWarning, placeholder_mismatch
 from .ids import case_suffix, id_derive, node_base
 from .narration import narration_text, placeholder_value, render_interpolation
 from .schema import (
@@ -89,6 +89,7 @@ __all__ = [
     'ParameterTable',
     'Phase',
     'PytestGivenError',
+    'PytestGivenWarning',
     'RawParamValue',
     'RecordingState',
     'ReportData',

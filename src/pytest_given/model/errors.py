@@ -1,6 +1,19 @@
 from collections.abc import Sequence
 
 
+class PytestGivenWarning(UserWarning):
+    """Anything pytest-given wants to say without refusing to continue.
+
+    Lives here beside `PytestGivenError` rather than being spelled
+    `pytest.PytestWarning` at the one site that raises it: that spelling was
+    the only reason `capture/` imported pytest at all, and `capture/` is meant
+    to record without one (`capture.discovery` is built to be unit-testable
+    against plain module objects for the same reason). A `UserWarning`
+    subclass still lands in pytest's warnings summary, and being our own type
+    is what lets a suite filter it by name.
+    """
+
+
 class PytestGivenError(RuntimeError):
     """Anything pytest-given refuses to do, raised from any layer.
 
