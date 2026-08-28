@@ -4,12 +4,8 @@ One module for the whole of what a step *is* from user code — the dual
 context-manager/decorator descriptor, the paired `when_then`, and the
 attachment call that binds to whatever step is open. They share
 `_recording_collector`, which is the one place that decides whether a call
-records, no-ops with a warning, or refuses.
-
-Split out of the former `decorators.py` for the reason the `plugin` package
-was split: that module held the step descriptor, the scenario marker and the
-`Annotated` reader in one 600-line file while every other module in the tree
-holds one thing. The scenario marker is `scenario.py`'s.
+records, no-ops with a warning, or refuses. The scenario marker is
+`scenario.py`'s.
 
 `capture.traceback` names this module in `_INTERNAL_SUFFIXES`: the wrappers and
 `__enter__` / `__exit__` below are pytest-given frames a reader never wants in
@@ -55,10 +51,8 @@ from .template import Template, narration_from, resolved_placeholder_part
 class StepDecorated(Protocol):
     """A function carrying a pytest-given step descriptor.
 
-    `StepDescriptor.__call__` stashes `self` as ``_step_descriptor`` on the
-    wrapped function; `_ensure_teardown_wrapped` does the same for the
-    generator-fixture wrapper. Read sites (`pytest_fixture_setup`,
-    `_graft_fixture_recordings`) cast to this Protocol instead of probing an
+    Whatever wraps the function stashes the descriptor as
+    ``_step_descriptor``; readers cast to this Protocol rather than probing an
     untyped attribute.
     """
 
@@ -130,11 +124,10 @@ class StepDescriptor:
     def is_deferred_template(self) -> bool:
         """Whether the label was written as `pytest_given.Template(...)`.
 
-        A property rather than an `isinstance` at each read site: the question
-        is asked from four places here and one in `plugin/fixtures.py`, and
-        that last one is the only thing in the package that would otherwise
-        reach across a package boundary into a private attribute. What the
-        label was *written* as is the descriptor's business to answer.
+        A property rather than an `isinstance` on `_source` at each read site:
+        what the label was *written* as is the descriptor's business to answer,
+        and `plugin/` would otherwise have to reach across a package boundary
+        into a private attribute to ask.
         """
         return isinstance(self._source, Template)
 
@@ -142,9 +135,7 @@ class StepDescriptor:
     def is_tstring(self) -> bool:
         """Whether the label was written as a t-string (`t"…"`).
 
-        The counterpart to `is_deferred_template`, for the same reason: the
-        two rejection sites — a decorator label and an `Annotated` one — ask
-        exactly this and nothing else about `_source`.
+        The counterpart to `is_deferred_template`, for the same reason.
         """
         return isinstance(self._source, templatelib.Template)
 
@@ -191,11 +182,11 @@ class StepDescriptor:
         """Decorate `func`: reject the forms this label cannot take, then wrap
         it in whatever its own flavor needs.
 
-        The two halves are separated because they answer different questions —
-        whether this *label* is legal on this function at all, and which of
-        four wrappers the *function* calls for. Only `sig` crosses between
-        them, and only for a `Template` label, whose per-call substitution
-        needs the signature the validation already had to inspect.
+        The two halves answer different questions — whether this *label* is
+        legal on this function at all, and which wrapper the *function* calls
+        for. The signature crosses between them only for a `Template` label,
+        whose per-call substitution needs what the validation already
+        inspected.
         """
         return self._wrapped(func, self._validated(func))
 

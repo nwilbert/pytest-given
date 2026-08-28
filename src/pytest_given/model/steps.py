@@ -51,11 +51,6 @@ def step_narrations(steps: list[Step]) -> Iterator[Narration]:
 
 
 def iter_narrations(scenario: Scenario) -> Iterator[Narration]:
-    """A scenario's own narration followed by every step's, depth-first.
-
-    `lint/` and `report/` may not import from each other and both walk exactly
-    this, so it lives here in the leaf beside `walk_steps` — the same reason
-    the tree walk itself does.
-    """
+    """A scenario's own narration followed by every step's, depth-first."""
     yield scenario.narration
     yield from step_narrations(scenario.steps)

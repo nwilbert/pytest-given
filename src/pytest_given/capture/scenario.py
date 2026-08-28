@@ -6,11 +6,9 @@ that is `steps.py`, which this module imports for the descriptor an
 
 `ScenarioDecorator` hands the function straight back rather than wrapping it,
 so the marker itself can never appear in a failure traceback. Reading the
-`Annotated` labels can: `annotated_given_descriptors` runs from
-`pytest_runtest_setup` and raises on three authoring forms, which is why
-`capture.traceback` names this module in `_INTERNAL_SUFFIXES` alongside
-`steps.py` — the reader wants the offending test signature, not our scanner's
-frame.
+`Annotated` labels can, and raises on the forms it rejects — which is why
+`capture.traceback` names this module in `_INTERNAL_SUFFIXES`: the reader
+wants the offending test signature, not our scanner's frame.
 """
 
 import inspect

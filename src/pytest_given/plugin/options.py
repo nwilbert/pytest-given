@@ -131,9 +131,7 @@ def _cli_over_ini(config: pytest.Config, name: str) -> str | bool:
     """The value of a dual CLI/ini option: the flag when it was given at all,
     otherwise the ini.
 
-    The precedence rule for every option carrying both, stated once — the
-    reason `GivenConfig` exists is that no read site should re-derive it, and
-    three copies of the rule in this module was the same problem one scope in.
+    The precedence rule for every option carrying both, stated once.
 
     Presence is `is not None`, never truthiness: the flags all default to None,
     so an explicitly empty one is still a flag that was given and still wins

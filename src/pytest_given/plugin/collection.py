@@ -20,21 +20,11 @@ from ..model import (
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     """Validate Template-named scenarios and story bindings eagerly at collection.
 
-    Four checks:
-    1. A Template-named scenario must be parametrized (its substitution source
-       is `callspec.params`).
-    2. Every Template placeholder must match a parametrize column name —
-       catches typos at `pytest --collect-only` rather than at session-finish
-       grouping, where the error would escape `pytest_sessionfinish` opaquely.
-    3. Any activity_ids on the scenario must be valid ids within the story.
-    4. `group_parametrized=False` must have a parametrization to decline —
-       otherwise the flag would silently do nothing, since an unparametrized
-       scenario never reaches the grouping pass at all.
-
-    Deferred to collection time (rather than decoration time) because
-    @scenario and @pytest.mark.parametrize can appear in either order, and
-    decoration-time inspection only sees markers from earlier (bottom-up)
-    decorators.
+    Eagerly, because the alternative is late or never: a mistyped `Template`
+    placeholder surfaces at session-finish grouping, where the error escapes
+    `pytest_sessionfinish` opaquely, and `group_parametrized=False` on an
+    unparametrized test is never noticed at all — such a scenario does not
+    reach grouping.
 
     Reported as a `pytest.UsageError`, the way `pytest_configure` reports a bad
     lint config: an exception raised from a collection hook renders as an
@@ -50,8 +40,8 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
 
 
 def _validate_scenario_marker(item: pytest.Item) -> None:
-    """The four collection-time checks for one item, or nothing when it carries
-    no `@scenario`."""
+    """The collection-time checks for one item, or nothing when it carries no
+    `@scenario`."""
     marker = _get_scenario_marker(item)
     if marker is None:
         return

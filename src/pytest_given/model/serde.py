@@ -6,12 +6,8 @@ on the story tree).
 `report_from_dict` is the inverse; the renderer reads the JSON, calls it
 once, and operates on typed dataclasses from there.
 
-The non-trivial parts: `Narration.parts`, whose subtypes share the parent
-type but each carry a distinct key (`value` / `rendered` / `name` /
-`term_id`); a `ParameterCase` cell, discriminated object-vs-scalar (an object
-is an attachment payload, anything else a scalar); and a step attachment,
-discriminated by `content`-vs-`column_id` (a promoted attachment carries no
-`content`, only a pointer to its column).
+The non-trivial parts are the unions — narration parts, a case cell, a step
+attachment — each discriminated on read by the keys its variants do not share.
 """
 
 import dataclasses

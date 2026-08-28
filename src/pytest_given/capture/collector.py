@@ -60,8 +60,8 @@ def no_scenario_error(action: str) -> PytestGivenError:
     """The single wording for "nothing is being recorded right now".
 
     Raised from the collector when a call reaches it in the idle state, and
-    from the front doors in `decorators` when there is no collector at all to
-    reach — the same situation to the author, so it says the same sentence.
+    from the step front doors when there is no collector at all to reach — the
+    same situation to the author, so it says the same sentence.
     """
     return PytestGivenError(f'Cannot {action} — no active scenario or fixture.')
 
@@ -116,12 +116,11 @@ class Collector:
 
     @property
     def active_fixture_descriptor(self) -> StepDescriptor | None:
-        """The descriptor pytest_fixture_setup pinned for the current fixture call.
+        """The descriptor pinned for the current fixture call, or None.
 
-        Used by StepDescriptor's helper-decorator wrapper to recognize the case
-        where pytest is invoking it as a fixture body (in which case
-        pytest_fixture_setup has already created the recording's root step from
-        the descriptor's narration, and the wrapper must not push a duplicate).
+        Lets a helper-decorator wrapper recognize pytest invoking it as a
+        fixture body, whose root step the fixture hook has already recorded
+        from this same descriptor.
         """
         return self._active_fixture_descriptor
 
@@ -179,10 +178,7 @@ class Collector:
         starts even for a scenario that never ran a step, and what it times
         there is the hook overhead past setup rather than work of the
         scenario's: sub-millisecond for a skip, a few ms when a failure repr
-        had to be built. Not injectable: the one production caller never
-        passed a duration, so an override parameter existed only for tests,
-        and every test taking it left `_elapsed_ms` — the code that actually
-        runs — unasserted.
+        had to be built.
         """
         assert self._current_scenario is not None
         self._current_scenario.status = status
@@ -334,9 +330,8 @@ class Collector:
     ) -> None:
         """Validate step activity_ids against the active scenario's story scope.
 
-        Lives on Collector (not on StepDescriptor) so every push_step entry
-        point — context manager, helper wrapper, future fixture grafting —
-        gets the check by construction.
+        Lives on Collector so every `push_step` entry point gets the check by
+        construction.
         """
         story = self.active_scenario_story
         if story is None:

@@ -13,12 +13,8 @@ traceback entries before `getrepr` runs, so the pre-filter and this post-parse
 pass agree.
 
 `_INTERNAL_SUFFIXES` names whole modules, so a function that raises at test
-time belongs in one of them or its frame reaches the reader. Both halves of
-the former `decorators.py` are listed for that reason: `steps.py` for the
-wrappers and `__enter__` / `__exit__`, `scenario.py` for
-`annotated_given_descriptors`, which runs from `pytest_runtest_setup` and
-rejects three authoring forms from there. Moving such a function to a new
-module means adding that module here.
+time belongs in one of them or its frame reaches the reader. Moving such a
+function to a new module means adding that module here.
 """
 
 import re

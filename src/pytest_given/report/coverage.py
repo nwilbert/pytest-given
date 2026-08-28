@@ -133,12 +133,6 @@ def compute_coverage(
     from *narration* matching — the ``A_refs ⊆ S`` rule would let one term, or
     none, be covered by almost any step. An explicit ``activity=`` pin says
     what the narration cannot, so it reaches them too; only scope bounds it.
-
-    Matching uses an inverted index `identity → activity_ids` built once
-    per scenario: per step, the candidate set narrows to activities sharing
-    at least one identity with the step's `s_for_step`, replacing the prior
-    O(|activities|) inner scan with O(|s_cache| + |candidates|).
-
     """
     # Intersected with the story's own ids, never taken verbatim: `scope` is
     # the only guard the pin path below has, and an id naming no activity in

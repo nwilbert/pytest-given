@@ -8,13 +8,9 @@ summary. The stash rather than module globals throughout, so a
 nested in-process run (pytester, `pytest.main`) gets its own set instead of
 rebinding — and thereby clobbering — the outer session's.
 
-Nothing here is underscored. Every name in this module is read by a sibling —
-that is what the module is for — so a leading underscore would claim a privacy
-none of them has and that every import already contradicts. Package-internal
-is what they are, and the package boundary is what states it: `plugin/` has no
-`__all__` beyond its hook surface, and nothing outside it imports from here.
-Names genuinely private to one module (`_sink_config`, `_run_lint`) keep the
-underscore, which is then worth something.
+Nothing here is underscored: every name in this module is read by a sibling,
+so an underscore would claim a privacy none of them has. The package boundary
+is what makes them internal — nothing outside `plugin/` imports from here.
 """
 
 from dataclasses import dataclass, field
@@ -39,12 +35,7 @@ collector_key: pytest.StashKey[Collector] = pytest.StashKey()
 
 
 def session_collector(config: pytest.Config) -> Collector:
-    """The collector owned by this session, created at `pytest_sessionstart`.
-
-    Lives in `config.stash` rather than a module global so a nested in-process
-    run (pytester, `pytest.main`) gets its own instance instead of rebinding —
-    and thereby clobbering — the outer session's.
-    """
+    """The collector owned by this session, created at `pytest_sessionstart`."""
     return config.stash[collector_key]
 
 
@@ -52,14 +43,9 @@ def session_collector(config: pytest.Config) -> Collector:
 class GivenConfig:
     """This run's pytest-given options, parsed once.
 
-    Parsed eagerly in `pytest_configure` — a typo in a rule name or a
-    source-link preset is a `UsageError` before the suite runs, not a surprise
-    after it — and read from session start onwards. One bundle rather than a
-    key apiece, so the parse seam is a single object with a single writer:
-    every option this plugin takes is resolved here once, including the two
-    that read a CLI flag over an ini value (`title`, `lint_enabled`). Resolving
-    either at its read site instead would put the precedence rule in as many
-    places as there are readers — `lint_enabled` alone has two.
+    One bundle rather than a key apiece, so the parse seam is a single object
+    with a single writer: every option this plugin takes is resolved once, the
+    CLI-over-ini ones included, rather than at each read site.
     """
 
     rule_levels: dict[RuleId, Level]

@@ -116,9 +116,8 @@ class GlossaryPinned:
     underscored, so serde drops it and it never reaches the JSON.
 
     Subclassed rather than repeated on each of `ActivityPath`, `Activity` and
-    `Story`: three copies of one invariant drift, and the comment explaining
-    it drifts first. Every field is `kw_only`, so inheriting one changes no
-    call site, and serde skips it either way — the JSON is unaffected.
+    `Story`, whose every field is `kw_only` — so inheriting it changes nothing
+    they already declare.
     """
 
     _glossaries: dict[int, Glossary] = field(
@@ -217,8 +216,7 @@ class ParamSpec(NamedTuple):
     group: bool = True
 
     def mapping(self) -> dict[str, RawParamValue]:
-        """This case's parameters by name — the pairing of the two lists,
-        defined once for everything that needs to look a name up."""
+        """This case's parameters by name — the pairing of the two lists."""
         return dict(zip(self.names, self.values, strict=True))
 
 
@@ -271,9 +269,8 @@ def location_suffix(location: SourceLocation | None) -> str:
     """The `` (filename:line)`` locator appended to a message about a scenario,
     or ``''`` when there is no source location.
 
-    Lives beside `SourceLocation` because both the lint (findings) and grouping
-    (rejected-form errors) end their messages with it, and neither of those
-    packages is the other's dependency.
+    Lives beside `SourceLocation` because the lint and grouping both end their
+    messages with it, and neither may import the other.
     """
     if location is None:
         return ''

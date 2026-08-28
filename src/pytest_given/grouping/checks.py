@@ -2,9 +2,8 @@
 
 Each raises `PytestGivenError` rather than reporting a finding the way lint
 does: a grouped tree built on any of these is false, so the run fails and no
-sink is written (see `plugin.pytest_sessionfinish`). Rules 1, 3 and 6 are
-checked up front, against the whole group; 2, 4 and 5 fire from the baseline
-walk, which is where the offending part is in hand.
+sink is written. Some are checked up front against the whole group; the rest
+fire from the baseline walk, which is where the offending part is in hand.
 """
 
 from collections.abc import Iterator

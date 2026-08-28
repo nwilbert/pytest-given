@@ -170,10 +170,6 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
     node_id = NodeId(report.nodeid)
     collector = get_active_collector()
     if collector is None or collector.active_scenario_id != node_id:
-        # No active collector: either outside any tracked scenario, or the
-        # teardown phase (whose logreport returns early below anyway). Every
-        # phase that reaches finish_scenario — call, setup-skip, setup-fail —
-        # runs while the ContextVar is still set.
         return
     # Tests marked @pytest.mark.skip skip at setup time; fixture exceptions
     # produce a failed setup report and no call report at all; in-body

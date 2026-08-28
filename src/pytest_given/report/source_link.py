@@ -22,8 +22,8 @@ _STATIC_PRESETS: dict[str, str] = {
     'pycharm': 'pycharm://open?file={path}&line={line}',
 }
 
-# `github` is a preset but resolves via _detect_github_repo (next task), not
-# the static table. Listed here so the unknown-preset error advertises it.
+# `github` is a preset but resolves via `_detect_github_repo`, not the static
+# table. Listed here so the unknown-preset error advertises it.
 _ALL_PRESET_NAMES = frozenset(_STATIC_PRESETS) | {'github'}
 
 _VALID_VARS = frozenset({'path', 'relpath', 'line', 'project', 'sha'})

@@ -4,9 +4,7 @@
 while `report/inline_markdown.py` *renders* it in a definition cell: a term
 written ``**Guest**`` has to canonicalize to the same word its definition
 renders bold, so the two must recognize exactly the same spans. Neither package
-may import the other, so the pattern lives here in the leaf — the same reason
-`narration.py` holds the rules `capture/` and `grouping/` both apply, rather
-than each layer keeping its own copy.
+may import the other, so the pattern lives here in the leaf.
 
 Only the pattern is shared. What a match *becomes* differs by caller — plain
 text on one side, HTML on the other — so each keeps its own substitution

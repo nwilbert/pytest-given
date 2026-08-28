@@ -40,8 +40,7 @@ from .source_link import compile_source_link
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 
 # Maps parameter name to its color index. The index resolves to a color via
-# `palette.param_column_colors`, which never runs out — the fixed list it
-# replaced wrapped at six.
+# `palette.param_column_colors`, which never runs out.
 type ParamColorMap = dict[str, int]
 
 
@@ -68,9 +67,6 @@ def _script_json(value: object, *, indent: int | None = None) -> Markup:
     node ids and attachment payloads — so one containing `</script>` would
     otherwise break out of the tag (stored XSS), and one containing
     `<!--<script` would swallow the rest of the document.
-
-    `indent` is the only thing that ever varied between call sites; it rides
-    here rather than justifying a second, hand-rolled spelling of the escape.
     """
     return Markup(_neutralize_script_data(json.dumps(value, indent=indent)))
 
@@ -94,10 +90,7 @@ def render_html_string(
     `source_link_template` is the already-resolved template string (preset
     expansion happens before this point). None disables source linking.
 
-    Returns the document rather than writing it: every caller goes through
-    `sinks`, which renders all of a run's sinks before writing any of them, so
-    a render that raises cannot leave this run's JSON beside the previous
-    run's HTML.
+    Returns the document rather than writing it — `sinks` owns the writing.
     """
     # Built once and handed to both: the narration filter colors placeholders
     # with it, and the template emits the matching `.param-color-N` rules.
@@ -246,16 +239,10 @@ def _make_narration_filter(
     param_color_map: ParamColorMap,
     glossary: Glossary | None = None,
 ) -> Callable[[Narration], Markup]:
-    """Filter usage: `{{ step.narration | narration }}` or
-    `{{ scenario.narration | narration }}`.
+    """Jinja filter: renders a `Narration` to HTML, part by part.
 
-    The narration is a `Narration` dataclass with a flat `text` and a list
-    of typed `NarrationPart` variants:
-      - `NarrationLiteral` → escape `value`
-      - `NarrationValue`   → `.value-highlight` around `rendered`
-      - `NarrationPlaceholder` → color-coded `{name}` token
-      - `NarrationTermRef` → kind-colored term ref resolved via glossary
-    Empty parts → escape `text` and emit verbatim.
+    Usage: `{{ step.narration | narration }}`. A parts-less narration (a plain
+    string label) is escaped and emitted verbatim.
     """
 
     def _render(narration: Narration) -> Markup:

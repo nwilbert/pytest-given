@@ -5,19 +5,8 @@ module's attributes for `pytest_*` names, so re-exporting them here is what
 registers them; the `hookimpl` options ride on the function objects and survive
 the re-export untouched.
 
-The implementations live one module per concern, which is why this package
-exists at all — as a single module the plugin held the option table, the
-collection-time validation, the fixture machinery, the per-item hooks, the
-report path and the terminal presentation in one 900-line file, while every
-other module in the tree holds one thing:
-
-- `state` — what the session keeps in `config.stash` (the leaf; every other
-  module here reads it, none of them reads each other except as noted)
-- `options` — the option table and the one place options are resolved
-- `collection` — collection-time validation of what `@scenario` declared
-- `fixtures` — recording a decorated fixture and grafting what it recorded
-- `runtest` — the per-item hooks (reads `collection` and `fixtures`)
-- `session` — the session's two edges: capture globals in, report and lint out
+The implementations live one module per concern, each one's docstring saying
+which. `state` is the leaf every other module here reads.
 
 Only what needs pytest belongs anywhere in here. The pytest-free work is the
 subpackages': `capture` records, `grouping` merges, `lint` checks, `report`

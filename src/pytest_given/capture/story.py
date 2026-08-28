@@ -50,13 +50,12 @@ def path(*parts: _PathArg) -> ActivityPath:
             continue  # a bare word carries no role; valid at any position
         _check_position(part, position, slot_for(position), parts)
     schema_parts = tuple(_to_part(part) for part in parts)
-    # Stash the live Glossary objects the path references, keyed by object id —
-    # read by activity() and _check_single_glossary to enforce the v1 "one
-    # glossary per story" invariant at construction time, and by story() so the
-    # owning Glossary travels on the Story tree itself. discovery.resolve_glossary
-    # reads that stash to pick the report's glossary deterministically, without
-    # consulting any session-global. Keying by id() dedups by identity (Glossary
-    # is unhashable) while keeping the object. Not serialized.
+    # Stash the live Glossary objects the path references: the enclosing
+    # activity and story merge them upwards, which is what enforces the v1 "one
+    # glossary per story" invariant at construction time and what carries the
+    # owning Glossary on the Story tree for `resolve_glossary`. Keyed by id(),
+    # which dedups by identity (Glossary is unhashable) while keeping the
+    # object.
     glossaries: dict[int, Glossary] = {
         id(owner): owner
         for owner in (_glossary_of(part) for part in parts)

@@ -49,8 +49,8 @@ class TermOccurrence:
     """One sighting of a term in the recorded steps, as the Glossary shows it.
 
     Not `capture`'s `TermInstance`, which is the authored thing — a term
-    wearing one surface form. This is the report-side tally of where that
-    surface form turned up, so the two must not share a name.
+    wearing one surface form; this is the report-side tally of where that
+    surface form turned up.
     """
 
     display: str
@@ -61,13 +61,8 @@ TermForm = NewType('TermForm', str)
 """One verb surface form collected from story activity parts.
 
 The inflection as story prose spells it (`books` for `book`), never the term's
-own canonical name — `record_form` drops that one.
-
-A `NewType` over `str` rather than a one-field dataclass: the form *is* the
-word, and wrapping it bought only a `.display` hop for the template that
-renders it. The distinct type still separates it from the canonical name and
-from a `TermId` at every call site, which is the whole of what the dataclass
-was carrying.
+own canonical name — `record_form` drops that one. A distinct type, so it
+cannot be confused with the canonical name or with a `TermId`.
 """
 
 

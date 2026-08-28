@@ -1,9 +1,7 @@
 """The URL-fragment slug each scenario is addressed by (`#scenario=<slug>`).
 
-Its own module rather than another `build_*` beside the coverage and glossary
-rollups in `aggregations`: naming a scenario for a URL shares no input, no
-output and no vocabulary with those, and the collision escalation below is the
-only part of either file with an algorithm to follow.
+Its own module rather than another rollup in `aggregations`: naming a scenario
+for a URL shares no input, no output and no vocabulary with those.
 """
 
 from collections import Counter

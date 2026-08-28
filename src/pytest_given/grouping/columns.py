@@ -159,10 +159,9 @@ def param_cell_formats(
     Only a formatting every slot for that column shares is used. Two slots
     formatting one parameter differently (`{when:%H:%M}` and `{when:%Y-%m-%d}`)
     leave no single text a shared cell could hold; the column keeps its plain
-    value and each disagreeing slot gets a column of its own (see
-    `_templatize_param_value` for a step's, `reconcile_name_slots` for a
-    scenario name's). The trivial formatting counts as one of the two, so a
-    column read plainly in one slot and formatted in another goes the same way.
+    value and each disagreeing slot gets a column of its own. The trivial
+    formatting counts as one of the two, so a column read plainly in one slot
+    and formatted in another goes the same way.
     """
     seen: dict[str, set[Format]] = {}
     for narration in narrations:

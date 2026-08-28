@@ -177,7 +177,7 @@ def _cells(
     `ParameterCase.values` is positionally aligned with `table.columns` and
     nothing below reads one without the other, so the pairing — and the
     `strict=True` that asserts the alignment — is stated once here rather than
-    at each of the three sites that walk a row.
+    at each site that walks a row.
     """
     return zip(table.columns, case.values, strict=True)
 

@@ -41,8 +41,6 @@ class LintRule:
     default: Level
 
 
-# The rule catalog as data: config validation and docs stay in sync with this
-# one table.
 RULES: tuple[LintRule, ...] = (
     LintRule(id=RuleId('missing-phase'), surface='runtime', default='warn'),
     LintRule(id=RuleId('empty-step'), surface='ast', default='error'),
@@ -68,9 +66,7 @@ def finding(
     """A finding at its rule's catalog-default severity.
 
     The one place that reads `RULES_BY_ID`, so a rule cannot be reported at a
-    level its catalog entry does not name. Here beside the catalog rather than
-    in either rule module: both surfaces build findings exactly this way, and
-    two copies is one more than the invariant can survive.
+    level its catalog entry does not name.
     """
     return Finding(
         rule=rule,

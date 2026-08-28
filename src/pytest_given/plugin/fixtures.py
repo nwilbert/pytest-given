@@ -153,13 +153,11 @@ def _fixture_instance_key(
 def _graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
     """Graft this item's fixture step-recordings and Annotated `given` labels.
 
-    Phase 1: fixture recordings in `collector.recordings()` setup order
-    (`_recordings` is insertion-ordered by setup time, so this stays correct
-    even though `item.fixturenames` can list a dependent before its
-    dependency). Each recording may take an Annotated override narration,
-    matched to the recording by its parameter name. Phase 2: Annotated-only
-    leaves (parametrize values, built-in / undecorated fixtures) in
-    test-signature order.
+    Phase 1 takes the fixture recordings in setup order — `_recordings` is
+    insertion-ordered by setup time, so this stays correct even though
+    `item.fixturenames` can list a dependent before its dependency — each with
+    an optional Annotated override narration matched by parameter name. Phase 2
+    takes the Annotated-only leaves in test-signature order.
     """
     assert hasattr(item, 'fixturenames'), f'expected fixturenames on {item!r}'
     func = getattr(item, 'function', None)
@@ -179,7 +177,6 @@ def _graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
         key = _cached_instance_key(fixturedef)
         expected[key] = fixturedef.scope
 
-    # Phase 1: fixture recordings in setup order, with optional override.
     # Function-scoped recordings won't be re-consumed; drop after grafting so
     # the recordings dict doesn't grow unboundedly across the session.
     grafted_names: set[str | None] = set()
@@ -197,8 +194,7 @@ def _graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
     for key in to_drop:
         collector.drop_recording(key)
 
-    # Phase 2: Annotated-only leaves (parametrize values, built-in /
-    # undecorated fixtures) in test-signature order.
+    # Parametrize values and built-in / undecorated fixtures.
     for name, descriptor in descriptors.items():
         if name in grafted_names:
             continue

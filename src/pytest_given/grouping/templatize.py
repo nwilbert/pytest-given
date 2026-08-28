@@ -291,11 +291,7 @@ def _case_independent_part(
     A literal is one by definition, and so is a *value* a parametrize column
     binds — the column already holds every case's. A term ref never is: rule 4
     requires it to read identically across cases whether a column binds it or
-    not, so it always goes on to be compared. That makes this the whole of
-    templatizing a *scenario* name, which is evaluated once at decoration time
-    and cannot vary; a step's narration reaches its own comparison work only
-    past it. One definition, so the placeholder contract (`name` and `column_id`
-    both the parametrize name) cannot drift between the two callers.
+    not, so it always goes on to be compared.
     """
     match part:
         case NarrationLiteral():
@@ -336,11 +332,10 @@ def templatize_narration(
 ) -> Narration:
     """Convert matching NarrationValue entries to NarrationPlaceholder.
 
-    For the **scenario** narration only — a scenario name is evaluated once at
-    decoration time, so it cannot vary across cases and there is nothing to
-    compare against other cases the way a step's narration is. That makes it
-    exactly `_case_independent_part` and nothing else: a part no parametrize column
-    binds stays verbatim, since its rendering is shared across cases.
+    For the **scenario** narration only — a name is evaluated once at
+    decoration time, so it cannot vary and has nothing to be compared against.
+    That makes it exactly `_case_independent_part` and nothing else: a part no
+    parametrize column binds stays verbatim.
     """
     if not narration.parts:
         return narration
@@ -365,10 +360,7 @@ def reconcile_name_slots(
     formats it, where no single cell can serve both.
 
     A slot the cell cannot serve gets a `derived` column of its own, holding
-    what the slot renders for each case. Unlike a step's, the name has no
-    per-case recording to compare against — it is evaluated once at decoration
-    time — so the renderings are recomputed from each case's raw parameter,
-    exactly as `param_cell` builds the cell it is being compared with.
+    what the slot renders for each case.
     """
     if not narration.parts:
         return narration
@@ -380,9 +372,8 @@ def _reconciled_slot(part: NarrationPart, ctx: GroupContext) -> NarrationPart:
     """One `Template` slot re-pointed at a column that reads the way it does.
 
     Shared by the scenario name and by a step's `Template` slots: neither
-    records a per-case rendering to compare against, so both recompute what the
-    slot renders from each case's raw parameter — exactly as `param_cell`
-    builds the cell being compared with.
+    records a per-case rendering to compare against, so both recompute what
+    the slot renders from each case's raw parameter.
     """
     if not isinstance(part, NarrationPlaceholder) or part.column_id not in ctx.cells:
         return part
@@ -438,12 +429,9 @@ def _promoted_column(
     """The `derived` column a slot needs when the cell it points at does not
     read the way the slot renders — or None when that cell already serves it.
 
-    The one compare-and-promote rule, shared by the two slot kinds that reach
-    it: a `NarrationValue` bound to a `param` column, whose renderings come off
-    the recorded tree, and a `Template` slot, whose renderings are recomputed
-    from each case's raw parameter. Only where the renderings come from
-    differs, so keeping the decision in one place is what stops the two from
-    drifting into disagreeing about what "reads the same" means.
+    The one compare-and-promote rule, shared by both slot kinds — only where
+    the renderings come from differs, and a second copy would let the two
+    disagree about what "reads the same" means.
     """
     if all(
         text == cell_text(ctx.cells[column_id][case_id])

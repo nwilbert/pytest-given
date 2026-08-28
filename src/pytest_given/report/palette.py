@@ -7,10 +7,8 @@ by hand so that every prefix stayed well spread, since a two-column table only
 ever sees the first two entries.
 
 Colors come off a ring: one lightness at full chroma, stepped by colorfulness
-rather than by angle (see `_hue_at`, which is where the interesting part is,
-and `_LIGHTNESS`, where an earlier version went wrong). An index picks its
-place on that ring by the golden ratio (`_GOLDEN_RATIO_CONJUGATE`), which is
-what makes every prefix spread by itself.
+rather than by angle. An index picks its place on that ring by the golden
+ratio, which is what makes every prefix spread by itself.
 
 Columns are the report's one *arbitrary* color vocabulary — the index means
 nothing, the colors only have to be told apart — which is why they can take

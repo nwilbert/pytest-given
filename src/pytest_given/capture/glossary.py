@@ -44,9 +44,9 @@ class TermHandle:
         """This term as one call site reads it (``guest('Alice')``).
 
         Whether that reads as a distinct entity or as a mere inflection is the
-        *term's* business, decided from `declared_kind` where it matters (see
-        `report.coverage.identity_of_part`) — an actor's `Alice` is its own
-        identity, a verb's `books` is the same verb in another form.
+        *term's* business, decided from `declared_kind` where it matters — an
+        actor's `Alice` is its own identity, a verb's `books` is the same verb
+        in another form.
         """
         return TermInstance(handle=self, display=display)
 
@@ -87,11 +87,8 @@ class TermHandle:
 class TermInstance:
     """A term wearing one surface form: the handle it came from, plus display.
 
-    One type for every kind. The three it replaces (`ActorInstance`,
-    `WorkObjectInstance`, `InflectedVerb`) differed only in the name of this
-    field, which bought nothing — every consumer had to enumerate all three,
-    and the identity rule they were supposed to encode is read off the term's
-    kind at use time regardless.
+    One type for every kind — the identity rule a per-kind type would encode is
+    read off the term's kind at use time regardless.
     """
 
     handle: TermHandle
@@ -119,8 +116,8 @@ class DeferredTermHandle(TermHandle):
 def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:
     """Whether two terms are the same registration: kind, canonical, and
     definition agree (`source` is intentionally excluded). Shared by the
-    code-defined (`_register_kind`) and file-backed (`FileGlossary._add_row`)
-    idempotency-and-conflict checks so the identity rule lives in one place."""
+    code-defined and file-backed conflict checks, so the identity rule lives in
+    one place."""
     return (
         existing.kind == candidate.kind
         and existing.canonical == candidate.canonical
@@ -189,14 +186,10 @@ def deferred_handle_or_raise(
 
 
 class Glossary(BaseGlossary):
-    """The user-facing glossary: storage plus the registration API.
+    """The user-facing glossary: the model's storage plus the registration API.
 
-    Subclasses the report model's storage rather than being grafted onto it.
-    Every method here needs the *caller's* source location, which only
-    `capture` knows how to resolve — and `model`, being the leaf, may not
-    import from it. Everything internal (serde, grouping, the renderers) keeps
-    annotating the base, which a `Glossary` satisfies; only what a user
-    constructs is this class.
+    Only what a user constructs is this class; everything internal keeps
+    annotating the base, which this satisfies.
 
     `skip=2` throughout: this method, then the user's call site.
     """

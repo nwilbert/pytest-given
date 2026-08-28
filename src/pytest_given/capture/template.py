@@ -79,11 +79,8 @@ def parse_tstring(
 ) -> tuple[str, list[NarrationPart]]:
     """Convert a t-string Template into (rendered text, structured parts).
 
-    Iterates the t-string yielding str | Interpolation. Each interpolation
-    is inspected:
-    - Glossary handles (any kind, and their instances/inflections)
-      become NarrationTermRef carrying term_id, display, and the source expression.
-    - All other values become NarrationValue as before.
+    An interpolation of a glossary handle (or one of its instances) records a
+    `NarrationTermRef`; every other value records a `NarrationValue`.
     """
     parts: list[NarrationPart] = []
     rendered_chunks: list[str] = []

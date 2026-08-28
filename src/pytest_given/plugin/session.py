@@ -85,9 +85,7 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
         ever configured, while `pytest_unconfigure` only fires for one that
         did. A nested run that dies during argument parsing — an unrecognized
         flag raises `UsageError` before `pytest_configure` — would otherwise
-        strand the outer session's rootdir at the nested run's, and every step
-        recorded afterwards would capture `source=None`, silently taking the
-        lint's whole AST-rule surface down with it.
+        strand the outer session's capture state at the nested run's.
 
         Registered only once the snapshot is in hand, so a run that aborted
         before this point has nothing to restore.
@@ -125,23 +123,16 @@ class _SessionReport:
 def pytest_sessionfinish(session: pytest.Session) -> None:
     """Build the report and write the configured sinks.
 
-    Building a report fails with a `PytestGivenError` — a rejected grouping
-    form, a suite reaching two glossaries, a term used in incompatible slots, an
-    unusable source-link template, colliding scenario slugs — and writing one
-    fails with an `OSError`: a read-only output directory, a full disk, a path
-    whose parent cannot be created. An exception leaving this hook is neither a
-    test failure nor an INTERNALERROR: pytest lets it out of `console_main` as a
-    bare traceback, with no summary line and no exit code at all. So both run
-    under one handler that reports through the terminal summary, discards the
-    sinks this run would have written, and fails the run.
+    Building a report fails with a `PytestGivenError` (any of the authoring
+    forms the layers below refuse) and writing one with an `OSError`. An
+    exception leaving this hook is neither a test failure nor an INTERNALERROR:
+    pytest lets it out of `console_main` as a bare traceback, with no summary
+    line and no exit code at all. So both run under one handler that reports
+    through the terminal summary, discards the sinks this run would have
+    written, and fails the run.
 
-    Guarding only the grouping call is not enough, and neither is guarding each
-    step separately: the sinks have to stay consistent *with each other*. They
-    are therefore rendered in full before any of them is written, so a render
-    that raises cannot leave this run's JSON beside the previous run's HTML —
-    two reports that disagree, with nothing on either saying so. `write_sinks`
-    is inside the same handler for that reason and not only for the traceback:
-    it writes one file at a time, so a disk filling between the first and the
+    `write_sinks` is inside that handler and not only for the traceback: it
+    writes one file at a time, so a disk filling between the first and the
     second leaves exactly that pair, and only discarding both puts the run back
     to having no report rather than half of one.
     """
