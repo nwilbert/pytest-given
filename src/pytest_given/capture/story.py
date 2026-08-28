@@ -17,6 +17,7 @@ from ..model import (
     id_derive,
 )
 from .glossary import TermHandle, TermInstance
+from .kind_inference import Slot, slot_for
 from .source import capture_caller_source
 
 type _PathArg = TermHandle | TermInstance | str
@@ -24,8 +25,8 @@ type _PathArg = TermHandle | TermInstance | str
 # What every slot accepts structurally: a glossary reference of some sort, or a
 # bare connective. Which *kind* of reference fits a given position is a
 # separate question, answered by `_check_position` from the term's declared
-# kind — and, for a term that declares none, deferred to kind inference and
-# `_slot_for`.
+# kind — and, for a term that declares none, deferred to kind inference over
+# the same `slot_for` positions.
 _TERM_TYPES = (TermHandle, TermInstance)
 
 
@@ -47,12 +48,7 @@ def path(*parts: _PathArg) -> ActivityPath:
     for position, part in enumerate(parts):
         if isinstance(part, str):
             continue  # a bare word carries no role; valid at any position
-        if position == 0:
-            _check_position(part, 0, 'actor', parts)
-        elif position % 2 == 1:
-            _check_position(part, position, 'verb', parts)
-        else:
-            _check_position(part, position, 'noun', parts)
+        _check_position(part, position, slot_for(position), parts)
     schema_parts = tuple(_to_part(part) for part in parts)
     # Stash the live Glossary objects the path references, keyed by object id —
     # read by activity() and _check_single_glossary to enforce the v1 "one
@@ -228,7 +224,7 @@ def _check_single_glossary(title: str, glossaries: dict[int, Glossary]) -> None:
 # known (`g("…")`, or a file glossary with no kind column) declares nothing and
 # is valid anywhere — `infer_glossary_kinds` classifies it from these same slot
 # positions later.
-_ROLE_ACCEPTS: dict[str, tuple[str, ...]] = {
+_ROLE_ACCEPTS: dict[Slot, tuple[str, ...]] = {
     'actor': ('actor',),
     'verb': ('verb',),
     'noun': ('actor', 'object'),
@@ -271,7 +267,7 @@ def _render_path(parts: tuple[object, ...]) -> str:
 def _check_position(
     value: object,
     pos: int,
-    role: str,
+    role: Slot,
     full_parts: tuple[object, ...],
 ) -> None:
     """Reject a part whose kind cannot fill this slot.
@@ -297,7 +293,7 @@ def _check_position(
     )
 
 
-def _suggestion_for(role: str) -> str:
+def _suggestion_for(role: Slot) -> str:
     if role == 'actor':
         return (
             'Position 0 is the actor node — pass an actor handle '

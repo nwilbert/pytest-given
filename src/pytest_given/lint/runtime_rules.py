@@ -10,7 +10,6 @@ from ..model import (
     NodeId,
     Phase,
     Scenario,
-    SourceLocation,
     Story,
     TermId,
     id_derive,
@@ -18,7 +17,7 @@ from ..model import (
     iter_steps,
     location_suffix,
 )
-from .base import RULES_BY_ID, Finding, RuleId
+from .base import Finding, RuleId, finding
 
 
 def run_runtime_rules(
@@ -105,7 +104,7 @@ def _tag_shadows_term_findings(
         assert term is not None
         noun = 'scenario' if shadow.scenarios == 1 else 'scenarios'
         findings.append(
-            _finding(
+            finding(
                 RuleId('tag-shadows-term'),
                 subject=slug,
                 node_id=shadow.example,
@@ -139,7 +138,7 @@ def _dead_term_findings(
                     if isinstance(ref, ActivityTermRef):
                         referenced.add(ref.term_id)
     return [
-        _finding(
+        finding(
             RuleId('dead-term'),
             subject=term.id,
             node_id=None,
@@ -154,31 +153,10 @@ def _dead_term_findings(
 def _scenario_finding(rule: RuleId, scenario: Scenario, text: str) -> Finding:
     """A finding about a whole scenario, located and suffixed like a lint
     message anywhere else."""
-    return _finding(
+    return finding(
         rule,
         subject=scenario.id,
         node_id=scenario.id,
         location=scenario.source,
         message=f'{text}{location_suffix(scenario.source)}',
-    )
-
-
-def _finding(
-    rule: RuleId,
-    *,
-    subject: str,
-    node_id: NodeId | None,
-    location: SourceLocation | None,
-    message: str,
-) -> Finding:
-    """A finding at its rule's configured-default severity — the one place
-    that reads `RULES_BY_ID`, so a rule cannot be reported at a level its
-    catalog entry does not name."""
-    return Finding(
-        rule=rule,
-        severity=RULES_BY_ID[rule].default,
-        subject=subject,
-        node_id=node_id,
-        location=location,
-        message=message,
     )

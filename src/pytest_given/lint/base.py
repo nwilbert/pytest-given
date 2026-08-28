@@ -55,3 +55,28 @@ RULES: tuple[LintRule, ...] = (
 )
 
 RULES_BY_ID: dict[RuleId, LintRule] = {rule.id: rule for rule in RULES}
+
+
+def finding(
+    rule: RuleId,
+    *,
+    subject: str,
+    node_id: NodeId | None,
+    location: SourceLocation | None,
+    message: str,
+) -> Finding:
+    """A finding at its rule's catalog-default severity.
+
+    The one place that reads `RULES_BY_ID`, so a rule cannot be reported at a
+    level its catalog entry does not name. Here beside the catalog rather than
+    in either rule module: both surfaces build findings exactly this way, and
+    two copies is one more than the invariant can survive.
+    """
+    return Finding(
+        rule=rule,
+        severity=RULES_BY_ID[rule].default,
+        subject=subject,
+        node_id=node_id,
+        location=location,
+        message=message,
+    )

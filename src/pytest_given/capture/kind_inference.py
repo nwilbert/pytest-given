@@ -19,12 +19,29 @@ from ..model import (
     TermKind,
 )
 
-type _Slot = Literal['actor', 'verb', 'noun']
+type Slot = Literal['actor', 'verb', 'noun']
+
+
+def slot_for(position: int) -> Slot:
+    """Which slot an activity-path position is: 0 is the actor node, odd
+    positions are edges (verbs), even positions from 2 on are further nodes.
+
+    The single definition of the path grammar's positional rule. `story.path`
+    validates a declared kind against it at construction and this module infers
+    an undeclared one from it afterwards — two readings of one rule, and a
+    second copy would let a path that validates get a kind contradicting the
+    slot it validated in.
+    """
+    if position == 0:
+        return 'actor'
+    if position % 2 == 1:
+        return 'verb'
+    return 'noun'
 
 
 def infer_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary:
     """Return a new Glossary with each term's kind inferred/verified."""
-    stories_by_slot: dict[TermId, dict[_Slot, set[str]]] = defaultdict(
+    stories_by_slot: dict[TermId, dict[Slot, set[str]]] = defaultdict(
         lambda: defaultdict(set)
     )
     for story in stories:
@@ -32,7 +49,7 @@ def infer_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary:
             for activity_path in activity.paths:
                 for position, part in enumerate(activity_path.parts):
                     if isinstance(part, ActivityTermRef):
-                        slot = _slot_for(position)
+                        slot = slot_for(position)
                         stories_by_slot[part.term_id][slot].add(story.title)
     inferred_terms = [
         replace(term, kind=_infer_one(term, stories_by_slot.get(term.id, {})))
@@ -41,24 +58,16 @@ def infer_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary:
     return Glossary(terms=inferred_terms)
 
 
-def _slot_for(position: int) -> _Slot:
-    if position == 0:
-        return 'actor'
-    if position % 2 == 1:
-        return 'verb'
-    return 'noun'
-
-
 def _infer_one(
     term: GlossaryTerm,
-    stories_by_slot: dict[_Slot, set[str]],
+    stories_by_slot: dict[Slot, set[str]],
 ) -> TermKind | None:
     slots = set(stories_by_slot)
     if term.kind is not None:
         _verify_declared(term, stories_by_slot)
         return term.kind
     if 'verb' in slots and ('actor' in slots or 'noun' in slots):
-        other: _Slot = 'actor' if 'actor' in slots else 'noun'
+        other: Slot = 'actor' if 'actor' in slots else 'noun'
         where = _where(stories_by_slot, 'verb', other)
         raise PytestGivenError(
             f'term {term.canonical!r} is used in incompatible positions{where}: '
@@ -73,9 +82,7 @@ def _infer_one(
     return None
 
 
-def _verify_declared(
-    term: GlossaryTerm, stories_by_slot: dict[_Slot, set[str]]
-) -> None:
+def _verify_declared(term: GlossaryTerm, stories_by_slot: dict[Slot, set[str]]) -> None:
     declared = term.kind
     slots = set(stories_by_slot)
     if 'verb' in slots and declared != 'verb':
@@ -93,7 +100,7 @@ def _raise_declared(term: GlossaryTerm, slot: str, where: str) -> None:
     )
 
 
-def _where(stories_by_slot: dict[_Slot, set[str]], *slots: _Slot) -> str:
+def _where(stories_by_slot: dict[Slot, set[str]], *slots: Slot) -> str:
     """Story titles for just the named slots, so a conflict names only the
     stories that actually contributed the offending positions."""
     titles = sorted({title for slot in slots for title in stories_by_slot[slot]})

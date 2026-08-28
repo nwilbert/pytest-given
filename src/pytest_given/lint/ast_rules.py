@@ -18,7 +18,7 @@ from ..model import (
     iter_steps,
     location_suffix,
 )
-from .base import RULES_BY_ID, Finding, RuleId
+from .base import Finding, RuleId, finding
 
 # A step body's anchored AST node: the `with` statement of an inline step, or
 # the decorated helper function whose body is the step body. `AsyncFunctionDef`
@@ -302,9 +302,9 @@ def _step_finding(rule: RuleId, anchored: _AnchoredStep, problem: str) -> Findin
 
 
 def _anchored_finding(rule: RuleId, anchored: _AnchoredStep, text: str) -> Finding:
-    return Finding(
-        rule=rule,
-        severity=RULES_BY_ID[rule].default,
+    """A finding about one anchored step, located at the step's own anchor."""
+    return finding(
+        rule,
         subject=anchored.node_id,
         node_id=anchored.node_id,
         location=anchored.source,

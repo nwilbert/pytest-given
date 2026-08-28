@@ -10,6 +10,12 @@ from markupsafe import escape
 _BR = re.compile(r'&lt;br\s*/?\s*&gt;', re.IGNORECASE)
 _NEWLINE = re.compile(r'\r\n|[\r\n]')
 # Code span first so a `*` inside `code` is not treated as emphasis.
+# Deliberately the same alternation as `capture/markdown_glossary._EMPHASIS`,
+# which *strips* this markup from a term cell while this renders it in a
+# definition cell: a term written `**Guest**` must canonicalize to the same
+# word its definition renders bold. The two cannot share one constant —
+# `capture/` and `report/` may not import from each other, and neither
+# pattern belongs in `model/` — so changing one means changing both.
 _INLINE = re.compile(r'`(.+?)`|\*\*(.+?)\*\*|__(.+?)__|\*(.+?)\*')
 
 
