@@ -188,6 +188,20 @@ class StepDescriptor:
         collector.pop_step()
 
     def __call__(self, func: Callable[..., object]) -> StepDecorated:
+        """Decorate `func`: reject the forms this label cannot take, then wrap
+        it in whatever its own flavor needs.
+
+        The two halves are separated because they answer different questions —
+        whether this *label* is legal on this function at all, and which of
+        four wrappers the *function* calls for. Only `sig` crosses between
+        them, and only for a `Template` label, whose per-call substitution
+        needs the signature the validation already had to inspect.
+        """
+        return self._wrapped(func, self._validated(func))
+
+    def _validated(self, func: Callable[..., object]) -> inspect.Signature | None:
+        """Reject the label forms `func` cannot carry, returning the signature
+        a `Template` label binds against (None for every other label)."""
         is_fixture = (
             getattr(func, '_fixture_function_marker', None) is not None
             or getattr(func, '_pytestfixturefunction', None) is not None
@@ -200,16 +214,22 @@ class StepDescriptor:
             )
         if self.is_tstring:
             self._check_tstring_decorator_safety()
-        sig = (
-            self._validate_template_against_signature(func)
-            if self.is_deferred_template
-            else None
-        )
+        if self.is_deferred_template:
+            return self._validate_template_against_signature(func)
+        return None
+
+    def _wrapped(
+        self, func: Callable[..., object], sig: inspect.Signature | None
+    ) -> StepDecorated:
+        """`func` behind the wrapper its flavor needs, carrying this descriptor.
+
+        Four flavors, and the branch order matters: an async generator is
+        neither `isgeneratorfunction` nor `iscoroutinefunction`, so it has to be
+        asked about before the call-time wrappers can claim it.
+        """
         # A generator function is a fixture body: `pytest_fixture_setup` has
         # already made the recording's root from this descriptor, so the
-        # wrapper only carries the marker. Both flavors, since an async
-        # generator is neither `isgeneratorfunction` nor `iscoroutinefunction`
-        # and would otherwise fall through to the call-time wrapper below.
+        # wrapper only carries the marker.
         if inspect.isgeneratorfunction(func):
 
             @functools.wraps(func)
@@ -366,10 +386,12 @@ def normalize_activity(
     """
     if activity is None:
         return ()
-    # `bool` and `str` are rejected before the two accepting branches, not
-    # inside them: a bool is an `int` and a str is a `Sequence[int]` to nobody
-    # but `isinstance`, and `activities='13'` would otherwise yield ids 1 and 3
-    # and fail later against a story that visibly lists them as valid.
+    # Each accepting branch excludes the type that would otherwise slip into
+    # it: a bool is an `int` and a str is a `Sequence[int]` to nobody but
+    # `isinstance`, so both guards carry a `not isinstance(...)` and both
+    # values fall through to the TypeError at the end. Without them
+    # `activities='13'` would yield ids 1 and 3 and fail later against a story
+    # that visibly lists them as valid.
     if isinstance(activity, int) and not isinstance(activity, bool):
         return (ActivityId(activity),)
     if isinstance(activity, Sequence) and not isinstance(activity, str):
