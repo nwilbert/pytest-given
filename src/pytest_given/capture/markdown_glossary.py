@@ -9,20 +9,13 @@ name (case-insensitive) or a 0-based index.
 import re
 from dataclasses import dataclass
 
-from ..model import PytestGivenError
+from ..model import EMPHASIS, PytestGivenError
 
 type ColumnSpec = int | str
 
 _SEPARATOR_CELL = re.compile(r'^:?-+:?$')
 _FENCE = re.compile(r'^\s*(```|~~~)')
 _SPLIT_ON_UNESCAPED_PIPE = re.compile(r'(?<!\\)\|')
-
-# Unwrap inline emphasis so a term cell written as `**Scenario**` yields the
-# plain canonical `Scenario`. Only paired markers are unwrapped; a lone
-# underscore inside an identifier (e.g. work_object) is left untouched. Code
-# span first, matching `report/inline_markdown.py`, which renders this same
-# markup in a definition cell — the two have to agree on what a span means.
-_EMPHASIS = re.compile(r'`(.+?)`|\*\*(.+?)\*\*|__(.+?)__|\*(.+?)\*')
 
 
 @dataclass(frozen=True)
@@ -102,13 +95,17 @@ def _strip_emphasis(cell: str) -> str:
     from a cell, leaving its text content. Applied to term and kind cells so a
     glossary written with emphasized term names renders clean pills.
 
+    The span grammar is `model.EMPHASIS`, shared with the renderer that turns
+    this same markup into HTML in a definition cell; only what a match becomes
+    differs.
+
     Nesting unwraps by recursing into each match rather than by re-running the
     pattern over the whole string: a repeated whole-string pass re-enters a
     code span it has already unwrapped and strips markup that is literal
     there, so `` `a*b*c` `` canonicalized to `abc` while the identical markup
     in a definition cell rendered as `a*b*c`.
     """
-    return _EMPHASIS.sub(_unwrap_emphasis, cell).strip()
+    return EMPHASIS.sub(_unwrap_emphasis, cell).strip()
 
 
 def _unwrap_emphasis(match: re.Match[str]) -> str:
@@ -116,7 +113,7 @@ def _unwrap_emphasis(match: re.Match[str]) -> str:
     if code is not None:
         return code
     inner = next(g for g in (bold_star, bold_underscore, italic) if g is not None)
-    return _EMPHASIS.sub(_unwrap_emphasis, inner)
+    return EMPHASIS.sub(_unwrap_emphasis, inner)
 
 
 def _is_table_row(line: str) -> bool:

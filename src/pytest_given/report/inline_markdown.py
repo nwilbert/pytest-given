@@ -6,17 +6,11 @@ import re
 
 from markupsafe import escape
 
+from ..model import EMPHASIS
+
 # Re-admit an author's escaped <br> / <br/> / <br /> (any case) as a real break.
 _BR = re.compile(r'&lt;br\s*/?\s*&gt;', re.IGNORECASE)
 _NEWLINE = re.compile(r'\r\n|[\r\n]')
-# Code span first so a `*` inside `code` is not treated as emphasis.
-# Deliberately the same alternation as `capture/markdown_glossary._EMPHASIS`,
-# which *strips* this markup from a term cell while this renders it in a
-# definition cell: a term written `**Guest**` must canonicalize to the same
-# word its definition renders bold. The two cannot share one constant —
-# `capture/` and `report/` may not import from each other, and neither
-# pattern belongs in `model/` — so changing one means changing both.
-_INLINE = re.compile(r'`(.+?)`|\*\*(.+?)\*\*|__(.+?)__|\*(.+?)\*')
 
 
 def _emphasis(match: re.Match[str]) -> str:
@@ -33,7 +27,12 @@ def _emphasis(match: re.Match[str]) -> str:
 
 def render_inline_markdown(text: str) -> str:
     """HTML-escape `text`, then render **bold**/__bold__, *italic*, `code`, and
-    hard breaks (<br> or a newline) as safe inline HTML."""
+    hard breaks (<br> or a newline) as safe inline HTML.
+
+    The span grammar is `model.EMPHASIS`, shared with the glossary parser that
+    strips this same markup from a term cell; only what a match becomes
+    differs.
+    """
     escaped = str(escape(text))
     with_breaks = _NEWLINE.sub('<br>', _BR.sub('<br>', escaped))
-    return _INLINE.sub(_emphasis, with_breaks)
+    return EMPHASIS.sub(_emphasis, with_breaks)
