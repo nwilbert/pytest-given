@@ -127,36 +127,42 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
-def _resolve_title(config: pytest.Config) -> str | None:
-    """The report title: CLI flag (when given) wins over the ini value.
+def _cli_over_ini(config: pytest.Config, name: str) -> str | bool:
+    """The value of a dual CLI/ini option: the flag when it was given at all,
+    otherwise the ini.
 
-    None when neither is set, which leaves renderers on the rootdir name.
+    The precedence rule for every option carrying both, stated once — the
+    reason `_GivenConfig` exists is that no read site should re-derive it, and
+    three copies of the rule in this module was the same problem one scope in.
+
+    Presence is `is not None`, never truthiness: the flags all default to None
+    and an explicitly empty one means what it says. `--given-source-link=`
+    disables links rather than falling through to whatever the ini declares.
+    The ini value is returned as pytest typed it (`str` for a string ini,
+    `bool` for a bool one), so each caller below converts its own.
     """
-    cli = config.getoption('given_title')
+    cli = config.getoption(name)
     if cli is not None:
         return cast('str', cli)
-    return cast('str', config.getini('given_title')) or None
+    return cast('str | bool', config.getini(name))
+
+
+def _resolve_title(config: pytest.Config) -> str | None:
+    """The report title. None when neither flag nor ini is set, which leaves
+    renderers on the rootdir name."""
+    return cast('str', _cli_over_ini(config, 'given_title')) or None
 
 
 def _resolve_lint_enabled(config: pytest.Config) -> bool:
-    """The lint switch: CLI flag (when given) wins over the ini value."""
-    cli = config.getoption('given_lint')
-    if cli is not None:
-        return cast('str', cli) == 'true'
-    return bool(config.getini('given_lint'))
+    """The lint switch. The flag spells it `'true'` / `'false'`; the ini is
+    already a bool."""
+    value = _cli_over_ini(config, 'given_lint')
+    return value == 'true' if isinstance(value, str) else bool(value)
 
 
 def _resolve_source_link(config: pytest.Config) -> str:
-    """The source-link template: CLI flag (when given) wins over the ini value.
-
-    Tested with `is not None` like the other two rather than for truthiness, so
-    an explicit `--given-source-link=` means what it says — no links — instead
-    of falling through to whatever the ini declares.
-    """
-    cli = config.getoption('given_source_link')
-    if cli is not None:
-        return cast('str', cli)
-    return cast('str', config.getini('given_source_link'))
+    """The source-link template or preset name."""
+    return cast('str', _cli_over_ini(config, 'given_source_link'))
 
 
 def pytest_configure(config: pytest.Config) -> None:

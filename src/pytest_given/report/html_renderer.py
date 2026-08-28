@@ -313,7 +313,7 @@ def _render_narration_part(
             assert_never(part)
 
 
-_TERM_KIND_CLASSES = {
+_TERM_KIND_CLASSES: dict[str | None, str] = {
     'actor': 'term-ref-actor',
     'object': 'term-ref-object',
     'verb': 'term-ref-verb',
@@ -321,9 +321,10 @@ _TERM_KIND_CLASSES = {
 
 
 def _term_kind_class(kind: str | None) -> str:
-    return (
-        _TERM_KIND_CLASSES.get(kind, 'term-ref-unknown') if kind else 'term-ref-unknown'
-    )
+    """The CSS class for a term's kind. A kind still deferred to inference —
+    or one this renderer does not know — falls back, and `dict.get` already
+    reads `None` as a miss."""
+    return _TERM_KIND_CLASSES.get(kind, 'term-ref-unknown')
 
 
 def _term_ref_span(

@@ -132,14 +132,16 @@ def build_coverage_maps(
     story_index: dict[StoryId, Story] = {s.id: s for s in report.stories}
     result: dict[NodeId, dict[ActivityId, set[StepRef]]] = {}
     for scenario in report.scenarios:
-        if glossary is None or scenario.story_id is None:
-            result[scenario.id] = {}
-            continue
-        story = story_index.get(scenario.story_id)
-        if story is None:
-            result[scenario.id] = {}
-            continue
-        result[scenario.id] = compute_coverage(glossary, scenario, story)
+        story = (
+            story_index.get(scenario.story_id)
+            if scenario.story_id is not None
+            else None
+        )
+        result[scenario.id] = (
+            compute_coverage(glossary, scenario, story)
+            if glossary is not None and story is not None
+            else {}
+        )
     return result
 
 
