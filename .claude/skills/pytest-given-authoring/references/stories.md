@@ -17,7 +17,7 @@ book_a_group_trip = story('Book a Group Trip', [
 - An activity reads left-to-right: **actor → verb → work object**, with optional connective words (`'for'`, `'to'`) between parts. Structurally it is a strict node/edge alternation of odd length ≥ 3: even positions are entity nodes (position 0 is the acting actor), odd positions are edges (a verb or a connective).
 - **A bare word consumes a position.** Write a connective as one string in an edge slot (`'to the'`, `'with a'`); never insert a standalone article before a noun — it shifts the noun into a verb slot and construction fails.
 - Handles come from the glossary; calling one supplies an instance or inflection — `organizer('Carol')`, `search('searches for')`.
-- Any part may be a **bare string** instead of a glossary handle — but an activity needs at least two distinct glossary terms to be coverage-tracked; under-anchored activities render as "not coverage-tracked".
+- Any part may be a **bare string** instead of a glossary handle — but an activity needs at least two distinct glossary terms to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them (below).
 - `path(...)` branches an activity where alternate sequences run in parallel or share a prefix:
 
 ```python
@@ -47,7 +47,7 @@ Two corollaries of "per step":
 - **Only step narration counts.** Term refs in the `@scenario` name never contribute. A scenario titled with both actors stays uncovered until those refs also appear in a `given`/`when`/`then`.
 - **Growing an activity's terms raises its coverage bar.** Adding a term — or narrowing one to an instance (`room` → `room('Deluxe Suite')`) — makes every covering step carry the new identity too, so editing a story can silently uncover a scenario that used to cover it (a pinned step is immune). Re-render the Stories tab after touching an activity.
 
-A step can also **pin** an activity explicitly — `given(text, activity=3)`, taking the 1-based activity number in the story (or a sequence of numbers). A pin *replaces* narration matching for that step rather than adding to it: the step covers exactly the activities it names and no others, however well its text fits them. Use a pin when the activity is phrased above the vocabulary the step narrates (e.g. a process-level activity implemented by a technical test), and keep it on the one step that genuinely demonstrates the activity.
+A step can also **pin** an activity explicitly — `given(text, activity=3)`, taking the 1-based activity number in the story (or a sequence of numbers). A pin *replaces* narration matching for that step rather than adding to it: the step covers exactly the activities it names and no others, however well its text fits them. A pin is also the only thing that reaches an under-anchored activity: the two-term rule gates narration matching, not pins. Use a pin when the activity is phrased above the vocabulary the step narrates (e.g. a process-level activity implemented by a technical test), and keep it on the one step that genuinely demonstrates the activity.
 
 An uncovered activity is a signal, not an error — it marks vocabulary and behavior no test exercises yet.
 

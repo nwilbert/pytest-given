@@ -75,7 +75,7 @@ class GlossaryAggregation:
 @dataclass
 class ActivityCoverage:
     """Per-activity coverage rollup: which scenarios cover it, pass/skip counts,
-    total, and whether it is eligible for coverage matching at all."""
+    total, and whether it is eligible for narration matching at all."""
 
     scenario_ids: list[NodeId] = field(default_factory=list)
     passed: int = 0
@@ -85,6 +85,16 @@ class ActivityCoverage:
     @property
     def total(self) -> int:
         return len(self.scenario_ids)
+
+    @property
+    def untracked(self) -> bool:
+        """Whether the report can say nothing about this activity.
+
+        Ineligibility alone no longer settles it: an `activity=` pin covers an
+        under-anchored activity that narration matching cannot reach, and a
+        covered activity must never render as untracked.
+        """
+        return not self.eligible and not self.total
 
     @property
     def failed(self) -> int:

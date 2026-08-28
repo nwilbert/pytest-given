@@ -334,7 +334,7 @@ book_a_group_trip = story('Book a Group Trip', [
 ])
 ```
 
-An activity reads left-to-right: actor → verb → work object (with optional connective words). Any part may be a bare string instead of a glossary handle — but an activity needs at least two distinct glossary terms to be tracked for coverage; under-anchored activities render as "not coverage-tracked". `path(...)` lets a story branch where alternate activity sequences share a prefix.
+An activity reads left-to-right: actor → verb → work object (with optional connective words). Any part may be a bare string instead of a glossary handle — but an activity needs at least two distinct glossary terms to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them explicitly. `path(...)` lets a story branch where alternate activity sequences share a prefix.
 
 **3. Scenario ↔ activity binding** — link a scenario (and individual steps) to the story it implements:
 

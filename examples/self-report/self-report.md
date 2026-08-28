@@ -1269,8 +1269,16 @@
 - **when** the story rollups are built
 - **then** only the anchored «Activity» is «Coverage»-eligible
 
+## ✓ A pinned under-anchored «activity» stops reading as untracked
+`tests/unit/report/test_aggregations.py:660::test_build_story_rollups_pinned_under_anchored_activity_is_tracked`
+
+- **given** a «Story» whose only «Activity» is under-anchored
+- **given** a «Scenario» whose «step» pins it by id
+- **when** the story rollups are built
+- **then** it stays narration-ineligible but is no longer untracked
+
 ## ✓ An «Activity» is labeled by the prose of its «paths»
-`tests/unit/report/test_aggregations.py:714::test_build_activity_labels_joins_parts_into_prose`
+`tests/unit/report/test_aggregations.py:762::test_build_activity_labels_joins_parts_into_prose`
 
 - **given** a «Story» with a two-«path» «activity»
 - **when** the «activity» labels are built
@@ -1376,12 +1384,12 @@
 - **when** a «Step» «binds» to it explicitly by id
 - **then** «Coverage» counts it directly, without identity matching
 
-## ✓ An explicit binding still requires eligibility
-`tests/unit/report/test_coverage.py:545::test_compute_coverage_explicit_binding_ignored_for_ineligible_activity` · validation
+## ✓ An explicit binding covers an under-anchored «activity»
+`tests/unit/report/test_coverage.py:545::test_compute_coverage_explicit_binding_covers_under_anchored_activity`
 
 - **given** a «Story» whose «Activity» is under-anchored
 - **when** a «Step» «binds» to it explicitly by id
-- **then** eligibility gates the binding, so «Coverage» stays empty
+- **then** «Coverage» counts it, despite the missing anchors
 
 ## ✓ «Parameter coloring» marks placeholders and table headers
 `tests/unit/report/test_html_renderer.py:212::test_render_parametrized_step_with_structured_narration`

@@ -657,6 +657,54 @@ def test_build_story_rollups_flags_under_anchored_activity_ineligible() -> None:
         assert per_activity[ActivityId(2)].eligible is False
 
 
+@scenario(
+    t'A pinned under-anchored {pg["Activity"].low} stops reading as untracked',
+)
+def test_build_story_rollups_pinned_under_anchored_activity_is_tracked() -> None:
+    """`untracked` is what the timeline renders as '—'. An under-anchored
+    activity earns it only while nothing pins it."""
+    with given(t'a {pg["Story"]} whose only {pg["Activity"]} is under-anchored'):
+        g = _g()
+        under_anchored = Activity(
+            id=ActivityId(1),
+            paths=(
+                ActivityPath(
+                    parts=(
+                        _ent('guest', 'Guest'),
+                        ActivityWord(text='browses'),
+                        ActivityWord(text='listings'),
+                    )
+                ),
+            ),
+        )
+        story = Story(id=StoryId('book'), title='Book', activities=(under_anchored,))
+    with given(t'a {pg["Scenario"]} whose {pg["Step"].low} pins it by id'):
+        pinned = Scenario(
+            id=NodeId('test::a'),
+            narration=Narration(text='a'),
+            module='m',
+            status='passed',
+            story_id=StoryId('book'),
+            steps=[
+                Step(
+                    phase='when',
+                    narration=Narration(text='the listing page is opened'),
+                    activity_ids=[ActivityId(1)],
+                )
+            ],
+        )
+        rd = ReportData(
+            metadata=_meta(), scenarios=[pinned], stories=[story], glossary=g
+        )
+    with when('the story rollups are built'):
+        rollups = build_story_rollups(rd, build_coverage_maps(rd))
+    with then(t'it stays narration-ineligible but is no longer untracked'):
+        cov = rollups[StoryId('book')].per_activity[ActivityId(1)]
+        assert cov.eligible is False
+        assert cov.total == 1
+        assert cov.untracked is False
+
+
 def _covering_scn(node_id: str, status: str) -> Scenario:
     """A scenario whose single step references guest/search/room, so it covers
     the guest-search-room activity used across the rollup-count tests."""

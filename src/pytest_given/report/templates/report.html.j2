@@ -357,7 +357,7 @@
               {% endfor %}
             </div>
             <div class="activity-cov">
-              {% if not cov.eligible %}
+              {% if cov.untracked %}
               <span class="cov-chip cov-untracked" title="insufficient number of glossary terms for matching">—</span>
               {% elif cov.total == 0 %}
               <span class="cov-chip cov-uncovered">no coverage</span>
@@ -369,7 +369,7 @@
                   so the row keeps one meaning per click: the row selects, this
                   leaves for the Scenarios view. Only where there is something
                   to show — an uncovered activity would land on an empty list. -#}
-              {% if cov.eligible and cov.total %}
+              {% if cov.total %}
               <button type="button" class="use-chip activity-jump"
                       data-activity-jump="{{ story.id }}:{{ activity.id }}">Open in Scenarios <span aria-hidden="true">→</span></button>
               {% endif %}

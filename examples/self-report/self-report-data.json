@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-27T20:14:49.651092+00:00",
+    "timestamp": "2026-08-28T08:20:31.004351+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "2c91b0e98aa10a0046c3ff876a37031e5149d5f9",
+    "commit_sha": "1fe8743eba24a0d97756048f3552875c5285a7f2",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -12160,6 +12160,128 @@
       "activity_ids": []
     },
     {
+      "id": "tests/unit/report/test_aggregations.py::test_build_story_rollups_pinned_under_anchored_activity_is_tracked",
+      "narration": {
+        "text": "A pinned under-anchored activity stops reading as untracked",
+        "parts": [
+          {
+            "value": "A pinned under-anchored "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
+          },
+          {
+            "value": " stops reading as untracked"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_aggregations",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Story whose only Activity is under-anchored",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " whose only "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
+              },
+              {
+                "value": " is under-anchored"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Scenario whose step pins it by id",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]"
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " pins it by id"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the story rollups are built",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it stays narration-ineligible but is no longer untracked",
+            "parts": [
+              {
+                "value": "it stays narration-ineligible but is no longer untracked"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_aggregations.py",
+        "line": 660
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "tests/unit/report/test_aggregations.py::test_build_activity_labels_joins_parts_into_prose",
       "narration": {
         "text": "An Activity is labeled by the prose of its paths",
@@ -12275,7 +12397,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 714
+        "line": 762
       },
       "story_id": null,
       "activity_ids": []
@@ -13981,15 +14103,22 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_explicit_binding_ignored_for_ineligible_activity",
+      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_explicit_binding_covers_under_anchored_activity",
       "narration": {
-        "text": "An explicit binding still requires eligibility",
-        "parts": []
+        "text": "An explicit binding covers an under-anchored activity",
+        "parts": [
+          {
+            "value": "An explicit binding covers an under-anchored "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
+          }
+        ]
       },
       "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "validation"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -14058,18 +14187,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "eligibility gates the binding, so Coverage stays empty",
+            "text": "Coverage counts it, despite the missing anchors",
             "parts": [
-              {
-                "value": "eligibility gates the binding, so "
-              },
               {
                 "term_id": "coverage",
                 "display": "Coverage",
                 "expression": "pg[\"Coverage\"]"
               },
               {
-                "value": " stays empty"
+                "value": " counts it, despite the missing anchors"
               }
             ]
           },
@@ -14107,7 +14233,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 68,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -17941,7 +18067,7 @@
         "id": "deferred-term",
         "kind": null,
         "canonical": "Deferred term",
-        "definition": "A term obtained before its kind is known \u2014 the `DeferredTermHandle` returned by the code glossary (`g('foo')` declare-or-get, `g['foo']` get-only) and by a *file glossary* (`g['Guest']`). It is the one `TermHandle` type every term is handed as, refined only by what defers: the kind stays `None` until *kind inference* runs.",
+        "definition": "A term handed over before its kind is settled \u2014 the `DeferredTermHandle` returned by the code glossary (`g('foo')` declare-or-get, `g['foo']` get-only) and by every *file glossary* lookup (`g['Guest']`). It subclasses the plain `TermHandle` that the typed registrations (`g.actor(...)` and friends) return, and adds no behavior \u2014 it marks only that the kind was left open. The deferral is in the handing over, not the term: a row with an explicit `kind_column` arrives through the same handle already kinded, while the rest stay `None` until *kind inference* runs.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 67
@@ -18081,7 +18207,7 @@
         "id": "coverage",
         "kind": null,
         "canonical": "Coverage",
-        "definition": "The \"did this scenario touch that activity\" relation. Computed by the *A_refs \u2286 S* rule: an activity is covered when its set of term references (as identities, with a canonical fallback) is a subset of a single step's term-reference identities \u2014 matching is per step, not against the union across steps. A step can also cover an activity explicitly via the `activity=` pin, regardless of its narration.",
+        "definition": "The \"did this scenario touch that activity\" relation. Computed by the *A_refs \u2286 S* rule: an activity is covered when its set of term references (as identities, with a canonical fallback) is a subset of a single step's term-reference identities \u2014 matching is per step, not against the union across steps. A step can also cover an activity explicitly via the `activity=` pin, regardless of its narration or its term count.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 81

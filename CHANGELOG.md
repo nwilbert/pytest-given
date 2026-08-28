@@ -189,6 +189,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - Accent-colored text and the parametrize column colors now meet WCAG AA, term
   kinds stay distinguishable for red-green color blindness, and attachment badges
   are keyboard-operable.
+- A step pinned with `given(..., activity=N)` now covers an under-anchored
+  activity as well; the two-distinct-terms rule gates narration matching only,
+  and a covered activity no longer renders as "not coverage-tracked".
 
 #### Bundled skills
 

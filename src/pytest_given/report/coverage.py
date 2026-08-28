@@ -75,9 +75,10 @@ def a_refs(glossary: Glossary, activity: Activity) -> set[Identity]:
 
 
 def is_coverage_eligible(activity: Activity) -> bool:
-    """An activity participates in coverage matching only if it carries at
+    """An activity participates in *narration* matching only if it carries at
     least two distinct glossary term refs. Under-anchored activities (0 or 1
-    distinct term) are excluded from matching and render 'not coverage-tracked'."""
+    distinct term) are excluded from it, and render 'not coverage-tracked'
+    unless an `activity=` pin covers them anyway."""
     term_ids = {
         part.term_id
         for activity_path in activity.paths
@@ -129,7 +130,9 @@ def compute_coverage(
     Scope: if scenario.activity_ids is non-empty, only those activity ids
     can appear in the result. Otherwise every story activity is considered.
     Under-anchored activities (fewer than 2 distinct term refs) are excluded
-    from matching and never appear in the result.
+    from *narration* matching — the ``A_refs ⊆ S`` rule would let one term, or
+    none, be covered by almost any step. An explicit ``activity=`` pin says
+    what the narration cannot, so it reaches them too; only scope bounds it.
 
     Matching uses an inverted index `identity → activity_ids` built once
     per scenario: per step, the candidate set narrows to activities sharing
@@ -157,7 +160,7 @@ def compute_coverage(
         ref: StepRef = (scenario.id, path_index)
         if step.activity_ids:
             for aid in step.activity_ids:
-                if aid in refs_by_activity:
+                if aid in scope:
                     result.setdefault(aid, set()).add(ref)
             continue
         s_cache = s_for_step(glossary, step)

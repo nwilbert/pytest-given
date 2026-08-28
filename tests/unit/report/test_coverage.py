@@ -543,12 +543,11 @@ def test_compute_coverage_explicit_step_binding_covers_eligible_activity(g):
 
 
 @scenario(
-    'An explicit binding still requires eligibility',
-    tags=['validation'],
+    t'An explicit binding covers an under-anchored {pg["Activity"].low}',
 )
-def test_compute_coverage_explicit_binding_ignored_for_ineligible_activity(g):
-    """An explicit binding to an under-anchored (ineligible) activity is
-    ignored — eligibility gates explicit bindings too."""
+def test_compute_coverage_explicit_binding_covers_under_anchored_activity(g):
+    """Eligibility gates narration matching only. An explicit binding says what
+    the narration cannot, so it covers an under-anchored activity too."""
     with given(t'a {pg["Story"]} whose {pg["Activity"]} is under-anchored'):
         activity = Activity(
             id=ActivityId(1),
@@ -567,5 +566,5 @@ def test_compute_coverage_explicit_binding_ignored_for_ineligible_activity(g):
     ):
         scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
         coverage = compute_coverage(g, scenario, story)
-    with then(t'eligibility gates the binding, so {pg["Coverage"]} stays empty'):
-        assert ActivityId(1) not in coverage
+    with then(t'{pg["Coverage"]} counts it, despite the missing anchors'):
+        assert ActivityId(1) in coverage
