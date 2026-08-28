@@ -125,26 +125,32 @@ class _SessionReport:
 def pytest_sessionfinish(session: pytest.Session) -> None:
     """Build the report and write the configured sinks.
 
-    Every failure in here is a `PytestGivenError` — a rejected grouping form, a
-    suite reaching two glossaries, a term used in incompatible slots, an
-    unusable source-link template, colliding scenario slugs — and an exception
-    leaving this hook is neither a test failure nor an INTERNALERROR: pytest
-    lets it out of `console_main` as a bare traceback, with no summary line and
-    no exit code at all. So the whole body runs under one handler that reports
-    through the terminal summary, discards the sinks this run would have
-    written, and fails the run.
+    Building a report fails with a `PytestGivenError` — a rejected grouping
+    form, a suite reaching two glossaries, a term used in incompatible slots, an
+    unusable source-link template, colliding scenario slugs — and writing one
+    fails with an `OSError`: a read-only output directory, a full disk, a path
+    whose parent cannot be created. An exception leaving this hook is neither a
+    test failure nor an INTERNALERROR: pytest lets it out of `console_main` as a
+    bare traceback, with no summary line and no exit code at all. So both run
+    under one handler that reports through the terminal summary, discards the
+    sinks this run would have written, and fails the run.
 
     Guarding only the grouping call is not enough, and neither is guarding each
     step separately: the sinks have to stay consistent *with each other*. They
     are therefore rendered in full before any of them is written, so a render
     that raises cannot leave this run's JSON beside the previous run's HTML —
-    two reports that disagree, with nothing on either saying so.
+    two reports that disagree, with nothing on either saying so. `write_sinks`
+    is inside the same handler for that reason and not only for the traceback:
+    it writes one file at a time, so a disk filling between the first and the
+    second leaves exactly that pair, and only discarding both puts the run back
+    to having no report rather than half of one.
     """
     collector = _collector(session.config)
     state = _state(session.config)
     try:
         built = _build_report(session, collector, state.param_info)
-    except PytestGivenError as error:
+        write_sinks(built.sinks)
+    except (PytestGivenError, OSError) as error:
         session.config.stash[_session_outcome].report_error = '\n'.join(
             [str(error), *discard_stale_sinks(_sink_config(session.config))]
         )
@@ -154,7 +160,6 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         # Every way out drops the captured parametrize values: they are read
         # only here, and a nested in-process run must not inherit them.
         state.param_info.clear()
-    write_sinks(built.sinks)
     if built.sinks.md_stdout is not None:
         session.config.stash[_session_outcome].md_stdout = built.sinks.md_stdout
     _run_lint(session, built.scenarios, built.glossary, built.stories)

@@ -152,11 +152,13 @@ form `## [x.y.z] - YYYY-MM-DD`.
   instead of leaving it green in a report pytest counted as an error.
 - An error-level narration-lint finding now counts as an error in the run's
   summary line, which previously read green over the non-zero exit code.
-- Every report-building failure — a suite reaching two glossaries, a term used in
-  incompatible slots, an unusable source-link template — now surfaces as a
-  terminal summary and a failing exit code, where only grouping errors did.
-- The sinks are now rendered in full before any is written, so a failing render
-  can no longer leave this run's JSON beside the previous run's HTML.
+- Every failure building or writing a report — a suite reaching two glossaries, a
+  term used in incompatible slots, an unusable source-link template, an
+  unwritable output path — now surfaces as a terminal summary and a failing exit
+  code, where only grouping errors did.
+- The sinks are now rendered in full before any is written, and a failure on
+  either side discards all of them, so a run can no longer leave its JSON beside
+  the previous run's HTML.
 
 #### Report content (all formats)
 

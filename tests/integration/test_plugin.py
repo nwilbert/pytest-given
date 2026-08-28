@@ -456,6 +456,47 @@ def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):
     assert not html_path.exists()
 
 
+def test_a_write_failure_leaves_no_half_written_report(pytester, tmp_path):
+    """A sink that cannot be written fails the run the way one that cannot be
+    rendered does.
+
+    `write_sinks` writes one file at a time, so a failure on the second leaves
+    the first behind — this run's JSON with no HTML beside it, which reads as a
+    complete report. And an exception escaping `pytest_sessionfinish` is not an
+    INTERNALERROR: pytest lets it out of `console_main` as a bare traceback with
+    no summary line at all.
+
+    The HTML's parent is a regular file, so `mkdir(parents=True, exist_ok=True)`
+    raises on every platform — unlike a permission bit, which native Windows
+    does not honor this way.
+    """
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, then
+
+        @scenario("Brew")
+        def test_brew():
+            with then("it brews"):
+                assert True
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    blocker = tmp_path / 'blocker'
+    blocker.write_text('not a directory')
+    result = pytester.runpytest(
+        f'--given-json={json_path}',
+        f'--given-html={blocker / "report.html"}',
+        '-ra',
+    )
+    assert result.ret == pytest.ExitCode.TESTS_FAILED
+    result.stdout.fnmatch_lines(['*report not written*'])
+    # The summary line counts it, so the run cannot read green while exiting
+    # non-zero — and the JSON that did land is discarded with the one that
+    # did not.
+    result.stdout.fnmatch_lines(['*1 passed*1 error*'])
+    assert not json_path.exists()
+
+
 def test_an_unwritable_report_shows_in_the_summary_line(pytester, tmp_path):
     """A run that writes no report must not print a green summary.
 
