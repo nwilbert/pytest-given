@@ -10,7 +10,7 @@ The test suite narrates itself: rendered scenarios are a behavioral spec, the gl
 ## Orientation — first contact
 
 1. **Glossary first.** Read `GLOSSARY.md` (or the `Glossary()` / `FileGlossary` declaration reachable from a `conftest.py`): the domain vocabulary, with definitions.
-2. **Render the spec.** `pytest <selection> --given-md` runs the selected tests and prints a Markdown spec of every scenario to stdout between `<!-- pytest-given:md:start -->` / `:end` fences — narration with `«term»` markers, a ``file.py:line::test_name`` anchor under each heading with the scenario's tags after it, and a ✓ / ✗ / ⤼ status glyph per scenario (a skipped one also carries ` · skipped` and its reason). Select with pytest's own args (`-k`, node ids, `--lf`); the renderer narrates whatever ran.
+2. **Render the spec.** `pytest <selection> --given-md` runs the selected tests and prints a Markdown spec of every scenario to stdout between `<!-- pytest-given:md:start -->` / `:end` fences — narration with `«term»` markers, a ``file.py:line::test_name`` anchor under each heading with the scenario's tags after it, and a ✓ / ✗ / ⤼ status glyph per scenario (a skipped one also carries ` · skipped` and its reason). A grouped parametrized scenario reads ` · N cases` and renders its parameter table below the steps, one row per case with its own glyph. Select with pytest's own args (`-k`, node ids, `--lf`); the renderer narrates whatever ran.
 3. **Stories.** Read the `story(...)` definitions — actor-level flows the scenarios implement; `story=` on a `@scenario` links them.
 
 ## Structured questions — JSON + jq
@@ -32,7 +32,7 @@ jq -r '.scenarios[] | select(.tags | index("validation"))
 - **Scenario tags are report metadata, not pytest marks.** `pytest -m <tag>` selects nothing — that is expected, not a broken suite. Filter tags via the JSON report or read them in the Markdown output.
 - **Put a bare `--given-md` / `--given-json` last on the command line** (or use the `=PATH` form): a path-like token right after the bare flag is parsed as its output path, silently changing what runs.
 - **The Markdown report contains scenarios only.** Glossary and stories render in the HTML report (`--given-html`) and live in the JSON (`.glossary.terms[]`, `.stories[]`).
-- A ✗ scenario in the Markdown shows the steps that ran, not the traceback — read `.error` in the JSON or rerun that node id with plain pytest.
+- A ✗ scenario in the Markdown carries the failure's first message line and its innermost non-internal frame as a blockquote (a grouped one, per failing case under the table) — usually enough to place the failure. Drop to `.error` in the JSON, or rerun the node id with plain pytest, when you need the full frame list.
 - Re-render a saved run without rerunning tests: `pytest-given report <data.json> --format md`.
 
 ## When to drop to the code

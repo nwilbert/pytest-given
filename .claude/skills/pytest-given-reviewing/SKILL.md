@@ -5,7 +5,7 @@ description: Use when reviewing pytest-given artifacts — checking @scenario na
 
 # Reviewing pytest-given artifacts
 
-Narration is **auditable, not verified**: nothing mechanical compares a step's text to its body, so a passing suite says nothing about the narration being true. Review in layers — the lint decides what is mechanically decidable, a semantic audit judges what it can't, then a completeness audit asks what the report leaves out entirely. Don't skip layer 1: it is cheaper and stricter than re-deriving the same findings by reading.
+Narration is **auditable, not verified**: nothing mechanical compares a step's text to its body, so a passing suite says nothing about the narration being true. Review in layers — the lint decides what is mechanically decidable, a semantic audit judges what it can't, a completeness audit asks what the report leaves out entirely, and a last pass checks the glossary, tags and stories for hygiene. Don't skip layer 1: it is cheaper and stricter than re-deriving the same findings by reading.
 
 ## 1. Structural gate — run the lint first
 

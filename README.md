@@ -380,6 +380,8 @@ All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-
 
 Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection.
 
+The ini settings live in `[tool.pytest]`, pytest 9's native TOML table. The legacy `[tool.pytest.ini_options]` is still read, but the two are mutually exclusive — pytest raises `UsageError` if both are present.
+
 ## Narration lint
 
 `--given-lint=true` runs a rule catalog over the scenarios the run just recorded, catching steps whose narration lies about their body — an empty `given`, a `then` that checks nothing, an action smuggled into an assertion. The AST rules analyze exactly the steps the run identified (there is no parallel static discovery), so decorated helpers, fixtures, and `when_then` pairs are all attributed correctly.
@@ -470,7 +472,6 @@ Caveats:
 
 - Editor presets (`vscode` / `cursor` / `zed`) resolve `{path}` from the current working directory at render time. Re-rendering a CI-downloaded JSON from a different directory will produce broken links.
 - The GitHub-permalink template is SHA-pinned, so links remain stable after the line moves — what an archived CI report wants.
-- Pytest 9 uses `[tool.pytest]`; older pytest used `[tool.pytest.ini_options]` (still accepted for back-compat).
 
 ## Standalone CLI
 
@@ -515,7 +516,7 @@ Adopt selectively: decorate the tests that assert behavior, and leave plumbing (
 
 ### Agent skills
 
-`pytest-given skills install` copies the bundled [Agent Skills](https://agentskills.io) into your repo's `.claude/skills/`, where Claude Code (and other harnesses following the same format) auto-discover them. It ships three skills: **`pytest-given-authoring`** — a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories; **`pytest-given-navigating`** — how to explore a codebase through its rendered reports (`--given-md` for the prose spec, `--given-json` + `jq` for filtering by tag, term, or status) instead of grepping test bodies; and **`pytest-given-reviewing`** — a three-layer review of narrated tests (the narration lint as the structural gate, a semantic audit of step text against step bodies — may abstract, never overstate — then a completeness audit of what the report leaves out). The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` detects drift in CI. Use `--dest` for a non-default skills directory.
+`pytest-given skills install` copies the bundled [Agent Skills](https://agentskills.io) into your repo's `.claude/skills/`, where Claude Code (and other harnesses following the same format) auto-discover them. It ships three skills: **`pytest-given-authoring`** — a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories; **`pytest-given-navigating`** — how to explore a codebase through its rendered reports (`--given-md` for the prose spec, `--given-json` + `jq` for filtering by tag, term, or status) instead of grepping test bodies; and **`pytest-given-reviewing`** — a layered review of narrated tests (the narration lint as the structural gate, a semantic audit of step text against step bodies — may abstract, never overstate — a completeness audit of what the report leaves out, then a hygiene pass over the glossary, tags and stories). The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` detects drift in CI. Use `--dest` for a non-default skills directory.
 
 ```bash
 pytest-given skills install            # copies into ./.claude/skills/

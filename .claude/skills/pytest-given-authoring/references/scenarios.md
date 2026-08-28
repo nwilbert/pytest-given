@@ -60,6 +60,19 @@ Step text may abstract; it must never overstate.
 
 ## Mechanical counterparts
 
-The narration lint (`pytest --given-lint=true`, or `given_lint = true` in `[tool.pytest]`) enforces the structural subset of these rules: `missing-phase`, `empty-step`, `then-without-check`, `check-outside-then`, `action-in-then`, `unused-interpolation`, `tag-shadows-term`, and the opt-in `dead-term`. Only *error*-severity findings fail the run.
+The narration lint (`pytest --given-lint=true`, or `given_lint = true` in `[tool.pytest]`) enforces the structural subset of these rules. A *warn* finding prints in the terminal summary; only an *error* finding fails the run.
+
+| Rule | Default | Catches |
+|---|---|---|
+| `empty-step` | error | A step whose body does nothing — only constants/`pass`, or, for `when`/`then`, only an `attach(...)` call. |
+| `then-without-check` | error | A `then` with no `assert` and no checking call (`pytest.raises`, `pytest.approx`, …). |
+| `missing-phase` | warn | A passed scenario that doesn't cover all three phases. Fixture `@given`s and `Annotated[..., given(...)]` parameters count. |
+| `check-outside-then` | warn | An `assert` inside a `given` or `when` (the `when` half of a `when_then` pair is exempt). |
+| `action-in-then` | warn | No `when` performs an action and a `then` folds the action into its assertion. |
+| `unused-interpolation` | warn | A t-string narration interpolating `{name}` that the step body never uses. |
+| `tag-shadows-term` | warn | A scenario tag whose slug duplicates a glossary term. |
+| `dead-term` | off | A glossary term referenced by no step narration and no story activity. Opt in where the glossary should be fully exercised. |
+
+Severities are overridable per rule via the `given_lint_rules` ini; that and the rest of the setup are in the project README.
 
 **Treat a `missing-phase` warning as a prompt to restructure, not to suppress.** It defaults to **warn**, so it never fails the run on its own, and it nearly always marks a hidden `when` rather than a genuinely two-phase scenario: apply the constructor rule above, or surface a parametrized input as `Annotated[..., given(Template('…'))]` so the inline block is free to narrate the action. `given_lint_ignore` (`missing-phase: <node-id glob>`) is a last resort, and it costs more than it looks: an entry that suppresses nothing raises `stale-ignore`, **always error-level, not downgradable via `given_lint_rules`, not itself ignorable**. Any selection that doesn't reach the suppressed node then fails on the stale entry alone — `pytest tests/one_file.py --given-lint=true` fails even when every collected scenario is clean.

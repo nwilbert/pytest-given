@@ -198,8 +198,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled skills are corrected against the shipped behavior: the navigating
   skill's term query and JSON reference, the authoring skill's guidance for
   divergent parametrize narration, glossary discovery order, `@scenario`'s
-  keyword-only arguments, the scope of a pinned step, and the oversized-glossary
-  advice.
+  keyword-only arguments, the scope of a pinned step, the oversized-glossary
+  advice, what the Markdown report shows for a failure and for a parametrized
+  scenario, and the lint rule catalog, which the authoring skill now carries in
+  full rather than pointing at the README.
 
 ## [0.1.0] - 2026-08-08
 
