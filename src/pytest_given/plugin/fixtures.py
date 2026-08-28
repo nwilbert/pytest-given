@@ -16,7 +16,6 @@ from ..capture import (
     FixtureInstanceKey,
     StepDecorated,
     StepDescriptor,
-    Template,
     annotated_given_descriptors,
 )
 from ..model import (
@@ -42,7 +41,7 @@ def pytest_fixture_setup(
             'but only @given is allowed on fixtures (fixtures are setup). '
             'Use @given(...) on the fixture, or move the step into the test body.'
         )
-    if isinstance(desc._source, Template):
+    if desc.is_deferred_template:
         raise PytestGivenError(
             f'@given(Template(...)) on fixture {fixturedef.argname!r} is not '
             'yet supported; use a plain string label, or move the step into a '

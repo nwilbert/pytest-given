@@ -1,3 +1,21 @@
+"""The step front doors: `given` / `when` / `then` / `when_then` / `attach`.
+
+One module for the whole of what a step *is* from user code — the dual
+context-manager/decorator descriptor, the paired `when_then`, and the
+attachment call that binds to whatever step is open. They share
+`_recording_collector`, which is the one place that decides whether a call
+records, no-ops with a warning, or refuses.
+
+Split out of the former `decorators.py` for the reason the `plugin` package
+was split: that module held the step descriptor, the scenario marker and the
+`Annotated` reader in one 600-line file while every other module in the tree
+holds one thing. The scenario marker is `scenario.py`'s.
+
+`capture.traceback` names this module in `_INTERNAL_SUFFIXES`: the wrappers and
+`__enter__` / `__exit__` below are pytest-given frames a reader never wants in
+a failure traceback. Moving a wrapper out of here means updating that tuple.
+"""
+
 import functools
 import inspect
 import json
@@ -11,7 +29,6 @@ from typing import (
     Self,
     assert_never,
     cast,
-    get_type_hints,
     runtime_checkable,
 )
 
@@ -28,7 +45,6 @@ from ..model import (
     Phase,
     PytestGivenError,
     SourceLocation,
-    Story,
     narration_text,
 )
 from .collector import Collector, get_active_collector, no_scenario_error
@@ -111,8 +127,30 @@ class StepDescriptor:
         self._pinned_source: SourceLocation | None = None
         self._captures_own_source: bool = True
 
+    @property
+    def is_deferred_template(self) -> bool:
+        """Whether the label was written as `pytest_given.Template(...)`.
+
+        A property rather than an `isinstance` at each read site: the question
+        is asked from four places here and one in `plugin/fixtures.py`, and
+        that last one is the only thing in the package that would otherwise
+        reach across a package boundary into a private attribute. What the
+        label was *written* as is the descriptor's business to answer.
+        """
+        return isinstance(self._source, Template)
+
+    @property
+    def is_tstring(self) -> bool:
+        """Whether the label was written as a t-string (`t"…"`).
+
+        The counterpart to `is_deferred_template`, for the same reason: the
+        two rejection sites — a decorator label and an `Annotated` one — ask
+        exactly this and nothing else about `_source`.
+        """
+        return isinstance(self._source, templatelib.Template)
+
     def __enter__(self) -> Self:
-        if isinstance(self._source, Template):
+        if self.is_deferred_template:
             raise PytestGivenError(
                 f'{self.phase}(Template(...)) is not supported in a test body; '
                 f'use a t-string for dynamic values, or a plain string for '
@@ -155,17 +193,17 @@ class StepDescriptor:
             getattr(func, '_fixture_function_marker', None) is not None
             or getattr(func, '_pytestfixturefunction', None) is not None
         )
-        if isinstance(self._source, Template) and is_fixture:
+        if self.is_deferred_template and is_fixture:
             raise PytestGivenError(
                 f'@{self.phase}(Template(...)) on a fixture is not yet '
                 'supported; use a plain string label, or move the step into a '
                 'helper function.'
             )
-        if isinstance(self._source, templatelib.Template):
+        if self.is_tstring:
             self._check_tstring_decorator_safety()
         sig = (
             self._validate_template_against_signature(func)
-            if isinstance(self._source, Template)
+            if self.is_deferred_template
             else None
         )
         # A generator function is a fixture body: `pytest_fixture_setup` has
@@ -318,56 +356,24 @@ class StepDescriptor:
         return Narration(text=narration_text(parts), parts=parts)
 
 
-class ScenarioDecorator:
-    """Decorator that marks a test for inclusion in the report."""
-
-    def __init__(
-        self,
-        name: str | Template | Narration,
-        tags: list[str],
-        *,
-        story: Story | None = None,
-        activity_ids: tuple[ActivityId, ...] = (),
-        group_parametrized: bool = True,
-    ) -> None:
-        self.name: str | Template | Narration = name
-        self.tags = tags
-        self.story = story
-        self.activity_ids = activity_ids
-        self.group_parametrized = group_parametrized
-
-    def __call__(self, func: Callable[..., object]) -> Callable[..., object]:
-        """Mark `func` and hand back the same object.
-
-        No pass-through wrapper: the marker attribute is the whole job, and a
-        `*args, **kwargs` shim only hides the real function — its signature,
-        and so its fixture requests — behind `functools.wraps`.
-        """
-        func._scenario = self  # type: ignore[attr-defined]
-        return func
-
-
-def _normalize_activity(
+def normalize_activity(
     activity: int | Sequence[int] | None,
     kwarg: str = 'activity',
 ) -> tuple[ActivityId, ...]:
     """Normalize an ``activity=`` / ``activities=`` kwarg to ActivityId values.
 
     `kwarg` names the argument the author actually wrote, so the step form and
-    the scenario form each report their own. Rejecting `str` matters most:
-    it is a `Sequence[int]` to no one but `isinstance`, and `activities='13'`
-    would otherwise yield ids 1 and 3 and fail later against a story that
-    visibly lists them as valid.
+    the scenario form each report their own.
     """
     if activity is None:
         return ()
-    if isinstance(activity, bool | str):
-        raise TypeError(
-            f'{kwarg} must be an int or a Sequence[int], got {type(activity)!r}'
-        )
-    if isinstance(activity, int):
+    # `bool` and `str` are rejected before the two accepting branches, not
+    # inside them: a bool is an `int` and a str is a `Sequence[int]` to nobody
+    # but `isinstance`, and `activities='13'` would otherwise yield ids 1 and 3
+    # and fail later against a story that visibly lists them as valid.
+    if isinstance(activity, int) and not isinstance(activity, bool):
         return (ActivityId(activity),)
-    if isinstance(activity, Sequence):
+    if isinstance(activity, Sequence) and not isinstance(activity, str):
         result: list[ActivityId] = []
         for item in activity:
             if not isinstance(item, int) or isinstance(item, bool):
@@ -387,7 +393,7 @@ def given(
     activity: int | Sequence[int] | None = None,
 ) -> StepDescriptor:
     """Create a Given step (context manager or decorator)."""
-    return StepDescriptor('given', text, activity_ids=_normalize_activity(activity))
+    return StepDescriptor('given', text, activity_ids=normalize_activity(activity))
 
 
 def when(
@@ -396,7 +402,7 @@ def when(
     activity: int | Sequence[int] | None = None,
 ) -> StepDescriptor:
     """Create a When step (context manager or decorator)."""
-    return StepDescriptor('when', text, activity_ids=_normalize_activity(activity))
+    return StepDescriptor('when', text, activity_ids=normalize_activity(activity))
 
 
 def then(
@@ -405,7 +411,7 @@ def then(
     activity: int | Sequence[int] | None = None,
 ) -> StepDescriptor:
     """Create a Then step (context manager or decorator)."""
-    return StepDescriptor('then', text, activity_ids=_normalize_activity(activity))
+    return StepDescriptor('then', text, activity_ids=normalize_activity(activity))
 
 
 class WhenThen:
@@ -525,97 +531,3 @@ def attach(label: str, content: object) -> None:
             json.dumps(content, indent=2, default=str),
             content_type='json',
         )
-
-
-def scenario(
-    name: str | templatelib.Template | Template,
-    tags: list[str] | None = None,
-    *,
-    story: Story | None = None,
-    activities: int | Sequence[int] | None = None,
-    group_parametrized: bool = True,
-) -> ScenarioDecorator:
-    """Mark a test for inclusion in the report."""
-    resolved_name: str | Template | Narration
-    if isinstance(name, templatelib.Template):
-        # @scenario runs at module-import time. Glossary handles are in scope
-        # then and render eagerly to term refs; a parametrize value is not,
-        # so it would be baked into the name frozen. Accept the first, reject
-        # the second — mirrors the step-decorator rule.
-        narration = narration_from(name)
-        for part in narration.parts:
-            if isinstance(part, NarrationValue):
-                raise PytestGivenError(
-                    f'@scenario(t"...") interpolates non-glossary value '
-                    f'{{{part.expression}}} (rendered as {part.rendered!r}); '
-                    f'@scenario runs at module-import time, so parametrize '
-                    f'values are not in scope. Use pytest_given.Template(...) '
-                    f'for a parametrized name, a glossary handle '
-                    f'(g.actor/g.work_object/g.verb) for a term ref, or a '
-                    f'plain string for a static name.'
-                )
-        resolved_name = narration
-    else:
-        resolved_name = name
-    if story is not None and not isinstance(story, Story):
-        raise PytestGivenError(
-            f'@scenario(story=...) must be a Story instance; '
-            f'got {type(story).__name__}: {story!r}'
-        )
-    activity_ids = _normalize_activity(activities, 'activities')
-    return ScenarioDecorator(
-        resolved_name,
-        tags or [],
-        story=story,
-        activity_ids=activity_ids,
-        group_parametrized=group_parametrized,
-    )
-
-
-def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
-    """Map each parameter carrying ``Annotated[..., given(...)]`` to its
-    descriptor.
-
-    Reads type hints off the unwrapped function (past the ``@scenario``
-    wrapper). Best-effort: if the annotations cannot be resolved, returns an
-    empty mapping rather than failing the test. Rejects the forbidden forms —
-    ``when(...)`` / ``then(...)``, a t-string label, or more than one
-    descriptor on a single parameter.
-    """
-    target = inspect.unwrap(cast(Any, func))
-    try:
-        hints = get_type_hints(target, include_extras=True)
-    except Exception:  # noqa: BLE001 — annotations are arbitrary user code; see the docstring
-        return {}
-    out: dict[str, StepDescriptor] = {}
-    for name, hint in hints.items():
-        if name in ('self', 'cls', 'return'):
-            continue
-        metadata = getattr(hint, '__metadata__', None)
-        if metadata is None:
-            continue
-        descriptors = [m for m in metadata if isinstance(m, StepDescriptor)]
-        if not descriptors:
-            continue
-        if len(descriptors) > 1:
-            raise PytestGivenError(
-                f'multiple given()/when()/then() in Annotated metadata for '
-                f'parameter {name!r} — use exactly one.'
-            )
-        desc = descriptors[0]
-        if desc.phase != 'given':
-            raise PytestGivenError(
-                f'only given() is supported inside Annotated; parameter '
-                f"{name!r} carries {desc.phase}(). Use 'with when(...)' / "
-                f"'with then(...)' in the test body for the action and outcome."
-            )
-        if isinstance(desc._source, templatelib.Template):
-            raise PytestGivenError(
-                f'Annotated given(t"...") on parameter {name!r} is not '
-                f'supported: a t-string evaluates at function-definition time, '
-                f'where the parameter value is not in scope. Use '
-                f'given(Template("... {{{name}}} ...")) for a per-case '
-                f'placeholder, or a plain string label.'
-            )
-        out[name] = desc
-    return out

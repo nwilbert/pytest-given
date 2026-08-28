@@ -12,18 +12,18 @@ from pytest_given.capture.collector import (
     get_active_collector,
     set_active_collector,
 )
-from pytest_given.capture.decorators import (
+from pytest_given.capture.scenario import scenario
+from pytest_given.capture.source import restore_rootdir, set_rootdir
+from pytest_given.capture.steps import (
     StepDecorated,
     StepDescriptor,
-    _normalize_activity,
     attach,
     given,
-    scenario,
+    normalize_activity,
     then,
     when,
     when_then,
 )
-from pytest_given.capture.source import restore_rootdir, set_rootdir
 from pytest_given.capture.story import (
     activity as activity_fn,
 )
@@ -405,7 +405,7 @@ def test_when_then_allows_nested_when_as_child_sub_step() -> None:
 def test_when_then_exported_from_package() -> None:
     """when_then is part of the public API."""
     # Deliberately function-level: the module imports when_then from
-    # capture.decorators, so only a fresh package-root lookup proves the
+    # capture.steps, so only a fresh package-root lookup proves the
     # re-export exists.
     import pytest_given
 
@@ -892,17 +892,17 @@ def test_scenario_decorator_rejects_non_story_object():
 
 def test_normalize_activity_rejects_str():
     with pytest.raises(TypeError, match='int or a Sequence'):
-        _normalize_activity('3')  # type: ignore[arg-type]
+        normalize_activity('3')  # type: ignore[arg-type]
 
 
 def test_normalize_activity_rejects_bool():
     with pytest.raises(TypeError, match='int or a Sequence'):
-        _normalize_activity(True)  # type: ignore[arg-type]
+        normalize_activity(True)  # type: ignore[arg-type]
 
 
 def test_normalize_activity_rejects_non_int_in_sequence():
     with pytest.raises(TypeError, match='must contain int values'):
-        _normalize_activity((1, 'x'))  # type: ignore[list-item]
+        normalize_activity((1, 'x'))  # type: ignore[list-item]
 
 
 def test_push_step_rejects_activity_id_not_in_story_no_scope() -> None:

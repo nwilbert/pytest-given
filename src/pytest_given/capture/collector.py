@@ -27,9 +27,9 @@ from ..model import (
 from .template import Template, narration_from
 
 if TYPE_CHECKING:
-    # `decorators` imports this module, so the descriptor type can only travel
+    # `steps` imports this module, so the descriptor type can only travel
     # one way at runtime; the annotation still gets the real type.
-    from .decorators import StepDescriptor
+    from .steps import StepDescriptor
 
 
 @dataclass(frozen=True)

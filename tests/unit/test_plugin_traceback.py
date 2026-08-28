@@ -27,7 +27,7 @@ def test_filter_internal_frames_keeps_only_user_entries() -> None:
     excinfo = _FakeExcinfo(
         '/venv/site-packages/pluggy/_hooks.py',
         '/venv/site-packages/_pytest/runner.py',
-        '/proj/src/pytest_given/capture/decorators.py',
+        '/proj/src/pytest_given/capture/steps.py',
         '/proj/tests/test_billing.py',
     )
     _filter_internal_frames(cast(Any, excinfo))

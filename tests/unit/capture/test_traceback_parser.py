@@ -112,7 +112,7 @@ def test_pluggy_frame_classified_internal() -> None:
 
 def test_pytest_given_wrapper_frame_classified_internal() -> None:
     text = (
-        'src/pytest_given/capture/decorators.py:191: in wrapper\n'
+        'src/pytest_given/capture/steps.py:191: in wrapper\n'
         '    return func(*args, **kwargs)\n'
         'E   AssertionError'
     )

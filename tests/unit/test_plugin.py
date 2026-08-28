@@ -16,13 +16,13 @@ from pytest_given.capture.collector import (
     get_active_collector,
     set_active_collector,
 )
-from pytest_given.capture.decorators import (
+from pytest_given.capture.params import snapshot_param_value
+from pytest_given.capture.scenario import (
     ScenarioDecorator,
-    StepDescriptor,
     annotated_given_descriptors,
 )
-from pytest_given.capture.params import snapshot_param_value
 from pytest_given.capture.source import file_source
+from pytest_given.capture.steps import StepDescriptor
 from pytest_given.capture.story import (
     clear_story_registry,
 )

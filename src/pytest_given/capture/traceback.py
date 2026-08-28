@@ -28,7 +28,7 @@ _INTERNAL_SUBSTRINGS = (
     '/site-packages/_pytest/',
     '/site-packages/pluggy/',
 )
-_INTERNAL_SUFFIXES = ('/pytest_given/capture/decorators.py',)
+_INTERNAL_SUFFIXES = ('/pytest_given/capture/steps.py',)
 
 _SITE_PACKAGES_MARKER = '/site-packages/'
 

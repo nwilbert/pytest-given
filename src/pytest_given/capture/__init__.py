@@ -4,18 +4,6 @@ from .collector import (
     get_active_collector,
     set_active_collector,
 )
-from .decorators import (
-    ScenarioDecorator,
-    StepDecorated,
-    StepDescriptor,
-    annotated_given_descriptors,
-    attach,
-    given,
-    scenario,
-    then,
-    when,
-    when_then,
-)
 from .discovery import resolve_glossary
 from .file_glossary import FileGlossary
 from .glossary import Glossary
@@ -26,7 +14,21 @@ from .process_state import (
     capture_snapshot,
     restore_capture_state,
 )
+from .scenario import (
+    ScenarioDecorator,
+    annotated_given_descriptors,
+    scenario,
+)
 from .source import item_source
+from .steps import (
+    StepDecorated,
+    StepDescriptor,
+    attach,
+    given,
+    then,
+    when,
+    when_then,
+)
 from .story import (
     activity,
     path,
