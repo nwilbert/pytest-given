@@ -4,7 +4,7 @@ Everything is a top-level export of `pytest_given`:
 
 ```python
 from pytest_given import (
-    FileGlossary, Glossary, PytestGivenError, Template,
+    FileGlossary, Glossary, PytestGivenError, PytestGivenWarning, Template,
     activity, attach, given, path, scenario, story, then, when, when_then,
 )
 ```
@@ -55,7 +55,7 @@ Hard rules (each raises `PytestGivenError`):
 
 ## Stories
 
-- `story('Name', [activity(...), ...])` — a flow of `activity(actor, verb, work_object, ...)` rows, read left-to-right; parts may be bare strings, but an activity needs **two distinct glossary terms** to be coverage-tracked. `path(...)` branches alternate sequences off a shared prefix.
+- `story('Name', [activity(...), ...])` — a flow of `activity(actor, verb, work_object, ...)` rows, read left-to-right; parts may be bare strings, but an activity needs **two distinct glossary terms** to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them. `path(...)` branches alternate sequences off a shared prefix.
 - Bind a scenario with `@scenario(..., story=the_story)` — the only way a story reaches the report. Coverage matches **per step**, and `given(text, activity=3)` (a 1-based activity number or a sequence) pins a step to an activity regardless of its narration. The matching rule and what it costs you when authoring: [stories.md](stories.md).
 
 ## Verifying

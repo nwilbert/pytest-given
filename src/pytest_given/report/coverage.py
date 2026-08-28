@@ -140,10 +140,16 @@ def compute_coverage(
     O(|activities|) inner scan with O(|s_cache| + |candidates|).
 
     """
+    # Intersected with the story's own ids, never taken verbatim: `scope` is
+    # the only guard the pin path below has, and an id naming no activity in
+    # this story would otherwise enter the coverage map and render a `Covers:`
+    # chip pointing at a timeline row that does not exist. A live run cannot
+    # reach that — collection validates `activities=` against the bound story —
+    # but a saved report replayed through `pytest-given report` is deserialized
+    # without validation, and this is the one place that would notice.
+    story_ids = {a.id for a in story.activities}
     scope = (
-        set(scenario.activity_ids)
-        if scenario.activity_ids
-        else {a.id for a in story.activities}
+        set(scenario.activity_ids) & story_ids if scenario.activity_ids else story_ids
     )
     refs_by_activity: dict[ActivityId, set[Identity]] = {}
     for activity in story.activities:

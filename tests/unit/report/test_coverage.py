@@ -457,12 +457,13 @@ def test_is_coverage_eligible_false_for_all_bare_activity(g):
 
 
 @scenario(
-    t'An under-anchored {pg["Activity"].low} is never reported as covered',
+    t'An under-anchored {pg["Activity"].low} is never covered by narration matching',
 )
 def test_compute_coverage_excludes_under_anchored_activity(g):
     """An activity with fewer than two distinct terms is excluded from
-    matching — it is never reported as covered (replaces the old
-    'empty refs matches every step' behavior)."""
+    narration matching (replaces the old 'empty refs matches every step'
+    behavior). An explicit `activity=` pin still reaches it — the sibling
+    scenario below."""
     with given(t'a {pg["Story"]} whose {pg["Activity"]} is all bare words'):
         a = Activity(
             id=ActivityId(1),
