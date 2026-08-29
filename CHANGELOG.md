@@ -131,6 +131,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
   accessor produced them.
 - A `when_then` step in a test without `@scenario` now points its warning at the
   test rather than at pytest-given's own module.
+- The error for a helper `Template` placeholder naming no parameter now asks for
+  a *named* parameter, where it claimed positional-or-keyword though keyword-only
+  and positional-only parameters have always been accepted.
 
 #### Plugin and run behavior
 

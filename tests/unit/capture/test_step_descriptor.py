@@ -695,7 +695,7 @@ def test_decorator_template_error_lists_available_parameters() -> None:
 
 def test_decorator_template_placeholder_matching_var_positional_raises() -> None:
     """Placeholder referencing *args is rejected at decoration time."""
-    with pytest.raises(PytestGivenError, match='positional-or-keyword'):
+    with pytest.raises(PytestGivenError, match='not a named parameter'):
 
         @when(Template('values: ${args}'))
         def helper(*args: int) -> None: ...
@@ -703,10 +703,44 @@ def test_decorator_template_placeholder_matching_var_positional_raises() -> None
 
 def test_decorator_template_placeholder_matching_var_keyword_raises() -> None:
     """Placeholder referencing **kwargs is rejected at decoration time."""
-    with pytest.raises(PytestGivenError, match='positional-or-keyword'):
+    with pytest.raises(PytestGivenError, match='not a named parameter'):
 
         @when(Template('values: ${kwargs}'))
         def helper(**kwargs: int) -> None: ...
+
+
+def test_decorator_template_placeholder_may_name_a_keyword_only_parameter() -> None:
+    """A keyword-only parameter is a named parameter, so it can be narrated."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+
+        @when(Template('I insert ${amount}'))
+        def insert(*, amount: int) -> None: ...
+
+        insert(amount=3)
+        scenario = collector.finish_scenario(status='passed')
+    finally:
+        set_active_collector(None)
+    assert [s.narration.text for s in scenario.steps] == ['I insert $3']
+
+
+def test_decorator_template_placeholder_may_name_a_positional_only_parameter() -> None:
+    """A positional-only parameter is a named parameter, so it can be narrated."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+
+        @when(Template('I insert ${amount}'))
+        def insert(amount: int, /) -> None: ...
+
+        insert(4)
+        scenario = collector.finish_scenario(status='passed')
+    finally:
+        set_active_collector(None)
+    assert [s.narration.text for s in scenario.steps] == ['I insert $4']
 
 
 def test_decorator_template_records_substituted_narration_per_call() -> None:

@@ -350,7 +350,7 @@ class StepDescriptor:
                 raise PytestGivenError(
                     f'@{self.phase}(Template({self._source.template!r})) '
                     f'references placeholder {{{name}}} which is not a '
-                    f'positional-or-keyword parameter of {func.__name__}. '
+                    f'named parameter of {func.__name__}. '
                     f'Available parameters: {available}. Rename the '
                     f'placeholder, or add the parameter.'
                 )
