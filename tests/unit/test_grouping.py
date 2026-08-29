@@ -104,6 +104,30 @@ def test_group_parametrized_any_failed_groups_as_failed() -> None:
         assert grouped[0].status == 'failed'
 
 
+@scenario(
+    t'A {pg["Parametrized scenario"].low} keeps its place among the '
+    t'{pg["Scenario"]("scenarios")} around it',
+    tags=['parametrization'],
+    story=adopt_pytest_given,
+)
+def test_group_parametrized_keeps_source_order() -> None:
+    with given(t'a plain {pg["Scenario"].low} between two parametrized ones'):
+        first, mid, last = NodeId('t::a[1]'), NodeId('t::b'), NodeId('t::c[1]')
+        scenarios = [
+            Scenario(id=first, narration=Narration(text='a'), module='m'),
+            Scenario(id=mid, narration=Narration(text='b'), module='m'),
+            Scenario(id=last, narration=Narration(text='c'), module='m'),
+        ]
+        param_info = {
+            first: ParamSpec(names=['n'], values=[1]),
+            last: ParamSpec(names=['n'], values=[1]),
+        }
+    with when(t'the {pg["Group"]("grouping")} pass runs', activity=9):
+        grouped = group_parametrized(scenarios, param_info)
+    with then(t'the {pg["Report"].low} lists them in the order the file declares'):
+        assert [s.id for s in grouped] == [first, mid, last]
+
+
 def test_group_parametrized_distinct_functions_same_name_do_not_group() -> None:
     # Two different parametrized functions in one module that happen to share a
     # scenario label must stay separate — grouping keys on the test function
@@ -2646,3 +2670,4 @@ def test_part_key_rejects_unknown_variant() -> None:
     # narrations on a key that ignores the new part entirely.
     with pytest.raises(AssertionError):
         checks._part_key(cast(Any, object()))
+

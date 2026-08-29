@@ -162,6 +162,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Report content (all formats)
 
+- A parametrized scenario now keeps its place in source order instead of moving
+  below every unparametrized one.
 - A glossary term written as a code span keeps the markup inside it, so
   `` `a*b*c` `` canonicalizes to `a*b*c` and matches how a definition cell
   renders the same span.
