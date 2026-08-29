@@ -59,7 +59,9 @@ class StepDecorated(Protocol):
     _step_descriptor: StepDescriptor
 
 
-def _recording_collector(action: str, warning: str) -> Collector | None:
+def _recording_collector(
+    action: str, warning: str, *, stacklevel: int = 3
+) -> Collector | None:
     """The collector to record into, or None when the caller should do nothing.
 
     None means an unannotated test, where `with given(...)` and `attach(...)`
@@ -68,14 +70,15 @@ def _recording_collector(action: str, warning: str) -> Collector | None:
     raising. With nothing recording anywhere else there is no such reading, and
     the call raises.
 
-    `stacklevel=3` reaches past this helper and its caller to the user's own
-    line — the two front doors are called directly from user code.
+    The default `stacklevel` reaches past this helper and its caller to the
+    user's own line; a composed descriptor (see `StepDescriptor._composed`) adds
+    one more frame and says so.
     """
     collector = get_active_collector()
     if collector is not None and collector.state != 'idle':
         return collector
     if collector is not None and collector.inside_unannotated_test:
-        warnings.warn(warning, PytestGivenWarning, stacklevel=3)
+        warnings.warn(warning, PytestGivenWarning, stacklevel=stacklevel)
         return None
     raise no_scenario_error(action)
 
@@ -113,12 +116,13 @@ class StepDescriptor:
         self._source: str | templatelib.Template | Template = text
         self.narration: Narration = narration_from(text)
         self.activity_ids: tuple[ActivityId, ...] = activity_ids
-        # Lint anchor of the step's `with` statement. A descriptor normally
-        # captures its own caller frame on __enter__; when_then composes two
-        # descriptors behind an extra frame, so it captures once itself and
-        # pins the shared location here (_captures_own_source False).
+        # Set when another construct drives this descriptor — `when_then`, which
+        # enters both its halves one frame above the user's `with`. That frame
+        # is what the caller-frame walk and the warning below both have to reach
+        # past, and it is why the shared lint anchor is captured once by the
+        # composing construct and pinned here rather than walked for.
+        self._composed: bool = False
         self._pinned_source: SourceLocation | None = None
-        self._captures_own_source: bool = True
 
     @property
     def is_deferred_template(self) -> bool:
@@ -152,15 +156,14 @@ class StepDescriptor:
             f"enter '{self.phase}: {self.narration.text}'",
             f"'{self.phase}: {self.narration.text}' recorded in a test without "
             '@scenario — step will not appear in the report.',
+            stacklevel=4 if self._composed else 3,
         )
         if collector is None:
             return self
         source: SourceLocation | None = None
         if collector.capture_step_source:
             source = (
-                capture_caller_source(skip=2)
-                if self._captures_own_source
-                else self._pinned_source
+                self._pinned_source if self._composed else capture_caller_source(skip=2)
             )
         collector.push_step(
             self.phase, self.narration, activity_ids=self.activity_ids, source=source
@@ -456,8 +459,8 @@ class WhenThen:
     ) -> None:
         self._when = StepDescriptor('when', when_text)
         self._then = StepDescriptor('then', then_text)
-        self._when._captures_own_source = False
-        self._then._captures_own_source = False
+        self._when._composed = True
+        self._then._composed = True
 
     def __enter__(self) -> Self:
         collector = get_active_collector()

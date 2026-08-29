@@ -162,6 +162,21 @@ def test_context_manager_unannotated_test_warns_instead_of_raises() -> None:
         set_active_collector(None)
 
 
+def test_when_then_warning_points_at_the_test_file() -> None:
+    """The pair sits one frame above the user's `with`, so the warning has to
+    reach one level further than a bare step's — otherwise `filterwarnings`
+    scoped by module never matches the test that caused it."""
+    collector = Collector()
+    collector.inside_unannotated_test = True
+    set_active_collector(collector)
+    try:
+        with pytest.warns(PytestGivenWarning) as caught, when_then('act', 'outcome'):
+            pass
+    finally:
+        set_active_collector(None)
+    assert [w.filename for w in caught] == [__file__, __file__]
+
+
 def test_attach_without_collector_raises() -> None:
     set_active_collector(None)
     with pytest.raises(PytestGivenError, match='no active scenario or fixture'):

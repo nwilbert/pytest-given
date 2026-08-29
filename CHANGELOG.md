@@ -129,6 +129,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
   `activities=2` already worked at runtime but failed type checking.
 - Glossary term handles are now hashable, and equal for the same term whichever
   accessor produced them.
+- A `when_then` step in a test without `@scenario` now points its warning at the
+  test rather than at pytest-given's own module.
 
 #### Plugin and run behavior
 
