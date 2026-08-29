@@ -130,6 +130,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Plugin and run behavior
 
+- A `git` on PATH that cannot be executed no longer fails the run; the
+  commit-SHA lookup reads it as no answer.
 - A nested in-process pytest run that dies while parsing its arguments no longer
   strands the outer session's captured rootdir, which silently dropped every
   later step's source anchor.

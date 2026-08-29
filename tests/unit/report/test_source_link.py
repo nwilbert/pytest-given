@@ -346,3 +346,40 @@ def test_detect_commit_sha_git_not_installed_returns_none(
 
     monkeypatch.setattr(subprocess, 'run', fake_run)
     assert detect_commit_sha() is None
+
+
+def test_detect_commit_sha_unrunnable_git_returns_none(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A `git` that exists but cannot be executed is still "git cannot answer".
+
+    `subprocess.run` raises `PermissionError` (an `OSError`, neither a
+    `SubprocessError` nor a `FileNotFoundError`) for a non-executable `git` on
+    PATH. Escaping here costs the whole report: session finish catches `OSError`
+    and discards every sink over an optional SHA.
+    """
+    _clear_ci_vars(monkeypatch)
+
+    def fake_run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        raise PermissionError(13, 'Permission denied', 'git')
+
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+    assert detect_commit_sha() is None
+
+
+def test_resolve_github_preset_unrunnable_git_raises_the_plugin_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The same failure on the preset path stays a `PytestGivenError`.
+
+    `pytest_configure` catches only that; a bare `PermissionError` reaches the
+    user as an INTERNALERROR instead of the message naming the escape hatch.
+    """
+    _clear_github_env(monkeypatch)
+
+    def fake_run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        raise PermissionError(13, 'Permission denied', 'git')
+
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+    with pytest.raises(PytestGivenError, match='could not detect an org/repo'):
+        resolve_template('github')

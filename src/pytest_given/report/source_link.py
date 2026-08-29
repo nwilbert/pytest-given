@@ -181,9 +181,13 @@ def _git(*args: str) -> str | None:
     """The stripped stdout of a `git` call, or None when it cannot answer.
 
     Both callers want the same thing and the same failure policy — no git on
-    PATH, no repository, a non-zero exit — so the run lives here once. Timed
-    out rather than left to hang: this runs on the report path, where a wedged
-    git would hold up a finished test session.
+    PATH, one that cannot be run, no repository, a non-zero exit — so the run
+    lives here once. `OSError` covers the whole exec side (`FileNotFoundError`
+    among it): a `git` that exists but is not executable raises
+    `PermissionError`, which escaping here would cost the entire report, since
+    session finish catches `OSError` and discards every sink. Timed out rather
+    than left to hang: this runs on the report path, where a wedged git would
+    hold up a finished test session.
     """
     try:
         result = subprocess.run(
@@ -193,7 +197,7 @@ def _git(*args: str) -> str | None:
             timeout=2,
             check=True,
         )
-    except subprocess.SubprocessError, FileNotFoundError:
+    except OSError, subprocess.SubprocessError:
         return None
     return result.stdout.strip()
 
