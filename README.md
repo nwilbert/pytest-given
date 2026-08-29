@@ -56,7 +56,7 @@ This produces `given-report/report.html` — one file you can open directly in a
 
 Classical BDD tools (Cucumber, behave, pytest-bdd) center on a natural-language DSL like Gherkin, designed so stakeholders can author tests themselves and engineers maintain the glue that binds each step to a Python function.
 
-pytest-given is for the opposite case: **engineers write normal tests, and the plugin turns them into readable documentation**. The HTML report is something stakeholders, domain experts, and engineers on adjacent teams can open and follow — without any of them needing to touch the test suite. For the engineers writing the tests, the same narrative gives a high-level, domain-focused view of behavior that's easier to scan than raw test code. Browsing by tag, glossary term, or module, text search across scenario names and tags, and status filters help zero in on what matters.
+pytest-given is for the opposite case: **engineers write normal tests, and the plugin turns them into readable documentation**. The HTML report is something stakeholders, domain experts, and engineers on adjacent teams can open and follow — without any of them needing to touch the test suite. For the engineers writing the tests, the same narrative gives a high-level, domain-focused view of behavior that's easier to scan than raw test code — browsable by tag, glossary term, or module, with text search and status filters.
 
 - Plain Python — no Gherkin, no `.feature` files, no parser.
 - Tests stay first-class pytest tests; the report is a by-product.
@@ -182,9 +182,26 @@ def test_sold_out(machine):
 
 The body runs inside the `when`; the sibling `then` is emitted once the body exits cleanly (e.g. after the inner `pytest.raises` catches the error). If the body raises uncaught, the `when` is recorded, the `then` is skipped, and the exception propagates.
 
+### Step text & placeholders
+
+| Form | Example | How it renders |
+|---|---|---|
+| Plain string (including f-strings) | `with given('a cup')` <br> `with given(f'a {cup_size} cup')` | Rendered verbatim. F-string interpolation happens before pytest-given runs, so values aren't highlighted. |
+| T-string | `with given(t'a {cup_size} cup')` | pytest-given interpolates at runtime. Values are color-coded when the interpolation expression matches a parametrize column; otherwise highlighted neutrally. |
+| `Template` in `@scenario(...)` | `@scenario(Template('Brew {cup_size} ml'))` | Deferred substitution against parametrize columns at report time. Unmatched placeholders raise `PytestGivenError` at collection. |
+| T-string in `@scenario(...)` | `@scenario(t'a {guest} checks in')` | Glossary handles render as term refs in the title. Evaluated eagerly at import, so only glossary handles are allowed; a value/expression interpolation raises `PytestGivenError`. |
+| `Template` on a helper-function decorator | `@when(Template('I insert {amount}'))` | Deferred substitution against the function's bound arguments at each call. Placeholders must name a positional-or-keyword parameter of the helper. Unmatched placeholders raise `PytestGivenError` at decoration time. |
+| `Annotated[..., given(...)]` on a test parameter | `def test(text: Annotated[str, given(Template('a {text} cup'))])` | Synthesizes a `given` step for a fixture or parametrize value at the call site. Plain string renders verbatim; `Template` does deferred substitution against parametrize columns. Only `given` is allowed; a t-string is rejected. |
+
+Two rules follow from that split:
+
+1. **`pytest_given.Template` only accepts bare identifiers** — `{name}`, `{name:spec}`, `{name!conv}`. Attribute access (`{obj.attr}`), indexing (`{d[key]}`), and arbitrary expressions (`{x + 1}`) raise `PytestGivenError` at construction. Workaround: parametrize by the attributes directly, or move the step into a test-body t-string (which supports full expression syntax).
+
+2. **`Template` and a t-string are each rejected in the other's place**, because the split is about scope: `with given(Template(...))` raises `PytestGivenError` at entry, as does a t-string on a fixture or helper decorator. The one exception is the `@scenario(...)` t-string in the table — glossary handles, unlike values, *are* in scope at import.
+
 ### Parametrized scenarios
 
-Parametrized tests are automatically grouped into a single scenario with a parameter table. Use **t-strings** (`t'...'`) to interpolate parameter values into step text — the plugin recognizes parameter names in t-string interpolations and color-codes them in the report:
+Parametrized tests are automatically grouped into a single scenario with a parameter table. The grouped step tree comes from a **baseline case** — the first that passed — and anything varying across cases is promoted into a column of the table: a parametrize argument, a t-string interpolation whose value differs per case (the step keeps a `{name}` placeholder pointing at the column), and an attachment whose payload differs (the step keeps a content-less badge).
 
 ```python
 @scenario('Pricing')
@@ -217,7 +234,7 @@ def test_check_in(guest):
 
 Because a t-string is evaluated at import, only glossary handles (which are in scope then) are allowed in a scenario name; a parametrize-value interpolation is rejected — use `Template` for that. The two don't combine in one name: a title needing both a term ref and a per-case value isn't expressible today.
 
-When the cases have nothing honest to share — the narration genuinely branches per case — decline the merge with `group_parametrized=False`:
+What a column cannot carry is a case that narrates a *different sentence*. When the narration genuinely branches per case, decline the merge with `group_parametrized=False`:
 
 ```python
 @scenario(Template('Brew {cup_size} ml'), group_parametrized=False)
@@ -228,35 +245,16 @@ def test_brew(cup_size):
 
 Each case then becomes its own scenario with no parameter table, titled by its parametrize id — `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first (a plain-string name is suffixed the same way). Every case carries the id, including one whose name already renders its values. On a test that isn't parametrized the argument raises at collection.
 
-### Step text & placeholders
+**Six authoring forms are rejected outright** in a parametrized scenario, because each would make the grouped tree lie. Every one fails the run and writes no report — the message names the fix:
 
-| Form | Example | How it renders |
+| # | Rejected | Fix |
 |---|---|---|
-| Plain string (including f-strings) | `with given('a cup')` <br> `with given(f'a {cup_size} cup')` | Rendered verbatim. F-string interpolation happens before pytest-given runs, so values aren't highlighted. |
-| T-string | `with given(t'a {cup_size} cup')` | pytest-given interpolates at runtime. Values are color-coded when the interpolation expression matches a parametrize column; otherwise highlighted neutrally. |
-| `Template` in `@scenario(...)` | `@scenario(Template('Brew {cup_size} ml'))` | Deferred substitution against parametrize columns at report time. Unmatched placeholders raise `PytestGivenError` at collection. |
-| T-string in `@scenario(...)` | `@scenario(t'a {guest} checks in')` | Glossary handles render as term refs in the title. Evaluated eagerly at import, so only glossary handles are allowed; a value/expression interpolation raises `PytestGivenError`. |
-| `Template` on a helper-function decorator | `@when(Template('I insert {amount}'))` | Deferred substitution against the function's bound arguments at each call. Placeholders must name a positional-or-keyword parameter of the helper. Unmatched placeholders raise `PytestGivenError` at decoration time. |
-| `Annotated[..., given(...)]` on a test parameter | `def test(text: Annotated[str, given(Template('a {text} cup'))])` | Synthesizes a `given` step for a fixture or parametrize value at the call site. Plain string renders verbatim; `Template` does deferred substitution against parametrize columns. Only `given` is allowed; a t-string is rejected. |
-
-Four things worth knowing:
-
-1. **`pytest_given.Template` only accepts bare identifiers** — `{name}`, `{name:spec}`, `{name!conv}`. Attribute access (`{obj.attr}`), indexing (`{d[key]}`), and arbitrary expressions (`{x + 1}`) raise `PytestGivenError` at construction. Workaround: parametrize by the attributes directly, or move the step into a test-body t-string (which supports full expression syntax).
-
-2. **`Template` and a t-string are each rejected in the other's place**, because the split above is about scope: `with given(Template(...))` raises `PytestGivenError` at entry, as does a t-string on a fixture or helper decorator. The one exception is the `@scenario(...)` t-string in the table — glossary handles, unlike values, *are* in scope at import.
-
-3. **The grouped tree comes from a baseline case** (the first that passed), and anything varying across cases is promoted into a column of the parameter table: a parametrize argument, a t-string interpolation whose value differs per case (the step keeps a `{name}` placeholder pointing at the column), and an attachment whose payload differs (the step keeps a content-less badge). What a column cannot carry is a case that narrates a *different sentence* — that is rule 6 below, and `group_parametrized=False` is its answer.
-
-4. **Six authoring forms are rejected outright in a parametrized scenario**, because each would make the grouped tree lie. Every one fails the run and writes no report — the message names the fix:
-
-   | # | Rejected | Fix |
-   |---|---|---|
-   | 1 | A plain `str` (usually an f-string) whose text differs per case | Narrate with a t-string so the varying part is a placeholder, not case 1's text |
-   | 2 | A varying interpolation that isn't a bare name — `t'{cup_size * 0.01}'`, `t'{m.balance}'` | Bind it to a local and narrate that local |
-   | 3 | An interpolation naming a parametrize column that no longer holds the case's value | Rename the local that rebound the name — or, if the body mutated the value in place before narrating it, bind the result to its own name and narrate that |
-   | 4 | A glossary term ref whose display differs between cases (unless the term ref *is* the parametrize value) | Split the term ref from the value: `given(t"{pg['Customer']} {name} places an order")` |
-   | 5 | A step whose set of `attach` labels differs between cases | Keep the label constant and let the content vary — that's what the attachment column is for |
-   | 6 | Passed cases that narrate different templates — a different step structure, a differently shaped narration, different wording, or a different interpolated expression | Decline the merge with `@scenario(..., group_parametrized=False)` and let each case be its own scenario |
+| 1 | A plain `str` (usually an f-string) whose text differs per case | Narrate with a t-string so the varying part is a placeholder, not case 1's text |
+| 2 | A varying interpolation that isn't a bare name — `t'{cup_size * 0.01}'`, `t'{m.balance}'` | Bind it to a local and narrate that local |
+| 3 | An interpolation naming a parametrize column that no longer holds the case's value | Rename the local that rebound the name — or, if the body mutated the value in place before narrating it, bind the result to its own name and narrate that |
+| 4 | A glossary term ref whose display differs between cases (unless the term ref *is* the parametrize value) | Split the term ref from the value: `given(t"{pg['Customer']} {name} places an order")` |
+| 5 | A step whose set of `attach` labels differs between cases | Keep the label constant and let the content vary — that's what the attachment column is for |
+| 6 | Passed cases that narrate different templates — a different step structure, a differently shaped narration, different wording, or a different interpolated expression | Decline the merge with `@scenario(..., group_parametrized=False)` and let each case be its own scenario |
 
 ### Domain Storytelling
 
@@ -293,8 +291,7 @@ g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')
 The file must contain at least one GFM pipe table. By default the first column is the term and the second is the description; override with `term_column`, `description_column`, and `kind_column` (each accepts a 0-based index or a header name, case-insensitive):
 
 ```python
-g = FileGlossary('GLOSSARY.md', kind_column='Kind')   # explicit kinds from a "Kind" column
-g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning')
+g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning', kind_column='Kind')
 ```
 
 Access terms by name — `g['Guest']` (case-insensitive). A `FileGlossary` is a **closed vocabulary**: unlike a code-defined `Glossary`, both `g['foo']` and `g('foo')` only look up, and both raise on an unknown name — new vocabulary is added as a row in the file. The returned handle is usable inline everywhere a code-defined handle is:
@@ -308,11 +305,9 @@ with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
     ...
 ```
 
-**Kinds** — a term's kind is either declared (`g.actor(...)` / `g.work_object(...)` / `g.verb(...)`, or a `kind_column`) or **inferred from story activity-slot positions** at session finish: position 0 → actor, odd positions → verb, even positions ≥ 2 → work object. A term used only in t-string steps, never in any story activity, stays kindless and renders under a neutral wash instead of a kind color. A kind is never silently overridden. A term that already declares one — a typed handle (`g.work_object(...)`) or a `kind_column` row — is checked against its slot when `activity(...)` is constructed, so misplacing it raises `PytestGivenError` naming the term and its declared kind. Only a genuinely undeclared kind is left to inference, which raises at session finish if the same term turns up in both a verb slot and a noun slot; add a `kind_column` to disambiguate that.
+**Kinds** — a term's kind is either declared (`g.actor(...)` / `g.work_object(...)` / `g.verb(...)`, or a `kind_column`) or **inferred from story activity-slot positions** at session finish: position 0 → actor, odd positions → verb, even positions ≥ 2 → work object. A declared kind is never silently overridden — it is checked against its slot when `activity(...)` is constructed, so misplacing it raises `PytestGivenError` naming the term and its kind. Inference then handles only the undeclared terms, and raises at session finish if one turns up in both a verb slot and a noun slot; add a `kind_column` to disambiguate.
 
-**Kindless and undefined terms** — on a code-defined glossary, `g('foo')` declares a term the team hasn't classified yet. It registers under the *Uncategorized* bucket in the Glossary view (no kind pill) and shows an *Undefined* badge until `definition=` is supplied. `g['foo']` looks up an already-declared term by name (raises if unknown). Both forms return a handle usable in t-strings and story activities, with the same bare / `.low` / callable surface forms as any other handle.
-
-**Every declared term is included in the report**, even one referenced by no story and no step. Terms whose kind could not be identified are listed under the **Uncategorized** section in the Glossary tab (and filterable via its own toggle).
+**Kindless and undefined terms** — a term that no story activity references stays kindless. On a code-defined glossary `g('foo')` also declares a term the team hasn't classified yet (`g['foo']` only looks up, and raises if unknown); it shows an *Undefined* badge until `definition=` is supplied. Both forms return a handle with the same bare / `.low` / callable surface forms as any other. Every declared term reaches the report, referenced or not; kindless ones render under a neutral wash instead of a kind color, and collect under **Uncategorized** in the Glossary tab with their own filter toggle.
 
 **Discovery** — the plugin finds the glossary in one of two ways: off any `story(...)` that references it (a story records its glossary at construction), or, failing that, by scanning `conftest.py` module attributes for a `Glossary` / `FileGlossary` instance. A suite with no stories — glossary-only mode — therefore has to bind the instance **by name** in a `conftest.py`:
 
@@ -420,9 +415,9 @@ The lint is zero-cost when off: nothing extra is captured, and report artifacts 
 
 ## Traceback frames
 
-When a scenario fails, its traceback is captured into the report. By default only your own frames are kept — the `pluggy` dispatcher, `_pytest` runner, and pytest-given's own `@scenario` wrapper frames are dropped, since they're implementation noise you rarely need. Dropping them before they are formatted also keeps large failing suites fast — pytest's per-frame source analysis is the dominant cost when many scenarios fail.
+When a scenario fails, its traceback is captured into the report. By default only your own frames are kept — the `pluggy` dispatcher, the `_pytest` runner, and pytest-given's own step-recording frames are dropped, since they're implementation noise you rarely need. Dropping them before they are formatted also keeps large failing suites fast: pytest's per-frame source analysis is the dominant cost when many scenarios fail.
 
-Pass `--given-all-frames` to retain every frame (each stored with an `is_internal` flag; the HTML report then shows a **"Show internal frames"** toggle on each failure). It's a debugging escape hatch for when you're troubleshooting the plugin or pytest itself — it re-introduces the per-frame cost, so leave it off for normal runs on large failing suites.
+Pass `--given-all-frames` to retain every frame (each stored with an `is_internal` flag; the HTML report then shows a **"Show internal frames"** toggle on each failure). It's a debugging escape hatch for troubleshooting the plugin or pytest itself, and it re-introduces that per-frame cost.
 
 Skipped scenarios never capture a traceback at all — they carry their skip reason instead.
 
@@ -484,18 +479,18 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
 
 `--source-link` accepts the same presets and raw templates as `--given-source-link` (see [Source links](#source-links)). Omit it (or pass `--source-link=none`) to render plain file:line text without an anchor.
 
-Pass `--format md` to render Markdown instead of HTML; the format is also inferred from the `-o` extension, so `-o report.md` renders Markdown without needing `--format` explicitly. Omit `-o` with `--format md` to print to stdout.
+Pass `--format md` for Markdown instead of HTML; it is also inferred from the `-o` extension, so `-o report.md` needs no `--format`. Omit `-o` with `--format md` to print to stdout.
 
 The same script owns `skills install` — see [Agent skills](#agent-skills).
 
 ## Examples
 
-Four example suites live under [`examples/`](https://github.com/nwilbert/pytest-given/tree/main/examples/), each with pre-rendered JSON + HTML committed:
+Four example suites live under [`examples/`](https://github.com/nwilbert/pytest-given/tree/main/examples/), each with pre-rendered JSON + HTML committed — the rendered pages are linked at the top of this README:
 
-- [`coffeeshop/test_coffeeshop.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/coffeeshop/test_coffeeshop.py) — a tour of the core feature surface: `when`/`then` blocks, generator fixtures with teardown, plain text and JSON attachments, parametrized tests rendered as tables, t-string interpolation, `Annotated[..., given(...)]` labels on a parametrize value, helper functions that record their own steps, top-level `given` blocks, deeply nested steps, failure rendering, and skipped scenarios. Output: [`coffeeshop.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/coffeeshop/coffeeshop.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/coffeeshop/coffeeshop.html)).
-- [`hotel-booking/test_hotel_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/test_hotel_booking.py) — Domain Storytelling features: a `Glossary` of actors / work objects / verbs, a `story(...)` with `activity(...)` rows, scenarios bound to a story with per-activity coverage, and kindless + undefined terms (registered with `g('foo')`) awaiting classification. Output: [`hotel-booking.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/hotel-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/hotel-booking/hotel-booking.html)).
-- [`file-glossary-booking/test_file_glossary_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/test_file_glossary_booking.py) — `FileGlossary` features: loading a Markdown glossary file, name-based term access, inferred kinds from story activity slots, and a deliberately kindless term (neutral wash). Output: [`file-glossary-booking.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/file-glossary-booking.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/file-glossary-booking/file-glossary-booking.html)).
-- [`self-report/`](https://github.com/nwilbert/pytest-given/tree/main/examples/self-report/) — pytest-given applied to its own backend test suite: many unit tests are `@scenario`-decorated and narrated in the vocabulary of [`GLOSSARY.md`](https://github.com/nwilbert/pytest-given/blob/main/GLOSSARY.md) (loaded as a `FileGlossary`). No hand-written test file — it's generated from the whole suite. Output: [`self-report.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/self-report/self-report.html) ([live preview](https://raw.githack.com/nwilbert/pytest-given/main/examples/self-report/self-report.html)).
+- [`coffeeshop/test_coffeeshop.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/coffeeshop/test_coffeeshop.py) — a tour of the core feature surface: `when`/`then` blocks, generator fixtures with teardown, plain text and JSON attachments, parametrized tests rendered as tables, t-string interpolation, `Annotated[..., given(...)]` labels on a parametrize value, helper functions that record their own steps, top-level `given` blocks, deeply nested steps, failure rendering, and skipped scenarios. Output: [`coffeeshop.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/coffeeshop/coffeeshop.html).
+- [`hotel-booking/test_hotel_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/test_hotel_booking.py) — Domain Storytelling features: a `Glossary` of actors / work objects / verbs, a `story(...)` with `activity(...)` rows, scenarios bound to a story with per-activity coverage, and kindless + undefined terms (registered with `g('foo')`) awaiting classification. Output: [`hotel-booking.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/hotel-booking.html).
+- [`file-glossary-booking/test_file_glossary_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/test_file_glossary_booking.py) — `FileGlossary` features: loading a Markdown glossary file, name-based term access, inferred kinds from story activity slots, and a deliberately kindless term (neutral wash). Output: [`file-glossary-booking.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/file-glossary-booking.html).
+- [`self-report/`](https://github.com/nwilbert/pytest-given/tree/main/examples/self-report/) — pytest-given applied to its own backend test suite: many unit tests are `@scenario`-decorated and narrated in the vocabulary of [`GLOSSARY.md`](https://github.com/nwilbert/pytest-given/blob/main/GLOSSARY.md) (loaded as a `FileGlossary`). No hand-written test file — it's generated from the whole suite. Output: [`self-report.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/self-report/self-report.html).
 
 Run `nox -s examples` to regenerate the first three, and `nox -s self_report` for the self-report.
 
@@ -516,7 +511,13 @@ Adopt selectively: decorate the tests that assert behavior, and leave plumbing (
 
 ### Agent skills
 
-`pytest-given skills install` copies the bundled [Agent Skills](https://agentskills.io) into your repo's `.claude/skills/`, where Claude Code (and other harnesses following the same format) auto-discover them. It ships three skills: **`pytest-given-authoring`** — a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories; **`pytest-given-navigating`** — how to explore a codebase through its rendered reports (`--given-md` for the prose spec, `--given-json` + `jq` for filtering by tag, term, or status) instead of grepping test bodies; and **`pytest-given-reviewing`** — a layered review of narrated tests (the narration lint as the structural gate, a semantic audit of step text against step bodies — may abstract, never overstate — a completeness audit of what the report leaves out, then a hygiene pass over the glossary, tags and stories). The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` detects drift in CI. Use `--dest` for a non-default skills directory.
+`pytest-given skills install` copies the bundled [Agent Skills](https://agentskills.io) into your repo's `.claude/skills/`, where Claude Code (and other harnesses following the same format) auto-discover them. Three ship:
+
+- **`pytest-given-authoring`** — a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories.
+- **`pytest-given-navigating`** — exploring a codebase through its rendered reports (`--given-md` for the prose spec, `--given-json` + `jq` for filtering by tag, term, or status) instead of grepping test bodies.
+- **`pytest-given-reviewing`** — a layered review of narrated tests: the narration lint as the structural gate, a semantic audit of step text against step bodies, a completeness audit of what the report leaves out, then a hygiene pass over the glossary, tags and stories.
+
+The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` detects drift in CI. Use `--dest` for a non-default skills directory.
 
 ```bash
 pytest-given skills install            # copies into ./.claude/skills/

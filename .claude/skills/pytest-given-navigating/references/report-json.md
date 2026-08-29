@@ -5,7 +5,7 @@
 ```
 metadata      project, title, timestamp, pytest_version, plugin_version, commit_sha
 scenarios[]   one entry per @scenario (parametrized cases grouped into one)
-glossary      {terms: [...]} — every declared term, referenced or not
+glossary      {terms: [...]} — every declared term, referenced or not; null on a suite with no glossary
 stories[]     one entry per story(...)
 ```
 

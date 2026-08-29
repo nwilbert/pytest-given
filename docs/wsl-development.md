@@ -1,6 +1,5 @@
 # Running pytest-given under WSL & Windows in parallel
 
-
 ## Why
 
 Enable development under Windows with an IDE like PyCharm, while at the same time using a Linux sandbox for agentic development. But the venvs for Linux must not collide with the ones used for Windows.
@@ -79,47 +78,29 @@ default in-repo `.nox/` directory and the noxfile stays portable for anyone else
 
 ## Source-path normalization in `capture/source.py`
 
-Running the same working tree from both Windows (PyCharm) and WSL has a second,
-subtler consequence: the **paths Python records for source frames are not always
-Linux paths**.
-
 `capture/source.py` reconstructs source locations (for `Story`/`GlossaryTerm`
 frames, scenario `item.location`s, and glossary files) into paths relative to
-rootdir so the HTML report can render source links. Running the same working
-tree from both Windows (PyCharm) and WSL means a single file can be recorded in
-**either** path convention, regardless of which interpreter is running:
+rootdir so the HTML report can render source links. Running one working tree
+from both sides has a second, subtler consequence for that: **a single file can
+be recorded in either path convention, regardless of which interpreter is
+running.** A `.pyc` compiled by one side caches its own absolute path, and the
+other side reads it verbatim out of the code object — a Windows
+`C:\Users\Niko\repos\...` under WSL, or a `/mnt/c/...` under native Windows.
 
-- **Windows path under WSL.** A `.pyc` compiled by the Windows interpreter caches
-  the absolute Windows path (`C:\Users\Niko\repos\...`); once embedded in the
-  code object the WSL interpreter reads it verbatim. On Linux `pathlib` treats
-  `\` as an ordinary filename character, so `Path(r'C:\Users\...\foo.py')` is a
-  *single-segment* relative path and `relative_to(rootdir)` raises `ValueError`.
-- **WSL-mount path under native Windows.** The mirror case: a `.pyc` compiled
-  under WSL caches the `/mnt/c/...` form, and the Windows interpreter reuses it
-  for the shared checkout. Windows `pathlib` treats a leading `/mnt/c/...` as a
-  *drive-relative* path (`drive=''`), so `.resolve()` prepends the current drive
-  and produces a bogus `C:\mnt\c\...` that no longer shares a drive anchor with
-  the real `C:\Users\...` rootdir — again `relative_to` raises `ValueError`.
+Either way `relative_to(rootdir)` raises `ValueError`: Linux `pathlib` treats
+`\` as an ordinary filename character, so the Windows path is a *single-segment
+relative* one, while Windows `pathlib` reads a leading `/mnt/c/...` as
+*drive-relative* and resolves it to a bogus `C:\mnt\c\...` sharing no drive
+anchor with the real rootdir. `capture_caller_source` then silently returns
+`None` and the source link just disappears from the report, with no error to
+explain why.
 
-In both cases `capture_caller_source` silently returns `None` and the source link
-just disappears from the report, with no error to explain why.
-
-The fix is a small **bidirectional** normalization (`_co_filename_to_path`)
-applied to every path before any `Path` math — both to captured `co_filename`s
-and, via `set_rootdir`, to the rootdir itself, so the two sides always share an
-anchor:
-
-- Under WSL (`_IS_WSL`): a leading `<drive>:\` (or `<drive>:/`, matched by
-  `_WINDOWS_PATH_RE`) is rewritten to the canonical `/mnt/<drive>/...` mount
-  path — drive letter lowercased, backslashes flipped to forward slashes.
-- Under native Windows (`_IS_WINDOWS`): a leading `/mnt/<drive>/...` (matched by
-  `_MNT_PATH_RE`) is rewritten back to `<drive>:\...`.
-- On plain Linux and macOS neither branch fires — there `/mnt/<drive>` is a real
-  directory and a Windows-style `co_filename` should never occur — so paths fall
-  straight through to `Path(filename)` untouched.
+The fix is a small bidirectional normalization, `_co_filename_to_path`, applied
+before any `Path` math — both to captured `co_filename`s and, via
+`set_rootdir`, to the rootdir itself, so the two sides always share an anchor.
+Its docstring carries the rewrite table and the platform guards that keep it
+inert on plain Linux and macOS.
 
 Because the WSL `/mnt`-absolute assumption is POSIX-only, tests that assert it
 must `skipif(sys.platform == 'win32', ...)`; every other test passes on all four
 targets (native Windows, macOS, Linux, WSL).
-
-

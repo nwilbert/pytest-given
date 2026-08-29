@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-28T09:02:33.137664+00:00",
+    "timestamp": "2026-08-29T08:40:42.717355+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "88355ae0de6d40798cd0a4524586afe0c5c63756",
+    "commit_sha": "ee1b63b1b31bfaed4ce3299a43b514fe232308e7",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -14233,7 +14233,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -17807,7 +17807,7 @@
         "id": "step",
         "kind": "object",
         "canonical": "Step",
-        "definition": "A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest. Each carries a phase, narration, attachments, and children \u2014 but no status and no error of its own: a failure is recorded on the *Scenario*, and per *Case* on the *Parameter table*, which is where both renderers read it.",
+        "definition": "A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest, and each carries a phase, narration, attachments and children \u2014 but no status or error of its own: a failure is recorded on the *Scenario*, and per *Case* on the *Parameter table*, which is where both renderers read it.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 14
@@ -17817,7 +17817,7 @@
         "id": "narration",
         "kind": null,
         "canonical": "Narration",
-        "definition": "The human-readable text on a step or scenario name. Modeled as a `Narration` dataclass bundling a flat rendered `text: str` with a `parts: list[NarrationPart]` (empty for plain-string authoring; populated when the source was a t-string or `pytest_given.Template`, with `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationTermRef` pieces). The structured form lets the templatizer and renderer treat parametrize-bound values specially without regex tricks.",
+        "definition": "The human-readable text on a step or scenario name. A `Narration` bundles the flat rendered `text` with `parts` \u2014 empty for plain-string authoring, and for a t-string or `pytest_given.Template` a list of `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationTermRef` pieces. The structured form lets the templatizer and renderer treat parametrize-bound values specially without regex tricks.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 15
@@ -17897,7 +17897,7 @@
         "id": "group",
         "kind": "verb",
         "canonical": "Group",
-        "definition": "Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a *Parameter table*. Cases group when they share the same *Node ID* without its parametrize tail \u2014 one test function \u2014 and the same name; two same-named scenarios on different test functions stay separate. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario.",
+        "definition": "Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a *Parameter table*. Cases group when they share both the same name and the same *Node ID* without its parametrize tail \u2014 one test function; two same-named scenarios on different test functions stay separate. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 28
@@ -18037,7 +18037,7 @@
         "id": "source-link",
         "kind": null,
         "canonical": "Source link",
-        "definition": "A clickable file:line anchor on a scenario card, a story panel, or an expanded glossary term card. Resolved from the `given_source_link` config (preset name like `vscode` / `github`, or a raw URL template). Captured as a `SourceLocation` (POSIX relpath + 1-indexed line) \u2014 from `pytest.Item.location` for a scenario, from the declaration site for a *Story* or *Term*. Disabled by default.",
+        "definition": "A clickable file:line anchor on a scenario card, a story panel, or an expanded glossary term card, resolved from the `given_source_link` config \u2014 a preset name like `vscode` / `github`, or a raw URL template. Captured as a `SourceLocation` (POSIX relpath + 1-indexed line) from `pytest.Item.location` for a scenario, from the declaration site for a *Story* or *Term*. Disabled by default.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 57
@@ -18067,7 +18067,7 @@
         "id": "deferred-term",
         "kind": null,
         "canonical": "Deferred term",
-        "definition": "A term handed over before its kind is settled \u2014 the `DeferredTermHandle` returned by the code glossary (`g('foo')` declare-or-get, `g['foo']` get-only) and by every *file glossary* lookup (`g['Guest']`). It subclasses the plain `TermHandle` that the typed registrations (`g.actor(...)` and friends) return, and adds no behavior \u2014 it marks only that the kind was left open. The deferral is in the handing over, not the term: a row with an explicit `kind_column` arrives through the same handle already kinded, while the rest stay `None` until *kind inference* runs.",
+        "definition": "A term handed over before its kind is settled \u2014 the `DeferredTermHandle` returned by `g('foo')` and `g['foo']` on a code glossary, and by every *file glossary* lookup. It subclasses the plain `TermHandle` of the typed registrations (`g.actor(...)` and friends) and adds no behavior; it marks only that the kind was left open. The deferral is in the handing over, not the term: a row with an explicit `kind_column` arrives through the same handle already kinded, while the rest stay `None` until *kind inference* runs.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 67
@@ -18167,7 +18167,7 @@
         "id": "activity-part",
         "kind": null,
         "canonical": "Activity Part",
-        "definition": "The two-variant union making up an activity's prose (`ActivityPart` = `ActivityTermRef",
+        "definition": "The two-variant union making up an activity's prose (`ActivityPart` = `ActivityTermRef` or `ActivityWord`): a reference to a glossary term, whose kind resolves via the glossary, or a bare path word \u2014 a node label or edge connective that carries no kind or id, is never classified by inference, and never reaches the glossary. That last is what separates it from a kindless term, which has an id and is tracked.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 77

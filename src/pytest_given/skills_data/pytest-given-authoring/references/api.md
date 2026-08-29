@@ -60,5 +60,4 @@ Hard rules (each raises `PytestGivenError`):
 
 ## Verifying
 
-- `pytest <selection> --given-md` — render touched scenarios to stdout.
-- `pytest <selection> --given-lint=true` — narration lint; only *error* findings fail the run. The rule catalog is in [scenarios.md](scenarios.md) under "Mechanical counterparts"; per-project config (`given_lint_rules`, `given_lint_ignore`) is in the README.
+`pytest <selection> --given-md` renders the touched scenarios to stdout; `--given-lint=true` runs the narration lint, where only *error* findings fail the run. Its rule catalog is in [scenarios.md](scenarios.md) under "Mechanical counterparts".

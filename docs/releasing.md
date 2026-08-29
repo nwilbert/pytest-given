@@ -22,27 +22,21 @@ mistake shipped to PyPI is permanent.
 - [ ] Land it on `main` and wait for CI to go green. Releases can only be
       dispatched from `main`.
 
-A PR is not required. `main` carries no branch protection, and CI runs on direct
-pushes to `main` as well as on pull requests, so committing the bump straight to
-`main` is gated either way. The only thing a PR adds is that CI runs *before* the
-commit lands, so `main` is never briefly red — worth it for substantive changes,
-thin for a version bump. Either way, a red `main` cannot produce a bad release:
-the release workflow re-runs the whole gate in `verify` and `build` before
-anything is published.
+A PR is not required: `main` carries no branch protection and CI gates direct
+pushes too, and the release workflow re-runs the whole gate in `verify` and
+`build` before publishing anything, so a red `main` cannot produce a bad
+release. A PR only buys running CI *before* the commit lands — worth it for
+substantive changes, thin for a version bump.
 
-No local `nox` run is listed here, on purpose. CI's `quality`, `test`, `package`
-and `audit` jobs already run `lint`, `mypy`, `test`, `coverage` and `audit` — the
-default `nox` gate minus `format`, which rewrites files where `lint`'s
-`ruff format --check` already fails on the same drift — plus `nox -s build`, and
-the release workflow then runs the same set again. A local run before dispatching
-would be the third. The usual "run `uv run nox` before committing" rule from
+No local `nox` run is listed here, on purpose: CI already runs the default gate
+(minus `format`, which rewrites files where `lint`'s `ruff format --check`
+already fails on the same drift) plus `nox -s build`, and the release workflow
+then runs it again. The usual "run `uv run nox` before committing" rule from
 [AGENTS.md](../AGENTS.md) applies to the bump commit like any other — it just
-isn't a release-specific step.
-
-The exception is a change to packaging itself: build config in `pyproject.toml`,
-the hatch include lists, or anything affecting what lands in the wheel. There
-`uv run nox -s build` locally is worth it for the faster loop, and it is the only
-place a Windows-side packaging problem can surface at all, since CI is
+isn't a release-specific step. The exception is a change to packaging itself
+(build config, the hatch include lists, anything affecting what lands in the
+wheel): there `uv run nox -s build` locally is worth the faster loop, and it is
+the only place a Windows-side packaging problem can surface at all, since CI is
 Linux-only.
 
 ### 2. Rehearse on TestPyPI
