@@ -1,6 +1,5 @@
 """Story / Activity / Path constructors."""
 
-import sys
 from collections.abc import Iterable, Sequence
 
 from ..model import (
@@ -12,6 +11,7 @@ from ..model import (
     ActivityWord,
     Glossary,
     PytestGivenError,
+    SourceLocation,
     Story,
     StoryId,
     id_derive,
@@ -151,9 +151,14 @@ def restore_story_registry(snapshot: dict[StoryId, str]) -> None:
     _STORY_REGISTRY.update(snapshot)
 
 
-def _register_story(sid: StoryId, title: str) -> None:
-    frame = sys._getframe(2)
-    site = f'{frame.f_code.co_filename}:{frame.f_lineno}'
+def _register_story(sid: StoryId, title: str, source: SourceLocation | None) -> None:
+    """Claim `sid`, or refuse a second claim on it.
+
+    Takes the source `story()` already captured rather than walking the same
+    frame again: a raw `co_filename` would put an absolute, unfolded path in
+    the message.
+    """
+    site = _site_text(source)
     if sid in _STORY_REGISTRY:
         raise PytestGivenError(
             f'story {title!r} (id {sid!r}) already declared at '
@@ -162,12 +167,19 @@ def _register_story(sid: StoryId, title: str) -> None:
     _STORY_REGISTRY[sid] = site
 
 
+def _site_text(source: SourceLocation | None) -> str:
+    """The declaration site a collision message names; None outside rootdir."""
+    if source is None:
+        return 'an unknown location'
+    return f'{source.relpath}:{source.line}'
+
+
 def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     """Construct a Story. Reassigns auto-numbered ids, validates uniqueness,
     and enforces v1's single-glossary invariant."""
     sid = StoryId(id_derive(title))
-    _register_story(sid, title)
     source = capture_caller_source(skip=2)
+    _register_story(sid, title, source)
     numbered = _assign_sequence_numbers(tuple(activities))
     _check_unique_ids(numbered)
     glossaries = merge_glossaries(a._glossaries for a in numbered)

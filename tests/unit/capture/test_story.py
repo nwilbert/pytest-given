@@ -508,6 +508,19 @@ def test_story_id_collision_raises_with_both_sites():
         story('book-a-room', [])
 
 
+def test_story_id_collision_reports_a_rootdir_relative_site():
+    repo_root = Path(__file__).resolve().parents[3]
+    source_mod.set_rootdir(repo_root)
+    try:
+        story('Book a Room', [])
+        with pytest.raises(PytestGivenError, match='already declared') as excinfo:
+            story('book-a-room', [])
+    finally:
+        source_mod.restore_rootdir(None)
+    assert 'tests/unit/capture/test_story.py:' in str(excinfo.value)
+    assert str(repo_root) not in str(excinfo.value)
+
+
 def test_story_id_collision_does_not_fire_after_registry_clear():
     story('Book', [])
     clear_story_registry()
