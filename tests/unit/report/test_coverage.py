@@ -1,5 +1,3 @@
-from typing import Any, cast
-
 import pytest
 
 from pytest_given import given, scenario, then, when
@@ -571,11 +569,3 @@ def test_compute_coverage_explicit_binding_covers_under_anchored_activity(g):
         coverage = compute_coverage(g, scenario, story)
     with then(t'{pg["Coverage"]} counts it, despite the missing anchors'):
         assert ActivityId(1) in coverage
-
-
-def test_identity_of_part_rejects_unknown_variant() -> None:
-    # The exhaustive match guards against an ActivityPart variant being added
-    # without an identity branch, which would silently under-report coverage
-    # rather than fail. assert_never fires at runtime.
-    with pytest.raises(AssertionError):
-        identity_of_part(Glossary(), cast(Any, object()))

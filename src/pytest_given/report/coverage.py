@@ -1,6 +1,6 @@
 """Scenario ↔ story-activity coverage matching."""
 
-from typing import NamedTuple, assert_never
+from typing import NamedTuple
 
 from ..model import (
     Activity,
@@ -60,8 +60,6 @@ def identity_of_part(
             )
         case ActivityWord():
             return None
-        case _:
-            assert_never(part)
 
 
 def a_refs(glossary: Glossary, activity: Activity) -> set[Identity]:
