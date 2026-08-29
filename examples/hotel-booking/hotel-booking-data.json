@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-24T09:01:14.078005+00:00",
+    "timestamp": "2026-08-29T09:38:49.747333+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "eb6d2982a9eeaa42ac29e8b54e40e8dfd9f1226f",
+    "commit_sha": "ed8404d9491eb3566bd7ddfc1471ec8ade529382",
     "title": "Hotel Booking Example"
   },
   "scenarios": [
@@ -461,197 +461,6 @@
       "activity_ids": []
     },
     {
-      "id": "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking",
-      "narration": {
-        "text": "Alice cancels her booking and is refunded",
-        "parts": []
-      },
-      "module": "test_hotel_booking",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "our guest Alice",
-            "parts": [
-              {
-                "value": "our guest "
-              },
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "alice"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "Alice has a confirmed Booking she paid for",
-            "parts": [
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              },
-              {
-                "value": " has a confirmed "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              },
-              {
-                "value": " she paid for"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "Alice cancels the Booking",
-            "parts": [
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "cancel",
-                "display": "cancels",
-                "expression": "cancel(\"cancels\")"
-              },
-              {
-                "value": " the "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Booking System refunds the Payment for the Booking",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "booking-system",
-                "display": "Booking System",
-                "expression": "booking_system"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "refund",
-                "display": "refunds",
-                "expression": "refund(\"refunds\")"
-              },
-              {
-                "value": " the "
-              },
-              {
-                "term_id": "payment",
-                "display": "Payment",
-                "expression": "payment"
-              },
-              {
-                "value": " for the "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Booking System sends a Confirmation to Alice",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "booking-system",
-                "display": "Booking System",
-                "expression": "booking_system"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "send",
-                "display": "sends",
-                "expression": "send(\"sends\")"
-              },
-              {
-                "value": " a "
-              },
-              {
-                "term_id": "confirmation",
-                "display": "Confirmation",
-                "expression": "confirmation"
-              },
-              {
-                "value": " to "
-              },
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 240
-      },
-      "story_id": "cancel-a-booking",
-      "activity_ids": []
-    },
-    {
       "id": "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]",
       "narration": {
         "text": "Payment is declined \u2014 the booking is not finalized",
@@ -978,6 +787,197 @@
         "line": 198
       },
       "story_id": "book-a-group-trip",
+      "activity_ids": []
+    },
+    {
+      "id": "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking",
+      "narration": {
+        "text": "Alice cancels her booking and is refunded",
+        "parts": []
+      },
+      "module": "test_hotel_booking",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "our guest Alice",
+            "parts": [
+              {
+                "value": "our guest "
+              },
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": "alice"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "Alice has a confirmed Booking she paid for",
+            "parts": [
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")"
+              },
+              {
+                "value": " has a confirmed "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking"
+              },
+              {
+                "value": " she paid for"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Alice cancels the Booking",
+            "parts": [
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")"
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "cancel",
+                "display": "cancels",
+                "expression": "cancel(\"cancels\")"
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Booking System refunds the Payment for the Booking",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "booking-system",
+                "display": "Booking System",
+                "expression": "booking_system"
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "refund",
+                "display": "refunds",
+                "expression": "refund(\"refunds\")"
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "payment",
+                "display": "Payment",
+                "expression": "payment"
+              },
+              {
+                "value": " for the "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Booking System sends a Confirmation to Alice",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "booking-system",
+                "display": "Booking System",
+                "expression": "booking_system"
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "send",
+                "display": "sends",
+                "expression": "send(\"sends\")"
+              },
+              {
+                "value": " a "
+              },
+              {
+                "term_id": "confirmation",
+                "display": "Confirmation",
+                "expression": "confirmation"
+              },
+              {
+                "value": " to "
+              },
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/hotel-booking/test_hotel_booking.py",
+        "line": 240
+      },
+      "story_id": "cancel-a-booking",
       "activity_ids": []
     }
   ],

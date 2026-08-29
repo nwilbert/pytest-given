@@ -35,6 +35,32 @@
 - **when** I run a query
 - **then** the connection is open and the query was logged
 
+## ✓ Parametrized test (renders as a parameter table) · 3 cases
+`examples/coffeeshop/test_coffeeshop.py:54::test_pricing` · pricing
+
+- **given** a coffee machine
+- **when** I insert ${euros}
+- **then** the purchase is allowed: {expect}
+
+| euros | expect | |
+|---|---|---|
+| 1 | False | ✓ |
+| 2 | True | ✓ |
+| 3 | True | ✓ |
+
+## ✓ Parametrize value surfaced as a given (Annotated) · 2 cases
+`examples/coffeeshop/test_coffeeshop.py:66::test_annotated_given_label`
+
+- **given** a coffee machine
+- **given** an order for a {cup_size} ml cup
+- **when** I brew the cup
+- **then** the machine has one fewer coffee
+
+| cup_size | |
+|---|---|
+| 200 | ✓ |
+| 350 | ✓ |
+
 ## ✓ T-string with a non-parametrize value (neutral highlight)
 `examples/coffeeshop/test_coffeeshop.py:78::test_neutral_highlight`
 
@@ -42,6 +68,67 @@
 - **given** I have some coins in hand
 - **when** I insert $5
 - **then** the machine has 9 coffees left
+
+## ✓ Brew {cup_size} ml (templated scenario name) · 2 cases
+`examples/coffeeshop/test_coffeeshop.py:89::test_brew`
+
+- **given** a coffee machine
+- **when** I brew a {cup_size} ml cup
+- **then** the machine has one fewer coffee
+
+| cup_size | |
+|---|---|
+| 200 | ✓ |
+| 300 | ✓ |
+
+## ✓ Serve a 200 ml cup (one scenario per case) [200]
+`examples/coffeeshop/test_coffeeshop.py:98::test_serve`
+
+- **given** a coffee machine
+- **when** I order a 200 ml cup
+- **then** the machine has one fewer coffee
+
+## ✓ Serve a 400 ml cup (one scenario per case) [400]
+`examples/coffeeshop/test_coffeeshop.py:98::test_serve`
+
+- **given** a coffee machine
+- **given** the barista reaches for a takeaway cup
+- **when** I order a 400 ml cup
+- **then** the machine has one fewer coffee
+
+## ✓ Brew a {flavor} coffee (per-case columns) · 2 cases
+`examples/coffeeshop/test_coffeeshop.py:115::test_flavor_columns` · pricing
+
+- **given** a coffee machine
+- **given** the machine is primed for {flavor}
+  - 📎 brew log — *see parameter table*
+- **when** I brew a {flavor} coffee
+- **then** the drink costs {price} euros
+
+| flavor | brew log | price | |
+|---|---|---|---|
+| vanilla | brew log | 2 | ✓ |
+| mocha | brew log | 3 | ✓ |
+
+- **vanilla** — brew log:
+  ```
+  00:00  purge vanilla line, 40 ml at 92.8C
+  00:04  dose 18.5 g, grind 12, hopper: vanilla
+  00:09  pre-infuse at 3.0 bar for 4.0 s
+  00:13  ramp to 9.0 bar
+  00:27  stop at 36.0 g yield, ratio 1:1.95
+  00:31  purge group head, vanilla residue cleared
+  ```
+
+- **mocha** — brew log:
+  ```
+  00:00  purge mocha line, 40 ml at 92.8C
+  00:04  dose 18.5 g, grind 12, hopper: mocha
+  00:09  pre-infuse at 3.0 bar for 4.0 s
+  00:13  ramp to 9.0 bar
+  00:27  stop at 36.0 g yield, ratio 1:1.95
+  00:31  purge group head, mocha residue cleared
+  ```
 
 ## ✓ Helper functions can record their own steps
 `examples/coffeeshop/test_coffeeshop.py:162::test_buy_with_validation` · checkout, validation
@@ -119,93 +206,6 @@
 ## ⤼ Skipped scenario rendering · skipped
 `examples/coffeeshop/test_coffeeshop.py:254::test_skipped` — reason: demonstrates skipped status
 
-
-## ✓ Parametrized test (renders as a parameter table) · 3 cases
-`examples/coffeeshop/test_coffeeshop.py:54::test_pricing` · pricing
-
-- **given** a coffee machine
-- **when** I insert ${euros}
-- **then** the purchase is allowed: {expect}
-
-| euros | expect | |
-|---|---|---|
-| 1 | False | ✓ |
-| 2 | True | ✓ |
-| 3 | True | ✓ |
-
-## ✓ Parametrize value surfaced as a given (Annotated) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:66::test_annotated_given_label`
-
-- **given** a coffee machine
-- **given** an order for a {cup_size} ml cup
-- **when** I brew the cup
-- **then** the machine has one fewer coffee
-
-| cup_size | |
-|---|---|
-| 200 | ✓ |
-| 350 | ✓ |
-
-## ✓ Brew {cup_size} ml (templated scenario name) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:89::test_brew`
-
-- **given** a coffee machine
-- **when** I brew a {cup_size} ml cup
-- **then** the machine has one fewer coffee
-
-| cup_size | |
-|---|---|
-| 200 | ✓ |
-| 300 | ✓ |
-
-## ✓ Serve a 200 ml cup (one scenario per case) [200]
-`examples/coffeeshop/test_coffeeshop.py:98::test_serve`
-
-- **given** a coffee machine
-- **when** I order a 200 ml cup
-- **then** the machine has one fewer coffee
-
-## ✓ Serve a 400 ml cup (one scenario per case) [400]
-`examples/coffeeshop/test_coffeeshop.py:98::test_serve`
-
-- **given** a coffee machine
-- **given** the barista reaches for a takeaway cup
-- **when** I order a 400 ml cup
-- **then** the machine has one fewer coffee
-
-## ✓ Brew a {flavor} coffee (per-case columns) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:115::test_flavor_columns` · pricing
-
-- **given** a coffee machine
-- **given** the machine is primed for {flavor}
-  - 📎 brew log — *see parameter table*
-- **when** I brew a {flavor} coffee
-- **then** the drink costs {price} euros
-
-| flavor | brew log | price | |
-|---|---|---|---|
-| vanilla | brew log | 2 | ✓ |
-| mocha | brew log | 3 | ✓ |
-
-- **vanilla** — brew log:
-  ```
-  00:00  purge vanilla line, 40 ml at 92.8C
-  00:04  dose 18.5 g, grind 12, hopper: vanilla
-  00:09  pre-infuse at 3.0 bar for 4.0 s
-  00:13  ramp to 9.0 bar
-  00:27  stop at 36.0 g yield, ratio 1:1.95
-  00:31  purge group head, vanilla residue cleared
-  ```
-
-- **mocha** — brew log:
-  ```
-  00:00  purge mocha line, 40 ml at 92.8C
-  00:04  dose 18.5 g, grind 12, hopper: mocha
-  00:09  pre-infuse at 3.0 bar for 4.0 s
-  00:13  ramp to 9.0 bar
-  00:27  stop at 36.0 g yield, ratio 1:1.95
-  00:31  purge group head, mocha residue cleared
-  ```
 
 ## ⤼ All cases skipped · skipped
 `examples/coffeeshop/test_coffeeshop.py:261::test_parametrized_all_skipped`

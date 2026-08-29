@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-24T09:01:13.816733+00:00",
+    "timestamp": "2026-08-29T09:38:49.494367+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "eb6d2982a9eeaa42ac29e8b54e40e8dfd9f1226f",
+    "commit_sha": "ed8404d9491eb3566bd7ddfc1471ec8ade529382",
     "title": "Coffee Shop Example"
   },
   "scenarios": [
@@ -199,6 +199,225 @@
       "activity_ids": []
     },
     {
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]",
+      "narration": {
+        "text": "Parametrized test (renders as a parameter table)",
+        "parts": []
+      },
+      "module": "test_coffeeshop",
+      "tags": [
+        "pricing"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": "machine"
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I insert ${euros}",
+            "parts": [
+              {
+                "value": "I insert $"
+              },
+              {
+                "name": "euros",
+                "column_id": "euros",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the purchase is allowed: {expect}",
+            "parts": [
+              {
+                "value": "the purchase is allowed: "
+              },
+              {
+                "name": "expect",
+                "column_id": "expect",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "euros",
+            "name": "euros",
+            "kind": "param"
+          },
+          {
+            "id": "expect",
+            "name": "expect",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "values": [
+              1,
+              false
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              2,
+              true
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              3,
+              true
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
+        "line": 54
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]",
+      "narration": {
+        "text": "Parametrize value surfaced as a given (Annotated)",
+        "parts": []
+      },
+      "module": "test_coffeeshop",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": "machine"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an order for a {cup_size} ml cup",
+            "parts": [
+              {
+                "value": "an order for a "
+              },
+              {
+                "name": "cup_size",
+                "column_id": "cup_size",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " ml cup"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I brew the cup",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the machine has one fewer coffee",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "cup_size",
+            "name": "cup_size",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "values": [
+              200
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              350
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
+        "line": 66
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight",
       "narration": {
         "text": "T-string with a non-parametrize value (neutral highlight)",
@@ -283,6 +502,459 @@
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 78
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_brew[200]",
+      "narration": {
+        "text": "Brew {cup_size} ml (templated scenario name)",
+        "parts": [
+          {
+            "value": "Brew "
+          },
+          {
+            "name": "cup_size",
+            "column_id": "cup_size",
+            "format_spec": "",
+            "conversion": null
+          },
+          {
+            "value": " ml (templated scenario name)"
+          }
+        ]
+      },
+      "module": "test_coffeeshop",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": "machine"
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I brew a {cup_size} ml cup",
+            "parts": [
+              {
+                "value": "I brew a "
+              },
+              {
+                "name": "cup_size",
+                "column_id": "cup_size",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " ml cup"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the machine has one fewer coffee",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "cup_size",
+            "name": "cup_size",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "values": [
+              200
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              300
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
+        "line": 89
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_serve[200]",
+      "narration": {
+        "text": "Serve a 200 ml cup (one scenario per case) [200]",
+        "parts": [
+          {
+            "value": "Serve a "
+          },
+          {
+            "rendered": "200",
+            "expression": "cup_size",
+            "format_spec": "",
+            "conversion": null
+          },
+          {
+            "value": " ml cup (one scenario per case)"
+          },
+          {
+            "value": " [200]"
+          }
+        ]
+      },
+      "module": "test_coffeeshop",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": "machine"
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I order a 200 ml cup",
+            "parts": [
+              {
+                "value": "I order a "
+              },
+              {
+                "rendered": "200",
+                "expression": "cup_size",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " ml cup"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the machine has one fewer coffee",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
+        "line": 98
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_serve[400]",
+      "narration": {
+        "text": "Serve a 400 ml cup (one scenario per case) [400]",
+        "parts": [
+          {
+            "value": "Serve a "
+          },
+          {
+            "rendered": "400",
+            "expression": "cup_size",
+            "format_spec": "",
+            "conversion": null
+          },
+          {
+            "value": " ml cup (one scenario per case)"
+          },
+          {
+            "value": " [400]"
+          }
+        ]
+      },
+      "module": "test_coffeeshop",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": "machine"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "the barista reaches for a takeaway cup",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I order a 400 ml cup",
+            "parts": [
+              {
+                "value": "I order a "
+              },
+              {
+                "rendered": "400",
+                "expression": "cup_size",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " ml cup"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the machine has one fewer coffee",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
+        "line": 98
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]",
+      "narration": {
+        "text": "Brew a {flavor} coffee (per-case columns)",
+        "parts": [
+          {
+            "value": "Brew a "
+          },
+          {
+            "name": "flavor",
+            "column_id": "flavor",
+            "format_spec": "",
+            "conversion": null
+          },
+          {
+            "value": " coffee (per-case columns)"
+          }
+        ]
+      },
+      "module": "test_coffeeshop",
+      "tags": [
+        "pricing"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": "machine"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "the machine is primed for {flavor}",
+            "parts": [
+              {
+                "value": "the machine is primed for "
+              },
+              {
+                "name": "flavor",
+                "column_id": "flavor",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "brew log",
+              "content_type": "text",
+              "column_id": "attachment:0"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I brew a {flavor} coffee",
+            "parts": [
+              {
+                "value": "I brew a "
+              },
+              {
+                "name": "flavor",
+                "column_id": "flavor",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " coffee"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the drink costs {price} euros",
+            "parts": [
+              {
+                "value": "the drink costs "
+              },
+              {
+                "name": "price",
+                "column_id": "derived:0",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " euros"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "flavor",
+            "name": "flavor",
+            "kind": "param"
+          },
+          {
+            "id": "attachment:0",
+            "name": "brew log",
+            "kind": "attachment"
+          },
+          {
+            "id": "derived:0",
+            "name": "price",
+            "kind": "derived"
+          }
+        ],
+        "cases": [
+          {
+            "values": [
+              "vanilla",
+              {
+                "label": "brew log",
+                "content": "00:00  purge vanilla line, 40 ml at 92.8C\n00:04  dose 18.5 g, grind 12, hopper: vanilla\n00:09  pre-infuse at 3.0 bar for 4.0 s\n00:13  ramp to 9.0 bar\n00:27  stop at 36.0 g yield, ratio 1:1.95\n00:31  purge group head, vanilla residue cleared",
+                "content_type": "text"
+              },
+              "2"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "mocha",
+              {
+                "label": "brew log",
+                "content": "00:00  purge mocha line, 40 ml at 92.8C\n00:04  dose 18.5 g, grind 12, hopper: mocha\n00:09  pre-infuse at 3.0 bar for 4.0 s\n00:13  ramp to 9.0 bar\n00:27  stop at 36.0 g yield, ratio 1:1.95\n00:31  purge group head, mocha residue cleared",
+                "content_type": "text"
+              },
+              "3"
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
+        "line": 115
       },
       "story_id": null,
       "activity_ids": []
@@ -746,7 +1418,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 56,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -894,678 +1566,6 @@
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 254
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]",
-      "narration": {
-        "text": "Parametrized test (renders as a parameter table)",
-        "parts": []
-      },
-      "module": "test_coffeeshop",
-      "tags": [
-        "pricing"
-      ],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a coffee machine",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "machine"
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "I insert ${euros}",
-            "parts": [
-              {
-                "value": "I insert $"
-              },
-              {
-                "name": "euros",
-                "column_id": "euros",
-                "format_spec": "",
-                "conversion": null
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the purchase is allowed: {expect}",
-            "parts": [
-              {
-                "value": "the purchase is allowed: "
-              },
-              {
-                "name": "expect",
-                "column_id": "expect",
-                "format_spec": "",
-                "conversion": null
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": {
-        "columns": [
-          {
-            "id": "euros",
-            "name": "euros",
-            "kind": "param"
-          },
-          {
-            "id": "expect",
-            "name": "expect",
-            "kind": "param"
-          }
-        ],
-        "cases": [
-          {
-            "values": [
-              1,
-              false
-            ],
-            "status": "passed",
-            "error": null
-          },
-          {
-            "values": [
-              2,
-              true
-            ],
-            "status": "passed",
-            "error": null
-          },
-          {
-            "values": [
-              3,
-              true
-            ],
-            "status": "passed",
-            "error": null
-          }
-        ]
-      },
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 54
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]",
-      "narration": {
-        "text": "Parametrize value surfaced as a given (Annotated)",
-        "parts": []
-      },
-      "module": "test_coffeeshop",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a coffee machine",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "machine"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "an order for a {cup_size} ml cup",
-            "parts": [
-              {
-                "value": "an order for a "
-              },
-              {
-                "name": "cup_size",
-                "column_id": "cup_size",
-                "format_spec": "",
-                "conversion": null
-              },
-              {
-                "value": " ml cup"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "I brew the cup",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the machine has one fewer coffee",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": {
-        "columns": [
-          {
-            "id": "cup_size",
-            "name": "cup_size",
-            "kind": "param"
-          }
-        ],
-        "cases": [
-          {
-            "values": [
-              200
-            ],
-            "status": "passed",
-            "error": null
-          },
-          {
-            "values": [
-              350
-            ],
-            "status": "passed",
-            "error": null
-          }
-        ]
-      },
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 66
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "examples/coffeeshop/test_coffeeshop.py::test_brew[200]",
-      "narration": {
-        "text": "Brew {cup_size} ml (templated scenario name)",
-        "parts": [
-          {
-            "value": "Brew "
-          },
-          {
-            "name": "cup_size",
-            "column_id": "cup_size",
-            "format_spec": "",
-            "conversion": null
-          },
-          {
-            "value": " ml (templated scenario name)"
-          }
-        ]
-      },
-      "module": "test_coffeeshop",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a coffee machine",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "machine"
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "I brew a {cup_size} ml cup",
-            "parts": [
-              {
-                "value": "I brew a "
-              },
-              {
-                "name": "cup_size",
-                "column_id": "cup_size",
-                "format_spec": "",
-                "conversion": null
-              },
-              {
-                "value": " ml cup"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the machine has one fewer coffee",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": {
-        "columns": [
-          {
-            "id": "cup_size",
-            "name": "cup_size",
-            "kind": "param"
-          }
-        ],
-        "cases": [
-          {
-            "values": [
-              200
-            ],
-            "status": "passed",
-            "error": null
-          },
-          {
-            "values": [
-              300
-            ],
-            "status": "passed",
-            "error": null
-          }
-        ]
-      },
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 89
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "examples/coffeeshop/test_coffeeshop.py::test_serve[200]",
-      "narration": {
-        "text": "Serve a 200 ml cup (one scenario per case) [200]",
-        "parts": [
-          {
-            "value": "Serve a "
-          },
-          {
-            "rendered": "200",
-            "expression": "cup_size",
-            "format_spec": "",
-            "conversion": null
-          },
-          {
-            "value": " ml cup (one scenario per case)"
-          },
-          {
-            "value": " [200]"
-          }
-        ]
-      },
-      "module": "test_coffeeshop",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a coffee machine",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "machine"
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "I order a 200 ml cup",
-            "parts": [
-              {
-                "value": "I order a "
-              },
-              {
-                "rendered": "200",
-                "expression": "cup_size",
-                "format_spec": "",
-                "conversion": null
-              },
-              {
-                "value": " ml cup"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the machine has one fewer coffee",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 98
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "examples/coffeeshop/test_coffeeshop.py::test_serve[400]",
-      "narration": {
-        "text": "Serve a 400 ml cup (one scenario per case) [400]",
-        "parts": [
-          {
-            "value": "Serve a "
-          },
-          {
-            "rendered": "400",
-            "expression": "cup_size",
-            "format_spec": "",
-            "conversion": null
-          },
-          {
-            "value": " ml cup (one scenario per case)"
-          },
-          {
-            "value": " [400]"
-          }
-        ]
-      },
-      "module": "test_coffeeshop",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a coffee machine",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "machine"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "the barista reaches for a takeaway cup",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "I order a 400 ml cup",
-            "parts": [
-              {
-                "value": "I order a "
-              },
-              {
-                "rendered": "400",
-                "expression": "cup_size",
-                "format_spec": "",
-                "conversion": null
-              },
-              {
-                "value": " ml cup"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the machine has one fewer coffee",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 98
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]",
-      "narration": {
-        "text": "Brew a {flavor} coffee (per-case columns)",
-        "parts": [
-          {
-            "value": "Brew a "
-          },
-          {
-            "name": "flavor",
-            "column_id": "flavor",
-            "format_spec": "",
-            "conversion": null
-          },
-          {
-            "value": " coffee (per-case columns)"
-          }
-        ]
-      },
-      "module": "test_coffeeshop",
-      "tags": [
-        "pricing"
-      ],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a coffee machine",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "machine"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "the machine is primed for {flavor}",
-            "parts": [
-              {
-                "value": "the machine is primed for "
-              },
-              {
-                "name": "flavor",
-                "column_id": "flavor",
-                "format_spec": "",
-                "conversion": null
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "brew log",
-              "content_type": "text",
-              "column_id": "attachment:0"
-            }
-          ],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "I brew a {flavor} coffee",
-            "parts": [
-              {
-                "value": "I brew a "
-              },
-              {
-                "name": "flavor",
-                "column_id": "flavor",
-                "format_spec": "",
-                "conversion": null
-              },
-              {
-                "value": " coffee"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the drink costs {price} euros",
-            "parts": [
-              {
-                "value": "the drink costs "
-              },
-              {
-                "name": "price",
-                "column_id": "derived:0",
-                "format_spec": "",
-                "conversion": null
-              },
-              {
-                "value": " euros"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": {
-        "columns": [
-          {
-            "id": "flavor",
-            "name": "flavor",
-            "kind": "param"
-          },
-          {
-            "id": "attachment:0",
-            "name": "brew log",
-            "kind": "attachment"
-          },
-          {
-            "id": "derived:0",
-            "name": "price",
-            "kind": "derived"
-          }
-        ],
-        "cases": [
-          {
-            "values": [
-              "vanilla",
-              {
-                "label": "brew log",
-                "content": "00:00  purge vanilla line, 40 ml at 92.8C\n00:04  dose 18.5 g, grind 12, hopper: vanilla\n00:09  pre-infuse at 3.0 bar for 4.0 s\n00:13  ramp to 9.0 bar\n00:27  stop at 36.0 g yield, ratio 1:1.95\n00:31  purge group head, vanilla residue cleared",
-                "content_type": "text"
-              },
-              "2"
-            ],
-            "status": "passed",
-            "error": null
-          },
-          {
-            "values": [
-              "mocha",
-              {
-                "label": "brew log",
-                "content": "00:00  purge mocha line, 40 ml at 92.8C\n00:04  dose 18.5 g, grind 12, hopper: mocha\n00:09  pre-infuse at 3.0 bar for 4.0 s\n00:13  ramp to 9.0 bar\n00:27  stop at 36.0 g yield, ratio 1:1.95\n00:31  purge group head, mocha residue cleared",
-                "content_type": "text"
-              },
-              "3"
-            ],
-            "status": "passed",
-            "error": null
-          }
-        ]
-      },
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 115
       },
       "story_id": null,
       "activity_ids": []

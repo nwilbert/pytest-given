@@ -21,15 +21,6 @@
 - **then** the «Booking System» «confirms» the «Booking»
 - **then** the «Booking System» «sends» the «Confirmation» to «Alice» and «Bob»
 
-## ✓ Alice cancels her booking and is refunded
-`examples/hotel-booking/test_hotel_booking.py:240::test_cancel_booking`
-
-- **given** our guest «Alice»
-- **given** «Alice» has a confirmed «Booking» she paid for
-- **when** «Alice» «cancels» the «Booking»
-- **then** the «Booking System» «refunds» the «Payment» for the «Booking»
-- **then** the «Booking System» «sends» a «Confirmation» to «Alice»
-
 ## ✗ Payment is declined — the booking is not finalized · 4 cases
 `examples/hotel-booking/test_hotel_booking.py:198::test_payment_declined`
 
@@ -51,3 +42,12 @@
 - **gift card, partial balance** — failed:
   > assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}
   > test_hotel_booking.py:230 in test_payment_declined
+
+## ✓ Alice cancels her booking and is refunded
+`examples/hotel-booking/test_hotel_booking.py:240::test_cancel_booking`
+
+- **given** our guest «Alice»
+- **given** «Alice» has a confirmed «Booking» she paid for
+- **when** «Alice» «cancels» the «Booking»
+- **then** the «Booking System» «refunds» the «Payment» for the «Booking»
+- **then** the «Booking System» «sends» a «Confirmation» to «Alice»
