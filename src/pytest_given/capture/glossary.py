@@ -193,37 +193,36 @@ class Glossary(BaseGlossary):
     canonical and definition all equal — and raises on anything else, a
     definition supplied only the first time included. Re-reading a term declared
     elsewhere is `g[name]`, which never registers.
-
-    `skip=2` throughout: this method, then the user's call site.
     """
+
+    def _declare(
+        self, kind: TermKind | None, name: str, definition: str | None
+    ) -> TermHandle:
+        """Register `name` under `kind` and hand back its handle.
+
+        `skip=3` reaches past this method and the accessor that called it to
+        the user's own line.
+        """
+        term = _register_kind(
+            self, kind, name, definition, capture_caller_source(skip=3)
+        )
+        return TermHandle(_term=term, _glossary=self)
 
     def actor(self, name: str, definition: str | None = None) -> TermHandle:
         """Register an actor — a participant in the domain."""
-        term = _register_kind(
-            self, 'actor', name, definition, capture_caller_source(skip=2)
-        )
-        return TermHandle(_term=term, _glossary=self)
+        return self._declare('actor', name, definition)
 
     def work_object(self, name: str, definition: str | None = None) -> TermHandle:
         """Register a work object — a thing acted on."""
-        term = _register_kind(
-            self, 'object', name, definition, capture_caller_source(skip=2)
-        )
-        return TermHandle(_term=term, _glossary=self)
+        return self._declare('object', name, definition)
 
     def verb(self, name: str, definition: str | None = None) -> TermHandle:
         """Register a verb — an action."""
-        term = _register_kind(
-            self, 'verb', name, definition, capture_caller_source(skip=2)
-        )
-        return TermHandle(_term=term, _glossary=self)
+        return self._declare('verb', name, definition)
 
     def __call__(self, name: str, definition: str | None = None) -> TermHandle:
         """Declare-or-get a term whose kind inference will settle later."""
-        term = _register_kind(
-            self, None, name, definition, capture_caller_source(skip=2)
-        )
-        return TermHandle(_term=term, _glossary=self)
+        return self._declare(None, name, definition)
 
     def __getitem__(self, name: str) -> TermHandle:
         """Get-only lookup; an unknown name raises with a did-you-mean hint."""
