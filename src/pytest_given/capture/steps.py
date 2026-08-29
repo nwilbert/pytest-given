@@ -1,15 +1,9 @@
 """The step front doors: `given` / `when` / `then` / `when_then` / `attach`.
 
-One module for the whole of what a step *is* from user code — the dual
-context-manager/decorator descriptor, the paired `when_then`, and the
+The dual context-manager/decorator descriptor, the paired `when_then`, and the
 attachment call that binds to whatever step is open. They share
-`_recording_collector`, which is the one place that decides whether a call
-records, no-ops with a warning, or refuses. The scenario marker is
-`scenario.py`'s.
-
-`capture.traceback` names this module in `_INTERNAL_SUFFIXES`: the wrappers and
-`__enter__` / `__exit__` below are pytest-given frames a reader never wants in
-a failure traceback. Moving a wrapper out of here means updating that tuple.
+`_recording_collector`, which decides whether a call records, no-ops with a
+warning, or refuses. The scenario marker is `scenario.py`'s.
 """
 
 import functools
@@ -51,9 +45,7 @@ from .template import Template, narration_from, resolved_placeholder_part
 class StepDecorated(Protocol):
     """A function carrying a pytest-given step descriptor.
 
-    Whatever wraps the function stashes the descriptor as
-    ``_step_descriptor``; readers cast to this Protocol rather than probing an
-    untyped attribute.
+    Read sites cast to this Protocol rather than probing an untyped attribute.
     """
 
     _step_descriptor: StepDescriptor
@@ -65,14 +57,12 @@ def _recording_collector(
     """The collector to record into, or None when the caller should do nothing.
 
     None means an unannotated test, where `with given(...)` and `attach(...)`
-    are both legal and both no-ops: a test without `@scenario` is not a
-    mistake, it simply has no report to appear in, so it warns once instead of
-    raising. With nothing recording anywhere else there is no such reading, and
-    the call raises.
+    are both legal and both no-ops: not a mistake, just a test with no report
+    to appear in. With nothing recording anywhere else there is no such
+    reading, and the call raises.
 
     The default `stacklevel` reaches past this helper and its caller to the
-    user's own line; a composed descriptor (see `StepDescriptor._composed`) adds
-    one more frame and says so.
+    user's own line; a composed descriptor adds one more frame.
     """
     collector = get_active_collector()
     if collector is not None and collector.state != 'idle':
@@ -116,31 +106,21 @@ class StepDescriptor:
         self._source: str | templatelib.Template | Template = text
         self.narration: Narration = narration_from(text)
         self.activity_ids: tuple[ActivityId, ...] = activity_ids
-        # Set when another construct drives this descriptor — `when_then`, which
-        # enters both its halves one frame above the user's `with`. That frame
-        # is what the caller-frame walk and the warning below both have to reach
-        # past, and it is why the shared lint anchor is captured once by the
-        # composing construct and pinned here rather than walked for.
+        # Set when another construct drives this descriptor — `when_then`,
+        # which enters both halves one frame above the user's `with`. That
+        # frame is what the caller-frame walk and the warning have to reach
+        # past, and why the shared lint anchor is pinned rather than walked for.
         self._composed: bool = False
         self._pinned_source: SourceLocation | None = None
 
     @property
     def is_deferred_template(self) -> bool:
-        """Whether the label was written as `pytest_given.Template(...)`.
-
-        A property rather than an `isinstance` on `_source` at each read site:
-        what the label was *written* as is the descriptor's business to answer,
-        and `plugin/` would otherwise have to reach across a package boundary
-        into a private attribute to ask.
-        """
+        """Whether the label was written as `pytest_given.Template(...)`."""
         return isinstance(self._source, Template)
 
     @property
     def is_tstring(self) -> bool:
-        """Whether the label was written as a t-string (`t"…"`).
-
-        The counterpart to `is_deferred_template`, for the same reason.
-        """
+        """Whether the label was written as a t-string (`t"…"`)."""
         return isinstance(self._source, templatelib.Template)
 
     def __enter__(self) -> Self:
@@ -185,11 +165,8 @@ class StepDescriptor:
         """Decorate `func`: reject the forms this label cannot take, then wrap
         it in whatever its own flavor needs.
 
-        The two halves answer different questions — whether this *label* is
-        legal on this function at all, and which wrapper the *function* calls
-        for. The signature crosses between them only for a `Template` label,
-        whose per-call substitution needs what the validation already
-        inspected.
+        The signature crosses between the two halves only for a `Template`
+        label, whose per-call substitution needs what validation inspected.
         """
         return self._wrapped(func, self._validated(func))
 
@@ -285,10 +262,9 @@ class StepDescriptor:
         """Open this step for one helper call, returning the collector to pop
         it with — or None when the call passes straight through.
 
-        None covers the three transparent cases: no collector, an idle one,
-        and pytest invoking this very descriptor as a fixture body (where
-        `pytest_fixture_setup` already created the root from its narration and
-        a second push would duplicate it).
+        The least obvious of the transparent cases is pytest invoking this
+        very descriptor as a fixture body, whose root the fixture hook has
+        already recorded from the same narration.
         """
         collector = get_active_collector()
         if (
@@ -382,10 +358,8 @@ def normalize_activity(
         return ()
     # Each accepting branch excludes the type that would otherwise slip into
     # it: a bool is an `int` and a str is a `Sequence[int]` to nobody but
-    # `isinstance`, so both guards carry a `not isinstance(...)` and both
-    # values fall through to the TypeError at the end. Without them
-    # `activities='13'` would yield ids 1 and 3 and fail later against a story
-    # that visibly lists them as valid.
+    # `isinstance`. Without the guards `activities='13'` would yield ids 1
+    # and 3 rather than the TypeError it deserves.
     if isinstance(activity, int) and not isinstance(activity, bool):
         return (ActivityId(activity),)
     if isinstance(activity, Sequence) and not isinstance(activity, str):
@@ -447,9 +421,7 @@ class WhenThen:
 
     If the body raises and nothing catches it, the outcome never held: the
     ``when`` is recorded, the ``then`` is skipped, and the exception
-    propagates. It composes two `StepDescriptor` instances, so every guard
-    (Template rejection, idle/unannotated handling, t-string narration) is
-    inherited by construction.
+    propagates.
     """
 
     def __init__(
@@ -500,8 +472,8 @@ def _resolve_template_parts(
 ) -> list[NarrationPart]:
     """Each `Template` part resolved against the value bound to its name.
 
-    The `case _` guard is load-bearing — the match appends in a loop rather
-    than returning, so without it a new part kind would vanish silently.
+    The `case _` guard is load-bearing: the match appends in a loop, so a new
+    part kind would otherwise vanish silently.
     """
     out: list[NarrationPart] = []
     for part in parts:
@@ -514,10 +486,9 @@ def _resolve_template_parts(
             case NarrationPlaceholder(name=name):
                 out.append(resolved_placeholder_part(part, mapping[name]))
             case NarrationTermRef():
-                # Not reachable while `Template` parses only literals and
-                # placeholders, but a term ref carries its own display and has
-                # nothing to resolve — passing it through is what keeps the
-                # word in the narration if `Template` ever learns to hold one.
+                # Unreachable while `Template` parses only literals and
+                # placeholders; a term ref carries its own display and has
+                # nothing to resolve anyway.
                 out.append(part)
             case _:
                 assert_never(part)

@@ -6,11 +6,9 @@ registers them; the `hookimpl` options ride on the function objects and survive
 the re-export untouched.
 
 The implementations live one module per concern, each one's docstring saying
-which. `state` is the leaf every other module here reads.
-
-Only what needs pytest belongs anywhere in here. The pytest-free work is the
-subpackages': `capture` records, `grouping` merges, `lint` checks, `report`
-renders, and this layer resolves options into the shapes those take.
+which; `state` is the leaf every other module here reads. Only what needs
+pytest belongs in this package — the rest is the subpackages', and this layer
+resolves options into the pytest-free shapes they take.
 """
 
 from .collection import pytest_collection_modifyitems

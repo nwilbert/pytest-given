@@ -220,10 +220,9 @@ def _unused_interpolation_findings(
 
     Placeholders count as interpolations too: the lint runs on *grouped*
     scenarios, where grouping has already turned every varying interpolation
-    into one. Scanning values alone would leave the rule blind to parametrized
-    scenarios entirely. A placeholder names its column rather than its
-    expression, so a column whose name was disambiguated (`price #2`) is not a
-    bare identifier and drops out with the complex expressions.
+    into one, so scanning values alone would be blind to parametrized
+    scenarios. A placeholder names its column, so a disambiguated name
+    (`price #2`) drops out with the complex expressions.
     """
     if not isinstance(node, ast.With):
         return []
@@ -334,11 +333,10 @@ def _bare_identifier(expression: str) -> str | None:
 
     Asked of the string rather than of `ast.parse`, which reads `#` as a
     comment: a disambiguated column name (`price #2`) parses to `Name('price')`
-    and would be reported under a token the report never shows, sending the
-    reader looking for a `{price}` that is not there. The keyword test stands
-    in for the rest of what the parse ruled out — `class` is an identifier by
-    `str`'s reckoning but not a name, and `None` is a constant. Soft keywords
-    (`match`, `type`) are ordinary names and stay.
+    and would be reported under a token the report never shows. The keyword
+    test stands in for the rest of what the parse ruled out — `class` is an
+    identifier by `str`'s reckoning but not a name. Soft keywords (`match`,
+    `type`) are ordinary names and stay.
     """
     if not expression.isidentifier() or keyword.iskeyword(expression):
         return None

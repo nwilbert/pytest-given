@@ -48,9 +48,7 @@ def activity_key(story_id: StoryId, activity_id: ActivityId) -> ActivityKey:
 class TermOccurrence:
     """One sighting of a term in the recorded steps, as the Glossary shows it.
 
-    Not `capture`'s `TermInstance`, which is the authored thing — a term
-    wearing one surface form; this is the report-side tally of where that
-    surface form turned up.
+    The report-side tally, not `capture`'s authored `TermInstance`.
     """
 
     display: str
@@ -219,8 +217,7 @@ def build_glossary_aggregations(
 
     Two walks feed one index: scenario steps contribute entity instances, and
     story activity prose contributes story refs, more instances, and verb
-    surface forms. `_GlossaryIndex` owns the dedup, so each walk just reports
-    what it sees.
+    surface forms.
     """
     glossary = report.glossary
     if glossary is None:
@@ -237,7 +234,7 @@ def build_glossary_aggregations(
     for story in report.stories:
         for ref in _story_term_refs(story):
             # Each `record_*` no-ops for a term of the wrong kind, so the walk
-            # states what it saw rather than re-deriving which bucket it lands in.
+            # states what it saw rather than sorting it into a bucket.
             index.record_story_ref(ref.term_id, story.id)
             index.record_instance(ref.term_id, ref.display)
             index.record_form(ref.term_id, ref.display)
@@ -258,11 +255,9 @@ def _story_term_refs(story: Story) -> Iterator[ActivityTermRef]:
 class _GlossaryIndex:
     """Accumulates the Glossary view's cross-references, deduping as it goes.
 
-    Owns the three "already recorded" sets that the walks would otherwise have
-    to thread through every helper. Every `record_*` is idempotent for a given
-    identity and silently ignores a term whose kind the bucket does not take,
-    so a caller can report an observation without first working out where it
-    belongs.
+    Every `record_*` is idempotent for a given identity and silently ignores a
+    term whose kind the bucket does not take, so a caller can report an
+    observation without first working out where it belongs.
     """
 
     def __init__(self, glossary: Glossary) -> None:

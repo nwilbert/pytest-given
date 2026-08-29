@@ -175,10 +175,9 @@ def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
 def _step_from_dict(d: dict[str, Any]) -> Step:
     """A step, dropping any `status` / `error` an older report carries.
 
-    Failure lives on the scenario and — for a parametrized run — on the case,
-    which is where both renderers show it. Steps never carried one that a real
-    run had set, so an old report's `"status": "passed"` is noise to discard,
-    not data to migrate.
+    Failure lives on the scenario and — for a parametrized run — on the case.
+    An old report's `"status": "passed"` is noise to discard, not data to
+    migrate.
     """
     phase: Phase = d['phase']
     return Step(
@@ -240,10 +239,9 @@ def _param_table_from_dict(d: dict[str, Any] | None) -> ParameterTable | None:
 def _stale_report_error(shape: str) -> PytestGivenError:
     """A JSON report predating the case-column change.
 
-    There is no migration — the missing fields are grouping-time knowledge that
-    the saved report never recorded — so the message says the one thing that
-    fixes it rather than leaving a bare `KeyError` to surface out of
-    `pytest-given report`.
+    There is no migration — the missing fields are grouping-time knowledge the
+    saved report never recorded — so the message says the one thing that fixes
+    it rather than leaving a bare `KeyError` to surface.
     """
     return PytestGivenError(
         f'This JSON report predates pytest-given 0.2 ({shape}). There is no '

@@ -21,10 +21,9 @@ def resolve_glossary(
 
     A story that references a `Glossary` is the authoritative answer — `story()`
     stashes the owning object on the tree at construction, so this depends only
-    on the live objects the run was handed, never on a mutable session-global
-    that a nested run could clear. (The stash is a side-channel that does not
-    survive JSON; resolution only ever runs on live in-memory stories, and the
-    renderer reads the serialized `glossary` field instead.)
+    on the live objects the run was handed, never on a session-global a nested
+    run could clear. The stash does not survive JSON; a saved report carries the
+    serialized `glossary` field instead.
 
     With no stories — or stories referencing none — the conftest scan catches
     the suite that declares a glossary and only ever uses term refs in

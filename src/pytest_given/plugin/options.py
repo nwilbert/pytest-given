@@ -132,11 +132,9 @@ def _cli_over_ini(config: pytest.Config, name: str) -> str | bool:
     stated once: the flag when it was given at all, otherwise the ini.
 
     Presence is `is not None`, never truthiness: the flags all default to None,
-    so an explicitly empty one is still a flag that was given and still wins
-    over the ini. `--given-source-link=` therefore disables links rather than
-    falling through to whatever the ini declares. The ini value comes back as
-    pytest typed it (`str` for a string ini, `bool` for a bool one), so each
-    caller below converts its own.
+    so an explicitly empty one still wins over the ini — `--given-source-link=`
+    disables links rather than falling through. The ini value comes back as
+    pytest typed it, so each caller converts its own.
     """
     cli = config.getoption(name)
     if cli is not None:
@@ -147,13 +145,11 @@ def _cli_over_ini(config: pytest.Config, name: str) -> str | bool:
 def _resolve_title(config: pytest.Config) -> str | None:
     """The report title, or None when it is empty from whichever source won.
 
-    None leaves the renderers on the rootdir name, which is also what an empty
-    title would display — so the two spellings of "no title" (`--given-title=`
-    and `given_title = ""`) resolve alike rather than reaching the JSON's
-    `metadata.title` as `null` from one and `""` from the other. Coalescing
-    here rather than inside `_cli_over_ini` keeps that an option's own rule:
-    `--given-source-link=` reads its empty value as given, and means the
-    opposite.
+    None leaves the renderers on the rootdir name, which is what an empty title
+    would display anyway — so the two spellings of "no title" resolve alike
+    rather than reaching `metadata.title` as `null` from one and `""` from the
+    other. Coalescing here rather than in `_cli_over_ini` keeps it this
+    option's own rule: `--given-source-link=` means the opposite.
     """
     return cast('str', _cli_over_ini(config, 'given_title')) or None
 

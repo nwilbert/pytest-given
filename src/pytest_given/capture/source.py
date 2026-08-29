@@ -36,12 +36,11 @@ def _co_filename_to_path(filename: str) -> Path:
 
     The same file can reach us in either convention regardless of platform: a
     frame's `co_filename` (or a stored rootdir) may be a Windows path
-    (``C:\\...``) or a WSL-mount POSIX path (``/mnt/<drive>/...``). A native
-    Windows interpreter that loads an assertion-rewritten ``.pyc`` previously
-    compiled under WSL, for instance, carries a ``/mnt/c/...`` co_filename for a
-    file the rest of the process knows as ``C:\\...``. Comparing the two
-    conventions with `relative_to` fails (mismatched drive anchors), so we fold
-    whichever foreign form we see into the native one:
+    (``C:\\...``) or a WSL-mount POSIX path (``/mnt/<drive>/...``), most often
+    when a ``.pyc`` compiled by the other interpreter is reused across a shared
+    WSL+Windows checkout. Comparing the two conventions with `relative_to`
+    fails on mismatched drive anchors, so we fold whichever foreign form we see
+    into the native one:
 
     - Under WSL (Linux kernel, Windows filesystem): ``C:\\...`` -> ``/mnt/c/...``
     - Under native Windows: ``/mnt/<drive>/...`` -> ``<drive>:\\...``
@@ -72,7 +71,7 @@ _relpath_cache: dict[str, str | None] = {}
 
 
 def set_rootdir(path: Path) -> None:
-    """Called by the plugin in `pytest_load_initial_conftests`.
+    """Point capture at a session's rootdir.
 
     Folded into the native convention first (see `_co_filename_to_path`) so the
     rootdir and the captured `co_filename`s always share a drive anchor — e.g. a
@@ -85,17 +84,14 @@ def set_rootdir(path: Path) -> None:
 
 
 def current_rootdir() -> Path | None:
-    """The rootdir as last set (already resolved). The plugin saves this before
-    a nested in-process run re-points it via `set_rootdir`, and hands it back
-    to `restore_rootdir` when that run unconfigures."""
+    """The rootdir as last set (already resolved)."""
     return _rootdir
 
 
 def restore_rootdir(previous: Path | None) -> None:
-    """Reinstate a rootdir captured with `current_rootdir`. Unlike
-    `set_rootdir`, the value is used as-is — it was already normalized and
-    resolved when first set. Clears the relpath cache, whose entries are only
-    valid for the rootdir they were computed against."""
+    """Reinstate a rootdir captured with `current_rootdir`, as-is — it was
+    already normalized and resolved when first set. Clears the relpath cache,
+    whose entries are valid only for the rootdir they were computed against."""
     global _rootdir
     _rootdir = previous
     _relpath_cache.clear()
@@ -147,10 +143,8 @@ def to_relpath(raw: str) -> str:
     Folds the path into the native convention (see `_co_filename_to_path`) and,
     if it is then an absolute path inside rootdir, returns it relative to rootdir;
     otherwise returns it unchanged as posix. Used for both scenario
-    `item.location` paths and traceback frame paths so neither leaks an absolute,
-    machine-specific path — the same file can surface absolute (and in the wrong
-    convention) when a `.pyc` compiled by the other interpreter is reused across
-    a shared WSL+Windows checkout.
+    `item.location` paths and traceback frame paths, so neither leaks an
+    absolute, machine-specific path.
     """
     path = _co_filename_to_path(raw)
     if path.is_absolute():
@@ -163,14 +157,12 @@ def to_relpath(raw: str) -> str:
 def item_source(relpath_raw: str, line: int) -> SourceLocation:
     """Build a SourceLocation from a pytest `item.location` path + 1-based line.
 
-    `item.location[0]` is normally already rootdir-relative, but under WSL pytest
-    cannot relativize a Windows-style `co_filename` (e.g. ``C:\\Users\\...``)
-    against the POSIX ``/mnt/<drive>`` rootdir and falls back to the absolute
-    Windows path. `to_relpath` rewrites it to the native convention and
-    re-relativizes against rootdir. Unlike `capture_caller_source`, this always
-    returns a location: an absolute path outside rootdir (or unset rootdir)
-    degrades to the path as given rather than to "no link", so every scenario
-    carries a source.
+    `item.location[0]` is normally already rootdir-relative, but pytest cannot
+    relativize a foreign-convention `co_filename` and falls back to the absolute
+    path; `to_relpath` folds and re-relativizes it. Unlike
+    `capture_caller_source`, this always returns a location: a path outside
+    rootdir (or unset rootdir) degrades to the path as given rather than to "no
+    link", so every scenario carries a source.
     """
     return SourceLocation(relpath=to_relpath(relpath_raw), line=line)
 

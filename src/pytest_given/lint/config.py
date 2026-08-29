@@ -85,12 +85,10 @@ def apply_config(
 ) -> list[Finding]:
     """Resolve raw rule findings against the configuration, in report order.
 
-    Drops findings of rules configured ``off`` (before ignore matching, so an
-    entry scoped to a disabled rule counts as stale), suppresses findings
-    matched by an ignore glob, maps the rest to their effective severity, and
-    appends an error-level ``stale-ignore`` finding for every entry that
-    suppressed nothing. Result is sorted errors-first, then by file/line, with
-    the stale entries last.
+    Rules configured ``off`` are dropped *before* ignore matching, so an entry
+    scoped to a disabled rule counts as stale. Every entry that suppressed
+    nothing earns an error-level ``stale-ignore`` finding, appended after the
+    errors-first, then file/line ordering.
     """
     effective = {rule.id: levels.get(rule.id, rule.default) for rule in RULES}
     used: set[int] = set()

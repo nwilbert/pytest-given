@@ -1,8 +1,7 @@
 """One depth-first walk over a step tree, shared by lint, report and the grouping pass.
 
 `report/` and `lint/` may not import from each other and both need this walk;
-`model/` is the leaf they both depend on, so it lives here (as `ids.py` does
-for id derivation).
+`model/` is the leaf they both depend on, so it lives here.
 """
 
 from collections.abc import Iterator
@@ -42,9 +41,8 @@ def step_narrations(steps: list[Step]) -> Iterator[Narration]:
     """Every narration in a step tree, depth-first.
 
     Separate from `iter_narrations` because the grouping pass needs exactly
-    this and not the scenario's own: it scans the *baseline* case's steps for
-    parameter formatting while taking the name from `group[0]`, which is a
-    different scenario whenever the first case did not pass.
+    this and not the scenario's own: the baseline case whose steps it scans is
+    not the case it takes the name from.
     """
     return (step.narration for _path, step in walk_steps(steps))
 

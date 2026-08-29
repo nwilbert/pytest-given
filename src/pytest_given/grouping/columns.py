@@ -47,9 +47,8 @@ class GroupContext:
     cells: dict[str, dict[NodeId, CellValue | None]] = field(default_factory=dict)
     # Each comparable case's tree keyed by position, so "the same position in
     # every other case" is a lookup rather than a parallel descent through
-    # several trees. Derived from `comparable` rather than passed alongside it:
-    # the two must agree on which cases are in play, and a caller that built
-    # one from the other could only ever get that wrong.
+    # several trees. Derived from `comparable` rather than passed alongside it,
+    # so the two cannot disagree about which cases are in play.
     indexed: dict[NodeId, dict[StepPath, Step]] = field(init=False)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
     _taken_names: set[str] = field(default_factory=set)
@@ -60,10 +59,7 @@ class GroupContext:
         }
         # The parametrize columns come first and keep their argname as id: a
         # step's placeholder points at them by name (`column_id=expression`),
-        # and every generated column is emitted after them by the baseline
-        # walk. Creating them here rather than in the caller keeps one column
-        # list, one cell store, and one name registry — disambiguation spans
-        # the whole table, not the generated columns alone.
+        # and the baseline walk emits every generated column after them.
         for name in self.param_names:
             self.new_column('param', name)
 
@@ -73,10 +69,7 @@ class GroupContext:
         A `param` column is identified by its argname; generated ids are
         `derived:0`, `attachment:0`, … numbered per kind in emission order. The
         colon makes collision with an argname impossible — those are
-        `callspec.params` keys, hence always Python identifiers. The whole
-        column comes back rather than its id alone because the caller also
-        builds the step tree's pointer at it, which has to carry the
-        disambiguated `name` (see `_unique_name`).
+        `callspec.params` keys, hence always Python identifiers.
         """
         if kind == 'param':
             column_id = name
@@ -98,9 +91,9 @@ class GroupContext:
         """`name`, or `name #2`, `name #3`, … once it is already taken.
 
         A rendered table shows only the name and a Markdown badge carries no id
-        at all, so two columns sharing a label need distinct names too — while
-        the first stays bare, since suffixing it would churn every report that
-        has only one.
+        at all, so two columns sharing a label need distinct names too. The
+        first stays bare, since suffixing it would churn every report that has
+        only one.
 
         The candidate is checked against the names already taken rather than
         counted per name, because a label is arbitrary text and can itself read
@@ -119,9 +112,8 @@ def _param_value(value: RawParamValue) -> ParamValue:
     """Coerce a raw parametrize argument into a table cell.
 
     A glossary term instance unwraps to its display: `str()` on one would store
-    a dataclass repr of the whole `Glossary` — hundreds of characters — in the
-    table and the JSON report. JSON primitives pass through; everything else is
-    its `str()`, since a cell only ever feeds display and the JSON sink.
+    a dataclass repr of the whole `Glossary` in the table and the JSON report.
+    JSON primitives pass through; everything else is its `str()`.
     """
     term_ref = try_term_ref(value)
     if term_ref is not None:
@@ -147,19 +139,13 @@ def param_cell_formats(
     ever narrated. Rule 3 has already established that the narration is the raw
     value rendered through the interpolation's own conversion and spec, so
     re-applying that spec to the cell reproduces the narrated text exactly.
-
-    Both slot kinds count. A step records its interpolations as
-    `NarrationValue`; a `Template` — a scenario name, or an
-    `Annotated[..., given(Template(...))]` label — records a
-    `NarrationPlaceholder` whose spec is just as load-bearing and is likewise
-    the only formatting in play when no step interpolates that parameter.
+    Both slot kinds count — a step's `NarrationValue` and a `Template`'s
+    `NarrationPlaceholder`.
 
     Only a formatting every slot for that column shares is used. Two slots
-    formatting one parameter differently (`{when:%H:%M}` and `{when:%Y-%m-%d}`)
-    leave no single text a shared cell could hold; the column keeps its plain
-    value and each disagreeing slot gets a column of its own. The trivial
-    formatting counts as one of the two, so a column read plainly in one slot
-    and formatted in another goes the same way.
+    formatting one parameter differently leave no single text a shared cell
+    could hold; the column keeps its plain value and each disagreeing slot gets
+    a column of its own. The trivial formatting counts as one of the two.
     """
     seen: dict[str, set[Format]] = {}
     for narration in narrations:
@@ -192,9 +178,8 @@ def param_cell(value: RawParamValue, fmt: Format | None) -> ParamValue:
     or `_param_value`'s plain coercion when they carry no formatting of their
     own or the value refuses this one.
 
-    The unformatted path stays `_param_value` rather than `format(value, '')` —
-    a glossary term instance has to unwrap to its display, and every cell that
-    exists today keeps its current type and text.
+    The unformatted path stays `_param_value` rather than `format(value, '')`,
+    so a glossary term instance still unwraps to its display.
     """
     if fmt is None:
         return _param_value(value)

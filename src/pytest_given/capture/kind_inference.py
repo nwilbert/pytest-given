@@ -26,11 +26,9 @@ def slot_for(position: int) -> Slot:
     """Which slot an activity-path position is: 0 is the actor node, odd
     positions are edges (verbs), even positions from 2 on are further nodes.
 
-    The single definition of the path grammar's positional rule. `story.path`
-    validates a declared kind against it at construction and this module infers
-    an undeclared one from it afterwards — two readings of one rule, and a
-    second copy would let a path that validates get a kind contradicting the
-    slot it validated in.
+    The single definition of the path grammar's positional rule: `story.path`
+    validates a declared kind against it at construction, and this module infers
+    an undeclared one from it afterwards.
     """
     if position == 0:
         return 'actor'

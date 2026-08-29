@@ -21,12 +21,10 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
     What was dropped comes back when it has to disambiguate, and only for the
     scenarios that need it, so the common case stays short and stable across
     re-runs. The tail returns first, for several scenarios out of one
-    parametrized function — they share a file and a name, so nothing else
-    separates them. Then directory components, innermost first, for two test
-    files sharing a basename: a `tests/unit` + `tests/integration` layout is
-    ordinary, and asking the author to rename a file to satisfy a URL fragment
-    is not a fix. Colliding scenarios escalate together, never greedily — which
-    slug a scenario gets must not depend on the order the report lists them in.
+    parametrized function; then directory components, innermost first, for two
+    test files sharing a basename. Colliding scenarios escalate together, never
+    greedily — which slug a scenario gets must not depend on the order the
+    report lists them in.
 
     A pair that survives a full path (`a/test_x.py` beside `a/x.py`, both
     defining `test_y`) falls back to the node id, which is unique by

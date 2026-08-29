@@ -6,9 +6,8 @@ written ``**Guest**`` has to canonicalize to the same word its definition
 renders bold, so the two must recognize exactly the same spans. Neither package
 may import the other, so the pattern lives here in the leaf.
 
-Only the pattern is shared. What a match *becomes* differs by caller — plain
-text on one side, HTML on the other — so each keeps its own substitution
-function; both read the groups in the order declared here.
+Only the pattern is shared: what a match *becomes* differs by caller, so each
+keeps its own substitution function.
 """
 
 import re

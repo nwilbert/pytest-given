@@ -7,12 +7,10 @@ process-wide, so a nested in-process run (pytester, `pytest.main`) has to
 displace every one of them on the way in and put every one back on the way
 out.
 
-They are saved and restored together rather than a call site at a time
-because the failure mode of missing one is silent and belongs to the *outer*
-session: a stranded rootdir makes every later step record `source=None`,
-which quietly takes the lint's whole AST surface down with it. One value and
-one pair of functions means a fourth global cannot be added and forgotten
-here.
+They are saved and restored together rather than a call site at a time because
+missing one is a silent bug the *outer* session pays for: a stranded rootdir
+makes every later step record `source=None`, which quietly takes the lint's
+whole AST surface down with it.
 """
 
 from dataclasses import dataclass

@@ -27,12 +27,7 @@ def _emphasis(match: re.Match[str]) -> str:
 
 def render_inline_markdown(text: str) -> str:
     """HTML-escape `text`, then render **bold**/__bold__, *italic*, `code`, and
-    hard breaks (<br> or a newline) as safe inline HTML.
-
-    The span grammar is `model.EMPHASIS`, shared with the glossary parser that
-    strips this same markup from a term cell; only what a match becomes
-    differs.
-    """
+    hard breaks (<br> or a newline) as safe inline HTML."""
     escaped = str(escape(text))
     with_breaks = _NEWLINE.sub('<br>', _BR.sub('<br>', escaped))
     return EMPHASIS.sub(_emphasis, with_breaks)

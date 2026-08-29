@@ -157,16 +157,14 @@ def resolved_placeholder_part(
 ) -> NarrationPart:
     """One `Template` slot resolved against the value bound to its name.
 
-    A glossary term instance becomes a real term ref — the same thing a
-    t-string interpolation of that handle records — so the declined-merge path
-    and the helper-decorator path narrate a term the way the grouped path's
-    cell does. `placeholder_value` alone would render the whole `Glossary`
-    dataclass repr, since `model` is the leaf and cannot reach `try_term_ref`.
+    A glossary term instance becomes a real term ref, the same thing a t-string
+    interpolation of that handle records; `placeholder_value` alone would
+    render the whole `Glossary` dataclass repr, since `model` is the leaf and
+    cannot reach `try_term_ref`.
 
-    Only an unformatted slot unwraps. A term ref carries a fixed display and
-    can hold no spec, and the grouped path renders a spec'd slot through
-    `render_interpolation` too — gating here keeps the two paths agreeing
-    rather than making one of them raise where the other formats.
+    Only an unformatted slot unwraps: a term ref can hold no spec, and the
+    grouped path renders a spec'd slot through `render_interpolation` too, so
+    gating here keeps the two paths agreeing.
     """
     if not part.conversion and not part.format_spec:
         term_ref = try_term_ref(value, part.name)

@@ -37,9 +37,8 @@ def check_varying_str_narration(baseline: Scenario, ctx: GroupContext) -> None:
     """Rule 1: a `str` narration whose rendered value varies across cases.
 
     A `str` records `parts == []` however it was built, so there is nothing to
-    promote and nothing to compare — the whole narration is the baseline's. An
-    f-string is the usual cause, but a helper call or a lookup looks identical
-    from the recorder's side.
+    promote and the whole narration would be the baseline's. An f-string is the
+    usual cause, but a helper call or a lookup looks identical from here.
     """
     for path, step in walk_steps(baseline.steps):
         if step.narration.parts:
@@ -61,20 +60,18 @@ def check_varying_str_narration(baseline: Scenario, ctx: GroupContext) -> None:
 def check_same_template(baseline: Scenario, ctx: GroupContext) -> None:
     """Rule 6: every comparable case must narrate the baseline's template.
 
-    A column carries what varies *within* a sentence — a parameter, a derived
-    value, an attachment payload. A case that narrates a different sentence, or
-    a different tree of them, has nothing a column can hold: the grouped view
-    would show one case's words for all of them. Four shapes reach that state
-    (a different step structure, a differently shaped narration under a
-    matching one, different wording, a different interpolated expression) and
-    all four have the same answer, so they share a rule and a fix.
+    A column carries what varies *within* a sentence. A case that narrates a
+    different sentence, or a different tree of them, has nothing a column can
+    hold: the grouped view would show one case's words for all of them. Four
+    shapes reach that state (a different step structure, a differently shaped
+    narration under a matching one, different wording, a different interpolated
+    expression) and all four have the same answer, so they share a rule and a
+    fix.
 
     Runs first, against the very tree `templatize_steps` goes on to walk: the
-    other rules index `ctx.indexed[case.id][path]` without a `.get`, and the
-    shape asserts in `_value_at` and `check_constant_term_ref` read the part
-    there as the baseline's kind. Both hold because this ran and raised
-    otherwise. A non-passed case is exempt — a skipped one records no steps and
-    a failed one may abort mid-tree — which is exactly `ctx.comparable`.
+    other rules index a case by the baseline's path without a `.get` and read
+    the part there as the baseline's kind, both of which hold only because this
+    ran. A non-passed case is exempt — which is exactly `ctx.comparable`.
     """
     signature = structure_signature(baseline.steps)
     # Walked and keyed once per group: every case is compared against the same
@@ -132,9 +129,9 @@ def _part_key(part: NarrationPart) -> PartKey:
     """A part reduced to its template.
 
     Never `rendered`, which is exactly what grouping promotes into a column,
-    and never a term ref's `display`, which rule 4 governs: no term ref may
-    vary across cases, and rule 4 names that as the authoring error it is
-    where a template divergence would only report that two cases disagree.
+    and never a term ref's `display` — rule 4 governs that, and names it as the
+    authoring error it is where a template divergence would only report that
+    two cases disagree.
     """
     match part:
         case NarrationLiteral(value=value):
@@ -191,15 +188,13 @@ def check_rebound_params(
     case. Per case, re-apply the interpolation's own conversion and format spec
     to that case's **raw** parameter object and compare with what was recorded
     — exactly what the t-string did at capture time, so a faithful
-    interpolation agrees for every type. Being a per-case check rather than a
+    interpolation agrees for every type. Being per-case rather than a
     comparison, this fires where no other rule can: a single-value parametrize
     still catches it.
 
-    What a mismatch proves is that the cell and the step disagree, not *why*.
-    A local rebinding the name is one cause; a body mutating the value in place
-    before narrating it is the other, since the cell holds the value as it
-    stood at fixture setup (see `_capture_param_spec`). The message offers both
-    remedies rather than asserting a cause it cannot tell apart.
+    A mismatch proves that the cell and the step disagree, not *why*: a local
+    rebinding the name is one cause, a body mutating the value in place before
+    narrating it the other. The message offers both remedies.
     """
     params = spec.mapping()
     for _path, step in walk_steps(scenario.steps):
@@ -210,11 +205,9 @@ def check_rebound_params(
                 reformatted = _reformat(params[part.expression], part)
             except Exception:  # noqa: BLE001 — see _reformat's contract
                 # A value whose own `__format__`/`__str__` raises something
-                # other than the two errors below is broken, not evidence of a
-                # rebinding, and rule 3 cannot tell the difference. Skipping is
-                # the only safe reading: raising would abort every sink in the
-                # session, and letting it through would escape
-                # `pytest_sessionfinish` as a bare traceback.
+                # other than the two errors `_reformat` handles is broken, not
+                # evidence of a rebinding. Skipping is the only safe reading:
+                # raising here would abort every sink in the session.
                 continue
             if reformatted == part.rendered:
                 continue
@@ -291,11 +284,10 @@ def check_constant_term_ref(
     """Rule 4: a term ref must name the same term and read the same in every case.
 
     No exemption for one a parametrize column binds. Rejected rather than
-    promoted, because promotion would strip the term ref out of the grouped tree
-    and `compute_coverage` matches story activities on term-ref identities — and
-    a grouped tree keeps a single `term_id` and a single display, so a varying
-    ref would leave every case's value filed under the first case's, in the
-    Glossary view and in story coverage alike.
+    promoted, because promotion would strip the term ref out of the grouped
+    tree, and story coverage matches on term-ref identities. The grouped tree
+    keeps a single `term_id` and a single display either way, so a varying ref
+    would file every case's value under the first case's.
     """
     identity = (part.term_id, part.display)
     for case_part in _case_term_refs(index, path, ctx):
@@ -319,7 +311,7 @@ def _case_term_refs(
 
     Rule 6 pins every comparable case to the baseline's template, so a term ref
     here is a term ref there; what may still differ is which term it names and
-    how it reads, which is what rule 4 is about.
+    how it reads.
     """
     for case in ctx.comparable:
         case_part = ctx.indexed[case.id][path].narration.parts[index]

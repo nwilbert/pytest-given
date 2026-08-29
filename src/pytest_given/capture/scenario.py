@@ -3,12 +3,6 @@
 What marks a test for the report, as opposed to what records inside one —
 that is `steps.py`, which this module imports for the descriptor an
 `Annotated[..., given(...)]` parameter carries.
-
-`ScenarioDecorator` hands the function straight back rather than wrapping it,
-so the marker itself can never appear in a failure traceback. Reading the
-`Annotated` labels can, and raises on the forms it rejects — which is why
-`capture.traceback` names this module in `_INTERNAL_SUFFIXES`: the reader
-wants the offending test signature, not our scanner's frame.
 """
 
 import inspect
@@ -48,9 +42,9 @@ class ScenarioDecorator:
     def __call__(self, func: Callable[..., object]) -> Callable[..., object]:
         """Mark `func` and hand back the same object.
 
-        No pass-through wrapper: the marker attribute is the whole job, and a
-        `*args, **kwargs` shim only hides the real function — its signature,
-        and so its fixture requests — behind `functools.wraps`.
+        No pass-through wrapper: a `*args, **kwargs` shim would hide the real
+        function — its signature, and so its fixture requests — behind
+        `functools.wraps`.
         """
         func._scenario = self  # type: ignore[attr-defined]
         return func

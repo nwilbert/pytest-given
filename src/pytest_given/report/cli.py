@@ -62,14 +62,13 @@ def _load_report(json_file: Path) -> tuple[ReportData, dict[str, Any]]:
     `PytestGivenError`.
 
     Returns the model *and* the dict it was built from, because the file is
-    already the serialized report: re-deriving it with `report_to_dict` would
-    hand the JSON sink a round-tripped copy rather than what was read.
+    already the serialized report: re-deriving it would hand the JSON sink a
+    round-tripped copy rather than what was read.
 
-    `report_from_dict` indexes whatever it is handed, so a file that parses as
-    JSON but is not a pytest-given report surfaces as a builtin from deep inside
-    serde. Converting here rather than widening the handler in `run_report`
-    keeps the same builtins raised by a *renderer* visible as the bugs they
-    would be.
+    `report_from_dict` indexes whatever it is handed, so a file that is not a
+    pytest-given report surfaces as a builtin from deep inside serde.
+    Converting it here rather than widening the caller's handler keeps the same
+    builtins raised by a *renderer* visible as the bugs they would be.
     """
     report_dict = json.loads(json_file.read_text(encoding='utf-8'))
     try:
@@ -85,11 +84,10 @@ def _render_report(args: argparse.Namespace) -> int:
     """Render the requested sink through the same render-then-write path the
     plugin uses.
 
-    Going through `SinkConfig` rather than calling a renderer and writing the
-    result here is what keeps the two entry points honest with each other: a
-    render that raises leaves no half-written file, and the rules about which
-    sink a flag selects live in one place. Only one sink is ever configured —
-    this command renders one format per invocation.
+    Going through `SinkConfig` rather than calling a renderer directly is what
+    keeps the two entry points honest with each other: a render that raises
+    leaves no half-written file. Only one sink is ever configured — this
+    command renders one format per invocation.
     """
     report, report_dict = _load_report(args.json_file)
     rendered = render_sinks(report, report_dict, _sink_config(args))

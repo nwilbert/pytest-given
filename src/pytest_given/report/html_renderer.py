@@ -61,11 +61,9 @@ def _neutralize_script_data(text: str) -> str:
 
 def _script_json(value: object, *, indent: int | None = None) -> Markup:
     """Serialize `value` to JSON for embedding in an inline `<script>`, with the
-    tokenizer-steering sequences neutralized. `json.dumps` escapes neither `</`
-    nor `<!--` inside string literals, and these blobs carry user-controlled
-    node ids and attachment payloads — so one containing `</script>` would
-    otherwise break out of the tag (stored XSS), and one containing
-    `<!--<script` would swallow the rest of the document.
+    tokenizer-steering sequences neutralized. `json.dumps` escapes neither of
+    them inside string literals, and these blobs carry user-controlled node ids
+    and attachment payloads.
     """
     return Markup(_neutralize_script_data(json.dumps(value, indent=indent)))
 
@@ -213,12 +211,9 @@ def _make_source_url_filter(
 ) -> Callable[[SourceLocation | None], str | None]:
     """Build a Jinja filter that resolves a SourceLocation to a URL string.
 
-    Returns None when source linking is disabled or the source is absent —
-    the template uses that as the signal to render a plain `<span>` via the
-    `source_link` macro.
-
-    The template is validated and parsed once here (not per location); the
-    per-call closure only performs the substitution.
+    Returns None when source linking is disabled or the source is absent — the
+    template reads that as "render a plain `<span>`". The template itself is
+    validated and parsed once here, not per location.
     """
     substitute = (
         None
@@ -274,8 +269,7 @@ def _render_narration_part(
             # — two steps can interpolate the same expression with different
             # values, which would cross-wire if the name were the key. The
             # palette keys on `name` instead, so one parameter reads the same
-            # color everywhere. `data-subst` is row-hover substitution's own
-            # attribute (see setHoverRow in app.js).
+            # color everywhere. `data-subst` is row-hover substitution's own.
             #
             # Both go in data-* and are read back off the element: interpolating
             # into the Alpine expression would be an injection, since Alpine
@@ -353,10 +347,10 @@ def _placeholder_token(part: NarrationPlaceholder) -> str:
     """Render the grouped-template slot as a bare `{name}`.
 
     The grouped view is schematic — it marks *which* column varies, not how any
-    one value prints. Conversion (`!r`) and format spec (`:03d`) are per-value
-    rendering details, already applied in the concrete per-case rows, so they
-    are noise in the collapsed slot and are dropped here (still stored on the
-    placeholder for the concrete-value and deferred-`Template` paths)."""
+    one value prints. Conversion and format spec are already applied in the
+    concrete per-case rows, so they are noise in the collapsed slot and are
+    dropped here (still stored on the placeholder for the paths that need
+    them)."""
     return '{' + part.name + '}'
 
 

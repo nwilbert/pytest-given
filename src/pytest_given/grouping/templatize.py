@@ -59,17 +59,15 @@ def _templatize_attachments(
 ) -> list[StepAttachment]:
     """Baseline attachments, with any whose payload varies promoted to a column.
 
-    Paired **by label** — rule 5 guarantees the label set is shared, making the
-    key total, and position does not survive a case attaching the same labels in
-    a different order. Same-label attachments pair by occurrence order.
+    Paired **by label** — rule 5 guarantees the label set is shared, and
+    position does not survive a case attaching the same labels in a different
+    order. Same-label attachments pair by occurrence order.
 
-    A non-baseline case may attach a label *more* times than the baseline does
-    — rule 5 only checks the label *set*, so a differing count does not raise.
-    Once the baseline's own occurrences of a label are exhausted, any further
-    occurrence in another case gets a column-only promotion (baseline cell
-    blank, no badge — the baseline tree has no slot for an occurrence it never
-    recorded), appended right after that label's baseline occurrences so
-    column ids keep following the walk.
+    Rule 5 checks the label *set* only, so another case may attach a label more
+    times than the baseline. Those extra occurrences get a column-only
+    promotion — no badge, since the baseline tree has no slot for an occurrence
+    it never recorded — appended right after that label's baseline occurrences
+    so column ids keep following the walk.
     """
     check_attachment_labels(step, path, ctx)
     baseline = _by_label(step)
@@ -138,12 +136,9 @@ def _promote_extra_occurrences(
     others: dict[NodeId, dict[str, list[Attachment]]],
     ctx: GroupContext,
 ) -> None:
-    """Occurrences of `label` past the baseline's own count.
-
-    Every case's occurrences of `label` past the baseline's last one get a
-    column each, with every case's occurrence in its own cell and the
-    baseline's left `None` — there is no baseline attachment for it, so nothing
-    is appended to the grouped step's attachments.
+    """Occurrences of `label` past the baseline's own count: one column each,
+    with the baseline's cell left `None` and nothing appended to the grouped
+    step's attachments.
 
     The count comes from `baseline`, never from `others[first case]`: the
     baseline is the first *passed* case, so a skipped first case would put the
@@ -196,10 +191,9 @@ def _templatize_part(
 ) -> NarrationPart:
     """One baseline part, against the same position in every comparable case.
 
-    A literal has nothing that could vary. What the rest do differs by kind —
-    and for a value by whether a parametrize column binds it, since the column
-    already holds every case's and the slot is compared against that cell
-    rather than against the cases.
+    A literal has nothing that could vary. A value bound to a parametrize
+    column is compared against that cell rather than against the cases, since
+    the column already holds every case's.
     """
     match part:
         case NarrationLiteral():
@@ -244,11 +238,9 @@ def _templatize_param_value(
     not.
 
     `param_cell_formats` already gave the column the one formatting its
-    placeholders agree on, so this is a no-op for every slot in the ordinary
-    case. It earns its keep where they disagree — two steps formatting one
-    parameter differently — which no shared cell can serve: the odd slot is
-    promoted like any other varying value, and the ` #2` suffix keeps its token
-    pointing at the column that actually holds its text.
+    placeholders agree on, so this is a no-op in the ordinary case. It earns
+    its keep where two steps format one parameter differently, which no shared
+    cell can serve.
     """
     rendered = {
         case.id: _value_at(ctx.indexed[case.id][path], index) for case in ctx.comparable
@@ -339,16 +331,10 @@ def reconcile_name_slots(
 ) -> Narration:
     """The scenario name's slots re-pointed at columns that read the way they do.
 
-    The name is a hover-substitution slot like any step's: the card's `{token}`
-    spans all take the hovered row's cell text. A `{price:.2f}` slot over a
-    cell holding `1.5` therefore reads `charge 1.5 euros` on hover — a sentence
-    no case narrated. `param_cell_formats` gives the shared cell the one
-    formatting every slot agrees on, so this is a no-op whenever they do agree;
-    it earns its keep when a step reads the parameter plainly and the name
-    formats it, where no single cell can serve both.
-
-    A slot the cell cannot serve gets a `derived` column of its own, holding
-    what the slot renders for each case.
+    The name is a hover-substitution slot like any step's: a `{price:.2f}` slot
+    over a cell holding `1.5` would read `charge 1.5 euros` on hover, a
+    sentence no case narrated. A slot the shared cell cannot serve gets a
+    `derived` column of its own, holding what it renders for each case.
     """
     if not narration.parts:
         return narration
@@ -379,13 +365,10 @@ def _slot_renderings(
     """What this slot renders for each case, built exactly as `param_cell`
     builds the cell it will be compared with.
 
-    Going through `param_cell` rather than `render_interpolation` is what
-    makes the comparison meaningful: it unwraps a glossary term instance to
-    its display, and it already carries the rule for a value whose own
-    `__format__` refuses this spec — such a value falls back to the same plain
-    coercion the cell falls back to, so the two agree and the slot keeps
-    pointing at the shared column, which is what a slot that never rendered
-    wants.
+    Going through `param_cell` rather than `render_interpolation` is what makes
+    the comparison meaningful: it unwraps a glossary term instance to its
+    display, and a value whose own `__format__` refuses this spec falls back to
+    the same plain coercion the cell does, so the two still agree.
     """
     out: dict[NodeId, str] = {}
     for case_id, params in case_params.items():
@@ -400,11 +383,10 @@ def _slot_format(part: NarrationPlaceholder) -> Format | None:
     """The formatting this slot renders its value with, or None when it carries
     none.
 
-    None is what `param_cell` needs to take its unformatted path: a slot with
-    no conversion and an empty spec has to reach the cell's plain coercion —
-    which unwraps a glossary term instance to its display — rather than
-    `format(value, '')`, which would render the whole `Glossary` repr and
-    never match the cell it is compared with.
+    None is what puts `param_cell` on its unformatted path, whose plain
+    coercion unwraps a glossary term instance to its display — where
+    `format(value, '')` would render the whole `Glossary` repr and never match
+    the cell it is compared with.
     """
     if not part.conversion and not part.format_spec:
         return None
@@ -418,8 +400,7 @@ def _promoted_column(
     read the way the slot renders — or None when that cell already serves it.
 
     The one compare-and-promote rule, shared by both slot kinds — only where
-    the renderings come from differs, and a second copy would let the two
-    disagree about what "reads the same" means.
+    the renderings come from differs.
     """
     if all(
         text == cell_text(ctx.cells[column_id][case_id])

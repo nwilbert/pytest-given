@@ -126,9 +126,8 @@ def _cached_instance_key(
 ) -> FixtureInstanceKey:
     """The key at graft time, reading back the cache key pytest stored.
 
-    `cached_result` is `(value, cache_key, exc)`; taking element 1 rather than
-    re-deriving it is deliberate — the request that produced it is gone by now,
-    and the stored value is by definition the one `_setup_instance_key` saw.
+    `cached_result` is `(value, cache_key, exc)`; element 1 rather than a
+    re-derivation, since the request that produced it is gone by now.
     """
     assert fixturedef.cached_result is not None
     return _fixture_instance_key(fixturedef, fixturedef.cached_result[1])
@@ -139,7 +138,7 @@ def _fixture_instance_key(
     cache_key: object,
 ) -> FixtureInstanceKey:
     """Built here rather than at either end of the graft, so the two cannot
-    drift into keys that no longer meet; a miss is silent, and costs the
+    drift into keys that no longer meet — a miss is silent, and costs the
     fixture's whole recorded subtree."""
     return (id(fixturedef), cache_key)
 

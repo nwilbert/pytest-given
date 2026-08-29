@@ -104,9 +104,9 @@ def _param_table_md(table: ParameterTable) -> str:
 def _case_error_block(table: ParameterTable, case: ParameterCase) -> list[str]:
     """A failing case's error, keyed by its parametrize values.
 
-    Below the table rather than in the row: Markdown has no way to nest a
-    block inside a table cell. A grouped scenario carries no error of its own,
-    so without this a failed case shows a ✗ and no reason anywhere.
+    Below the table rather than in the row: Markdown cannot nest a block inside
+    a table cell. A grouped scenario carries no error of its own, so without
+    this a failed case shows a ✗ and no reason anywhere.
     """
     if case.error is None:
         return []
@@ -127,9 +127,7 @@ def _case_cell(column: ParameterColumn, value: CellValue | None) -> str:
     the column kind, never on the value.
 
     A short single-line attachment sits inline in backticks; a longer one names
-    its column here and is fenced below the table. The *column* name rather
-    than the attachment label: two columns can share a label, and only the
-    column name is disambiguated.
+    its column here and is fenced below the table.
     """
     if column.kind == 'param':
         return _cell(value)
@@ -173,10 +171,9 @@ def _cells(
 ) -> Iterator[tuple[ParameterColumn, CellValue | None]]:
     """A case's cells paired with the columns they sit under.
 
-    `ParameterCase.values` is positionally aligned with `table.columns` and
-    nothing below reads one without the other, so the pairing — and the
-    `strict=True` that asserts the alignment — is stated once here rather than
-    at each site that walks a row.
+    `ParameterCase.values` is positionally aligned with `table.columns`, so the
+    pairing — and the `strict=True` that asserts the alignment — is stated once
+    here rather than at each site that walks a row.
     """
     return zip(table.columns, case.values, strict=True)
 
@@ -189,9 +186,8 @@ def _fits_inline(content: str) -> bool:
 
     A newline or a backtick would break the surrounding structure outright.
     Length breaks it just as effectively without being malformed: a
-    300-character cell — one `json.dumps` without `indent` — pushes every other
-    column of the parameter table off the terminal. `_MAX_INLINE` is the width of a
-    payload that still leaves room for the columns beside it.
+    300-character cell pushes every other column of the parameter table off the
+    terminal.
     """
     return (
         not any(nl in content for nl in ('\r\n', '\n', '\r'))

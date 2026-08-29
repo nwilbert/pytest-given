@@ -5,16 +5,13 @@ line of the form `<path>:<lineno>: in <funcname>`, followed by indented code
 (and optionally a caret-highlight row). After the last frame, lines starting
 with `E   ` carry the exception summary.
 
-The renderer wants frames classified into "user" vs "internal" — pluggy
-dispatchers, pytest's own runner, and pytest-given's own step and scenario
-machinery are implementation noise the reader almost never needs.
-`is_internal_path` is that classifier; the plugin applies it to pytest's own
-traceback entries before `getrepr` runs, so the pre-filter and this post-parse
-pass agree.
+`is_internal_path` classifies a frame as user or internal — pluggy dispatchers,
+pytest's runner and pytest-given's own machinery are noise the reader almost
+never needs. The plugin applies it to pytest's traceback entries before
+`getrepr` runs, so the pre-filter and this post-parse pass agree.
 
-`_INTERNAL_SUFFIXES` names whole modules, so a function that raises at test
-time belongs in one of them or its frame reaches the reader. Moving such a
-function to a new module means adding that module here.
+`_INTERNAL_SUFFIXES` names whole modules: a function that raises at test time
+belongs in one of them, or its frame reaches the reader.
 """
 
 import re
@@ -112,15 +109,12 @@ def parse_short_repr(text: str) -> tuple[list[TracebackFrame], str | None]:
 def _portable_path(normalized_path: str) -> str:
     """Rewrite a frame path to a stable, machine-independent form.
 
-    Two cases churn between environments (and can surface absolute when a `.pyc`
-    compiled by the other interpreter is reused across a shared WSL+Windows
-    checkout):
+    Two cases churn between environments:
 
-    - A `site-packages` dependency frame carries a machine-specific venv prefix
-      (`.nox/.../Lib/site-packages/...` vs `/home/me/.../site-packages/...`);
+    - A `site-packages` dependency frame carries a machine-specific venv prefix;
       truncate it to the stable `site-packages/...` tail.
     - A project/user frame can arrive absolute and in the wrong path convention;
-      `to_relpath` folds it to the native convention and back to rootdir-relative.
+      `to_relpath` folds it back to rootdir-relative.
 
     `is_internal` is still computed from the full path, so classification is
     unaffected.

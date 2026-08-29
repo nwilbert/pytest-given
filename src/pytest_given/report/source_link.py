@@ -69,15 +69,10 @@ def compile_source_link(
     """Validate `template` once and return a per-location substitution function.
 
     The returned function substitutes `{path}`, `{relpath}`, `{line}`,
-    `{project}`, `{sha}` for a given `SourceLocation`. Validation (unknown
-    variables, attribute/index access, and the `{sha}` → `commit_sha`
-    requirement) depends only on the template, so it runs once here rather
-    than on every call — a render substitutes one template across every
-    scenario, story, and term. Template errors therefore surface eagerly, at
-    compile time, before any location is rendered.
-
-    `{path}` is resolved against the current working directory at call time;
-    `{sha}` requires `commit_sha`; unknown variables raise.
+    `{project}`, `{sha}` for a given `SourceLocation`. Validation depends only
+    on the template, so it runs once here and its errors surface before any
+    location is rendered. `{path}` is resolved against the current working
+    directory at call time.
     """
     used = set(_extract_field_names(template))
     unknown = used - _VALID_VARS
@@ -180,14 +175,11 @@ def _detect_github_repo() -> tuple[str, str] | None:
 def _git(*args: str) -> str | None:
     """The stripped stdout of a `git` call, or None when it cannot answer.
 
-    Both callers want the same thing and the same failure policy — no git on
-    PATH, one that cannot be run, no repository, a non-zero exit — so the run
-    lives here once. `OSError` covers the whole exec side (`FileNotFoundError`
-    among it): a `git` that exists but is not executable raises
-    `PermissionError`, which escaping here would cost the entire report, since
-    session finish catches `OSError` and discards every sink. Timed out rather
-    than left to hang: this runs on the report path, where a wedged git would
-    hold up a finished test session.
+    `OSError` covers the whole exec side: a `git` that exists but is not
+    executable raises `PermissionError`, and letting that escape would cost the
+    entire report — session finish catches `OSError` and discards every sink.
+    Timed out rather than left to hang, since a wedged git would hold up an
+    already-finished test session.
     """
     try:
         result = subprocess.run(

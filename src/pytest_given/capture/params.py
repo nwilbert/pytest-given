@@ -15,10 +15,8 @@ def snapshot_param_value(value: RawParamValue) -> RawParamValue:
 
     A copy that renders differently is worse than no copy at all. An object
     inheriting the default `__repr__` — or a `MagicMock` — renders its own
-    address, so the copy puts a value in the cell that no case ever narrated
-    and reads to the rebound-parameter rule as a rebinding that never happened.
-    Mutation cannot change such a rendering anyway, so keeping the original
-    gives up nothing the copy was there to protect.
+    address, so the copy would put a value in the cell that no case narrated.
+    Mutation cannot change such a rendering anyway.
     """
     with contextlib.suppress(Exception):
         snapshot = copy.copy(value)

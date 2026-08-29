@@ -2,9 +2,8 @@
 into one logical scenario carrying a parameter table.
 
 Cases group on `(node_base(id), narration.text)` — one test function, one name.
-Two same-named scenarios on different test functions therefore stay separate.
-Everything else in the run passes through untouched, and a group's own assembly
-— baseline, comparable cases, cells, cases — happens here; the promoting is
+Everything else in the run passes through untouched. A group's own assembly —
+baseline, comparable cases, cells, cases — happens here; the promoting is
 `templatize`'s.
 """
 
@@ -127,11 +126,9 @@ def _baseline(group: list[Scenario]) -> Scenario:
     tree; failing that, `group[0]`.
 
     A skipped case records no steps and a failed one may abort mid-tree, so
-    neither can define the shared structure — with no passed case there is
-    nothing to compare and the grouped tree is one case's rendering either way.
-    Which one still matters: a skipped case has *no* steps, so preferring it
-    over a failed one renders the scenario step-less and hides the failure a
-    reader opened it for.
+    neither can define the shared structure. Which one to fall back on still
+    matters: a skipped case has *no* steps, so preferring it over a failed one
+    renders the scenario step-less and hides the failure a reader opened it for.
     """
     passed = next((s for s in group if s.status == 'passed'), None)
     if passed is not None:
@@ -143,9 +140,9 @@ def _comparable(group: list[Scenario]) -> list[Scenario]:
     """The passed cases — every one of them.
 
     Rule 6 has already refused any group whose passed cases narrate different
-    templates, so positional comparison is safe by construction here. A
-    non-passed case still drops out: a skipped one records no steps and a
-    failed one may abort mid-tree.
+    templates, so positional comparison is safe by construction. A non-passed
+    case drops out: a skipped one records no steps and a failed one may abort
+    mid-tree.
     """
     return [s for s in group if s.status == 'passed']
 

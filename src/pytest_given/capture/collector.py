@@ -54,9 +54,8 @@ def get_active_collector() -> Collector | None:
 def no_scenario_error(action: str) -> PytestGivenError:
     """The single wording for "nothing is being recorded right now".
 
-    Raised from the collector when a call reaches it in the idle state, and
-    from the step front doors when there is no collector at all to reach — the
-    same situation to the author, so it says the same sentence.
+    An idle collector and no collector at all are the same situation to the
+    author, so they say the same sentence.
     """
     return PytestGivenError(f'Cannot {action} — no active scenario or fixture.')
 
@@ -72,8 +71,7 @@ class Collector:
         self._step_stack: list[Step] = []
         # When the active scenario's clock was started, or None before it is.
         # A single slot rather than a dict keyed by node id: scenarios never
-        # overlap, and a dict keeps an entry for every scenario that started
-        # but never finished.
+        # overlap.
         self._started_at: float | None = None
         self._state: RecordingState = 'idle'
         self._active_recording: FixtureRecording | None = None
@@ -110,8 +108,7 @@ class Collector:
         """The descriptor pinned for the current fixture call, or None.
 
         Lets a helper-decorator wrapper recognize pytest invoking it as a
-        fixture body, whose root step the fixture hook has already recorded
-        from this same descriptor.
+        fixture body, whose root step the fixture hook already recorded.
         """
         return self._active_fixture_descriptor
 
@@ -149,10 +146,8 @@ class Collector:
 
         Called once the arrangement pytest owns is done, so the recorded
         duration is the scenario's own and not its fixtures'. Timing lives here
-        rather than in the plugin because the hook that closes a scenario
-        (`pytest_runtest_logreport`) is handed neither a config nor an item —
-        this collector, reached through the ContextVar, is the only thing both
-        ends of the measurement can see.
+        because the hook that closes a scenario is handed neither a config nor
+        an item — this collector is the only thing both ends can see.
         """
         self._started_at = time.monotonic()
 
@@ -163,13 +158,10 @@ class Collector:
     ) -> Scenario:
         """Close the active scenario and return it.
 
-        The duration is what `begin_timing` measured. The setup hook is a
-        hookwrapper, so pluggy captures a fixture exception or a mark-based
-        skip into the `Result` and resumes the generator anyway — the clock
-        starts even for a scenario that never ran a step, and what it times
-        there is the hook overhead past setup rather than work of the
-        scenario's: sub-millisecond for a skip, a few ms when a failure repr
-        had to be built.
+        The duration is what `begin_timing` measured — including for a
+        scenario that never ran a step, since the setup hookwrapper resumes
+        even for a skip or a fixture error. What it times there is hook
+        overhead past setup, not the scenario's own work.
         """
         assert self._current_scenario is not None
         self._current_scenario.status = status
@@ -212,9 +204,7 @@ class Collector:
         """Put back whatever the matching `enter_*` displaced.
 
         One exit for both entries: the token carries the whole of what was
-        displaced, so leaving setup and leaving teardown are the same act. The
-        `enter_*` pair stays split because they genuinely differ — setup pins a
-        recording and a descriptor, teardown pins neither.
+        displaced, so leaving setup and leaving teardown are the same act.
         """
         self._state = token.previous_state
         self._active_recording = token.previous_recording
@@ -292,11 +282,10 @@ class Collector:
         if stack:
             stack[-1].children.append(step)
         elif self._state == 'test':
-            # `_require_recordable` has ruled out idle and teardown, and the
-            # two are set and cleared together, so a recordable 'test' state
-            # always has a scenario. Asserted rather than re-tested: the step
-            # is already on the stack, so a miss records it and then drops it
-            # from the report silently.
+            # `_require_recordable` has ruled out idle and teardown, so a
+            # recordable 'test' state always has a scenario. Asserted rather
+            # than re-tested: the step is already on the stack, so a miss
+            # would drop it from the report silently.
             assert self._current_scenario is not None
             self._current_scenario.steps.append(step)
         stack.append(step)
@@ -307,11 +296,7 @@ class Collector:
         phase: Phase,
         activity_ids: tuple[ActivityId, ...],
     ) -> None:
-        """Validate step activity_ids against the active scenario's story scope.
-
-        Lives on Collector so every `push_step` entry point gets the check by
-        construction.
-        """
+        """Validate step activity_ids against the active scenario's story scope."""
         story = self.active_scenario_story
         if story is None:
             raise PytestGivenError(
@@ -356,9 +341,8 @@ class Collector:
         if not stack:
             # An attachment binds to the step being recorded, so a test body
             # that attaches before opening one has nowhere to put it. Refused
-            # rather than dropped: every other misuse of this API raises, and a
-            # payload that silently never reaches the report is the one outcome
-            # the author cannot notice.
+            # rather than dropped: a payload that silently never reaches the
+            # report is the one outcome the author cannot notice.
             raise PytestGivenError(
                 f"Cannot attach '{label}' — no step is open. An attachment "
                 'binds to the step being recorded; move the call inside a '
@@ -371,11 +355,8 @@ class Collector:
     def _require_recordable(self, action: str) -> None:
         """Refuse a recording the current state cannot take.
 
-        Two refusals, and they say different things: idle means nothing is
-        being recorded at all, while fixture teardown *is* recording-capable
-        and simply has nothing narrative to say. `action` phrases the attempt
-        ("record 'given: a machine'", "attach 'log'"), so both messages name
-        what the author actually wrote.
+        `action` phrases the attempt ("record 'given: a machine'", "attach
+        'log'"), so both refusals name what the author actually wrote.
         """
         if self._state == 'idle':
             raise no_scenario_error(action)
@@ -411,14 +392,12 @@ class Collector:
         """Fail a scenario that has already finished — the teardown path.
 
         A fixture raising past its `yield` errors after the call report ran
-        `finish_scenario`, so there is no active scenario left for
-        `fail_scenario` to mark and the run would otherwise report green for
-        something pytest counted as an error.
+        `finish_scenario`, so there is no active scenario left to mark and the
+        run would otherwise report green for something pytest counted as an
+        error.
 
         An error already on the scenario is kept: a call-phase failure is what
-        the reader opened the scenario for, and pytest reports the teardown
-        error separately either way. Unknown ids (an unannotated test, a
-        finalizer attributed to a non-scenario item) are ignored.
+        the reader opened the scenario for. Unknown ids are ignored.
         """
         scenario = self._scenarios_by_id.get(node_id)
         if scenario is None:
@@ -431,5 +410,4 @@ class Collector:
 def _error_info(
     message: str, frames: list[TracebackFrame] | None, error_tail: str | None
 ) -> ErrorInfo:
-    """A scenario's failure, however it was reached — mid-run or after the fact."""
     return ErrorInfo(message=message, frames=frames or [], error_tail=error_tail)

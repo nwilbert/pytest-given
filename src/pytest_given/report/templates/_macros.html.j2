@@ -3,12 +3,11 @@
 
   Kept out of report.html.j2 so the page reads as its own structure — header,
   tabs, the three views — rather than opening with 120 lines of helpers.
-  Imported `with context`, so the environment's filters (`narration`,
-  `source_url`, `inline_md`) and the render context resolve exactly as they
-  did inline.
+  Imported `with context`, so the environment's filters resolve exactly as
+  they did inline.
 
-  The two-space indent is deliberate: these lines moved here verbatim, which
-  is what makes the rendered HTML byte-identical to before the split.
+  The two-space indent is deliberate: it keeps the rendered HTML identical to
+  when these lines sat inline.
 #}
   {%- macro source_link(source) -%}
     {%- if source -%}
@@ -71,11 +70,9 @@
     {%- endif -%}
   {%- endmacro -%}
 
-  {#- Badge plus the payload it expands, keyed on `cell_id`. The step tree and
-      the parameter table both attach this way; only a promoted attachment differs,
-      having no payload of its own to expand. -#}
-  {#- A badge opens a payload, so it is operable: reachable by keyboard and
-      announced as a control, not as decorated text. -#}
+  {#- Badge plus the payload it expands, keyed on `cell_id`; a promoted
+      attachment has no payload of its own to expand. Operable rather than
+      decorated text: reachable by keyboard and announced as a control. -#}
   {%- macro attachment_badge(cell_id, label, content_type) -%}
     <span class="attachment-badge" role="button" tabindex="0"
           :aria-expanded="expandedAttachments['{{ cell_id }}'] ? 'true' : 'false'"

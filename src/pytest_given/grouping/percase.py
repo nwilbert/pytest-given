@@ -30,10 +30,8 @@ def per_case_scenarios(group: list[Scenario], param_info: ParamInfo) -> list[Sce
     parametrize id.
 
     Every case takes the id, including one whose `Template` name already
-    renders its values — the redundancy buys a title that says the same thing
-    whichever cases a run collected. Deciding per group instead (suffix only
-    when two titles would collide) makes the title depend on the selection: `-k`
-    down to one case of a colliding group would drop a suffix the full run
+    renders its values: suffixing only on collision would make the title depend
+    on the selection, so `-k` down to one case would drop a suffix the full run
     carries.
     """
     return [

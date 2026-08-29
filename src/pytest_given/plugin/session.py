@@ -66,13 +66,11 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
 
     Uses `pytest_load_initial_conftests` (not `pytest_configure`) so that
     rootdir is set *before* root conftest.py is imported — users commonly
-    declare shared glossaries / stories at conftest module level, and that
-    code runs during conftest import. The story registry is snapshotted and
-    cleared here for the same reason: a nested in-process run's conftests
-    import during *its* load-initial-conftests, before its sessionstart, so
-    clearing at sessionstart would leave the outer session's registrations
-    visible (spurious `already declared` collisions) and let the nested run's
-    own registrations leak back into the outer session."""
+    declare shared glossaries / stories at conftest module level. The story
+    registry is snapshotted and cleared here for the same reason: a nested
+    in-process run's conftests import before its sessionstart, so clearing
+    there would leave the outer session's registrations visible as spurious
+    `already declared` collisions."""
     displaced = capture_snapshot()
 
     def restore_displaced_state() -> None:
@@ -80,15 +78,11 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
         a nested in-process run (pytester, `pytest.main`) leaves the outer
         session's as it found it.
 
-        A config cleanup rather than `pytest_unconfigure`: pytest drains the
-        cleanup stack from `Config._ensure_unconfigure` whether or not the run
-        ever configured, while `pytest_unconfigure` only fires for one that
-        did. A nested run that dies during argument parsing — an unrecognized
-        flag raises `UsageError` before `pytest_configure` — would otherwise
-        strand the outer session's capture state at the nested run's.
-
-        Registered only once the snapshot is in hand, so a run that aborted
-        before this point has nothing to restore.
+        A config cleanup rather than `pytest_unconfigure`: the cleanup stack
+        drains whether or not the run ever configured, while
+        `pytest_unconfigure` only fires for one that did. A nested run that
+        dies during argument parsing would otherwise strand the outer
+        session's capture state at the nested run's.
         """
         restore_capture_state(displaced)
 
@@ -123,18 +117,16 @@ class _SessionReport:
 def pytest_sessionfinish(session: pytest.Session) -> None:
     """Build the report and write the configured sinks.
 
-    Building a report fails with a `PytestGivenError` (any of the authoring
-    forms the layers below refuse) and writing one with an `OSError`. An
-    exception leaving this hook is neither a test failure nor an INTERNALERROR:
-    pytest lets it out of `console_main` as a bare traceback, with no summary
-    line and no exit code at all. So both run under one handler that reports
-    through the terminal summary, discards the sinks this run would have
-    written, and fails the run.
+    Building a report fails with a `PytestGivenError` and writing one with an
+    `OSError`. An exception leaving this hook is neither a test failure nor an
+    INTERNALERROR: pytest lets it out of `console_main` as a bare traceback,
+    with no summary line and no exit code at all. So both run under one handler
+    that reports through the terminal summary, discards the sinks this run
+    would have written, and fails the run.
 
-    `write_sinks` is inside that handler and not only for the traceback: it
-    writes one file at a time, so a disk filling between the first and the
-    second leaves exactly that pair, and only discarding both puts the run back
-    to having no report rather than half of one.
+    `write_sinks` is inside that handler for a second reason: it writes one
+    file at a time, so only discarding both puts a run whose disk filled
+    mid-write back to having no report rather than half of one.
     """
     collector = session_collector(session.config)
     state = session_state(session.config)
@@ -163,9 +155,8 @@ def _build_report(
     touches the filesystem.
 
     Grouping and the glossary passes run on every run — each refuses its own
-    authoring forms. Everything after them is sink-only work (the metadata
-    shells out to git; the round trip and renderers walk the report again), so
-    a run with no sink skips it and keeps just what the lint reads.
+    authoring forms. Everything after them is sink-only work, so a run with no
+    sink skips it and keeps just what the lint reads.
     """
     scenarios = group_parametrized(collector.scenarios, param_info)
     stories = collector.stories
@@ -276,11 +267,10 @@ def _count_as_error(terminalreporter: pytest.TerminalReporter, summary: str) -> 
     """Register a pytest-given failure with the reporter, so the summary line
     counts it and turns red.
 
-    `pytest_sessionfinish` is where the exit code is set, and by then the
-    terminal reporter has already bound the `exitstatus` it was called with —
-    the summary line is built from `stats` alone. Without this, a run that
-    writes no report (or fails its lint) prints `N passed` in green and exits
-    non-zero, which is the one combination a CI log cannot be read through.
+    By the time session finish sets the exit code, the terminal reporter has
+    already bound the `exitstatus` it was called with — the summary line is
+    built from `stats` alone. Without this, a run that writes no report (or
+    fails its lint) prints `N passed` in green and exits non-zero.
 
     A real `CollectReport` rather than a stand-in: `short_test_summary` renders
     whatever lands in `stats` under `-ra`, and a `str` longrepr is the shape it

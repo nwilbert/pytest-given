@@ -2,14 +2,13 @@
 
 A run may be told to write any combination of JSON, HTML and Markdown, and
 they have to agree with each other: a render that raises must not leave this
-run's JSON beside the previous run's HTML, two reports that disagree with
-nothing on either saying so. So rendering and writing are separate steps here
-— `render_sinks` does everything that can fail and touches no file,
-`write_sinks` touches files and cannot fail on content.
+run's JSON beside the previous run's HTML, with nothing on either saying so.
+So rendering and writing are separate steps — `render_sinks` does everything
+that can fail and touches no file, `write_sinks` touches files and cannot fail
+on content.
 
 Pytest-free like the rest of `report/`: the caller resolves its options into a
-`SinkConfig` and hands that over, which is also what lets `pytest-given
-report` reach the same code.
+`SinkConfig`, which is also what lets `pytest-given report` reach the same code.
 """
 
 import json
@@ -100,8 +99,7 @@ def discard_stale_sinks(config: SinkConfig) -> list[str]:
 
     Writing no report leaves the *previous* run's in place, where it reads as
     current — the one outcome worse than no report at all. Only the paths this
-    run was told to write are touched, and each was going to be overwritten
-    anyway.
+    run was told to write are touched.
     """
     removed = []
     for path in config.file_paths():

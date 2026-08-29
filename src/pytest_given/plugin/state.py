@@ -3,14 +3,10 @@
 Four values, one writer each: `Collector` is the recorder itself, created at
 session start; `GivenConfig` is this run's options, parsed once at configure
 time; `SessionState` is the bookkeeping the per-item hooks pass between each
-other; `SessionOutcome` is what session finish leaves for the terminal
-summary. The stash rather than module globals throughout, so a
-nested in-process run (pytester, `pytest.main`) gets its own set instead of
-rebinding — and thereby clobbering — the outer session's.
-
-Nothing here is underscored: every name in this module is read by a sibling,
-so an underscore would claim a privacy none of them has. The package boundary
-is what makes them internal — nothing outside `plugin/` imports from here.
+other; `SessionOutcome` is what session finish leaves for the terminal summary.
+The stash rather than module globals throughout, so a nested in-process run
+(pytester, `pytest.main`) gets its own set instead of rebinding — and thereby
+clobbering — the outer session's.
 """
 
 from dataclasses import dataclass, field
@@ -44,9 +40,8 @@ def session_collector(config: pytest.Config) -> Collector:
 class GivenConfig:
     """This run's pytest-given options, parsed once.
 
-    One bundle rather than a key apiece, so the parse seam is a single object
-    with a single writer: every option this plugin takes is resolved once, the
-    CLI-over-ini ones included, rather than at each read site.
+    One bundle rather than a key apiece: every option this plugin takes is
+    resolved once, the CLI-over-ini ones included, rather than at each read site.
     """
 
     rule_levels: dict[RuleId, Level]
@@ -60,10 +55,9 @@ class GivenConfig:
 class SessionOutcome:
     """What session finish leaves for the terminal summary to print.
 
-    Filled at up to three points on the way out — a report that could not be
-    written, the lint's findings, the Markdown destined for stdout — and read
-    in one place. Mutable and stashed once at configure time, so the summary
-    never has to distinguish "nothing happened" from "the hook never ran".
+    Filled at up to three points on the way out and read in one place. Mutable
+    and stashed once at configure time, so the summary never has to distinguish
+    "nothing happened" from "the hook never ran".
     """
 
     report_error: str | None = None
@@ -86,13 +80,10 @@ class SessionState:
     attributes on it, which keeps `Collector` to what it records.
 
     `published_for` is the item whose setup published the collector to the
-    ContextVar, so teardown clears only what it published. Not
-    `active_scenario_id`: that is already None by teardown (the call report
-    finished the scenario), which is how the clear came to be skipped entirely.
-
-    `fixture_recordings` is insertion-ordered by setup time, which is what lets
-    the graft take them in dependency order — `item.fixturenames` can list a
-    dependent before its dependency.
+    ContextVar, so teardown clears only what it published. `fixture_recordings`
+    is insertion-ordered by setup time, which is what lets the graft take them
+    in dependency order — `item.fixturenames` can list a dependent before its
+    dependency.
     """
 
     param_info: ParamInfo = field(default_factory=dict)

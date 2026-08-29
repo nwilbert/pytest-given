@@ -114,10 +114,6 @@ class GlossaryPinned:
     off a session-global that a nested run could clear. A declared field (not a
     name stashed at runtime) so it is typed and mypy sees every read;
     underscored, so serde drops it and it never reaches the JSON.
-
-    Subclassed rather than repeated on each of `ActivityPath`, `Activity` and
-    `Story`, whose every field is `kw_only` — so inheriting it changes nothing
-    they already declare.
     """
 
     _glossaries: dict[int, Glossary] = field(
@@ -150,11 +146,8 @@ class Glossary:
 
     Storage and atomic write-through, nothing else: this is what the report
     model carries and what the deserializer rebuilds. The user-facing
-    registration API (`actor` / `work_object` / `verb`, `g(...)`, `g[...]`) is
-    a subclass in `pytest_given.capture.glossary` — it needs the caller's
-    source location, which is capture's business, and `model` is the leaf that
-    may not reach into it. `_register` is the low-level primitive both that
-    subclass and the deserializer call.
+    registration API is a subclass in `pytest_given.capture.glossary`, which
+    needs the caller's source location — capture's business, not the leaf's.
     """
 
     terms: list[GlossaryTerm] = field(default_factory=list)
@@ -180,10 +173,10 @@ class Glossary:
 type Phase = Literal['given', 'when', 'then']
 
 # How a scenario or one parametrize case came out. A `str` here would let a
-# typo ('pass') through every comparison site in grouping, lint and both
-# renderers. Static checking only: serde's `cast` at the JSON boundary is a
-# runtime no-op, so a foreign or hand-edited report.json can still carry any
-# string — the glyph lookup falls back and every `== 'passed'` reads false.
+# typo ('pass') through every comparison site. Static checking only: serde's
+# `cast` at the JSON boundary is a runtime no-op, so a hand-edited report.json
+# can still carry any string — the glyph lookup falls back and every
+# `== 'passed'` reads false.
 type Status = Literal['passed', 'failed', 'skipped']
 
 # Lifecycle state of the collector — determines where push_step/attach route.
@@ -207,8 +200,8 @@ class ParamSpec(NamedTuple):
 
     `group` carries `@scenario(group_parametrized=...)`: False declines the
     merge and emits this case as its own scenario. It rides here rather than on
-    `Scenario` because the grouping pass already reads a `ParamSpec` per case
-    and `param_info` is runtime-only — the report schema stays untouched.
+    `Scenario` because `param_info` is runtime-only, so the report schema stays
+    untouched.
     """
 
     names: list[str]
@@ -269,7 +262,7 @@ def location_suffix(location: SourceLocation | None) -> str:
     """The `` (filename:line)`` locator appended to a message about a scenario,
     or ``''`` when there is no source location.
 
-    Lives beside `SourceLocation` because the lint and grouping both end their
+    Lives beside `SourceLocation` because lint and grouping both end their
     messages with it, and neither may import the other.
     """
     if location is None:

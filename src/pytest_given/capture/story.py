@@ -23,10 +23,7 @@ from .source import capture_caller_source
 type _PathArg = TermHandle | TermInstance | str
 
 # What every slot accepts structurally: a glossary reference of some sort, or a
-# bare connective. Which *kind* of reference fits a given position is a
-# separate question, answered by `_check_position` from the term's declared
-# kind — and, for a term that declares none, deferred to kind inference over
-# the same `slot_for` positions.
+# bare connective. Which *kind* fits a given position is `_check_position`'s.
 _TERM_TYPES = (TermHandle, TermInstance)
 
 
@@ -50,12 +47,10 @@ def path(*parts: _PathArg) -> ActivityPath:
             continue  # a bare word carries no role; valid at any position
         _check_position(part, position, slot_for(position), parts)
     schema_parts = tuple(_to_part(part) for part in parts)
-    # Stash the live Glossary objects the path references: the enclosing
+    # Stash the live Glossary objects the path references; the enclosing
     # activity and story merge them upwards, which is what enforces the v1 "one
-    # glossary per story" invariant at construction time and what carries the
-    # owning Glossary on the Story tree for `resolve_glossary`. Keyed by id(),
-    # which dedups by identity (Glossary is unhashable) while keeping the
-    # object.
+    # glossary per story" invariant at construction time. Keyed by id(), which
+    # dedups by identity (Glossary is unhashable) while keeping the object.
     glossaries: dict[int, Glossary] = {
         id(owner): owner
         for owner in (_glossary_of(part) for part in parts)
@@ -71,9 +66,8 @@ def _pin_glossaries(
 ) -> None:
     """Record which live `Glossary` objects a story node references.
 
-    The field is declared `init=False` on a frozen dataclass, so this is the
-    one way to fill it — and the one place that names it, rather than three
-    `object.__setattr__` calls spelling the attribute out by hand.
+    The field is `init=False` on a frozen dataclass, so this is the one way to
+    fill it, and the one place that names it.
     """
     object.__setattr__(node, '_glossaries', glossaries)
 
@@ -139,9 +133,7 @@ def clear_story_registry() -> None:
 
 
 def snapshot_story_registry() -> dict[StoryId, str]:
-    """A copy of the registry. The plugin takes one before clearing at
-    sessionstart, so a nested in-process run can hand the outer session's
-    registrations back via `restore_story_registry` when it unconfigures."""
+    """A copy of the registry, to hand back to `restore_story_registry`."""
     return dict(_STORY_REGISTRY)
 
 
@@ -185,8 +177,6 @@ def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     glossaries = merge_glossaries(a._glossaries for a in numbered)
     _check_single_glossary(title, glossaries)
     result = Story(id=sid, title=title, activities=numbered, source=source)
-    # Carry the story's glossary on the tree so discovery.resolve_glossary can
-    # pick it deterministically from the collected stories themselves.
     _pin_glossaries(result, glossaries)
     return result
 
@@ -232,9 +222,8 @@ def _check_single_glossary(title: str, glossaries: dict[int, Glossary]) -> None:
 
 
 # What each slot role accepts, as declared kinds. A term whose kind is not yet
-# known (`g("…")`, or a file glossary with no kind column) declares nothing and
-# is valid anywhere — `infer_glossary_kinds` classifies it from these same slot
-# positions later.
+# known declares nothing and is valid anywhere — `infer_glossary_kinds`
+# classifies it from these same slot positions later.
 _ROLE_ACCEPTS: dict[Slot, tuple[str, ...]] = {
     'actor': ('actor',),
     'verb': ('verb',),
@@ -243,18 +232,12 @@ _ROLE_ACCEPTS: dict[Slot, tuple[str, ...]] = {
 
 _KIND_LABEL = {'actor': 'an actor', 'object': 'a work object', 'verb': 'a verb'}
 
-# The slot itself, phrased for the message ('must be …'). Slot names are the
-# canonical GLOSSARY.md vocabulary: actor / verb / noun.
+# The slot itself, phrased for the message ('must be …').
 _ROLE_LABEL = {'actor': 'an actor', 'verb': 'a verb', 'noun': 'a noun'}
 
 
 def _declared_kind(value: object) -> str | None:
-    """The kind a part already claims, or None when it is still deferred.
-
-    One reading for both glossary flavors — `g.actor(...)` wrote its kind into
-    the term at registration, and a file-glossary row carries whatever its kind
-    column said — which is what lets one check cover both at construction
-    time."""
+    """The kind a part already claims, or None when it is still deferred."""
     if isinstance(value, _TERM_TYPES):
         return value.declared_kind
     return None
@@ -283,9 +266,9 @@ def _check_position(
 ) -> None:
     """Reject a part whose kind cannot fill this slot.
 
-    One check for both glossary flavors: a declared kind (eager handle or
-    `kind_column` row) is verified here, at construction; only a genuinely
-    undeclared kind is deferred to `infer_glossary_kinds`.
+    A declared kind — eager handle or `kind_column` row — is verified here, at
+    construction; only a genuinely undeclared one is deferred to
+    `infer_glossary_kinds`.
     """
     declared = _declared_kind(value)
     if declared is not None:
@@ -293,8 +276,6 @@ def _check_position(
             return
         problem = f'{_term_name(value)!r} is declared {_KIND_LABEL[declared]}'
     elif isinstance(value, _TERM_TYPES):
-        # A term that declares no kind fits any slot here; which one it really
-        # belongs to is `infer_glossary_kinds`' answer, from these positions.
         return
     else:
         problem = f'got {type(value).__name__}'

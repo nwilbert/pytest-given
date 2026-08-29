@@ -121,23 +121,20 @@ def compute_coverage(
 ) -> dict[ActivityId, set[StepRef]]:
     """Per-scenario activity-coverage map.
 
-    Each activity covered by at least one step appears in the result; the
-    value is the set of StepRef tuples for the covering steps.
+    Each activity covered by at least one step appears in the result, valued
+    by the StepRefs of the covering steps. A non-empty `scenario.activity_ids`
+    bounds which activities can appear at all.
 
-    Scope: if scenario.activity_ids is non-empty, only those activity ids
-    can appear in the result. Otherwise every story activity is considered.
     Under-anchored activities (fewer than 2 distinct term refs) are excluded
     from *narration* matching — the ``A_refs ⊆ S`` rule would let one term, or
     none, be covered by almost any step. An explicit ``activity=`` pin says
-    what the narration cannot, so it reaches them too; only scope bounds it.
+    what the narration cannot, so it reaches them too.
     """
     # Intersected with the story's own ids, never taken verbatim: `scope` is
     # the only guard the pin path below has, and an id naming no activity in
-    # this story would otherwise enter the coverage map and render a `Covers:`
-    # chip pointing at a timeline row that does not exist. A live run cannot
-    # reach that — collection validates `activities=` against the bound story —
-    # but a saved report replayed through `pytest-given report` is deserialized
-    # without validation, and this is the one place that would notice.
+    # this story would render a `Covers:` chip pointing at a timeline row that
+    # does not exist. Collection rules that out for a live run, but a saved
+    # report replayed through `pytest-given report` is deserialized unvalidated.
     story_ids = {a.id for a in story.activities}
     scope = (
         set(scenario.activity_ids) & story_ids if scenario.activity_ids else story_ids

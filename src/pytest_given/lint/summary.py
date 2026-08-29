@@ -1,9 +1,7 @@
 """The terminal presentation of a run's lint findings.
 
 Formatting only — the title, the aligned finding rows, the error tally. The
-plugin owns the writing (and the exit code); this owns what the reader sees,
-so the wording and the column alignment live beside the findings they
-describe rather than in the pytest hook that happens to print them.
+plugin owns the writing and the exit code.
 """
 
 from .base import Finding

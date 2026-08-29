@@ -104,11 +104,9 @@ def pytest_runtest_teardown(item: pytest.Item) -> None:
 
     Keyed on `published_for`, not on `active_scenario_id`: the call-phase
     logreport has already run `finish_scenario`, so an annotated scenario's id
-    is None here and a guard reading it never matched — leaving the finished
-    session's Collector, and every Scenario and Step it recorded, reachable
-    from the process-global ContextVar. `trylast` puts this after the
-    finalizers, which still need the collector; the teardown report reads
-    `item.config` rather than the ContextVar, so it is unaffected.
+    is None here and a guard reading it would never match — leaving the whole
+    finished session reachable from the process-global ContextVar. `trylast`
+    puts this after the finalizers, which still need the collector.
     """
     state = session_state(item.config)
     if state.published_for != NodeId(item.nodeid):
@@ -123,14 +121,10 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
     """Put the error behind a failing phase on the scenario.
 
     Setup (a fixture exception) and call (a test-body failure) fail the
-    *active* scenario; without the setup branch a fixture failure would bypass
-    `fail_scenario` and the scenario would carry no error info.
-
-    Teardown is the odd one out. The call report has already run
-    `finish_scenario` by then, so there is no active scenario to fail and the
-    scenario is amended by node id instead. Without that branch a fixture
-    raising past its `yield` leaves a green scenario behind a run pytest
-    counted as an error.
+    *active* scenario. Teardown is the odd one out: the call report has already
+    run `finish_scenario`, so there is no active scenario left and the one with
+    that node id is amended instead — otherwise a fixture raising past its
+    `yield` leaves a green scenario behind a run pytest counted as an error.
     """
     if call.excinfo is None or call.when not in ('setup', 'call', 'teardown'):
         return
@@ -139,12 +133,10 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
     teardown = call.when == 'teardown'
     if not teardown and collector.active_scenario_id != node_id:
         return
-    # A skip raises Skipped (at setup for mark.skip/skipif, at call for an
-    # in-body pytest.skip()). Its traceback is pure skip machinery — the
-    # scenario carries a structured skip_reason instead (set in logreport).
-    # Short-circuit before getrepr, whose per-frame AST scan would otherwise
-    # run for every skipped scenario. Not gated on --given-all-frames: a skip
-    # never wants a traceback regardless.
+    # A skip's traceback is pure skip machinery — the scenario carries a
+    # structured skip_reason instead. Short-circuited before getrepr, whose
+    # per-frame AST scan would otherwise run for every skipped scenario. Not
+    # gated on --given-all-frames: a skip never wants a traceback regardless.
     if call.excinfo.errisinstance(pytest.skip.Exception):
         return
     if not item.config.getoption('given_all_frames'):
@@ -163,20 +155,18 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
 @pytest.hookimpl(trylast=True)
 def pytest_runtest_logreport(report: pytest.TestReport) -> None:
     # This hook's spec carries no config or item, so the session's stash is
-    # unreachable here; use the active collector instead. It is set for a
-    # tracked scenario's whole runtest protocol, and every terminal report
-    # handled below (setup skip/fail, call) arrives before
-    # pytest_runtest_teardown clears it.
+    # unreachable here; the active collector stands in. It is set for a tracked
+    # scenario's whole runtest protocol, and every terminal report handled
+    # below arrives before pytest_runtest_teardown clears it.
     node_id = NodeId(report.nodeid)
     collector = get_active_collector()
     if collector is None or collector.active_scenario_id != node_id:
         return
-    # Tests marked @pytest.mark.skip skip at setup time; fixture exceptions
-    # produce a failed setup report and no call report at all; in-body
-    # pytest.skip() / failures surface during 'call'. All three terminal cases
-    # must reach finish_scenario, otherwise _current_scenario is orphaned
-    # (silently dropped from the report, and any later unannotated test's
-    # `with given(...)` would push into the orphan since state != 'idle').
+    # Three terminal cases: a setup-time skip (@pytest.mark.skip), a failed
+    # setup report with no call report at all (a fixture exception), and the
+    # call report. All three must reach finish_scenario, or _current_scenario is
+    # orphaned — silently dropped from the report, and still not 'idle', so a
+    # later unannotated test's `with given(...)` would push into it.
     setup_skip = report.when == 'setup' and report.skipped
     setup_fail = report.when == 'setup' and report.failed
     if report.when != 'call' and not setup_skip and not setup_fail:
@@ -198,12 +188,11 @@ def _filter_internal_frames(excinfo: pytest.ExceptionInfo[BaseException]) -> Non
     the exception's native ``__traceback__`` is left intact.
 
     Lives here rather than beside the parser because rewriting a pytest object
-    is runner surgery, and it is what would otherwise make ``capture/`` import
-    pytest and the private ``_pytest`` traceback type. It applies ``capture``'s
-    own ``is_internal_path``, so the pre-filter and the post-parse
-    classification stay one rule. If every entry classifies as internal — e.g.
-    a failure raised entirely within plugin/library code — the original
-    traceback is kept so ``getrepr`` still has a crash frame to format.
+    would otherwise make ``capture/`` import pytest and the private ``_pytest``
+    traceback type. It applies ``capture``'s own ``is_internal_path``, so the
+    pre-filter and the post-parse classification stay one rule. If every entry
+    classifies as internal, the original traceback is kept so ``getrepr`` still
+    has a crash frame to format.
     """
     filtered = excinfo.traceback.filter(lambda entry: not _is_internal_entry(entry))
     if len(filtered) > 0:

@@ -95,10 +95,6 @@ def _strip_emphasis(cell: str) -> str:
     from a cell, leaving its text content. Applied to term and kind cells so a
     glossary written with emphasized term names renders clean pills.
 
-    The span grammar is `model.EMPHASIS`, shared with the renderer that turns
-    this same markup into HTML in a definition cell; only what a match becomes
-    differs.
-
     Nesting unwraps by recursing into each match rather than by re-running the
     pattern over the whole string: a repeated whole-string pass re-enters a
     code span it has already unwrapped and strips markup that is literal

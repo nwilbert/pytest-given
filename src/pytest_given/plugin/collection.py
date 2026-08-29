@@ -21,16 +21,13 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     """Validate Template-named scenarios and story bindings eagerly at collection.
 
     Eagerly, because the alternative is late or never: a mistyped `Template`
-    placeholder surfaces at session-finish grouping, where the error escapes
-    `pytest_sessionfinish` opaquely, and `group_parametrized=False` on an
-    unparametrized test is never noticed at all — such a scenario does not
-    reach grouping.
+    placeholder surfaces opaquely at session-finish grouping, and
+    `group_parametrized=False` on an unparametrized test is never noticed at
+    all — such a scenario does not reach grouping.
 
-    Reported as a `pytest.UsageError`, the way `pytest_configure` reports a bad
-    lint config: an exception raised from a collection hook renders as an
-    INTERNALERROR stack dump with the message buried under forty lines of
-    pluggy frames, which is not what an author who mistyped a placeholder needs
-    to read.
+    Reported as a `pytest.UsageError` because an exception raised from a
+    collection hook renders as an INTERNALERROR stack dump with the message
+    buried under forty lines of pluggy frames.
     """
     try:
         for item in items:

@@ -30,18 +30,14 @@ def normalize_definition(definition: str | None) -> str | None:
 class TermHandle:
     """A `GlossaryTerm` plus a back-ref to its owning `Glossary`.
 
-    The whole behavior of a handle lives here: calling one names a surface form
-    for the term, and `declared_kind` reads whatever kind the registration
-    settled on. One type for every kind and every accessor — `g.actor(...)`,
-    `g.work_object(...)`, `g.verb(...)`, `g(...)` and `g[...]` differ in what
-    they register, not in what they hand back, and the kind is read off the term
-    at use time.
+    One type for every kind and every accessor: the registration methods differ
+    in what they register, not in what they hand back, and the kind is read off
+    the term at use time.
     """
 
     _term: GlossaryTerm
-    # Out of the identity: it is the term this handle names, and a handle is a
-    # public return value that a user may put in a set — which the `Glossary`,
-    # mutable and so unhashable, would otherwise refuse.
+    # Out of the identity: a handle is a public return value a user may put in
+    # a set, which the mutable — and so unhashable — `Glossary` would refuse.
     _glossary: BaseGlossary = field(compare=False)
 
     def __call__(self, display: str) -> TermInstance:
@@ -78,22 +74,14 @@ class TermHandle:
 
     @property
     def declared_kind(self) -> TermKind | None:
-        """The kind the term claims, or None while it is still deferred.
-
-        One reading for every flavor: an eager handle's kind was written into
-        the term by `_register_kind`, and a deferred one carries whatever the
-        glossary declared — `None` until `infer_glossary_kinds` settles it.
-        """
+        """The kind the term claims, or None until `infer_glossary_kinds`
+        settles it."""
         return self._term.kind
 
 
 @dataclass(frozen=True)
 class TermInstance:
-    """A term wearing one surface form: the handle it came from, plus display.
-
-    One type for every kind — the identity rule a per-kind type would encode is
-    read off the term's kind at use time regardless.
-    """
+    """A term wearing one surface form: the handle it came from, plus display."""
 
     handle: TermHandle
     display: str
@@ -185,9 +173,6 @@ def handle_or_raise(
 
 class Glossary(BaseGlossary):
     """The user-facing glossary: the model's storage plus the registration API.
-
-    Only what a user constructs is this class; everything internal keeps
-    annotating the base, which this satisfies.
 
     Every registration below is idempotent for an *exactly* repeated one — kind,
     canonical and definition all equal — and raises on anything else, a
