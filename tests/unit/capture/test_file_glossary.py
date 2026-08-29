@@ -2,7 +2,7 @@ import pytest
 
 from pytest_given import attach, given, scenario, then, when, when_then
 from pytest_given.capture.file_glossary import FileGlossary
-from pytest_given.capture.glossary import DeferredTermHandle
+from pytest_given.capture.glossary import TermHandle
 from pytest_given.capture.story import activity
 from pytest_given.model import ActivityTermRef, PytestGivenError, TermId
 from tests.ubiquitous_language import pg
@@ -34,7 +34,7 @@ def test_lookup_is_case_insensitive(glossary_file):
     with when(t'the same {pg["Term"]} is looked up in three different cases'):
         handles = [glossary['Guest'], glossary['guest'], glossary['GUEST']]
     with then('every lookup resolves to one handle type and the same id'):
-        assert all(isinstance(h, DeferredTermHandle) for h in handles)
+        assert all(isinstance(h, TermHandle) for h in handles)
         assert {h.id for h in handles} == {'guest'}
 
 
@@ -310,7 +310,7 @@ def test_file_glossary_call_known_name_returns_handle(glossary_file):
     with when(t'a known {pg["Term"]} is looked up by call'):
         handle = glossary('Guest')
     with then(t'a {pg["Deferred term"]} is returned'):
-        assert isinstance(handle, DeferredTermHandle)
+        assert handle.declared_kind is None
         assert handle.term.canonical == 'Guest'
 
 

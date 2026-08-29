@@ -11,8 +11,8 @@ from ..model import (
     id_derive,
 )
 from .glossary import (
-    DeferredTermHandle,
-    deferred_handle_or_raise,
+    TermHandle,
+    handle_or_raise,
     normalize_definition,
     terms_match,
 )
@@ -51,7 +51,7 @@ class FileGlossary:
             kind_column=kind_column,
         )
         self._glossary = Glossary()
-        self._handles: dict[TermId, DeferredTermHandle] = {}
+        self._handles: dict[TermId, TermHandle] = {}
         for row in rows:
             self._add_row(row)
 
@@ -93,10 +93,10 @@ class FileGlossary:
             )
         return mapped
 
-    def __getitem__(self, name: str) -> DeferredTermHandle:
-        return deferred_handle_or_raise(self._glossary, name, self._handles)
+    def __getitem__(self, name: str) -> TermHandle:
+        return handle_or_raise(self._glossary, name, self._handles)
 
-    def __call__(self, name: str) -> DeferredTermHandle:
+    def __call__(self, name: str) -> TermHandle:
         # A FileGlossary is a closed vocabulary: the call form looks up only,
         # never creates. Unknown names raise (same as the subscript).
         return self[name]

@@ -1,7 +1,7 @@
 """User-facing Glossary API: id derivation, value classes, registration."""
 
 import difflib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ..model import (
     Glossary as BaseGlossary,
@@ -32,13 +32,17 @@ class TermHandle:
 
     The whole behavior of a handle lives here: calling one names a surface form
     for the term, and `declared_kind` reads whatever kind the registration
-    settled on. One type for all three kinds — `g.actor(...)`, `g.work_object(...)`
-    and `g.verb(...)` differ in what they register, not in what they hand back,
-    and the kind is read off the term at use time.
+    settled on. One type for every kind and every accessor — `g.actor(...)`,
+    `g.work_object(...)`, `g.verb(...)`, `g(...)` and `g[...]` differ in what
+    they register, not in what they hand back, and the kind is read off the term
+    at use time.
     """
 
     _term: GlossaryTerm
-    _glossary: BaseGlossary
+    # Out of the identity: it is the term this handle names, and a handle is a
+    # public return value that a user may put in a set — which the `Glossary`,
+    # mutable and so unhashable, would otherwise refuse.
+    _glossary: BaseGlossary = field(compare=False)
 
     def __call__(self, display: str) -> TermInstance:
         """This term as one call site reads it (``guest('Alice')``).
@@ -107,12 +111,6 @@ class TermInstance:
         return self.handle.declared_kind
 
 
-@dataclass(frozen=True)
-class DeferredTermHandle(TermHandle):
-    """A term whose kind is settled post-collection — a file-glossary row with
-    no kind column, or a code-glossary `g(...)` / `g[...]` lookup."""
-
-
 def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:
     """Whether two terms are the same registration: kind, canonical, and
     definition agree (`source` is intentionally excluded). Shared by the
@@ -161,14 +159,14 @@ def _register_kind(
     return new
 
 
-def deferred_handle_or_raise(
+def handle_or_raise(
     glossary: BaseGlossary,
     name: str,
-    handle_cache: dict[TermId, DeferredTermHandle] | None = None,
-) -> DeferredTermHandle:
-    """Name-based, case-insensitive get-only lookup returning a deferred handle.
-    Raises PytestGivenError with a did-you-mean hint on an unknown name. Shared
-    by the code glossary's g[...] / g(...) lookups and FileGlossary."""
+    handle_cache: dict[TermId, TermHandle] | None = None,
+) -> TermHandle:
+    """Name-based, case-insensitive get-only lookup. Raises PytestGivenError
+    with a did-you-mean hint on an unknown name. Shared by the code glossary's
+    g[...] / g(...) lookups and FileGlossary."""
     term_id = id_derive(name)
     if handle_cache is not None and term_id in handle_cache:
         return handle_cache[term_id]
@@ -179,7 +177,7 @@ def deferred_handle_or_raise(
         )
         hint = f' Did you mean: {", ".join(close)}?' if close else ''
         raise PytestGivenError(f'no glossary term named {name!r}.{hint}')
-    handle = DeferredTermHandle(_term=term, _glossary=glossary)
+    handle = TermHandle(_term=term, _glossary=glossary)
     if handle_cache is not None:
         handle_cache[term_id] = handle
     return handle
@@ -191,37 +189,42 @@ class Glossary(BaseGlossary):
     Only what a user constructs is this class; everything internal keeps
     annotating the base, which this satisfies.
 
+    Every registration below is idempotent for an *exactly* repeated one — kind,
+    canonical and definition all equal — and raises on anything else, a
+    definition supplied only the first time included. Re-reading a term declared
+    elsewhere is `g[name]`, which never registers.
+
     `skip=2` throughout: this method, then the user's call site.
     """
 
     def actor(self, name: str, definition: str | None = None) -> TermHandle:
-        """Register (or fetch) an actor — a participant in the domain."""
+        """Register an actor — a participant in the domain."""
         term = _register_kind(
             self, 'actor', name, definition, capture_caller_source(skip=2)
         )
         return TermHandle(_term=term, _glossary=self)
 
     def work_object(self, name: str, definition: str | None = None) -> TermHandle:
-        """Register (or fetch) a work object — a thing acted on."""
+        """Register a work object — a thing acted on."""
         term = _register_kind(
             self, 'object', name, definition, capture_caller_source(skip=2)
         )
         return TermHandle(_term=term, _glossary=self)
 
     def verb(self, name: str, definition: str | None = None) -> TermHandle:
-        """Register (or fetch) a verb — an action."""
+        """Register a verb — an action."""
         term = _register_kind(
             self, 'verb', name, definition, capture_caller_source(skip=2)
         )
         return TermHandle(_term=term, _glossary=self)
 
-    def __call__(self, name: str, definition: str | None = None) -> DeferredTermHandle:
+    def __call__(self, name: str, definition: str | None = None) -> TermHandle:
         """Declare-or-get a term whose kind inference will settle later."""
         term = _register_kind(
             self, None, name, definition, capture_caller_source(skip=2)
         )
-        return DeferredTermHandle(_term=term, _glossary=self)
+        return TermHandle(_term=term, _glossary=self)
 
-    def __getitem__(self, name: str) -> DeferredTermHandle:
+    def __getitem__(self, name: str) -> TermHandle:
         """Get-only lookup; an unknown name raises with a did-you-mean hint."""
-        return deferred_handle_or_raise(self, name)
+        return handle_or_raise(self, name)

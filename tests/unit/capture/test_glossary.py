@@ -15,7 +15,6 @@ from pytest_given import (
 from pytest_given.capture import glossary as gloss_mod
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.glossary import (
-    DeferredTermHandle,
     Glossary,
     TermHandle,
     TermInstance,
@@ -356,7 +355,23 @@ def test_call_accepts_definition():
 def test_call_returns_deferred_handle():
     g = Glossary()
     handle = g('loyalty points')
-    assert isinstance(handle, DeferredTermHandle)
+    assert isinstance(handle, TermHandle)
+    assert handle.declared_kind is None
+
+
+def test_a_term_handle_is_hashable_and_keys_on_its_term():
+    """Handles are public return values, so a user may put one in a set or key
+    a dict on it — which the mutable `Glossary` they carry used to refuse."""
+    g = Glossary()
+    guest, room = g.actor('Guest'), g.work_object('Room')
+    assert {guest, room, guest} == {guest, room}
+    assert hash(guest('Alice')) == hash(guest('Alice'))
+
+
+def test_a_lookup_equals_the_registration_of_the_same_term():
+    """Which accessor handed the term over is not part of its identity."""
+    g = Glossary()
+    assert g.actor('Guest') == g['Guest']
 
 
 def test_low_yields_lowercased_display_instance():

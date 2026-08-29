@@ -127,6 +127,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `@scenario(activities=...)` is now typed `int | Sequence[int] | None`, matching
   a step's `activity=` and the documented "an int or a sequence of them"; a bare
   `activities=2` already worked at runtime but failed type checking.
+- Glossary term handles are now hashable, and equal for the same term whichever
+  accessor produced them.
 
 #### Plugin and run behavior
 
