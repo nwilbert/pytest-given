@@ -363,6 +363,8 @@ In a parametrized scenario the label must read the same in every case: a payload
 
 All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-*` flag enables its own sink independently, and they combine freely (e.g. pass both `--given-json` and `--given-html` to get both files from one run).
 
+The *checks* are not opt-in. Every run builds the report it would have written, so an authoring form that cannot be narrated honestly — the parametrize rules above among them — fails the run whether or not a sink was configured. Learning about it from the first run that asks for HTML, long after the test was written, is the outcome that buys.
+
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--given-json[=PATH]` | off | Write JSON report data (bare → `given-report/report-data.json`). |
