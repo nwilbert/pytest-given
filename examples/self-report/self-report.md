@@ -1046,21 +1046,21 @@
 - **then** a PytestGivenError reports the id was already declared
 
 ## ✓ A «path» may chain a second verb-object pair
-`tests/unit/capture/test_story.py:564::test_path_allows_second_verb_edge`
+`tests/unit/capture/test_story.py:577::test_path_allows_second_verb_edge`
 
 - **given** an «Actor», two «Verb» and two «Work Object» handles
 - **when** they form a five-node «Path» (actor verb object verb object)
 - **then** every slot is a «Term ref», with no bare words
 
 ## ✓ A declared «work object» in a «verb» «slot» is rejected at construction
-`tests/unit/capture/test_story.py:656::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
+`tests/unit/capture/test_story.py:669::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
 
 - **given** a «File glossary» declaring Room a work object
 - **when** Room is placed in the «verb» «slot»
 - **then** a PytestGivenError names the term and its declared kind
 
 ## ✓ A «slot» error names the «term», not its repr
-`tests/unit/capture/test_story.py:682::test_slot_error_message_stays_compact` · diagnostics
+`tests/unit/capture/test_story.py:695::test_slot_error_message_stays_compact` · diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1070,14 +1070,14 @@
 - **then** the message is short and free of dataclass reprs
 
 ## ✓ A kindless «term» stays valid in any «slot»
-`tests/unit/capture/test_story.py:703::test_kindless_term_is_accepted_in_either_slot` · validation
+`tests/unit/capture/test_story.py:716::test_kindless_term_is_accepted_in_either_slot` · validation
 
 - **given** a «Kindless» «Term» declared with g(...)
 - **when** it is placed in a node «slot» and a verb slot
 - **then** both paths construct, leaving the kind to inference
 
 ## ✓ A non-handle «activity part» names its type
-`tests/unit/capture/test_story.py:718::test_non_handle_part_names_its_type` · validation, diagnostics
+`tests/unit/capture/test_story.py:731::test_non_handle_part_names_its_type` · validation, diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1356,56 +1356,56 @@
 - **then** the label reads as prose under a story-scoped key, with the «path» texts joined
 
 ## ✓ A «verb» «activity» ref has one identity regardless of «inflection»
-`tests/unit/report/test_coverage.py:68::test_identity_of_activity_term_ref_verb_ignores_display`
+`tests/unit/report/test_coverage.py:66::test_identity_of_activity_term_ref_verb_ignores_display`
 
 - **given** a «Verb» written canonically and as an «Inflection»
 - **when** «Coverage» derives each «Term ref» identity
 - **then** both collapse to the one canonical verb identity
 
 ## ✓ A branching «activity» unions references across its «paths»
-`tests/unit/report/test_coverage.py:151::test_a_refs_unions_across_multi_path_activity`
+`tests/unit/report/test_coverage.py:149::test_a_refs_unions_across_multi_path_activity`
 
 - **given** an «Activity» that branches into two «Path» alternatives
 - **when** «Coverage» collects the «Activity» references
 - **then** both «Instance» identities across the branches are present
 
 ## ✓ An «instance» «step» ref adds a canonical fallback
-`tests/unit/report/test_coverage.py:202::test_s_for_step_instance_entity_ref_adds_canonical_fallback`
+`tests/unit/report/test_coverage.py:200::test_s_for_step_instance_entity_ref_adds_canonical_fallback`
 
 - **given** a «Step» referring to a named «Instance»
 - **when** «Coverage» computes the identity set for the «Step»
 - **then** it includes the canonical «Term ref» fallback
 
 ## ✓ A «verb» ref always resolves to its canonical identity
-`tests/unit/report/test_coverage.py:217::test_s_for_step_verb_ref_always_canonical`
+`tests/unit/report/test_coverage.py:215::test_s_for_step_verb_ref_always_canonical`
 
 - **given** a «Step» using an «Inflection» of a «Verb»
 - **when** «Coverage» computes its identity set
 - **then** the identity ignores the surface form and stays canonical
 
 ## ✓ An unknown «term ref» is skipped
-`tests/unit/report/test_coverage.py:229::test_s_for_step_unknown_term_ref_skipped` · validation
+`tests/unit/report/test_coverage.py:227::test_s_for_step_unknown_term_ref_skipped` · validation
 
 - **given** a «Step» referencing a «Term» not in the glossary
 - **when** «Coverage» computes its identity set
 - **then** the unknown ref contributes nothing to the identity set
 
 ## ✓ An «instance» «step» covers a canonical «activity»
-`tests/unit/report/test_coverage.py:253::test_compute_coverage_covers_canonical_activity_via_instance_step`
+`tests/unit/report/test_coverage.py:251::test_compute_coverage_covers_canonical_activity_via_instance_step`
 
 - **given** a «Story» with a canonical «Activity»
 - **when** a «Scenario» step names a specific «Instance»
 - **then** «Coverage» reports the «Activity» as covered
 
 ## ✓ A canonical «step» does not cover an «instance» «activity»
-`tests/unit/report/test_coverage.py:284::test_compute_coverage_does_not_cover_instance_activity_with_canonical_step`
+`tests/unit/report/test_coverage.py:282::test_compute_coverage_does_not_cover_instance_activity_with_canonical_step`
 
 - **given** an «Activity» anchored to a named «Instance»
 - **when** a «Scenario» step only names the canonical «Actor»
 - **then** «Coverage» leaves the more specific instance activity uncovered
 
 ## ✓ Promoting a bare word to a «verb» ref drops «coverage» from a «step» that matched
-`tests/unit/report/test_coverage.py:315::test_compute_coverage_lost_when_activity_gains_a_term`
+`tests/unit/report/test_coverage.py:313::test_compute_coverage_lost_when_activity_gains_a_term`
 
 - **given** a «Step» naming two «term refs»
 - **given** the same «Activity» with that middle slot a bare word, then a «Verb» ref
@@ -1414,56 +1414,56 @@
 - **then** the widened «Activity» is no longer covered
 
 ## ✓ A «scenario» «activity» binding constrains «coverage»
-`tests/unit/report/test_coverage.py:363::test_compute_coverage_scenario_constrained_to_activity_ids`
+`tests/unit/report/test_coverage.py:361::test_compute_coverage_scenario_constrained_to_activity_ids`
 
 - **given** a «Story» with two matching activities
 - **when** the «Scenario» «binds» only to activity 1
 - **then** «Coverage» considers only the bound «Activity»
 
 ## ✓ An «activity» with two distinct «terms» is «coverage»-eligible
-`tests/unit/report/test_coverage.py:409::test_is_coverage_eligible_true_for_two_distinct_terms`
+`tests/unit/report/test_coverage.py:407::test_is_coverage_eligible_true_for_two_distinct_terms`
 
 - **given** an «Activity» anchored by two distinct «Term» refs
 - **when** its «Coverage» eligibility is checked
 - **then** it is eligible for «Coverage» tracking
 
 ## ✓ An under-anchored «activity» is not «coverage»-eligible
-`tests/unit/report/test_coverage.py:431::test_is_coverage_eligible_false_for_one_distinct_term`
+`tests/unit/report/test_coverage.py:429::test_is_coverage_eligible_false_for_one_distinct_term`
 
 - **given** an «Activity» that mentions only one distinct «Term»
 - **when** its «Coverage» eligibility is checked
 - **then** it is ineligible — «Coverage» needs at least two anchors
 
 ## ✓ An under-anchored «activity» is never covered by narration matching
-`tests/unit/report/test_coverage.py:461::test_compute_coverage_excludes_under_anchored_activity`
+`tests/unit/report/test_coverage.py:459::test_compute_coverage_excludes_under_anchored_activity`
 
 - **given** a «Story» whose «Activity» is all bare words
 - **when** coverage is computed against a scenario
 - **then** «Coverage» excludes the under-anchored «Activity»
 
 ## ✓ Nested «steps» are walked for «coverage»
-`tests/unit/report/test_coverage.py:485::test_compute_coverage_nested_steps_are_walked`
+`tests/unit/report/test_coverage.py:483::test_compute_coverage_nested_steps_are_walked`
 
 - **given** a «Story» with one canonical «Activity»
 - **when** the covering «Term ref»s live in a nested child «Step»
 - **then** the nested «Step» still counts and the «Activity» is covered
 
 ## ✓ An explicit «step» binding covers an eligible «activity»
-`tests/unit/report/test_coverage.py:520::test_compute_coverage_explicit_step_binding_covers_eligible_activity`
+`tests/unit/report/test_coverage.py:518::test_compute_coverage_explicit_step_binding_covers_eligible_activity`
 
 - **given** a «Story» with a coverage-eligible «Activity»
 - **when** a «Step» «binds» to it explicitly by id
 - **then** «Coverage» counts it directly, without identity matching
 
 ## ✓ An explicit binding covers an under-anchored «activity»
-`tests/unit/report/test_coverage.py:548::test_compute_coverage_explicit_binding_covers_under_anchored_activity`
+`tests/unit/report/test_coverage.py:546::test_compute_coverage_explicit_binding_covers_under_anchored_activity`
 
 - **given** a «Story» whose «Activity» is under-anchored
 - **when** a «Step» «binds» to it explicitly by id
 - **then** «Coverage» counts it, despite the missing anchors
 
 ## ✓ «Parameter coloring» marks placeholders and table headers
-`tests/unit/report/test_html_renderer.py:212::test_render_parametrized_step_with_structured_narration`
+`tests/unit/report/test_html_renderer.py:208::test_render_parametrized_step_with_structured_narration`
 
 - **given** a «Report» holding a «Parametrized scenario» with a «Parameter table»
 - **when** the «Renderer» renders the HTML page
@@ -1471,7 +1471,7 @@
 - **then** the page carries one generated color rule per column, after the stylesheet so a term ref bound to a column takes the column ink
 
 ## ✓ A passed «scenario» renders as a checked heading with «step» bullets
-`tests/unit/report/test_md_renderer.py:50::test_passed_scenario_heading_and_steps`
+`tests/unit/report/test_md_renderer.py:46::test_passed_scenario_heading_and_steps`
 
 - **given** a «Report» holding a passed «Scenario» with three steps
   - 📎 Scenario record:
@@ -1536,28 +1536,28 @@
 - **then** the heading is checked and each «Step» is a phase bullet
 
 ## ✓ Nested «steps» indent under their parent
-`tests/unit/report/test_md_renderer.py:149::test_nested_steps_indent`
+`tests/unit/report/test_md_renderer.py:145::test_nested_steps_indent`
 
 - **given** a «Scenario» whose when «Step» has a nested child
 - **when** the Markdown «Report» is rendered
 - **then** the child bullet indents under its parent
 
 ## ✓ Structured «narration» renders «terms», values and placeholders
-`tests/unit/report/test_md_renderer.py:173::test_narration_parts_resolve_terms_and_values`
+`tests/unit/report/test_md_renderer.py:169::test_narration_parts_resolve_terms_and_values`
 
 - **given** a «Step» whose «Narration» carries a «Term ref», a value and a placeholder
 - **when** the Markdown «Report» is rendered
 - **then** the «Term ref» renders in guillemets, the value verbatim and the placeholder in braces
 
 ## ✓ A «parametrized scenario» renders its «parameter table»
-`tests/unit/report/test_md_renderer.py:227::test_parametrized_scenario_renders_table` · parametrization
+`tests/unit/report/test_md_renderer.py:223::test_parametrized_scenario_renders_table` · parametrization
 
 - **given** a «Parametrized scenario» with a two-«Case» «Parameter table»
 - **when** the Markdown «Report» is rendered
 - **then** the heading counts the cases and the «Parameter table» lists each row
 
 ## ✓ A failing «step» is marked with a minimal error digest
-`tests/unit/report/test_md_renderer.py:263::test_failing_scenario_renders_a_minimal_error`
+`tests/unit/report/test_md_renderer.py:259::test_failing_scenario_renders_a_minimal_error`
 
 - **given** a failed «Scenario» carrying a two-line error and an internal frame
   - 📎 Error record:
@@ -1588,42 +1588,42 @@
 - **then** only the first message line and the non-internal frame are quoted
 
 ## ✓ A multi-line «attachment» renders as a fenced block
-`tests/unit/report/test_md_renderer.py:333::test_multiline_attachment_renders_fenced_block`
+`tests/unit/report/test_md_renderer.py:329::test_multiline_attachment_renders_fenced_block`
 
 - **given** a «Step» carrying a multi-line «Attachment»
 - **when** the Markdown «Report» is rendered
 - **then** the «Attachment» content sits in an indented fence, not inline
 
 ## ✓ A skipped scenario shows its skip reason
-`tests/unit/report/test_md_renderer.py:495::test_skipped_scenario_shows_reason`
+`tests/unit/report/test_md_renderer.py:491::test_skipped_scenario_shows_reason`
 
 - **given** a skipped «Scenario» with a reason
 - **when** the Markdown «Report» is rendered
 - **then** the heading is marked skipped and the reason follows the node id
 
 ## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
-`tests/unit/test_grouping.py:75::test_group_parametrized_any_failed_groups_as_failed` · parametrization
+`tests/unit/test_grouping.py:74::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
 - **given** three «Case» records of one «Parametrized scenario»
 - **when** the «grouping» pass collapses them
 - **then** one scenario remains and any failed «Case» fails it
 
 ## ✓ A «parametrized scenario» keeps its place among the «scenarios» around it
-`tests/unit/test_grouping.py:107::test_group_parametrized_keeps_source_order` · parametrization
+`tests/unit/test_grouping.py:106::test_group_parametrized_keeps_source_order` · parametrization
 
 - **given** a plain «scenario» between two parametrized ones
 - **when** the «grouping» pass runs
 - **then** the «report» lists them in the order the file declares
 
 ## ✓ The grouped tree comes from the first passed «case»
-`tests/unit/test_grouping.py:206::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
+`tests/unit/test_grouping.py:205::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
 
 - **given** a skipped first «Case» and a second one that ran
 - **when** the «cases» are «grouped»
 - **then** the tree is the one the passed «Case» recorded
 
 ## ✓ A plain-str «narration» that varies across «cases» is refused
-`tests/unit/test_grouping.py:427::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
+`tests/unit/test_grouping.py:426::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
 
 - **given** two «cases» whose text differs but records no parts
 - **when** the «cases» are «grouped»
@@ -1631,7 +1631,7 @@
 - **then** the error names the test, the missing parts and the t-string fix
 
 ## ✓ A narrated value that varies becomes a derived «parameter table» column
-`tests/unit/test_grouping.py:544::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
+`tests/unit/test_grouping.py:543::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
 
 - **given** two «cases» narrating a value that differs
 - **when** «templatizing» walks the «cases»
@@ -1639,7 +1639,7 @@
 - **then** the «Step» keeps a placeholder pointing at that column
 
 ## ✓ A varying interpolation that is not a bare name is refused
-`tests/unit/test_grouping.py:656::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
+`tests/unit/test_grouping.py:655::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
 
 - **given** two «cases» narrating a computed expression
 - **when** the «cases» are «grouped»
@@ -1647,14 +1647,14 @@
 - **then** the error quotes the expression and shows the bind-a-local fix
 
 ## ✓ A «parameter table» cell reads the way the scenario name formats it
-`tests/unit/test_grouping.py:1022::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
+`tests/unit/test_grouping.py:1021::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
 
 - **given** a Template scenario name formatting its parameter
 - **when** the «cases» are «grouped»
 - **then** the cells carry the formatting the name declared
 
 ## ✓ A scenario name formatting a parameter a «step» reads plainly gets its own column
-`tests/unit/test_grouping.py:1037::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1036::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
 
 - **given** a name formatting the parameter and a step reading it plainly
 - **when** the «cases» are «grouped»
@@ -1662,7 +1662,7 @@
 - **then** the name renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» formatting a parameter the scenario name reads plainly gets its own column
-`tests/unit/test_grouping.py:1080::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1079::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
 
 - **given** a step formatting the parameter and a name reading it plainly
 - **when** the «cases» are «grouped»
@@ -1670,7 +1670,7 @@
 - **then** the step renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» narrating a parameter its column no longer holds is refused
-`tests/unit/test_grouping.py:1162::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
+`tests/unit/test_grouping.py:1161::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
 
 - **given** two «cases» narrating a value their column lacks
 - **when** the «cases» are «grouped»
@@ -1678,7 +1678,7 @@
 - **then** the error names the column and what the case actually narrated
 
 ## ✓ A «term ref» whose display differs between «cases» is refused
-`tests/unit/test_grouping.py:1513::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1512::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» reads differently
 - **when** the «cases» are «grouped»
@@ -1686,7 +1686,7 @@
 - **then** the error names the «Term ref» and the split-it-out fix
 
 ## ✓ A «term ref» that *is* the parametrize value is refused too
-`tests/unit/test_grouping.py:1570::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1569::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» is the parameter itself
 - **when** the «cases» are «grouped»
@@ -1694,7 +1694,7 @@
 - **then** the error points at the per-case «scenario» opt-out
 
 ## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py:1734::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+`tests/unit/test_grouping.py:1733::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
 
 - **given** two «cases» attaching a label with differing payloads
 - **when** «templatizing» walks the «cases»
@@ -1702,7 +1702,7 @@
 - **then** the «Step» keeps a content-less badge pointing at it
 
 ## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py:1790::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+`tests/unit/test_grouping.py:1789::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
 
 - **given** an «Attachment» label only one «Case» attaches
 - **when** the «cases» are «grouped»
@@ -1710,7 +1710,7 @@
 - **then** the error names the label and asks for a constant one
 
 ## ✓ A «parameter table» cell reads the way the «step» that points at it read
-`tests/unit/test_grouping.py:2338::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+`tests/unit/test_grouping.py:2337::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec
 - **when** «grouping» builds the «parameter table»
@@ -1718,7 +1718,7 @@
 - **then** the step keeps its placeholder, which that cell substitutes into
 
 ## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py:2476::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+`tests/unit/test_grouping.py:2475::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
 
 - **given** two «cases» whose «step» trees differ
 - **when** the «cases» are «grouped»
@@ -1726,7 +1726,7 @@
 - **then** the error names the divergence and the opt-out that answers it
 
 ## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
-`tests/unit/test_grouping.py:2604::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
+`tests/unit/test_grouping.py:2603::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
 
 - **given** a step narrating a parameter bound to a glossary term instance
 - **when** the «cases» are «grouped»
