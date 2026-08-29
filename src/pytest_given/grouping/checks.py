@@ -7,7 +7,7 @@ fire from the baseline walk, which is where the offending part is in hand.
 """
 
 from collections.abc import Iterator
-from typing import NamedTuple, assert_never
+from typing import NamedTuple
 
 from ..model import (
     Narration,
@@ -145,8 +145,6 @@ def _part_key(part: NarrationPart) -> PartKey:
             return PartKey('placeholder', n, (c or '', f))
         case NarrationTermRef(expression=expression):
             return PartKey('term', expression)
-        case _:
-            assert_never(part)
 
 
 def _divergence_error(

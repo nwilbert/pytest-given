@@ -8,7 +8,6 @@ so has nothing to be compared against.
 """
 
 from dataclasses import replace
-from typing import assert_never
 
 from ..model import (
     Attachment,
@@ -222,8 +221,6 @@ def _templatize_part(
             # column binds it or not, so it is always compared.
             check_constant_term_ref(part, index, path, phase, ctx)
             return part
-        case _:
-            assert_never(part)
 
 
 def _param_slot(part: NarrationValue) -> NarrationPlaceholder:

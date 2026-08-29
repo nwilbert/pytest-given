@@ -32,6 +32,9 @@ def narration_text(parts: list[NarrationPart]) -> str:
     `{name}` token — which is what makes this both the grouped template's text
     (placeholders left standing, pointing at columns) and a substituted case's
     (no placeholders left to stand).
+
+    The `case _` guard is load-bearing — the match appends in a loop rather
+    than returning, so without it a new part kind would vanish silently.
     """
     out: list[str] = []
     for part in parts:

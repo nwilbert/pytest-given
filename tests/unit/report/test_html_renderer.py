@@ -2,9 +2,6 @@ import json
 import re
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, cast
-
-import pytest
 
 from pytest_given import given, scenario, then, when
 from pytest_given.model import (
@@ -37,7 +34,6 @@ from pytest_given.report.html_renderer import (
     _make_activity_part_filter,
     _make_narration_filter,
     _neutralize_script_data,
-    _render_narration_part,
     render_html_string,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
@@ -636,13 +632,6 @@ def test_neutralized_script_data_stays_valid_json() -> None:
     assert '</' not in neutralized
     assert '<!--' not in neutralized
     assert json.loads(neutralized) == payload
-
-
-def test_render_narration_part_rejects_unknown_variant() -> None:
-    # The exhaustive match guards against a NarrationPart variant being added
-    # without a render branch (silent drop). assert_never fires at runtime.
-    with pytest.raises(AssertionError):
-        _render_narration_part(cast(Any, object()), {}, None)
 
 
 def test_render_self_contained(tmp_path: Path) -> None:

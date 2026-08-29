@@ -1,7 +1,6 @@
 import re
 from collections.abc import Iterator
 from pathlib import Path
-from typing import assert_never
 
 from ..model import (
     Attachment,
@@ -282,5 +281,3 @@ def _part_md(part: NarrationPart) -> str:
             return '{' + name + '}'
         case NarrationTermRef(display=display):
             return f'«{display}»'
-        case _:
-            assert_never(part)

@@ -1,7 +1,6 @@
 import json
 from collections.abc import Callable
 from pathlib import Path
-from typing import assert_never
 
 import jinja2
 from markupsafe import Markup, escape
@@ -262,9 +261,7 @@ def _render_narration_part(
     param_color_map: ParamColorMap,
     glossary: Glossary | None,
 ) -> str:
-    """Render one `NarrationPart` to an HTML fragment. The `case _` guard makes
-    a future variant a type error here (via `assert_never`) rather than a part
-    silently dropped from the rendered narration."""
+    """Render one `NarrationPart` to an HTML fragment."""
     match part:
         case NarrationLiteral(value=value):
             return str(escape(value))
@@ -296,8 +293,6 @@ def _render_narration_part(
             )
         case NarrationTermRef():
             return _render_term_ref(part, glossary)
-        case _:
-            assert_never(part)
 
 
 _TERM_KIND_CLASSES: dict[str | None, str] = {

@@ -498,6 +498,11 @@ def _resolve_template_parts(
     parts: list[NarrationPart],
     mapping: Mapping[str, Any],
 ) -> list[NarrationPart]:
+    """Each `Template` part resolved against the value bound to its name.
+
+    The `case _` guard is load-bearing — the match appends in a loop rather
+    than returning, so without it a new part kind would vanish silently.
+    """
     out: list[NarrationPart] = []
     for part in parts:
         assert not isinstance(part, NarrationValue), (
