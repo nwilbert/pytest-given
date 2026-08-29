@@ -42,7 +42,7 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
 def _validate_scenario_marker(item: pytest.Item) -> None:
     """The collection-time checks for one item, or nothing when it carries no
     `@scenario`."""
-    marker = _get_scenario_marker(item)
+    marker = scenario_marker(item)
     if marker is None:
         return
     _validate_scenario_story_binding(item, marker)
@@ -93,7 +93,7 @@ def _validate_scenario_story_binding(
             )
 
 
-def _get_scenario_marker(item: pytest.Item) -> ScenarioDecorator | None:
+def scenario_marker(item: pytest.Item) -> ScenarioDecorator | None:
     """Get the _scenario attribute from a test function, if present.
 
     Returns None for items without a `.function` (e.g. DoctestItem) — those

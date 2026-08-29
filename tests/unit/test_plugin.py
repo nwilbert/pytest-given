@@ -79,31 +79,34 @@ def _fake_func(desc: StepDescriptor | None = None) -> Any:
     return f
 
 
-def _fake_item(fixturedefs: dict[str, Any]) -> pytest.Item:
+def _fake_item(fixturedefs: dict[str, Any], config: Any) -> pytest.Item:
     fm = SimpleNamespace(getfixturedefs=lambda name, _item: fixturedefs.get(name))
     session = SimpleNamespace(_fixturemanager=fm)
     return cast(
         pytest.Item,
-        SimpleNamespace(fixturenames=list(fixturedefs.keys()), session=session),
+        SimpleNamespace(
+            fixturenames=list(fixturedefs.keys()), session=session, config=config
+        ),
     )
 
 
 def test_pytest_fixture_setup_skips_plain_fixture(
-    fresh_collector: Collector,
+    fresh_state: state.SessionState,
 ) -> None:
     fixturedef = SimpleNamespace(func=lambda: None)
     _drive_fixture_setup(fixturedef, SimpleNamespace())
-    assert list(fresh_collector.recordings()) == []
+    assert fresh_state.fixture_recordings == {}
 
 
 def test_pytest_fixture_setup_skips_when_collector_idle(
     fake_config: Any,
     fresh_collector: Collector,
+    fresh_state: state.SessionState,
 ) -> None:
     fixturedef = SimpleNamespace(func=_fake_func(StepDescriptor('given', 'a thing')))
     assert fresh_collector.state == 'idle'
     _drive_fixture_setup(fixturedef, SimpleNamespace(config=fake_config))
-    assert list(fresh_collector.recordings()) == []
+    assert fresh_state.fixture_recordings == {}
 
 
 def test_ensure_teardown_wrapped_is_idempotent() -> None:
@@ -145,34 +148,37 @@ def test_wrapped_generator_handles_no_yield() -> None:
 
 
 def test_graft_fixture_recordings_skips_plain_fixtures(
+    fake_config: Any,
     fresh_collector: Collector,
 ) -> None:
     fixturedef = SimpleNamespace(func=lambda: None, cached_result=('v', None, None))
-    item = _fake_item({'plain': [fixturedef]})
+    item = _fake_item({'plain': [fixturedef]}, fake_config)
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
-    fixtures._graft_fixture_recordings(item, fresh_collector)
+    fixtures.graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
 
 
 def test_graft_fixture_recordings_skips_uncached_fixtures(
+    fake_config: Any,
     fresh_collector: Collector,
 ) -> None:
     deco = _fake_func(StepDescriptor('given', 'a thing'))
     fixturedef = SimpleNamespace(func=deco, cached_result=None)
-    item = _fake_item({'deco': [fixturedef]})
+    item = _fake_item({'deco': [fixturedef]}, fake_config)
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
-    fixtures._graft_fixture_recordings(item, fresh_collector)
+    fixtures.graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
 
 
 def test_graft_fixture_recordings_skips_unknown_fixturename(
+    fake_config: Any,
     fresh_collector: Collector,
 ) -> None:
-    item = _fake_item({'missing': None})
+    item = _fake_item({'missing': None}, fake_config)
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
-    fixtures._graft_fixture_recordings(item, fresh_collector)
+    fixtures.graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
 
@@ -359,7 +365,7 @@ def test_get_scenario_marker_returns_none_for_item_without_function() -> None:
     """DoctestItem and other non-Function items lack `.function`; the marker
     lookup must tolerate that rather than asserting."""
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::doctest'))
-    assert collection._get_scenario_marker(item) is None
+    assert collection.scenario_marker(item) is None
 
 
 def test_extract_skip_reason_parses_canonical_tuple() -> None:
@@ -481,22 +487,25 @@ def test_extract_returns_empty_on_unresolvable_annotations() -> None:
 
 
 def test_graft_skips_recording_not_belonging_to_item(
+    fake_config: Any,
     fresh_collector: Collector,
+    fresh_state: state.SessionState,
 ) -> None:
-    """A recording left in the collector by another item (its key isn't in
-    this item's `expected` set) is skipped, not grafted."""
+    """A recording left by another item (its key isn't among this item's step
+    fixtures) is skipped, not grafted."""
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
     stale = FixtureRecording(
         root=Step(phase='given', narration=Narration(text='stale'), fixture_name='o')
     )
-    fresh_collector.store_recording((object(), None), stale)
-    item = _fake_item({})
-    fixtures._graft_fixture_recordings(item, fresh_collector)
+    fresh_state.fixture_recordings[(object(), None)] = stale
+    item = _fake_item({}, fake_config)
+    fixtures.graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
 
 
 def test_graft_phase2_skips_decorated_fixture_without_recording(
+    fake_config: Any,
     fresh_collector: Collector,
 ) -> None:
     """An Annotated given() on a decorated fixture that recorded nothing (no
@@ -513,10 +522,15 @@ def test_graft_phase2_skips_decorated_fixture_without_recording(
     session = SimpleNamespace(_fixturemanager=fm)
     item = cast(
         pytest.Item,
-        SimpleNamespace(fixturenames=['machine'], session=session, function=testfn),
+        SimpleNamespace(
+            fixturenames=['machine'],
+            session=session,
+            function=testfn,
+            config=fake_config,
+        ),
     )
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
-    fixtures._graft_fixture_recordings(item, fresh_collector)
+    fixtures.graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None
     assert fresh_collector._current_scenario.steps == []
 

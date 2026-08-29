@@ -27,6 +27,7 @@ from ..lint import (
     RuleId,
 )
 from ..model import (
+    FixtureRecording,
     NodeId,
     ParamInfo,
 )
@@ -70,22 +71,35 @@ class SessionOutcome:
     findings: list[Finding] = field(default_factory=list)
 
 
+# One fixture *instance*: the def it came from, plus its cache key. Both ends
+# of the graft build this key, and they reach the cache key two ways — at setup
+# from the request, at graft from what pytest cached.
+type FixtureInstanceKey = tuple[object, object]
+
+
 @dataclass(kw_only=True)
 class SessionState:
     """The per-item bookkeeping the hooks pass between each other.
 
-    Neither field is the collector's business — nothing in `capture/` reads
-    them — so they live in the session's stash beside it rather than as
-    attributes on the recorder, which keeps `Collector` to what it records.
+    None of it is the collector's business — nothing in `capture/` reads any of
+    it — so it lives in the session's stash beside the recorder rather than as
+    attributes on it, which keeps `Collector` to what it records.
 
     `published_for` is the item whose setup published the collector to the
     ContextVar, so teardown clears only what it published. Not
     `active_scenario_id`: that is already None by teardown (the call report
     finished the scenario), which is how the clear came to be skipped entirely.
+
+    `fixture_recordings` is insertion-ordered by setup time, which is what lets
+    the graft take them in dependency order — `item.fixturenames` can list a
+    dependent before its dependency.
     """
 
     param_info: ParamInfo = field(default_factory=dict)
     published_for: NodeId | None = None
+    fixture_recordings: dict[FixtureInstanceKey, FixtureRecording] = field(
+        default_factory=dict
+    )
 
 
 given_config_key: pytest.StashKey[GivenConfig] = pytest.StashKey()

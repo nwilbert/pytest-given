@@ -23,8 +23,8 @@ from ..model import (
     ParamSpec,
     Status,
 )
-from .collection import _get_scenario_marker
-from .fixtures import _graft_fixture_recordings
+from .collection import scenario_marker
+from .fixtures import graft_fixture_recordings
 from .state import session_collector, session_state
 
 if TYPE_CHECKING:
@@ -34,8 +34,8 @@ if TYPE_CHECKING:
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
 def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     collector = session_collector(item.config)
-    scenario_marker = _get_scenario_marker(item)
-    if scenario_marker is None:
+    marker = scenario_marker(item)
+    if marker is None:
         # Unannotated test: set the flag so `with given(...)` inside it warns
         # instead of raising. Teardown clears the flag and active collector.
         collector.inside_unannotated_test = True
@@ -51,19 +51,19 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     source = item_source(relpath_raw, (lineno0 or 0) + 1)
     collector.start_scenario(
         scenario_id=node_id,
-        name=scenario_marker.name,
+        name=marker.name,
         module=module,
-        tags=scenario_marker.tags,
+        tags=marker.tags,
         source=source,
-        story=scenario_marker.story,
-        activity_ids=scenario_marker.activity_ids,
+        story=marker.story,
+        activity_ids=marker.activity_ids,
     )
     session_state(item.config).published_for = node_id
     set_active_collector(collector)
     # Pre-fixture-setup work done; let pytest run fixture setup here.
     yield
-    _capture_param_spec(item, node_id, group=scenario_marker.group_parametrized)
-    _graft_fixture_recordings(item, collector)
+    _capture_param_spec(item, node_id, group=marker.group_parametrized)
+    graft_fixture_recordings(item, collector)
     # The clock starts past fixture setup, so a scenario's duration is its own.
     collector.begin_timing()
 

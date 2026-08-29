@@ -1,6 +1,5 @@
 from .collector import (
     Collector,
-    FixtureInstanceKey,
     get_active_collector,
     set_active_collector,
 )
@@ -44,7 +43,6 @@ from .traceback import is_internal_path, parse_short_repr
 __all__ = [
     'Collector',
     'FileGlossary',
-    'FixtureInstanceKey',
     'Glossary',
     'ScenarioDecorator',
     'StepDecorated',

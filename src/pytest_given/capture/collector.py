@@ -1,6 +1,5 @@
 import copy
 import time
-from collections.abc import Iterator
 from contextvars import ContextVar
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -40,8 +39,6 @@ class StateToken:
     previous_recording: FixtureRecording | None
     previous_fixture_descriptor: StepDescriptor | None
 
-
-type FixtureInstanceKey = tuple[object, object]
 
 _collector_var: ContextVar[Collector | None] = ContextVar('collector', default=None)
 
@@ -86,7 +83,6 @@ class Collector:
         self._state: RecordingState = 'idle'
         self._active_recording: FixtureRecording | None = None
         self._active_fixture_descriptor: StepDescriptor | None = None
-        self._recordings: dict[FixtureInstanceKey, FixtureRecording] = {}
         self.inside_unannotated_test: bool = False
         # Whether steps record their body's source anchor (narration lint
         # only); off is the zero-cost default — no frame walking happens.
@@ -249,18 +245,6 @@ class Collector:
             self._active_fixture_descriptor = descriptor
         return token
 
-    def store_recording(
-        self, key: FixtureInstanceKey, recording: FixtureRecording
-    ) -> None:
-        self._recordings[key] = recording
-
-    def recordings(self) -> Iterator[tuple[FixtureInstanceKey, FixtureRecording]]:
-        """(key, recording) pairs in storage (setup) order."""
-        return iter(self._recordings.items())
-
-    def drop_recording(self, key: FixtureInstanceKey) -> None:
-        self._recordings.pop(key, None)
-
     def graft_recording(
         self,
         recording: FixtureRecording,
@@ -420,11 +404,7 @@ class Collector:
     ) -> None:
         if self._current_scenario is not None:
             self._current_scenario.status = 'failed'
-            self._current_scenario.error = ErrorInfo(
-                message=message,
-                frames=frames or [],
-                error_tail=error_tail,
-            )
+            self._current_scenario.error = _error_info(message, frames, error_tail)
 
     def fail_recorded_scenario(
         self,
@@ -450,8 +430,11 @@ class Collector:
             return
         scenario.status = 'failed'
         if scenario.error is None:
-            scenario.error = ErrorInfo(
-                message=message,
-                frames=frames or [],
-                error_tail=error_tail,
-            )
+            scenario.error = _error_info(message, frames, error_tail)
+
+
+def _error_info(
+    message: str, frames: list[TracebackFrame] | None, error_tail: str | None
+) -> ErrorInfo:
+    """A scenario's failure, however it was reached — mid-run or after the fact."""
+    return ErrorInfo(message=message, frames=frames or [], error_tail=error_tail)

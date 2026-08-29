@@ -13,7 +13,6 @@ from _pytest.fixtures import SubRequest
 
 from ..capture import (
     Collector,
-    FixtureInstanceKey,
     StepDecorated,
     StepDescriptor,
     annotated_given_descriptors,
@@ -23,7 +22,7 @@ from ..model import (
     PytestGivenError,
     Step,
 )
-from .state import session_collector
+from .state import FixtureInstanceKey, session_collector, session_state
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -67,7 +66,7 @@ def pytest_fixture_setup(
     finally:
         collector.exit_fixture(token)
         key = _setup_instance_key(fixturedef, request)
-        collector.store_recording(key, recording)
+        session_state(request.config).fixture_recordings[key] = recording
 
 
 def _ensure_teardown_wrapped(
@@ -139,72 +138,90 @@ def _fixture_instance_key(
     fixturedef: pytest.FixtureDef[object],
     cache_key: object,
 ) -> FixtureInstanceKey:
-    """One fixture *instance*: the def it came from, plus its cache key.
-
-    Both ends of the graft build this key, and they reach the cache key two
-    ways — at setup from the request, at graft from what pytest cached. The
-    shape lives here rather than at either end so the two cannot drift into
-    keys that no longer meet; a miss is silent, and costs the fixture's whole
-    recorded subtree.
-    """
+    """Built here rather than at either end of the graft, so the two cannot
+    drift into keys that no longer meet; a miss is silent, and costs the
+    fixture's whole recorded subtree."""
     return (id(fixturedef), cache_key)
 
 
-def _graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
-    """Graft this item's fixture step-recordings and Annotated `given` labels.
-
-    Phase 1 takes the fixture recordings in setup order — `_recordings` is
-    insertion-ordered by setup time, so this stays correct even though
-    `item.fixturenames` can list a dependent before its dependency — each with
-    an optional Annotated override narration matched by parameter name. Phase 2
-    takes the Annotated-only leaves in test-signature order.
-    """
-    assert hasattr(item, 'fixturenames'), f'expected fixturenames on {item!r}'
+def graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
+    """Graft this item's fixture step-recordings and Annotated `given` labels."""
     func = getattr(item, 'function', None)
     descriptors = annotated_given_descriptors(func) if func is not None else {}
+    grafted = _graft_recorded_fixtures(item, collector, descriptors)
+    _graft_annotated_leaves(item, collector, descriptors, grafted)
 
-    fm = item.session._fixturemanager
-    expected: dict[FixtureInstanceKey, str] = {}
-    for name in item.fixturenames:
-        defs = fm.getfixturedefs(name, item)
-        if not defs:
-            continue
-        fixturedef = defs[-1]
-        if getattr(fixturedef.func, '_step_descriptor', None) is None:
-            continue
-        if fixturedef.cached_result is None:
-            continue
-        key = _cached_instance_key(fixturedef)
-        expected[key] = fixturedef.scope
 
+def _graft_recorded_fixtures(
+    item: pytest.Item,
+    collector: Collector,
+    descriptors: dict[str, StepDescriptor],
+) -> set[str | None]:
+    """Graft what this item's step fixtures recorded, in setup order, each with
+    the Annotated override narration its parameter name carries. Returns the
+    fixture names grafted — what `_graft_annotated_leaves` must leave alone.
+    """
+    recordings = session_state(item.config).fixture_recordings
+    scopes = _recorded_fixture_scopes(item)
+    grafted: set[str | None] = set()
     # Function-scoped recordings won't be re-consumed; drop after grafting so
-    # the recordings dict doesn't grow unboundedly across the session.
-    grafted_names: set[str | None] = set()
+    # the store doesn't grow unboundedly across the session.
     to_drop: list[FixtureInstanceKey] = []
-    for key, recording in collector.recordings():
-        if key not in expected:
+    for key, recording in recordings.items():
+        if key not in scopes:
             continue
         name = recording.root.fixture_name
         descriptor = descriptors.get(name) if name is not None else None
-        override = descriptor.narration if descriptor is not None else None
-        collector.graft_recording(recording, override_narration=override)
-        grafted_names.add(name)
-        if expected[key] == 'function':
+        collector.graft_recording(
+            recording,
+            override_narration=None if descriptor is None else descriptor.narration,
+        )
+        grafted.add(name)
+        if scopes[key] == 'function':
             to_drop.append(key)
     for key in to_drop:
-        collector.drop_recording(key)
+        del recordings[key]
+    return grafted
 
-    # Parametrize values and built-in / undecorated fixtures.
-    for name, descriptor in descriptors.items():
-        if name in grafted_names:
+
+def _recorded_fixture_scopes(item: pytest.Item) -> dict[FixtureInstanceKey, str]:
+    """The instance key of every step fixture this item has cached, and its
+    scope — which is what says whether its recording is still needed after."""
+    assert hasattr(item, 'fixturenames'), f'expected fixturenames on {item!r}'
+    scopes: dict[FixtureInstanceKey, str] = {}
+    for name in item.fixturenames:
+        fixturedef = _step_fixturedef(item, name)
+        if fixturedef is None or fixturedef.cached_result is None:
             continue
-        defs = fm.getfixturedefs(name, item)
-        fdef = defs[-1] if defs else None
-        # A decorated fixture is phase-1 territory; skip it here so its
-        # recorded body is never replaced by a bodyless leaf.
-        if (
-            fdef is not None
-            and getattr(fdef.func, '_step_descriptor', None) is not None
-        ):
+        scopes[_cached_instance_key(fixturedef)] = fixturedef.scope
+    return scopes
+
+
+def _graft_annotated_leaves(
+    item: pytest.Item,
+    collector: Collector,
+    descriptors: dict[str, StepDescriptor],
+    grafted: set[str | None],
+) -> None:
+    """Graft the Annotated-only labels — parametrize values and built-in or
+    undecorated fixtures — in test-signature order.
+
+    A decorated fixture is phase-1 territory even when it recorded nothing, so
+    its body is never replaced by a bodyless leaf.
+    """
+    for name, descriptor in descriptors.items():
+        if name in grafted or _step_fixturedef(item, name) is not None:
             continue
         collector.graft_leaf_given(descriptor.narration)
+
+
+def _step_fixturedef(item: pytest.Item, name: str) -> pytest.FixtureDef[object] | None:
+    """The fixturedef `name` resolves to for this item, when it carries a step
+    descriptor — else None. Both phases ask this, from opposite sides."""
+    defs = item.session._fixturemanager.getfixturedefs(name, item)
+    if not defs:
+        return None
+    fixturedef = defs[-1]
+    if getattr(fixturedef.func, '_step_descriptor', None) is None:
+        return None
+    return fixturedef
