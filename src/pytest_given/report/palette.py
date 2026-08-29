@@ -1,10 +1,8 @@
 """Generated text colors for the HTML report's parametrize columns.
 
 A report needs one color per parametrize column, for a count it only learns at
-render time. The fixed six-color list this replaces capped that count — a
-seventh column wrapped back onto the first color — and it had to be *ordered*
-by hand so that every prefix stayed well spread, since a two-column table only
-ever sees the first two entries.
+render time — and every *prefix* of the sequence has to stay well spread, since
+a two-column table only ever sees the first two entries.
 
 Colors come off a ring: one lightness at full chroma, stepped by colorfulness
 rather than by angle. An index picks its place on that ring by the golden
@@ -50,10 +48,8 @@ _GOLDEN_RATIO_CONJUGATE = 0.6180339887498949
 # a parameter value renders over the card, the page, the hovered row's blue
 # tint and the failed row's red tint, and the worst case anywhere on the ring
 # is 4.72:1 — and light is what the ring wants, because chroma collapses as a
-# color darkens. An earlier version alternated a second, darker band to buy
-# separation; it bought near-black instead, and the columns became hard to tell
-# apart. Lightness is the wrong axis for this: at 13px you identify a word's
-# color by its hue, and darkening only drains the hue away.
+# color darkens. Lightness is the wrong axis to separate on: at 13px you
+# identify a word's color by its hue, and darkening only drains the hue away.
 _LIGHTNESS = 43.0
 
 # How finely the ring is sampled when measuring its circumference. One degree
@@ -100,9 +96,8 @@ def _hue_at(fraction: float) -> float:
     available chroma instead puts fewer columns where the gamut is thin and
     more where it is wide, which is where they can actually be told apart.
     Together with the golden-ratio placement above, this holds neighbouring
-    columns a constant distance apart at every count, and beats the
-    hand-picked list this replaces at every count past two — in ordinary
-    vision and under simulated deuteranopia, protanopia and tritanopia."""
+    columns a constant distance apart at every count — in ordinary vision and
+    under simulated deuteranopia, protanopia and tritanopia."""
     arc = _chroma_arc()
     target = (fraction % 1.0) * arc[-1]
     return float(bisect.bisect_left(arc, target) % _HUE_SAMPLES) * (

@@ -97,12 +97,10 @@ class GroupContext:
     def _unique_name(self, name: str) -> str:
         """`name`, or `name #2`, `name #3`, … once it is already taken.
 
-        An id disambiguates two columns in the JSON, but a rendered table shows
-        only the name and a Markdown badge carries no id at all — so two
-        occurrences of one attachment label, or one expression promoted in two
-        steps, need distinct names as well. The first stays bare: a single
-        column is the overwhelmingly common case, and suffixing it would churn
-        every existing report.
+        A rendered table shows only the name and a Markdown badge carries no id
+        at all, so two columns sharing a label need distinct names too — while
+        the first stays bare, since suffixing it would churn every report that
+        has only one.
 
         The candidate is checked against the names already taken rather than
         counted per name, because a label is arbitrary text and can itself read

@@ -55,7 +55,6 @@ from .schema import (
 
 
 def report_to_dict(report: ReportData) -> dict[str, Any]:
-    """Serialize a `ReportData` to a JSON-shaped dict, skipping _ fields."""
     result = _asdict_filtered(report)
     assert isinstance(result, dict)
     return result
@@ -78,7 +77,6 @@ def _asdict_filtered(obj: Any) -> Any:
 
 
 def report_from_dict(d: dict[str, Any]) -> ReportData:
-    """Reconstruct a `ReportData` from a JSON-shaped dict."""
     return ReportData(
         metadata=_metadata_from_dict(d['metadata']),
         scenarios=[_scenario_from_dict(s) for s in d['scenarios']],

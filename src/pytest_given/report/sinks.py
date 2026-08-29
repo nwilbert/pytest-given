@@ -85,7 +85,6 @@ def render_sinks(
 
 
 def write_sinks(rendered: RenderedSinks) -> None:
-    """Write every rendered sink, creating parent directories as needed."""
     for path, text in rendered.files:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding='utf-8')

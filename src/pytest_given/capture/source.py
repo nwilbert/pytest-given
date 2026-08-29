@@ -135,9 +135,6 @@ def capture_caller_source(skip: int = 1) -> SourceLocation | None:
     Use `skip=2` when called from a one-level-deep user-facing wrapper (e.g.
     `g.actor("Guest")` -> wrapper -> this helper) so frame 2 is the user's
     code.
-
-    Returns None if rootdir is unset, or if the caller's file resolves to a
-    path outside rootdir.
     """
     frame = sys._getframe(skip)
     abs_path = _co_filename_to_path(frame.f_code.co_filename)
@@ -172,8 +169,8 @@ def item_source(relpath_raw: str, line: int) -> SourceLocation:
     Windows path. `to_relpath` rewrites it to the native convention and
     re-relativizes against rootdir. Unlike `capture_caller_source`, this always
     returns a location: an absolute path outside rootdir (or unset rootdir)
-    degrades to the path as given rather than to "no link", matching the prior
-    behavior where every scenario carried a source.
+    degrades to the path as given rather than to "no link", so every scenario
+    carries a source.
     """
     return SourceLocation(relpath=to_relpath(relpath_raw), line=line)
 
@@ -191,9 +188,6 @@ def code_source(code: types.CodeType) -> SourceLocation | None:
 
 
 def file_source(path: Path, line: int) -> SourceLocation | None:
-    """SourceLocation for a known file path + line (e.g. a glossary table row).
-
-    Mirrors `capture_caller_source` but for a path we already hold rather than
-    a stack frame. Returns None if rootdir is unset or the file is outside it.
-    """
+    """`capture_caller_source` for a path already in hand rather than a stack
+    frame — a glossary table row, say."""
     return _optional_source(path, line)

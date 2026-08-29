@@ -61,10 +61,9 @@ def _load_report(json_file: Path) -> tuple[ReportData, dict[str, Any]]:
     """Deserialize the input file, mapping a shape mismatch to a
     `PytestGivenError`.
 
-    Returns the model *and* the dict it was built from: `render_sinks` takes
-    both, and this file is already the serialized report — re-deriving it with
-    `report_to_dict` would be work the caller has in hand, and would hand the
-    JSON sink a round-tripped copy rather than what was actually read.
+    Returns the model *and* the dict it was built from, because the file is
+    already the serialized report: re-deriving it with `report_to_dict` would
+    hand the JSON sink a round-tripped copy rather than what was read.
 
     `report_from_dict` indexes whatever it is handed, so a file that parses as
     JSON but is not a pytest-given report surfaces as a builtin from deep inside

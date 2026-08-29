@@ -44,12 +44,10 @@ _collector_var: ContextVar[Collector | None] = ContextVar('collector', default=N
 
 
 def set_active_collector(collector: Collector | None) -> None:
-    """Set the active collector for the current thread."""
     _collector_var.set(collector)
 
 
 def get_active_collector() -> Collector | None:
-    """Get the active collector for the current thread, or None."""
     return _collector_var.get()
 
 
@@ -64,11 +62,8 @@ def no_scenario_error(action: str) -> PytestGivenError:
 
 
 class Collector:
-    """Collects step data during test execution.
-
-    Maintains a stack of active steps. Context managers push/pop steps.
-    Nested context managers create child steps.
-    """
+    """Accumulates a session's scenarios, and the open step stack each one is
+    recorded into."""
 
     def __init__(self) -> None:
         self._scenarios: list[Scenario] = []

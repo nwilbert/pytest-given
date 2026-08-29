@@ -21,7 +21,6 @@ type StepSignature = tuple[tuple[Phase, StepSignature], ...]
 def walk_steps(
     steps: list[Step], prefix: StepPath = ()
 ) -> Iterator[tuple[StepPath, Step]]:
-    """Depth-first walk yielding `(index_path, step)` for every step in the tree."""
     for index, step in enumerate(steps):
         path = (*prefix, index)
         yield path, step

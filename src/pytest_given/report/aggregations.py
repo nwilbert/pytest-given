@@ -114,7 +114,6 @@ class StoryRollup:
 
 
 def tab_visibility(report: ReportData) -> dict[str, bool]:
-    """Return a dict of tab-name → visible bool for the report UI."""
     return {
         'scenarios': True,
         'stories': bool(report.stories),
@@ -125,12 +124,8 @@ def tab_visibility(report: ReportData) -> dict[str, bool]:
 def build_coverage_maps(
     report: ReportData,
 ) -> dict[NodeId, dict[ActivityId, set[StepRef]]]:
-    """Compute per-scenario coverage maps.
-
-    Returns a dict keyed by scenario node id; each value is the result of
-    `compute_coverage` for that scenario (or an empty dict when the scenario
-    has no story_id or the report has no glossary).
-    """
+    """Every scenario's coverage map, keyed by node id — empty for one bound to
+    no story, or a report carrying no glossary to match term refs against."""
     glossary = report.glossary
     story_index: dict[StoryId, Story] = {s.id: s for s in report.stories}
     result: dict[NodeId, dict[ActivityId, set[StepRef]]] = {}

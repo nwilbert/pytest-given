@@ -97,7 +97,7 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
-    """Give the session its own collector."""
+    """Give the session its own collector and hook bookkeeping."""
     collector = Collector()
     collector.capture_step_source = session.config.stash[given_config_key].lint_enabled
     session.config.stash[collector_key] = collector
