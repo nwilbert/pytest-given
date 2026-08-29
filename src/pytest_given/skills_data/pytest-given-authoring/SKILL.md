@@ -36,12 +36,10 @@ Read the guide for the artifact you are about to touch — not all of them:
 
 ## Adoption levels
 
-Each artifact kind stands on its own — scenarios-only is a perfectly good adoption level. They compound when combined: scenarios narrate in glossary vocabulary (term refs render as kind-colored words and power per-term filtering), and stories give the actor-level view that scenarios link into for coverage.
+Each artifact kind stands on its own — scenarios-only is a perfectly good level — and they compound: scenarios narrate in glossary vocabulary (term refs render as kind-colored words and power per-term filtering), and stories give the actor-level view scenarios link into for coverage. Where to start depends on the project:
 
-The natural adoption order depends on the project:
-
-- **Existing codebase** — start with scenarios: decorate the tests that assert behavior, and let glossary terms emerge from their narration.
-- **Greenfield** — consider starting with stories: transfer the results of Domain Storytelling sessions with stakeholders into `story(...)` code before any scenarios exist, so domain understanding and vocabulary are established up front.
+- **Existing codebase** — scenarios: decorate the tests that assert behavior, and let glossary terms emerge from their narration.
+- **Greenfield** — consider stories first, transferring Domain Storytelling sessions with stakeholders into `story(...)` code before any scenarios exist, so domain understanding and vocabulary are established up front.
 - **Glossary** — adopt an existing `GLOSSARY.md` via `FileGlossary`, or discover terms from scenarios and stories along the way.
 
 ## Verify before committing

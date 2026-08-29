@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-29T17:51:26.149315+00:00",
+    "timestamp": "2026-08-29T18:00:48.557213+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "61e78325abe7afaa0f046e926451ecf64cb13973",
+    "commit_sha": "49da310374b96e4beee6297e7587e2e98b61d1ea",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -14922,7 +14922,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -18052,7 +18052,7 @@
         "id": "fixture-recording",
         "kind": "object",
         "canonical": "Fixture recording",
-        "definition": "A captured subtree of steps + attachments produced while a step fixture is being set up (and, for generator fixtures, torn down). Stored keyed by fixture-instance identity.",
+        "definition": "A captured subtree of steps + attachments produced while a step fixture is being set up. Stored keyed by fixture-instance identity. A generator fixture's teardown records nothing \u2014 it refuses steps and attachments.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 37
@@ -18072,7 +18072,7 @@
         "id": "collector",
         "kind": "actor",
         "canonical": "Collector",
-        "definition": "The module-level singleton that accumulates scenarios, fixture recordings, and parameter info during a pytest session. Reset at the start of each session.",
+        "definition": "The per-session object accumulating scenarios, fixture recordings, and parameter info, published through a `ContextVar` so a nested run can displace and restore it.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 44

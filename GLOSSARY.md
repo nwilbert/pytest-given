@@ -34,14 +34,14 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 |---|---|
 | **Step fixture** | A pytest fixture whose function is wrapped with `@given(text)`. Only `@given` is allowed on fixtures; `@when` / `@then` are rejected. |
 | **Plain fixture** | A pytest fixture without a pytest-given decorator. Used by tests but produces no step in the report. |
-| **Fixture recording** | A captured subtree of steps + attachments produced while a step fixture is being set up (and, for generator fixtures, torn down). Stored keyed by fixture-instance identity. |
+| **Fixture recording** | A captured subtree of steps + attachments produced while a step fixture is being set up. Stored keyed by fixture-instance identity. A generator fixture's teardown records nothing — it refuses steps and attachments. |
 | **Graft** | Attaching a fixture recording into the active scenario's step tree at the moment its host test starts. |
 
 ## Collector state
 
 | Term | Meaning |
 |---|---|
-| **Collector** | The module-level singleton that accumulates scenarios, fixture recordings, and parameter info during a pytest session. Reset at the start of each session. |
+| **Collector** | The per-session object accumulating scenarios, fixture recordings, and parameter info, published through a `ContextVar` so a nested run can displace and restore it. |
 | **Active scenario** | The scenario currently being recorded into; tracked by node ID. |
 | **Node ID** | A pytest test identifier (e.g., `tests/test_x.py::test_y[a-b]`). Used as a key throughout the collector. |
 | **Step stack** | The chain of currently-open steps; entered by `with given(...)`, popped on exit. Mirrored inside a fixture recording while a fixture body is running. |
