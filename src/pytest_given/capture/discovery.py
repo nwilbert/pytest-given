@@ -11,6 +11,7 @@ from pathlib import Path
 
 from ..model import Glossary, PytestGivenError, Story
 from .file_glossary import FileGlossary
+from .story import merge_glossaries
 
 
 def resolve_glossary(
@@ -29,9 +30,7 @@ def resolve_glossary(
     the suite that declares a glossary and only ever uses term refs in
     narrations.
     """
-    reaching: dict[int, Glossary] = {}
-    for story in stories:
-        reaching.update(story._glossaries)
+    reaching = merge_glossaries(story._glossaries for story in stories)
     if len(reaching) > 1:
         raise PytestGivenError(
             f'stories reach {len(reaching)} distinct Glossary instances; '

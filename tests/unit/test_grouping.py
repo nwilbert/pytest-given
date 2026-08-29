@@ -2671,3 +2671,14 @@ def test_part_key_rejects_unknown_variant() -> None:
     with pytest.raises(AssertionError):
         checks._part_key(cast(Any, object()))
 
+
+def test_templatize_part_rejects_unknown_variant() -> None:
+    # The exhaustive match guards against a NarrationPart variant being added
+    # without a promotion branch (silently kept as the baseline's). assert_never
+    # fires at runtime.
+    anchor = Scenario(id=NodeId('t::x'), narration=Narration(text='x'), module='m')
+    ctx = columns.GroupContext(
+        param_names=[], comparable=[], anchor=anchor, case_params={}
+    )
+    with pytest.raises(AssertionError):
+        templatize._templatize_part(cast(Any, object()), 0, (0,), 'given', ctx)

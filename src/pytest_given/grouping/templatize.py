@@ -8,6 +8,7 @@ so has nothing to be compared against.
 """
 
 from dataclasses import replace
+from typing import assert_never
 
 from ..model import (
     Attachment,
@@ -88,12 +89,9 @@ def _templatize_attachments(
 
 
 def _by_label(step: Step) -> dict[str, list[Attachment]]:
-    """That step's attachments grouped by label, in the order it recorded them.
-
-    The one shape everything below reads: a count is a `len`, an occurrence is
-    an index, and a label the case never attached is a missing key. (A recorded
-    tree holds no `AttachmentRef`s, so nothing here is content-less.)
-    """
+    """That step's attachments grouped by label, in the order it recorded them —
+    the one shape everything below reads: a count is a `len`, an occurrence an
+    index, and a label the case never attached a missing key."""
     out: dict[str, list[Attachment]] = {}
     for attachment in step.attachments:
         assert isinstance(attachment, Attachment), 'a recorded tree holds no refs'
@@ -151,10 +149,7 @@ def _promote_extra_occurrences(
     The count comes from `baseline`, never from `others[first case]`: the
     baseline is the first *passed* case, so a skipped first case would put the
     range at 0 and re-promote occurrences the baseline already carries a badge
-    for. The baseline is itself one of `others` — it passed, and trivially
-    matches its own structure signature — so `max` never falls below its own
-    count. With no passed case at all `others` is empty and there is nothing
-    past a baseline nobody can be compared to.
+    for.
     """
     for occurrence in range(len(baseline.get(label, [])), _max_count(label, others)):
         column = ctx.new_column('attachment', label)
@@ -200,31 +195,49 @@ def _templatize_step_narration(
 def _templatize_part(
     part: NarrationPart, index: int, path: StepPath, phase: Phase, ctx: GroupContext
 ) -> NarrationPart:
-    independent = _case_independent_part(part, ctx.param_names)
-    if independent is not None:
-        if isinstance(part, NarrationValue) and isinstance(
-            independent, NarrationPlaceholder
-        ):
-            return _templatize_param_value(part, independent, index, path, ctx)
-        if isinstance(independent, NarrationPlaceholder):
+    """One baseline part, against the same position in every comparable case.
+
+    A literal has nothing that could vary. What the rest do differs by kind —
+    and for a value by whether a parametrize column binds it, since the column
+    already holds every case's and the slot is compared against that cell
+    rather than against the cases.
+    """
+    match part:
+        case NarrationLiteral():
+            return part
+        case NarrationValue(expression=expression) if expression in ctx.param_names:
+            return _templatize_param_value(part, index, path, ctx)
+        case NarrationValue():
+            return _templatize_value(part, index, path, phase, ctx)
+        case NarrationPlaceholder(name=name):
+            if name not in ctx.param_names:
+                raise placeholder_mismatch(name, ctx.param_names)
             # A `Template` slot in a step body (an `Annotated[..., given(...)]`
             # label). It records no per-case rendering, so it reconciles the
             # way the scenario name's slots do rather than the way a
             # `NarrationValue` does.
-            return _reconciled_slot(independent, ctx)
-        return independent
-    if isinstance(part, NarrationValue):
-        return _templatize_value(part, index, path, phase, ctx)
-    assert isinstance(part, NarrationTermRef), (
-        'a literal or placeholder is case-independent by definition'
+            return _reconciled_slot(part, ctx)
+        case NarrationTermRef():
+            # Rule 4 requires it to read identically across cases whether a
+            # column binds it or not, so it is always compared.
+            check_constant_term_ref(part, index, path, phase, ctx)
+            return part
+        case _:
+            assert_never(part)
+
+
+def _param_slot(part: NarrationValue) -> NarrationPlaceholder:
+    """The `param` column slot an interpolation of that column's value becomes."""
+    return NarrationPlaceholder(
+        name=part.expression,
+        column_id=part.expression,
+        format_spec=part.format_spec,
+        conversion=part.conversion,
     )
-    check_constant_term_ref(part, index, path, phase, ctx)
-    return part
 
 
 def _templatize_param_value(
     part: NarrationValue,
-    placeholder: NarrationPlaceholder,
     index: int,
     path: StepPath,
     ctx: GroupContext,
@@ -245,7 +258,7 @@ def _templatize_param_value(
     }
     column = _promoted_column(rendered, part.expression, part.expression, ctx)
     if column is None:
-        return placeholder
+        return _param_slot(part)
     return NarrationPlaceholder(
         name=column.name,
         column_id=column.id,
@@ -282,36 +295,6 @@ def _templatize_value(
     )
 
 
-def _case_independent_part(
-    part: NarrationPart, param_names: list[str]
-) -> NarrationPart | None:
-    """The part as it stands when no other case has a say in it, or None when
-    it has to be compared against them first.
-
-    A literal is one by definition, and so is a *value* a parametrize column
-    binds — the column already holds every case's. A term ref never is: rule 4
-    requires it to read identically across cases whether a column binds it or
-    not, so it always goes on to be compared.
-    """
-    match part:
-        case NarrationLiteral():
-            return part
-        case NarrationValue(expression=expression, format_spec=fs, conversion=conv):
-            if expression not in param_names:
-                return None
-            return NarrationPlaceholder(
-                name=expression,
-                column_id=expression,
-                format_spec=fs,
-                conversion=conv,
-            )
-        case NarrationPlaceholder(name=name):
-            if name not in param_names:
-                raise placeholder_mismatch(name, param_names)
-            return part
-    return None
-
-
 def _value_at(step: Step, index: int) -> str:
     """That case's rendering of the interpolation at `index`.
 
@@ -334,15 +317,23 @@ def templatize_narration(
 
     For the **scenario** narration only — a name is evaluated once at
     decoration time, so it cannot vary and has nothing to be compared against.
-    That makes it exactly `_case_independent_part` and nothing else: a part no
-    parametrize column binds stays verbatim.
+    Every part therefore stays verbatim but the one a parametrize column binds.
     """
     if not narration.parts:
         return narration
-    out = [
-        _case_independent_part(part, param_names) or part for part in narration.parts
-    ]
+    out = [_name_part(part, param_names) for part in narration.parts]
     return Narration(text=narration_text(out), parts=out)
+
+
+def _name_part(part: NarrationPart, param_names: list[str]) -> NarrationPart:
+    """One part of a scenario name: a value a column binds becomes that column's
+    slot, a placeholder has to name a column, everything else stands."""
+    match part:
+        case NarrationValue(expression=expression) if expression in param_names:
+            return _param_slot(part)
+        case NarrationPlaceholder(name=name) if name not in param_names:
+            raise placeholder_mismatch(name, param_names)
+    return part
 
 
 def reconcile_name_slots(

@@ -294,11 +294,12 @@ class _GlossaryIndex:
         term = self._glossary.get(term_id)
         if term is None or term.kind not in ('actor', 'object'):
             return
-        agg = self._agg(term_id)
         if display == term.canonical or (term_id, display) in self._instances:
             return
         self._instances.add((term_id, display))
-        agg.instances.append(TermOccurrence(display=display, fixture_name=fixture_name))
+        self._agg(term_id).instances.append(
+            TermOccurrence(display=display, fixture_name=fixture_name)
+        )
 
     def record_form(self, term_id: TermId, display: str) -> None:
         """Note one surface form of a verb term.

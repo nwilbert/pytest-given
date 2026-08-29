@@ -1,6 +1,6 @@
 """Scenario ↔ story-activity coverage matching."""
 
-from typing import NamedTuple
+from typing import NamedTuple, assert_never
 
 from ..model import (
     Activity,
@@ -60,6 +60,8 @@ def identity_of_part(
             )
         case ActivityWord():
             return None
+        case _:
+            assert_never(part)
 
 
 def a_refs(glossary: Glossary, activity: Activity) -> set[Identity]:
@@ -105,15 +107,12 @@ def s_for_step(glossary: Glossary, step: Step) -> set[Identity]:
         term = glossary.get(part.term_id)
         if term is None:
             continue
+        out.add(Identity(term_id=part.term_id, instance_id=None))
         if term.kind == 'verb':
-            out.add(Identity(term_id=part.term_id, instance_id=None))
             continue
-        inst_id = instance_id_of(glossary, part.term_id, part.display)
-        if inst_id is None:
-            out.add(Identity(term_id=part.term_id, instance_id=None))
-        else:
-            out.add(Identity(term_id=part.term_id, instance_id=inst_id))
-            out.add(Identity(term_id=part.term_id, instance_id=None))
+        instance_id = instance_id_of(glossary, part.term_id, part.display)
+        if instance_id is not None:
+            out.add(Identity(term_id=part.term_id, instance_id=instance_id))
     return out
 
 

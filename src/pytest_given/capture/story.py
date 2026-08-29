@@ -106,7 +106,7 @@ def activity(
         paths = tuple(p for p in parts_or_paths if isinstance(p, ActivityPath))
     else:
         paths = (path(*parts_or_paths),)  # type: ignore[arg-type]
-    glossaries = _merge_glossaries(p._glossaries for p in paths)
+    glossaries = merge_glossaries(p._glossaries for p in paths)
     if activity_id == 0:
         raise PytestGivenError(
             'activity(activity_id=0) is reserved as the unset sentinel; '
@@ -120,7 +120,7 @@ def activity(
     return a
 
 
-def _merge_glossaries(
+def merge_glossaries(
     stashes: Iterable[dict[int, Glossary]],
 ) -> dict[int, Glossary]:
     """Union the id→Glossary stashes of several paths/activities, deduping by
@@ -170,7 +170,7 @@ def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     source = capture_caller_source(skip=2)
     numbered = _assign_sequence_numbers(tuple(activities))
     _check_unique_ids(numbered)
-    glossaries = _merge_glossaries(a._glossaries for a in numbered)
+    glossaries = merge_glossaries(a._glossaries for a in numbered)
     _check_single_glossary(title, glossaries)
     result = Story(id=sid, title=title, activities=numbered, source=source)
     # Carry the story's glossary on the tree so discovery.resolve_glossary can
