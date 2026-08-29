@@ -2,6 +2,8 @@ import json
 
 import pytest
 
+from pytest_given.plugin import session
+
 
 def test_basic_scenario_generates_json(pytester, tmp_path):
     """A simple @scenario test produces JSON output."""
@@ -2386,3 +2388,60 @@ def test_group_parametrized_false_emits_one_scenario_per_case(pytester, tmp_path
         'Brew 300 ml [300]',
     ]
     assert all(s['parameters'] is None for s in data['scenarios'])
+
+
+_SIMPLE_SCENARIO = """
+    from pytest_given import scenario, given, when, then
+
+    @scenario("My scenario")
+    def test_example():
+        with given("a value"):
+            x = 1
+        with when("I double it"):
+            result = x * 2
+        with then("it is 2"):
+            assert result == 2
+    """
+
+
+def test_bare_run_does_no_report_rendering_work(pytester, tmp_path, monkeypatch):
+    """A run with no sink configured skips the sink-only work.
+
+    Counted rather than asserted absent, so the same spy shows it still
+    happening when a sink is configured.
+    """
+    calls: list[str] = []
+
+    def spy() -> str | None:
+        calls.append('called')
+        return None
+
+    monkeypatch.setattr(session, 'detect_commit_sha', spy)
+    pytester.makepyfile(_SIMPLE_SCENARIO)
+
+    pytester.runpytest().assert_outcomes(passed=1)
+    assert calls == []
+
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(passed=1)
+    assert len(calls) == 1
+    assert json_path.exists()
+
+
+def test_bare_run_still_enforces_the_grouping_rules(pytester):
+    """The grouping pass runs whether or not a sink is configured."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then
+
+        @scenario("Brew")
+        @pytest.mark.parametrize('cup_size', [200, 300])
+        def test_brew(cup_size):
+            with then(f'it brews {cup_size} ml'):
+                assert cup_size
+        """
+    )
+    result = pytester.runpytest()
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*records no parts*'])

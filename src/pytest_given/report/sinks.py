@@ -45,6 +45,11 @@ class SinkConfig:
             if path is not None
         ]
 
+    def writes_anything(self) -> bool:
+        """Whether any sink is configured — `file_paths()` plus stdout Markdown,
+        which writes no file but still has to be rendered."""
+        return bool(self.file_paths()) or self.md_to_stdout
+
 
 @dataclass(frozen=True)
 class RenderedSinks:

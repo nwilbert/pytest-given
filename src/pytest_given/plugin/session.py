@@ -160,12 +160,26 @@ def _build_report(
     session: pytest.Session, collector: Collector, param_info: ParamInfo
 ) -> _SessionReport:
     """Group, resolve, and render — everything that can fail, and nothing that
-    touches the filesystem."""
+    touches the filesystem.
+
+    Grouping and the glossary passes run on every run — each refuses its own
+    authoring forms. Everything after them is sink-only work (the metadata
+    shells out to git; the round trip and renderers walk the report again), so
+    a run with no sink skips it and keeps just what the lint reads.
+    """
     scenarios = group_parametrized(collector.scenarios, param_info)
     stories = collector.stories
     glossary = resolve_glossary(stories, session.config.pluginmanager.get_plugins())
     if glossary is not None:
         glossary = infer_glossary_kinds(glossary, stories)
+    sink_config = _sink_config(session.config)
+    if not sink_config.writes_anything():
+        return _SessionReport(
+            scenarios=scenarios,
+            glossary=glossary,
+            stories=stories,
+            sinks=RenderedSinks(),
+        )
     report = ReportData(
         metadata=Metadata(
             project=session.config.rootpath.name,
@@ -181,7 +195,7 @@ def _build_report(
     )
     report_dict = report_to_dict(report)
     rendered = report_from_dict(report_dict)  # serde round-trip = fidelity guarantee
-    sinks = render_sinks(rendered, report_dict, _sink_config(session.config))
+    sinks = render_sinks(rendered, report_dict, sink_config)
     return _SessionReport(
         scenarios=scenarios,
         glossary=glossary,
