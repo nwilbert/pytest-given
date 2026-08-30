@@ -1,9 +1,10 @@
 import subprocess
 from pathlib import Path
+from typing import Annotated
 
 import pytest
 
-from pytest_given import given, scenario, then, when, when_then
+from pytest_given import Template, given, scenario, then, when, when_then
 from pytest_given.model import PytestGivenError, SourceLocation
 from pytest_given.report.source_link import (
     compile_source_link,
@@ -43,25 +44,23 @@ def test_resolve_template_empty_returns_none() -> None:
 @scenario(
     t"A named editor preset becomes that editor's {pg['Source link'].low} template"
 )
-def test_resolve_template_vscode_preset() -> None:
-    with given('the config set to a named editor preset'):
-        value = 'vscode'
+@pytest.mark.parametrize(
+    ('preset', 'url_scheme'),
+    [
+        ('vscode', 'vscode://file/{path}:{line}'),
+        ('cursor', 'cursor://file/{path}:{line}'),
+        ('zed', 'zed://file/{path}:{line}'),
+        ('pycharm', 'pycharm://open?file={path}&line={line}'),
+    ],
+)
+def test_resolve_template_editor_preset(
+    preset: Annotated[str, given(Template('the config set to the {preset} preset'))],
+    url_scheme: str,
+) -> None:
     with when('the config value is resolved'):
-        template = resolve_template(value)
+        template = resolve_template(preset)
     with then("the template is that editor's URL scheme"):
-        assert template == 'vscode://file/{path}:{line}'
-
-
-def test_resolve_template_cursor_preset() -> None:
-    assert resolve_template('cursor') == 'cursor://file/{path}:{line}'
-
-
-def test_resolve_template_zed_preset() -> None:
-    assert resolve_template('zed') == 'zed://file/{path}:{line}'
-
-
-def test_resolve_template_pycharm_preset() -> None:
-    assert resolve_template('pycharm') == 'pycharm://open?file={path}&line={line}'
+        assert template == url_scheme
 
 
 @scenario(t'A raw URL template is used as the {pg["Source link"].low} verbatim')
@@ -341,22 +340,20 @@ def _clear_ci_vars(monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv(var, raising=False)
 
 
-def test_detect_commit_sha_github_env(monkeypatch: pytest.MonkeyPatch) -> None:
+@pytest.mark.parametrize(
+    ('env_var', 'sha'),
+    [
+        ('GITHUB_SHA', 'abc123'),
+        ('CI_COMMIT_SHA', 'def456'),
+        ('BUILDKITE_COMMIT', '7890ab'),
+    ],
+)
+def test_detect_commit_sha_from_a_ci_env_var(
+    monkeypatch: pytest.MonkeyPatch, env_var: str, sha: str
+) -> None:
     _clear_ci_vars(monkeypatch)
-    monkeypatch.setenv('GITHUB_SHA', 'abc123')
-    assert detect_commit_sha() == 'abc123'
-
-
-def test_detect_commit_sha_gitlab_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    _clear_ci_vars(monkeypatch)
-    monkeypatch.setenv('CI_COMMIT_SHA', 'def456')
-    assert detect_commit_sha() == 'def456'
-
-
-def test_detect_commit_sha_buildkite_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    _clear_ci_vars(monkeypatch)
-    monkeypatch.setenv('BUILDKITE_COMMIT', '7890ab')
-    assert detect_commit_sha() == '7890ab'
+    monkeypatch.setenv(env_var, sha)
+    assert detect_commit_sha() == sha
 
 
 def test_detect_commit_sha_priority_github_over_gitlab(

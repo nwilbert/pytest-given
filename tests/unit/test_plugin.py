@@ -368,10 +368,6 @@ def test_get_scenario_marker_returns_none_for_item_without_function() -> None:
     assert collection.scenario_marker(item) is None
 
 
-def test_extract_skip_reason_parses_canonical_tuple() -> None:
-    assert runtest._extract_skip_reason(('t.py', 12, 'Skipped: because')) == 'because'
-
-
 def test_extract_skip_reason_strips_prefix_when_present() -> None:
     assert runtest._extract_skip_reason(('t.py', 12, 'Skipped: mid-test')) == 'mid-test'
 

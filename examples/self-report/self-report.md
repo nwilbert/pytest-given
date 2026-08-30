@@ -75,8 +75,25 @@
 - **then** the run says no report was written, naming the sink
 - **then** the stale files are gone rather than left reading as current
 
+## ✓ An unknown «source link» preset stops the run before it collects
+`tests/integration/test_plugin.py:435::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
+
+- **given** a suite that would otherwise pass
+  - 📎 suite:
+    ```
+    from pytest_given import scenario, then
+    
+    @scenario("Brew")
+    def test_brew():
+        with then("it brews"):
+            assert True
+    ```
+- **when** the suite runs with a misspelled «source link» preset
+- **then** the run ends as a usage error, naming the preset
+- **then** no test ran: the run stopped at configure, before collection
+
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2217::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2226::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -99,14 +116,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2230::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2239::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2251::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2260::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -114,7 +131,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2283::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2292::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -133,8 +150,17 @@
 - **then** the run fails, naming the offending form
 - **then** not one sink is written, and no traceback escapes
 
+## ✓ `--given-title` names the «report» instead of the rootdir
+`tests/integration/test_plugin.py:2321::test_given_title_cli_flag_names_the_report`
+
+- **given** a suite with one «scenario»
+- **when** the suite runs with --given-title
+- **then** the test passes
+- **then** the title reaches the JSON metadata
+- **then** the title also heads the Markdown rendering
+
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:2486::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:2501::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -997,34 +1023,42 @@
 - **then** the span unwraps once and its contents stay literal
 
 ## ✓ A «step» pairs its «narration» with a «phase»
-`tests/unit/capture/test_step_descriptor.py:58::test_context_manager_basic`
+`tests/unit/capture/test_step_descriptor.py:59::test_context_manager_basic`
 
 - **when** a given «Step» descriptor is created
 - **then** it carries the given «Phase» and its «Narration»
 
+## ✓ A «step» opened outside a «scenario» warns rather than raising
+`tests/unit/capture/test_step_descriptor.py:151::test_context_manager_unannotated_test_warns_instead_of_raises`
+
+- **given** a «collector» recording inside an undecorated test
+- **when** a given «step» is opened against it
+- **then** a `PytestGivenWarning` is raised, not an error
+- **then** it names the missing `@scenario`, so a suite can filter it
+
 ## ✓ «when_then» records the action and its outcome as siblings
-`tests/unit/capture/test_step_descriptor.py:266::test_when_then_records_two_sibling_steps_on_clean_exit`
+`tests/unit/capture/test_step_descriptor.py:279::test_when_then_records_two_sibling_steps_on_clean_exit`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a «when_then» block exits cleanly
 - **then** a when and a sibling then «Step» are recorded
 
 ## ✓ «when_then» pairs with an inner pytest.raises
-`tests/unit/capture/test_step_descriptor.py:291::test_when_then_pairs_with_inner_pytest_raises`
+`tests/unit/capture/test_step_descriptor.py:304::test_when_then_pairs_with_inner_pytest_raises`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises and an inner pytest.raises swallows it
 - **then** both sibling steps are still recorded
 
 ## ✓ «when_then» omits the then when the body raises uncaught
-`tests/unit/capture/test_step_descriptor.py:319::test_when_then_omits_then_when_body_raises_uncaught` · validation
+`tests/unit/capture/test_step_descriptor.py:332::test_when_then_omits_then_when_body_raises_uncaught` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises with nothing catching inside
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ A cross-phase «step» cannot open inside a «when_then» body · 2 cases
-`tests/unit/capture/test_step_descriptor.py:361::test_when_then_rejects_cross_phase_nested_step` · validation
+`tests/unit/capture/test_step_descriptor.py:374::test_when_then_rejects_cross_phase_nested_step` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a given or then opens inside the «when_then» body
@@ -1037,14 +1071,22 @@
 | then | ✓ |
 
 ## ✓ A nested when becomes a child of the «when_then» action
-`tests/unit/capture/test_step_descriptor.py:393::test_when_then_allows_nested_when_as_child_sub_step`
+`tests/unit/capture/test_step_descriptor.py:406::test_when_then_allows_nested_when_as_child_sub_step`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a when opens inside the «when_then» body
 - **then** the sub-action is a child of the action and the then still follows
 
+## ✓ `@scenario` marks the test function without wrapping it
+`tests/unit/capture/test_step_descriptor.py:450::test_scenario_marks_the_function_without_wrapping_it`
+
+- **given** a test function taking one fixture
+- **when** the function is decorated
+- **then** the very same function comes back, keeping its signature
+- **then** it carries the «scenario» marker, and a plain one does not
+
 ## ✓ An «attachment» label must be plain text · 3 cases
-`tests/unit/capture/test_step_descriptor.py:502::test_attach_rejects_a_non_str_label` · validation
+`tests/unit/capture/test_step_descriptor.py:520::test_attach_rejects_a_non_str_label` · validation
 
 - **given** a non-str «Attachment» label of kind {label_kind}
 - **when** it is attached
@@ -1055,6 +1097,13 @@
 | deferred-template | ✓ |
 | t-string | ✓ |
 | not-a-string | ✓ |
+
+## ✓ A string `activities=` argument is refused by `@scenario`
+`tests/unit/capture/test_step_descriptor.py:911::test_scenario_rejects_a_string_activities_argument` · validation
+
+- **given** a string where a sequence of «activity» ids goes
+- **when** the «scenario» is declared
+- **then** a `TypeError` naming the argument is raised
 
 ## ✓ An «actor» handle in a «path» becomes a «term ref»
 `tests/unit/capture/test_story.py:62::test_path_dispatches_actor_to_activity_term_ref`
@@ -1927,28 +1976,35 @@
 - **then** the heading is marked skipped and the reason follows the node id
 
 ## ✓ The literal `none` disables the «source link»
-`tests/unit/report/test_source_link.py:28::test_resolve_template_none_returns_none`
+`tests/unit/report/test_source_link.py:29::test_resolve_template_none_returns_none`
 
 - **given** the «source link» config set to `none`
 - **when** the config value is resolved
 - **then** no template comes back, so no link is rendered
 
-## ✓ A named editor preset becomes that editor's «source link» template
-`tests/unit/report/test_source_link.py:43::test_resolve_template_vscode_preset`
+## ✓ A named editor preset becomes that editor's «source link» template · 4 cases
+`tests/unit/report/test_source_link.py:44::test_resolve_template_editor_preset`
 
-- **given** the config set to a named editor preset
+- **given** the config set to the {preset} preset
 - **when** the config value is resolved
 - **then** the template is that editor's URL scheme
 
+| preset | url_scheme | |
+|---|---|---|
+| vscode | vscode://file/{path}:{line} | ✓ |
+| cursor | cursor://file/{path}:{line} | ✓ |
+| zed | zed://file/{path}:{line} | ✓ |
+| pycharm | pycharm://open?file={path}&line={line} | ✓ |
+
 ## ✓ A raw URL template is used as the «source link» verbatim
-`tests/unit/report/test_source_link.py:67::test_resolve_template_raw_template_passes_through`
+`tests/unit/report/test_source_link.py:66::test_resolve_template_raw_template_passes_through`
 
 - **given** a raw blob-URL template rather than a preset name
 - **when** the config value is resolved
 - **then** it comes back unchanged
 
 ## ✓ An unknown preset name is refused, with the valid ones listed
-`tests/unit/report/test_source_link.py:77::test_resolve_template_unknown_preset_raises` · diagnostics
+`tests/unit/report/test_source_link.py:76::test_resolve_template_unknown_preset_raises` · diagnostics
 
 - **given** a bareword that is neither a known preset nor a template
 - **when** the config value is resolved
@@ -1956,7 +2012,7 @@
 - **then** the error names the offender and lists every valid preset
 
 ## ✓ The github preset prefers GITHUB_REPOSITORY over the git remote
-`tests/unit/report/test_source_link.py:112::test_resolve_github_preset_env_beats_remote`
+`tests/unit/report/test_source_link.py:111::test_resolve_github_preset_env_beats_remote`
 
 - **given** GITHUB_REPOSITORY naming one repository
 - **given** an origin remote naming a different one
@@ -1964,14 +2020,14 @@
 - **then** the template points at the environment's repository
 
 ## ✓ The github preset derives org and repo from the git origin remote
-`tests/unit/report/test_source_link.py:135::test_resolve_github_preset_from_https_remote`
+`tests/unit/report/test_source_link.py:134::test_resolve_github_preset_from_https_remote`
 
 - **given** no GITHUB_REPOSITORY, and an https origin remote
 - **when** the github preset is resolved
 - **then** the blob-URL template names the remote's org and repo
 
 ## ✓ The github preset refuses a remote that is not on GitHub
-`tests/unit/report/test_source_link.py:184::test_resolve_github_preset_non_github_remote_raises` · diagnostics
+`tests/unit/report/test_source_link.py:183::test_resolve_github_preset_non_github_remote_raises` · diagnostics
 
 - **given** no GITHUB_REPOSITORY, and an origin remote on another host
 - **when** the github preset is resolved

@@ -1,5 +1,6 @@
 import asyncio
 import inspect
+import warnings
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import cast
@@ -147,19 +148,31 @@ def test_context_manager_in_idle_collector_raises() -> None:
         set_active_collector(None)
 
 
+@scenario(
+    t'A {pg["Step"].low} opened outside a {pg["Scenario"].low} warns rather than '
+    t'raising'
+)
 def test_context_manager_unannotated_test_warns_instead_of_raises() -> None:
-    """When inside an unannotated test, soft-warn instead of raising."""
-    collector = Collector()
-    collector.inside_unannotated_test = True
-    set_active_collector(collector)
-    try:
-        with (
-            pytest.warns(PytestGivenWarning, match='without @scenario'),
-            StepDescriptor('given', 'noisy'),
-        ):
-            pass
-    finally:
-        set_active_collector(None)
+    with given(t'a {pg["Collector"].low} recording inside an undecorated test'):
+        collector = Collector()
+        collector.inside_unannotated_test = True
+    with when(t'a given {pg["Step"].low} is opened against it'):
+        # The swap is undone inside the step: this session's own collector is
+        # what the surrounding narration records onto.
+        outer = get_active_collector()
+        set_active_collector(collector)
+        try:
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter('always')
+                with StepDescriptor('given', 'noisy'):
+                    pass
+        finally:
+            set_active_collector(outer)
+    with then('a `PytestGivenWarning` is raised, not an error'):
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, PytestGivenWarning)
+    with then('it names the missing `@scenario`, so a suite can filter it'):
+        assert 'without @scenario' in str(caught[0].message)
 
 
 def test_when_then_warning_points_at_the_test_file() -> None:
@@ -434,6 +447,7 @@ def test_scenario_with_plain_str_keeps_name() -> None:
     assert isinstance(deco.name, str)
 
 
+@scenario(t'`@scenario` marks the test function without wrapping it')
 def test_scenario_marks_the_function_without_wrapping_it() -> None:
     """`@scenario` hands back the very function it was given.
 
@@ -442,19 +456,23 @@ def test_scenario_marks_the_function_without_wrapping_it() -> None:
     test requests, behind a `*args, **kwargs` shim.
     """
 
-    def brew(machine: object) -> None:
-        pass
+    with given('a test function taking one fixture'):
 
-    marked = scenario('Brew coffee')(brew)
+        def brew(machine: object) -> None:
+            pass
 
-    assert marked is brew
-    assert brew._scenario.name == 'Brew coffee'  # type: ignore[attr-defined]
-    assert list(inspect.signature(marked).parameters) == ['machine']
+    with when('the function is decorated'):
+        marked = scenario('Brew coffee')(brew)
+    with then('the very same function comes back, keeping its signature'):
+        assert marked is brew
+        assert list(inspect.signature(marked).parameters) == ['machine']
+    with then(t'it carries the {pg["Scenario"].low} marker, and a plain one does not'):
+        assert brew._scenario.name == 'Brew coffee'  # type: ignore[attr-defined]
 
-    def plain() -> None:
-        pass
+        def plain() -> None:
+            pass
 
-    assert getattr(plain, '_scenario', None) is None
+        assert getattr(plain, '_scenario', None) is None
 
 
 def test_scenario_with_template_keeps_template() -> None:
@@ -890,13 +908,25 @@ def test_step_descriptor_rejects_non_sequence_activity():
         given('x', activity=1.5)  # type: ignore[arg-type]
 
 
+@scenario(
+    t'A string `activities=` argument is refused by `@scenario`',
+    tags=['validation'],
+)
 def test_scenario_rejects_a_string_activities_argument():
     """`activities='13'` is a Sequence of str, so a bare comprehension would
     yield ActivityId('1'), ActivityId('3') and fail at collection with
     "activity id 1 not in story (valid: [1, 2])" — naming an id that visibly
     is in the valid list. Rejected at the decorator instead."""
-    with pytest.raises(TypeError, match='activities'):
-        scenario('x', activities='13')  # type: ignore[arg-type]
+    with given(t'a string where a sequence of {pg["Activity"]("activity")} ids goes'):
+        activities = '13'
+    with (
+        when_then(
+            t'the {pg["Scenario"].low} is declared',
+            'a `TypeError` naming the argument is raised',
+        ),
+        pytest.raises(TypeError, match='activities'),
+    ):
+        scenario('x', activities=activities)  # type: ignore[arg-type]
 
 
 def test_scenario_rejects_non_int_activities_members():

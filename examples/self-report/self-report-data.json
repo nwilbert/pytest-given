@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-30T16:30:48.818642+00:00",
+    "timestamp": "2026-08-30T16:57:16.781659+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "5fe4941eb63fda4d9da840287b68a2f24bea1082",
+    "commit_sha": "16a13494c3308f4a4c0973d6c250f1397368428c",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -26,7 +26,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -134,7 +134,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -270,7 +270,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -525,6 +525,104 @@
       "activity_ids": []
     },
     {
+      "id": "tests/integration/test_plugin.py::test_an_unknown_source_link_preset_fails_before_the_suite_runs",
+      "narration": {
+        "text": "An unknown source link preset stops the run before it collects",
+        "parts": [
+          {
+            "value": "An unknown "
+          },
+          {
+            "term_id": "source-link",
+            "display": "source link",
+            "expression": "pg[\"Source link\"].low"
+          },
+          {
+            "value": " preset stops the run before it collects"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 6,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite that would otherwise pass",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "from pytest_given import scenario, then\n\n@scenario(\"Brew\")\ndef test_brew():\n    with then(\"it brews\"):\n        assert True",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with a misspelled source link preset",
+            "parts": [
+              {
+                "value": "the suite runs with a misspelled "
+              },
+              {
+                "term_id": "source-link",
+                "display": "source link",
+                "expression": "pg[\"Source link\"].low"
+              },
+              {
+                "value": " preset"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the run ends as a usage error, naming the preset",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no test ran: the run stopped at configure, before collection",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 435
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "tests/integration/test_plugin.py::test_no_output_flags_writes_nothing",
       "narration": {
         "text": "A bare run writes no report at all",
@@ -545,7 +643,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -612,7 +710,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2217
+        "line": 2226
       },
       "story_id": null,
       "activity_ids": []
@@ -638,7 +736,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 19,
       "steps": [
         {
           "phase": "given",
@@ -688,7 +786,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2230
+        "line": 2239
       },
       "story_id": null,
       "activity_ids": []
@@ -714,7 +812,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 61,
+      "duration_ms": 78,
       "steps": [
         {
           "phase": "given",
@@ -775,7 +873,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2251
+        "line": 2260
       },
       "story_id": null,
       "activity_ids": []
@@ -800,7 +898,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -858,7 +956,105 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2283
+        "line": 2292
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin.py::test_given_title_cli_flag_names_the_report",
+      "narration": {
+        "text": "`--given-title` names the report instead of the rootdir",
+        "parts": [
+          {
+            "value": "`--given-title` names the "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].low"
+          },
+          {
+            "value": " instead of the rootdir"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 20,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite with one scenario",
+            "parts": [
+              {
+                "value": "a suite with one "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with --given-title",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the test passes",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the title reaches the JSON metadata",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the title also heads the Markdown rendering",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 2321
       },
       "story_id": null,
       "activity_ids": []
@@ -886,7 +1082,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -933,7 +1129,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2486
+        "line": 2501
       },
       "story_id": null,
       "activity_ids": []
@@ -956,7 +1152,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -1057,7 +1253,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -1156,7 +1352,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 32,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -8132,9 +8328,119 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 58
+        "line": 59
       },
       "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_step_descriptor.py::test_context_manager_unannotated_test_warns_instead_of_raises",
+      "narration": {
+        "text": "A step opened outside a scenario warns rather than raising",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low"
+          },
+          {
+            "value": " opened outside a "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].low"
+          },
+          {
+            "value": " warns rather than raising"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_step_descriptor",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a collector recording inside an undecorated test",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "collector",
+                "display": "collector",
+                "expression": "pg[\"Collector\"].low"
+              },
+              {
+                "value": " recording inside an undecorated test"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a given step is opened against it",
+            "parts": [
+              {
+                "value": "a given "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " is opened against it"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a `PytestGivenWarning` is raised, not an error",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it names the missing `@scenario`, so a suite can filter it",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_step_descriptor.py",
+        "line": 151
+      },
+      "story_id": null,
       "activity_ids": []
     },
     {
@@ -8239,7 +8545,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 266
+        "line": 279
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -8332,7 +8638,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 291
+        "line": 304
       },
       "story_id": null,
       "activity_ids": []
@@ -8427,7 +8733,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 319
+        "line": 332
       },
       "story_id": null,
       "activity_ids": []
@@ -8580,7 +8886,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 361
+        "line": 374
       },
       "story_id": null,
       "activity_ids": []
@@ -8678,9 +8984,91 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 393
+        "line": 406
       },
       "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_step_descriptor.py::test_scenario_marks_the_function_without_wrapping_it",
+      "narration": {
+        "text": "`@scenario` marks the test function without wrapping it",
+        "parts": [
+          {
+            "value": "`@scenario` marks the test function without wrapping it"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_step_descriptor",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a test function taking one fixture",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the function is decorated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the very same function comes back, keeping its signature",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it carries the scenario marker, and a plain one does not",
+            "parts": [
+              {
+                "value": "it carries the "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              },
+              {
+                "value": " marker, and a plain one does not"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_step_descriptor.py",
+        "line": 450
+      },
+      "story_id": null,
       "activity_ids": []
     },
     {
@@ -8812,7 +9200,92 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 502
+        "line": 520
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_step_descriptor.py::test_scenario_rejects_a_string_activities_argument",
+      "narration": {
+        "text": "A string `activities=` argument is refused by `@scenario`",
+        "parts": [
+          {
+            "value": "A string `activities=` argument is refused by `@scenario`"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_step_descriptor",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a string where a sequence of activity ids goes",
+            "parts": [
+              {
+                "value": "a string where a sequence of "
+              },
+              {
+                "term_id": "activity",
+                "display": "activity",
+                "expression": "pg[\"Activity\"](\"activity\")"
+              },
+              {
+                "value": " ids goes"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the scenario is declared",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              },
+              {
+                "value": " is declared"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a `TypeError` naming the argument is raised",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_step_descriptor.py",
+        "line": 911
       },
       "story_id": null,
       "activity_ids": []
@@ -18246,13 +18719,13 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
-        "line": 28
+        "line": 29
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_source_link.py::test_resolve_template_vscode_preset",
+      "id": "tests/unit/report/test_source_link.py::test_resolve_template_editor_preset[vscode-vscode://file/{path}:{line}]",
       "narration": {
         "text": "A named editor preset becomes that editor's source link template",
         "parts": [
@@ -18277,8 +18750,21 @@
         {
           "phase": "given",
           "narration": {
-            "text": "the config set to a named editor preset",
-            "parts": []
+            "text": "the config set to the {preset} preset",
+            "parts": [
+              {
+                "value": "the config set to the "
+              },
+              {
+                "name": "preset",
+                "column_id": "preset",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " preset"
+              }
+            ]
           },
           "children": [],
           "attachments": [],
@@ -18308,12 +18794,59 @@
           "fixture_name": null
         }
       ],
-      "parameters": null,
+      "parameters": {
+        "columns": [
+          {
+            "id": "preset",
+            "name": "preset",
+            "kind": "param"
+          },
+          {
+            "id": "url_scheme",
+            "name": "url_scheme",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "values": [
+              "vscode",
+              "vscode://file/{path}:{line}"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "cursor",
+              "cursor://file/{path}:{line}"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "zed",
+              "zed://file/{path}:{line}"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "pycharm",
+              "pycharm://open?file={path}&line={line}"
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
       "error": null,
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
-        "line": 43
+        "line": 44
       },
       "story_id": null,
       "activity_ids": []
@@ -18380,7 +18913,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
-        "line": 67
+        "line": 66
       },
       "story_id": null,
       "activity_ids": []
@@ -18448,7 +18981,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
-        "line": 77
+        "line": 76
       },
       "story_id": null,
       "activity_ids": []
@@ -18514,7 +19047,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
-        "line": 112
+        "line": 111
       },
       "story_id": null,
       "activity_ids": []
@@ -18569,7 +19102,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
-        "line": 135
+        "line": 134
       },
       "story_id": null,
       "activity_ids": []
@@ -18637,7 +19170,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
-        "line": 184
+        "line": 183
       },
       "story_id": null,
       "activity_ids": []

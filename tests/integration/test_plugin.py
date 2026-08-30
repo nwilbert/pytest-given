@@ -432,27 +432,36 @@ def test_two_test_files_sharing_a_basename_render_fine(pytester, tmp_path):
     assert 'pkg/dup/thing' in html_path.read_text(encoding='utf-8')
 
 
+@scenario(
+    t'An unknown {pg["Source link"].low} preset stops the run before it collects',
+    tags=['validation'],
+)
 def test_an_unknown_source_link_preset_fails_before_the_suite_runs(pytester):
     """A typo in --given-source-link is a usage error, caught at configure time.
 
     Learning about it only at session finish means paying for the whole suite
     first, and the error arrived as a bare traceback with no summary line.
     """
-    pytester.makepyfile(
-        """
-        from pytest_given import scenario, then
+    with given('a suite that would otherwise pass'):
+        suite = """
+            from pytest_given import scenario, then
 
-        @scenario("Brew")
-        def test_brew():
-            with then("it brews"):
-                assert True
-        """
-    )
-    result = pytester.runpytest('--given-html=report.html', '--given-source-link=bogus')
-    assert result.ret == pytest.ExitCode.USAGE_ERROR
-    result.stderr.fnmatch_lines(['*Unknown given_source_link preset*'])
-    # No outcome line at all: the run stopped at configure, before collection.
-    assert 'passed' not in result.stdout.str()
+            @scenario("Brew")
+            def test_brew():
+                with then("it brews"):
+                    assert True
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+    with when(t'the suite runs with a misspelled {pg["Source link"].low} preset'):
+        result = pytester.runpytest(
+            '--given-html=report.html', '--given-source-link=bogus'
+        )
+    with then('the run ends as a usage error, naming the preset'):
+        assert result.ret == pytest.ExitCode.USAGE_ERROR
+        result.stderr.fnmatch_lines(['*Unknown given_source_link preset*'])
+    with then('no test ran: the run stopped at configure, before collection'):
+        assert 'passed' not in result.stdout.str()
 
 
 def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):
@@ -2309,30 +2318,36 @@ def test_a_rejected_form_fails_the_run_with_no_sink_flag(pytester):
     result.stdout.fnmatch_lines(['*varies across parametrize cases*'])
 
 
+@scenario(t'`--given-title` names the {pg["Report"].low} instead of the rootdir')
 def test_given_title_cli_flag_names_the_report(pytester, tmp_path):
-    pytester.makepyfile(
-        """
-        from pytest_given import scenario, when
+    with given(t'a suite with one {pg["Scenario"].low}'):
+        pytester.makepyfile(
+            """
+            from pytest_given import scenario, when
 
-        @scenario("A")
-        def test_a():
-            with when("x"):
-                pass
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    md_path = tmp_path / 'report.md'
-    result = pytester.runpytest(
-        f'--given-json={json_path}',
-        f'--given-md={md_path}',
-        '--given-title=Coffee Shop Example',
-    )
-    result.assert_outcomes(passed=1)
-    data = json.loads(json_path.read_text())
-    assert data['metadata']['title'] == 'Coffee Shop Example'
-    assert md_path.read_text(encoding='utf-8').startswith(
-        '# pytest-given — Coffee Shop Example'
-    )
+            @scenario("A")
+            def test_a():
+                with when("x"):
+                    pass
+            """
+        )
+        json_path = tmp_path / 'report.json'
+        md_path = tmp_path / 'report.md'
+    with when('the suite runs with --given-title'):
+        result = pytester.runpytest(
+            f'--given-json={json_path}',
+            f'--given-md={md_path}',
+            '--given-title=Coffee Shop Example',
+        )
+    with then('the test passes'):
+        result.assert_outcomes(passed=1)
+    with then('the title reaches the JSON metadata'):
+        data = json.loads(json_path.read_text())
+        assert data['metadata']['title'] == 'Coffee Shop Example'
+    with then('the title also heads the Markdown rendering'):
+        assert md_path.read_text(encoding='utf-8').startswith(
+            '# pytest-given — Coffee Shop Example'
+        )
 
 
 def test_given_title_absent_leaves_the_title_unset(pytester, tmp_path):
