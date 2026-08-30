@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-30T15:51:09.333482+00:00",
+    "timestamp": "2026-08-30T16:11:36.578992+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "8363f9d1e55c39ee240ffa93e33ed9c07e76e41c",
+    "commit_sha": "d7876efd77da98f22e2bd42d72ce45e970c07f68",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -16922,6 +16922,473 @@
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 491
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_source_link.py::test_resolve_template_none_returns_none",
+      "narration": {
+        "text": "The literal `none` disables the source link",
+        "parts": [
+          {
+            "value": "The literal `none` disables the "
+          },
+          {
+            "term_id": "source-link",
+            "display": "source link",
+            "expression": "pg[\"Source link\"].low"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_source_link",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "the source link config set to `none`",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "source-link",
+                "display": "source link",
+                "expression": "pg[\"Source link\"].low"
+              },
+              {
+                "value": " config set to `none`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the config value is resolved",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no template comes back, so no link is rendered",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_source_link.py",
+        "line": 28
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_source_link.py::test_resolve_template_vscode_preset",
+      "narration": {
+        "text": "A named editor preset becomes that editor's source link template",
+        "parts": [
+          {
+            "value": "A named editor preset becomes that editor's "
+          },
+          {
+            "term_id": "source-link",
+            "display": "source link",
+            "expression": "pg['Source link'].low"
+          },
+          {
+            "value": " template"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_source_link",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "the config set to a named editor preset",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the config value is resolved",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the template is that editor's URL scheme",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_source_link.py",
+        "line": 43
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_source_link.py::test_resolve_template_raw_template_passes_through",
+      "narration": {
+        "text": "A raw URL template is used as the source link verbatim",
+        "parts": [
+          {
+            "value": "A raw URL template is used as the "
+          },
+          {
+            "term_id": "source-link",
+            "display": "source link",
+            "expression": "pg[\"Source link\"].low"
+          },
+          {
+            "value": " verbatim"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_source_link",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a raw blob-URL template rather than a preset name",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the config value is resolved",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it comes back unchanged",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_source_link.py",
+        "line": 67
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_source_link.py::test_resolve_template_unknown_preset_raises",
+      "narration": {
+        "text": "An unknown preset name is refused, with the valid ones listed",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_source_link",
+      "tags": [
+        "diagnostics"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a bareword that is neither a known preset nor a template",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the config value is resolved",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the value is refused",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the error names the offender and lists every valid preset",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_source_link.py",
+        "line": 77
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_source_link.py::test_resolve_github_preset_env_beats_remote",
+      "narration": {
+        "text": "The github preset prefers GITHUB_REPOSITORY over the git remote",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_source_link",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "GITHUB_REPOSITORY naming one repository",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an origin remote naming a different one",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the github preset is resolved",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the template points at the environment's repository",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_source_link.py",
+        "line": 112
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_source_link.py::test_resolve_github_preset_from_https_remote",
+      "narration": {
+        "text": "The github preset derives org and repo from the git origin remote",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_source_link",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "no GITHUB_REPOSITORY, and an https origin remote",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the github preset is resolved",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the blob-URL template names the remote's org and repo",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_source_link.py",
+        "line": 135
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_source_link.py::test_resolve_github_preset_non_github_remote_raises",
+      "narration": {
+        "text": "The github preset refuses a remote that is not on GitHub",
+        "parts": []
+      },
+      "module": "tests.unit.report.test_source_link",
+      "tags": [
+        "diagnostics"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "no GITHUB_REPOSITORY, and an origin remote on another host",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the github preset is resolved",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the preset is refused",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the error points at the env var and the raw-template escape hatch",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_source_link.py",
+        "line": 184
       },
       "story_id": null,
       "activity_ids": []

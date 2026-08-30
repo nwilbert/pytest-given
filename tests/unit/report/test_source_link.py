@@ -3,12 +3,14 @@ from pathlib import Path
 
 import pytest
 
+from pytest_given import given, scenario, then, when, when_then
 from pytest_given.model import PytestGivenError, SourceLocation
 from pytest_given.report.source_link import (
     compile_source_link,
     detect_commit_sha,
     resolve_template,
 )
+from tests.ubiquitous_language import pg
 
 
 def test_compile_source_link_rejects_positional_index_field() -> None:
@@ -23,8 +25,14 @@ def test_compile_source_link_rejects_empty_positional_field() -> None:
         compile_source_link('file://{}', project='p', commit_sha=None)
 
 
+@scenario(t'The literal `none` disables the {pg["Source link"].low}')
 def test_resolve_template_none_returns_none() -> None:
-    assert resolve_template('none') is None
+    with given(t'the {pg["Source link"].low} config set to `none`'):
+        value = 'none'
+    with when('the config value is resolved'):
+        template = resolve_template(value)
+    with then('no template comes back, so no link is rendered'):
+        assert template is None
 
 
 def test_resolve_template_empty_returns_none() -> None:
@@ -32,8 +40,16 @@ def test_resolve_template_empty_returns_none() -> None:
     assert resolve_template(None) is None
 
 
+@scenario(
+    t"A named editor preset becomes that editor's {pg['Source link'].low} template"
+)
 def test_resolve_template_vscode_preset() -> None:
-    assert resolve_template('vscode') == 'vscode://file/{path}:{line}'
+    with given('the config set to a named editor preset'):
+        value = 'vscode'
+    with when('the config value is resolved'):
+        template = resolve_template(value)
+    with then("the template is that editor's URL scheme"):
+        assert template == 'vscode://file/{path}:{line}'
 
 
 def test_resolve_template_cursor_preset() -> None:
@@ -48,19 +64,36 @@ def test_resolve_template_pycharm_preset() -> None:
     assert resolve_template('pycharm') == 'pycharm://open?file={path}&line={line}'
 
 
+@scenario(t'A raw URL template is used as the {pg["Source link"].low} verbatim')
 def test_resolve_template_raw_template_passes_through() -> None:
-    raw = 'https://github.com/o/r/blob/{sha}/{relpath}#L{line}'
-    assert resolve_template(raw) == raw
+    with given('a raw blob-URL template rather than a preset name'):
+        raw = 'https://github.com/o/r/blob/{sha}/{relpath}#L{line}'
+    with when('the config value is resolved'):
+        template = resolve_template(raw)
+    with then('it comes back unchanged'):
+        assert template == raw
 
 
+@scenario(
+    'An unknown preset name is refused, with the valid ones listed',
+    tags=['diagnostics'],
+)
 def test_resolve_template_unknown_preset_raises() -> None:
-    with pytest.raises(PytestGivenError) as exc:
-        resolve_template('emacs')
-    msg = str(exc.value)
-    assert 'emacs' in msg
-    assert 'vscode' in msg
-    assert 'pycharm' in msg
-    assert 'github' in msg
+    with given('a bareword that is neither a known preset nor a template'):
+        value = 'emacs'
+    with (
+        when_then('the config value is resolved', 'the value is refused'),
+        pytest.raises(PytestGivenError) as exc,
+    ):
+        resolve_template(value)
+    with then('the error names the offender and lists every valid preset'):
+        msg = str(exc.value)
+        assert 'emacs' in msg
+        assert 'vscode' in msg
+        assert 'cursor' in msg
+        assert 'zed' in msg
+        assert 'pycharm' in msg
+        assert 'github' in msg
 
 
 _GH_TEMPLATE = 'https://github.com/{org}/{repo}/blob/{{sha}}/{{relpath}}#L{{line}}'
@@ -76,35 +109,48 @@ def test_resolve_github_preset_from_env(monkeypatch: pytest.MonkeyPatch) -> None
     assert resolve_template('github') == _GH_TEMPLATE.format(org='myorg', repo='myrepo')
 
 
+@scenario('The github preset prefers GITHUB_REPOSITORY over the git remote')
 def test_resolve_github_preset_env_beats_remote(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    _clear_github_env(monkeypatch)
-    monkeypatch.setenv('GITHUB_REPOSITORY', 'env-org/env-repo')
+    with given('GITHUB_REPOSITORY naming one repository'):
+        _clear_github_env(monkeypatch)
+        monkeypatch.setenv('GITHUB_REPOSITORY', 'env-org/env-repo')
+    with given('an origin remote naming a different one'):
 
-    def fake_run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
-        return subprocess.CompletedProcess(
-            cmd, 0, stdout='https://github.com/git-org/git-repo.git\n', stderr=''
-        )
+        def fake_run(
+            cmd: list[str], **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
+            return subprocess.CompletedProcess(
+                cmd, 0, stdout='https://github.com/git-org/git-repo.git\n', stderr=''
+            )
 
-    monkeypatch.setattr(subprocess, 'run', fake_run)
-    assert resolve_template('github') == _GH_TEMPLATE.format(
-        org='env-org', repo='env-repo'
-    )
+        monkeypatch.setattr(subprocess, 'run', fake_run)
+    with when('the github preset is resolved'):
+        template = resolve_template('github')
+    with then("the template points at the environment's repository"):
+        assert template == _GH_TEMPLATE.format(org='env-org', repo='env-repo')
 
 
+@scenario('The github preset derives org and repo from the git origin remote')
 def test_resolve_github_preset_from_https_remote(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    _clear_github_env(monkeypatch)
+    with given('no GITHUB_REPOSITORY, and an https origin remote'):
+        _clear_github_env(monkeypatch)
 
-    def fake_run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
-        return subprocess.CompletedProcess(
-            cmd, 0, stdout='https://github.com/o/r.git\n', stderr=''
-        )
+        def fake_run(
+            cmd: list[str], **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
+            return subprocess.CompletedProcess(
+                cmd, 0, stdout='https://github.com/o/r.git\n', stderr=''
+            )
 
-    monkeypatch.setattr(subprocess, 'run', fake_run)
-    assert resolve_template('github') == _GH_TEMPLATE.format(org='o', repo='r')
+        monkeypatch.setattr(subprocess, 'run', fake_run)
+    with when('the github preset is resolved'):
+        template = resolve_template('github')
+    with then("the blob-URL template names the remote's org and repo"):
+        assert template == _GH_TEMPLATE.format(org='o', repo='r')
 
 
 def test_resolve_github_preset_from_https_remote_no_git_suffix(
@@ -135,22 +181,33 @@ def test_resolve_github_preset_from_ssh_remote(
     assert resolve_template('github') == _GH_TEMPLATE.format(org='o', repo='r')
 
 
+@scenario(
+    'The github preset refuses a remote that is not on GitHub',
+    tags=['diagnostics'],
+)
 def test_resolve_github_preset_non_github_remote_raises(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    _clear_github_env(monkeypatch)
+    with given('no GITHUB_REPOSITORY, and an origin remote on another host'):
+        _clear_github_env(monkeypatch)
 
-    def fake_run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
-        return subprocess.CompletedProcess(
-            cmd, 0, stdout='https://gitlab.com/o/r.git\n', stderr=''
-        )
+        def fake_run(
+            cmd: list[str], **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
+            return subprocess.CompletedProcess(
+                cmd, 0, stdout='https://gitlab.com/o/r.git\n', stderr=''
+            )
 
-    monkeypatch.setattr(subprocess, 'run', fake_run)
-    with pytest.raises(PytestGivenError) as exc:
+        monkeypatch.setattr(subprocess, 'run', fake_run)
+    with (
+        when_then('the github preset is resolved', 'the preset is refused'),
+        pytest.raises(PytestGivenError) as exc,
+    ):
         resolve_template('github')
-    msg = str(exc.value)
-    assert 'GITHUB_REPOSITORY' in msg
-    assert '{sha}' in msg
+    with then('the error points at the env var and the raw-template escape hatch'):
+        msg = str(exc.value)
+        assert 'GITHUB_REPOSITORY' in msg
+        assert '{sha}' in msg
 
 
 def test_resolve_github_preset_no_git_and_no_env_raises(

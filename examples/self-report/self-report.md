@@ -1710,6 +1710,58 @@
 - **when** the Markdown «Report» is rendered
 - **then** the heading is marked skipped and the reason follows the node id
 
+## ✓ The literal `none` disables the «source link»
+`tests/unit/report/test_source_link.py:28::test_resolve_template_none_returns_none`
+
+- **given** the «source link» config set to `none`
+- **when** the config value is resolved
+- **then** no template comes back, so no link is rendered
+
+## ✓ A named editor preset becomes that editor's «source link» template
+`tests/unit/report/test_source_link.py:43::test_resolve_template_vscode_preset`
+
+- **given** the config set to a named editor preset
+- **when** the config value is resolved
+- **then** the template is that editor's URL scheme
+
+## ✓ A raw URL template is used as the «source link» verbatim
+`tests/unit/report/test_source_link.py:67::test_resolve_template_raw_template_passes_through`
+
+- **given** a raw blob-URL template rather than a preset name
+- **when** the config value is resolved
+- **then** it comes back unchanged
+
+## ✓ An unknown preset name is refused, with the valid ones listed
+`tests/unit/report/test_source_link.py:77::test_resolve_template_unknown_preset_raises` · diagnostics
+
+- **given** a bareword that is neither a known preset nor a template
+- **when** the config value is resolved
+- **then** the value is refused
+- **then** the error names the offender and lists every valid preset
+
+## ✓ The github preset prefers GITHUB_REPOSITORY over the git remote
+`tests/unit/report/test_source_link.py:112::test_resolve_github_preset_env_beats_remote`
+
+- **given** GITHUB_REPOSITORY naming one repository
+- **given** an origin remote naming a different one
+- **when** the github preset is resolved
+- **then** the template points at the environment's repository
+
+## ✓ The github preset derives org and repo from the git origin remote
+`tests/unit/report/test_source_link.py:135::test_resolve_github_preset_from_https_remote`
+
+- **given** no GITHUB_REPOSITORY, and an https origin remote
+- **when** the github preset is resolved
+- **then** the blob-URL template names the remote's org and repo
+
+## ✓ The github preset refuses a remote that is not on GitHub
+`tests/unit/report/test_source_link.py:184::test_resolve_github_preset_non_github_remote_raises` · diagnostics
+
+- **given** no GITHUB_REPOSITORY, and an origin remote on another host
+- **when** the github preset is resolved
+- **then** the preset is refused
+- **then** the error points at the env var and the raw-template escape hatch
+
 ## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
 `tests/unit/test_grouping.py:74::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
