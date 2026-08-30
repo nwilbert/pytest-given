@@ -48,6 +48,7 @@ function reportApp() {
   const scenarioActivities = window.__scenarioActivities || {};
   const activityLabels = window.__activityLabels || {};
   const hasGlossary = glossaryTerms.length > 0;
+  const allModules = [...new Set(data.scenarios.map(s => s.module))];
   // Term id -> canonical display name, for the Terms browse axis.
   const termNames = {};
   for (const t of glossaryTerms) termNames[t.id] = t.canonical;
@@ -58,9 +59,10 @@ function reportApp() {
   }
   return {
     search: '',
-    // Terms is the richest axis when there is a glossary; reports without one
-    // have no Terms segment, so they open on Tags.
-    view: hasGlossary ? 'terms' : 'tags',
+    // Modules is the only axis every report has: a suite may carry no tags and
+    // no glossary, but every scenario has a module. So it leads the segments
+    // and opens by default, and no report can open on an empty browse tree.
+    view: 'modules',
     mainView: 'scenarios',
     // How the browse tree orders its groups. Ephemeral like `view` above —
     // the hash carries filters, which change what you see, not the order.
@@ -154,47 +156,118 @@ function reportApp() {
     get filteredCount() {
       return data.scenarios.filter((_, i) => this.isVisible(i)).length;
     },
+    // Every axis renders as the same flat list of rows carrying their own
+    // `depth`, so one template serves all three. Tags and terms are depth 0
+    // throughout; only modules nest, and only their interior rows have
+    // children to expand.
     get groups() {
+      return this.view === 'modules' ? this._moduleRows() : this._flatRows();
+    },
+    _flatRows() {
       const grouped = {};
       const isTerms = this.view === 'terms';
       for (const s of data.scenarios) {
         if (!this._matchesFilters(s)) continue;
-        let keys;
-        if (isTerms) {
-          const ids = scenarioTerms[s.id] || [];
-          keys = ids.length ? ids : [NO_TERMS];
-        } else if (this.view === 'tags') {
-          keys = s.tags.length ? s.tags : [NO_TAGS];
-        } else {
-          keys = [s.module];
-        }
-        for (const k of keys) {
+        const ids = isTerms ? scenarioTerms[s.id] || [] : s.tags;
+        for (const k of ids.length ? ids : [isTerms ? NO_TERMS : NO_TAGS]) {
           if (!grouped[k]) {
             grouped[k] = {
               id: k,
               name: isTerms ? this.termLabel(k) : this.tagLabel(k),
-              scenarios: [],
+              depth: 0,
+              count: 0,
+              hasChildren: false,
             };
           }
-          grouped[k].scenarios.push(s);
+          grouped[k].count++;
         }
       }
-      // Selected groups pin to the top so what you filtered by stays in view:
-      // arriving from the Glossary tab, the term you came for is the first row
-      // rather than somewhere down the list. Below the pin the sort toggle
-      // decides, with ties alphabetical so the order stays stable.
+      return this._ordered(Object.values(grouped));
+    },
+    // A module path tree, flattened depth-first into rows. A row is visible
+    // only while every ancestor is expanded, so collapsing a package hides
+    // the subtree without rebuilding it.
+    _moduleRows() {
+      const counts = {};
+      for (const s of data.scenarios) {
+        if (this._matchesFilters(s)) counts[s.module] = (counts[s.module] || 0) + 1;
+      }
+      const modules = Object.keys(counts);
+      if (!modules.length) return [];
+      // Depth comes from every module in the report, not the filtered subset:
+      // selecting a package narrows the tree to it, and a prefix recomputed
+      // from that subset would strip the selected row itself out of view.
+      const skip = this._commonDepth(allModules);
+      const root = {};
+      for (const m of modules) {
+        let node = root;
+        const parts = m.split('.');
+        for (let i = skip; i < parts.length; i++) {
+          const key = parts.slice(0, i + 1).join('.');
+          node = (node[key] || (node[key] = { __id: key, __name: parts[i], __kids: {} })).__kids;
+        }
+      }
+      const rows = [];
+      const walk = (kids, depth, visible) => {
+        const level = Object.values(kids).map(node => {
+          const id = node.__id;
+          const own = counts[id] || 0;
+          const sub = Object.keys(node.__kids).length;
+          return { node, id, name: node.__name, depth, hasChildren: sub > 0,
+                   count: own + this._subtreeCount(node, counts) };
+        });
+        for (const row of this._ordered(level)) {
+          if (visible) rows.push(row);
+          // A package on the path to the selected module opens whether or not
+          // it was expanded by hand, so the selected row is never stranded
+          // inside a collapsed ancestor — on a `#module=` deep link there was
+          // no chance to expand it, and after a click it must stay visible to
+          // be clicked again.
+          const onPath = this.moduleFilter && this.moduleFilter.startsWith(row.id + '.');
+          walk(row.node.__kids, depth + 1,
+               visible && (!!this.expandedGroups[row.id] || onPath));
+        }
+      };
+      walk(root, 0, true);
+      return rows.map(({ node, ...row }) => row);
+    },
+    _subtreeCount(node, counts) {
+      return Object.values(node.__kids).reduce(
+        (n, kid) => n + (counts[kid.__id] || 0) + this._subtreeCount(kid, counts), 0);
+    },
+    // Segments every module shares carry no information — `tests` above a
+    // suite rooted there is a row and an indent that say nothing. Never eats
+    // a module's last segment, or a lone module would render nameless.
+    _commonDepth(modules) {
+      const first = modules[0].split('.');
+      let i = 0;
+      while (i < first.length - 1
+             && modules.every(m => {
+               const parts = m.split('.');
+               return parts.length > i + 1 && parts[i] === first[i];
+             })) i++;
+      return i;
+    },
+    // Selected groups pin to the top so what you filtered by stays in view:
+    // arriving from the Glossary tab, the term you came for is the first row
+    // rather than somewhere down the list. Below the pin the sort toggle
+    // decides, with ties alphabetical so the order stays stable.
+    _ordered(rows) {
       const byCount = this.sortBy === 'count';
-      return Object.values(grouped).sort((a, b) =>
+      return rows.sort((a, b) =>
         (this.isGroupActive(a) ? 0 : 1) - (this.isGroupActive(b) ? 0 : 1)
-        || (byCount ? b.scenarios.length - a.scenarios.length : 0)
+        || (byCount ? b.count - a.count : 0)
         || a.name.localeCompare(b.name));
     },
     _matchesFilters(s) {
       if (s.status === 'passed' && !this.showPassed) return false;
       if (s.status === 'failed' && !this.showFailed) return false;
       if (s.status === 'skipped' && !this.showSkipped) return false;
-      // A scenario has exactly one module, so this axis is single-select.
-      if (this.moduleFilter && s.module !== this.moduleFilter) return false;
+      // A scenario has exactly one module, so this axis is single-select. The
+      // filter is a path prefix, not an exact id: selecting a package in the
+      // browse tree takes everything under it.
+      if (this.moduleFilter && s.module !== this.moduleFilter
+          && !s.module.startsWith(this.moduleFilter + '.')) return false;
       // Tags and terms are set-valued, so several of them narrow with AND:
       // the scenario must carry every selected one, not any of them.
       for (const tag of this.tagFilters) {

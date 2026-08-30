@@ -267,16 +267,9 @@ body {
 /* padding-left keeps a minimum gap from the group name even when a wrapped
    name fills the row and the auto margin collapses to zero. */
 .nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); }
-.nav-scenario {
-  padding: 2px 0 2px 14px;
-  font-size: var(--font-size-sm);
-  color: var(--color-accent);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-}
-.nav-scenario:hover { text-decoration: underline; }
+/* Keeps a childless row's name aligned with its siblings that carry a
+   chevron, so one level reads as one column. */
+.nav-group-toggle-placeholder { width: 8px; flex-shrink: 0; margin-right: 6px; }
 .nav-status-icon { font-size: 0.625rem; }
 
 /* === Main === */
@@ -1236,29 +1229,20 @@ span.param-highlight {
                   aria-label="Sort groups by scenario count">Count</button>
         </div>
       </div>
-      <div class="seg-toggle">
-        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
+      <div class="seg-toggle"><div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+        
         <div class="seg-btn" :class="{ active: view === 'terms' }" @click="view = 'terms'">Terms</div>
         
-        <div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
       </div>
-      <div class="nav-tree">
-        <template x-for="group in groups" :key="group.id">
-          <div><div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }" @click="onGroupClick(group)">
-              <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
-              <span class="nav-group-name" x-text="group.name"></span>
-              <span class="nav-group-count" x-text="group.scenarios.length"></span>
-            </div>
-            <template x-if="expandedGroups[group.id]">
-              <div>
-                <template x-for="s in group.scenarios" :key="s.id">
-                  <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
-                    <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
-                    <span x-text="s.narration.text"></span>
-                  </div>
-                </template>
-              </div>
-            </template>
+      <div class="nav-tree"><template x-for="group in groups" :key="group.id">
+          <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }"
+               :style="'padding-left:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
+            <span class="nav-group-toggle" x-show="group.hasChildren"
+                  :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
+            <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren"></span>
+            <span class="nav-group-name" x-text="group.name"></span>
+            <span class="nav-group-count" x-text="group.count"></span>
           </div>
         </template>
       </div>
@@ -1313,7 +1297,7 @@ span.param-highlight {
         <span class="scenario-status passed">
           ✓ passed
         </span>
-        <span class="scenario-duration">22ms</span>
+        <span class="scenario-duration">20ms</span>
       </span>
     </div>
 
@@ -1335,7 +1319,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin.py#L134">tests/integration/test_plugin.py:134</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin.py#L134">tests/integration/test_plugin.py:134</a></div>
       
     </div>
     </div>
@@ -1403,7 +1387,7 @@ def test_fixture(value):
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin.py#L197">tests/integration/test_plugin.py:197</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin.py#L197">tests/integration/test_plugin.py:197</a></div>
       
     </div>
     </div>
@@ -1429,7 +1413,7 @@ def test_fixture(value):
         <span class="scenario-status passed">
           ✓ passed
         </span>
-        <span class="scenario-duration">35ms</span>
+        <span class="scenario-duration">21ms</span>
       </span>
     </div>
 
@@ -1477,7 +1461,7 @@ def test_add(a, b, expected):
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin.py#L232">tests/integration/test_plugin.py:232</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin.py#L232">tests/integration/test_plugin.py:232</a></div>
       
     </div>
     </div>
@@ -1545,7 +1529,7 @@ def test_brew(cup_size):
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin.py#L368">tests/integration/test_plugin.py:368</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin.py#L368">tests/integration/test_plugin.py:368</a></div>
       
     </div>
     </div>
@@ -1609,7 +1593,7 @@ def test_brew():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin.py#L436">tests/integration/test_plugin.py:436</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin.py#L436">tests/integration/test_plugin.py:436</a></div>
       
     </div>
     </div>
@@ -1633,7 +1617,7 @@ def test_brew():
         <span class="scenario-status passed">
           ✓ passed
         </span>
-        <span class="scenario-duration">12ms</span>
+        <span class="scenario-duration">13ms</span>
       </span>
     </div>
 
@@ -1678,7 +1662,7 @@ def test_brew():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin.py#L2227">tests/integration/test_plugin.py:2227</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin.py#L2227">tests/integration/test_plugin.py:2227</a></div>
       
     </div>
     </div>
@@ -1702,7 +1686,7 @@ def test_brew():
         <span class="scenario-status passed">
           ✓ passed
         </span>
-        <span class="scenario-duration">20ms</span>
+        <span class="scenario-duration">21ms</span>
       </span>
     </div>
 
@@ -1722,7 +1706,7 @@ def test_brew():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin.py#L2240">tests/integration/test_plugin.py:2240</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin.py#L2240">tests/integration/test_plugin.py:2240</a></div>
       
     </div>
     </div>
@@ -1746,7 +1730,7 @@ def test_brew():
         <span class="scenario-status passed">
           ✓ passed
         </span>
-        <span class="scenario-duration">55ms</span>
+        <span class="scenario-duration">60ms</span>
       </span>
     </div>
 
@@ -1768,7 +1752,7 @@ def test_brew():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin.py#L2261">tests/integration/test_plugin.py:2261</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin.py#L2261">tests/integration/test_plugin.py:2261</a></div>
       
     </div>
     </div>
@@ -1794,7 +1778,7 @@ def test_brew():
         <span class="scenario-status passed">
           ✓ passed
         </span>
-        <span class="scenario-duration">14ms</span>
+        <span class="scenario-duration">13ms</span>
       </span>
     </div>
 
@@ -1836,7 +1820,7 @@ def test_brew(cup_size):
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin.py#L2293">tests/integration/test_plugin.py:2293</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin.py#L2293">tests/integration/test_plugin.py:2293</a></div>
       
     </div>
     </div>
@@ -1884,7 +1868,7 @@ def test_brew(cup_size):
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin.py#L2322">tests/integration/test_plugin.py:2322</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin.py#L2322">tests/integration/test_plugin.py:2322</a></div>
       
     </div>
     </div>
@@ -1948,7 +1932,7 @@ def test_brew(cup_size):
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin.py#L2502">tests/integration/test_plugin.py:2502</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin.py#L2502">tests/integration/test_plugin.py:2502</a></div>
       
     </div>
     </div>
@@ -1972,7 +1956,7 @@ def test_brew(cup_size):
         <span class="scenario-status passed">
           ✓ passed
         </span>
-        <span class="scenario-duration">14ms</span>
+        <span class="scenario-duration">15ms</span>
       </span>
     </div>
 
@@ -2016,7 +2000,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin_lint.py#L89">tests/integration/test_plugin_lint.py:89</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin_lint.py#L89">tests/integration/test_plugin_lint.py:89</a></div>
       
     </div>
     </div>
@@ -2082,7 +2066,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin_lint.py#L118">tests/integration/test_plugin_lint.py:118</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin_lint.py#L118">tests/integration/test_plugin_lint.py:118</a></div>
       
     </div>
     </div>
@@ -2106,7 +2090,7 @@ def test_empty_given():
         <span class="scenario-status passed">
           ✓ passed
         </span>
-        <span class="scenario-duration">13ms</span>
+        <span class="scenario-duration">30ms</span>
       </span>
     </div>
 
@@ -2150,7 +2134,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/integration/test_plugin_lint.py#L150">tests/integration/test_plugin_lint.py:150</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/integration/test_plugin_lint.py#L150">tests/integration/test_plugin_lint.py:150</a></div>
       
     </div>
     </div>
@@ -2194,7 +2178,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L26">tests/unit/capture/test_collector.py:26</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L26">tests/unit/capture/test_collector.py:26</a></div>
       
     </div>
     </div>
@@ -2238,7 +2222,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L42">tests/unit/capture/test_collector.py:42</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L42">tests/unit/capture/test_collector.py:42</a></div>
       
     </div>
     </div>
@@ -2282,7 +2266,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L64">tests/unit/capture/test_collector.py:64</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L64">tests/unit/capture/test_collector.py:64</a></div>
       
     </div>
     </div>
@@ -2326,7 +2310,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L208">tests/unit/capture/test_collector.py:208</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L208">tests/unit/capture/test_collector.py:208</a></div>
       
     </div>
     </div>
@@ -2370,7 +2354,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L228">tests/unit/capture/test_collector.py:228</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L228">tests/unit/capture/test_collector.py:228</a></div>
       
     </div>
     </div>
@@ -2414,7 +2398,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L246">tests/unit/capture/test_collector.py:246</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L246">tests/unit/capture/test_collector.py:246</a></div>
       
     </div>
     </div>
@@ -2458,7 +2442,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L300">tests/unit/capture/test_collector.py:300</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L300">tests/unit/capture/test_collector.py:300</a></div>
       
     </div>
     </div>
@@ -2502,7 +2486,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L317">tests/unit/capture/test_collector.py:317</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L317">tests/unit/capture/test_collector.py:317</a></div>
       
     </div>
     </div>
@@ -2546,7 +2530,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L461">tests/unit/capture/test_collector.py:461</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L461">tests/unit/capture/test_collector.py:461</a></div>
       
     </div>
     </div>
@@ -2590,7 +2574,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L480">tests/unit/capture/test_collector.py:480</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L480">tests/unit/capture/test_collector.py:480</a></div>
       
     </div>
     </div>
@@ -2634,7 +2618,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L498">tests/unit/capture/test_collector.py:498</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L498">tests/unit/capture/test_collector.py:498</a></div>
       
     </div>
     </div>
@@ -2678,7 +2662,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L513">tests/unit/capture/test_collector.py:513</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L513">tests/unit/capture/test_collector.py:513</a></div>
       
     </div>
     </div>
@@ -2722,7 +2706,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L531">tests/unit/capture/test_collector.py:531</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L531">tests/unit/capture/test_collector.py:531</a></div>
       
     </div>
     </div>
@@ -2766,7 +2750,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_collector.py#L556">tests/unit/capture/test_collector.py:556</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_collector.py#L556">tests/unit/capture/test_collector.py:556</a></div>
       
     </div>
     </div>
@@ -2828,7 +2812,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L27">tests/unit/capture/test_file_glossary.py:27</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L27">tests/unit/capture/test_file_glossary.py:27</a></div>
       
     </div>
     </div>
@@ -2890,7 +2874,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L41">tests/unit/capture/test_file_glossary.py:41</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L41">tests/unit/capture/test_file_glossary.py:41</a></div>
       
     </div>
     </div>
@@ -2952,7 +2936,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L54">tests/unit/capture/test_file_glossary.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L54">tests/unit/capture/test_file_glossary.py:54</a></div>
       
     </div>
     </div>
@@ -3018,7 +3002,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L70">tests/unit/capture/test_file_glossary.py:70</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L70">tests/unit/capture/test_file_glossary.py:70</a></div>
       
     </div>
     </div>
@@ -3080,7 +3064,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L88">tests/unit/capture/test_file_glossary.py:88</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L88">tests/unit/capture/test_file_glossary.py:88</a></div>
       
     </div>
     </div>
@@ -3142,7 +3126,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L104">tests/unit/capture/test_file_glossary.py:104</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L104">tests/unit/capture/test_file_glossary.py:104</a></div>
       
     </div>
     </div>
@@ -3201,7 +3185,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L123">tests/unit/capture/test_file_glossary.py:123</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L123">tests/unit/capture/test_file_glossary.py:123</a></div>
       
     </div>
     </div>
@@ -3260,7 +3244,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L142">tests/unit/capture/test_file_glossary.py:142</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L142">tests/unit/capture/test_file_glossary.py:142</a></div>
       
     </div>
     </div>
@@ -3318,7 +3302,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L161">tests/unit/capture/test_file_glossary.py:161</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L161">tests/unit/capture/test_file_glossary.py:161</a></div>
       
     </div>
     </div>
@@ -3380,7 +3364,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L176">tests/unit/capture/test_file_glossary.py:176</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L176">tests/unit/capture/test_file_glossary.py:176</a></div>
       
     </div>
     </div>
@@ -3426,7 +3410,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L196">tests/unit/capture/test_file_glossary.py:196</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L196">tests/unit/capture/test_file_glossary.py:196</a></div>
       
     </div>
     </div>
@@ -3488,7 +3472,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L221">tests/unit/capture/test_file_glossary.py:221</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L221">tests/unit/capture/test_file_glossary.py:221</a></div>
       
     </div>
     </div>
@@ -3549,7 +3533,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L241">tests/unit/capture/test_file_glossary.py:241</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L241">tests/unit/capture/test_file_glossary.py:241</a></div>
       
     </div>
     </div>
@@ -3607,7 +3591,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L265">tests/unit/capture/test_file_glossary.py:265</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L265">tests/unit/capture/test_file_glossary.py:265</a></div>
       
     </div>
     </div>
@@ -3666,7 +3650,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L280">tests/unit/capture/test_file_glossary.py:280</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L280">tests/unit/capture/test_file_glossary.py:280</a></div>
       
     </div>
     </div>
@@ -3728,7 +3712,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L303">tests/unit/capture/test_file_glossary.py:303</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L303">tests/unit/capture/test_file_glossary.py:303</a></div>
       
     </div>
     </div>
@@ -3794,7 +3778,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_file_glossary.py#L317">tests/unit/capture/test_file_glossary.py:317</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_file_glossary.py#L317">tests/unit/capture/test_file_glossary.py:317</a></div>
       
     </div>
     </div>
@@ -4076,7 +4060,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L27">tests/unit/capture/test_glossary.py:27</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L27">tests/unit/capture/test_glossary.py:27</a></div>
       
     </div>
     </div>
@@ -4212,7 +4196,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L53">tests/unit/capture/test_glossary.py:53</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L53">tests/unit/capture/test_glossary.py:53</a></div>
       
     </div>
     </div>
@@ -4256,7 +4240,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L101">tests/unit/capture/test_glossary.py:101</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L101">tests/unit/capture/test_glossary.py:101</a></div>
       
     </div>
     </div>
@@ -4300,7 +4284,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L127">tests/unit/capture/test_glossary.py:127</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L127">tests/unit/capture/test_glossary.py:127</a></div>
       
     </div>
     </div>
@@ -4344,7 +4328,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L147">tests/unit/capture/test_glossary.py:147</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L147">tests/unit/capture/test_glossary.py:147</a></div>
       
     </div>
     </div>
@@ -4388,7 +4372,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L179">tests/unit/capture/test_glossary.py:179</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L179">tests/unit/capture/test_glossary.py:179</a></div>
       
     </div>
     </div>
@@ -4434,7 +4418,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L193">tests/unit/capture/test_glossary.py:193</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L193">tests/unit/capture/test_glossary.py:193</a></div>
       
     </div>
     </div>
@@ -4480,7 +4464,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L211">tests/unit/capture/test_glossary.py:211</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L211">tests/unit/capture/test_glossary.py:211</a></div>
       
     </div>
     </div>
@@ -4524,7 +4508,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L235">tests/unit/capture/test_glossary.py:235</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L235">tests/unit/capture/test_glossary.py:235</a></div>
       
     </div>
     </div>
@@ -4568,7 +4552,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L327">tests/unit/capture/test_glossary.py:327</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L327">tests/unit/capture/test_glossary.py:327</a></div>
       
     </div>
     </div>
@@ -4612,7 +4596,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L422">tests/unit/capture/test_glossary.py:422</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L422">tests/unit/capture/test_glossary.py:422</a></div>
       
     </div>
     </div>
@@ -4660,7 +4644,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_glossary.py#L435">tests/unit/capture/test_glossary.py:435</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_glossary.py#L435">tests/unit/capture/test_glossary.py:435</a></div>
       
     </div>
     </div>
@@ -4704,7 +4688,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L46">tests/unit/capture/test_kind_inference.py:46</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L46">tests/unit/capture/test_kind_inference.py:46</a></div>
       
     </div>
     </div>
@@ -4748,7 +4732,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L64">tests/unit/capture/test_kind_inference.py:64</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L64">tests/unit/capture/test_kind_inference.py:64</a></div>
       
     </div>
     </div>
@@ -4792,7 +4776,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L84">tests/unit/capture/test_kind_inference.py:84</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L84">tests/unit/capture/test_kind_inference.py:84</a></div>
       
     </div>
     </div>
@@ -4840,7 +4824,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L96">tests/unit/capture/test_kind_inference.py:96</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L96">tests/unit/capture/test_kind_inference.py:96</a></div>
       
     </div>
     </div>
@@ -4884,7 +4868,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L118">tests/unit/capture/test_kind_inference.py:118</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L118">tests/unit/capture/test_kind_inference.py:118</a></div>
       
     </div>
     </div>
@@ -4932,7 +4916,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L140">tests/unit/capture/test_kind_inference.py:140</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L140">tests/unit/capture/test_kind_inference.py:140</a></div>
       
     </div>
     </div>
@@ -4980,7 +4964,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L157">tests/unit/capture/test_kind_inference.py:157</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L157">tests/unit/capture/test_kind_inference.py:157</a></div>
       
     </div>
     </div>
@@ -5028,7 +5012,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L183">tests/unit/capture/test_kind_inference.py:183</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L183">tests/unit/capture/test_kind_inference.py:183</a></div>
       
     </div>
     </div>
@@ -5074,7 +5058,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L201">tests/unit/capture/test_kind_inference.py:201</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L201">tests/unit/capture/test_kind_inference.py:201</a></div>
       
     </div>
     </div>
@@ -5122,7 +5106,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L220">tests/unit/capture/test_kind_inference.py:220</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L220">tests/unit/capture/test_kind_inference.py:220</a></div>
       
     </div>
     </div>
@@ -5170,7 +5154,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L240">tests/unit/capture/test_kind_inference.py:240</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L240">tests/unit/capture/test_kind_inference.py:240</a></div>
       
     </div>
     </div>
@@ -5216,7 +5200,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L263">tests/unit/capture/test_kind_inference.py:263</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L263">tests/unit/capture/test_kind_inference.py:263</a></div>
       
     </div>
     </div>
@@ -5260,7 +5244,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_kind_inference.py#L282">tests/unit/capture/test_kind_inference.py:282</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_kind_inference.py#L282">tests/unit/capture/test_kind_inference.py:282</a></div>
       
     </div>
     </div>
@@ -5321,7 +5305,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L24">tests/unit/capture/test_markdown_glossary.py:24</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L24">tests/unit/capture/test_markdown_glossary.py:24</a></div>
       
     </div>
     </div>
@@ -5388,7 +5372,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L41">tests/unit/capture/test_markdown_glossary.py:41</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L41">tests/unit/capture/test_markdown_glossary.py:41</a></div>
       
     </div>
     </div>
@@ -5446,7 +5430,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L59">tests/unit/capture/test_markdown_glossary.py:59</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L59">tests/unit/capture/test_markdown_glossary.py:59</a></div>
       
     </div>
     </div>
@@ -5504,7 +5488,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L74">tests/unit/capture/test_markdown_glossary.py:74</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L74">tests/unit/capture/test_markdown_glossary.py:74</a></div>
       
     </div>
     </div>
@@ -5568,7 +5552,7 @@ def test_empty_given():
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L91">tests/unit/capture/test_markdown_glossary.py:91</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L91">tests/unit/capture/test_markdown_glossary.py:91</a></div>
       
     </div>
     </div>
@@ -5627,7 +5611,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L109">tests/unit/capture/test_markdown_glossary.py:109</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L109">tests/unit/capture/test_markdown_glossary.py:109</a></div>
       
     </div>
     </div>
@@ -5692,7 +5676,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L129">tests/unit/capture/test_markdown_glossary.py:129</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L129">tests/unit/capture/test_markdown_glossary.py:129</a></div>
       
     </div>
     </div>
@@ -5757,7 +5741,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L146">tests/unit/capture/test_markdown_glossary.py:146</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L146">tests/unit/capture/test_markdown_glossary.py:146</a></div>
       
     </div>
     </div>
@@ -5820,7 +5804,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L170">tests/unit/capture/test_markdown_glossary.py:170</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L170">tests/unit/capture/test_markdown_glossary.py:170</a></div>
       
     </div>
     </div>
@@ -5878,7 +5862,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L188">tests/unit/capture/test_markdown_glossary.py:188</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L188">tests/unit/capture/test_markdown_glossary.py:188</a></div>
       
     </div>
     </div>
@@ -5937,7 +5921,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L207">tests/unit/capture/test_markdown_glossary.py:207</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L207">tests/unit/capture/test_markdown_glossary.py:207</a></div>
       
     </div>
     </div>
@@ -5995,7 +5979,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L222">tests/unit/capture/test_markdown_glossary.py:222</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L222">tests/unit/capture/test_markdown_glossary.py:222</a></div>
       
     </div>
     </div>
@@ -6053,7 +6037,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L237">tests/unit/capture/test_markdown_glossary.py:237</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L237">tests/unit/capture/test_markdown_glossary.py:237</a></div>
       
     </div>
     </div>
@@ -6111,7 +6095,7 @@ No tables here.</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L252">tests/unit/capture/test_markdown_glossary.py:252</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L252">tests/unit/capture/test_markdown_glossary.py:252</a></div>
       
     </div>
     </div>
@@ -6172,7 +6156,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L270">tests/unit/capture/test_markdown_glossary.py:270</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L270">tests/unit/capture/test_markdown_glossary.py:270</a></div>
       
     </div>
     </div>
@@ -6230,7 +6214,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_markdown_glossary.py#L292">tests/unit/capture/test_markdown_glossary.py:292</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_markdown_glossary.py#L292">tests/unit/capture/test_markdown_glossary.py:292</a></div>
       
     </div>
     </div>
@@ -6272,7 +6256,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_step_descriptor.py#L59">tests/unit/capture/test_step_descriptor.py:59</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_step_descriptor.py#L59">tests/unit/capture/test_step_descriptor.py:59</a></div>
       
     </div>
     </div>
@@ -6318,7 +6302,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_step_descriptor.py#L151">tests/unit/capture/test_step_descriptor.py:151</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_step_descriptor.py#L151">tests/unit/capture/test_step_descriptor.py:151</a></div>
       
     </div>
     </div>
@@ -6362,7 +6346,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_step_descriptor.py#L279">tests/unit/capture/test_step_descriptor.py:279</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_step_descriptor.py#L279">tests/unit/capture/test_step_descriptor.py:279</a></div>
       
     </div>
     </div>
@@ -6406,7 +6390,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_step_descriptor.py#L304">tests/unit/capture/test_step_descriptor.py:304</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_step_descriptor.py#L304">tests/unit/capture/test_step_descriptor.py:304</a></div>
       
     </div>
     </div>
@@ -6452,7 +6436,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_step_descriptor.py#L332">tests/unit/capture/test_step_descriptor.py:332</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_step_descriptor.py#L332">tests/unit/capture/test_step_descriptor.py:332</a></div>
       
     </div>
     </div>
@@ -6554,7 +6538,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_step_descriptor.py#L374">tests/unit/capture/test_step_descriptor.py:374</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_step_descriptor.py#L374">tests/unit/capture/test_step_descriptor.py:374</a></div>
       
     </div>
     </div>
@@ -6598,7 +6582,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_step_descriptor.py#L406">tests/unit/capture/test_step_descriptor.py:406</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_step_descriptor.py#L406">tests/unit/capture/test_step_descriptor.py:406</a></div>
       
     </div>
     </div>
@@ -6644,7 +6628,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_step_descriptor.py#L450">tests/unit/capture/test_step_descriptor.py:450</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_step_descriptor.py#L450">tests/unit/capture/test_step_descriptor.py:450</a></div>
       
     </div>
     </div>
@@ -6762,7 +6746,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_step_descriptor.py#L520">tests/unit/capture/test_step_descriptor.py:520</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_step_descriptor.py#L520">tests/unit/capture/test_step_descriptor.py:520</a></div>
       
     </div>
     </div>
@@ -6808,7 +6792,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_step_descriptor.py#L911">tests/unit/capture/test_step_descriptor.py:911</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_step_descriptor.py#L911">tests/unit/capture/test_step_descriptor.py:911</a></div>
       
     </div>
     </div>
@@ -6856,7 +6840,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L62">tests/unit/capture/test_story.py:62</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L62">tests/unit/capture/test_story.py:62</a></div>
       
     </div>
     </div>
@@ -6906,7 +6890,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L105">tests/unit/capture/test_story.py:105</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L105">tests/unit/capture/test_story.py:105</a></div>
       
     </div>
     </div>
@@ -6954,7 +6938,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L122">tests/unit/capture/test_story.py:122</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L122">tests/unit/capture/test_story.py:122</a></div>
       
     </div>
     </div>
@@ -7002,7 +6986,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L137">tests/unit/capture/test_story.py:137</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L137">tests/unit/capture/test_story.py:137</a></div>
       
     </div>
     </div>
@@ -7050,7 +7034,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L153">tests/unit/capture/test_story.py:153</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L153">tests/unit/capture/test_story.py:153</a></div>
       
     </div>
     </div>
@@ -7100,7 +7084,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L168">tests/unit/capture/test_story.py:168</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L168">tests/unit/capture/test_story.py:168</a></div>
       
     </div>
     </div>
@@ -7146,7 +7130,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L183">tests/unit/capture/test_story.py:183</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L183">tests/unit/capture/test_story.py:183</a></div>
       
     </div>
     </div>
@@ -7194,7 +7178,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L193">tests/unit/capture/test_story.py:193</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L193">tests/unit/capture/test_story.py:193</a></div>
       
     </div>
     </div>
@@ -7242,7 +7226,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L208">tests/unit/capture/test_story.py:208</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L208">tests/unit/capture/test_story.py:208</a></div>
       
     </div>
     </div>
@@ -7290,7 +7274,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L223">tests/unit/capture/test_story.py:223</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L223">tests/unit/capture/test_story.py:223</a></div>
       
     </div>
     </div>
@@ -7336,7 +7320,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L238">tests/unit/capture/test_story.py:238</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L238">tests/unit/capture/test_story.py:238</a></div>
       
     </div>
     </div>
@@ -7380,7 +7364,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L253">tests/unit/capture/test_story.py:253</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L253">tests/unit/capture/test_story.py:253</a></div>
       
     </div>
     </div>
@@ -7424,7 +7408,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L272">tests/unit/capture/test_story.py:272</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L272">tests/unit/capture/test_story.py:272</a></div>
       
     </div>
     </div>
@@ -7470,7 +7454,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L297">tests/unit/capture/test_story.py:297</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L297">tests/unit/capture/test_story.py:297</a></div>
       
     </div>
     </div>
@@ -7518,7 +7502,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L322">tests/unit/capture/test_story.py:322</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L322">tests/unit/capture/test_story.py:322</a></div>
       
     </div>
     </div>
@@ -7568,7 +7552,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L335">tests/unit/capture/test_story.py:335</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L335">tests/unit/capture/test_story.py:335</a></div>
       
     </div>
     </div>
@@ -7620,7 +7604,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L349">tests/unit/capture/test_story.py:349</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L349">tests/unit/capture/test_story.py:349</a></div>
       
     </div>
     </div>
@@ -7670,7 +7654,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L366">tests/unit/capture/test_story.py:366</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L366">tests/unit/capture/test_story.py:366</a></div>
       
     </div>
     </div>
@@ -7718,7 +7702,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L384">tests/unit/capture/test_story.py:384</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L384">tests/unit/capture/test_story.py:384</a></div>
       
     </div>
     </div>
@@ -7768,7 +7752,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L399">tests/unit/capture/test_story.py:399</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L399">tests/unit/capture/test_story.py:399</a></div>
       
     </div>
     </div>
@@ -7820,7 +7804,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L416">tests/unit/capture/test_story.py:416</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L416">tests/unit/capture/test_story.py:416</a></div>
       
     </div>
     </div>
@@ -7864,7 +7848,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L436">tests/unit/capture/test_story.py:436</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L436">tests/unit/capture/test_story.py:436</a></div>
       
     </div>
     </div>
@@ -7916,7 +7900,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L448">tests/unit/capture/test_story.py:448</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L448">tests/unit/capture/test_story.py:448</a></div>
       
     </div>
     </div>
@@ -7962,7 +7946,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L494">tests/unit/capture/test_story.py:494</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L494">tests/unit/capture/test_story.py:494</a></div>
       
     </div>
     </div>
@@ -8006,7 +7990,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L577">tests/unit/capture/test_story.py:577</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L577">tests/unit/capture/test_story.py:577</a></div>
       
     </div>
     </div>
@@ -8052,7 +8036,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L669">tests/unit/capture/test_story.py:669</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L669">tests/unit/capture/test_story.py:669</a></div>
       
     </div>
     </div>
@@ -8104,7 +8088,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L695">tests/unit/capture/test_story.py:695</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L695">tests/unit/capture/test_story.py:695</a></div>
       
     </div>
     </div>
@@ -8150,7 +8134,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L716">tests/unit/capture/test_story.py:716</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L716">tests/unit/capture/test_story.py:716</a></div>
       
     </div>
     </div>
@@ -8200,7 +8184,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_story.py#L731">tests/unit/capture/test_story.py:731</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_story.py#L731">tests/unit/capture/test_story.py:731</a></div>
       
     </div>
     </div>
@@ -8246,7 +8230,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_template.py#L37">tests/unit/capture/test_template.py:37</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_template.py#L37">tests/unit/capture/test_template.py:37</a></div>
       
     </div>
     </div>
@@ -8292,7 +8276,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_template.py#L81">tests/unit/capture/test_template.py:81</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_template.py#L81">tests/unit/capture/test_template.py:81</a></div>
       
     </div>
     </div>
@@ -8410,7 +8394,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_template.py#L118">tests/unit/capture/test_template.py:118</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_template.py#L118">tests/unit/capture/test_template.py:118</a></div>
       
     </div>
     </div>
@@ -8454,7 +8438,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_template.py#L147">tests/unit/capture/test_template.py:147</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_template.py#L147">tests/unit/capture/test_template.py:147</a></div>
       
     </div>
     </div>
@@ -8498,7 +8482,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_template.py#L210">tests/unit/capture/test_template.py:210</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_template.py#L210">tests/unit/capture/test_template.py:210</a></div>
       
     </div>
     </div>
@@ -8542,7 +8526,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_template.py#L249">tests/unit/capture/test_template.py:249</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_template.py#L249">tests/unit/capture/test_template.py:249</a></div>
       
     </div>
     </div>
@@ -8586,7 +8570,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_template.py#L277">tests/unit/capture/test_template.py:277</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_template.py#L277">tests/unit/capture/test_template.py:277</a></div>
       
     </div>
     </div>
@@ -8630,7 +8614,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_template.py#L298">tests/unit/capture/test_template.py:298</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_template.py#L298">tests/unit/capture/test_template.py:298</a></div>
       
     </div>
     </div>
@@ -8674,7 +8658,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_template.py#L313">tests/unit/capture/test_template.py:313</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_template.py#L313">tests/unit/capture/test_template.py:313</a></div>
       
     </div>
     </div>
@@ -8720,7 +8704,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_template.py#L353">tests/unit/capture/test_template.py:353</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_template.py#L353">tests/unit/capture/test_template.py:353</a></div>
       
     </div>
     </div>
@@ -8764,7 +8748,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/capture/test_template.py#L396">tests/unit/capture/test_template.py:396</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/capture/test_template.py#L396">tests/unit/capture/test_template.py:396</a></div>
       
     </div>
     </div>
@@ -8824,7 +8808,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/lint/test_ast_rules.py#L63">tests/unit/lint/test_ast_rules.py:63</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/lint/test_ast_rules.py#L63">tests/unit/lint/test_ast_rules.py:63</a></div>
       
     </div>
     </div>
@@ -8883,7 +8867,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/lint/test_ast_rules.py#L227">tests/unit/lint/test_ast_rules.py:227</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/lint/test_ast_rules.py#L227">tests/unit/lint/test_ast_rules.py:227</a></div>
       
     </div>
     </div>
@@ -9057,7 +9041,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/lint/test_ast_rules.py#L393">tests/unit/lint/test_ast_rules.py:393</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/lint/test_ast_rules.py#L393">tests/unit/lint/test_ast_rules.py:393</a></div>
       
     </div>
     </div>
@@ -9117,7 +9101,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/lint/test_ast_rules.py#L536">tests/unit/lint/test_ast_rules.py:536</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/lint/test_ast_rules.py#L536">tests/unit/lint/test_ast_rules.py:536</a></div>
       
     </div>
     </div>
@@ -9175,7 +9159,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/lint/test_ast_rules.py#L714">tests/unit/lint/test_ast_rules.py:714</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/lint/test_ast_rules.py#L714">tests/unit/lint/test_ast_rules.py:714</a></div>
       
     </div>
     </div>
@@ -9221,7 +9205,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/lint/test_runtime_rules.py#L61">tests/unit/lint/test_runtime_rules.py:61</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/lint/test_runtime_rules.py#L61">tests/unit/lint/test_runtime_rules.py:61</a></div>
       
     </div>
     </div>
@@ -9267,7 +9251,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/lint/test_runtime_rules.py#L130">tests/unit/lint/test_runtime_rules.py:130</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/lint/test_runtime_rules.py#L130">tests/unit/lint/test_runtime_rules.py:130</a></div>
       
     </div>
     </div>
@@ -9313,7 +9297,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/lint/test_runtime_rules.py#L200">tests/unit/lint/test_runtime_rules.py:200</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/lint/test_runtime_rules.py#L200">tests/unit/lint/test_runtime_rules.py:200</a></div>
       
     </div>
     </div>
@@ -9482,7 +9466,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_aggregations.py#L159">tests/unit/report/test_aggregations.py:159</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_aggregations.py#L159">tests/unit/report/test_aggregations.py:159</a></div>
       
     </div>
     </div>
@@ -9526,7 +9510,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_aggregations.py#L263">tests/unit/report/test_aggregations.py:263</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_aggregations.py#L263">tests/unit/report/test_aggregations.py:263</a></div>
       
     </div>
     </div>
@@ -9570,7 +9554,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_aggregations.py#L293">tests/unit/report/test_aggregations.py:293</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_aggregations.py#L293">tests/unit/report/test_aggregations.py:293</a></div>
       
     </div>
     </div>
@@ -9614,7 +9598,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_aggregations.py#L363">tests/unit/report/test_aggregations.py:363</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_aggregations.py#L363">tests/unit/report/test_aggregations.py:363</a></div>
       
     </div>
     </div>
@@ -9658,7 +9642,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_aggregations.py#L449">tests/unit/report/test_aggregations.py:449</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_aggregations.py#L449">tests/unit/report/test_aggregations.py:449</a></div>
       
     </div>
     </div>
@@ -9702,7 +9686,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_aggregations.py#L482">tests/unit/report/test_aggregations.py:482</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_aggregations.py#L482">tests/unit/report/test_aggregations.py:482</a></div>
       
     </div>
     </div>
@@ -9746,7 +9730,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_aggregations.py#L575">tests/unit/report/test_aggregations.py:575</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_aggregations.py#L575">tests/unit/report/test_aggregations.py:575</a></div>
       
     </div>
     </div>
@@ -9790,7 +9774,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_aggregations.py#L616">tests/unit/report/test_aggregations.py:616</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_aggregations.py#L616">tests/unit/report/test_aggregations.py:616</a></div>
       
     </div>
     </div>
@@ -9836,7 +9820,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_aggregations.py#L660">tests/unit/report/test_aggregations.py:660</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_aggregations.py#L660">tests/unit/report/test_aggregations.py:660</a></div>
       
     </div>
     </div>
@@ -9880,7 +9864,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_aggregations.py#L762">tests/unit/report/test_aggregations.py:762</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_aggregations.py#L762">tests/unit/report/test_aggregations.py:762</a></div>
       
     </div>
     </div>
@@ -9924,7 +9908,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L66">tests/unit/report/test_coverage.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L66">tests/unit/report/test_coverage.py:66</a></div>
       
     </div>
     </div>
@@ -9968,7 +9952,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L149">tests/unit/report/test_coverage.py:149</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L149">tests/unit/report/test_coverage.py:149</a></div>
       
     </div>
     </div>
@@ -10012,7 +9996,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L200">tests/unit/report/test_coverage.py:200</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L200">tests/unit/report/test_coverage.py:200</a></div>
       
     </div>
     </div>
@@ -10056,7 +10040,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L215">tests/unit/report/test_coverage.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L215">tests/unit/report/test_coverage.py:215</a></div>
       
     </div>
     </div>
@@ -10102,7 +10086,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L227">tests/unit/report/test_coverage.py:227</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L227">tests/unit/report/test_coverage.py:227</a></div>
       
     </div>
     </div>
@@ -10146,7 +10130,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L251">tests/unit/report/test_coverage.py:251</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L251">tests/unit/report/test_coverage.py:251</a></div>
       
     </div>
     </div>
@@ -10190,7 +10174,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L282">tests/unit/report/test_coverage.py:282</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L282">tests/unit/report/test_coverage.py:282</a></div>
       
     </div>
     </div>
@@ -10238,7 +10222,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L313">tests/unit/report/test_coverage.py:313</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L313">tests/unit/report/test_coverage.py:313</a></div>
       
     </div>
     </div>
@@ -10282,7 +10266,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L361">tests/unit/report/test_coverage.py:361</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L361">tests/unit/report/test_coverage.py:361</a></div>
       
     </div>
     </div>
@@ -10326,7 +10310,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L407">tests/unit/report/test_coverage.py:407</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L407">tests/unit/report/test_coverage.py:407</a></div>
       
     </div>
     </div>
@@ -10370,7 +10354,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L429">tests/unit/report/test_coverage.py:429</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L429">tests/unit/report/test_coverage.py:429</a></div>
       
     </div>
     </div>
@@ -10414,7 +10398,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L459">tests/unit/report/test_coverage.py:459</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L459">tests/unit/report/test_coverage.py:459</a></div>
       
     </div>
     </div>
@@ -10458,7 +10442,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L483">tests/unit/report/test_coverage.py:483</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L483">tests/unit/report/test_coverage.py:483</a></div>
       
     </div>
     </div>
@@ -10502,7 +10486,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L518">tests/unit/report/test_coverage.py:518</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L518">tests/unit/report/test_coverage.py:518</a></div>
       
     </div>
     </div>
@@ -10546,7 +10530,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_coverage.py#L546">tests/unit/report/test_coverage.py:546</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_coverage.py#L546">tests/unit/report/test_coverage.py:546</a></div>
       
     </div>
     </div>
@@ -10572,7 +10556,7 @@ Next line is not a separator.
         <span class="scenario-status passed">
           ✓ passed
         </span>
-        <span class="scenario-duration">59ms</span>
+        <span class="scenario-duration">60ms</span>
       </span>
     </div>
 
@@ -10594,7 +10578,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_html_renderer.py#L208">tests/unit/report/test_html_renderer.py:208</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_html_renderer.py#L208">tests/unit/report/test_html_renderer.py:208</a></div>
       
     </div>
     </div>
@@ -10657,7 +10641,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_md_renderer.py#L46">tests/unit/report/test_md_renderer.py:46</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_md_renderer.py#L46">tests/unit/report/test_md_renderer.py:46</a></div>
       
     </div>
     </div>
@@ -10719,7 +10703,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_md_renderer.py#L145">tests/unit/report/test_md_renderer.py:145</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_md_renderer.py#L145">tests/unit/report/test_md_renderer.py:145</a></div>
       
     </div>
     </div>
@@ -10780,7 +10764,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_md_renderer.py#L170">tests/unit/report/test_md_renderer.py:170</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_md_renderer.py#L170">tests/unit/report/test_md_renderer.py:170</a></div>
       
     </div>
     </div>
@@ -10848,7 +10832,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_md_renderer.py#L225">tests/unit/report/test_md_renderer.py:225</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_md_renderer.py#L225">tests/unit/report/test_md_renderer.py:225</a></div>
       
     </div>
     </div>
@@ -10944,7 +10928,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_md_renderer.py#L262">tests/unit/report/test_md_renderer.py:262</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_md_renderer.py#L262">tests/unit/report/test_md_renderer.py:262</a></div>
       
     </div>
     </div>
@@ -11010,7 +10994,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_md_renderer.py#L333">tests/unit/report/test_md_renderer.py:333</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_md_renderer.py#L333">tests/unit/report/test_md_renderer.py:333</a></div>
       
     </div>
     </div>
@@ -11071,7 +11055,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_md_renderer.py#L496">tests/unit/report/test_md_renderer.py:496</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_md_renderer.py#L496">tests/unit/report/test_md_renderer.py:496</a></div>
       
     </div>
     </div>
@@ -11115,7 +11099,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_source_link.py#L29">tests/unit/report/test_source_link.py:29</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_source_link.py#L29">tests/unit/report/test_source_link.py:29</a></div>
       
     </div>
     </div>
@@ -11289,7 +11273,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_source_link.py#L44">tests/unit/report/test_source_link.py:44</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_source_link.py#L44">tests/unit/report/test_source_link.py:44</a></div>
       
     </div>
     </div>
@@ -11333,7 +11317,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_source_link.py#L66">tests/unit/report/test_source_link.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_source_link.py#L66">tests/unit/report/test_source_link.py:66</a></div>
       
     </div>
     </div>
@@ -11381,7 +11365,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_source_link.py#L76">tests/unit/report/test_source_link.py:76</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_source_link.py#L76">tests/unit/report/test_source_link.py:76</a></div>
       
     </div>
     </div>
@@ -11427,7 +11411,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_source_link.py#L111">tests/unit/report/test_source_link.py:111</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_source_link.py#L111">tests/unit/report/test_source_link.py:111</a></div>
       
     </div>
     </div>
@@ -11471,7 +11455,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_source_link.py#L134">tests/unit/report/test_source_link.py:134</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_source_link.py#L134">tests/unit/report/test_source_link.py:134</a></div>
       
     </div>
     </div>
@@ -11519,7 +11503,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/report/test_source_link.py#L183">tests/unit/report/test_source_link.py:183</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/report/test_source_link.py#L183">tests/unit/report/test_source_link.py:183</a></div>
       
     </div>
     </div>
@@ -11565,7 +11549,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L74">tests/unit/test_grouping.py:74</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L74">tests/unit/test_grouping.py:74</a></div>
       
     </div>
     </div>
@@ -11611,7 +11595,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L106">tests/unit/test_grouping.py:106</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L106">tests/unit/test_grouping.py:106</a></div>
       
     </div>
     </div>
@@ -11657,7 +11641,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L205">tests/unit/test_grouping.py:205</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L205">tests/unit/test_grouping.py:205</a></div>
       
     </div>
     </div>
@@ -11707,7 +11691,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L426">tests/unit/test_grouping.py:426</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L426">tests/unit/test_grouping.py:426</a></div>
       
     </div>
     </div>
@@ -11755,7 +11739,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L543">tests/unit/test_grouping.py:543</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L543">tests/unit/test_grouping.py:543</a></div>
       
     </div>
     </div>
@@ -11807,7 +11791,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L655">tests/unit/test_grouping.py:655</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L655">tests/unit/test_grouping.py:655</a></div>
       
     </div>
     </div>
@@ -11853,7 +11837,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L1021">tests/unit/test_grouping.py:1021</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L1021">tests/unit/test_grouping.py:1021</a></div>
       
     </div>
     </div>
@@ -11901,7 +11885,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L1036">tests/unit/test_grouping.py:1036</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L1036">tests/unit/test_grouping.py:1036</a></div>
       
     </div>
     </div>
@@ -11949,7 +11933,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L1079">tests/unit/test_grouping.py:1079</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L1079">tests/unit/test_grouping.py:1079</a></div>
       
     </div>
     </div>
@@ -11999,7 +11983,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L1161">tests/unit/test_grouping.py:1161</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L1161">tests/unit/test_grouping.py:1161</a></div>
       
     </div>
     </div>
@@ -12049,7 +12033,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L1512">tests/unit/test_grouping.py:1512</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L1512">tests/unit/test_grouping.py:1512</a></div>
       
     </div>
     </div>
@@ -12099,7 +12083,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L1569">tests/unit/test_grouping.py:1569</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L1569">tests/unit/test_grouping.py:1569</a></div>
       
     </div>
     </div>
@@ -12147,7 +12131,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L1733">tests/unit/test_grouping.py:1733</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L1733">tests/unit/test_grouping.py:1733</a></div>
       
     </div>
     </div>
@@ -12197,7 +12181,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L1789">tests/unit/test_grouping.py:1789</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L1789">tests/unit/test_grouping.py:1789</a></div>
       
     </div>
     </div>
@@ -12245,7 +12229,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L2337">tests/unit/test_grouping.py:2337</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L2337">tests/unit/test_grouping.py:2337</a></div>
       
     </div>
     </div>
@@ -12295,7 +12279,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L2475">tests/unit/test_grouping.py:2475</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L2475">tests/unit/test_grouping.py:2475</a></div>
       
     </div>
     </div>
@@ -12343,7 +12327,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_grouping.py#L2603">tests/unit/test_grouping.py:2603</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_grouping.py#L2603">tests/unit/test_grouping.py:2603</a></div>
       
     </div>
     </div>
@@ -12389,7 +12373,7 @@ Next line is not a separator.
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/unit/test_percase.py#L59">tests/unit/test_percase.py:59</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/unit/test_percase.py#L59">tests/unit/test_percase.py:59</a></div>
       
     </div>
     </div>
@@ -13613,7 +13597,7 @@ Next line is not a separator.
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/tests/ubiquitous_language.py#L53">tests/ubiquitous_language.py:53</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/tests/ubiquitous_language.py#L53">tests/ubiquitous_language.py:53</a></div>
         
       </div>
       
@@ -13771,7 +13755,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L44">GLOSSARY.md:44</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L44">GLOSSARY.md:44</a></div>
                 
               </div>
             </div>
@@ -13832,7 +13816,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L54">GLOSSARY.md:54</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L54">GLOSSARY.md:54</a></div>
                 
               </div>
             </div>
@@ -13893,7 +13877,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L63">GLOSSARY.md:63</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L63">GLOSSARY.md:63</a></div>
                 
               </div>
             </div>
@@ -13944,7 +13928,7 @@ Next line is not a separator.
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L101">GLOSSARY.md:101</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L101">GLOSSARY.md:101</a></div>
                 
               </div>
             </div>
@@ -13995,7 +13979,7 @@ Next line is not a separator.
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L102">GLOSSARY.md:102</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L102">GLOSSARY.md:102</a></div>
                 
               </div>
             </div>
@@ -14046,7 +14030,7 @@ Next line is not a separator.
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L103">GLOSSARY.md:103</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L103">GLOSSARY.md:103</a></div>
                 
               </div>
             </div>
@@ -14132,7 +14116,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L13">GLOSSARY.md:13</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L13">GLOSSARY.md:13</a></div>
                 
               </div>
             </div>
@@ -14203,7 +14187,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L14">GLOSSARY.md:14</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L14">GLOSSARY.md:14</a></div>
                 
               </div>
             </div>
@@ -14264,7 +14248,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L16">GLOSSARY.md:16</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L16">GLOSSARY.md:16</a></div>
                 
               </div>
             </div>
@@ -14335,7 +14319,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L18">GLOSSARY.md:18</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L18">GLOSSARY.md:18</a></div>
                 
               </div>
             </div>
@@ -14406,7 +14390,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L19">GLOSSARY.md:19</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L19">GLOSSARY.md:19</a></div>
                 
               </div>
             </div>
@@ -14477,7 +14461,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L25">GLOSSARY.md:25</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L25">GLOSSARY.md:25</a></div>
                 
               </div>
             </div>
@@ -14548,7 +14532,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L27">GLOSSARY.md:27</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L27">GLOSSARY.md:27</a></div>
                 
               </div>
             </div>
@@ -14619,7 +14603,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L35">GLOSSARY.md:35</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L35">GLOSSARY.md:35</a></div>
                 
               </div>
             </div>
@@ -14680,7 +14664,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L37">GLOSSARY.md:37</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L37">GLOSSARY.md:37</a></div>
                 
               </div>
             </div>
@@ -14741,7 +14725,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L47">GLOSSARY.md:47</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L47">GLOSSARY.md:47</a></div>
                 
               </div>
             </div>
@@ -14812,7 +14796,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L53">GLOSSARY.md:53</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L53">GLOSSARY.md:53</a></div>
                 
               </div>
             </div>
@@ -14873,7 +14857,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L55">GLOSSARY.md:55</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L55">GLOSSARY.md:55</a></div>
                 
               </div>
             </div>
@@ -14946,7 +14930,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L64">GLOSSARY.md:64</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L64">GLOSSARY.md:64</a></div>
                 
               </div>
             </div>
@@ -15017,7 +15001,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L74">GLOSSARY.md:74</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L74">GLOSSARY.md:74</a></div>
                 
               </div>
             </div>
@@ -15078,7 +15062,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L84">GLOSSARY.md:84</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L84">GLOSSARY.md:84</a></div>
                 
               </div>
             </div>
@@ -15151,7 +15135,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L85">GLOSSARY.md:85</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L85">GLOSSARY.md:85</a></div>
                 
               </div>
             </div>
@@ -15234,7 +15218,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L28">GLOSSARY.md:28</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L28">GLOSSARY.md:28</a></div>
                 
               </div>
             </div>
@@ -15302,7 +15286,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L38">GLOSSARY.md:38</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L38">GLOSSARY.md:38</a></div>
                 
               </div>
             </div>
@@ -15368,7 +15352,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L15">GLOSSARY.md:15</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L15">GLOSSARY.md:15</a></div>
                 
               </div>
             </div>
@@ -15419,7 +15403,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L17">GLOSSARY.md:17</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L17">GLOSSARY.md:17</a></div>
                 
               </div>
             </div>
@@ -15470,7 +15454,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L26">GLOSSARY.md:26</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L26">GLOSSARY.md:26</a></div>
                 
               </div>
             </div>
@@ -15521,7 +15505,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L29">GLOSSARY.md:29</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L29">GLOSSARY.md:29</a></div>
                 
               </div>
             </div>
@@ -15562,7 +15546,7 @@ Next line is not a separator.
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L36">GLOSSARY.md:36</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L36">GLOSSARY.md:36</a></div>
                 
               </div>
             </div>
@@ -15613,7 +15597,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L45">GLOSSARY.md:45</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L45">GLOSSARY.md:45</a></div>
                 
               </div>
             </div>
@@ -15664,7 +15648,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L46">GLOSSARY.md:46</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L46">GLOSSARY.md:46</a></div>
                 
               </div>
             </div>
@@ -15715,7 +15699,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L56">GLOSSARY.md:56</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L56">GLOSSARY.md:56</a></div>
                 
               </div>
             </div>
@@ -15766,7 +15750,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L57">GLOSSARY.md:57</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L57">GLOSSARY.md:57</a></div>
                 
               </div>
             </div>
@@ -15817,7 +15801,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L65">GLOSSARY.md:65</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L65">GLOSSARY.md:65</a></div>
                 
               </div>
             </div>
@@ -15868,7 +15852,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L66">GLOSSARY.md:66</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L66">GLOSSARY.md:66</a></div>
                 
               </div>
             </div>
@@ -15919,7 +15903,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L75">GLOSSARY.md:75</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L75">GLOSSARY.md:75</a></div>
                 
               </div>
             </div>
@@ -15970,7 +15954,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L76">GLOSSARY.md:76</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L76">GLOSSARY.md:76</a></div>
                 
               </div>
             </div>
@@ -16021,7 +16005,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L77">GLOSSARY.md:77</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L77">GLOSSARY.md:77</a></div>
                 
               </div>
             </div>
@@ -16072,7 +16056,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L78">GLOSSARY.md:78</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L78">GLOSSARY.md:78</a></div>
                 
               </div>
             </div>
@@ -16123,7 +16107,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L79">GLOSSARY.md:79</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L79">GLOSSARY.md:79</a></div>
                 
               </div>
             </div>
@@ -16174,7 +16158,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L80">GLOSSARY.md:80</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L80">GLOSSARY.md:80</a></div>
                 
               </div>
             </div>
@@ -16225,7 +16209,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L81">GLOSSARY.md:81</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L81">GLOSSARY.md:81</a></div>
                 
               </div>
             </div>
@@ -16276,7 +16260,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L82">GLOSSARY.md:82</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L82">GLOSSARY.md:82</a></div>
                 
               </div>
             </div>
@@ -16327,7 +16311,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L83">GLOSSARY.md:83</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L83">GLOSSARY.md:83</a></div>
                 
               </div>
             </div>
@@ -16378,7 +16362,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L86">GLOSSARY.md:86</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L86">GLOSSARY.md:86</a></div>
                 
               </div>
             </div>
@@ -16429,7 +16413,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L87">GLOSSARY.md:87</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L87">GLOSSARY.md:87</a></div>
                 
               </div>
             </div>
@@ -16480,7 +16464,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L88">GLOSSARY.md:88</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L88">GLOSSARY.md:88</a></div>
                 
               </div>
             </div>
@@ -16531,7 +16515,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L89">GLOSSARY.md:89</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L89">GLOSSARY.md:89</a></div>
                 
               </div>
             </div>
@@ -16582,7 +16566,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L90">GLOSSARY.md:90</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L90">GLOSSARY.md:90</a></div>
                 
               </div>
             </div>
@@ -16633,7 +16617,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L91">GLOSSARY.md:91</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L91">GLOSSARY.md:91</a></div>
                 
               </div>
             </div>
@@ -16684,7 +16668,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L92">GLOSSARY.md:92</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L92">GLOSSARY.md:92</a></div>
                 
               </div>
             </div>
@@ -16735,7 +16719,7 @@ Next line is not a separator.
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0c582eda4831012ba6dd7cd0fbe548499084fb14/GLOSSARY.md#L93">GLOSSARY.md:93</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/GLOSSARY.md#L93">GLOSSARY.md:93</a></div>
                 
               </div>
             </div>
@@ -16763,10 +16747,10 @@ Next line is not a separator.
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-30T17:29:14.307950+00:00",
+    "timestamp": "2026-08-30T17:40:30.076136+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "0c582eda4831012ba6dd7cd0fbe548499084fb14",
+    "commit_sha": "f9053084abef30e4bfd6a116a1cb37245706e7ad",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -16788,7 +16772,7 @@ window.__REPORT_DATA__ = {
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -17034,7 +17018,7 @@ window.__REPORT_DATA__ = {
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -17407,7 +17391,7 @@ window.__REPORT_DATA__ = {
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -17500,7 +17484,7 @@ window.__REPORT_DATA__ = {
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -17576,7 +17560,7 @@ window.__REPORT_DATA__ = {
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 55,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -17662,7 +17646,7 @@ window.__REPORT_DATA__ = {
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -17916,7 +17900,7 @@ window.__REPORT_DATA__ = {
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -18116,7 +18100,7 @@ window.__REPORT_DATA__ = {
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -34508,7 +34492,7 @@ window.__REPORT_DATA__ = {
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -38981,6 +38965,7 @@ function reportApp() {
   const scenarioActivities = window.__scenarioActivities || {};
   const activityLabels = window.__activityLabels || {};
   const hasGlossary = glossaryTerms.length > 0;
+  const allModules = [...new Set(data.scenarios.map(s => s.module))];
   // Term id -> canonical display name, for the Terms browse axis.
   const termNames = {};
   for (const t of glossaryTerms) termNames[t.id] = t.canonical;
@@ -38991,9 +38976,10 @@ function reportApp() {
   }
   return {
     search: '',
-    // Terms is the richest axis when there is a glossary; reports without one
-    // have no Terms segment, so they open on Tags.
-    view: hasGlossary ? 'terms' : 'tags',
+    // Modules is the only axis every report has: a suite may carry no tags and
+    // no glossary, but every scenario has a module. So it leads the segments
+    // and opens by default, and no report can open on an empty browse tree.
+    view: 'modules',
     mainView: 'scenarios',
     // How the browse tree orders its groups. Ephemeral like `view` above —
     // the hash carries filters, which change what you see, not the order.
@@ -39087,47 +39073,118 @@ function reportApp() {
     get filteredCount() {
       return data.scenarios.filter((_, i) => this.isVisible(i)).length;
     },
+    // Every axis renders as the same flat list of rows carrying their own
+    // `depth`, so one template serves all three. Tags and terms are depth 0
+    // throughout; only modules nest, and only their interior rows have
+    // children to expand.
     get groups() {
+      return this.view === 'modules' ? this._moduleRows() : this._flatRows();
+    },
+    _flatRows() {
       const grouped = {};
       const isTerms = this.view === 'terms';
       for (const s of data.scenarios) {
         if (!this._matchesFilters(s)) continue;
-        let keys;
-        if (isTerms) {
-          const ids = scenarioTerms[s.id] || [];
-          keys = ids.length ? ids : [NO_TERMS];
-        } else if (this.view === 'tags') {
-          keys = s.tags.length ? s.tags : [NO_TAGS];
-        } else {
-          keys = [s.module];
-        }
-        for (const k of keys) {
+        const ids = isTerms ? scenarioTerms[s.id] || [] : s.tags;
+        for (const k of ids.length ? ids : [isTerms ? NO_TERMS : NO_TAGS]) {
           if (!grouped[k]) {
             grouped[k] = {
               id: k,
               name: isTerms ? this.termLabel(k) : this.tagLabel(k),
-              scenarios: [],
+              depth: 0,
+              count: 0,
+              hasChildren: false,
             };
           }
-          grouped[k].scenarios.push(s);
+          grouped[k].count++;
         }
       }
-      // Selected groups pin to the top so what you filtered by stays in view:
-      // arriving from the Glossary tab, the term you came for is the first row
-      // rather than somewhere down the list. Below the pin the sort toggle
-      // decides, with ties alphabetical so the order stays stable.
+      return this._ordered(Object.values(grouped));
+    },
+    // A module path tree, flattened depth-first into rows. A row is visible
+    // only while every ancestor is expanded, so collapsing a package hides
+    // the subtree without rebuilding it.
+    _moduleRows() {
+      const counts = {};
+      for (const s of data.scenarios) {
+        if (this._matchesFilters(s)) counts[s.module] = (counts[s.module] || 0) + 1;
+      }
+      const modules = Object.keys(counts);
+      if (!modules.length) return [];
+      // Depth comes from every module in the report, not the filtered subset:
+      // selecting a package narrows the tree to it, and a prefix recomputed
+      // from that subset would strip the selected row itself out of view.
+      const skip = this._commonDepth(allModules);
+      const root = {};
+      for (const m of modules) {
+        let node = root;
+        const parts = m.split('.');
+        for (let i = skip; i < parts.length; i++) {
+          const key = parts.slice(0, i + 1).join('.');
+          node = (node[key] || (node[key] = { __id: key, __name: parts[i], __kids: {} })).__kids;
+        }
+      }
+      const rows = [];
+      const walk = (kids, depth, visible) => {
+        const level = Object.values(kids).map(node => {
+          const id = node.__id;
+          const own = counts[id] || 0;
+          const sub = Object.keys(node.__kids).length;
+          return { node, id, name: node.__name, depth, hasChildren: sub > 0,
+                   count: own + this._subtreeCount(node, counts) };
+        });
+        for (const row of this._ordered(level)) {
+          if (visible) rows.push(row);
+          // A package on the path to the selected module opens whether or not
+          // it was expanded by hand, so the selected row is never stranded
+          // inside a collapsed ancestor — on a `#module=` deep link there was
+          // no chance to expand it, and after a click it must stay visible to
+          // be clicked again.
+          const onPath = this.moduleFilter && this.moduleFilter.startsWith(row.id + '.');
+          walk(row.node.__kids, depth + 1,
+               visible && (!!this.expandedGroups[row.id] || onPath));
+        }
+      };
+      walk(root, 0, true);
+      return rows.map(({ node, ...row }) => row);
+    },
+    _subtreeCount(node, counts) {
+      return Object.values(node.__kids).reduce(
+        (n, kid) => n + (counts[kid.__id] || 0) + this._subtreeCount(kid, counts), 0);
+    },
+    // Segments every module shares carry no information — `tests` above a
+    // suite rooted there is a row and an indent that say nothing. Never eats
+    // a module's last segment, or a lone module would render nameless.
+    _commonDepth(modules) {
+      const first = modules[0].split('.');
+      let i = 0;
+      while (i < first.length - 1
+             && modules.every(m => {
+               const parts = m.split('.');
+               return parts.length > i + 1 && parts[i] === first[i];
+             })) i++;
+      return i;
+    },
+    // Selected groups pin to the top so what you filtered by stays in view:
+    // arriving from the Glossary tab, the term you came for is the first row
+    // rather than somewhere down the list. Below the pin the sort toggle
+    // decides, with ties alphabetical so the order stays stable.
+    _ordered(rows) {
       const byCount = this.sortBy === 'count';
-      return Object.values(grouped).sort((a, b) =>
+      return rows.sort((a, b) =>
         (this.isGroupActive(a) ? 0 : 1) - (this.isGroupActive(b) ? 0 : 1)
-        || (byCount ? b.scenarios.length - a.scenarios.length : 0)
+        || (byCount ? b.count - a.count : 0)
         || a.name.localeCompare(b.name));
     },
     _matchesFilters(s) {
       if (s.status === 'passed' && !this.showPassed) return false;
       if (s.status === 'failed' && !this.showFailed) return false;
       if (s.status === 'skipped' && !this.showSkipped) return false;
-      // A scenario has exactly one module, so this axis is single-select.
-      if (this.moduleFilter && s.module !== this.moduleFilter) return false;
+      // A scenario has exactly one module, so this axis is single-select. The
+      // filter is a path prefix, not an exact id: selecting a package in the
+      // browse tree takes everything under it.
+      if (this.moduleFilter && s.module !== this.moduleFilter
+          && !s.module.startsWith(this.moduleFilter + '.')) return false;
       // Tags and terms are set-valued, so several of them narrow with AND:
       // the scenario must carry every selected one, not any of them.
       for (const tag of this.tagFilters) {

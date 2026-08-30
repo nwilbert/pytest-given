@@ -267,16 +267,9 @@ body {
 /* padding-left keeps a minimum gap from the group name even when a wrapped
    name fills the row and the auto margin collapses to zero. */
 .nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); }
-.nav-scenario {
-  padding: 2px 0 2px 14px;
-  font-size: var(--font-size-sm);
-  color: var(--color-accent);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-}
-.nav-scenario:hover { text-decoration: underline; }
+/* Keeps a childless row's name aligned with its siblings that carry a
+   chevron, so one level reads as one column. */
+.nav-group-toggle-placeholder { width: 8px; flex-shrink: 0; margin-right: 6px; }
 .nav-status-icon { font-size: 0.625rem; }
 
 /* === Main === */
@@ -1229,29 +1222,20 @@ span.param-highlight {
                   aria-label="Sort groups by scenario count">Count</button>
         </div>
       </div>
-      <div class="seg-toggle">
-        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
+      <div class="seg-toggle"><div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+        
         <div class="seg-btn" :class="{ active: view === 'terms' }" @click="view = 'terms'">Terms</div>
         
-        <div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
       </div>
-      <div class="nav-tree">
-        <template x-for="group in groups" :key="group.id">
-          <div><div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }" @click="onGroupClick(group)">
-              <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
-              <span class="nav-group-name" x-text="group.name"></span>
-              <span class="nav-group-count" x-text="group.scenarios.length"></span>
-            </div>
-            <template x-if="expandedGroups[group.id]">
-              <div>
-                <template x-for="s in group.scenarios" :key="s.id">
-                  <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
-                    <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
-                    <span x-text="s.narration.text"></span>
-                  </div>
-                </template>
-              </div>
-            </template>
+      <div class="nav-tree"><template x-for="group in groups" :key="group.id">
+          <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }"
+               :style="'padding-left:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
+            <span class="nav-group-toggle" x-show="group.hasChildren"
+                  :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
+            <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren"></span>
+            <span class="nav-group-name" x-text="group.name"></span>
+            <span class="nav-group-count" x-text="group.count"></span>
           </div>
         </template>
       </div>
@@ -1328,7 +1312,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27aeb25439fe5db3696ade497e4e4be8fb8fe977/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
       
     </div>
     </div>
@@ -1374,7 +1358,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27aeb25439fe5db3696ade497e4e4be8fb8fe977/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
       
     </div>
     </div>
@@ -1547,7 +1531,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27aeb25439fe5db3696ade497e4e4be8fb8fe977/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -1695,7 +1679,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27aeb25439fe5db3696ade497e4e4be8fb8fe977/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
                 
               </div>
             </div>
@@ -1771,7 +1755,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27aeb25439fe5db3696ade497e4e4be8fb8fe977/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
                 
               </div>
             </div>
@@ -1832,7 +1816,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27aeb25439fe5db3696ade497e4e4be8fb8fe977/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
                 
               </div>
             </div>
@@ -1915,7 +1899,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27aeb25439fe5db3696ade497e4e4be8fb8fe977/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
                 
               </div>
             </div>
@@ -1981,7 +1965,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27aeb25439fe5db3696ade497e4e4be8fb8fe977/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
                 
               </div>
             </div>
@@ -2022,7 +2006,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/27aeb25439fe5db3696ade497e4e4be8fb8fe977/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/f9053084abef30e4bfd6a116a1cb37245706e7ad/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
                 
               </div>
             </div>
@@ -2050,10 +2034,10 @@ span.param-highlight {
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-30T10:28:06.339045+00:00",
+    "timestamp": "2026-08-30T17:40:24.132241+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "27aeb25439fe5db3696ade497e4e4be8fb8fe977",
+    "commit_sha": "f9053084abef30e4bfd6a116a1cb37245706e7ad",
     "title": "File Glossary Example"
   },
   "scenarios": [
@@ -2509,6 +2493,7 @@ function reportApp() {
   const scenarioActivities = window.__scenarioActivities || {};
   const activityLabels = window.__activityLabels || {};
   const hasGlossary = glossaryTerms.length > 0;
+  const allModules = [...new Set(data.scenarios.map(s => s.module))];
   // Term id -> canonical display name, for the Terms browse axis.
   const termNames = {};
   for (const t of glossaryTerms) termNames[t.id] = t.canonical;
@@ -2519,9 +2504,10 @@ function reportApp() {
   }
   return {
     search: '',
-    // Terms is the richest axis when there is a glossary; reports without one
-    // have no Terms segment, so they open on Tags.
-    view: hasGlossary ? 'terms' : 'tags',
+    // Modules is the only axis every report has: a suite may carry no tags and
+    // no glossary, but every scenario has a module. So it leads the segments
+    // and opens by default, and no report can open on an empty browse tree.
+    view: 'modules',
     mainView: 'scenarios',
     // How the browse tree orders its groups. Ephemeral like `view` above —
     // the hash carries filters, which change what you see, not the order.
@@ -2615,47 +2601,118 @@ function reportApp() {
     get filteredCount() {
       return data.scenarios.filter((_, i) => this.isVisible(i)).length;
     },
+    // Every axis renders as the same flat list of rows carrying their own
+    // `depth`, so one template serves all three. Tags and terms are depth 0
+    // throughout; only modules nest, and only their interior rows have
+    // children to expand.
     get groups() {
+      return this.view === 'modules' ? this._moduleRows() : this._flatRows();
+    },
+    _flatRows() {
       const grouped = {};
       const isTerms = this.view === 'terms';
       for (const s of data.scenarios) {
         if (!this._matchesFilters(s)) continue;
-        let keys;
-        if (isTerms) {
-          const ids = scenarioTerms[s.id] || [];
-          keys = ids.length ? ids : [NO_TERMS];
-        } else if (this.view === 'tags') {
-          keys = s.tags.length ? s.tags : [NO_TAGS];
-        } else {
-          keys = [s.module];
-        }
-        for (const k of keys) {
+        const ids = isTerms ? scenarioTerms[s.id] || [] : s.tags;
+        for (const k of ids.length ? ids : [isTerms ? NO_TERMS : NO_TAGS]) {
           if (!grouped[k]) {
             grouped[k] = {
               id: k,
               name: isTerms ? this.termLabel(k) : this.tagLabel(k),
-              scenarios: [],
+              depth: 0,
+              count: 0,
+              hasChildren: false,
             };
           }
-          grouped[k].scenarios.push(s);
+          grouped[k].count++;
         }
       }
-      // Selected groups pin to the top so what you filtered by stays in view:
-      // arriving from the Glossary tab, the term you came for is the first row
-      // rather than somewhere down the list. Below the pin the sort toggle
-      // decides, with ties alphabetical so the order stays stable.
+      return this._ordered(Object.values(grouped));
+    },
+    // A module path tree, flattened depth-first into rows. A row is visible
+    // only while every ancestor is expanded, so collapsing a package hides
+    // the subtree without rebuilding it.
+    _moduleRows() {
+      const counts = {};
+      for (const s of data.scenarios) {
+        if (this._matchesFilters(s)) counts[s.module] = (counts[s.module] || 0) + 1;
+      }
+      const modules = Object.keys(counts);
+      if (!modules.length) return [];
+      // Depth comes from every module in the report, not the filtered subset:
+      // selecting a package narrows the tree to it, and a prefix recomputed
+      // from that subset would strip the selected row itself out of view.
+      const skip = this._commonDepth(allModules);
+      const root = {};
+      for (const m of modules) {
+        let node = root;
+        const parts = m.split('.');
+        for (let i = skip; i < parts.length; i++) {
+          const key = parts.slice(0, i + 1).join('.');
+          node = (node[key] || (node[key] = { __id: key, __name: parts[i], __kids: {} })).__kids;
+        }
+      }
+      const rows = [];
+      const walk = (kids, depth, visible) => {
+        const level = Object.values(kids).map(node => {
+          const id = node.__id;
+          const own = counts[id] || 0;
+          const sub = Object.keys(node.__kids).length;
+          return { node, id, name: node.__name, depth, hasChildren: sub > 0,
+                   count: own + this._subtreeCount(node, counts) };
+        });
+        for (const row of this._ordered(level)) {
+          if (visible) rows.push(row);
+          // A package on the path to the selected module opens whether or not
+          // it was expanded by hand, so the selected row is never stranded
+          // inside a collapsed ancestor — on a `#module=` deep link there was
+          // no chance to expand it, and after a click it must stay visible to
+          // be clicked again.
+          const onPath = this.moduleFilter && this.moduleFilter.startsWith(row.id + '.');
+          walk(row.node.__kids, depth + 1,
+               visible && (!!this.expandedGroups[row.id] || onPath));
+        }
+      };
+      walk(root, 0, true);
+      return rows.map(({ node, ...row }) => row);
+    },
+    _subtreeCount(node, counts) {
+      return Object.values(node.__kids).reduce(
+        (n, kid) => n + (counts[kid.__id] || 0) + this._subtreeCount(kid, counts), 0);
+    },
+    // Segments every module shares carry no information — `tests` above a
+    // suite rooted there is a row and an indent that say nothing. Never eats
+    // a module's last segment, or a lone module would render nameless.
+    _commonDepth(modules) {
+      const first = modules[0].split('.');
+      let i = 0;
+      while (i < first.length - 1
+             && modules.every(m => {
+               const parts = m.split('.');
+               return parts.length > i + 1 && parts[i] === first[i];
+             })) i++;
+      return i;
+    },
+    // Selected groups pin to the top so what you filtered by stays in view:
+    // arriving from the Glossary tab, the term you came for is the first row
+    // rather than somewhere down the list. Below the pin the sort toggle
+    // decides, with ties alphabetical so the order stays stable.
+    _ordered(rows) {
       const byCount = this.sortBy === 'count';
-      return Object.values(grouped).sort((a, b) =>
+      return rows.sort((a, b) =>
         (this.isGroupActive(a) ? 0 : 1) - (this.isGroupActive(b) ? 0 : 1)
-        || (byCount ? b.scenarios.length - a.scenarios.length : 0)
+        || (byCount ? b.count - a.count : 0)
         || a.name.localeCompare(b.name));
     },
     _matchesFilters(s) {
       if (s.status === 'passed' && !this.showPassed) return false;
       if (s.status === 'failed' && !this.showFailed) return false;
       if (s.status === 'skipped' && !this.showSkipped) return false;
-      // A scenario has exactly one module, so this axis is single-select.
-      if (this.moduleFilter && s.module !== this.moduleFilter) return false;
+      // A scenario has exactly one module, so this axis is single-select. The
+      // filter is a path prefix, not an exact id: selecting a package in the
+      // browse tree takes everything under it.
+      if (this.moduleFilter && s.module !== this.moduleFilter
+          && !s.module.startsWith(this.moduleFilter + '.')) return false;
       // Tags and terms are set-valued, so several of them narrow with AND:
       // the scenario must carry every selected one, not any of them.
       for (const tag of this.tagFilters) {

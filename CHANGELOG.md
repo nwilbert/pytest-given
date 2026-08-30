@@ -95,6 +95,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### HTML report
 
+- The browse sidebar leads with **Modules** and opens there — the one axis every
+  report has, so no report opens on an empty tree — and renders modules as a
+  collapsible package tree whose nodes filter by path prefix, so selecting a
+  package takes every scenario beneath it.
+- The browse sidebar no longer lists individual scenarios under each group; the
+  Scenarios view already lists them, collapsed, one click away.
 - A selected filter now reads the same in the sidebar and in the header chip
   that mirrors it, and the `×` marker on a selected row is gone — the row itself
   toggles, and the chip carries the real dismiss button.

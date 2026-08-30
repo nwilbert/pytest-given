@@ -82,35 +82,30 @@
         </div>
       </div>
       <div class="seg-toggle">
-        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
-        {#- The Terms axis needs a glossary to browse; without one the segment
-            is omitted and app.js falls back to opening on Tags. -#}
+        {#- Modules leads and opens by default: it is the one axis every report
+            has, so no report opens on an empty tree. The Terms axis needs a
+            glossary to browse; without one the segment is simply absent. -#}
+        <div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
         {% if tab_visibility.glossary %}
         <div class="seg-btn" :class="{ active: view === 'terms' }" @click="view = 'terms'">Terms</div>
         {% endif %}
-        <div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
       </div>
       <div class="nav-tree">
+        {#- Rows key on `group.id`, not the display name: a term row shows its
+            canonical name but filters by term id, and a module row shows one
+            path segment but filters by the whole path. The chevron stops
+            propagation so it expands without touching the filter; only a
+            module package has children, so only it renders one. Indenting by
+            `depth` is what makes the flat row list read as a tree. -#}
         <template x-for="group in groups" :key="group.id">
-          <div>
-            {#- Groups key on `group.id`, not the display name: a term group
-                shows its canonical name but filters by term id. The chevron
-                stops propagation so it expands without touching the filter. -#}
-            <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }" @click="onGroupClick(group)">
-              <span class="nav-group-toggle" :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
-              <span class="nav-group-name" x-text="group.name"></span>
-              <span class="nav-group-count" x-text="group.scenarios.length"></span>
-            </div>
-            <template x-if="expandedGroups[group.id]">
-              <div>
-                <template x-for="s in group.scenarios" :key="s.id">
-                  <div class="nav-scenario" @click="scrollToAndExpand(s.id)">
-                    <span class="nav-status-icon" :class="'dot-' + s.status" x-text="s.status === 'passed' ? '✓' : s.status === 'failed' ? '✗' : '○'"></span>
-                    <span x-text="s.narration.text"></span>
-                  </div>
-                </template>
-              </div>
-            </template>
+          <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }"
+               :style="'padding-left:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
+            <span class="nav-group-toggle" x-show="group.hasChildren"
+                  :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
+            <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren"></span>
+            <span class="nav-group-name" x-text="group.name"></span>
+            <span class="nav-group-count" x-text="group.count"></span>
           </div>
         </template>
       </div>
