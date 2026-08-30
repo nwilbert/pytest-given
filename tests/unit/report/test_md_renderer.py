@@ -62,10 +62,10 @@ def test_passed_scenario_heading_and_steps() -> None:
             ],
         )
         rd = _report(scn)
-        attach('Scenario record', report_to_dict(rd)['scenarios'][0])
     with when(t'the Markdown {pg["Report"]} is rendered'):
         md = render_md(rd)
     with then(t'the heading is checked and each {pg["Step"]} is a phase bullet'):
+        attach('Rendered Markdown', md)
         assert '## ✓ Buy coffee' in md
         assert '`tests/t.py::test_buy` · billing, happy-path' in md
         assert '- **given** a machine' in md
@@ -162,6 +162,7 @@ def test_nested_steps_indent() -> None:
     with when(t'the Markdown {pg["Report"]} is rendered'):
         md = render_md(_report(scn))
     with then('the child bullet indents under its parent'):
+        attach('Rendered Markdown', md)
         assert '- **when** outer' in md
         assert '  - **when** inner' in md
 
@@ -200,6 +201,7 @@ def test_narration_parts_resolve_terms_and_values() -> None:
         t'the {pg["Term ref"]} renders in guillemets, the value verbatim '
         t'and the placeholder in braces'
     ):
+        attach('Rendered Markdown', md)
         assert '- **when** a «Guest»42{amount}' in md
 
 
@@ -250,6 +252,7 @@ def test_parametrized_scenario_renders_table() -> None:
     with then(
         t'the heading counts the cases and the {pg["Parameter table"]} lists each row'
     ):
+        attach('Rendered Markdown', md)
         assert '## ✓ Pricing · 2 cases' in md
         assert '| euros | expect | |' in md
         assert '| 1 | False | ✓ |' in md
@@ -299,6 +302,7 @@ def test_failing_scenario_renders_a_minimal_error() -> None:
     with when(t'the Markdown {pg["Report"]} is rendered'):
         md = render_md(rd)
     with then('the heading is crossed and the error follows the steps'):
+        attach('Rendered Markdown', md)
         assert '## ✗ Sold out' in md
         assert '- **then** reports sold out' in md
         assert md.index('reports sold out') < md.index('> ValueError')
@@ -346,6 +350,7 @@ def test_multiline_attachment_renders_fenced_block() -> None:
     with when(t'the Markdown {pg["Report"]} is rendered'):
         md = render_md(_report(scn))
     with then(t'the {pg["Attachment"]} content sits in an indented fence, not inline'):
+        attach('Rendered Markdown', md)
         assert '  - 📎 Doc:' in md
         assert '\n    ```\n' in md
         assert '\n    line1\n' in md
@@ -504,6 +509,7 @@ def test_skipped_scenario_shows_reason() -> None:
     with when(t'the Markdown {pg["Report"]} is rendered'):
         md = render_md(_report(scn))
     with then('the heading is marked skipped and the reason follows the node id'):
+        attach('Rendered Markdown', md)
         assert '## ⤼ Later · skipped' in md
         assert '`tests/t.py::test_skip` — reason: needs fixture data' in md
 

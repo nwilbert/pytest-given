@@ -1848,66 +1848,19 @@
 `tests/unit/report/test_md_renderer.py:46::test_passed_scenario_heading_and_steps`
 
 - **given** a «Report» holding a passed «Scenario» with three steps
-  - 📎 Scenario record:
-    ```
-    {
-      "id": "tests/t.py::test_buy",
-      "narration": {
-        "text": "Buy coffee",
-        "parts": []
-      },
-      "module": "tests/t.py",
-      "tags": [
-        "billing",
-        "happy-path"
-      ],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a machine",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "I insert $2",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "I get a coffee",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": null,
-      "story_id": null,
-      "activity_ids": []
-    }
-    ```
 - **when** the Markdown «Report» is rendered
 - **then** the heading is checked and each «Step» is a phase bullet
+  - 📎 Rendered Markdown:
+    ```
+    # pytest-given — proj
+    
+    ## ✓ Buy coffee
+    `tests/t.py::test_buy` · billing, happy-path
+    
+    - **given** a machine
+    - **when** I insert $2
+    - **then** I get a coffee
+    ```
 
 ## ✓ Nested «steps» indent under their parent
 `tests/unit/report/test_md_renderer.py:145::test_nested_steps_indent`
@@ -1915,23 +1868,56 @@
 - **given** a «Scenario» whose when «Step» has a nested child
 - **when** the Markdown «Report» is rendered
 - **then** the child bullet indents under its parent
+  - 📎 Rendered Markdown:
+    ```
+    # pytest-given — proj
+    
+    ## ✓ Nest
+    `tests/t.py::test_nest`
+    
+    - **when** outer
+      - **when** inner
+    ```
 
 ## ✓ Structured «narration» renders «terms», values and placeholders
-`tests/unit/report/test_md_renderer.py:169::test_narration_parts_resolve_terms_and_values`
+`tests/unit/report/test_md_renderer.py:170::test_narration_parts_resolve_terms_and_values`
 
 - **given** a «Step» whose «Narration» carries a «Term ref», a value and a placeholder
 - **when** the Markdown «Report» is rendered
 - **then** the «Term ref» renders in guillemets, the value verbatim and the placeholder in braces
+  - 📎 Rendered Markdown:
+    ```
+    # pytest-given — proj
+    
+    ## ✓ ignored
+    `tests/t.py::test_parts`
+    
+    - **when** a «Guest»42{amount}
+    ```
 
 ## ✓ A «parametrized scenario» renders its «parameter table»
-`tests/unit/report/test_md_renderer.py:223::test_parametrized_scenario_renders_table` · parametrization
+`tests/unit/report/test_md_renderer.py:225::test_parametrized_scenario_renders_table` · parametrization
 
 - **given** a «Parametrized scenario» with a two-«Case» «Parameter table»
 - **when** the Markdown «Report» is rendered
 - **then** the heading counts the cases and the «Parameter table» lists each row
+  - 📎 Rendered Markdown:
+    ```
+    # pytest-given — proj
+    
+    ## ✓ Pricing · 2 cases
+    `tests/t.py::test_price`
+    
+    - **when** insert
+    
+    | euros | expect | |
+    |---|---|---|
+    | 1 | False | ✓ |
+    | 2 | True | ✓ |
+    ```
 
 ## ✓ A failing «step» is marked with a minimal error digest
-`tests/unit/report/test_md_renderer.py:259::test_failing_scenario_renders_a_minimal_error`
+`tests/unit/report/test_md_renderer.py:262::test_failing_scenario_renders_a_minimal_error`
 
 - **given** a failed «Scenario» carrying a two-line error and an internal frame
   - 📎 Error record:
@@ -1959,21 +1945,56 @@
     ```
 - **when** the Markdown «Report» is rendered
 - **then** the heading is crossed and the error follows the steps
+  - 📎 Rendered Markdown:
+    ```
+    # pytest-given — proj
+    
+    ## ✗ Sold out
+    `tests/t.py::test_sold_out`
+    
+    - **then** reports sold out
+    
+    > ValueError: not sold out
+    > test_shop.py:88 in test_sold_out
+    ```
 - **then** only the first message line and the non-internal frame are quoted
 
 ## ✓ A multi-line «attachment» renders as a fenced block
-`tests/unit/report/test_md_renderer.py:329::test_multiline_attachment_renders_fenced_block`
+`tests/unit/report/test_md_renderer.py:333::test_multiline_attachment_renders_fenced_block`
 
 - **given** a «Step» carrying a multi-line «Attachment»
 - **when** the Markdown «Report» is rendered
 - **then** the «Attachment» content sits in an indented fence, not inline
+  - 📎 Rendered Markdown:
+    ````
+    # pytest-given — proj
+    
+    ## ✓ Multi
+    `tests/t.py::test_multiline`
+    
+    - **then** result
+      - 📎 Doc:
+        ```
+        line1
+        line2
+        ```
+    ````
 
 ## ✓ A skipped scenario shows its skip reason
-`tests/unit/report/test_md_renderer.py:491::test_skipped_scenario_shows_reason`
+`tests/unit/report/test_md_renderer.py:496::test_skipped_scenario_shows_reason`
 
 - **given** a skipped «Scenario» with a reason
 - **when** the Markdown «Report» is rendered
 - **then** the heading is marked skipped and the reason follows the node id
+  - 📎 Rendered Markdown:
+    ```
+    # pytest-given — proj
+    
+    ## ⤼ Later · skipped
+    `tests/t.py::test_skip` — reason: needs fixture data
+    
+    - **when** act
+    ```
 
 ## ✓ The literal `none` disables the «source link»
 `tests/unit/report/test_source_link.py:29::test_resolve_template_none_returns_none`

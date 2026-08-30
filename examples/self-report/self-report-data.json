@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-30T16:57:16.781659+00:00",
+    "timestamp": "2026-08-30T17:08:54.638667+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "16a13494c3308f4a4c0973d6c250f1397368428c",
+    "commit_sha": "2bcd20e65badcc58a87fd3a81532d6a37622a3aa",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -134,7 +134,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -270,7 +270,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -736,7 +736,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 19,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -812,7 +812,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 78,
+      "duration_ms": 61,
       "steps": [
         {
           "phase": "given",
@@ -898,7 +898,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -982,7 +982,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -1152,7 +1152,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -1253,7 +1253,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -1352,7 +1352,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -17937,13 +17937,7 @@
             ]
           },
           "children": [],
-          "attachments": [
-            {
-              "label": "Scenario record",
-              "content": "{\n  \"id\": \"tests/t.py::test_buy\",\n  \"narration\": {\n    \"text\": \"Buy coffee\",\n    \"parts\": []\n  },\n  \"module\": \"tests/t.py\",\n  \"tags\": [\n    \"billing\",\n    \"happy-path\"\n  ],\n  \"status\": \"passed\",\n  \"duration_ms\": 0,\n  \"steps\": [\n    {\n      \"phase\": \"given\",\n      \"narration\": {\n        \"text\": \"a machine\",\n        \"parts\": []\n      },\n      \"children\": [],\n      \"attachments\": [],\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    },\n    {\n      \"phase\": \"when\",\n      \"narration\": {\n        \"text\": \"I insert $2\",\n        \"parts\": []\n      },\n      \"children\": [],\n      \"attachments\": [],\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    },\n    {\n      \"phase\": \"then\",\n      \"narration\": {\n        \"text\": \"I get a coffee\",\n        \"parts\": []\n      },\n      \"children\": [],\n      \"attachments\": [],\n      \"activity_ids\": [],\n      \"fixture_name\": null\n    }\n  ],\n  \"parameters\": null,\n  \"error\": null,\n  \"skip_reason\": null,\n  \"source\": null,\n  \"story_id\": null,\n  \"activity_ids\": []\n}",
-              "content_type": "json"
-            }
-          ],
+          "attachments": [],
           "activity_ids": [],
           "fixture_name": null
         },
@@ -17989,7 +17983,13 @@
             ]
           },
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Rendered Markdown",
+              "content": "# pytest-given \u2014 proj\n\n## \u2713 Buy coffee\n`tests/t.py::test_buy` \u00b7 billing, happy-path\n\n- **given** a machine\n- **when** I insert $2\n- **then** I get a coffee\n",
+              "content_type": "text"
+            }
+          ],
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18088,7 +18088,13 @@
             "parts": []
           },
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Rendered Markdown",
+              "content": "# pytest-given \u2014 proj\n\n## \u2713 Nest\n`tests/t.py::test_nest`\n\n- **when** outer\n  - **when** inner\n",
+              "content_type": "text"
+            }
+          ],
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18215,7 +18221,13 @@
             ]
           },
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Rendered Markdown",
+              "content": "# pytest-given \u2014 proj\n\n## \u2713 ignored\n`tests/t.py::test_parts`\n\n- **when** a \u00abGuest\u00bb42{amount}\n",
+              "content_type": "text"
+            }
+          ],
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18225,7 +18237,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 169
+        "line": 170
       },
       "story_id": null,
       "activity_ids": []
@@ -18338,7 +18350,13 @@
             ]
           },
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Rendered Markdown",
+              "content": "# pytest-given \u2014 proj\n\n## \u2713 Pricing \u00b7 2 cases\n`tests/t.py::test_price`\n\n- **when** insert\n\n| euros | expect | |\n|---|---|---|\n| 1 | False | \u2713 |\n| 2 | True | \u2713 |\n",
+              "content_type": "text"
+            }
+          ],
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18348,7 +18366,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 223
+        "line": 225
       },
       "story_id": null,
       "activity_ids": []
@@ -18435,7 +18453,13 @@
             "parts": []
           },
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Rendered Markdown",
+              "content": "# pytest-given \u2014 proj\n\n## \u2717 Sold out\n`tests/t.py::test_sold_out`\n\n- **then** reports sold out\n\n> ValueError: not sold out\n> test_shop.py:88 in test_sold_out\n",
+              "content_type": "text"
+            }
+          ],
           "activity_ids": [],
           "fixture_name": null
         },
@@ -18456,7 +18480,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 259
+        "line": 262
       },
       "story_id": null,
       "activity_ids": []
@@ -18554,7 +18578,13 @@
             ]
           },
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Rendered Markdown",
+              "content": "# pytest-given \u2014 proj\n\n## \u2713 Multi\n`tests/t.py::test_multiline`\n\n- **then** result\n  - \ud83d\udcce Doc:\n    ```\n    line1\n    line2\n    ```\n",
+              "content_type": "text"
+            }
+          ],
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18564,7 +18594,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 329
+        "line": 333
       },
       "story_id": null,
       "activity_ids": []
@@ -18633,7 +18663,13 @@
             "parts": []
           },
           "children": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "label": "Rendered Markdown",
+              "content": "# pytest-given \u2014 proj\n\n## \u293c Later \u00b7 skipped\n`tests/t.py::test_skip` \u2014 reason: needs fixture data\n\n- **when** act\n",
+              "content_type": "text"
+            }
+          ],
           "activity_ids": [],
           "fixture_name": null
         }
@@ -18643,7 +18679,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 491
+        "line": 496
       },
       "story_id": null,
       "activity_ids": []
