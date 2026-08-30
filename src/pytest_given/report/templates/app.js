@@ -33,9 +33,9 @@ function deserializeStory(params) {
 }
 
 // --- Alpine app ---
-// Buckets for scenarios with nothing on an axis. Both are selectable
-// filters, so the tokens have to survive a URL: a leading '!' cannot start a
-// term id (they are slugs) and is implausible as a tag.
+// Buckets for scenarios with nothing on an axis. Both are selectable filters,
+// so the tokens have to survive a URL: a leading '!' cannot start a term id
+// (they are slugs) and is implausible as a tag.
 const NO_TERMS = '!no-terms';
 const NO_TAGS = '!untagged';
 
@@ -44,7 +44,7 @@ function reportApp() {
   const storyIds = window.__storyIds || [];
   const glossaryTerms = (data.glossary && data.glossary.terms) || [];
   // Scenario -> covered activity ids, and activity key -> its prose. The story
-  // markup paints that prose as pills, which is unreadable as a filter label.
+  // markup paints that prose as pills, unreadable as a filter label.
   const scenarioActivities = window.__scenarioActivities || {};
   const activityLabels = window.__activityLabels || {};
   const hasGlossary = glossaryTerms.length > 0;
@@ -58,13 +58,12 @@ function reportApp() {
   }
   return {
     search: '',
-    // Terms is the richest axis when there is a glossary to browse; reports
-    // without one have no Terms segment, so they open on Tags.
+    // Terms is the richest axis when there is a glossary; reports without one
+    // have no Terms segment, so they open on Tags.
     view: hasGlossary ? 'terms' : 'tags',
     mainView: 'scenarios',
-    // How the browse tree orders its groups: 'name' alphabetically, 'count'
-    // by how many scenarios each holds. Ephemeral like `view` above — the
-    // hash carries filters, which change what you see, not the reading order.
+    // How the browse tree orders its groups. Ephemeral like `view` above —
+    // the hash carries filters, which change what you see, not the order.
     sortBy: 'name',
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
@@ -85,8 +84,8 @@ function reportApp() {
     termFilters: [],
     moduleFilter: null,
     // '<story id>:<activity id>', set by the jump from a story activity.
-    // Single-select: the Stories view is the only way in and every jump
-    // replaces the last, so a second one could never be selected.
+    // Single-select: every jump replaces the last, so a second one could
+    // never be selected.
     activityFilter: null,
     _suppressHashWrite: false,
     highlightedActivities: {},
@@ -132,9 +131,8 @@ function reportApp() {
         if (shown.length) parts.push(shown.join(', '));
       }
       if (this.search) parts.push('"' + this.search + '"');
-      // Term/tag/module filters each show as their own removable chip, so
-      // they aren't repeated here; suppress the "All Scenarios" fallback
-      // while any of them is active.
+      // Term/tag/module filters each have their own removable chip, so they
+      // are not repeated here — but they do suppress "All Scenarios".
       if (parts.length) return parts.join(' · ');
       const chipped = this.termFilters.length || this.tagFilters.length
         || this.moduleFilter || this.activityFilter;
@@ -181,12 +179,10 @@ function reportApp() {
           grouped[k].scenarios.push(s);
         }
       }
-      // Selected groups pin to the top so what you filtered by stays in view
-      // — arriving from the Glossary tab, the term you came for is the first
-      // row rather than somewhere down the list. Below that pin, the sort
-      // toggle decides, the same on all three axes: alphabetical for looking
-      // a name up, biggest-first for seeing where the coverage sits (ties
-      // still alphabetical, so equal-sized groups keep a stable reading order).
+      // Selected groups pin to the top so what you filtered by stays in view:
+      // arriving from the Glossary tab, the term you came for is the first row
+      // rather than somewhere down the list. Below the pin the sort toggle
+      // decides, with ties alphabetical so the order stays stable.
       const byCount = this.sortBy === 'count';
       return Object.values(grouped).sort((a, b) =>
         (this.isGroupActive(a) ? 0 : 1) - (this.isGroupActive(b) ? 0 : 1)
@@ -197,7 +193,7 @@ function reportApp() {
       if (s.status === 'passed' && !this.showPassed) return false;
       if (s.status === 'failed' && !this.showFailed) return false;
       if (s.status === 'skipped' && !this.showSkipped) return false;
-      // A scenario has exactly one module, so this axis stays single-select.
+      // A scenario has exactly one module, so this axis is single-select.
       if (this.moduleFilter && s.module !== this.moduleFilter) return false;
       // Tags and terms are set-valued, so several of them narrow with AND:
       // the scenario must carry every selected one, not any of them.
@@ -271,9 +267,9 @@ function reportApp() {
     },
     goToScenarioFresh(nodeId) {
       // Jumping in from a story activity: clear whatever was filtering the
-      // Scenarios view first, or the scenario you asked for can land behind
-      // a filter that hides it. Kept out of goToScenario itself, which also
-      // serves `#scenario=` deep links where the hash's own filters must win.
+      // Scenarios view first, or the scenario you asked for can land behind a
+      // filter that hides it. Kept out of goToScenario, which also serves
+      // `#scenario=` deep links where the hash's own filters must win.
       this.resetFilters();
       this.goToScenario(nodeId);
     },
@@ -296,20 +292,16 @@ function reportApp() {
       });
     },
     filterScenariosByTerm(id) {
-      // A jump from the Glossary tab is navigation, not refinement: it shows
-      // the term you clicked, on its own, rather than intersecting it with
-      // whatever the Scenarios view was already filtered by.
+      // Navigation, not refinement: the term arrives on its own rather than
+      // intersected with whatever the Scenarios view was already filtered by.
       this.resetFilters();
       this.termFilters = [id];
       this.mainView = 'scenarios';
-      // Reveal the active term in the sidebar rather than landing on an
-      // unrelated axis, mirroring what filterByTag does for tags.
+      // Reveal the active term rather than landing on an unrelated axis.
       if (hasGlossary) this.view = 'terms';
     },
     filterScenariosByActivity(key) {
-      // Navigation, not refinement — the same rule filterScenariosByTerm
-      // follows: the activity arrives on its own rather than intersected with
-      // whatever the Scenarios view was already filtered by.
+      // Navigation, not refinement, as for a term.
       this.resetFilters();
       this.activityFilter = key;
       // Keep the timeline lit on the activity you left from, so the Stories
@@ -322,9 +314,8 @@ function reportApp() {
     },
     activityLabel(key) {
       if (!key) return '';
-      // Activities are numbered in the timeline, but the number means nothing
-      // in the Scenarios view — so the chip leads with the prose and keeps the
-      // number as the pointer back into the story.
+      // The timeline number means nothing in the Scenarios view, so the chip
+      // leads with the prose and keeps the number as the pointer back.
       const number = key.split(':')[1];
       const text = activityLabels[key];
       return text ? `Activity ${number}: ${text}` : `Activity ${number}`;
@@ -341,8 +332,7 @@ function reportApp() {
     termLabel(id) {
       if (id === NO_TERMS) return 'no terms';
       // Term ids are slugs ('file-glossary'); the report speaks canonical
-      // names ('File glossary'). Falls back to the id for a term the
-      // glossary no longer carries.
+      // names ('File glossary'). Falls back to the id for an unknown term.
       return termNames[id] || id;
     },
     tagLabel(tag) {
@@ -354,10 +344,10 @@ function reportApp() {
       return this.moduleFilter === group.id;
     },
     onGroupClick(group) {
-      // In the Terms view the group name is the filter control: unlike tags,
-      // a term has no pill on the scenario card to activate a filter from,
-      // so the sidebar has to own that affordance. The chevron still expands
-      // (its own click stops propagation before reaching here).
+      // In the Terms view the group name is the filter control: unlike a tag,
+      // a term has no pill on the scenario card to filter from, so the sidebar
+      // owns that affordance. The chevron still expands (its own click stops
+      // propagation before reaching here).
       if (this.view === 'terms') {
         this.termFilters = this.termFilters.includes(group.id)
           ? this.termFilters.filter(t => t !== group.id)
@@ -365,8 +355,6 @@ function reportApp() {
       } else if (this.view === 'tags') {
         this.filterByTag(group.id);
       } else {
-        // Single-select: a scenario has one module, so intersecting two of
-        // them could only ever be empty.
         this.moduleFilter = this.moduleFilter === group.id ? null : group.id;
       }
     },
@@ -386,8 +374,7 @@ function reportApp() {
       history.replaceState(null, '', '#' + hashString);
       const btn = event.currentTarget;
       // Only flip to the "copied" state once the URL is actually on the
-      // clipboard — otherwise the icon would claim success even where the
-      // copy silently failed (e.g. a report served over http://).
+      // clipboard, or the icon would claim a success that never happened.
       this._copyText(window.location.href).then((ok) => {
         if (!ok) return;
         btn.classList.add('anchor-copied');
@@ -395,9 +382,9 @@ function reportApp() {
       });
     },
     _copyText(text) {
-      // navigator.clipboard exists only in secure contexts (https, file://);
-      // a report opened over plain http:// has none, so fall back to the
-      // legacy execCommand path. Also fall back if writeText rejects.
+      // navigator.clipboard exists only in secure contexts (https, file://),
+      // so a report served over plain http:// falls back to execCommand — as
+      // does a writeText that rejects.
       if (navigator.clipboard && navigator.clipboard.writeText) {
         return navigator.clipboard.writeText(text).then(
           () => true,
@@ -463,8 +450,8 @@ function reportApp() {
     init() {
       this._readHash();
       // Search typing replaces the current entry (no per-keystroke history
-      // spam); discrete navigations/filters push a back-able entry. All writes
-      // are suppressed while we're applying state FROM the hash (see _readHash).
+      // spam); discrete navigations and filters push a back-able one. All
+      // writes are suppressed while state is being applied FROM the hash.
       this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
       ['tagFilters', 'termFilters', 'moduleFilter', 'activityFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
@@ -476,8 +463,7 @@ function reportApp() {
       window.addEventListener('hashchange', () => this._readHash());
       window.addEventListener('popstate', () => this._readHash());
       // Capture phase + stopPropagation so a term pill inside a clickable
-      // container (e.g. a scenario header) navigates without also triggering
-      // that container's click (scenario expand/collapse).
+      // container navigates without also triggering that container's click.
       document.addEventListener('click', (event) => {
         const pill = event.target.closest('[data-term-id]');
         if (!pill) return;
@@ -488,13 +474,12 @@ function reportApp() {
       document.addEventListener('click', (event) => {
         const chip = event.target.closest('[data-activity-id]');
         if (!chip) return;
-        // The row's jump control sits inside the row and has its own
-        // destination; selecting the row as well would fight it.
+        // The row's own jump control has a different destination; selecting
+        // the row as well would fight it.
         if (event.target.closest('[data-activity-jump]')) return;
         this.toggleActivityHighlight(chip.dataset.activityId);
       });
-      // The selected activity row's jump control: filter the Scenarios view
-      // down to the scenarios covering that activity.
+      // The jump control filters the Scenarios view down to that activity.
       document.addEventListener('click', (event) => {
         const jump = event.target.closest('[data-activity-jump]');
         if (!jump) return;
@@ -509,10 +494,10 @@ function reportApp() {
       });
       this._initTermTooltip();
     },
-    // Single shared tooltip for every term ref. We position it with
-    // `fixed` from the ref's bounding box (rather than a CSS-only tooltip)
-    // because term refs live inside `overflow: hidden` collapsible bodies
-    // that would otherwise clip an absolutely positioned child.
+    // One shared tooltip for every term ref, positioned `fixed` from the
+    // ref's bounding box rather than done in CSS: term refs live inside
+    // `overflow: hidden` collapsible bodies, which would clip an absolutely
+    // positioned child.
     _initTermTooltip() {
       const tip = document.getElementById('term-tip');
       if (!tip) return;
@@ -525,10 +510,9 @@ function reportApp() {
         nameEl.textContent = pill.dataset.termName;
         const def = pill.dataset.termDef || '';
         // innerHTML because a definition carries inline markup. Safe not
-        // because the source is trusted — a term definition is ordinary
-        // report data — but because render_inline_markdown escapes the text
-        // first and only re-admits <br>/<code>/<strong>/<em>, none of which
-        // take attributes. Keep that invariant if you extend the renderer.
+        // because the source is trusted, but because render_inline_markdown
+        // escapes the text first and only re-admits <br>/<code>/<strong>/<em>,
+        // none of which take attributes. Keep that invariant.
         defEl.innerHTML = def;
         defEl.hidden = !def;
         tip.hidden = false;
@@ -563,7 +547,6 @@ function reportApp() {
       else this.tagFilters = [];
       if (params.has('module')) this.moduleFilter = params.get('module');
       else this.moduleFilter = null;
-      // Comma-separated; a single-term link from an older report still reads.
       if (params.has('term-filter')) {
         this.termFilters = params.get('term-filter').split(',').filter(Boolean);
       } else {

@@ -125,12 +125,11 @@ body {
   letter-spacing: 0.5px;
   margin-bottom: var(--space-sm);
 }
-/* The sort control shares the caption line with the section label. It stays
-   in the label's own register — no box, no fill — so the section keeps a
-   single bordered control (the browse-axis segments below it): choosing an
-   axis is the decision, ordering it is a modifier. Selection is marked the
-   way the top-level tabs mark it (accent text over an accent rule), not the
-   way filters do (tint + border) — sorting narrows nothing. */
+/* The sort control shares the caption line with the section label and stays in
+   the label's own register — no box, no fill — so the section keeps a single
+   bordered control: choosing a browse axis is the decision, ordering it is a
+   modifier. Marked the way the tabs mark selection (accent text over an accent
+   rule), not the way filters do (tint + border) — sorting narrows nothing. */
 .sidebar-label-row {
   display: flex;
   align-items: baseline;
@@ -183,10 +182,9 @@ body {
 .status-pill:not([class*="active-"]) { opacity: 0.5; text-decoration: line-through; }
 
 
-/* Segmented toggle — a connected single-select control. Shared by the
-   "Browse by" (Tags/Terms/Modules) toggle and the glossary "Definitions" filter so
-   the two read as the same idiom. (The Status pills above are deliberately
-   separate: they are multi-select with per-status semantic colors.) */
+/* Segmented toggle — a connected single-select control, shared by "Browse by"
+   and the glossary "Definitions" filter so the two read as one idiom. The
+   Status pills above stay separate: multi-select, with semantic colors. */
 .seg-toggle {
   display: flex;
   border: 1px solid var(--border);
@@ -215,14 +213,12 @@ body {
 .nav-tree { font-size: var(--font-size-base); margin-top: var(--space-md); }
 .nav-group {
   /* Same vertical inset as a filter chip, so a selected row and the chip it
-     mirrors come out near enough the same height (26px against 24px — the
-     row's text is a step larger). Also tightens the list: at 5px the rows
-     sat on a 34px pitch, loose for a 13px font. */
+     mirrors come out near enough the same height. Also tightens the list. */
   padding: 2px var(--space-xs);
   /* Bleed the row into the sidebar's own padding: the selected pill needs
      horizontal padding, but the label should stay aligned with the section
      heading above it. The 2px bottom margin keeps two selected rows from
-     fusing into one slab — several can be active at once. */
+     fusing into one slab. */
   margin: 0 calc(-1 * (var(--space-xs) + 1px)) 2px;
   /* A transparent border at rest reserves the selected border's space, so
      selecting a group tints it in place instead of nudging the row sideways. */
@@ -246,16 +242,13 @@ body {
   margin-right: 6px;
 }
 .nav-group-toggle-open { transform: rotate(45deg); }
-/* Dotted module paths are single unbreakable tokens; without a shrink
-   allowance and a forced break opportunity they widen the row past the
-   sidebar and produce a horizontal scrollbar. Wrap rather than ellipsize:
-   module names share long prefixes, so truncation would hide exactly the
-   distinguishing suffix. */
+/* Dotted module paths are single unbreakable tokens: without a shrink
+   allowance and a break opportunity they widen the row past the sidebar.
+   Wrapped rather than ellipsized — module names share long prefixes, so
+   truncation would hide the distinguishing suffix. */
 .nav-group-name { font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
-/* Tint + border rather than a solid fill: this was the sidebar's only solid
-   accent surface, while the status pills above it, the Browse-by segments and
-   the header chips that mirror these very selections all use a tint. The
-   border is also what separates two selected rows from each other. */
+/* Tint + border rather than a solid fill, matching every other selected
+   surface in the sidebar. The border also separates two selected rows. */
 .nav-group-active {
   background: var(--color-accent-bg);
   color: var(--color-accent-text);
@@ -287,9 +280,8 @@ body {
   display: flex;
   flex-direction: column;
 }
-/* View layout: sticky .sidebar (260px) + .view-main with consistent padding.
-   The layout grows to fill remaining vertical space so the sidebar stretches
-   to a consistent height across views regardless of content size. */
+/* Sticky .sidebar (260px) + .view-main. The layout fills the remaining
+   vertical space, so the sidebar is the same height in every view. */
 #view-scenarios,
 #view-stories,
 #view-glossary { flex: 1; min-height: 0; display: flex; }
@@ -385,10 +377,9 @@ body {
 }
 
 .scenario-name { font-size: var(--font-size-md); font-weight: 500; }
-/* Story-view scenario title: a plain clickable heading (jumps to the scenario).
-   No hover underline — it would bleed onto the term refs the title can carry,
-   whose own hover underline means something different (jump to the term, not
-   to the scenario); the trailing → cue signals clickability instead. */
+/* Story-view scenario title: a plain clickable heading. No hover underline —
+   it would bleed onto the term refs the title can carry, whose own underline
+   means something else; the trailing → cue signals clickability instead. */
 .scenario-name--goto {
   color: inherit;
   text-decoration: none;
@@ -472,13 +463,10 @@ body {
 }
 .step-chevron-open { transform: rotate(45deg) translateY(-2px); }
 
-/* A table cannot be shrunk below its columns' min-content width, so a long
-   unbreakable parametrize value outgrows the `max-width` cap below however
-   little room there is — at any viewport, and at a narrow one for ordinary
-   content. The card is `overflow: hidden` (the expand animation needs it), so
-   an uncontained overflow is clipped with no scrollbar and no way to reach the
-   columns past the edge. This scroll box turns that into a scrollbar. It stays
-   invisible until a table actually outgrows the card. */
+/* A table cannot shrink below its columns' min-content width, so a long
+   unbreakable value outgrows the `max-width` cap below however little room
+   there is. The card is `overflow: hidden` for the expand animation, which
+   would clip that with no scrollbar; this scroll box turns it into one. */
 .param-table-scroll { overflow-x: auto; }
 
 /* Param table */
@@ -515,9 +503,8 @@ body {
    to substitute from, so hovering it must not look like hovering a case row. */
 .param-table tbody tr:hover:not(.failed-row):not(.attachment-panel-row) { background: var(--color-accent-bg); }
 
-/* Crosshair: triggered by JS hovering a th/td. Highlights the matching column
-   header, every cell in the column, and any narration placeholders bound to
-   the same parameter name. */
+/* Crosshair: hovering a th/td highlights the column header, every cell in the
+   column, and any narration placeholder bound to that parameter. */
 .param-table th.param-highlight,
 .param-table td.param-highlight { background: var(--color-accent-bg); }
 .param-table tbody tr:hover td.param-highlight { background: #bfdbfe; }
@@ -526,11 +513,9 @@ span.param-highlight {
   border-radius: 2px;
 }
 
-/* A placeholder showing a hovered row's concrete value (see app.js
-   setHoverRow). The class is a JS hook with no background of its own: the
-   value text in its retained param-color-N is the "filled-in" cue, and the
-   tint stays reserved for the cell crosshair (.param-highlight) so hovering a
-   single cell still visibly emphasizes that one column. */
+/* A placeholder showing a hovered row's concrete value: a JS hook with no
+   background of its own. The value text in its retained param-color-N is the
+   "filled-in" cue, and the tint stays reserved for the cell crosshair. */
 
 /* Error */
 .error-block {
@@ -573,9 +558,8 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--text-muted);
-  /* The frame's code line below scrolls; this line is prose-like enough to
-     wrap instead, and has to — a frame location is an unbreakable path that a
-     narrow card would otherwise push past its edge and clip. */
+  /* The frame's code line below scrolls; this one wraps instead — an
+     unbreakable path that a narrow card would otherwise clip. */
   overflow-wrap: anywhere;
 }
 .error-frame-code {
@@ -660,17 +644,14 @@ span.param-highlight {
   letter-spacing: 0.5px;
   padding: var(--space-sm) 0 var(--space-xs);
 }
-/* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks into
-   it; on the card color it reads as the document it is.
+/* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks
+   into it; on the card color it reads as the document it is.
 
-   The payload sizes itself, and through its colspan cell it sizes the table:
-   a table with an attachment column ends up as wide as its widest content,
-   columns or payload, and no wider. Pinning it to the card instead (what
-   `width: 0; min-width: 100%` plus a full-width table used to do) cost every
-   such table the card's full width to fit a payload that rarely wants it —
-   the coffeeshop brew log needs 370px and was stretching its table to 1102px.
-   Only a payload wider than the card now hits the table's `max-width` and
-   scrolls inside its own box, which is the case that wanted the room. */
+   The payload sizes itself and, through its colspan cell, the table: one with
+   an attachment column ends up as wide as its widest content and no wider.
+   Pinning it to the card instead cost every such table the card's full width
+   to fit a payload that rarely wants it. Only a payload wider than the card
+   now hits the table's `max-width` and scrolls inside its own box. */
 .attachment-panel .attachment-content {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -696,10 +677,9 @@ span.param-highlight {
 .dot-failed { color: var(--color-failed); }
 .dot-skipped { color: var(--color-skipped); }
 
-/* Parameter colors. The color of each column is generated per report — see
-   report/palette.py, which splits the hue circle into as many steps as the
-   report has columns — and emitted as `.param-color-N` rules after this
-   sheet. Only what every column shares lives here. */
+/* Parameter colors. Each column's color is generated per report (see
+   report/palette.py) and emitted as a `.param-color-N` rule after this sheet;
+   only what every column shares lives here. */
 [class*="param-color-"] { font-weight: 600; }
 .value-highlight { color: var(--text-primary); font-weight: 700; }
 
@@ -708,8 +688,7 @@ span.param-highlight {
   color: var(--text-muted);
   padding: var(--space-xs) var(--space-md);
   text-align: right;
-  /* A source path is one unbreakable token, so a narrow card cannot fit it on
-     a line and would push it past the edge, where the card clips it. */
+  /* One unbreakable token, which a narrow card would otherwise clip. */
   overflow-wrap: anywhere;
 }
 .scenario-source a {
@@ -722,12 +701,10 @@ span.param-highlight {
   text-underline-offset: 2px;
 }
 /* In a scenario card the link stays in flow, under whatever the card ends
-   with. Anchoring it to the corner instead put it in a fight with every
-   full-width last element: over a parameter table it covered the last row's
-   rightmost cells, and over an error box it needed a card-colored chip to
-   stay legible against the reddish background. A refs panel ends in short
-   chip lines that never reach the corner, so there the anchor still pays for
-   itself. */
+   with: anchored to the corner it fought every full-width last element,
+   covering a parameter table's rightmost cells and needing its own chip to
+   stay legible over an error box. A refs panel ends in short chip lines that
+   never reach the corner, so there the anchor still pays for itself. */
 .refs-content > .scenario-source {
   position: absolute;
   right: 0;
@@ -741,44 +718,29 @@ span.param-highlight {
    ink says which kind, and only the first has to survive every context the
    word lands in.
 
-   That split is what fixed the hard case. A term with no kind has no hue, and
-   there is no fourth hue to give it — a color clearing the three kinds, the
-   body text, the statuses, the accent and the generated column ring while
-   holding AA on white does not exist at readable lightness. Standing weight in
-   for hue did not work either: weight only reads against its container, so a
-   step that is legible in 400 body text vanishes in a 500 scenario title, and
-   a third of the kindless refs sit in titles. A neutral wash is legible in
-   both, because it is measured against the card, which does not change.
+   That split is what solves the kindless term, which has no hue to give it.
+   No fourth hue clears the three kinds, the body text, the statuses, the
+   accent and the generated column ring while holding AA at readable
+   lightness; and weight cannot stand in for hue, since weight reads only
+   against its container — a ref legible in 400 body text vanishes in a 500
+   title, and a third of the kindless refs sit in titles. A neutral wash is
+   measured against the card, which does not change.
 
-   The washes are equalized perceptually, not by a fixed chroma: at equal
-   chroma the violet all but disappears while the teal reads strongly, so each
-   is placed at dE00 12 from the card instead. A neutral needs less — a gray
-   wash is never mistaken for paper tone the way a pale hue is — so the
-   kindless one sits lighter and still reads the strongest of the four.
+   The washes are equalized perceptually rather than at a fixed chroma, each
+   placed at dE00 12 from the card; the neutral needs less, since a gray wash
+   is never mistaken for paper tone the way a pale hue is.
 
-   Boxiness was the whole reason the old filled pills went, and it came from
-   their borders and their padding, not from the fill: "the Booking System
-   sends the Confirmation to Alice and Bob" is five terms and three
-   connectives, and bordered pills made the boxes the line. A wash with no
-   border and 3px of padding marks the word and costs the line 6px per term.
-
-   The padding carries no negative margin to pull those 6px back. `margin: 0
-   -1px` looks free — 2px a term, invisible — but Gecko subtracts negative
-   inline margins when it computes a block's max-content width and does not
-   apply them the same way when it breaks lines. A title is a flex item sized
-   to max-content, so the box came out 2px short per term ref and the last
-   word wrapped with the rest of the row empty: 51 of the self-report's 182
-   titles, at every viewport width, in Firefox only. Blink and WebKit size it
-   correctly, which is why this survived so long. Keep inline margins off the
-   wash; if the 6px ever needs pulling back, spend it on the padding instead.
-
-   A term ref sits next to another often enough to matter ("Kindless Term",
-   "actor slot" — 21 pairs in the self-report), and without the negative
-   margin the full space width separates their washes rather than 1.65px, so
-   adjacent terms read as two marks instead of one blob. For the same reason
-   the wash cannot move to a `box-shadow` spread to buy back its layout cost:
-   a 2px bleed would swallow that gap, and with 1px of leading each side
-   inside the 21px line box it would collide with the line above. */
+   No border, and 3px of padding: boxiness came from the old pills' borders and
+   padding, not their fill, and a line of five terms made the boxes the line.
+   The wash costs 6px a term and carries no negative margin to pull them back.
+   Gecko subtracts negative inline margins from a block's max-content width but
+   does not apply them the same way when it breaks lines, so `margin: 0 -1px`
+   left a max-content title 2px short per ref and wrapped its last word onto an
+   empty row — a third of the self-report's titles, at every viewport width, in
+   Firefox only. Keep inline margins off the wash; if the 6px ever needs pulling
+   back, spend it on the padding. A `box-shadow` spread cannot buy it back
+   either: a 2px bleed would swallow the gap that keeps two adjacent refs
+   reading as two marks, and would collide with the line above. */
 .term-ref-actor,
 .term-ref-object,
 .term-ref-verb,
@@ -795,9 +757,9 @@ span.param-highlight {
 .term-ref-actor { background: #ffe4d6; color: #92400e; }
 .term-ref-object { background: #d9f7f3; color: #0f766e; }
 .term-ref-verb { background: #f4e8ff; color: #6d28d9; }
-/* Warm stone for the ink rather than a slate: the body text is slate-900, so a
-   slate separates from it on lightness alone and reads as body text lightened
-   — receding, the opposite of marked. */
+/* Warm stone for the ink rather than a slate: against slate-900 body text a
+   slate separates on lightness alone and reads as body text lightened —
+   receding, the opposite of marked. */
 .term-ref-unknown {
   background: #ebebea;
   color: #57534e;
@@ -810,9 +772,9 @@ span.param-highlight {
 .activity-word {
   color: var(--text-secondary);
 }
-/* Custom hover tooltip for term refs (replaces the native title): the
-   canonical term name as a heading above its definition. Shown/positioned by
-   app.js; a single shared node lives at body level to dodge overflow clipping. */
+/* Custom hover tooltip for term refs, replacing the native title: the
+   canonical name as a heading above its definition. Positioned by app.js; one
+   shared node at body level, to dodge overflow clipping. */
 #term-tip {
   position: fixed;
   z-index: 1000;
@@ -1038,12 +1000,10 @@ span.param-highlight {
 }
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
 
-/* Kind color classes for kind headers and term pills. Kindless carries the
-   stone the narration gives it, so one kind is one color across both views —
-   the catalog would otherwise read cool slate for what prose reads warm stone.
-   Stone-100/300 keep it on the same ramp-100 fill / ramp-300 border pattern as
-   the three kinds; the border stays dashed, which is the catalog's own mark
-   for "not a kind" and is about the bucket, not the color. */
+/* Kind colors for kind headers and term pills. Kindless carries the same
+   stone the narration gives it, so one kind is one color across both views,
+   and on the same ramp-100 fill / ramp-300 border pattern as the three kinds.
+   Its border stays dashed — the catalog's own mark for "not a kind". */
 .term-actor { color: #92400e; }
 .term-obj { color: #0f766e; }
 .term-verb { color: #6d28d9; }
@@ -1124,12 +1084,10 @@ span.param-highlight {
   background: var(--color-accent-bg);
   color: var(--color-accent-text);
   border: 1px solid var(--color-accent);
-  /* Matches the selected sidebar group rather than the pill radius used by
-     tags and status: a chip and a highlighted row are the same filter drawn
-     in two places, so they take the same shape. (A stadium radius also
-     scales with height, and these chips are taller than a tag pill, so the
-     shared pill token read markedly rounder here.) Symmetric padding for the
-     same reason: the extra left inset only existed to balance the curve. */
+  /* Matches the selected sidebar group rather than the pill radius tags and
+     status use: a chip and a highlighted row are the same filter drawn in two
+     places, so they take the same shape. Symmetric padding for the same
+     reason — the extra left inset only balanced the curve. */
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   padding: 2px 8px;
@@ -1156,10 +1114,10 @@ span.param-highlight {
 }
 .filter-chip-x:hover { opacity: 1; }
 
-/* Selecting an activity row reveals its way out: the glossary hides the
-   equivalent action ("Show N scenarios using this term") behind expanding the
-   entry, and a selected row is this timeline's expanded state. Hidden rather
-   than dimmed so it is not a tab stop while it is out of reach. */
+/* Selecting an activity row reveals its way out — a selected row is this
+   timeline's expanded state, the way the glossary hides the equivalent action
+   behind expanding an entry. Hidden rather than dimmed, so it is not a tab
+   stop while it is out of reach. */
 .activity-jump {
   display: none;
   font: inherit;
