@@ -7,6 +7,8 @@ from pytest_given import attach, given, scenario, then, when
 from pytest_given.plugin import session
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
+# --- Capture to report: the basic shapes ---
+
 
 def test_basic_scenario_generates_json(pytester, tmp_path):
     """A simple @scenario test produces JSON output."""
@@ -150,6 +152,9 @@ def test_unannotated_test_not_in_report(pytester, tmp_path):
         assert len(data['scenarios']) == 0
 
 
+# --- Attachments ---
+
+
 def test_attachment_in_report(pytester, tmp_path):
     """Attachments on steps appear in the JSON."""
     pytester.makepyfile(
@@ -194,6 +199,9 @@ def test_attach_outside_a_step_fails_the_test(pytester, tmp_path):
     result.stdout.fnmatch_lines(['*no step is open*'])
 
 
+# --- Step fixtures grafted into the scenario ---
+
+
 @scenario(
     t'A {pg["Step fixture"].low} is {pg["Graft"]("grafted")} in as a given '
     t'{pg["Step"].low}',
@@ -227,6 +235,9 @@ def test_step_fixture_appears_as_given_step(pytester, tmp_path):
         steps = data['scenarios'][0]['steps']
         assert steps[0]['phase'] == 'given'
         assert steps[0]['narration']['text'] == 'a prepared value'
+
+
+# --- Parametrize capture and the parameter table ---
 
 
 @scenario(
@@ -363,6 +374,9 @@ def test_a_mutated_parametrize_value_is_captured_as_it_was_at_setup(pytester, tm
     data = json.loads(json_path.read_text())
     cases = data['scenarios'][0]['parameters']['cases']
     assert [c['values'] for c in cases] == [["['latte']"], ["['mocha']"]]
+
+
+# --- Report writing is all-or-nothing ---
 
 
 @scenario(
@@ -641,6 +655,9 @@ def test_full_html_report_generation(pytester, tmp_path):
     assert 'Failing test' in html
     assert 'a calculator' in html
     assert 'x-data' in html  # Alpine.js reactive
+
+
+# --- Fixture failures, and what may record in a fixture ---
 
 
 def test_fixture_setup_failure_appears_in_report(pytester, tmp_path):
@@ -1008,6 +1025,9 @@ def test_nested_step_fixtures_appear_as_siblings(pytester, tmp_path):
     assert user_step['children'][0]['narration']['text'] == 'with admin role'
 
 
+# --- Step text: t-strings, Templates, literal braces ---
+
+
 def test_tstring_in_non_parametrized_scenario_renders_value_with_no_placeholder(
     pytester, tmp_path
 ):
@@ -1236,6 +1256,9 @@ def test_template_placeholder_typo_raises_helpful_error(pytester, tmp_path):
     assert 'INTERNALERROR' not in result.stdout.str()
 
 
+# --- Skips and their reasons ---
+
+
 def test_skipped_scenario_captures_mark_reason(pytester, tmp_path):
     """@pytest.mark.skip(reason=...) surfaces the reason in JSON."""
     pytester.makepyfile(
@@ -1326,6 +1349,9 @@ def test_parametrized_all_cases_skipped_groups_as_skipped(pytester, tmp_path):
     assert data['scenarios'][0]['status'] == 'skipped'
 
 
+# --- Helper-function step decorators ---
+
+
 def test_helper_function_decorator_with_template_substitutes_args(pytester, tmp_path):
     """@when(Template('...${arg}...')) renders per call from bound args."""
     pytester.makepyfile(
@@ -1414,6 +1440,9 @@ def test_helper_function_decorator_called_outside_scenario_is_silent(pytester):
     )
     result = pytester.runpytest('-W', 'error', '-v')
     assert result.ret == 0
+
+
+# --- Source capture and source links ---
 
 
 def test_scenario_source_captured_in_json(pytester, tmp_path):
@@ -1715,7 +1744,7 @@ def test_step_activity_kwarg_propagates_to_report(pytester):
     assert steps[1]['activity_ids'] == [2, 3]
 
 
-# --- Task 7.3: Capture story_id and activity_ids at scenario start ---
+# --- Story binding recorded on the scenario ---
 
 
 def test_scenario_story_id_appears_in_report(pytester):
@@ -1740,7 +1769,7 @@ def test_scenario_story_id_appears_in_report(pytester):
     assert scn['activity_ids'] == [1]
 
 
-# --- Task 7.2: Validate scenario binding at collection / runtime ---
+# --- Story binding validated at collection and at runtime ---
 
 
 def test_scenario_activity_id_not_in_story_raises_at_collection(pytester):
@@ -1822,7 +1851,7 @@ def test_step_activity_without_scenario_story_raises(pytester):
     result.stdout.fnmatch_lines(['*step activity= requires a story on the scenario*'])
 
 
-# --- Task 7.4: Session-finish discovery + serde underscore filter ---
+# --- Session-finish discovery, and what serde leaves out ---
 
 
 def test_session_finish_populates_report_stories_and_glossary(pytester):
@@ -1883,7 +1912,7 @@ def test_report_json_excludes_underscore_fields(pytester):
     assert '_glossaries' not in raw
 
 
-# --- Task 7.5: Conftest-scan fallback ---
+# --- Glossary discovery: the conftest-scan fallback ---
 
 
 def test_glossary_only_in_conftest_is_discovered(pytester):
@@ -1950,6 +1979,9 @@ def test_multiple_glossaries_in_conftests_raises(pytester):
     assert result.ret == pytest.ExitCode.TESTS_FAILED
     result.stdout.fnmatch_lines(['*report not written*', '*multiple Glossary*'])
     assert not (pytester.path / 'report.json').exists()
+
+
+# --- Annotated[..., given(...)] on a parameter ---
 
 
 def test_annotated_given_on_parametrize_value_synthesizes_leaf(pytester, tmp_path):
@@ -2209,6 +2241,9 @@ def test_mixed_fixture_and_param_annotated_order(pytester, tmp_path):
     assert given_texts == ['a machine', 'the name {text}']
 
 
+# --- The sink flags: what each one writes ---
+
+
 _SUITE = """
     import pytest
     from pytest_given import scenario, given, when, then
@@ -2319,6 +2354,9 @@ def test_a_rejected_form_fails_the_run_with_no_sink_flag(pytester):
     result.stdout.fnmatch_lines(['*varies across parametrize cases*'])
 
 
+# --- Report title ---
+
+
 @scenario(t'`--given-title` names the {pg["Report"].low} instead of the rootdir')
 def test_given_title_cli_flag_names_the_report(pytester, tmp_path):
     with given(t'a suite with one {pg["Scenario"].low}'):
@@ -2419,6 +2457,9 @@ def test_given_title_cli_overrides_ini(pytester, tmp_path):
     assert data['metadata']['title'] == 'From CLI'
 
 
+# --- Declining the parametrize grouping ---
+
+
 def test_group_parametrized_false_without_parametrize_raises_at_collection(
     pytester, tmp_path
 ):
@@ -2473,6 +2514,9 @@ _SIMPLE_SCENARIO = """
         with then("it is 2"):
             assert result == 2
     """
+
+
+# --- A run with no sink configured ---
 
 
 def test_bare_run_does_no_report_rendering_work(pytester, tmp_path, monkeypatch):
