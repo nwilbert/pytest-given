@@ -232,6 +232,7 @@ def test_step_fixture_appears_as_given_step(pytester, tmp_path):
 @scenario(
     t'The {pg["Case"]("cases")} of a {pg["Parametrized scenario"].low} become one '
     t'{pg["Scenario"].low} with a {pg["Parameter table"].low}',
+    tags=['parametrization'],
     story=adopt_pytest_given,
 )
 def test_parametrized_test_as_table(pytester, tmp_path):

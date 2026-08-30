@@ -32,7 +32,7 @@
 - **then** the «step» from the fixture leads the recorded steps
 
 ## ✓ The «cases» of a «parametrized scenario» become one «scenario» with a «parameter table»
-`tests/integration/test_plugin.py:232::test_parametrized_test_as_table`
+`tests/integration/test_plugin.py:232::test_parametrized_test_as_table` · parametrization
 
 - **given** a «parametrized scenario» over two «cases»
   - 📎 suite:
@@ -56,7 +56,7 @@
 - **then** the grouped steps carry a placeholder per matching name
 
 ## ✓ A refused run discards the previous run's «report»
-`tests/integration/test_plugin.py:367::test_a_grouping_error_discards_the_previous_report` · validation
+`tests/integration/test_plugin.py:368::test_a_grouping_error_discards_the_previous_report` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -76,7 +76,7 @@
 - **then** the stale files are gone rather than left reading as current
 
 ## ✓ An unknown «source link» preset stops the run before it collects
-`tests/integration/test_plugin.py:435::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:436::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
   - 📎 suite:
@@ -93,7 +93,7 @@
 - **then** no test ran: the run stopped at configure, before collection
 
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2226::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2227::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -116,14 +116,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2239::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2240::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2260::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2261::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -131,7 +131,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2292::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2293::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -151,7 +151,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:2321::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:2322::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -160,7 +160,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:2501::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:2502::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -786,7 +786,7 @@
 - **then** position 0 is the actor «Slot», then verb and noun alternate
 
 ## ✓ A pipe table parses into «term» and definition rows
-`tests/unit/capture/test_markdown_glossary.py:24::test_parses_default_columns` · markdown
+`tests/unit/capture/test_markdown_glossary.py:24::test_parses_default_columns`
 
 - **given** a Markdown document with one pipe table
   - 📎 Markdown document:
@@ -802,7 +802,7 @@
 - **then** each row carries a «Term», definition and source line
 
 ## ✓ Multiple tables in one file are merged
-`tests/unit/capture/test_markdown_glossary.py:42::test_merges_multiple_tables` · markdown
+`tests/unit/capture/test_markdown_glossary.py:41::test_merges_multiple_tables`
 
 - **given** a document containing two separate pipe tables
   - 📎 Markdown document:
@@ -824,7 +824,7 @@
 - **then** every table contributes its «Term» rows
 
 ## ✓ Columns can be selected by header name
-`tests/unit/capture/test_markdown_glossary.py:61::test_column_by_header_name_case_insensitive` · markdown
+`tests/unit/capture/test_markdown_glossary.py:59::test_column_by_header_name_case_insensitive`
 
 - **given** a table with custom, differently-cased header names
   - 📎 Markdown document:
@@ -837,7 +837,7 @@
 - **then** the named columns are matched case-insensitively
 
 ## ✓ Escaped pipes are preserved in cells
-`tests/unit/capture/test_markdown_glossary.py:77::test_escaped_pipe_in_cell` · markdown
+`tests/unit/capture/test_markdown_glossary.py:74::test_escaped_pipe_in_cell`
 
 - **given** cells containing escaped pipe characters (\|)
   - 📎 Markdown document:
@@ -850,7 +850,7 @@
 - **then** the escaped pipe survives as a literal pipe
 
 ## ✓ Tables inside fenced code blocks are skipped
-`tests/unit/capture/test_markdown_glossary.py:95::test_skips_tables_in_fenced_code_blocks` · markdown
+`tests/unit/capture/test_markdown_glossary.py:91::test_skips_tables_in_fenced_code_blocks`
 
 - **given** a fenced code block that contains a look-alike table
   - 📎 Markdown document:
@@ -869,7 +869,7 @@
 - **then** only the real table outside the fence contributes rows
 
 ## ✓ A file with no pipe table is rejected
-`tests/unit/capture/test_markdown_glossary.py:114::test_no_table_raises` · markdown, validation
+`tests/unit/capture/test_markdown_glossary.py:109::test_no_table_raises` · validation
 
 - **given** a document with no pipe table
   - 📎 Markdown document:
@@ -882,7 +882,7 @@
 - **then** a PytestGivenError reports that the file has no pipe table
 
 ## ✓ A missing named column is rejected
-`tests/unit/capture/test_markdown_glossary.py:134::test_missing_named_column_raises` · diagnostics, markdown, validation
+`tests/unit/capture/test_markdown_glossary.py:129::test_missing_named_column_raises` · diagnostics, validation
 
 - **given** a Markdown document with one pipe table
   - 📎 Markdown document:
@@ -898,7 +898,7 @@
 - **then** a PytestGivenError names the missing column
 
 ## ✓ A column index out of range is rejected
-`tests/unit/capture/test_markdown_glossary.py:151::test_index_out_of_range_raises` · diagnostics, markdown, validation
+`tests/unit/capture/test_markdown_glossary.py:146::test_index_out_of_range_raises` · diagnostics, validation
 
 - **given** a Markdown document with one pipe table
   - 📎 Markdown document:
@@ -914,7 +914,7 @@
 - **then** a PytestGivenError names the out-of-range column
 
 ## ✓ A data row with too few columns is rejected
-`tests/unit/capture/test_markdown_glossary.py:175::test_data_row_with_fewer_columns_raises` · diagnostics, markdown, validation
+`tests/unit/capture/test_markdown_glossary.py:170::test_data_row_with_fewer_columns_raises` · diagnostics, validation
 
 - **given** a table with a data row narrower than its header
   - 📎 Markdown document:
@@ -928,7 +928,7 @@
 - **then** a PytestGivenError points at the short row
 
 ## ✓ Bold «term» cells render as clean «terms»
-`tests/unit/capture/test_markdown_glossary.py:193::test_strips_bold_from_term_cell` · markdown
+`tests/unit/capture/test_markdown_glossary.py:188::test_strips_bold_from_term_cell`
 
 - **given** a «Term» cell written with **bold** emphasis
   - 📎 Markdown document:
@@ -941,7 +941,7 @@
 - **then** the emphasis is unwrapped to the plain canonical
 
 ## ✓ Italic and inline-code «term» cells are unwrapped
-`tests/unit/capture/test_markdown_glossary.py:213::test_strips_italic_and_inline_code_from_term_cell` · markdown
+`tests/unit/capture/test_markdown_glossary.py:207::test_strips_italic_and_inline_code_from_term_cell`
 
 - **given** «Term» cells using *italic* and `code` emphasis
   - 📎 Markdown document:
@@ -955,7 +955,7 @@
 - **then** each unwraps to its plain text
 
 ## ✓ Underscores inside an identifier survive
-`tests/unit/capture/test_markdown_glossary.py:229::test_preserves_underscores_inside_term_identifier` · markdown
+`tests/unit/capture/test_markdown_glossary.py:222::test_preserves_underscores_inside_term_identifier`
 
 - **given** a «Term» literally named work_object
   - 📎 Markdown document:
@@ -968,7 +968,7 @@
 - **then** the single underscores are not treated as emphasis
 
 ## ✓ Emphasis is stripped from kind cells too
-`tests/unit/capture/test_markdown_glossary.py:245::test_strips_emphasis_from_kind_cell` · markdown
+`tests/unit/capture/test_markdown_glossary.py:237::test_strips_emphasis_from_kind_cell`
 
 - **given** a Kind cell written with bold emphasis
   - 📎 Markdown document:
@@ -981,7 +981,7 @@
 - **then** the kind is unwrapped to plain text
 
 ## ✓ Definition markdown is left intact
-`tests/unit/capture/test_markdown_glossary.py:261::test_leaves_description_markdown_intact` · markdown
+`tests/unit/capture/test_markdown_glossary.py:252::test_leaves_description_markdown_intact`
 
 - **given** a definition cell rich with inline code
   - 📎 Markdown document:
@@ -994,7 +994,7 @@
 - **then** the definition keeps its markup for the tooltip
 
 ## ✓ A pipe line without a separator is not a table
-`tests/unit/capture/test_markdown_glossary.py:280::test_pipe_line_without_separator_is_skipped` · markdown
+`tests/unit/capture/test_markdown_glossary.py:270::test_pipe_line_without_separator_is_skipped`
 
 - **given** prose containing a stray pipe, then a real table
   - 📎 Markdown document:
@@ -1010,7 +1010,7 @@
 - **then** only the real pipe table produces rows
 
 ## ✓ A code-span «term» cell keeps the markup inside it
-`tests/unit/capture/test_markdown_glossary.py:303::test_code_span_term_cell_keeps_inner_markup` · markdown
+`tests/unit/capture/test_markdown_glossary.py:292::test_code_span_term_cell_keeps_inner_markup`
 
 - **given** a «Term» cell written as a code span around an asterisk pair
   - 📎 Markdown document:
@@ -1837,7 +1837,7 @@
 - **then** «Coverage» counts it, despite the missing anchors
 
 ## ✓ «Parameter coloring» marks placeholders and table headers
-`tests/unit/report/test_html_renderer.py:208::test_render_parametrized_step_with_structured_narration`
+`tests/unit/report/test_html_renderer.py:208::test_render_parametrized_step_with_structured_narration` · parametrization
 
 - **given** a «Report» holding a «Parametrized scenario» with a «Parameter table»
 - **when** the «Renderer» renders the HTML page

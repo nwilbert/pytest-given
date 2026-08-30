@@ -207,6 +207,7 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
 
 @scenario(
     t'{pg["Parameter coloring"]} marks placeholders and table headers',
+    tags=['parametrization'],
     story=adopt_pytest_given,
 )
 def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> None:

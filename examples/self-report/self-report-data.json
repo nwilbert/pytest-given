@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-30T17:08:54.638667+00:00",
+    "timestamp": "2026-08-30T17:29:14.307950+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "2bcd20e65badcc58a87fd3a81532d6a37622a3aa",
+    "commit_sha": "0c582eda4831012ba6dd7cd0fbe548499084fb14",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -26,7 +26,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -134,7 +134,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -268,9 +268,11 @@
         ]
       },
       "module": "tests.integration.test_plugin",
-      "tags": [],
+      "tags": [
+        "parametrization"
+      ],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -519,7 +521,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 367
+        "line": 368
       },
       "story_id": null,
       "activity_ids": []
@@ -617,7 +619,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 435
+        "line": 436
       },
       "story_id": null,
       "activity_ids": []
@@ -643,7 +645,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -710,7 +712,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2226
+        "line": 2227
       },
       "story_id": null,
       "activity_ids": []
@@ -786,7 +788,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2239
+        "line": 2240
       },
       "story_id": null,
       "activity_ids": []
@@ -812,7 +814,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 61,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -873,7 +875,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2260
+        "line": 2261
       },
       "story_id": null,
       "activity_ids": []
@@ -898,7 +900,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -956,7 +958,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2292
+        "line": 2293
       },
       "story_id": null,
       "activity_ids": []
@@ -982,7 +984,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -1054,7 +1056,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2321
+        "line": 2322
       },
       "story_id": null,
       "activity_ids": []
@@ -1129,7 +1131,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2501
+        "line": 2502
       },
       "story_id": null,
       "activity_ids": []
@@ -1152,7 +1154,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -1253,7 +1255,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -1352,7 +1354,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 32,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -7097,9 +7099,7 @@
         ]
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7181,9 +7181,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7244,7 +7242,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 42
+        "line": 41
       },
       "story_id": null,
       "activity_ids": []
@@ -7256,9 +7254,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7307,7 +7303,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 61
+        "line": 59
       },
       "story_id": null,
       "activity_ids": []
@@ -7319,9 +7315,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7370,7 +7364,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 77
+        "line": 74
       },
       "story_id": null,
       "activity_ids": []
@@ -7382,9 +7376,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7433,7 +7425,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 95
+        "line": 91
       },
       "story_id": null,
       "activity_ids": []
@@ -7446,7 +7438,6 @@
       },
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
-        "markdown",
         "validation"
       ],
       "status": "passed",
@@ -7506,7 +7497,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 114
+        "line": 109
       },
       "story_id": null,
       "activity_ids": []
@@ -7520,7 +7511,6 @@
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
         "diagnostics",
-        "markdown",
         "validation"
       ],
       "status": "passed",
@@ -7571,7 +7561,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 134
+        "line": 129
       },
       "story_id": null,
       "activity_ids": []
@@ -7585,7 +7575,6 @@
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
         "diagnostics",
-        "markdown",
         "validation"
       ],
       "status": "passed",
@@ -7636,7 +7625,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 151
+        "line": 146
       },
       "story_id": null,
       "activity_ids": []
@@ -7650,7 +7639,6 @@
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [
         "diagnostics",
-        "markdown",
         "validation"
       ],
       "status": "passed",
@@ -7701,7 +7689,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 175
+        "line": 170
       },
       "story_id": null,
       "activity_ids": []
@@ -7730,9 +7718,7 @@
         ]
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7793,7 +7779,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 193
+        "line": 188
       },
       "story_id": null,
       "activity_ids": []
@@ -7817,9 +7803,7 @@
         ]
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7877,7 +7861,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 213
+        "line": 207
       },
       "story_id": null,
       "activity_ids": []
@@ -7889,9 +7873,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -7952,7 +7934,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 229
+        "line": 222
       },
       "story_id": null,
       "activity_ids": []
@@ -7964,9 +7946,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -8015,7 +7995,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 245
+        "line": 237
       },
       "story_id": null,
       "activity_ids": []
@@ -8027,9 +8007,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -8078,7 +8056,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 261
+        "line": 252
       },
       "story_id": null,
       "activity_ids": []
@@ -8090,9 +8068,7 @@
         "parts": []
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -8141,7 +8117,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 280
+        "line": 270
       },
       "story_id": null,
       "activity_ids": []
@@ -8165,9 +8141,7 @@
         ]
       },
       "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [
-        "markdown"
-      ],
+      "tags": [],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -8228,7 +8202,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 303
+        "line": 292
       },
       "story_id": null,
       "activity_ids": []
@@ -17768,9 +17742,11 @@
         ]
       },
       "module": "tests.unit.report.test_html_renderer",
-      "tags": [],
+      "tags": [
+        "parametrization"
+      ],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",

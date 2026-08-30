@@ -23,7 +23,6 @@ def simple_doc():
 
 @scenario(
     t'A pipe table parses into {pg["Term"].low} and definition rows',
-    tags=['markdown'],
 )
 def test_parses_default_columns(simple_doc):
     with when(t'the parser reads it into rows for a {pg["File glossary"]}'):
@@ -41,7 +40,6 @@ def test_parses_default_columns(simple_doc):
 
 @scenario(
     'Multiple tables in one file are merged',
-    tags=['markdown'],
 )
 def test_merges_multiple_tables():
     with given('a document containing two separate pipe tables'):
@@ -60,7 +58,6 @@ def test_merges_multiple_tables():
 
 @scenario(
     'Columns can be selected by header name',
-    tags=['markdown'],
 )
 def test_column_by_header_name_case_insensitive():
     with given('a table with custom, differently-cased header names'):
@@ -76,7 +73,6 @@ def test_column_by_header_name_case_insensitive():
 
 @scenario(
     'Escaped pipes are preserved in cells',
-    tags=['markdown'],
 )
 def test_escaped_pipe_in_cell():
     with given(r'cells containing escaped pipe characters (\|)'):
@@ -94,7 +90,6 @@ def test_escaped_pipe_in_cell():
 
 @scenario(
     'Tables inside fenced code blocks are skipped',
-    tags=['markdown'],
 )
 def test_skips_tables_in_fenced_code_blocks():
     with given('a fenced code block that contains a look-alike table'):
@@ -113,7 +108,7 @@ def test_skips_tables_in_fenced_code_blocks():
 
 @scenario(
     'A file with no pipe table is rejected',
-    tags=['markdown', 'validation'],
+    tags=['validation'],
 )
 def test_no_table_raises():
     with given('a document with no pipe table'):
@@ -133,7 +128,7 @@ def test_no_table_raises():
 
 @scenario(
     'A missing named column is rejected',
-    tags=['diagnostics', 'markdown', 'validation'],
+    tags=['diagnostics', 'validation'],
 )
 def test_missing_named_column_raises(simple_doc):
     with (
@@ -150,7 +145,7 @@ def test_missing_named_column_raises(simple_doc):
 
 @scenario(
     'A column index out of range is rejected',
-    tags=['diagnostics', 'markdown', 'validation'],
+    tags=['diagnostics', 'validation'],
 )
 def test_index_out_of_range_raises(simple_doc):
     with (
@@ -174,7 +169,7 @@ SHORT_ROW_TABLE = """| Term | Meaning | Type |
 
 @scenario(
     'A data row with too few columns is rejected',
-    tags=['diagnostics', 'markdown', 'validation'],
+    tags=['diagnostics', 'validation'],
 )
 def test_data_row_with_fewer_columns_raises():
     with given('a table with a data row narrower than its header'):
@@ -192,7 +187,6 @@ def test_data_row_with_fewer_columns_raises():
 
 @scenario(
     t'Bold {pg["Term"].low} cells render as clean {pg["Term"]("terms")}',
-    tags=['markdown'],
 )
 def test_strips_bold_from_term_cell():
     with given(t'a {pg["Term"]} cell written with **bold** emphasis'):
@@ -212,7 +206,6 @@ def test_strips_bold_from_term_cell():
 
 @scenario(
     t'Italic and inline-code {pg["Term"].low} cells are unwrapped',
-    tags=['markdown'],
 )
 def test_strips_italic_and_inline_code_from_term_cell():
     with given(t'{pg["Term"]} cells using *italic* and `code` emphasis'):
@@ -228,7 +221,6 @@ def test_strips_italic_and_inline_code_from_term_cell():
 
 @scenario(
     'Underscores inside an identifier survive',
-    tags=['markdown'],
 )
 def test_preserves_underscores_inside_term_identifier():
     with given(t'a {pg["Term"]} literally named work_object'):
@@ -244,7 +236,6 @@ def test_preserves_underscores_inside_term_identifier():
 
 @scenario(
     'Emphasis is stripped from kind cells too',
-    tags=['markdown'],
 )
 def test_strips_emphasis_from_kind_cell():
     with given('a Kind cell written with bold emphasis'):
@@ -260,7 +251,6 @@ def test_strips_emphasis_from_kind_cell():
 
 @scenario(
     'Definition markdown is left intact',
-    tags=['markdown'],
 )
 def test_leaves_description_markdown_intact():
     with given('a definition cell rich with inline code'):
@@ -279,7 +269,6 @@ def test_leaves_description_markdown_intact():
 
 @scenario(
     'A pipe line without a separator is not a table',
-    tags=['markdown'],
 )
 def test_pipe_line_without_separator_is_skipped():
     with given('prose containing a stray pipe, then a real table'):
@@ -302,7 +291,6 @@ def test_pipe_line_without_separator_is_skipped():
 
 @scenario(
     t'A code-span {pg["Term"].low} cell keeps the markup inside it',
-    tags=['markdown'],
 )
 def test_code_span_term_cell_keeps_inner_markup():
     with given(t'a {pg["Term"]} cell written as a code span around an asterisk pair'):
