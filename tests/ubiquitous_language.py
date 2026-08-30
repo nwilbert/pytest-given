@@ -47,6 +47,8 @@ parametrized_scenario_t = pg['Parametrized scenario']
 parameter_table_t = pg['Parameter table']
 report_t = pg['Report']
 parameter_coloring_t = pg['Parameter coloring']
+narration_lint_t = pg['Narration lint']
+lint_rule_t = pg['Lint rule']
 
 adopt_pytest_given = story(
     'Adopt pytest-given',
@@ -83,7 +85,9 @@ adopt_pytest_given = story(
         ),
         # 10
         activity(renderer_t, 'renders', report_t, 'with', parameter_coloring_t),
-        # 11 — honest gap: review is a human activity.
+        # 11
+        activity(narration_lint_t, 'flags', scenario_t, 'against a', lint_rule_t),
+        # 12 — honest gap: review is a human activity.
         activity(domain_expert, 'reviews', scenario_t, 'in the', report_t),
     ],
 )

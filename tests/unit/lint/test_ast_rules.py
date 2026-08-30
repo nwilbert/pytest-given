@@ -5,6 +5,7 @@ import textwrap
 
 import pytest
 
+from pytest_given import attach, given, scenario, then, when
 from pytest_given.lint import RuleId, run_ast_rules
 from pytest_given.model import (
     Narration,
@@ -17,6 +18,7 @@ from pytest_given.model import (
     Step,
     TermId,
 )
+from tests.ubiquitous_language import adopt_pytest_given, pg
 
 # --- AST pass: anchoring, when_then pairs, rules 1-2 ---
 
@@ -58,24 +60,36 @@ def _rule_findings(findings, rule):
     return [f for f in findings if f.rule == RuleId(rule)]
 
 
+@scenario(
+    t'{pg["Narration lint"]} flags a {pg["Step"].low} whose body does nothing',
+    story=adopt_pytest_given,
+)
 def test_empty_step_fires_on_pass_only_body(tmp_path) -> None:
-    src = _write(
-        tmp_path,
-        """\
-        def test_a():
-            with given('a value'):
-                pass
-        """,
-    )
-    with_line = _line(src, "with given('a value')")
-    scenario = _scenario([_step('given', 'a value', with_line)])
-    [finding] = run_ast_rules([scenario], tmp_path)
-    assert finding.rule == RuleId('empty-step')
-    assert finding.severity == 'error'
-    assert finding.subject == 'test_x.py::test_a'
-    assert finding.node_id == NodeId('test_x.py::test_a')
-    assert finding.location == SourceLocation(relpath='test_x.py', line=with_line)
-    assert finding.message == (f"given 'a value' has no code (test_x.py:{with_line})")
+    with given(t'a given {pg["Step"].low} whose body is only `pass`'):
+        src = _write(
+            tmp_path,
+            """\
+            def test_a():
+                with given('a value'):
+                    pass
+            """,
+        )
+        attach('step body', src)
+        with_line = _line(src, "with given('a value')")
+        empty = _scenario([_step('given', 'a value', with_line)])
+    with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
+        findings = run_ast_rules([empty], tmp_path)
+    with then(t'an empty-step {pg["Finding"].low} points at the {pg["Step"].low} line'):
+        [finding] = findings
+        assert finding.rule == RuleId('empty-step')
+        assert finding.subject == 'test_x.py::test_a'
+        assert finding.node_id == NodeId('test_x.py::test_a')
+        assert finding.location == SourceLocation(relpath='test_x.py', line=with_line)
+        assert finding.message == (
+            f"given 'a value' has no code (test_x.py:{with_line})"
+        )
+    with then(t'its {pg["Severity"].low} is error'):
+        assert finding.severity == 'error'
 
 
 def test_empty_step_fires_on_docstring_and_ellipsis_only_body(tmp_path) -> None:
@@ -210,25 +224,34 @@ def test_then_with_bare_assert_passes(tmp_path) -> None:
     assert run_ast_rules([scenario], tmp_path) == []
 
 
+@scenario(
+    t'{pg["Narration lint"]} flags a then {pg["Step"].low} that checks nothing',
+    story=adopt_pytest_given,
+)
 def test_then_without_check_fires(tmp_path) -> None:
-    # Neither a plain call, nor a call through a subscripted callable, counts
-    # as a check.
-    src = _write(
-        tmp_path,
-        """\
-        def test_a():
-            with then('it is one'):
-                x = compute()
-                handlers[0](x)
-        """,
-    )
-    with_line = _line(src, 'with then')
-    scenario = _scenario([_step('then', 'it is one', with_line)])
-    [finding] = run_ast_rules([scenario], tmp_path)
-    assert finding.rule == RuleId('then-without-check')
-    assert finding.message == (
-        f"then 'it is one' contains no assertion (test_x.py:{with_line})"
-    )
+    with given(t'a then {pg["Step"].low} whose body only calls'):
+        # Neither a plain call, nor a call through a subscripted callable,
+        # counts as a check.
+        src = _write(
+            tmp_path,
+            """\
+            def test_a():
+                with then('it is one'):
+                    x = compute()
+                    handlers[0](x)
+            """,
+        )
+        attach('step body', src)
+        with_line = _line(src, 'with then')
+        unchecked = _scenario([_step('then', 'it is one', with_line)])
+    with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
+        findings = run_ast_rules([unchecked], tmp_path)
+    with then(t'a then-without-check {pg["Finding"].low} reports the unchecked then'):
+        [finding] = findings
+        assert finding.rule == RuleId('then-without-check')
+        assert finding.message == (
+            f"then 'it is one' contains no assertion (test_x.py:{with_line})"
+        )
 
 
 def test_then_with_pytest_raises_item_passes(tmp_path) -> None:
@@ -367,25 +390,35 @@ def test_anchor_line_with_no_matching_node_is_skipped(tmp_path) -> None:
 # --- Rule 3: check-outside-then ---
 
 
+@scenario(
+    t'{pg["Narration lint"]} flags an assert outside a then {pg["Step"].low}',
+    story=adopt_pytest_given,
+)
 @pytest.mark.parametrize('phase', ['given', 'when'])
 def test_check_outside_then_fires_on_assert_in_given_or_when(tmp_path, phase) -> None:
-    src = _write(
-        tmp_path,
-        f"""\
-        def test_a():
-            with {phase}('a stocked machine'):
-                machine = stock()
-                assert machine['coffees'] > 0
-        """,
-    )
-    with_line = _line(src, 'with ')
-    scenario = _scenario([_step(phase, 'a stocked machine', with_line)])
-    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then')
-    [finding] = findings
-    assert finding.severity == 'warn'
-    assert finding.message == (
-        f"assert inside {phase} 'a stocked machine' (test_x.py:{with_line})"
-    )
+    with given(t'a {phase} {pg["Step"].low} whose body asserts'):
+        src = _write(
+            tmp_path,
+            f"""\
+            def test_a():
+                with {phase}('a stocked machine'):
+                    machine = stock()
+                    assert machine['coffees'] > 0
+            """,
+        )
+        attach('step body', src)
+        with_line = _line(src, 'with ')
+        checking = _scenario([_step(phase, 'a stocked machine', with_line)])
+    with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
+        findings = _rule_findings(
+            run_ast_rules([checking], tmp_path), 'check-outside-then'
+        )
+    with then(t'a warn {pg["Finding"].low} names the {phase} step holding the assert'):
+        [finding] = findings
+        assert finding.severity == 'warn'
+        assert finding.message == (
+            f"assert inside {phase} 'a stocked machine' (test_x.py:{with_line})"
+        )
 
 
 def test_check_outside_then_reports_one_finding_for_many_asserts(tmp_path) -> None:
@@ -500,33 +533,41 @@ def test_check_outside_then_fires_on_helper_body_assert(tmp_path) -> None:
 # --- Rule 4: action-in-then (per scenario) ---
 
 
+@scenario(
+    t'{pg["Narration lint"]} flags a then {pg["Step"].low} that folds in the action',
+    story=adopt_pytest_given,
+)
 def test_action_in_then_fires_when_no_when_exists(tmp_path) -> None:
-    src = _write(
-        tmp_path,
-        """\
-        def test_a():
-            with given('a machine'):
-                machine = stock()
-            with then('it brews'):
-                assert brew(machine) == 'coffee'
-        """,
-    )
-    then_line = _line(src, 'with then')
-    scenario = _scenario(
-        [
-            _step('given', 'a machine', _line(src, 'with given')),
-            _step('then', 'it brews', then_line),
-        ]
-    )
-    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then')
-    [finding] = findings
-    assert finding.severity == 'warn'
-    assert finding.subject == 'test_x.py::test_a'
-    assert finding.location == SourceLocation(relpath='test_x.py', line=then_line)
-    assert finding.message == (
-        f"then 'it brews' folds the action into its assertion; "
-        f'no when acts (test_x.py:{then_line})'
-    )
+    with given(t'a {pg["Scenario"].low} with no when, acting inside its then'):
+        src = _write(
+            tmp_path,
+            """\
+            def test_a():
+                with given('a machine'):
+                    machine = stock()
+                with then('it brews'):
+                    assert brew(machine) == 'coffee'
+            """,
+        )
+        attach('step body', src)
+        then_line = _line(src, 'with then')
+        folded = _scenario(
+            [
+                _step('given', 'a machine', _line(src, 'with given')),
+                _step('then', 'it brews', then_line),
+            ]
+        )
+    with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
+        findings = _rule_findings(run_ast_rules([folded], tmp_path), 'action-in-then')
+    with then(t'a warn {pg["Finding"].low} points at the then and says no when acts'):
+        [finding] = findings
+        assert finding.severity == 'warn'
+        assert finding.subject == 'test_x.py::test_a'
+        assert finding.location == SourceLocation(relpath='test_x.py', line=then_line)
+        assert finding.message == (
+            f"then 'it brews' folds the action into its assertion; "
+            f'no when acts (test_x.py:{then_line})'
+        )
 
 
 def test_action_in_then_fires_when_no_when_acts(tmp_path) -> None:
@@ -670,28 +711,37 @@ def _value_step(phase, text, line, expressions, children=()):
     return dataclasses.replace(step, narration=Narration(text=text, parts=parts))
 
 
+@scenario(
+    t'{pg["Narration lint"]} flags a {pg["Narration"].low} interpolating a name the '
+    t'body never uses',
+    story=adopt_pytest_given,
+)
 def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
-    # The `{size}` inside the step's own t-string narration must not count as
-    # a use — only code uses count.
-    src = _write(
-        tmp_path,
-        """\
-        def test_a():
-            with given(t'a {size} ml cup'):
-                cup = make_cup()
-        """,
-    )
-    with_line = _line(src, 'with given')
-    scenario = _scenario([_value_step('given', 'a 200 ml cup', with_line, ['size'])])
-    findings = _rule_findings(
-        run_ast_rules([scenario], tmp_path), 'unused-interpolation'
-    )
-    [finding] = findings
-    assert finding.severity == 'warn'
-    assert finding.message == (
-        f"given 'a 200 ml cup' interpolates {{size}} but never uses it "
-        f'(test_x.py:{with_line})'
-    )
+    with given(t'a given {pg["Step"].low} whose body never loads the name'):
+        # The `{size}` inside the step's own t-string narration must not count
+        # as a use — only code uses count.
+        src = _write(
+            tmp_path,
+            """\
+            def test_a():
+                with given(t'a {size} ml cup'):
+                    cup = make_cup()
+            """,
+        )
+        attach('step body', src)
+        with_line = _line(src, 'with given')
+        unused = _scenario([_value_step('given', 'a 200 ml cup', with_line, ['size'])])
+    with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
+        findings = _rule_findings(
+            run_ast_rules([unused], tmp_path), 'unused-interpolation'
+        )
+    with then(t'a warn {pg["Finding"].low} names the interpolation the body ignores'):
+        [finding] = findings
+        assert finding.severity == 'warn'
+        assert finding.message == (
+            f"given 'a 200 ml cup' interpolates {{size}} but never uses it "
+            f'(test_x.py:{with_line})'
+        )
 
 
 def test_unused_interpolation_fires_on_a_grouped_placeholder(tmp_path) -> None:

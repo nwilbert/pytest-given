@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-29T18:00:48.557213+00:00",
+    "timestamp": "2026-08-30T15:51:09.333482+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "49da310374b96e4beee6297e7587e2e98b61d1ea",
+    "commit_sha": "8363f9d1e55c39ee240ffa93e33ed9c07e76e41c",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -11810,6 +11810,1132 @@
       "activity_ids": []
     },
     {
+      "id": "tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body",
+      "narration": {
+        "text": "Narration lint flags a step whose body does nothing",
+        "parts": [
+          {
+            "term_id": "narration-lint",
+            "display": "Narration lint",
+            "expression": "pg[\"Narration lint\"]"
+          },
+          {
+            "value": " flags a "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low"
+          },
+          {
+            "value": " whose body does nothing"
+          }
+        ]
+      },
+      "module": "tests.unit.lint.test_ast_rules",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a given step whose body is only `pass`",
+            "parts": [
+              {
+                "value": "a given "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " whose body is only `pass`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "step body",
+              "content": "def test_a():\n    with given('a value'):\n        pass\n",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the AST rules parse that source",
+            "parts": [
+              {
+                "value": "the AST "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "rules",
+                "expression": "pg[\"Lint rule\"](\"rules\")"
+              },
+              {
+                "value": " parse that source"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            11
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "an empty-step finding points at the step line",
+            "parts": [
+              {
+                "value": "an empty-step "
+              },
+              {
+                "term_id": "finding",
+                "display": "finding",
+                "expression": "pg[\"Finding\"].low"
+              },
+              {
+                "value": " points at the "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " line"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its severity is error",
+            "parts": [
+              {
+                "value": "its "
+              },
+              {
+                "term_id": "severity",
+                "display": "severity",
+                "expression": "pg[\"Severity\"].low"
+              },
+              {
+                "value": " is error"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/lint/test_ast_rules.py",
+        "line": 63
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/lint/test_ast_rules.py::test_then_without_check_fires",
+      "narration": {
+        "text": "Narration lint flags a then step that checks nothing",
+        "parts": [
+          {
+            "term_id": "narration-lint",
+            "display": "Narration lint",
+            "expression": "pg[\"Narration lint\"]"
+          },
+          {
+            "value": " flags a then "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low"
+          },
+          {
+            "value": " that checks nothing"
+          }
+        ]
+      },
+      "module": "tests.unit.lint.test_ast_rules",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a then step whose body only calls",
+            "parts": [
+              {
+                "value": "a then "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " whose body only calls"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "step body",
+              "content": "def test_a():\n    with then('it is one'):\n        x = compute()\n        handlers[0](x)\n",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the AST rules parse that source",
+            "parts": [
+              {
+                "value": "the AST "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "rules",
+                "expression": "pg[\"Lint rule\"](\"rules\")"
+              },
+              {
+                "value": " parse that source"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            11
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a then-without-check finding reports the unchecked then",
+            "parts": [
+              {
+                "value": "a then-without-check "
+              },
+              {
+                "term_id": "finding",
+                "display": "finding",
+                "expression": "pg[\"Finding\"].low"
+              },
+              {
+                "value": " reports the unchecked then"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/lint/test_ast_rules.py",
+        "line": 227
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_fires_on_assert_in_given_or_when[given]",
+      "narration": {
+        "text": "Narration lint flags an assert outside a then step",
+        "parts": [
+          {
+            "term_id": "narration-lint",
+            "display": "Narration lint",
+            "expression": "pg[\"Narration lint\"]"
+          },
+          {
+            "value": " flags an assert outside a then "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low"
+          }
+        ]
+      },
+      "module": "tests.unit.lint.test_ast_rules",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a {phase} step whose body asserts",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "name": "phase",
+                "column_id": "phase",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " whose body asserts"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "step body",
+              "content_type": "text",
+              "column_id": "attachment:0"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the AST rules parse that source",
+            "parts": [
+              {
+                "value": "the AST "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "rules",
+                "expression": "pg[\"Lint rule\"](\"rules\")"
+              },
+              {
+                "value": " parse that source"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            11
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a warn finding names the {phase} step holding the assert",
+            "parts": [
+              {
+                "value": "a warn "
+              },
+              {
+                "term_id": "finding",
+                "display": "finding",
+                "expression": "pg[\"Finding\"].low"
+              },
+              {
+                "value": " names the "
+              },
+              {
+                "name": "phase",
+                "column_id": "phase",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " step holding the assert"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "phase",
+            "name": "phase",
+            "kind": "param"
+          },
+          {
+            "id": "attachment:0",
+            "name": "step body",
+            "kind": "attachment"
+          }
+        ],
+        "cases": [
+          {
+            "values": [
+              "given",
+              {
+                "label": "step body",
+                "content": "def test_a():\n    with given('a stocked machine'):\n        machine = stock()\n        assert machine['coffees'] > 0\n",
+                "content_type": "text"
+              }
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "when",
+              {
+                "label": "step body",
+                "content": "def test_a():\n    with when('a stocked machine'):\n        machine = stock()\n        assert machine['coffees'] > 0\n",
+                "content_type": "text"
+              }
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/lint/test_ast_rules.py",
+        "line": 393
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/lint/test_ast_rules.py::test_action_in_then_fires_when_no_when_exists",
+      "narration": {
+        "text": "Narration lint flags a then step that folds in the action",
+        "parts": [
+          {
+            "term_id": "narration-lint",
+            "display": "Narration lint",
+            "expression": "pg[\"Narration lint\"]"
+          },
+          {
+            "value": " flags a then "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low"
+          },
+          {
+            "value": " that folds in the action"
+          }
+        ]
+      },
+      "module": "tests.unit.lint.test_ast_rules",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a scenario with no when, acting inside its then",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              },
+              {
+                "value": " with no when, acting inside its then"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "step body",
+              "content": "def test_a():\n    with given('a machine'):\n        machine = stock()\n    with then('it brews'):\n        assert brew(machine) == 'coffee'\n",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the AST rules parse that source",
+            "parts": [
+              {
+                "value": "the AST "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "rules",
+                "expression": "pg[\"Lint rule\"](\"rules\")"
+              },
+              {
+                "value": " parse that source"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            11
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a warn finding points at the then and says no when acts",
+            "parts": [
+              {
+                "value": "a warn "
+              },
+              {
+                "term_id": "finding",
+                "display": "finding",
+                "expression": "pg[\"Finding\"].low"
+              },
+              {
+                "value": " points at the then and says no when acts"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/lint/test_ast_rules.py",
+        "line": 536
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/lint/test_ast_rules.py::test_unused_interpolation_fires_on_unused_bare_identifier",
+      "narration": {
+        "text": "Narration lint flags a narration interpolating a name the body never uses",
+        "parts": [
+          {
+            "term_id": "narration-lint",
+            "display": "Narration lint",
+            "expression": "pg[\"Narration lint\"]"
+          },
+          {
+            "value": " flags a "
+          },
+          {
+            "term_id": "narration",
+            "display": "narration",
+            "expression": "pg[\"Narration\"].low"
+          },
+          {
+            "value": " interpolating a name the body never uses"
+          }
+        ]
+      },
+      "module": "tests.unit.lint.test_ast_rules",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a given step whose body never loads the name",
+            "parts": [
+              {
+                "value": "a given "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " whose body never loads the name"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "step body",
+              "content": "def test_a():\n    with given(t'a {size} ml cup'):\n        cup = make_cup()\n",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the AST rules parse that source",
+            "parts": [
+              {
+                "value": "the AST "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "rules",
+                "expression": "pg[\"Lint rule\"](\"rules\")"
+              },
+              {
+                "value": " parse that source"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            11
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a warn finding names the interpolation the body ignores",
+            "parts": [
+              {
+                "value": "a warn "
+              },
+              {
+                "term_id": "finding",
+                "display": "finding",
+                "expression": "pg[\"Finding\"].low"
+              },
+              {
+                "value": " names the interpolation the body ignores"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/lint/test_ast_rules.py",
+        "line": 714
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/lint/test_runtime_rules.py::test_missing_phase_fires_on_passed_two_phase_scenario",
+      "narration": {
+        "text": "Narration lint flags a passed scenario that skips a phase",
+        "parts": [
+          {
+            "term_id": "narration-lint",
+            "display": "Narration lint",
+            "expression": "pg[\"Narration lint\"]"
+          },
+          {
+            "value": " flags a passed "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].low"
+          },
+          {
+            "value": " that skips a "
+          },
+          {
+            "term_id": "phase",
+            "display": "phase",
+            "expression": "pg[\"Phase\"].low"
+          }
+        ]
+      },
+      "module": "tests.unit.lint.test_runtime_rules",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a passed scenario narrating only given and then",
+            "parts": [
+              {
+                "value": "a passed "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              },
+              {
+                "value": " narrating only given and then"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the runtime rules run",
+            "parts": [
+              {
+                "value": "the runtime "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "rules",
+                "expression": "pg[\"Lint rule\"](\"rules\")"
+              },
+              {
+                "value": " run"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            11
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "one missing-phase finding names the absent when and the scenario source",
+            "parts": [
+              {
+                "value": "one missing-phase "
+              },
+              {
+                "term_id": "finding",
+                "display": "finding",
+                "expression": "pg[\"Finding\"].low"
+              },
+              {
+                "value": " names the absent when and the "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              },
+              {
+                "value": " source"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its severity is the catalog default, warn",
+            "parts": [
+              {
+                "value": "its "
+              },
+              {
+                "term_id": "severity",
+                "display": "severity",
+                "expression": "pg[\"Severity\"].low"
+              },
+              {
+                "value": " is the catalog default, warn"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/lint/test_runtime_rules.py",
+        "line": 61
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/lint/test_runtime_rules.py::test_tag_shadows_term_fires_once_per_unique_tag",
+      "narration": {
+        "text": "Narration lint flags a tag that duplicates a term",
+        "parts": [
+          {
+            "term_id": "narration-lint",
+            "display": "Narration lint",
+            "expression": "pg[\"Narration lint\"]"
+          },
+          {
+            "value": " flags a "
+          },
+          {
+            "term_id": "tag",
+            "display": "tag",
+            "expression": "pg[\"Tag\"].low"
+          },
+          {
+            "value": " that duplicates a "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low"
+          }
+        ]
+      },
+      "module": "tests.unit.lint.test_runtime_rules",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a glossary defining one term",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "glossary",
+                "display": "glossary",
+                "expression": "pg[\"Glossary\"].low"
+              },
+              {
+                "value": " defining one "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "two scenarios carrying that word as a tag",
+            "parts": [
+              {
+                "value": "two scenarios carrying that word as a "
+              },
+              {
+                "term_id": "tag",
+                "display": "tag",
+                "expression": "pg[\"Tag\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the runtime rules run",
+            "parts": [
+              {
+                "value": "the runtime "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "rules",
+                "expression": "pg[\"Lint rule\"](\"rules\")"
+              },
+              {
+                "value": " run"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            11
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a single warn finding names the tag, the term it shadows, and both scenarios",
+            "parts": [
+              {
+                "value": "a single warn "
+              },
+              {
+                "term_id": "finding",
+                "display": "finding",
+                "expression": "pg[\"Finding\"].low"
+              },
+              {
+                "value": " names the "
+              },
+              {
+                "term_id": "tag",
+                "display": "tag",
+                "expression": "pg[\"Tag\"].low"
+              },
+              {
+                "value": ", the "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].low"
+              },
+              {
+                "value": " it shadows, and both scenarios"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/lint/test_runtime_rules.py",
+        "line": 130
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/lint/test_runtime_rules.py::test_dead_term_flags_unreferenced_term",
+      "narration": {
+        "text": "Narration lint flags a term that no step or story references",
+        "parts": [
+          {
+            "term_id": "narration-lint",
+            "display": "Narration lint",
+            "expression": "pg[\"Narration lint\"]"
+          },
+          {
+            "value": " flags a "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low"
+          },
+          {
+            "value": " that no "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low"
+          },
+          {
+            "value": " or "
+          },
+          {
+            "term_id": "story",
+            "display": "story",
+            "expression": "pg[\"Story\"].low"
+          },
+          {
+            "value": " references"
+          }
+        ]
+      },
+      "module": "tests.unit.lint.test_runtime_rules",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a glossary holding one unreferenced term",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "glossary",
+                "display": "glossary",
+                "expression": "pg[\"Glossary\"].low"
+              },
+              {
+                "value": " holding one unreferenced "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the runtime rules run over no scenarios and no stories",
+            "parts": [
+              {
+                "value": "the runtime "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "rules",
+                "expression": "pg[\"Lint rule\"](\"rules\")"
+              },
+              {
+                "value": " run over no scenarios and no stories"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            11
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the finding names the unreferenced term",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "finding",
+                "display": "finding",
+                "expression": "pg[\"Finding\"].low"
+              },
+              {
+                "value": " names the unreferenced "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its severity is off \u2014 the rule is opt-in",
+            "parts": [
+              {
+                "value": "its "
+              },
+              {
+                "term_id": "severity",
+                "display": "severity",
+                "expression": "pg[\"Severity\"].low"
+              },
+              {
+                "value": " is off \u2014 the rule is opt-in"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/lint/test_runtime_rules.py",
+        "line": 200
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
       "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_collects_instances_and_forms",
       "narration": {
         "text": "The glossary view aggregates instances and verb forms",
@@ -14922,7 +16048,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -18159,13 +19285,53 @@
         }
       },
       {
+        "id": "narration-lint",
+        "kind": "actor",
+        "canonical": "Narration lint",
+        "definition": "The `--given-lint` pass that checks recorded scenarios against the *Lint rule* catalog once the *Report* model is built. It enforces the structural subset of the narration conventions \u2014 it cannot check whether a *Step*'s text is semantically true.",
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 63
+        }
+      },
+      {
+        "id": "lint-rule",
+        "kind": "object",
+        "canonical": "Lint rule",
+        "definition": "One named check, carrying a surface and a default *Severity*. A `runtime` rule reads the recorded scenarios; an `ast` rule parses the step bodies' source. The catalog in `lint/base.py` is data, so severities, config validation and docs stay in sync with one table.",
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 64
+        }
+      },
+      {
+        "id": "finding",
+        "kind": null,
+        "canonical": "Finding",
+        "definition": "One *Lint rule* firing on one subject: the rule id, the *Severity* it fired at, the subject, a *Source link* location and a message naming the offender.",
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 65
+        }
+      },
+      {
+        "id": "severity",
+        "kind": null,
+        "canonical": "Severity",
+        "definition": "A *Lint rule*'s level \u2014 `off`, `warn` or `error` \u2014 defaulted by the catalog and overridable per rule via `given_lint_rules`. Only `error` fails the run; `warn` reports in the terminal summary.",
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 66
+        }
+      },
+      {
         "id": "glossary",
         "kind": "object",
         "canonical": "Glossary",
         "definition": "The Ubiquitous-Language concept \u2014 the shared vocabulary a domain speaks in \u2014 and the class that realizes it: `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.verb(...)` registration methods and `g('foo')` (declare-or-get a kindless term, optional `definition=`) / `g['foo']` (get-only, raises on unknown) accessor forms.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 65
+          "line": 74
         }
       },
       {
@@ -18175,7 +19341,7 @@
         "definition": "A glossary loaded from a Markdown file, via the `FileGlossary(path)` class. It parses all GFM pipe tables in the file into the same inner `Glossary` model; terms are accessed by name (`g['Guest']`, case-insensitive). *Kind inference* fills in term kinds post-collection from activity *slot* positions when no explicit `kind_column` is configured.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 66
+          "line": 75
         }
       },
       {
@@ -18185,7 +19351,7 @@
         "definition": "A term handed over before its kind is settled \u2014 what `g('foo')` and `g['foo']` on a code glossary return, and every *file glossary* lookup. The handle is the same `TermHandle` the typed registrations (`g.actor(...)` and friends) hand back; `declared_kind is None` is what marks the deferral. The deferral is in the handing over, not the term: a row with an explicit `kind_column` arrives through the same handle already kinded, while the rest stay `None` until *kind inference* runs.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 67
+          "line": 76
         }
       },
       {
@@ -18195,7 +19361,7 @@
         "definition": "A registered glossary entry: an Actor, Work Object, Verb, or kindless term. Each carries an id (slug), a canonical name, a kind (`None` when kindless), and an optional definition (`str",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 68
+          "line": 77
         }
       },
       {
@@ -18205,7 +19371,7 @@
         "definition": "A glossary term for a participant in the domain (e.g., *Guest*). Carries the actor kind color: a wash in narration, a pill in the Glossary view.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 69
+          "line": 78
         }
       },
       {
@@ -18215,7 +19381,7 @@
         "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*). Carries the work-object kind color: a wash in narration, a pill in the Glossary view.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 70
+          "line": 79
         }
       },
       {
@@ -18225,7 +19391,7 @@
         "definition": "A glossary term for an action (e.g., *book*, *confirm*). Verbs accept inflections \u2014 calling `book('books')` records *books* as a surface form of the canonical *book*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 71
+          "line": 80
         }
       },
       {
@@ -18235,7 +19401,7 @@
         "definition": "An occurrence of a term inside narration. Modeled as `NarrationTermRef` in step text and as `ActivityTermRef` inside activity prose.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 72
+          "line": 81
         }
       },
       {
@@ -18245,7 +19411,7 @@
         "definition": "A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). Instances aggregate in the Glossary tab's refs block.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 73
+          "line": 82
         }
       },
       {
@@ -18255,7 +19421,7 @@
         "definition": "A surface form of a Verb other than its canonical name (e.g., *searches for* as an inflection of *search*). Reported under \"Also used as:\" in the Glossary.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 74
+          "line": 83
         }
       },
       {
@@ -18265,7 +19431,7 @@
         "definition": "A named flow modeled as a sequence of activities. Constructed by `story('Title', [activity(...), ...])`. Stories are first-class report tabs and the unit of coverage.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 75
+          "line": 84
         }
       },
       {
@@ -18275,7 +19441,7 @@
         "definition": "One row in a story \u2014 typically `actor + verb + work_object` plus optional connective words. Constructed by `activity(...)`.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 76
+          "line": 85
         }
       },
       {
@@ -18285,7 +19451,7 @@
         "definition": "The two-variant union making up an activity's prose (`ActivityPart` = `ActivityTermRef` or `ActivityWord`): a reference to a glossary term, whose kind resolves via the glossary, or a bare path word \u2014 a node label or edge connective that carries no kind or id, is never classified by inference, and never reaches the glossary. That last is what separates it from a kindless term, which has an id and is tracked.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 77
+          "line": 86
         }
       },
       {
@@ -18295,7 +19461,7 @@
         "definition": "A branching segment inside a story \u2014 `path(...)` lets alternate activity sequences share a prefix.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 78
+          "line": 87
         }
       },
       {
@@ -18305,7 +19471,7 @@
         "definition": "A position role in an activity path, from its node/edge alternation: position 0 is the actor slot, odd positions are verb slots, and even positions \u2265 2 are noun slots. Slots drive both path validation and *kind inference*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 79
+          "line": 88
         }
       },
       {
@@ -18315,7 +19481,7 @@
         "definition": "The link between a scenario (or step) and one or more story activities. Carried by `@scenario(story=, activities=)` and the `activity=` kwarg on `given`/`when`/`then`.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 80
+          "line": 89
         }
       },
       {
@@ -18325,7 +19491,7 @@
         "definition": "The \"did this scenario touch that activity\" relation. Computed by the *A_refs \u2286 S* rule: an activity is covered when its set of term references (as identities, with a canonical fallback) is a subset of a single step's term-reference identities \u2014 matching is per step, not against the union across steps. A step can also cover an activity explicitly via the `activity=` pin, regardless of its narration or its term count.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 81
+          "line": 90
         }
       },
       {
@@ -18335,7 +19501,7 @@
         "definition": "The post-collection pass (`infer_glossary_kinds`) that assigns each undeclared term a kind from the *slot* positions it occupies across all story activities; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any activity stays *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 82
+          "line": 91
         }
       },
       {
@@ -18345,7 +19511,7 @@
         "definition": "A term with `kind=None` \u2014 left unset when *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in an activity). Shown in the report's *Uncategorized* bucket.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 83
+          "line": 92
         }
       },
       {
@@ -18355,7 +19521,7 @@
         "definition": "A term with `definition is None`; surfaced by a badge and filter in the Glossary view. Orthogonal to *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 84
+          "line": 93
         }
       },
       {
@@ -18365,7 +19531,7 @@
         "definition": "Person who writes the application code and \u2014 together with the *Agent* \u2014 the scenarios; curates the glossary with the *Domain Expert*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 92
+          "line": 101
         }
       },
       {
@@ -18375,7 +19541,7 @@
         "definition": "Person who owns the domain knowledge and the ubiquitous language; source of domain stories and reviewer of scenarios and reports. A stakeholder in the broad sense.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 93
+          "line": 102
         }
       },
       {
@@ -18385,7 +19551,7 @@
         "definition": "AI coding agent that authors and maintains scenarios alongside the *Developer*, guided by the pytest-given skills.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 94
+          "line": 103
         }
       }
     ]
@@ -18680,6 +19846,33 @@
             {
               "parts": [
                 {
+                  "term_id": "narration-lint",
+                  "display": "Narration lint"
+                },
+                {
+                  "text": "flags"
+                },
+                {
+                  "term_id": "scenario",
+                  "display": "Scenario"
+                },
+                {
+                  "text": "against a"
+                },
+                {
+                  "term_id": "lint-rule",
+                  "display": "Lint rule"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "paths": [
+            {
+              "parts": [
+                {
                   "term_id": "domain-expert",
                   "display": "Domain Expert"
                 },
@@ -18704,7 +19897,7 @@
       ],
       "source": {
         "relpath": "tests/ubiquitous_language.py",
-        "line": 51
+        "line": 53
       }
     }
   ]

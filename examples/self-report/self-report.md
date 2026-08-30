@@ -1167,6 +1167,115 @@
 - **when** it is interpolated into a t-string step
 - **then** the step carries a single «Term ref»
 
+## ✓ «Narration lint» flags a «step» whose body does nothing
+`tests/unit/lint/test_ast_rules.py:63::test_empty_step_fires_on_pass_only_body`
+
+- **given** a given «step» whose body is only `pass`
+  - 📎 step body:
+    ```
+    def test_a():
+        with given('a value'):
+            pass
+    ```
+- **when** the AST «rules» parse that source
+- **then** an empty-step «finding» points at the «step» line
+- **then** its «severity» is error
+
+## ✓ «Narration lint» flags a then «step» that checks nothing
+`tests/unit/lint/test_ast_rules.py:227::test_then_without_check_fires`
+
+- **given** a then «step» whose body only calls
+  - 📎 step body:
+    ```
+    def test_a():
+        with then('it is one'):
+            x = compute()
+            handlers[0](x)
+    ```
+- **when** the AST «rules» parse that source
+- **then** a then-without-check «finding» reports the unchecked then
+
+## ✓ «Narration lint» flags an assert outside a then «step» · 2 cases
+`tests/unit/lint/test_ast_rules.py:393::test_check_outside_then_fires_on_assert_in_given_or_when`
+
+- **given** a {phase} «step» whose body asserts
+  - 📎 step body — *see parameter table*
+- **when** the AST «rules» parse that source
+- **then** a warn «finding» names the {phase} step holding the assert
+
+| phase | step body | |
+|---|---|---|
+| given | step body | ✓ |
+| when | step body | ✓ |
+
+- **given** — step body:
+  ```
+  def test_a():
+      with given('a stocked machine'):
+          machine = stock()
+          assert machine['coffees'] > 0
+  ```
+
+- **when** — step body:
+  ```
+  def test_a():
+      with when('a stocked machine'):
+          machine = stock()
+          assert machine['coffees'] > 0
+  ```
+
+## ✓ «Narration lint» flags a then «step» that folds in the action
+`tests/unit/lint/test_ast_rules.py:536::test_action_in_then_fires_when_no_when_exists`
+
+- **given** a «scenario» with no when, acting inside its then
+  - 📎 step body:
+    ```
+    def test_a():
+        with given('a machine'):
+            machine = stock()
+        with then('it brews'):
+            assert brew(machine) == 'coffee'
+    ```
+- **when** the AST «rules» parse that source
+- **then** a warn «finding» points at the then and says no when acts
+
+## ✓ «Narration lint» flags a «narration» interpolating a name the body never uses
+`tests/unit/lint/test_ast_rules.py:714::test_unused_interpolation_fires_on_unused_bare_identifier`
+
+- **given** a given «step» whose body never loads the name
+  - 📎 step body:
+    ```
+    def test_a():
+        with given(t'a {size} ml cup'):
+            cup = make_cup()
+    ```
+- **when** the AST «rules» parse that source
+- **then** a warn «finding» names the interpolation the body ignores
+
+## ✓ «Narration lint» flags a passed «scenario» that skips a «phase»
+`tests/unit/lint/test_runtime_rules.py:61::test_missing_phase_fires_on_passed_two_phase_scenario`
+
+- **given** a passed «scenario» narrating only given and then
+- **when** the runtime «rules» run
+- **then** one missing-phase «finding» names the absent when and the «scenario» source
+- **then** its «severity» is the catalog default, warn
+
+## ✓ «Narration lint» flags a «tag» that duplicates a «term»
+`tests/unit/lint/test_runtime_rules.py:130::test_tag_shadows_term_fires_once_per_unique_tag`
+
+- **given** a «glossary» defining one «term»
+- **given** two scenarios carrying that word as a «tag»
+- **when** the runtime «rules» run
+- **then** a single warn «finding» names the «tag», the «term» it shadows, and both scenarios
+
+## ✓ «Narration lint» flags a «term» that no «step» or «story» references
+`tests/unit/lint/test_runtime_rules.py:200::test_dead_term_flags_unreferenced_term`
+
+- **given** a «glossary» holding one unreferenced «term»
+- **when** the runtime «rules» run over no scenarios and no stories
+- **then** the «finding» names the unreferenced «term»
+- **then** its «severity» is off — the rule is opt-in
+
 ## ✓ The «glossary» view aggregates «instances» and «verb» forms
 `tests/unit/report/test_aggregations.py:159::test_build_glossary_aggregations_collects_instances_and_forms`
 

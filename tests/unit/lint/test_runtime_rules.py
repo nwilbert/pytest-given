@@ -2,6 +2,7 @@
 
 import dataclasses
 
+from pytest_given import given, scenario, then, when
 from pytest_given.lint import RuleId, run_runtime_rules
 from pytest_given.model import (
     Activity,
@@ -20,6 +21,7 @@ from pytest_given.model import (
     StoryId,
     id_derive,
 )
+from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 def _step(phase, text, line, children=()):
@@ -56,14 +58,27 @@ def _runtime(grouped=(), glossary=None, stories=()):
     return run_runtime_rules(list(grouped), glossary, list(stories))
 
 
+@scenario(
+    t'{pg["Narration lint"]} flags a passed {pg["Scenario"].low} that skips a '
+    t'{pg["Phase"].low}',
+    story=adopt_pytest_given,
+)
 def test_missing_phase_fires_on_passed_two_phase_scenario() -> None:
-    scenario = _phases_scenario('test_x.py::test_a', ['given', 'then'])
-    [finding] = _runtime(grouped=[scenario])
-    assert finding.rule == RuleId('missing-phase')
-    assert finding.severity == 'warn'
-    assert finding.subject == 'test_x.py::test_a'
-    assert finding.location == SourceLocation(relpath='test_x.py', line=7)
-    assert finding.message == 'missing: when (test_x.py:7)'
+    with given(t'a passed {pg["Scenario"].low} narrating only given and then'):
+        two_phase = _phases_scenario('test_x.py::test_a', ['given', 'then'])
+    with when(t'the runtime {pg["Lint rule"]("rules")} run', activity=11):
+        findings = _runtime(grouped=[two_phase])
+    with then(
+        t'one missing-phase {pg["Finding"].low} names the absent when and the '
+        t'{pg["Scenario"].low} source'
+    ):
+        [finding] = findings
+        assert finding.rule == RuleId('missing-phase')
+        assert finding.subject == 'test_x.py::test_a'
+        assert finding.location == SourceLocation(relpath='test_x.py', line=7)
+        assert finding.message == 'missing: when (test_x.py:7)'
+    with then(t'its {pg["Severity"].low} is the catalog default, warn'):
+        assert finding.severity == 'warn'
 
 
 def test_missing_phase_passes_a_complete_scenario() -> None:
@@ -112,25 +127,38 @@ def _glossary(*names):
     )
 
 
+@scenario(
+    t'{pg["Narration lint"]} flags a {pg["Tag"].low} that duplicates a '
+    t'{pg["Term"].low}',
+    story=adopt_pytest_given,
+)
 def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
-    glossary = _glossary('File glossary')
-    scenarios = [
-        _phases_scenario(
-            'test_x.py::test_a', ['given', 'when', 'then'], tags=['File Glossary']
-        ),
-        _phases_scenario(
-            'test_x.py::test_b', ['given', 'when', 'then'], tags=['File Glossary']
-        ),
-    ]
-    [finding] = _rule_findings(
-        _runtime(grouped=scenarios, glossary=glossary), 'tag-shadows-term'
-    )
-    assert finding.severity == 'warn'
-    assert finding.subject == 'file-glossary'
-    assert finding.message == (
-        "tag 'File Glossary' duplicates glossary term 'File glossary' "
-        '(2 scenarios, e.g. test_x.py::test_a)'
-    )
+    with given(t'a {pg["Glossary"].low} defining one {pg["Term"].low}'):
+        glossary = _glossary('File glossary')
+    with given(t'two scenarios carrying that word as a {pg["Tag"].low}'):
+        scenarios = [
+            _phases_scenario(
+                'test_x.py::test_a', ['given', 'when', 'then'], tags=['File Glossary']
+            ),
+            _phases_scenario(
+                'test_x.py::test_b', ['given', 'when', 'then'], tags=['File Glossary']
+            ),
+        ]
+    with when(t'the runtime {pg["Lint rule"]("rules")} run', activity=11):
+        findings = _rule_findings(
+            _runtime(grouped=scenarios, glossary=glossary), 'tag-shadows-term'
+        )
+    with then(
+        t'a single warn {pg["Finding"].low} names the {pg["Tag"].low}, the '
+        t'{pg["Term"].low} it shadows, and both scenarios'
+    ):
+        [finding] = findings
+        assert finding.severity == 'warn'
+        assert finding.subject == 'file-glossary'
+        assert finding.message == (
+            "tag 'File Glossary' duplicates glossary term 'File glossary' "
+            '(2 scenarios, e.g. test_x.py::test_a)'
+        )
 
 
 def test_tag_shadows_term_passes_orthogonal_tags() -> None:
@@ -169,11 +197,28 @@ def _dead_term_findings(glossary, grouped=(), stories=()):
     return _rule_findings(findings, 'dead-term')
 
 
+@scenario(
+    t'{pg["Narration lint"]} flags a {pg["Term"].low} that no {pg["Step"].low} or '
+    t'{pg["Story"].low} references',
+    story=adopt_pytest_given,
+)
 def test_dead_term_flags_unreferenced_term() -> None:
-    [finding] = _dead_term_findings(_glossary('Ghost term'))
-    assert finding.subject == 'ghost-term'
-    assert finding.severity == 'off'  # catalog default; apply_config drops it
-    assert finding.message == "term 'Ghost term' is referenced by no step and no story"
+    with given(t'a {pg["Glossary"].low} holding one unreferenced {pg["Term"].low}'):
+        glossary = _glossary('Ghost term')
+    with when(
+        t'the runtime {pg["Lint rule"]("rules")} run over no scenarios and no stories',
+        activity=11,
+    ):
+        findings = _dead_term_findings(glossary)
+    with then(t'the {pg["Finding"].low} names the unreferenced {pg["Term"].low}'):
+        [finding] = findings
+        assert finding.subject == 'ghost-term'
+        assert (
+            finding.message == "term 'Ghost term' is referenced by no step and no story"
+        )
+    with then(t'its {pg["Severity"].low} is off — the rule is opt-in'):
+        # Catalog default; `apply_config` drops it unless the suite opts in.
+        assert finding.severity == 'off'
 
 
 def test_dead_term_passes_term_referenced_by_a_step() -> None:
