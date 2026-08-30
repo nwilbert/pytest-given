@@ -49,6 +49,8 @@ Two corollaries of "per step":
 
 A step can also **pin** an activity explicitly — `given(text, activity=3)`, taking the 1-based activity number in the story (or a sequence of numbers). A pin *replaces* narration matching for that step rather than adding to it: the step covers exactly the activities it names and no others, however well its text fits them. A pin is also the only thing that reaches an under-anchored activity: the two-term rule gates narration matching, not pins. Use a pin when the activity is phrased above the vocabulary the step narrates (e.g. a process-level activity implemented by a technical test), and keep it on the one step that genuinely demonstrates the activity.
 
+**Activity numbers are positional, so inserting a row renumbers the pins after it.** `story(...)` assigns ids 1..N in list order, and a pin stores the number rather than the activity — insert in the middle and every `activity=N` past the insertion keeps its number while landing on a different activity, silently, with no error and no lint finding. Append where the flow allows it; otherwise number the new row explicitly (`activity(guest, 'cancels', booking, activity_id=12)` — auto-numbering skips ids already taken, so the two forms mix) and re-read the pins you would have shifted.
+
 An uncovered activity is a signal, not an error — it marks vocabulary and behavior no test exercises yet.
 
 ## When a story earns its keep

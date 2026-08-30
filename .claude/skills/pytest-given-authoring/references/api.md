@@ -43,6 +43,7 @@ Hard rules (each raises `PytestGivenError`):
 - **Narration that genuinely branches per case**: `@scenario(..., group_parametrized=False)` declines the merge and emits one scenario per case, each titled `<name> [<parametrize id>]` with any `Template` placeholders substituted per case first. No parameter table. On an unparametrized test it raises at collection.
 - Parametrized **scenario name**: `@scenario(Template('Brew {cup_size} ml'))`.
 - Surface a parametrize value as a `given`: `Annotated[int, given(Template('a {cup_size} ml cup'))]` on the parameter.
+- **Stacking**: `@scenario(...)` and `@pytest.mark.parametrize(...)` compose in either order — `@scenario` returns the function unwrapped, so neither hides the other's marks.
 
 ## Glossary
 
@@ -55,7 +56,7 @@ Hard rules (each raises `PytestGivenError`):
 
 ## Stories
 
-- `story('Name', [activity(...), ...])` — a flow of `activity(actor, verb, work_object, ...)` rows, read left-to-right; parts may be bare strings, but an activity needs **two distinct glossary terms** to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them. `path(...)` branches alternate sequences off a shared prefix.
+- `story('Name', [activity(...), ...])` — a flow of `activity(actor, verb, work_object, ...)` rows, read left-to-right; parts may be bare strings, but an activity needs **two distinct glossary terms** to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them. `path(...)` branches alternate sequences off a shared prefix. Activity ids are the rows' 1-based list positions unless a row fixes its own with `activity(..., activity_id=N)` (`activity_id=0` is the unset sentinel and raises); since `activity=` pins name those numbers, inserting a row renumbers the pins after it — see [stories.md](stories.md).
 - Bind a scenario with `@scenario(..., story=the_story)` — the only way a story reaches the report. Coverage matches **per step**, and `given(text, activity=3)` (a 1-based activity number or a sequence) pins a step to an activity regardless of its narration. The matching rule and what it costs you when authoring: [stories.md](stories.md).
 
 ## Verifying
