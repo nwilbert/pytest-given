@@ -15,14 +15,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - `pytest_given.PytestGivenWarning` is a top-level export. A step or `attach()`
   recorded in a test without `@scenario` warns with it instead of
-  `pytest.PytestWarning`, so a suite can filter it by name and `capture/`
-  no longer imports pytest at all.
+  `pytest.PytestWarning`, so a suite can filter it by name.
 - `--given-title=TEXT` (or the `given_title` ini) names the report, replacing the
   rootdir name.
 - A parametrized scenario's parameter table now carries a typed column per varying
-  value — `param`, `derived` or `attachment` — rather than one column per
-  parametrize name.
-- A varying attachment payload becomes an `attachment` column of its own.
+  value — `param`, `derived`, or `attachment` for a varying attachment payload —
+  rather than one column per parametrize name.
 - `@scenario(group_parametrized=False)` declines the grouping and emits each case
   as its own scenario, titled by its parametrize id.
 - The HTML report's sidebar gains **Terms** as a third browse axis, and all three
@@ -52,11 +50,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
     grouped tree cannot show per case;
   - passed cases that narrate different templates altogether.
 
-  Every one but the last has the same fix: bind the varying part to a local and
-  narrate it with a t-string, keeping labels and term refs constant; content may
-  still vary freely, which is what the new `attachment` column is for. The last
-  needs `@scenario(..., group_parametrized=False)`, giving each case its own
-  scenario. Each message names its own fix.
+  Every one but the last is fixed by binding the varying part to a local and
+  narrating it with a t-string, keeping labels and term refs constant; content
+  may still vary freely, which is what the new `attachment` column is for. The
+  last needs `@scenario(..., group_parametrized=False)`, giving each case its
+  own scenario.
 - **Breaking.** `attach()` now takes a plain `str` label; a t-string label raises
   `PytestGivenError` — use an f-string.
 - **Breaking.** `attach()` called with no step open now raises `PytestGivenError`
@@ -88,16 +86,18 @@ form `## [x.y.z] - YYYY-MM-DD`.
   across cases, so none is bound to a column), and a grouped step's
   `narration.text` is the template rather than case 1's rendering.
 - **Breaking (JSON report).** A step no longer carries `status` or `error`;
-  failure lives on the scenario and on the parameter table's cases, which is
-  where both renderers read it. A consumer reading `step.status` should read
-  `scenario.status` instead.
-- The Markdown report now shows why a scenario failed: the message and the
-  failing frame, under the scenario and — for a parametrized run — under the
-  parameter table for each failed case. It previously showed the ✗ and no reason.
+  failure lives on the scenario and on the parameter table's cases. A consumer
+  reading `step.status` should read `scenario.status` instead.
+- The Markdown report now shows a scenario's failure reason — the message and
+  the failing frame — under the scenario, and under the parameter table for each
+  failed case. A failure outside a step, or in any case but the one the grouped
+  tree came from, previously showed as a bare ✗.
 
 #### HTML report
 
-- The Scenarios sidebar and its header chips are visually tidied.
+- A selected filter now reads the same in the sidebar and in the header chip
+  that mirrors it, and the `×` marker on a selected row is gone — the row itself
+  toggles, and the chip carries the real dismiss button.
 - The HTML report's colors are retuned into one system, so glossary term kinds,
   statuses and parametrize columns can no longer land on the same color: a term
   ref in a step or a scenario title reads as a word under a light wash rather
@@ -131,9 +131,6 @@ form `## [x.y.z] - YYYY-MM-DD`.
   accessor produced them.
 - A `when_then` step in a test without `@scenario` now points its warning at the
   test rather than at pytest-given's own module.
-- The error for a helper `Template` placeholder naming no parameter now asks for
-  a *named* parameter, where it claimed positional-or-keyword though keyword-only
-  and positional-only parameters have always been accepted.
 
 #### Plugin and run behavior
 
@@ -176,21 +173,17 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A glossary term written as a code span keeps the markup inside it, so
   `` `a*b*c` `` canonicalizes to `a*b*c` and matches how a definition cell
   renders the same span.
-- A parameter-table cell now reads the way the step pointing at it read, carrying the
-  interpolation's own format spec and, under `indirect=True`, the bound test
-  argument; one parameter formatted two ways gets a column each.
+- A parameter-table cell now reads the way the step pointing at it read,
+  carrying the interpolation's own format spec and, under `indirect=True`, the
+  bound test argument.
 - A `Template` narration's `text` is now what its parts render, so the report's
   search box and `jq` queries match what the page displays.
 - The grouped step tree now comes from the first case that *passed*, where a
   skipped case 1 used to render an empty tree.
-- A `Template` slot bound to a glossary term instance now narrates the
-  instance's display. The slot's rendering was compared against the cell
-  without the cell's own term unwrapping, so it never matched: the comparison
-  invented a `derived` column and filled it — and the step text, the scenario
-  name and the JSON report — with the whole `Glossary` dataclass repr. The same
-  repr reached the title of every scenario under
-  `@scenario(..., group_parametrized=False)`, and the label of an
-  `Annotated[..., given(Template(...))]` parameter.
+- A parametrize value that is a glossary term instance now narrates as its
+  display — in a step's `Template` slot, in a scenario name, and in the label of
+  an `Annotated[..., given(Template(...))]` parameter. All three previously
+  rendered the whole `Glossary` dataclass repr.
 
 #### HTML report
 
@@ -212,14 +205,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Bundled skills
 
-- The bundled skills are corrected against the shipped behavior: the navigating
-  skill's term query and JSON reference, the authoring skill's guidance for
-  divergent parametrize narration, glossary discovery order, `@scenario`'s
-  keyword-only arguments, the scope of a pinned step, which parameters a helper
-  `Template` placeholder may name, the oversized-glossary advice, what the
-  Markdown report shows for a failure and for a parametrized scenario, and the
-  lint rule catalog, which the authoring skill now carries in full rather than
-  pointing at the README.
+- The bundled skills are corrected against the shipped behavior, and the
+  authoring skill now carries the lint rule catalog in full rather than pointing
+  at the README.
 
 ## [0.1.0] - 2026-08-08
 
