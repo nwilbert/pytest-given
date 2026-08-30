@@ -1,13 +1,1262 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-30T16:11:36.578992+00:00",
+    "timestamp": "2026-08-30T16:30:48.818642+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "d7876efd77da98f22e2bd42d72ce45e970c07f68",
+    "commit_sha": "5fe4941eb63fda4d9da840287b68a2f24bea1082",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
+    {
+      "id": "tests/integration/test_plugin.py::test_unannotated_test_not_in_report",
+      "narration": {
+        "text": "A test without `@scenario` stays out of the report",
+        "parts": [
+          {
+            "value": "A test without `@scenario` stays out of the "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].low"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 21,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite whose only test is undecorated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with --given-json",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the test itself passes",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the report holds no scenario",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].low"
+              },
+              {
+                "value": " holds no "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 134
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin.py::test_step_fixture_appears_as_given_step",
+      "narration": {
+        "text": "A step fixture is grafted in as a given step",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "step-fixture",
+            "display": "step fixture",
+            "expression": "pg[\"Step fixture\"].low"
+          },
+          {
+            "value": " is "
+          },
+          {
+            "term_id": "graft",
+            "display": "grafted",
+            "expression": "pg[\"Graft\"](\"grafted\")"
+          },
+          {
+            "value": " in as a given "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 22,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a scenario consuming a step fixture",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              },
+              {
+                "value": " consuming a "
+              },
+              {
+                "term_id": "step-fixture",
+                "display": "step fixture",
+                "expression": "pg[\"Step fixture\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "import pytest\nfrom pytest_given import scenario, given, then\n\n@pytest.fixture\n@given(\"a prepared value\")\ndef value():\n    return 42\n\n@scenario(\"Fixture test\")\ndef test_fixture(value):\n    with then(f\"value is {value}\"):\n        assert value == 42",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with --given-json",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            8
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the test passes",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the step from the fixture leads the recorded steps",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " from the fixture leads the recorded steps"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 197
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin.py::test_parametrized_test_as_table",
+      "narration": {
+        "text": "The cases of a parametrized scenario become one scenario with a parameter table",
+        "parts": [
+          {
+            "value": "The "
+          },
+          {
+            "term_id": "case",
+            "display": "cases",
+            "expression": "pg[\"Case\"](\"cases\")"
+          },
+          {
+            "value": " of a "
+          },
+          {
+            "term_id": "parametrized-scenario",
+            "display": "parametrized scenario",
+            "expression": "pg[\"Parametrized scenario\"].low"
+          },
+          {
+            "value": " become one "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].low"
+          },
+          {
+            "value": " with a "
+          },
+          {
+            "term_id": "parameter-table",
+            "display": "parameter table",
+            "expression": "pg[\"Parameter table\"].low"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 23,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a parametrized scenario over two cases",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "parametrized-scenario",
+                "display": "parametrized scenario",
+                "expression": "pg[\"Parametrized scenario\"].low"
+              },
+              {
+                "value": " over two "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"](\"cases\")"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "import pytest\nfrom pytest_given import scenario, given, when, then\n\n@scenario(\"Param test\", tags=[\"math\"])\n@pytest.mark.parametrize(\"a,b,expected\", [(1, 2, 3), (2, 3, 5)])\ndef test_add(a, b, expected):\n    with given(t\"a={a} and b={b}\"):\n        pass\n    with then(t\"sum is {expected}\"):\n        assert a + b == expected",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with --given-json",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            9
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "both cases pass",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the two runs collapse into one scenario",
+            "parts": [
+              {
+                "value": "the two runs collapse into one "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the parameter table holds a param column per argument",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "parameter-table",
+                "display": "parameter table",
+                "expression": "pg[\"Parameter table\"].low"
+              },
+              {
+                "value": " holds a param column per argument"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it holds one row per case, with that row's values",
+            "parts": [
+              {
+                "value": "it holds one row per "
+              },
+              {
+                "term_id": "case",
+                "display": "case",
+                "expression": "pg['Case'].low"
+              },
+              {
+                "value": ", with that row's values"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the grouped steps carry a placeholder per matching name",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 232
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin.py::test_a_grouping_error_discards_the_previous_report",
+      "narration": {
+        "text": "A refused run discards the previous run's report",
+        "parts": [
+          {
+            "value": "A refused run discards the previous run's "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg['Report'].low"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 13,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite whose narration varies across parametrize cases",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "import pytest\nfrom pytest_given import scenario, when\n\n@scenario(\"Brew\")\n@pytest.mark.parametrize(\"cup_size\", [200, 350])\ndef test_brew(cup_size):\n    with when(f\"it brews {cup_size} ml\"):\n        assert cup_size > 0",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report on disk from a previous run",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].low"
+              },
+              {
+                "value": " on disk from a previous run"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with those sinks configured",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the run says no report was written, naming the sink",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the stale files are gone rather than left reading as current",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 367
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin.py::test_no_output_flags_writes_nothing",
+      "narration": {
+        "text": "A bare run writes no report at all",
+        "parts": [
+          {
+            "value": "A bare run writes no "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].low"
+          },
+          {
+            "value": " at all"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 14,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite with one scenario",
+            "parts": [
+              {
+                "value": "a suite with one "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "\n    import pytest\n    from pytest_given import scenario, given, when, then\n\n    @scenario('Buy coffee')\n    def test_buy():\n        with given('a machine'):\n            pass\n        with when('I insert money'):\n            pass\n        with then('I get coffee'):\n            assert True\n",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with no output flag",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the run passes",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "nothing is written to disk",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 2217
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin.py::test_given_md_prints_fenced_block",
+      "narration": {
+        "text": "A bare `--given-md` prints the narration to stdout",
+        "parts": [
+          {
+            "value": "A bare `--given-md` prints the "
+          },
+          {
+            "term_id": "narration",
+            "display": "narration",
+            "expression": "pg[\"Narration\"].low"
+          },
+          {
+            "value": " to stdout"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 20,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite with one scenario",
+            "parts": [
+              {
+                "value": "a suite with one "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with a bare --given-md",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the narration is printed between the fence markers",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 2230
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin.py::test_given_html_alone_writes_no_json",
+      "narration": {
+        "text": "Each sink flag writes only its own report file",
+        "parts": [
+          {
+            "value": "Each sink flag writes only its own "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].low"
+          },
+          {
+            "value": " file"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 61,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite with one scenario",
+            "parts": [
+              {
+                "value": "a suite with one "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with --given-html alone",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the HTML rendering is written",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no JSON lands beside it",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 2251
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin.py::test_a_rejected_form_fails_the_run_and_writes_no_sink",
+      "narration": {
+        "text": "A rejected authoring form fails the run and writes no report",
+        "parts": [
+          {
+            "value": "A rejected authoring form fails the run and writes no "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].low"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 13,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite whose narration varies across parametrize cases",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "\nimport pytest\nfrom pytest_given import scenario, when\n\n@pytest.mark.parametrize('cup_size', [200, 350])\n@scenario('Brew')\ndef test_brew(cup_size):\n    with when(f'the machine brews {cup_size} ml'):\n        pass\n",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with all three sinks configured",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the run fails, naming the offending form",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "not one sink is written, and no traceback escapes",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 2283
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin.py::test_bare_run_still_enforces_the_grouping_rules",
+      "narration": {
+        "text": "A run with no sink still enforces the grouping rules",
+        "parts": [
+          {
+            "value": "A run with no sink still enforces the "
+          },
+          {
+            "term_id": "group",
+            "display": "grouping",
+            "expression": "pg[\"Group\"](\"grouping\")"
+          },
+          {
+            "value": " rules"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 13,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite whose f-string narration records no parts",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "import pytest\nfrom pytest_given import scenario, then\n\n@scenario(\"Brew\")\n@pytest.mark.parametrize('cup_size', [200, 300])\ndef test_brew(cup_size):\n    with then(f'it brews {cup_size} ml'):\n        assert cup_size",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with no sink configured",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the run still fails, naming the offending form",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 2486
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin_lint.py::test_disabled_by_default_records_no_sources_and_reports_nothing",
+      "narration": {
+        "text": "Narration lint is off unless it is asked for",
+        "parts": [
+          {
+            "term_id": "narration-lint",
+            "display": "Narration lint",
+            "expression": "pg[\"Narration lint\"]"
+          },
+          {
+            "value": " is off unless it is asked for"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin_lint",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 15,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite with one flawed step",
+            "parts": [
+              {
+                "value": "a suite with one flawed "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "\nfrom pytest_given import scenario, given, when, then\n\n@scenario(\"Empty given\")\ndef test_empty_given():\n    with given(\"a value\"):\n        pass\n    with when(\"computing\"):\n        x = 2\n    with then(\"it is two\"):\n        assert x == 2\n",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs without the lint flag",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the run passes and says nothing about the lint",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no step source is recorded, so the AST surface costs nothing",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin_lint.py",
+        "line": 89
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin_lint.py::test_enabled_error_finding_fails_the_run",
+      "narration": {
+        "text": "An error-severity finding fails the run",
+        "parts": [
+          {
+            "value": "An error-"
+          },
+          {
+            "term_id": "severity",
+            "display": "severity",
+            "expression": "pg[\"Severity\"].low"
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "finding",
+            "display": "finding",
+            "expression": "pg[\"Finding\"].low"
+          },
+          {
+            "value": " fails the run"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin_lint",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 13,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite whose given step has an empty body",
+            "parts": [
+              {
+                "value": "a suite whose given "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " has an empty body"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "\nfrom pytest_given import scenario, given, when, then\n\n@scenario(\"Empty given\")\ndef test_empty_given():\n    with given(\"a value\"):\n        pass\n    with when(\"computing\"):\n        x = 2\n    with then(\"it is two\"):\n        assert x == 2\n",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with the lint enabled",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            11
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the run exits failed, naming the lint rule and the step",
+            "parts": [
+              {
+                "value": "the run exits failed, naming the "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "lint rule",
+                "expression": "pg[\"Lint rule\"].low"
+              },
+              {
+                "value": " and the step"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin_lint.py",
+        "line": 118
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin_lint.py::test_warn_override_prints_but_does_not_fail",
+      "narration": {
+        "text": "A lint rule downgraded to warn reports without failing the run",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "lint-rule",
+            "display": "lint rule",
+            "expression": "pg[\"Lint rule\"].low"
+          },
+          {
+            "value": " downgraded to warn reports without failing the run"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin_lint",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 32,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite whose given step has an empty body",
+            "parts": [
+              {
+                "value": "a suite whose given "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " has an empty body"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "\nfrom pytest_given import scenario, given, when, then\n\n@scenario(\"Empty given\")\ndef test_empty_given():\n    with given(\"a value\"):\n        pass\n    with when(\"computing\"):\n        x = 2\n    with then(\"it is two\"):\n        assert x == 2\n",
+              "content_type": "text"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with that lint rule set to warn",
+            "parts": [
+              {
+                "value": "the suite runs with that "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "lint rule",
+                "expression": "pg[\"Lint rule\"].low"
+              },
+              {
+                "value": " set to warn"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [
+            11
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the run still passes",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the finding is printed anyway",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "finding",
+                "display": "finding",
+                "expression": "pg[\"Finding\"].low"
+              },
+              {
+                "value": " is printed anyway"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin_lint.py",
+        "line": 150
+      },
+      "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
     {
       "id": "tests/unit/capture/test_collector.py::test_start_and_finish_scenario",
       "narration": {
@@ -16048,7 +17297,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",

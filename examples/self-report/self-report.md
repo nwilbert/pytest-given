@@ -1,5 +1,221 @@
 # pytest-given — pytest-given Self-Report
 
+## ✓ A test without `@scenario` stays out of the «report»
+`tests/integration/test_plugin.py:134::test_unannotated_test_not_in_report`
+
+- **given** a suite whose only test is undecorated
+- **when** the suite runs with --given-json
+- **then** the test itself passes
+- **then** the «report» holds no «scenario»
+
+## ✓ A «step fixture» is «grafted» in as a given «step»
+`tests/integration/test_plugin.py:197::test_step_fixture_appears_as_given_step`
+
+- **given** a «scenario» consuming a «step fixture»
+  - 📎 suite:
+    ```
+    import pytest
+    from pytest_given import scenario, given, then
+    
+    @pytest.fixture
+    @given("a prepared value")
+    def value():
+        return 42
+    
+    @scenario("Fixture test")
+    def test_fixture(value):
+        with then(f"value is {value}"):
+            assert value == 42
+    ```
+- **when** the suite runs with --given-json
+- **then** the test passes
+- **then** the «step» from the fixture leads the recorded steps
+
+## ✓ The «cases» of a «parametrized scenario» become one «scenario» with a «parameter table»
+`tests/integration/test_plugin.py:232::test_parametrized_test_as_table`
+
+- **given** a «parametrized scenario» over two «cases»
+  - 📎 suite:
+    ```
+    import pytest
+    from pytest_given import scenario, given, when, then
+    
+    @scenario("Param test", tags=["math"])
+    @pytest.mark.parametrize("a,b,expected", [(1, 2, 3), (2, 3, 5)])
+    def test_add(a, b, expected):
+        with given(t"a={a} and b={b}"):
+            pass
+        with then(t"sum is {expected}"):
+            assert a + b == expected
+    ```
+- **when** the suite runs with --given-json
+- **then** both cases pass
+- **then** the two runs collapse into one «scenario»
+- **then** the «parameter table» holds a param column per argument
+- **then** it holds one row per «case», with that row's values
+- **then** the grouped steps carry a placeholder per matching name
+
+## ✓ A refused run discards the previous run's «report»
+`tests/integration/test_plugin.py:367::test_a_grouping_error_discards_the_previous_report` · validation
+
+- **given** a suite whose narration varies across parametrize cases
+  - 📎 suite:
+    ```
+    import pytest
+    from pytest_given import scenario, when
+    
+    @scenario("Brew")
+    @pytest.mark.parametrize("cup_size", [200, 350])
+    def test_brew(cup_size):
+        with when(f"it brews {cup_size} ml"):
+            assert cup_size > 0
+    ```
+- **given** a «report» on disk from a previous run
+- **when** the suite runs with those sinks configured
+- **then** the run says no report was written, naming the sink
+- **then** the stale files are gone rather than left reading as current
+
+## ✓ A bare run writes no «report» at all
+`tests/integration/test_plugin.py:2217::test_no_output_flags_writes_nothing`
+
+- **given** a suite with one «scenario»
+  - 📎 suite:
+    ```
+    
+        import pytest
+        from pytest_given import scenario, given, when, then
+    
+        @scenario('Buy coffee')
+        def test_buy():
+            with given('a machine'):
+                pass
+            with when('I insert money'):
+                pass
+            with then('I get coffee'):
+                assert True
+    ```
+- **when** the suite runs with no output flag
+- **then** the run passes
+- **then** nothing is written to disk
+
+## ✓ A bare `--given-md` prints the «narration» to stdout
+`tests/integration/test_plugin.py:2230::test_given_md_prints_fenced_block`
+
+- **given** a suite with one «scenario»
+- **when** the suite runs with a bare --given-md
+- **then** the narration is printed between the fence markers
+
+## ✓ Each sink flag writes only its own «report» file
+`tests/integration/test_plugin.py:2251::test_given_html_alone_writes_no_json`
+
+- **given** a suite with one «scenario»
+- **when** the suite runs with --given-html alone
+- **then** the HTML rendering is written
+- **then** no JSON lands beside it
+
+## ✓ A rejected authoring form fails the run and writes no «report»
+`tests/integration/test_plugin.py:2283::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+
+- **given** a suite whose narration varies across parametrize cases
+  - 📎 suite:
+    ```
+    
+    import pytest
+    from pytest_given import scenario, when
+    
+    @pytest.mark.parametrize('cup_size', [200, 350])
+    @scenario('Brew')
+    def test_brew(cup_size):
+        with when(f'the machine brews {cup_size} ml'):
+            pass
+    ```
+- **when** the suite runs with all three sinks configured
+- **then** the run fails, naming the offending form
+- **then** not one sink is written, and no traceback escapes
+
+## ✓ A run with no sink still enforces the «grouping» rules
+`tests/integration/test_plugin.py:2486::test_bare_run_still_enforces_the_grouping_rules` · validation
+
+- **given** a suite whose f-string narration records no parts
+  - 📎 suite:
+    ```
+    import pytest
+    from pytest_given import scenario, then
+    
+    @scenario("Brew")
+    @pytest.mark.parametrize('cup_size', [200, 300])
+    def test_brew(cup_size):
+        with then(f'it brews {cup_size} ml'):
+            assert cup_size
+    ```
+- **when** the suite runs with no sink configured
+- **then** the run still fails, naming the offending form
+
+## ✓ «Narration lint» is off unless it is asked for
+`tests/integration/test_plugin_lint.py:89::test_disabled_by_default_records_no_sources_and_reports_nothing`
+
+- **given** a suite with one flawed «step»
+  - 📎 suite:
+    ```
+    
+    from pytest_given import scenario, given, when, then
+    
+    @scenario("Empty given")
+    def test_empty_given():
+        with given("a value"):
+            pass
+        with when("computing"):
+            x = 2
+        with then("it is two"):
+            assert x == 2
+    ```
+- **when** the suite runs without the lint flag
+- **then** the run passes and says nothing about the lint
+- **then** no step source is recorded, so the AST surface costs nothing
+
+## ✓ An error-«severity» «finding» fails the run
+`tests/integration/test_plugin_lint.py:118::test_enabled_error_finding_fails_the_run`
+
+- **given** a suite whose given «step» has an empty body
+  - 📎 suite:
+    ```
+    
+    from pytest_given import scenario, given, when, then
+    
+    @scenario("Empty given")
+    def test_empty_given():
+        with given("a value"):
+            pass
+        with when("computing"):
+            x = 2
+        with then("it is two"):
+            assert x == 2
+    ```
+- **when** the suite runs with the lint enabled
+- **then** the run exits failed, naming the «lint rule» and the step
+
+## ✓ A «lint rule» downgraded to warn reports without failing the run
+`tests/integration/test_plugin_lint.py:150::test_warn_override_prints_but_does_not_fail`
+
+- **given** a suite whose given «step» has an empty body
+  - 📎 suite:
+    ```
+    
+    from pytest_given import scenario, given, when, then
+    
+    @scenario("Empty given")
+    def test_empty_given():
+        with given("a value"):
+            pass
+        with when("computing"):
+            x = 2
+        with then("it is two"):
+            assert x == 2
+    ```
+- **when** the suite runs with that «lint rule» set to warn
+- **then** the run still passes
+- **then** the «finding» is printed anyway
+
 ## ✓ A «scenario» records under its «node ID»
 `tests/unit/capture/test_collector.py:26::test_start_and_finish_scenario`
 

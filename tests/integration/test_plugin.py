@@ -1,8 +1,11 @@
 import json
+import textwrap
 
 import pytest
 
+from pytest_given import attach, given, scenario, then, when
 from pytest_given.plugin import session
+from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 def test_basic_scenario_generates_json(pytester, tmp_path):
@@ -128,19 +131,23 @@ def test_given_all_frames_retains_internal_frames(pytester, tmp_path):
     assert any(f['func'] == 'test_fail' for f in error['frames'])
 
 
+@scenario(t'A test without `@scenario` stays out of the {pg["Report"].low}')
 def test_unannotated_test_not_in_report(pytester, tmp_path):
-    """Tests without @scenario don't appear in the report."""
-    pytester.makepyfile(
-        """
-        def test_plain():
-            assert True
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}')
-    result.assert_outcomes(passed=1)
-    data = json.loads(json_path.read_text())
-    assert len(data['scenarios']) == 0
+    with given('a suite whose only test is undecorated'):
+        pytester.makepyfile(
+            """
+            def test_plain():
+                assert True
+            """
+        )
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with --given-json'):
+        result = pytester.runpytest(f'--given-json={json_path}')
+    with then('the test itself passes'):
+        result.assert_outcomes(passed=1)
+    with then(t'the {pg["Report"].low} holds no {pg["Scenario"].low}'):
+        data = json.loads(json_path.read_text())
+        assert len(data['scenarios']) == 0
 
 
 def test_attachment_in_report(pytester, tmp_path):
@@ -187,73 +194,88 @@ def test_attach_outside_a_step_fails_the_test(pytester, tmp_path):
     result.stdout.fnmatch_lines(['*no step is open*'])
 
 
+@scenario(
+    t'A {pg["Step fixture"].low} is {pg["Graft"]("grafted")} in as a given '
+    t'{pg["Step"].low}',
+    story=adopt_pytest_given,
+)
 def test_step_fixture_appears_as_given_step(pytester, tmp_path):
-    """A step fixture appears as a given step."""
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, given, then
+    with given(t'a {pg["Scenario"].low} consuming a {pg["Step fixture"].low}'):
+        suite = """
+            import pytest
+            from pytest_given import scenario, given, then
 
-        @pytest.fixture
-        @given("a prepared value")
-        def value():
-            return 42
+            @pytest.fixture
+            @given("a prepared value")
+            def value():
+                return 42
 
-        @scenario("Fixture test")
-        def test_fixture(value):
-            with then(f"value is {value}"):
-                assert value == 42
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}')
-    result.assert_outcomes(passed=1)
-    data = json.loads(json_path.read_text())
-    steps = data['scenarios'][0]['steps']
-    assert steps[0]['phase'] == 'given'
-    assert steps[0]['narration']['text'] == 'a prepared value'
+            @scenario("Fixture test")
+            def test_fixture(value):
+                with then(f"value is {value}"):
+                    assert value == 42
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with --given-json', activity=8):
+        result = pytester.runpytest(f'--given-json={json_path}')
+    with then('the test passes'):
+        result.assert_outcomes(passed=1)
+    with then(t'the {pg["Step"].low} from the fixture leads the recorded steps'):
+        data = json.loads(json_path.read_text())
+        steps = data['scenarios'][0]['steps']
+        assert steps[0]['phase'] == 'given'
+        assert steps[0]['narration']['text'] == 'a prepared value'
 
 
+@scenario(
+    t'The {pg["Case"]("cases")} of a {pg["Parametrized scenario"].low} become one '
+    t'{pg["Scenario"].low} with a {pg["Parameter table"].low}',
+    story=adopt_pytest_given,
+)
 def test_parametrized_test_as_table(pytester, tmp_path):
-    """Parametrized tests produce a parameter table in the report."""
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, given, when, then
+    with given(t'a {pg["Parametrized scenario"].low} over two {pg["Case"]("cases")}'):
+        suite = """
+            import pytest
+            from pytest_given import scenario, given, when, then
 
-        @scenario("Param test", tags=["math"])
-        @pytest.mark.parametrize("a,b,expected", [(1, 2, 3), (2, 3, 5)])
-        def test_add(a, b, expected):
-            with given(t"a={a} and b={b}"):
-                pass
-            with then(t"sum is {expected}"):
-                assert a + b == expected
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}')
-    result.assert_outcomes(passed=2)
-    data = json.loads(json_path.read_text())
-    # Parametrized tests are grouped into one scenario with a parameter table
-    assert len(data['scenarios']) == 1
-    s = data['scenarios'][0]
-    assert s['narration']['text'] == 'Param test'
-    assert s['parameters'] is not None
-    columns = s['parameters']['columns']
-    assert [c['name'] for c in columns] == ['a', 'b', 'expected']
-    assert all(c['kind'] == 'param' for c in columns)
-    assert all(c['id'] == c['name'] for c in columns)
-    assert len(s['parameters']['cases']) == 2
-    assert s['parameters']['cases'][0]['values'] == [1, 2, 3]
-    assert s['parameters']['cases'][0]['status'] == 'passed'
-    assert s['parameters']['cases'][1]['values'] == [2, 3, 5]
-    # The grouped step's narration parts carry placeholders for matching param names.
-    given_parts = s['steps'][0]['narration']['parts']
-    placeholder_names = [p['name'] for p in given_parts if 'name' in p]
-    assert placeholder_names == ['a', 'b']
-    then_parts = s['steps'][1]['narration']['parts']
-    then_placeholders = [p['name'] for p in then_parts if 'name' in p]
-    assert then_placeholders == ['expected']
+            @scenario("Param test", tags=["math"])
+            @pytest.mark.parametrize("a,b,expected", [(1, 2, 3), (2, 3, 5)])
+            def test_add(a, b, expected):
+                with given(t"a={a} and b={b}"):
+                    pass
+                with then(t"sum is {expected}"):
+                    assert a + b == expected
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with --given-json', activity=9):
+        result = pytester.runpytest(f'--given-json={json_path}')
+    with then('both cases pass'):
+        result.assert_outcomes(passed=2)
+    with then(t'the two runs collapse into one {pg["Scenario"].low}'):
+        data = json.loads(json_path.read_text())
+        assert len(data['scenarios']) == 1
+        s = data['scenarios'][0]
+        assert s['narration']['text'] == 'Param test'
+    with then(t'the {pg["Parameter table"].low} holds a param column per argument'):
+        assert s['parameters'] is not None
+        columns = s['parameters']['columns']
+        assert [c['name'] for c in columns] == ['a', 'b', 'expected']
+        assert all(c['kind'] == 'param' for c in columns)
+        assert all(c['id'] == c['name'] for c in columns)
+    with then(t"it holds one row per {pg['Case'].low}, with that row's values"):
+        assert len(s['parameters']['cases']) == 2
+        assert s['parameters']['cases'][0]['values'] == [1, 2, 3]
+        assert s['parameters']['cases'][0]['status'] == 'passed'
+        assert s['parameters']['cases'][1]['values'] == [2, 3, 5]
+    with then('the grouped steps carry a placeholder per matching name'):
+        given_parts = s['steps'][0]['narration']['parts']
+        assert [p['name'] for p in given_parts if 'name' in p] == ['a', 'b']
+        then_parts = s['steps'][1]['narration']['parts']
+        assert [p['name'] for p in then_parts if 'name' in p] == ['expected']
 
 
 def test_parametrized_non_json_values_are_captured_as_str(pytester, tmp_path):
@@ -342,34 +364,43 @@ def test_a_mutated_parametrize_value_is_captured_as_it_was_at_setup(pytester, tm
     assert [c['values'] for c in cases] == [["['latte']"], ["['mocha']"]]
 
 
+@scenario(
+    t"A refused run discards the previous run's {pg['Report'].low}",
+    tags=['validation'],
+)
 def test_a_grouping_error_discards_the_previous_report(pytester, tmp_path):
     """The run writes no sink because the report would be false — but the sink
     from the last run is still on disk, and a reader who opens it (or a CI step
     that publishes it) gets a report that looks current and says nothing about
     the failure."""
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, when
+    with given('a suite whose narration varies across parametrize cases'):
+        suite = """
+            import pytest
+            from pytest_given import scenario, when
 
-        @scenario("Brew")
-        @pytest.mark.parametrize("cup_size", [200, 350])
-        def test_brew(cup_size):
-            with when(f"it brews {cup_size} ml"):
-                assert cup_size > 0
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    html_path = tmp_path / 'report.html'
-    json_path.write_text('{"stale": true}')
-    html_path.write_text('<html>stale</html>')
-    result = pytester.runpytest(
-        f'--given-json={json_path}', f'--given-html={html_path}'
-    )
-    assert 'report not written' in result.stdout.str()
-    assert not json_path.exists()
-    assert not html_path.exists()
-    assert 'report.json' in result.stdout.str()
+            @scenario("Brew")
+            @pytest.mark.parametrize("cup_size", [200, 350])
+            def test_brew(cup_size):
+                with when(f"it brews {cup_size} ml"):
+                    assert cup_size > 0
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+    with given(t'a {pg["Report"].low} on disk from a previous run'):
+        json_path = tmp_path / 'report.json'
+        html_path = tmp_path / 'report.html'
+        json_path.write_text('{"stale": true}')
+        html_path.write_text('<html>stale</html>')
+    with when('the suite runs with those sinks configured'):
+        result = pytester.runpytest(
+            f'--given-json={json_path}', f'--given-html={html_path}'
+        )
+    with then('the run says no report was written, naming the sink'):
+        assert 'report not written' in result.stdout.str()
+        assert 'report.json' in result.stdout.str()
+    with then('the stale files are gone rather than left reading as current'):
+        assert not json_path.exists()
+        assert not html_path.exists()
 
 
 def test_two_test_files_sharing_a_basename_render_fine(pytester, tmp_path):
@@ -2183,20 +2214,30 @@ _SUITE = """
 """
 
 
+@scenario(t'A bare run writes no {pg["Report"].low} at all')
 def test_no_output_flags_writes_nothing(pytester: pytest.Pytester) -> None:
-    pytester.makepyfile(_SUITE)
-    result = pytester.runpytest()
-    assert result.ret == 0
-    assert not (pytester.path / 'given-report').exists()
+    with given(t'a suite with one {pg["Scenario"].low}'):
+        pytester.makepyfile(_SUITE)
+        attach('suite', _SUITE)
+    with when('the suite runs with no output flag'):
+        result = pytester.runpytest()
+    with then('the run passes'):
+        assert result.ret == 0
+    with then('nothing is written to disk'):
+        assert not (pytester.path / 'given-report').exists()
 
 
+@scenario(t'A bare `--given-md` prints the {pg["Narration"].low} to stdout')
 def test_given_md_prints_fenced_block(pytester: pytest.Pytester) -> None:
-    pytester.makepyfile(_SUITE)
-    result = pytester.runpytest('--given-md')
-    out = result.stdout.str()
-    assert '<!-- pytest-given:md:start -->' in out
-    assert '<!-- pytest-given:md:end -->' in out
-    assert '## ✓ Buy coffee' in out
+    with given(t'a suite with one {pg["Scenario"].low}'):
+        pytester.makepyfile(_SUITE)
+    with when('the suite runs with a bare --given-md'):
+        result = pytester.runpytest('--given-md')
+    with then('the narration is printed between the fence markers'):
+        out = result.stdout.str()
+        assert '<!-- pytest-given:md:start -->' in out
+        assert '<!-- pytest-given:md:end -->' in out
+        assert '## ✓ Buy coffee' in out
 
 
 def test_given_md_path_writes_file_no_stdout(pytester: pytest.Pytester) -> None:
@@ -2207,12 +2248,17 @@ def test_given_md_path_writes_file_no_stdout(pytester: pytest.Pytester) -> None:
     assert 'pytest-given:md:start' not in result.stdout.str()
 
 
+@scenario(t'Each sink flag writes only its own {pg["Report"].low} file')
 def test_given_html_alone_writes_no_json(pytester: pytest.Pytester) -> None:
-    pytester.makepyfile(_SUITE)
-    html_path = pytester.path / 'r.html'
-    pytester.runpytest(f'--given-html={html_path}')
-    assert html_path.exists()
-    assert not (pytester.path / 'given-report' / 'report-data.json').exists()
+    with given(t'a suite with one {pg["Scenario"].low}'):
+        pytester.makepyfile(_SUITE)
+        html_path = pytester.path / 'r.html'
+    with when('the suite runs with --given-html alone'):
+        pytester.runpytest(f'--given-html={html_path}')
+    with then('the HTML rendering is written'):
+        assert html_path.exists()
+    with then('no JSON lands beside it'):
+        assert not (pytester.path / 'given-report' / 'report-data.json').exists()
 
 
 def test_given_json_alone_writes_json(pytester: pytest.Pytester) -> None:
@@ -2234,17 +2280,26 @@ def test_brew(cup_size):
 """
 
 
+@scenario(
+    t'A rejected authoring form fails the run and writes no {pg["Report"].low}',
+    tags=['validation'],
+)
 def test_a_rejected_form_fails_the_run_and_writes_no_sink(pytester):
-    pytester.makepyfile(test_brew=_VIOLATING_SUITE)
-    result = pytester.runpytest(
-        '--given-json=out/report.json',
-        '--given-html=out/report.html',
-        '--given-md=out/report.md',
-    )
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*varies across parametrize cases*'])
-    assert not (pytester.path / 'out').exists()
-    assert 'Traceback (most recent call last)' not in result.stdout.str()
+    with given('a suite whose narration varies across parametrize cases'):
+        pytester.makepyfile(test_brew=_VIOLATING_SUITE)
+        attach('suite', _VIOLATING_SUITE)
+    with when('the suite runs with all three sinks configured'):
+        result = pytester.runpytest(
+            '--given-json=out/report.json',
+            '--given-html=out/report.html',
+            '--given-md=out/report.md',
+        )
+    with then('the run fails, naming the offending form'):
+        assert result.ret != 0
+        result.stdout.fnmatch_lines(['*varies across parametrize cases*'])
+    with then('not one sink is written, and no traceback escapes'):
+        assert not (pytester.path / 'out').exists()
+        assert 'Traceback (most recent call last)' not in result.stdout.str()
 
 
 def test_a_rejected_form_fails_the_run_with_no_sink_flag(pytester):
@@ -2428,20 +2483,27 @@ def test_bare_run_does_no_report_rendering_work(pytester, tmp_path, monkeypatch)
     assert json_path.exists()
 
 
+@scenario(
+    t'A run with no sink still enforces the {pg["Group"]("grouping")} rules',
+    tags=['validation'],
+)
 def test_bare_run_still_enforces_the_grouping_rules(pytester):
     """The grouping pass runs whether or not a sink is configured."""
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, then
+    with given('a suite whose f-string narration records no parts'):
+        suite = """
+            import pytest
+            from pytest_given import scenario, then
 
-        @scenario("Brew")
-        @pytest.mark.parametrize('cup_size', [200, 300])
-        def test_brew(cup_size):
-            with then(f'it brews {cup_size} ml'):
-                assert cup_size
-        """
-    )
-    result = pytester.runpytest()
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*records no parts*'])
+            @scenario("Brew")
+            @pytest.mark.parametrize('cup_size', [200, 300])
+            def test_brew(cup_size):
+                with then(f'it brews {cup_size} ml'):
+                    assert cup_size
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+    with when('the suite runs with no sink configured'):
+        result = pytester.runpytest()
+    with then('the run still fails, naming the offending form'):
+        assert result.ret != 0
+        result.stdout.fnmatch_lines(['*records no parts*'])

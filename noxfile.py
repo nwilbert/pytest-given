@@ -331,13 +331,14 @@ def self_report(session: nox.Session) -> None:
     the vocabulary of GLOSSARY.md (loaded as a FileGlossary in tests/conftest.py).
     """
     _sync(session, 'test', include_project=True)
-    # Only tests/unit: the integration tests carry no @scenario functions of
-    # their own (their @scenario code lives in string literals fed to inner
-    # pytester runs, which own their collectors), so including them would only
-    # slow the regeneration down.
+    # The whole backend suite: tests/unit narrates the internals, and
+    # tests/integration narrates the plugin's outermost behavior through inner
+    # pytester runs. Most of the @scenario text under tests/integration lives
+    # in string literals fed to those inner runs, which own their own
+    # collectors — only the outer, decorated tests reach this report.
     session.run(
         'pytest',
-        'tests/unit',
+        'tests',
         '--given-json=examples/self-report/self-report-data.json',
         '--given-html=examples/self-report/self-report.html',
         '--given-md=examples/self-report/self-report.md',

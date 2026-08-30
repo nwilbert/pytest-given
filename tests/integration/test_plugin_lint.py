@@ -5,7 +5,9 @@ import json
 
 import pytest
 
+from pytest_given import attach, given, scenario, then, when
 from pytest_given.plugin import state
+from tests.ubiquitous_language import adopt_pytest_given, pg
 
 CLEAN = """
 from pytest_given import scenario, given, when, then
@@ -84,13 +86,19 @@ def _run_observed(pytester, source, *args):
     return result, steps
 
 
+@scenario(t'{pg["Narration lint"]} is off unless it is asked for')
 def test_disabled_by_default_records_no_sources_and_reports_nothing(pytester):
-    result, steps = _run_observed(pytester, EMPTY_GIVEN)
-    result.assert_outcomes(passed=1)
-    assert result.ret == 0
-    assert 'narration lint' not in result.stdout.str()
-    assert steps  # sanity: the scenario recorded its steps
-    assert all(step.source is None for step in steps)
+    with given(t'a suite with one flawed {pg["Step"].low}'):
+        attach('suite', EMPTY_GIVEN)
+    with when('the suite runs without the lint flag'):
+        result, steps = _run_observed(pytester, EMPTY_GIVEN)
+    with then('the run passes and says nothing about the lint'):
+        result.assert_outcomes(passed=1)
+        assert result.ret == 0
+        assert 'narration lint' not in result.stdout.str()
+    with then('no step source is recorded, so the AST surface costs nothing'):
+        assert steps  # sanity: the scenario recorded its steps
+        assert all(step.source is None for step in steps)
 
 
 def test_an_error_finding_shows_in_the_summary_line(pytester):
@@ -107,18 +115,27 @@ def test_an_error_finding_shows_in_the_summary_line(pytester):
     result.stdout.fnmatch_lines(['*1 passed*1 error*'])
 
 
+@scenario(
+    t'An error-{pg["Severity"].low} {pg["Finding"].low} fails the run',
+    story=adopt_pytest_given,
+)
 def test_enabled_error_finding_fails_the_run(pytester):
-    result = _run(pytester, EMPTY_GIVEN, '--given-lint=true')
-    # The test itself passed; the error is pytest-given's own, registered so
-    # the summary line cannot read green over a non-zero exit.
-    result.assert_outcomes(passed=1, errors=1)
-    assert result.ret == pytest.ExitCode.TESTS_FAILED
-    result.stdout.fnmatch_lines(
-        [
-            '*narration lint (1 finding, 1 error)*',
-            "*ERROR*empty-step*test_sample.py::test_empty_given*'a value'*has no code*",
-        ]
-    )
+    with given(t'a suite whose given {pg["Step"].low} has an empty body'):
+        attach('suite', EMPTY_GIVEN)
+    with when('the suite runs with the lint enabled', activity=11):
+        result = _run(pytester, EMPTY_GIVEN, '--given-lint=true')
+    with then(t'the run exits failed, naming the {pg["Lint rule"].low} and the step'):
+        # The test itself passed; the error is pytest-given's own, registered
+        # so the summary line cannot read green over a non-zero exit.
+        result.assert_outcomes(passed=1, errors=1)
+        assert result.ret == pytest.ExitCode.TESTS_FAILED
+        result.stdout.fnmatch_lines(
+            [
+                '*narration lint (1 finding, 1 error)*',
+                '*ERROR*empty-step*test_sample.py::test_empty_given*'
+                "*'a value'*has no code*",
+            ]
+        )
 
 
 def test_enabled_clean_suite_exits_zero_and_captures_sources(pytester):
@@ -130,17 +147,32 @@ def test_enabled_clean_suite_exits_zero_and_captures_sources(pytester):
     assert all(step.source is not None for step in steps)
 
 
+@scenario(
+    t'A {pg["Lint rule"].low} downgraded to warn reports without failing the run',
+    story=adopt_pytest_given,
+)
 def test_warn_override_prints_but_does_not_fail(pytester):
-    result = _run(
-        pytester,
-        EMPTY_GIVEN,
-        '--given-lint=true',
-        '-o',
-        'given_lint_rules=empty-step=warn',
-    )
-    result.assert_outcomes(passed=1)
-    assert result.ret == 0
-    result.stdout.fnmatch_lines(['*WARN*empty-step*'])
+    with given(t'a suite whose given {pg["Step"].low} has an empty body'):
+        attach('suite', EMPTY_GIVEN)
+    with when(
+        t'the suite runs with that {pg["Lint rule"].low} set to warn', activity=11
+    ):
+        result = _run(
+            pytester,
+            EMPTY_GIVEN,
+            '--given-lint=true',
+            '-o',
+            'given_lint_rules=empty-step=warn',
+        )
+    with then('the run still passes'):
+        result.assert_outcomes(passed=1)
+        assert result.ret == 0
+    with then(t'the {pg["Finding"].low} is printed anyway'):
+        # One fnmatch pattern means "some line matches"; the assert says the
+        # same thing, and `then-without-check` can see it.
+        assert any(
+            'WARN' in line and 'empty-step' in line for line in result.stdout.lines
+        )
 
 
 def test_off_override_disables_the_rule(pytester):
@@ -246,8 +278,8 @@ def test_report_outputs_are_identical_with_and_without_lint(pytester, tmp_path):
     def normalized(path):
         data = json.loads(path.read_text(encoding='utf-8'))
         data['metadata']['timestamp'] = ''
-        for scenario in data['scenarios']:
-            scenario['duration_ms'] = 0
+        for recorded in data['scenarios']:
+            recorded['duration_ms'] = 0
         return data
 
     assert normalized(on_json) == normalized(off_json)
