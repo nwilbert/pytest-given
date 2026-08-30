@@ -13,7 +13,7 @@
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] How to handle work objects appearing multiple times in Domain Storytelling?
-- [ ] Decide what to do about the `Plain fixture` dead term — the last one, referenced by no step and no story. Narrating the integration suite was expected to retire it and did not: no scenario there contrasts a decorated fixture with an undecorated one. Either give it an honest reference (a scenario where a plain fixture is deliberately absent from the report) or drop the row.
+- [ ] `Plain fixture` is the last term nothing references, which is fine in itself — it is real vocabulary, the natural contrast to *Step fixture*, and the `dead-term` rule is off by default for exactly that reason. The open question is narrower: its definition asserts behavior ("produces no step in the report") that no scenario demonstrates. Either narrow the row to vocabulary and let the behavioral half go, or pin the claim with a scenario.
 
 ## Later
 

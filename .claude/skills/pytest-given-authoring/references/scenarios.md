@@ -71,7 +71,7 @@ The narration lint (`pytest --given-lint=true`, or `given_lint = true` in `[tool
 | `action-in-then` | warn | No `when` performs an action and a `then` folds the action into its assertion. |
 | `unused-interpolation` | warn | A t-string narration interpolating `{name}` that the step body never uses. |
 | `tag-shadows-term` | warn | A scenario tag whose slug duplicates a glossary term. |
-| `dead-term` | off | A glossary term referenced by no step narration and no story activity. Opt in where the glossary should be fully exercised. |
+| `dead-term` | off | A glossary term referenced by no step narration and no story activity. Off by default because an unreferenced term is normal; opt in where the glossary is meant to be fully exercised. |
 
 Severities are overridable per rule via the `given_lint_rules` ini; that and the rest of the setup are in the project README.
 
