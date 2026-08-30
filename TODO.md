@@ -13,8 +13,7 @@
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] How to handle work objects appearing multiple times in Domain Storytelling?
-- [ ] Narrate more backend tests into scenarios — continue the dogfood conversion, converting behavior, not plumbing (leave schema/serde round-trips, metadata/protocol checks, and config parsing plain). What is left:
-  - integration-test spike (`tests/integration/`, 124 plain): the plugin's outermost behavior — "when the suite runs with `--given-json` then the report shows …". Technically feasible (`test_plugin_session_isolation.py` proves narrated outer scenarios survive nested pytester runs) but needs its own spike for nested-session edge cases around open step stacks. Would retire the `Plain fixture` dead term (the last one).
+- [ ] Decide what to do about the `Plain fixture` dead term — the last one, referenced by no step and no story. Narrating the integration suite was expected to retire it and did not: no scenario there contrasts a decorated fixture with an undecorated one. Either give it an honest reference (a scenario where a plain fixture is deliberately absent from the report) or drop the row.
 
 ## Later
 
