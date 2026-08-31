@@ -28,6 +28,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
   each active filter carried in the sharable URL.
 - The sidebar's browse list can be ordered by group size as well as by name, via
   an **A–Z / Count** toggle.
+- The sidebar is resizable — drag the seam between it and the content, or focus
+  it and use the arrow keys.
 - A selected activity in the Stories view offers **Open in Scenarios**, filtering
   the Scenarios view down to the scenarios covering it.
 

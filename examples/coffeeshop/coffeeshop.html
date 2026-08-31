@@ -67,7 +67,9 @@ body {
 
 /* === Sidebar === */
 .sidebar {
-  width: 260px;
+  /* Set on <body> by the resize handle below; the fallback is what the page
+     renders at before Alpine binds it, and if scripting is off. */
+  width: var(--sidebar-w, 260px);
   background: var(--bg-sidebar);
   padding: var(--space-lg);
   flex-shrink: 0;
@@ -76,6 +78,37 @@ body {
   position: sticky;
   top: 0;
 }
+/* The seam between the sidebar and the content it filters: 5px of grab area,
+   invisible until pointed at, then a 1px accent rule down the full height. It
+   overlaps its neighbours by 2px on each side, so widening the grab area costs
+   the layout nothing. */
+.sidebar-resize {
+  flex: 0 0 5px;
+  margin: 0 -2px;
+  position: relative;
+  z-index: 1;
+  cursor: col-resize;
+  touch-action: none;
+}
+.sidebar-resize::before {
+  content: '';
+  position: absolute;
+  inset: 0 2px;
+  background: var(--color-accent);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.sidebar-resize:hover::before,
+.sidebar-resize:focus-visible::before,
+body.resizing-sidebar .sidebar-resize::before { opacity: 1; }
+/* The rule above *is* the focus indicator, so the default ring would only
+   double it — and it would sit on a 1px-wide box. */
+.sidebar-resize:focus-visible { outline: none; }
+/* Held on <body> for the duration of a drag: the cursor stays the resize
+   cursor wherever the pointer wanders, and the pass over the scenario list
+   doesn't select its text. */
+body.resizing-sidebar { cursor: col-resize; user-select: none; }
+
 /* Search box (wraps input + icons) */
 .search-box {
   position: relative;
@@ -1205,7 +1238,7 @@ span.param-highlight {
 .param-color-5, th.param-color-5 { color: #007454; }
 </style>
 </head>
-<body x-data="reportApp()">
+<body x-data="reportApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 
 <div class="main"><header class="topbar">
     <div class="topbar-title">Coffee Shop Example</div>
@@ -1268,6 +1301,14 @@ span.param-highlight {
       </div>
     </div>
   </div>
+  <div class="sidebar-resize" role="separator" aria-orientation="vertical"
+         aria-label="Sidebar width" tabindex="0"
+         :aria-valuenow="sidebarWidth" aria-valuemin="180" aria-valuemax="480"
+         @pointerdown="startSidebarResize($event)"
+         @dblclick="resetSidebar()"
+         @keydown.arrow-left.prevent="nudgeSidebar(-16)"
+         @keydown.arrow-right.prevent="nudgeSidebar(16)"
+         @keydown.home.prevent="resetSidebar()"></div>
   <div class="view-main">
   <div class="header">
     <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
@@ -1353,7 +1394,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1412,7 +1453,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1456,7 +1497,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1605,7 +1646,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -1705,7 +1746,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -1751,7 +1792,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
       
     </div>
     </div>
@@ -1849,7 +1890,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
       
     </div>
     </div>
@@ -1893,7 +1934,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -1939,7 +1980,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -2141,7 +2182,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
       
     </div>
     </div>
@@ -2215,7 +2256,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
       
     </div>
     </div>
@@ -2316,7 +2357,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
       
     </div>
     </div>
@@ -2366,7 +2407,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
@@ -2426,7 +2467,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
       
     </div>
     </div>
@@ -2522,7 +2563,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
       
     </div>
     </div>
@@ -2565,7 +2606,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
       
     </div>
     </div>
@@ -2657,7 +2698,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/fdf80221e83a7a0c18eae6dc5824ccf78203d29e/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
       
     </div>
     </div>
@@ -2688,10 +2729,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-31T08:00:41.101623+00:00",
+    "timestamp": "2026-08-31T08:07:18.204439+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "fdf80221e83a7a0c18eae6dc5824ccf78203d29e",
+    "commit_sha": "ad47d3107fa2d171f74ef4296355f4b89ea51aec",
     "title": "Coffee Shop Example"
   },
   "scenarios": [
@@ -4353,6 +4394,14 @@ function deserializeStory(params) {
 const NO_TERMS = '!no-terms';
 const NO_TAGS = '!untagged';
 
+// Sidebar width bounds, in CSS px. The floor is where a module row still fits
+// a segment plus its count; the ceiling keeps the scenario column the wider of
+// the two. `aria-valuemin` / `aria-valuemax` on the handle repeat these.
+const SIDEBAR_MIN = 180;
+const SIDEBAR_MAX = 480;
+const SIDEBAR_DEFAULT = 260;
+const clampSidebar = w => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, Math.round(w)));
+
 function reportApp() {
   const data = window.__REPORT_DATA__;
   const storyIds = window.__storyIds || [];
@@ -4381,6 +4430,11 @@ function reportApp() {
     // How the browse tree orders its groups. Ephemeral like `view` above —
     // the hash carries filters, which change what you see, not the order.
     sortBy: 'name',
+    // Applied as `--sidebar-w` on <body>, so one drag resizes all three views'
+    // sidebars. Deliberately not in the hash with the filters: a width is a
+    // property of the window it is read in, not of the view a link points at,
+    // and it would otherwise travel to whoever the link is shared with.
+    sidebarWidth: SIDEBAR_DEFAULT,
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
@@ -4613,6 +4667,39 @@ function reportApp() {
     toggleGroup(name) {
       if (this.expandedGroups[name]) delete this.expandedGroups[name];
       else this.expandedGroups[name] = true;
+    },
+    // Pointer capture on the handle keeps the drag alive over the iframe-free
+    // but text-heavy main column, and delivers the release even if the pointer
+    // leaves the window. The listeners live on the handle for the same reason.
+    startSidebarResize(event) {
+      // preventDefault stops the drag from placing a caret or starting a text
+      // selection — but it also suppresses the focus a click would otherwise
+      // give a tabindex'd element, which left the arrow keys dead for anyone
+      // who grabbed the seam and then reached for the keyboard. So focus it
+      // here, rather than depending on a default we just declined.
+      event.preventDefault();
+      const handle = event.currentTarget;
+      handle.focus();
+      const startX = event.clientX;
+      const startWidth = this.sidebarWidth;
+      handle.setPointerCapture(event.pointerId);
+      document.body.classList.add('resizing-sidebar');
+      const drag = e => { this.sidebarWidth = clampSidebar(startWidth + e.clientX - startX); };
+      const stop = () => {
+        handle.removeEventListener('pointermove', drag);
+        handle.removeEventListener('pointerup', stop);
+        handle.removeEventListener('pointercancel', stop);
+        document.body.classList.remove('resizing-sidebar');
+      };
+      handle.addEventListener('pointermove', drag);
+      handle.addEventListener('pointerup', stop);
+      handle.addEventListener('pointercancel', stop);
+    },
+    nudgeSidebar(step) {
+      this.sidebarWidth = clampSidebar(this.sidebarWidth + step);
+    },
+    resetSidebar() {
+      this.sidebarWidth = SIDEBAR_DEFAULT;
     },
     toggleStep(stepId) {
       if (this.expandedSteps[stepId]) delete this.expandedSteps[stepId];

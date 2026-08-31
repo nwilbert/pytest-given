@@ -60,7 +60,9 @@ body {
 
 /* === Sidebar === */
 .sidebar {
-  width: 260px;
+  /* Set on <body> by the resize handle below; the fallback is what the page
+     renders at before Alpine binds it, and if scripting is off. */
+  width: var(--sidebar-w, 260px);
   background: var(--bg-sidebar);
   padding: var(--space-lg);
   flex-shrink: 0;
@@ -69,6 +71,37 @@ body {
   position: sticky;
   top: 0;
 }
+/* The seam between the sidebar and the content it filters: 5px of grab area,
+   invisible until pointed at, then a 1px accent rule down the full height. It
+   overlaps its neighbours by 2px on each side, so widening the grab area costs
+   the layout nothing. */
+.sidebar-resize {
+  flex: 0 0 5px;
+  margin: 0 -2px;
+  position: relative;
+  z-index: 1;
+  cursor: col-resize;
+  touch-action: none;
+}
+.sidebar-resize::before {
+  content: '';
+  position: absolute;
+  inset: 0 2px;
+  background: var(--color-accent);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.sidebar-resize:hover::before,
+.sidebar-resize:focus-visible::before,
+body.resizing-sidebar .sidebar-resize::before { opacity: 1; }
+/* The rule above *is* the focus indicator, so the default ring would only
+   double it — and it would sit on a 1px-wide box. */
+.sidebar-resize:focus-visible { outline: none; }
+/* Held on <body> for the duration of a drag: the cursor stays the resize
+   cursor wherever the pointer wanders, and the pass over the scenario list
+   doesn't select its text. */
+body.resizing-sidebar { cursor: col-resize; user-select: none; }
+
 /* Search box (wraps input + icons) */
 .search-box {
   position: relative;

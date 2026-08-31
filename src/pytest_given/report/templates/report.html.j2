@@ -15,11 +15,11 @@
 {%- endfor %}
 </style>
 </head>
-<body x-data="reportApp()">
+<body x-data="reportApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, render_error, attachment_icon, attachment_badge, expandable_attachment, render_step with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, render_error, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer with context -%}
 
   <header class="topbar">
     <div class="topbar-title">{{ metadata.title or metadata.project }}</div>
@@ -116,6 +116,7 @@
       </div>
     </div>
   </div>
+  {{ sidebar_resizer() }}
   <div class="view-main">
   <div class="header">
     <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
@@ -327,6 +328,7 @@
       </div>
       {% endfor %}
     </div>
+    {{ sidebar_resizer() }}
     <div class="view-main">
       {% for story in stories %}
       <div data-story-id="{{ story.id }}" x-show="selectedStory === $el.dataset.storyId">
@@ -482,6 +484,7 @@
       </div>
       {% endif %}
     </div>
+    {{ sidebar_resizer() }}
 
     <div class="view-main">
       <div class="header">

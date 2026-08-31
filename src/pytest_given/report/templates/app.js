@@ -39,6 +39,14 @@ function deserializeStory(params) {
 const NO_TERMS = '!no-terms';
 const NO_TAGS = '!untagged';
 
+// Sidebar width bounds, in CSS px. The floor is where a module row still fits
+// a segment plus its count; the ceiling keeps the scenario column the wider of
+// the two. `aria-valuemin` / `aria-valuemax` on the handle repeat these.
+const SIDEBAR_MIN = 180;
+const SIDEBAR_MAX = 480;
+const SIDEBAR_DEFAULT = 260;
+const clampSidebar = w => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, Math.round(w)));
+
 function reportApp() {
   const data = window.__REPORT_DATA__;
   const storyIds = window.__storyIds || [];
@@ -67,6 +75,11 @@ function reportApp() {
     // How the browse tree orders its groups. Ephemeral like `view` above —
     // the hash carries filters, which change what you see, not the order.
     sortBy: 'name',
+    // Applied as `--sidebar-w` on <body>, so one drag resizes all three views'
+    // sidebars. Deliberately not in the hash with the filters: a width is a
+    // property of the window it is read in, not of the view a link points at,
+    // and it would otherwise travel to whoever the link is shared with.
+    sidebarWidth: SIDEBAR_DEFAULT,
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
@@ -299,6 +312,39 @@ function reportApp() {
     toggleGroup(name) {
       if (this.expandedGroups[name]) delete this.expandedGroups[name];
       else this.expandedGroups[name] = true;
+    },
+    // Pointer capture on the handle keeps the drag alive over the iframe-free
+    // but text-heavy main column, and delivers the release even if the pointer
+    // leaves the window. The listeners live on the handle for the same reason.
+    startSidebarResize(event) {
+      // preventDefault stops the drag from placing a caret or starting a text
+      // selection — but it also suppresses the focus a click would otherwise
+      // give a tabindex'd element, which left the arrow keys dead for anyone
+      // who grabbed the seam and then reached for the keyboard. So focus it
+      // here, rather than depending on a default we just declined.
+      event.preventDefault();
+      const handle = event.currentTarget;
+      handle.focus();
+      const startX = event.clientX;
+      const startWidth = this.sidebarWidth;
+      handle.setPointerCapture(event.pointerId);
+      document.body.classList.add('resizing-sidebar');
+      const drag = e => { this.sidebarWidth = clampSidebar(startWidth + e.clientX - startX); };
+      const stop = () => {
+        handle.removeEventListener('pointermove', drag);
+        handle.removeEventListener('pointerup', stop);
+        handle.removeEventListener('pointercancel', stop);
+        document.body.classList.remove('resizing-sidebar');
+      };
+      handle.addEventListener('pointermove', drag);
+      handle.addEventListener('pointerup', stop);
+      handle.addEventListener('pointercancel', stop);
+    },
+    nudgeSidebar(step) {
+      this.sidebarWidth = clampSidebar(this.sidebarWidth + step);
+    },
+    resetSidebar() {
+      this.sidebarWidth = SIDEBAR_DEFAULT;
     },
     toggleStep(stepId) {
       if (this.expandedSteps[stepId]) delete this.expandedSteps[stepId];
