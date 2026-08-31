@@ -47,6 +47,51 @@
 
 /* === Reset & Base === */
 * { margin: 0; padding: 0; box-sizing: border-box; }
+/* Chip- and row-shaped controls that are real <button>s so the keyboard
+   reaches them. Declared up here so the component rules below keep winning on
+   font and background at equal specificity. */
+.btn-reset {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  text-align: inherit;
+  cursor: pointer;
+}
+.btn-reset:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+/* A chevron's keyboard target; the row around it stays the mouse one. Sized
+   like .nav-group-toggle so the focus ring lands on a real box rather than an
+   8px rotated square. */
+.disclosure-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  /* The glyph inside is centred, so these pull the 18px box back around it
+     and leave every row's geometry exactly as it was. The gap to the label is
+     the chevron's own margin, moved out here. */
+  margin-left: -5px;
+  margin-right: 3px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.disclosure-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+.disclosure-btn > .scenario-chevron,
+.disclosure-btn > .step-chevron { margin-right: 0; }
+/* The step chevron is 7px, not 8, and its row is tighter. */
+.step-toggle > .disclosure-btn { margin-left: -5px; margin-right: 0; }
 body {
   font-family: var(--font-family);
   background: var(--bg-page);
@@ -235,6 +280,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   color: var(--text-muted);
   user-select: none;
 }
+.seg-btn { border-top: 0; border-right: 0; border-bottom: 0; }
 .seg-btn:first-child { border-left: none; }
 .seg-btn.active {
   background: var(--color-accent-bg);
@@ -332,6 +378,16 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
    chevron, so one level reads as one column. Only the module tree has any, so
    the flat axes leave it out rather than indent every row past nothing. */
 .nav-group-toggle-placeholder { width: 18px; flex-shrink: 0; margin-right: 2px; }
+/* The row's filter control, a sibling of the chevron button rather than a
+   wrapper around it: buttons cannot nest. */
+.nav-group-select {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  text-align: left;
+}
+.nav-group-select:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
 .nav-status-icon { font-size: 0.625rem; }
 
 /* === Main === */
@@ -680,6 +736,9 @@ span.param-highlight {
   margin-top: var(--space-xs);
 }
 .attachment-badge:hover { background: var(--border); }
+/* A promoted attachment names its column and expands nothing. */
+.attachment-badge--static { cursor: default; }
+.attachment-badge--static:hover { background: var(--bg-page); }
 .attachment-badge-icon {
   width: 12px;
   height: 12px;
@@ -913,6 +972,8 @@ span.param-highlight {
 
 /* === Story layout === */
 .story-sidebar-item {
+  display: block;
+  width: 100%;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -943,6 +1004,7 @@ span.param-highlight {
 .activity-row:hover { border-color: var(--color-accent); }
 .activity-num {
   min-width: 24px;
+  padding: 0;
   height: 24px;
   display: flex;
   align-items: center;
@@ -1048,6 +1110,10 @@ span.param-highlight {
 .kind-swatch-kindless { background: #d6d3d1; }
 
 /* === Kind section headers === */
+.glossary-empty {
+  padding: var(--space-xl) var(--space-lg);
+  color: var(--text-muted);
+}
 .kind-header {
   display: flex;
   align-items: baseline;
@@ -1099,7 +1165,8 @@ span.param-highlight {
   cursor: pointer;
   user-select: none;
 }
-.entry-head .scenario-chevron { margin-top: 6px; flex-shrink: 0; }
+.entry-head .disclosure-btn { margin-top: 2px; }
+.entry-head .scenario-chevron { flex-shrink: 0; }
 .entry-name { flex-shrink: 0; min-width: 160px; }
 .entry-body { flex: 1; }
 .entry-def { font-size: var(--font-size-md); color: var(--text-primary); }

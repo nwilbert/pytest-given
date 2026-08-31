@@ -90,11 +90,9 @@
       attachment has no payload of its own to expand. Operable rather than
       decorated text: reachable by keyboard and announced as a control. -#}
   {%- macro attachment_badge(cell_id, label, content_type) -%}
-    <span class="attachment-badge" role="button" tabindex="0"
-          :aria-expanded="expandedAttachments['{{ cell_id }}'] ? 'true' : 'false'"
-          @click="toggleAttachment('{{ cell_id }}')"
-          @keydown.enter.prevent="toggleAttachment('{{ cell_id }}')"
-          @keydown.space.prevent="toggleAttachment('{{ cell_id }}')">{{ attachment_icon(content_type) }}{{ label }}</span>
+    <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['{{ cell_id }}']"
+            @click="toggleAttachment('{{ cell_id }}')">{{ attachment_icon(content_type) }}{{ label }}</button>
   {%- endmacro -%}
 
   {%- macro expandable_attachment(cell_id, label, content, content_type) -%}
@@ -110,7 +108,10 @@
   <div class="step-text">
     {%- if step.children and step.children | length > 0 -%}
       <span class="step-toggle" @click="toggleStep('{{ step_id }}')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['{{ step_id }}'] }"></span>
+        <button type="button" class="disclosure-btn"
+                :aria-expanded="!!expandedSteps['{{ step_id }}']"
+                :aria-label="(expandedSteps['{{ step_id }}'] ? 'Collapse' : 'Expand') + ' sub-steps'"
+                @click.stop="toggleStep('{{ step_id }}')"><span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['{{ step_id }}'] }"></span></button>
         {{ step.narration | narration }}
       </span>
     {%- else -%}
@@ -130,7 +131,7 @@
     {%- for att in step.attachments -%}
     {%- if att is attachment_ref -%}
     <div>
-      <span class="attachment-badge" data-param="{{ att.column_id }}"
+      <span class="attachment-badge attachment-badge--static" data-param="{{ att.column_id }}"
             @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
             @mouseleave="setHoverParam(null, $event.currentTarget)">{{ attachment_icon(att.content_type) }}{{ att.label }}</span>
     </div>

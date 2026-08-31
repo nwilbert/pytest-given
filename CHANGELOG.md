@@ -114,6 +114,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - An attachment badge now takes its icon from the payload's content type —
   braces for JSON, a page for text — instead of a paperclip for both. The
   Markdown report keeps its `📎`.
+- Filtering a large report is cheaper: a keystroke in the search box now scans
+  the scenarios once instead of six times.
 
 #### Bundled skills
 
@@ -197,6 +199,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - Two test files sharing a basename across directories no longer abort the HTML
   report; the scenarios' `#scenario=` slugs gain directory components instead.
+- A `#view=stories`, `#view=glossary` or `#term=` link opened against a report
+  that has no such tab now falls back to the Scenarios view, instead of
+  stranding the reader on an empty one with no tab bar to leave by.
+- The Glossary view's kind headings and their term counts now follow the search
+  and definition filters, rather than showing the report's totals over a list
+  the filter emptied; a filter matching nothing now says so.
 - Content reaching past a scenario card's right edge is no longer clipped beyond
   reach: a wide parameter table and an attachment payload scroll, a source path and a
   traceback's frame location wrap, and the source link sits under the card's last
@@ -204,9 +212,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - Jumping to a scenario from a story activity, or to a term's scenarios from the
   Glossary tab, now clears filters that would hide the target; the filters in a
   `#scenario=` deep link still win.
-- Accent-colored text and the parametrize column colors now meet WCAG AA, term
-  kinds stay distinguishable for red-green color blindness, and attachment badges
-  are keyboard-operable.
+- Accent-colored text and the parametrize column colors now meet WCAG AA, and
+  term kinds stay distinguishable for red-green color blindness.
+- The report is operable from the keyboard: status pills, browse-axis and
+  browse-tree rows, tag pills, story sidebar entries, activity and attachment
+  badges, and every expand/collapse chevron are now real buttons, and the view
+  tabs report which one is selected.
 - A step pinned with `given(..., activity=N)` now covers an under-anchored
   activity as well; the two-distinct-terms rule gates narration matching only,
   and a covered activity no longer renders as "not coverage-tracked".

@@ -54,6 +54,51 @@
 
 /* === Reset & Base === */
 * { margin: 0; padding: 0; box-sizing: border-box; }
+/* Chip- and row-shaped controls that are real <button>s so the keyboard
+   reaches them. Declared up here so the component rules below keep winning on
+   font and background at equal specificity. */
+.btn-reset {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  text-align: inherit;
+  cursor: pointer;
+}
+.btn-reset:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+/* A chevron's keyboard target; the row around it stays the mouse one. Sized
+   like .nav-group-toggle so the focus ring lands on a real box rather than an
+   8px rotated square. */
+.disclosure-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  /* The glyph inside is centred, so these pull the 18px box back around it
+     and leave every row's geometry exactly as it was. The gap to the label is
+     the chevron's own margin, moved out here. */
+  margin-left: -5px;
+  margin-right: 3px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.disclosure-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+.disclosure-btn > .scenario-chevron,
+.disclosure-btn > .step-chevron { margin-right: 0; }
+/* The step chevron is 7px, not 8, and its row is tighter. */
+.step-toggle > .disclosure-btn { margin-left: -5px; margin-right: 0; }
 body {
   font-family: var(--font-family);
   background: var(--bg-page);
@@ -242,6 +287,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   color: var(--text-muted);
   user-select: none;
 }
+.seg-btn { border-top: 0; border-right: 0; border-bottom: 0; }
 .seg-btn:first-child { border-left: none; }
 .seg-btn.active {
   background: var(--color-accent-bg);
@@ -339,6 +385,16 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
    chevron, so one level reads as one column. Only the module tree has any, so
    the flat axes leave it out rather than indent every row past nothing. */
 .nav-group-toggle-placeholder { width: 18px; flex-shrink: 0; margin-right: 2px; }
+/* The row's filter control, a sibling of the chevron button rather than a
+   wrapper around it: buttons cannot nest. */
+.nav-group-select {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  text-align: left;
+}
+.nav-group-select:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
 .nav-status-icon { font-size: 0.625rem; }
 
 /* === Main === */
@@ -687,6 +743,9 @@ span.param-highlight {
   margin-top: var(--space-xs);
 }
 .attachment-badge:hover { background: var(--border); }
+/* A promoted attachment names its column and expands nothing. */
+.attachment-badge--static { cursor: default; }
+.attachment-badge--static:hover { background: var(--bg-page); }
 .attachment-badge-icon {
   width: 12px;
   height: 12px;
@@ -920,6 +979,8 @@ span.param-highlight {
 
 /* === Story layout === */
 .story-sidebar-item {
+  display: block;
+  width: 100%;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -950,6 +1011,7 @@ span.param-highlight {
 .activity-row:hover { border-color: var(--color-accent); }
 .activity-num {
   min-width: 24px;
+  padding: 0;
   height: 24px;
   display: flex;
   align-items: center;
@@ -1055,6 +1117,10 @@ span.param-highlight {
 .kind-swatch-kindless { background: #d6d3d1; }
 
 /* === Kind section headers === */
+.glossary-empty {
+  padding: var(--space-xl) var(--space-lg);
+  color: var(--text-muted);
+}
 .kind-header {
   display: flex;
   align-items: baseline;
@@ -1106,7 +1172,8 @@ span.param-highlight {
   cursor: pointer;
   user-select: none;
 }
-.entry-head .scenario-chevron { margin-top: 6px; flex-shrink: 0; }
+.entry-head .disclosure-btn { margin-top: 2px; }
+.entry-head .scenario-chevron { flex-shrink: 0; }
 .entry-name { flex-shrink: 0; min-width: 160px; }
 .entry-body { flex: 1; }
 .entry-def { font-size: var(--font-size-md); color: var(--text-primary); }
@@ -1245,12 +1312,7 @@ span.param-highlight {
     <div class="topbar-meta">pytest 9.0.3 · pytest-given 0.1.0 · <span x-text="formattedTimestamp"></span></div>
   </header>
 
-  
-  
-  
-  
-
-  <div id="view-scenarios" x-show="mainView === 'scenarios'">
+  <div id="view-scenarios"  x-show="mainView === 'scenarios'">
   <div class="view-layout">
   <div class="sidebar">
     <label class="search-box">
@@ -1264,9 +1326,9 @@ span.param-highlight {
     <div class="sidebar-section">
       <div class="sidebar-label">Status</div>
       <div class="status-pills">
-        <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
-        <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
-        <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
+        <button type="button" class="btn-reset status-pill" :class="{ 'active-passed': showPassed }" :aria-pressed="showPassed" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></button>
+        <button type="button" class="btn-reset status-pill" :class="{ 'active-failed': showFailed }" :aria-pressed="showFailed" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></button>
+        <button type="button" class="btn-reset status-pill" :class="{ 'active-skipped': showSkipped }" :aria-pressed="showSkipped" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></button>
       </div>
     </div>
 
@@ -1281,9 +1343,9 @@ span.param-highlight {
                   aria-label="Sort groups by scenario count">Count</button>
         </div>
       </div>
-      <div class="seg-toggle"><div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+      <div class="seg-toggle"><button type="button" class="btn-reset seg-btn" :class="{ active: view === 'modules' }" :aria-pressed="view === 'modules'" @click="view = 'modules'">Modules</button>
         
-        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
+        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'tags' }" :aria-pressed="view === 'tags'" @click="view = 'tags'">Tags</button>
       </div>
       <div class="nav-tree"><template x-for="group in groups" :key="group.id">
           <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }"
@@ -1294,8 +1356,12 @@ span.param-highlight {
                     :aria-label="(expandedGroups[group.id] ? 'Collapse ' : 'Expand ') + group.name"
                     @click.stop="toggleGroup(group.id)"></button>
             <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren && view === 'modules'"></span>
-            <span class="nav-group-name" x-text="group.name"></span>
-            <span class="nav-group-count" x-text="group.count"></span>
+            <button type="button" class="btn-reset nav-group-select"
+                    :aria-pressed="isGroupActive(group)"
+                    @click.stop="onGroupClick(group)">
+              <span class="nav-group-name" x-text="group.name"></span>
+              <span class="nav-group-count" x-text="group.count"></span>
+            </button>
           </div>
         </template>
       </div>
@@ -1341,19 +1407,19 @@ span.param-highlight {
 
   <div class="scenario passed"
        x-show="isVisible(0)"
-       :id="'scenario-' + 0"
+       id="scenario-0"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_buy_coffee"
        :class="{ 'scenario-expanded': expandedScenarios[0] }">
     <div class="scenario-header" @click="toggleScenario(0)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-0" :aria-expanded="!!expandedScenarios[0]" :aria-label="(expandedScenarios[0] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(0)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span></button>
         <span class="scenario-name">Basic scenario with when/then and a JSON attachment</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/buy_coffee"
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">checkout</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">checkout</button>
         
         
         
@@ -1364,7 +1430,7 @@ span.param-highlight {
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[0] }">
+    <div class="scenario-body" id="scenario-body-0" :class="{ expanded: expandedScenarios[0] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -1373,11 +1439,9 @@ span.param-highlight {
             <div class="step-text">I insert $2</div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text">I get a coffee</div><div>
-      <span class="attachment-badge" role="button" tabindex="0"
-          :aria-expanded="expandedAttachments['s0_2_att_0'] ? 'true' : 'false'"
-          @click="toggleAttachment('s0_2_att_0')"
-          @keydown.enter.prevent="toggleAttachment('s0_2_att_0')"
-          @keydown.space.prevent="toggleAttachment('s0_2_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>Machine state</span>
+      <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s0_2_att_0']"
+            @click="toggleAttachment('s0_2_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>Machine state</button>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s0_2_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{
@@ -1394,19 +1458,19 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(1)"
-       :id="'scenario-' + 1"
+       id="scenario-1"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_text_attachment"
        :class="{ 'scenario-expanded': expandedScenarios[1] }">
     <div class="scenario-header" @click="toggleScenario(1)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-1" :aria-expanded="!!expandedScenarios[1]" :aria-label="(expandedScenarios[1] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(1)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span></button>
         <span class="scenario-name">Plain text attachment</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/text_attachment"
@@ -1422,18 +1486,16 @@ span.param-highlight {
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[1] }">
+    <div class="scenario-body" id="scenario-body-1" :class="{ expanded: expandedScenarios[1] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
           </div><div class="phase-steps">
             <div class="step-text">a printed receipt</div><div>
-      <span class="attachment-badge" role="button" tabindex="0"
-          :aria-expanded="expandedAttachments['s1_1_att_0'] ? 'true' : 'false'"
-          @click="toggleAttachment('s1_1_att_0')"
-          @keydown.enter.prevent="toggleAttachment('s1_1_att_0')"
-          @keydown.space.prevent="toggleAttachment('s1_1_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>Receipt</span>
+      <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s1_1_att_0']"
+            @click="toggleAttachment('s1_1_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>Receipt</button>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s1_1_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>Coffee x1     $2.00
@@ -1453,19 +1515,19 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(2)"
-       :id="'scenario-' + 2"
+       id="scenario-2"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_generator_fixture"
        :class="{ 'scenario-expanded': expandedScenarios[2] }">
     <div class="scenario-header" @click="toggleScenario(2)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-2" :aria-expanded="!!expandedScenarios[2]" :aria-label="(expandedScenarios[2] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(2)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span></button>
         <span class="scenario-name">Generator fixture with teardown</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/generator_fixture"
@@ -1481,7 +1543,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[2] }">
+    <div class="scenario-body" id="scenario-body-2" :class="{ expanded: expandedScenarios[2] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -1497,26 +1559,26 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(3)"
-       :id="'scenario-' + 3"
+       id="scenario-3"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]"
        :class="{ 'scenario-expanded': expandedScenarios[3] }">
     <div class="scenario-header" @click="toggleScenario(3)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-3" :aria-expanded="!!expandedScenarios[3]" :aria-label="(expandedScenarios[3] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(3)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span></button>
         <span class="scenario-name">Parametrized test (renders as a parameter table)</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/pricing"
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="pricing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">pricing</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="pricing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">pricing</button>
         
         
         
@@ -1527,7 +1589,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[3] }">
+    <div class="scenario-body" id="scenario-body-3" :class="{ expanded: expandedScenarios[3] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -1646,19 +1708,19 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(4)"
-       :id="'scenario-' + 4"
+       id="scenario-4"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]"
        :class="{ 'scenario-expanded': expandedScenarios[4] }">
     <div class="scenario-header" @click="toggleScenario(4)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[4] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-4" :aria-expanded="!!expandedScenarios[4]" :aria-label="(expandedScenarios[4] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(4)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[4] }"></span></button>
         <span class="scenario-name">Parametrize value surfaced as a given (Annotated)</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/annotated_given_label"
@@ -1674,7 +1736,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[4] }">
+    <div class="scenario-body" id="scenario-body-4" :class="{ expanded: expandedScenarios[4] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -1746,19 +1808,19 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(5)"
-       :id="'scenario-' + 5"
+       id="scenario-5"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight"
        :class="{ 'scenario-expanded': expandedScenarios[5] }">
     <div class="scenario-header" @click="toggleScenario(5)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[5] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-5" :aria-expanded="!!expandedScenarios[5]" :aria-label="(expandedScenarios[5] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(5)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[5] }"></span></button>
         <span class="scenario-name">T-string with a non-parametrize value (neutral highlight)</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/neutral_highlight"
@@ -1774,7 +1836,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[5] }">
+    <div class="scenario-body" id="scenario-body-5" :class="{ expanded: expandedScenarios[5] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -1792,19 +1854,19 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(6)"
-       :id="'scenario-' + 6"
+       id="scenario-6"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_brew[200]"
        :class="{ 'scenario-expanded': expandedScenarios[6] }">
     <div class="scenario-header" @click="toggleScenario(6)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[6] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-6" :aria-expanded="!!expandedScenarios[6]" :aria-label="(expandedScenarios[6] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(6)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[6] }"></span></button>
         <span class="scenario-name">Brew <span class="param-color-2" data-param="cup_size" data-subst="cup_size" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{cup_size}</span> ml (templated scenario name)</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/brew"
@@ -1820,7 +1882,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[6] }">
+    <div class="scenario-body" id="scenario-body-6" :class="{ expanded: expandedScenarios[6] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -1890,19 +1952,19 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(7)"
-       :id="'scenario-' + 7"
+       id="scenario-7"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_serve[200]"
        :class="{ 'scenario-expanded': expandedScenarios[7] }">
     <div class="scenario-header" @click="toggleScenario(7)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[7] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-7" :aria-expanded="!!expandedScenarios[7]" :aria-label="(expandedScenarios[7] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(7)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[7] }"></span></button>
         <span class="scenario-name">Serve a <span class="value-highlight">200</span> ml cup (one scenario per case) [200]</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/serve[200]"
@@ -1918,7 +1980,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[7] }">
+    <div class="scenario-body" id="scenario-body-7" :class="{ expanded: expandedScenarios[7] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -1934,19 +1996,19 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(8)"
-       :id="'scenario-' + 8"
+       id="scenario-8"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_serve[400]"
        :class="{ 'scenario-expanded': expandedScenarios[8] }">
     <div class="scenario-header" @click="toggleScenario(8)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[8] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-8" :aria-expanded="!!expandedScenarios[8]" :aria-label="(expandedScenarios[8] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(8)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[8] }"></span></button>
         <span class="scenario-name">Serve a <span class="value-highlight">400</span> ml cup (one scenario per case) [400]</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/serve[400]"
@@ -1962,7 +2024,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[8] }">
+    <div class="scenario-body" id="scenario-body-8" :class="{ expanded: expandedScenarios[8] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -1980,26 +2042,26 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(9)"
-       :id="'scenario-' + 9"
+       id="scenario-9"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]"
        :class="{ 'scenario-expanded': expandedScenarios[9] }">
     <div class="scenario-header" @click="toggleScenario(9)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[9] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-9" :aria-expanded="!!expandedScenarios[9]" :aria-label="(expandedScenarios[9] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(9)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[9] }"></span></button>
         <span class="scenario-name">Brew a <span class="param-color-3" data-param="flavor" data-subst="flavor" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{flavor}</span> coffee (per-case columns)</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/flavor_columns"
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="pricing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">pricing</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="pricing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">pricing</button>
         
         
         
@@ -2010,14 +2072,14 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[9] }">
+    <div class="scenario-body" id="scenario-body-9" :class="{ expanded: expandedScenarios[9] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
           </div><div class="phase-steps">
             <div class="step-text">the machine is primed for <span class="param-color-3" data-param="flavor" data-subst="flavor" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{flavor}</span></div><div>
-      <span class="attachment-badge" data-param="attachment:0"
+      <span class="attachment-badge attachment-badge--static" data-param="attachment:0"
             @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
             @mouseleave="setHoverParam(null, $event.currentTarget)"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>brew log</span>
     </div>
@@ -2066,11 +2128,9 @@ Total:        $2.00</pre></div>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">
               
               
-              <span class="attachment-badge" role="button" tabindex="0"
-          :aria-expanded="expandedAttachments['s9_case0_col1'] ? 'true' : 'false'"
-          @click="toggleAttachment('s9_case0_col1')"
-          @keydown.enter.prevent="toggleAttachment('s9_case0_col1')"
-          @keydown.space.prevent="toggleAttachment('s9_case0_col1')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>brew log</span>
+              <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s9_case0_col1']"
+            @click="toggleAttachment('s9_case0_col1')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>brew log</button>
               
             </td>
             
@@ -2128,11 +2188,9 @@ Total:        $2.00</pre></div>
                 @mouseleave="setHoverParam(null, $event.currentTarget)">
               
               
-              <span class="attachment-badge" role="button" tabindex="0"
-          :aria-expanded="expandedAttachments['s9_case1_col1'] ? 'true' : 'false'"
-          @click="toggleAttachment('s9_case1_col1')"
-          @keydown.enter.prevent="toggleAttachment('s9_case1_col1')"
-          @keydown.space.prevent="toggleAttachment('s9_case1_col1')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>brew log</span>
+              <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s9_case1_col1']"
+            @click="toggleAttachment('s9_case1_col1')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>brew log</button>
               
             </td>
             
@@ -2182,28 +2240,28 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(10)"
-       :id="'scenario-' + 10"
+       id="scenario-10"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation"
        :class="{ 'scenario-expanded': expandedScenarios[10] }">
     <div class="scenario-header" @click="toggleScenario(10)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[10] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-10" :aria-expanded="!!expandedScenarios[10]" :aria-label="(expandedScenarios[10] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(10)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[10] }"></span></button>
         <span class="scenario-name">Helper functions can record their own steps</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/buy_with_validation"
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">checkout</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">checkout</button>
         
-        <span class="scenario-tag" data-tag="validation" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">validation</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="validation" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">validation</button>
         
         
         
@@ -2214,14 +2272,17 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[10] }">
+    <div class="scenario-body" id="scenario-body-10" :class="{ expanded: expandedScenarios[10] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">a coffee machine</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
             <div class="step-text"><span class="step-toggle" @click="toggleStep('s10_1')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s10_1'] }"></span>
+        <button type="button" class="disclosure-btn"
+                :aria-expanded="!!expandedSteps['s10_1']"
+                :aria-label="(expandedSteps['s10_1'] ? 'Collapse' : 'Expand') + ' sub-steps'"
+                @click.stop="toggleStep('s10_1')"><span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s10_1'] }"></span></button>
         I insert $2
       </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s10_1'] }">
       <div class="step-children"><div class="step-text">the coin is validated for $<span class="value-highlight">2</span></div><div class="step-text">the balance is updated</div></div>
@@ -2230,15 +2291,16 @@ Total:        $2.00</pre></div>
             <div class="step-text">the coin is accepted</div>
           </div><div class="phase-steps">
             <div class="step-text"><span class="step-toggle" @click="toggleStep('s10_3')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s10_3'] }"></span>
+        <button type="button" class="disclosure-btn"
+                :aria-expanded="!!expandedSteps['s10_3']"
+                :aria-label="(expandedSteps['s10_3'] ? 'Collapse' : 'Expand') + ' sub-steps'"
+                @click.stop="toggleStep('s10_3')"><span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s10_3'] }"></span></button>
         a coffee is dispensed
       </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s10_3'] }">
       <div class="step-children"><div class="step-text">the machine state is consistent</div><div>
-      <span class="attachment-badge" role="button" tabindex="0"
-          :aria-expanded="expandedAttachments['s10_3_0_att_0'] ? 'true' : 'false'"
-          @click="toggleAttachment('s10_3_0_att_0')"
-          @keydown.enter.prevent="toggleAttachment('s10_3_0_att_0')"
-          @keydown.space.prevent="toggleAttachment('s10_3_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>Final state</span>
+      <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s10_3_0_att_0']"
+            @click="toggleAttachment('s10_3_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>Final state</button>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s10_3_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{
@@ -2256,30 +2318,30 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(11)"
-       :id="'scenario-' + 11"
+       id="scenario-11"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_complex_order"
        :class="{ 'scenario-expanded': expandedScenarios[11] }">
     <div class="scenario-header" @click="toggleScenario(11)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[11] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-11" :aria-expanded="!!expandedScenarios[11]" :aria-label="(expandedScenarios[11] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(11)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[11] }"></span></button>
         <span class="scenario-name">Top-level `given` block and deeply nested steps</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/complex_order"
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">checkout</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">checkout</button>
         
-        <span class="scenario-tag" data-tag="loyalty" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">loyalty</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="loyalty" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">loyalty</button>
         
-        <span class="scenario-tag" data-tag="discounts" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">discounts</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="discounts" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">discounts</button>
         
         
         
@@ -2290,7 +2352,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[11] }">
+    <div class="scenario-body" id="scenario-body-11" :class="{ expanded: expandedScenarios[11] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -2299,11 +2361,17 @@ Total:        $2.00</pre></div>
             <div class="step-text">a loyalty card with 5 points</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
             <div class="step-text"><span class="step-toggle" @click="toggleStep('s11_2')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s11_2'] }"></span>
+        <button type="button" class="disclosure-btn"
+                :aria-expanded="!!expandedSteps['s11_2']"
+                :aria-label="(expandedSteps['s11_2'] ? 'Collapse' : 'Expand') + ' sub-steps'"
+                @click.stop="toggleStep('s11_2')"><span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s11_2'] }"></span></button>
         I place a large order
       </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s11_2'] }">
       <div class="step-children"><div class="step-text">I select 3 coffees</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s11_2_1')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s11_2_1'] }"></span>
+        <button type="button" class="disclosure-btn"
+                :aria-expanded="!!expandedSteps['s11_2_1']"
+                :aria-label="(expandedSteps['s11_2_1'] ? 'Collapse' : 'Expand') + ' sub-steps'"
+                @click.stop="toggleStep('s11_2_1')"><span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s11_2_1'] }"></span></button>
         I apply loyalty discount
       </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s11_2_1'] }">
       <div class="step-children"><div class="step-text">the loyalty card is validated</div><div class="step-text">the discount is calculated</div></div>
@@ -2311,19 +2379,23 @@ Total:        $2.00</pre></div>
     </div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text"><span class="step-toggle" @click="toggleStep('s11_3')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s11_3'] }"></span>
+        <button type="button" class="disclosure-btn"
+                :aria-expanded="!!expandedSteps['s11_3']"
+                :aria-label="(expandedSteps['s11_3'] ? 'Collapse' : 'Expand') + ' sub-steps'"
+                @click.stop="toggleStep('s11_3')"><span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s11_3'] }"></span></button>
         the order is processed correctly
       </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s11_3'] }">
       <div class="step-children"><div class="step-text">the coffee count is updated</div><div class="step-text"><span class="step-toggle" @click="toggleStep('s11_3_1')">
-        <span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s11_3_1'] }"></span>
+        <button type="button" class="disclosure-btn"
+                :aria-expanded="!!expandedSteps['s11_3_1']"
+                :aria-label="(expandedSteps['s11_3_1'] ? 'Collapse' : 'Expand') + ' sub-steps'"
+                @click.stop="toggleStep('s11_3_1')"><span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s11_3_1'] }"></span></button>
         the loyalty points are deducted
       </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s11_3_1'] }">
       <div class="step-children"><div class="step-text">the remaining points are valid</div><div>
-      <span class="attachment-badge" role="button" tabindex="0"
-          :aria-expanded="expandedAttachments['s11_3_1_0_att_0'] ? 'true' : 'false'"
-          @click="toggleAttachment('s11_3_1_0_att_0')"
-          @keydown.enter.prevent="toggleAttachment('s11_3_1_0_att_0')"
-          @keydown.space.prevent="toggleAttachment('s11_3_1_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>Loyalty state</span>
+      <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s11_3_1_0_att_0']"
+            @click="toggleAttachment('s11_3_1_0_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>Loyalty state</button>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s11_3_1_0_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{
@@ -2336,11 +2408,9 @@ Total:        $2.00</pre></div>
     </div>
           </div><div class="phase-steps">
             <div class="step-text">the machine state is consistent</div><div>
-      <span class="attachment-badge" role="button" tabindex="0"
-          :aria-expanded="expandedAttachments['s11_4_att_0'] ? 'true' : 'false'"
-          @click="toggleAttachment('s11_4_att_0')"
-          @keydown.enter.prevent="toggleAttachment('s11_4_att_0')"
-          @keydown.space.prevent="toggleAttachment('s11_4_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>Final machine state</span>
+      <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s11_4_att_0']"
+            @click="toggleAttachment('s11_4_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>Final machine state</button>
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['s11_4_att_0'] }">
       <div class="attachment-expand-inner">
         <div class="attachment-content"><pre>{
@@ -2357,28 +2427,28 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(12)"
-       :id="'scenario-' + 12"
+       id="scenario-12"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected"
        :class="{ 'scenario-expanded': expandedScenarios[12] }">
     <div class="scenario-header" @click="toggleScenario(12)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[12] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-12" :aria-expanded="!!expandedScenarios[12]" :aria-label="(expandedScenarios[12] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(12)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[12] }"></span></button>
         <span class="scenario-name">An expected error, narrated as when + then (when_then)</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/sold_out_is_rejected"
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">checkout</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">checkout</button>
         
-        <span class="scenario-tag" data-tag="validation" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">validation</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="validation" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">validation</button>
         
         
         
@@ -2389,7 +2459,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[12] }">
+    <div class="scenario-body" id="scenario-body-12" :class="{ expanded: expandedScenarios[12] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -2407,38 +2477,38 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario passed"
        x-show="isVisible(13)"
-       :id="'scenario-' + 13"
+       id="scenario-13"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase"
        :class="{ 'scenario-expanded': expandedScenarios[13] }">
     <div class="scenario-header" @click="toggleScenario(13)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[13] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-13" :aria-expanded="!!expandedScenarios[13]" :aria-label="(expandedScenarios[13] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(13)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[13] }"></span></button>
         <span class="scenario-name">Many tags (the report collapses them behind a +N pill)</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/discounted_purchase"
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
       </div>
       <span class="scenario-meta">
-        <span class="scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">checkout</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">checkout</button>
         
-        <span class="scenario-tag" data-tag="loyalty" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">loyalty</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="loyalty" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">loyalty</button>
         
-        <span class="scenario-tag" data-tag="discounts" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">discounts</span>
-        
-        
-        <span class="scenario-tag" x-cloak data-tag="pricing" x-show="expandedTags[13] || tagFilters.includes($el.dataset.tag)" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">pricing</span>
-        
-        <span class="scenario-tag" x-cloak data-tag="inventory" x-show="expandedTags[13] || tagFilters.includes($el.dataset.tag)" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">inventory</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="discounts" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">discounts</button>
         
         
-        <span class="scenario-tag scenario-tag-more" x-show="!expandedTags[13]" @click.stop="expandedTags[13] = true">+2</span>
+        <button type="button" class="btn-reset scenario-tag" x-cloak data-tag="pricing" x-show="expandedTags[13] || tagFilters.includes($el.dataset.tag)" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">pricing</button>
+        
+        <button type="button" class="btn-reset scenario-tag" x-cloak data-tag="inventory" x-show="expandedTags[13] || tagFilters.includes($el.dataset.tag)" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">inventory</button>
+        
+        
+        <button type="button" class="btn-reset scenario-tag scenario-tag-more" x-show="!expandedTags[13]" aria-label="Show 2 more tags" @click.stop="expandedTags[13] = true">+2</button>
         
         <span class="scenario-status passed">
           ✓ passed
@@ -2447,7 +2517,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[13] }">
+    <div class="scenario-body" id="scenario-body-13" :class="{ expanded: expandedScenarios[13] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -2467,19 +2537,19 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario failed"
        x-show="isVisible(14)"
-       :id="'scenario-' + 14"
+       id="scenario-14"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_failing"
        :class="{ 'scenario-expanded': expandedScenarios[14] }">
     <div class="scenario-header" @click="toggleScenario(14)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[14] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-14" :aria-expanded="!!expandedScenarios[14]" :aria-label="(expandedScenarios[14] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(14)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[14] }"></span></button>
         <span class="scenario-name">Failure rendering (intentionally failing)</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/failing"
@@ -2491,11 +2561,11 @@ Total:        $2.00</pre></div>
         <span class="scenario-status failed">
           ✗ failed
         </span>
-        <span class="scenario-duration">57ms</span>
+        <span class="scenario-duration">58ms</span>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[14] }">
+    <div class="scenario-body" id="scenario-body-14" :class="{ expanded: expandedScenarios[14] }">
     <div class="scenario-body-inner">
       
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
@@ -2563,19 +2633,19 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario skipped"
        x-show="isVisible(15)"
-       :id="'scenario-' + 15"
+       id="scenario-15"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_skipped"
        :class="{ 'scenario-expanded': expandedScenarios[15] }">
     <div class="scenario-header" @click="toggleScenario(15)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[15] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-15" :aria-expanded="!!expandedScenarios[15]" :aria-label="(expandedScenarios[15] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(15)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[15] }"></span></button>
         <span class="scenario-name">Skipped scenario rendering</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/skipped"
@@ -2591,7 +2661,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[15] }">
+    <div class="scenario-body" id="scenario-body-15" :class="{ expanded: expandedScenarios[15] }">
     <div class="scenario-body-inner">
       
       <div class="skip-reason">
@@ -2606,19 +2676,19 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
       
     </div>
     </div>
   </div>
   <div class="scenario skipped"
        x-show="isVisible(16)"
-       :id="'scenario-' + 16"
+       id="scenario-16"
        data-scenario-id="examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]"
        :class="{ 'scenario-expanded': expandedScenarios[16] }">
     <div class="scenario-header" @click="toggleScenario(16)">
       <div style="display:flex; align-items:center;">
-        <span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[16] }"></span>
+        <button type="button" class="disclosure-btn" aria-controls="scenario-body-16" :aria-expanded="!!expandedScenarios[16]" :aria-label="(expandedScenarios[16] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(16)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[16] }"></span></button>
         <span class="scenario-name">All cases skipped</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=coffeeshop/parametrized_all_skipped"
@@ -2634,7 +2704,7 @@ Total:        $2.00</pre></div>
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[16] }">
+    <div class="scenario-body" id="scenario-body-16" :class="{ expanded: expandedScenarios[16] }">
     <div class="scenario-body-inner">
       
       <div class="steps"></div>
@@ -2698,7 +2768,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ad47d3107fa2d171f74ef4296355f4b89ea51aec/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
       
     </div>
     </div>
@@ -2709,10 +2779,10 @@ Total:        $2.00</pre></div>
   </div>
   </div>
 
-  <div id="view-stories" x-show="mainView === 'stories'" x-cloak>
+  <div id="view-stories"  x-show="mainView === 'stories'" x-cloak>
   
   </div>
-  <div id="view-glossary" x-show="mainView === 'glossary'" x-cloak>
+  <div id="view-glossary"  x-show="mainView === 'glossary'" x-cloak>
   
   </div>
 
@@ -2729,10 +2799,10 @@ Total:        $2.00</pre></div>
 window.__REPORT_DATA__ = {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-08-31T08:07:18.204439+00:00",
+    "timestamp": "2026-08-31T08:40:34.095562+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "ad47d3107fa2d171f74ef4296355f4b89ea51aec",
+    "commit_sha": "b7af009c815b33c1e92e54a993f4cced04520a77",
     "title": "Coffee Shop Example"
   },
   "scenarios": [
@@ -4146,7 +4216,7 @@ window.__REPORT_DATA__ = {
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 57,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -4369,9 +4439,21 @@ function serializeHash(params, mode = 'push') {
   else history.pushState(null, '', url);
 }
 
+// Mirrors `tab_visibility`: these are the reports that render each tab.
+function hasStories() {
+  return (window.__storyIds || []).length > 0;
+}
+
+function hasTerms() {
+  return (window.__termIds || []).length > 0;
+}
+
 function deserializeView(params) {
+  // Gated on the tab existing: a stale `#view=glossary` would otherwise hide
+  // the Scenarios view behind an empty one, with no tab bar left to leave by.
   const v = params.get('view');
-  if (v === 'stories' || v === 'glossary') return v;
+  if (v === 'stories' && hasStories()) return 'stories';
+  if (v === 'glossary' && hasTerms()) return 'glossary';
   return 'scenarios';
 }
 
@@ -4385,6 +4467,12 @@ function deserializeStory(params) {
   const fromFilter = (params.get('activity-filter') || '').split(':')[0];
   if (ids.includes(fromFilter)) return fromFilter;
   return ids[0] || null;
+}
+
+// Own keys only: these are read from the URL fragment, and a bare `map[key]`
+// answers `#term-filter=toString` with a function off Object.prototype.
+function lookup(map, key, fallback) {
+  return Object.hasOwn(map, key) ? map[key] : fallback;
 }
 
 // --- Alpine app ---
@@ -4415,11 +4503,26 @@ function reportApp() {
   // Term id -> canonical display name, for the Terms browse axis.
   const termNames = {};
   for (const t of glossaryTerms) termNames[t.id] = t.canonical;
+  const termScenarios = window.__termScenarios || {};
   // __termScenarios is term -> scenarios; the sidebar needs the inverse.
   const scenarioTerms = {};
-  for (const [termId, ids] of Object.entries(window.__termScenarios || {})) {
+  for (const [termId, ids] of Object.entries(termScenarios)) {
     for (const sid of ids) (scenarioTerms[sid] || (scenarioTerms[sid] = [])).push(termId);
   }
+  // Filtering is the hot path: six Alpine effects rescan every scenario per
+  // filter change, so anything derivable once is derived here.
+  const searchHaystacks = data.scenarios.map(
+    s => (s.narration.text + ' ' + s.tags.join(' ')).toLowerCase(),
+  );
+  const statusesPresent = new Set(data.scenarios.map(s => s.status));
+  const statusCounts = {
+    passed: data.scenarios.filter(s => s.status === 'passed').length,
+    failed: data.scenarios.filter(s => s.status === 'failed').length,
+    skipped: data.scenarios.filter(s => s.status === 'skipped').length,
+  };
+  // A closure variable, not state: writing it from inside a reactive effect
+  // that also reads it would re-trigger that effect.
+  let visibleCache = null;
   return {
     search: '',
     // Modules is the only axis every report has: a suite may carry no tags and
@@ -4440,8 +4543,6 @@ function reportApp() {
     glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
     glossaryDefinitionFilter: 'all',
     expandedTerms: {},
-    hoveredActivity: null,
-    hoveredScenario: null,
     showPassed: true,
     showFailed: true,
     showSkipped: true,
@@ -4459,14 +4560,27 @@ function reportApp() {
     activityFilter: null,
     _suppressHashWrite: false,
     highlightedActivities: {},
+    // Presence sets: `delete` rather than `= false` keeps the matching
+    // "is anything open?" getters a plain key count.
+    _toggle(map, key) {
+      if (map[key]) delete map[key];
+      else map[key] = true;
+    },
     get anyActivitiesHighlighted() {
       return Object.keys(this.highlightedActivities).length > 0;
     },
     toggleActivityHighlight(id) {
-      if (this.highlightedActivities[id]) delete this.highlightedActivities[id];
-      else this.highlightedActivities[id] = true;
+      this._toggle(this.highlightedActivities, id);
     },
     clearActivityHighlights() {
+      this.highlightedActivities = {};
+    },
+    // Activity ids are per-story ints, so a highlight cannot travel. Cleared
+    // here rather than in a `selectedStory` watcher, which would fire after
+    // `_readHash` had set story and highlights together and undo the second.
+    selectStory(id) {
+      if (this.selectedStory === id) return;
+      this.selectedStory = id;
       this.highlightedActivities = {};
     },
     // Story-view scenario cards filter on the selected activities: a card stays
@@ -4474,6 +4588,30 @@ function reportApp() {
     activitySelectionMatches(coveredIds) {
       if (!this.anyActivitiesHighlighted) return true;
       return coveredIds.some(id => this.highlightedActivities[id]);
+    },
+    // Terms of one kind surviving the search and definition filters. The
+    // headings and their counts are Jinja-rendered report totals, so without
+    // this a search matching nothing leaves them standing over an empty page.
+    visibleTermCount(kind) {
+      const q = this.glossarySearch.toLowerCase();
+      const wantUndefined = this.glossaryDefinitionFilter === 'undefined';
+      let n = 0;
+      for (const t of glossaryTerms) {
+        if ((t.kind || 'kindless') !== kind) continue;
+        if (this.glossaryDefinitionFilter !== 'all'
+            && wantUndefined !== (t.definition === null || t.definition === undefined)) continue;
+        if (q && !t.canonical.toLowerCase().includes(q)) continue;
+        n++;
+      }
+      return n;
+    },
+    visibleTermLabel(kind) {
+      const n = this.visibleTermCount(kind);
+      return n + (n === 1 ? ' term' : ' terms');
+    },
+    get anyTermsVisible() {
+      return ['actor', 'object', 'verb', 'kindless']
+        .some(k => this.visibleTermCount(k) > 0);
     },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
@@ -4489,7 +4627,7 @@ function reportApp() {
     },
     get filterSummary() {
       const parts = [];
-      const hasStatus = (s) => data.scenarios.some(sc => sc.status === s);
+      const hasStatus = (s) => statusesPresent.has(s);
       const allShown = (this.showPassed || !hasStatus('passed'))
         && (this.showFailed || !hasStatus('failed'))
         && (this.showSkipped || !hasStatus('skipped'));
@@ -4515,14 +4653,29 @@ function reportApp() {
         + ' at ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
     },
     get counts() {
-      return {
-        passed: data.scenarios.filter(s => s.status === 'passed').length,
-        failed: data.scenarios.filter(s => s.status === 'failed').length,
-        skipped: data.scenarios.filter(s => s.status === 'skipped').length,
-      };
+      return statusCounts;
     },
     get filteredCount() {
-      return data.scenarios.filter((_, i) => this.isVisible(i)).length;
+      return this._visible().size;
+    },
+    // Computed once per filter change instead of once per reader. Reading the
+    // filter state here still registers each caller's reactive dependencies;
+    // the cache only stops the O(n) scan repeating within one pass. Control
+    // characters delimit the key — a tag and the search box carry any text.
+    _visible() {
+      const key = [
+        this.showPassed, this.showFailed, this.showSkipped,
+        this.moduleFilter, this.activityFilter, this.search,
+        this.tagFilters.join('\u0001'), this.termFilters.join('\u0001'),
+      ].join('\u0000');
+      if (visibleCache && visibleCache.key === key) return visibleCache.value;
+      const query = this.search.toLowerCase();
+      const value = new Set();
+      for (let i = 0; i < data.scenarios.length; i++) {
+        if (this._matchesFilters(data.scenarios[i], i, query)) value.add(i);
+      }
+      visibleCache = { key, value };
+      return value;
     },
     // Every axis renders as the same flat list of rows carrying their own
     // `depth`, so one template serves all three. Tags and terms are depth 0
@@ -4534,8 +4687,8 @@ function reportApp() {
     _flatRows() {
       const grouped = {};
       const isTerms = this.view === 'terms';
-      for (const s of data.scenarios) {
-        if (!this._matchesFilters(s)) continue;
+      for (const i of this._visible()) {
+        const s = data.scenarios[i];
         const ids = isTerms ? scenarioTerms[s.id] || [] : s.tags;
         for (const k of ids.length ? ids : [isTerms ? NO_TERMS : NO_TAGS]) {
           if (!grouped[k]) {
@@ -4557,8 +4710,9 @@ function reportApp() {
     // the subtree without rebuilding it.
     _moduleRows() {
       const counts = {};
-      for (const s of data.scenarios) {
-        if (this._matchesFilters(s)) counts[s.module] = (counts[s.module] || 0) + 1;
+      for (const i of this._visible()) {
+        const m = data.scenarios[i].module;
+        counts[m] = (counts[m] || 0) + 1;
       }
       const modules = Object.keys(counts);
       if (!modules.length) return [];
@@ -4627,7 +4781,9 @@ function reportApp() {
         || (byCount ? b.count - a.count : 0)
         || a.name.localeCompare(b.name));
     },
-    _matchesFilters(s) {
+    // Called from `_visible` alone. `index` addresses the precomputed
+    // haystack; `query` is the search box, lowercased once by the caller.
+    _matchesFilters(s, index, query) {
       if (s.status === 'passed' && !this.showPassed) return false;
       if (s.status === 'failed' && !this.showFailed) return false;
       if (s.status === 'skipped' && !this.showSkipped) return false;
@@ -4646,7 +4802,7 @@ function reportApp() {
       for (const termId of this.termFilters) {
         if (termId === NO_TERMS) {
           if ((scenarioTerms[s.id] || []).length) return false;
-        } else if (!(window.__termScenarios[termId] || []).includes(s.id)) {
+        } else if (!lookup(termScenarios, termId, []).includes(s.id)) {
           return false;
         }
       }
@@ -4657,21 +4813,19 @@ function reportApp() {
           return false;
         }
       }
-      if (this.search) {
-        const q = this.search.toLowerCase();
-        const text = (s.narration.text + ' ' + s.tags.join(' ')).toLowerCase();
-        if (!text.includes(q)) return false;
-      }
+      if (query && !searchHaystacks[index].includes(query)) return false;
       return true;
     },
     toggleGroup(name) {
-      if (this.expandedGroups[name]) delete this.expandedGroups[name];
-      else this.expandedGroups[name] = true;
+      this._toggle(this.expandedGroups, name);
     },
     // Pointer capture on the handle keeps the drag alive over the iframe-free
     // but text-heavy main column, and delivers the release even if the pointer
     // leaves the window. The listeners live on the handle for the same reason.
     startSidebarResize(event) {
+      // Primary button only: a right-click drags the sidebar *and* opens the
+      // context menu, whose swallowed release can leave the drag live.
+      if (event.button !== 0) return;
       // preventDefault stops the drag from placing a caret or starting a text
       // selection — but it also suppresses the focus a click would otherwise
       // give a tabindex'd element, which left the arrow keys dead for anyone
@@ -4702,29 +4856,27 @@ function reportApp() {
       this.sidebarWidth = SIDEBAR_DEFAULT;
     },
     toggleStep(stepId) {
-      if (this.expandedSteps[stepId]) delete this.expandedSteps[stepId];
-      else this.expandedSteps[stepId] = true;
+      this._toggle(this.expandedSteps, stepId);
     },
     toggleScenario(index) {
-      if (this.expandedScenarios[index]) delete this.expandedScenarios[index];
-      else this.expandedScenarios[index] = true;
+      this._toggle(this.expandedScenarios, index);
+    },
+    toggleTerm(id) {
+      this._toggle(this.expandedTerms, id);
     },
     get anyScenariosExpanded() {
-      return data.scenarios.some((_, i) => this.isVisible(i) && this.expandedScenarios[i]);
+      for (const i of this._visible()) if (this.expandedScenarios[i]) return true;
+      return false;
     },
     toggleAllScenarios() {
       const expand = !this.anyScenariosExpanded;
-      data.scenarios.forEach((_, i) => {
-        if (this.isVisible(i)) {
-          if (expand) this.expandedScenarios[i] = true;
-          else delete this.expandedScenarios[i];
-        }
-      });
+      for (const i of this._visible()) {
+        if (expand) this.expandedScenarios[i] = true;
+        else delete this.expandedScenarios[i];
+      }
     },
     isVisible(index) {
-      const scenario = data.scenarios[index];
-      if (!scenario) return false;
-      return this._matchesFilters(scenario);
+      return this._visible().has(index);
     },
     scrollToAndExpand(id) {
       const index = data.scenarios.findIndex(s => s.id === id);
@@ -4758,6 +4910,8 @@ function reportApp() {
       this.showSkipped = true;
     },
     goToTerm(id) {
+      // A stale `#term=` link would otherwise open an empty Glossary tab.
+      if (!Object.hasOwn(termNames, id)) return;
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
       this.$nextTick(() => {
@@ -4791,7 +4945,7 @@ function reportApp() {
       // The timeline number means nothing in the Scenarios view, so the chip
       // leads with the prose and keeps the number as the pointer back.
       const number = key.split(':')[1];
-      const text = activityLabels[key];
+      const text = lookup(activityLabels, key, '');
       return text ? `Activity ${number}: ${text}` : `Activity ${number}`;
     },
     removeTermFilter(id) {
@@ -4807,7 +4961,7 @@ function reportApp() {
       if (id === NO_TERMS) return 'no terms';
       // Term ids are slugs ('file-glossary'); the report speaks canonical
       // names ('File glossary'). Falls back to the id for an unknown term.
-      return termNames[id] || id;
+      return lookup(termNames, id, id);
     },
     tagLabel(tag) {
       return tag === NO_TAGS ? 'untagged' : tag;
@@ -4938,7 +5092,6 @@ function reportApp() {
       });
       this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       this.$watch('selectedStory', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
-      this.$watch('selectedStory', () => { this.highlightedActivities = {}; });
       // hashchange: manual URL edits / pasted links. popstate: back/forward.
       window.addEventListener('hashchange', () => this._readHash());
       window.addEventListener('popstate', () => this._readHash());
@@ -5048,9 +5201,21 @@ function reportApp() {
       else this.search = '';
       this.mainView = deserializeView(params);
       this.selectedStory = deserializeStory(params);
+      // Derived, so a pasted `#activity-filter=` link lands the way the in-app
+      // jump does — lit on the activity it names — and back/forward never
+      // keeps a highlight from the state it left.
+      this.highlightedActivities = this.activityFilter
+        ? { [this.activityFilter.split(':')[1]]: true }
+        : {};
+      // The axis is ephemeral, but a link arriving with a filter should reveal
+      // it. Only ever set, never reset — stepping back to an unfiltered state
+      // must not yank the sidebar out from under the reader.
+      if (this.termFilters.length && hasGlossary) this.view = 'terms';
+      else if (this.tagFilters.length) this.view = 'tags';
+      else if (this.moduleFilter) this.view = 'modules';
       const targetSlug = params.get('scenario');
       const targetScenario = targetSlug
-        ? (window.__scenarioSlugs || {})[targetSlug]
+        ? lookup(window.__scenarioSlugs || {}, targetSlug, null)
         : null;
       const targetTerm = params.get('term');
       if (targetTerm) {
@@ -5073,13 +5238,12 @@ function reportApp() {
       if (this.termFilters.length) params.set('term-filter', this.termFilters.join(','));
       if (this.activityFilter) params.set('activity-filter', this.activityFilter);
 
-      const present = new Set(data.scenarios.map(s => s.status));
       const shown = [];
       if (this.showPassed) shown.push('passed');
       if (this.showFailed) shown.push('failed');
       if (this.showSkipped) shown.push('skipped');
-      const shownInReport = shown.filter(s => present.has(s));
-      const presentList = ['passed', 'failed', 'skipped'].filter(s => present.has(s));
+      const shownInReport = shown.filter(s => statusesPresent.has(s));
+      const presentList = ['passed', 'failed', 'skipped'].filter(s => statusesPresent.has(s));
       if (shownInReport.length !== presentList.length) {
         params.set('status', shownInReport.join(','));
       }

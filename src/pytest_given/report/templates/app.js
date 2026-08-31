@@ -14,9 +14,21 @@ function serializeHash(params, mode = 'push') {
   else history.pushState(null, '', url);
 }
 
+// Mirrors `tab_visibility`: these are the reports that render each tab.
+function hasStories() {
+  return (window.__storyIds || []).length > 0;
+}
+
+function hasTerms() {
+  return (window.__termIds || []).length > 0;
+}
+
 function deserializeView(params) {
+  // Gated on the tab existing: a stale `#view=glossary` would otherwise hide
+  // the Scenarios view behind an empty one, with no tab bar left to leave by.
   const v = params.get('view');
-  if (v === 'stories' || v === 'glossary') return v;
+  if (v === 'stories' && hasStories()) return 'stories';
+  if (v === 'glossary' && hasTerms()) return 'glossary';
   return 'scenarios';
 }
 
@@ -30,6 +42,12 @@ function deserializeStory(params) {
   const fromFilter = (params.get('activity-filter') || '').split(':')[0];
   if (ids.includes(fromFilter)) return fromFilter;
   return ids[0] || null;
+}
+
+// Own keys only: these are read from the URL fragment, and a bare `map[key]`
+// answers `#term-filter=toString` with a function off Object.prototype.
+function lookup(map, key, fallback) {
+  return Object.hasOwn(map, key) ? map[key] : fallback;
 }
 
 // --- Alpine app ---
@@ -60,11 +78,26 @@ function reportApp() {
   // Term id -> canonical display name, for the Terms browse axis.
   const termNames = {};
   for (const t of glossaryTerms) termNames[t.id] = t.canonical;
+  const termScenarios = window.__termScenarios || {};
   // __termScenarios is term -> scenarios; the sidebar needs the inverse.
   const scenarioTerms = {};
-  for (const [termId, ids] of Object.entries(window.__termScenarios || {})) {
+  for (const [termId, ids] of Object.entries(termScenarios)) {
     for (const sid of ids) (scenarioTerms[sid] || (scenarioTerms[sid] = [])).push(termId);
   }
+  // Filtering is the hot path: six Alpine effects rescan every scenario per
+  // filter change, so anything derivable once is derived here.
+  const searchHaystacks = data.scenarios.map(
+    s => (s.narration.text + ' ' + s.tags.join(' ')).toLowerCase(),
+  );
+  const statusesPresent = new Set(data.scenarios.map(s => s.status));
+  const statusCounts = {
+    passed: data.scenarios.filter(s => s.status === 'passed').length,
+    failed: data.scenarios.filter(s => s.status === 'failed').length,
+    skipped: data.scenarios.filter(s => s.status === 'skipped').length,
+  };
+  // A closure variable, not state: writing it from inside a reactive effect
+  // that also reads it would re-trigger that effect.
+  let visibleCache = null;
   return {
     search: '',
     // Modules is the only axis every report has: a suite may carry no tags and
@@ -85,8 +118,6 @@ function reportApp() {
     glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
     glossaryDefinitionFilter: 'all',
     expandedTerms: {},
-    hoveredActivity: null,
-    hoveredScenario: null,
     showPassed: true,
     showFailed: true,
     showSkipped: true,
@@ -104,14 +135,27 @@ function reportApp() {
     activityFilter: null,
     _suppressHashWrite: false,
     highlightedActivities: {},
+    // Presence sets: `delete` rather than `= false` keeps the matching
+    // "is anything open?" getters a plain key count.
+    _toggle(map, key) {
+      if (map[key]) delete map[key];
+      else map[key] = true;
+    },
     get anyActivitiesHighlighted() {
       return Object.keys(this.highlightedActivities).length > 0;
     },
     toggleActivityHighlight(id) {
-      if (this.highlightedActivities[id]) delete this.highlightedActivities[id];
-      else this.highlightedActivities[id] = true;
+      this._toggle(this.highlightedActivities, id);
     },
     clearActivityHighlights() {
+      this.highlightedActivities = {};
+    },
+    // Activity ids are per-story ints, so a highlight cannot travel. Cleared
+    // here rather than in a `selectedStory` watcher, which would fire after
+    // `_readHash` had set story and highlights together and undo the second.
+    selectStory(id) {
+      if (this.selectedStory === id) return;
+      this.selectedStory = id;
       this.highlightedActivities = {};
     },
     // Story-view scenario cards filter on the selected activities: a card stays
@@ -119,6 +163,30 @@ function reportApp() {
     activitySelectionMatches(coveredIds) {
       if (!this.anyActivitiesHighlighted) return true;
       return coveredIds.some(id => this.highlightedActivities[id]);
+    },
+    // Terms of one kind surviving the search and definition filters. The
+    // headings and their counts are Jinja-rendered report totals, so without
+    // this a search matching nothing leaves them standing over an empty page.
+    visibleTermCount(kind) {
+      const q = this.glossarySearch.toLowerCase();
+      const wantUndefined = this.glossaryDefinitionFilter === 'undefined';
+      let n = 0;
+      for (const t of glossaryTerms) {
+        if ((t.kind || 'kindless') !== kind) continue;
+        if (this.glossaryDefinitionFilter !== 'all'
+            && wantUndefined !== (t.definition === null || t.definition === undefined)) continue;
+        if (q && !t.canonical.toLowerCase().includes(q)) continue;
+        n++;
+      }
+      return n;
+    },
+    visibleTermLabel(kind) {
+      const n = this.visibleTermCount(kind);
+      return n + (n === 1 ? ' term' : ' terms');
+    },
+    get anyTermsVisible() {
+      return ['actor', 'object', 'verb', 'kindless']
+        .some(k => this.visibleTermCount(k) > 0);
     },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
@@ -134,7 +202,7 @@ function reportApp() {
     },
     get filterSummary() {
       const parts = [];
-      const hasStatus = (s) => data.scenarios.some(sc => sc.status === s);
+      const hasStatus = (s) => statusesPresent.has(s);
       const allShown = (this.showPassed || !hasStatus('passed'))
         && (this.showFailed || !hasStatus('failed'))
         && (this.showSkipped || !hasStatus('skipped'));
@@ -160,14 +228,29 @@ function reportApp() {
         + ' at ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
     },
     get counts() {
-      return {
-        passed: data.scenarios.filter(s => s.status === 'passed').length,
-        failed: data.scenarios.filter(s => s.status === 'failed').length,
-        skipped: data.scenarios.filter(s => s.status === 'skipped').length,
-      };
+      return statusCounts;
     },
     get filteredCount() {
-      return data.scenarios.filter((_, i) => this.isVisible(i)).length;
+      return this._visible().size;
+    },
+    // Computed once per filter change instead of once per reader. Reading the
+    // filter state here still registers each caller's reactive dependencies;
+    // the cache only stops the O(n) scan repeating within one pass. Control
+    // characters delimit the key — a tag and the search box carry any text.
+    _visible() {
+      const key = [
+        this.showPassed, this.showFailed, this.showSkipped,
+        this.moduleFilter, this.activityFilter, this.search,
+        this.tagFilters.join('\u0001'), this.termFilters.join('\u0001'),
+      ].join('\u0000');
+      if (visibleCache && visibleCache.key === key) return visibleCache.value;
+      const query = this.search.toLowerCase();
+      const value = new Set();
+      for (let i = 0; i < data.scenarios.length; i++) {
+        if (this._matchesFilters(data.scenarios[i], i, query)) value.add(i);
+      }
+      visibleCache = { key, value };
+      return value;
     },
     // Every axis renders as the same flat list of rows carrying their own
     // `depth`, so one template serves all three. Tags and terms are depth 0
@@ -179,8 +262,8 @@ function reportApp() {
     _flatRows() {
       const grouped = {};
       const isTerms = this.view === 'terms';
-      for (const s of data.scenarios) {
-        if (!this._matchesFilters(s)) continue;
+      for (const i of this._visible()) {
+        const s = data.scenarios[i];
         const ids = isTerms ? scenarioTerms[s.id] || [] : s.tags;
         for (const k of ids.length ? ids : [isTerms ? NO_TERMS : NO_TAGS]) {
           if (!grouped[k]) {
@@ -202,8 +285,9 @@ function reportApp() {
     // the subtree without rebuilding it.
     _moduleRows() {
       const counts = {};
-      for (const s of data.scenarios) {
-        if (this._matchesFilters(s)) counts[s.module] = (counts[s.module] || 0) + 1;
+      for (const i of this._visible()) {
+        const m = data.scenarios[i].module;
+        counts[m] = (counts[m] || 0) + 1;
       }
       const modules = Object.keys(counts);
       if (!modules.length) return [];
@@ -272,7 +356,9 @@ function reportApp() {
         || (byCount ? b.count - a.count : 0)
         || a.name.localeCompare(b.name));
     },
-    _matchesFilters(s) {
+    // Called from `_visible` alone. `index` addresses the precomputed
+    // haystack; `query` is the search box, lowercased once by the caller.
+    _matchesFilters(s, index, query) {
       if (s.status === 'passed' && !this.showPassed) return false;
       if (s.status === 'failed' && !this.showFailed) return false;
       if (s.status === 'skipped' && !this.showSkipped) return false;
@@ -291,7 +377,7 @@ function reportApp() {
       for (const termId of this.termFilters) {
         if (termId === NO_TERMS) {
           if ((scenarioTerms[s.id] || []).length) return false;
-        } else if (!(window.__termScenarios[termId] || []).includes(s.id)) {
+        } else if (!lookup(termScenarios, termId, []).includes(s.id)) {
           return false;
         }
       }
@@ -302,21 +388,19 @@ function reportApp() {
           return false;
         }
       }
-      if (this.search) {
-        const q = this.search.toLowerCase();
-        const text = (s.narration.text + ' ' + s.tags.join(' ')).toLowerCase();
-        if (!text.includes(q)) return false;
-      }
+      if (query && !searchHaystacks[index].includes(query)) return false;
       return true;
     },
     toggleGroup(name) {
-      if (this.expandedGroups[name]) delete this.expandedGroups[name];
-      else this.expandedGroups[name] = true;
+      this._toggle(this.expandedGroups, name);
     },
     // Pointer capture on the handle keeps the drag alive over the iframe-free
     // but text-heavy main column, and delivers the release even if the pointer
     // leaves the window. The listeners live on the handle for the same reason.
     startSidebarResize(event) {
+      // Primary button only: a right-click drags the sidebar *and* opens the
+      // context menu, whose swallowed release can leave the drag live.
+      if (event.button !== 0) return;
       // preventDefault stops the drag from placing a caret or starting a text
       // selection — but it also suppresses the focus a click would otherwise
       // give a tabindex'd element, which left the arrow keys dead for anyone
@@ -347,29 +431,27 @@ function reportApp() {
       this.sidebarWidth = SIDEBAR_DEFAULT;
     },
     toggleStep(stepId) {
-      if (this.expandedSteps[stepId]) delete this.expandedSteps[stepId];
-      else this.expandedSteps[stepId] = true;
+      this._toggle(this.expandedSteps, stepId);
     },
     toggleScenario(index) {
-      if (this.expandedScenarios[index]) delete this.expandedScenarios[index];
-      else this.expandedScenarios[index] = true;
+      this._toggle(this.expandedScenarios, index);
+    },
+    toggleTerm(id) {
+      this._toggle(this.expandedTerms, id);
     },
     get anyScenariosExpanded() {
-      return data.scenarios.some((_, i) => this.isVisible(i) && this.expandedScenarios[i]);
+      for (const i of this._visible()) if (this.expandedScenarios[i]) return true;
+      return false;
     },
     toggleAllScenarios() {
       const expand = !this.anyScenariosExpanded;
-      data.scenarios.forEach((_, i) => {
-        if (this.isVisible(i)) {
-          if (expand) this.expandedScenarios[i] = true;
-          else delete this.expandedScenarios[i];
-        }
-      });
+      for (const i of this._visible()) {
+        if (expand) this.expandedScenarios[i] = true;
+        else delete this.expandedScenarios[i];
+      }
     },
     isVisible(index) {
-      const scenario = data.scenarios[index];
-      if (!scenario) return false;
-      return this._matchesFilters(scenario);
+      return this._visible().has(index);
     },
     scrollToAndExpand(id) {
       const index = data.scenarios.findIndex(s => s.id === id);
@@ -403,6 +485,8 @@ function reportApp() {
       this.showSkipped = true;
     },
     goToTerm(id) {
+      // A stale `#term=` link would otherwise open an empty Glossary tab.
+      if (!Object.hasOwn(termNames, id)) return;
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
       this.$nextTick(() => {
@@ -436,7 +520,7 @@ function reportApp() {
       // The timeline number means nothing in the Scenarios view, so the chip
       // leads with the prose and keeps the number as the pointer back.
       const number = key.split(':')[1];
-      const text = activityLabels[key];
+      const text = lookup(activityLabels, key, '');
       return text ? `Activity ${number}: ${text}` : `Activity ${number}`;
     },
     removeTermFilter(id) {
@@ -452,7 +536,7 @@ function reportApp() {
       if (id === NO_TERMS) return 'no terms';
       // Term ids are slugs ('file-glossary'); the report speaks canonical
       // names ('File glossary'). Falls back to the id for an unknown term.
-      return termNames[id] || id;
+      return lookup(termNames, id, id);
     },
     tagLabel(tag) {
       return tag === NO_TAGS ? 'untagged' : tag;
@@ -583,7 +667,6 @@ function reportApp() {
       });
       this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       this.$watch('selectedStory', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
-      this.$watch('selectedStory', () => { this.highlightedActivities = {}; });
       // hashchange: manual URL edits / pasted links. popstate: back/forward.
       window.addEventListener('hashchange', () => this._readHash());
       window.addEventListener('popstate', () => this._readHash());
@@ -693,9 +776,21 @@ function reportApp() {
       else this.search = '';
       this.mainView = deserializeView(params);
       this.selectedStory = deserializeStory(params);
+      // Derived, so a pasted `#activity-filter=` link lands the way the in-app
+      // jump does — lit on the activity it names — and back/forward never
+      // keeps a highlight from the state it left.
+      this.highlightedActivities = this.activityFilter
+        ? { [this.activityFilter.split(':')[1]]: true }
+        : {};
+      // The axis is ephemeral, but a link arriving with a filter should reveal
+      // it. Only ever set, never reset — stepping back to an unfiltered state
+      // must not yank the sidebar out from under the reader.
+      if (this.termFilters.length && hasGlossary) this.view = 'terms';
+      else if (this.tagFilters.length) this.view = 'tags';
+      else if (this.moduleFilter) this.view = 'modules';
       const targetSlug = params.get('scenario');
       const targetScenario = targetSlug
-        ? (window.__scenarioSlugs || {})[targetSlug]
+        ? lookup(window.__scenarioSlugs || {}, targetSlug, null)
         : null;
       const targetTerm = params.get('term');
       if (targetTerm) {
@@ -718,13 +813,12 @@ function reportApp() {
       if (this.termFilters.length) params.set('term-filter', this.termFilters.join(','));
       if (this.activityFilter) params.set('activity-filter', this.activityFilter);
 
-      const present = new Set(data.scenarios.map(s => s.status));
       const shown = [];
       if (this.showPassed) shown.push('passed');
       if (this.showFailed) shown.push('failed');
       if (this.showSkipped) shown.push('skipped');
-      const shownInReport = shown.filter(s => present.has(s));
-      const presentList = ['passed', 'failed', 'skipped'].filter(s => present.has(s));
+      const shownInReport = shown.filter(s => statusesPresent.has(s));
+      const presentList = ['passed', 'failed', 'skipped'].filter(s => statusesPresent.has(s));
       if (shownInReport.length !== presentList.length) {
         params.set('status', shownInReport.join(','));
       }

@@ -26,28 +26,33 @@
     <div class="topbar-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · <span x-text="formattedTimestamp"></span></div>
   </header>
 
-  {% if tab_visibility.scenarios or tab_visibility.stories or tab_visibility.glossary %}
-  {% set visible_count = (tab_visibility.scenarios|int) + (tab_visibility.stories|int) + (tab_visibility.glossary|int) %}
+  {#- The view divs read this too: `role="tabpanel"` only where a tablist
+      exists to belong to. -#}
+  {%- set visible_count = (tab_visibility.scenarios|int) + (tab_visibility.stories|int) + (tab_visibility.glossary|int) -%}
   {% if visible_count > 1 %}
-  <nav class="frame-nav" role="tablist">
-    <button class="nav-tab" role="tab"
+  {#- The class paints the active tab; `aria-selected` announces it. No roving
+      tabindex: three tabs do not earn the arrow-key handling. -#}
+  <nav class="frame-nav" role="tablist" aria-label="Report views">
+    <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
             :class="{ 'nav-tab-active': mainView === 'scenarios' }"
+            :aria-selected="mainView === 'scenarios'"
             @click="mainView = 'scenarios'">Scenarios</button>
     {% if tab_visibility.stories %}
-    <button class="nav-tab" role="tab"
+    <button class="nav-tab" role="tab" id="tab-stories" aria-controls="view-stories"
             :class="{ 'nav-tab-active': mainView === 'stories' }"
+            :aria-selected="mainView === 'stories'"
             @click="mainView = 'stories'">Stories</button>
     {% endif %}
     {% if tab_visibility.glossary %}
-    <button class="nav-tab" role="tab"
+    <button class="nav-tab" role="tab" id="tab-glossary" aria-controls="view-glossary"
             :class="{ 'nav-tab-active': mainView === 'glossary' }"
+            :aria-selected="mainView === 'glossary'"
             @click="mainView = 'glossary'">Glossary</button>
     {% endif %}
   </nav>
   {% endif %}
-  {% endif %}
 
-  <div id="view-scenarios" x-show="mainView === 'scenarios'">
+  <div id="view-scenarios" {% if visible_count > 1 %}role="tabpanel" aria-labelledby="tab-scenarios"{% endif %} x-show="mainView === 'scenarios'">
   <div class="view-layout">
   <div class="sidebar">
     <label class="search-box">
@@ -61,9 +66,9 @@
     <div class="sidebar-section">
       <div class="sidebar-label">Status</div>
       <div class="status-pills">
-        <span class="status-pill" :class="{ 'active-passed': showPassed }" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></span>
-        <span class="status-pill" :class="{ 'active-failed': showFailed }" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></span>
-        <span class="status-pill" :class="{ 'active-skipped': showSkipped }" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></span>
+        <button type="button" class="btn-reset status-pill" :class="{ 'active-passed': showPassed }" :aria-pressed="showPassed" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></button>
+        <button type="button" class="btn-reset status-pill" :class="{ 'active-failed': showFailed }" :aria-pressed="showFailed" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></button>
+        <button type="button" class="btn-reset status-pill" :class="{ 'active-skipped': showSkipped }" :aria-pressed="showSkipped" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></button>
       </div>
     </div>
 
@@ -85,11 +90,11 @@
         {#- Modules leads and opens by default: it is the one axis every report
             has, so no report opens on an empty tree. The Terms axis needs a
             glossary to browse; without one the segment is simply absent. -#}
-        <div class="seg-btn" :class="{ active: view === 'modules' }" @click="view = 'modules'">Modules</div>
+        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'modules' }" :aria-pressed="view === 'modules'" @click="view = 'modules'">Modules</button>
         {% if tab_visibility.glossary %}
-        <div class="seg-btn" :class="{ active: view === 'terms' }" @click="view = 'terms'">Terms</div>
+        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'terms' }" :aria-pressed="view === 'terms'" @click="view = 'terms'">Terms</button>
         {% endif %}
-        <div class="seg-btn" :class="{ active: view === 'tags' }" @click="view = 'tags'">Tags</div>
+        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'tags' }" :aria-pressed="view === 'tags'" @click="view = 'tags'">Tags</button>
       </div>
       <div class="nav-tree">
         {#- Rows key on `group.id`, not the display name: a term row shows its
@@ -99,7 +104,10 @@
             package without filtering by it, and selecting a package opens it
             too (see `onGroupClick`), so the common case needs no aim. Only a
             module package has children, so only it renders a chevron.
-            `--nav-indent` is what makes the flat row list read as a tree. -#}
+            `--nav-indent` is what makes the flat row list read as a tree.
+            The row keeps its own @click so the padding stays clickable; the
+            inner button is what the keyboard reaches, and stops propagation so
+            the two do not both fire. -#}
         <template x-for="group in groups" :key="group.id">
           <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }"
                :style="'--nav-indent:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
@@ -109,8 +117,12 @@
                     :aria-label="(expandedGroups[group.id] ? 'Collapse ' : 'Expand ') + group.name"
                     @click.stop="toggleGroup(group.id)"></button>
             <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren && view === 'modules'"></span>
-            <span class="nav-group-name" x-text="group.name"></span>
-            <span class="nav-group-count" x-text="group.count"></span>
+            <button type="button" class="btn-reset nav-group-select"
+                    :aria-pressed="isGroupActive(group)"
+                    @click.stop="onGroupClick(group)">
+              <span class="nav-group-name" x-text="group.name"></span>
+              <span class="nav-group-count" x-text="group.count"></span>
+            </button>
           </div>
         </template>
       </div>
@@ -157,12 +169,12 @@
   {%- set has_body = scenario.steps or scenario.parameters or scenario.error or scenario.skip_reason -%}
   <div class="scenario {{ scenario.status }}"
        x-show="isVisible({{ loop.index0 }})"
-       :id="'scenario-' + {{ loop.index0 }}"
+       id="scenario-{{ loop.index0 }}"
        data-scenario-id="{{ scenario.id }}"
        :class="{ 'scenario-expanded': expandedScenarios[{{ loop.index0 }}] }">
     <div class="scenario-header{% if not has_body %} scenario-header-empty{% endif %}"{% if has_body %} @click="toggleScenario({{ loop.index0 }})"{% endif %}>
       <div style="display:flex; align-items:center;">
-        {% if has_body %}<span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
+        {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ loop.index0 }}" :aria-expanded="!!expandedScenarios[{{ loop.index0 }}]" :aria-label="(expandedScenarios[{{ loop.index0 }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ loop.index0 }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
         <span class="scenario-name">{{ scenario.narration | narration }}</span>
         {{ anchor_link('scenario=' ~ scenario_slugs[scenario.id]) }}
       </div>
@@ -176,13 +188,13 @@
         {%- set visible_tags = scenario.tags[:3] if collapse_tags else scenario.tags -%}
         {%- set overflow_tags = scenario.tags[3:] if collapse_tags else [] -%}
         {% for tag in visible_tags %}
-        <span class="scenario-tag" data-tag="{{ tag }}" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">{{ tag }}</span>
+        <button type="button" class="btn-reset scenario-tag" data-tag="{{ tag }}" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">{{ tag }}</button>
         {% endfor %}
         {% for tag in overflow_tags %}
-        <span class="scenario-tag" x-cloak data-tag="{{ tag }}" x-show="expandedTags[{{ scenario_idx }}] || tagFilters.includes($el.dataset.tag)" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" @click.stop="filterByTag($el.dataset.tag)">{{ tag }}</span>
+        <button type="button" class="btn-reset scenario-tag" x-cloak data-tag="{{ tag }}" x-show="expandedTags[{{ scenario_idx }}] || tagFilters.includes($el.dataset.tag)" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">{{ tag }}</button>
         {% endfor %}
         {% if overflow_tags %}
-        <span class="scenario-tag scenario-tag-more" x-show="!expandedTags[{{ scenario_idx }}]" @click.stop="expandedTags[{{ scenario_idx }}] = true">+{{ overflow_tags | length }}</span>
+        <button type="button" class="btn-reset scenario-tag scenario-tag-more" x-show="!expandedTags[{{ scenario_idx }}]" aria-label="Show {{ overflow_tags | length }} more tags" @click.stop="expandedTags[{{ scenario_idx }}] = true">+{{ overflow_tags | length }}</button>
         {% endif %}
         <span class="scenario-status {{ scenario.status }}">
           {% if scenario.status == 'passed' %}✓ passed{% elif scenario.status == 'failed' %}✗ failed{% else %}○ skipped{% endif %}
@@ -191,7 +203,7 @@
       </span>
     </div>
 
-    <div class="scenario-body" :class="{ expanded: expandedScenarios[{{ loop.index0 }}] }">
+    <div class="scenario-body" id="scenario-body-{{ loop.index0 }}" :class="{ expanded: expandedScenarios[{{ loop.index0 }}] }">
     <div class="scenario-body-inner">
       {% if scenario.skip_reason %}
       <div class="skip-reason">
@@ -313,19 +325,20 @@
   </div>{# end .view-layout #}
   </div>{# end #view-scenarios #}
 
-  <div id="view-stories" x-show="mainView === 'stories'" x-cloak>
+  <div id="view-stories" {% if visible_count > 1 %}role="tabpanel" aria-labelledby="tab-stories"{% endif %} x-show="mainView === 'stories'" x-cloak>
   {% if stories %}
   <div class="view-layout">
     <div class="sidebar">
       <div class="sidebar-label">Stories</div>
       {% for story in stories %}
       {% set scns = story_rollups[story.id].scenarios %}
-      <div class="story-sidebar-item" data-story-id="{{ story.id }}"
-           :class="{ active: selectedStory === $el.dataset.storyId }"
-           @click="selectedStory = $el.dataset.storyId">
+      <button type="button" class="btn-reset story-sidebar-item" data-story-id="{{ story.id }}"
+              :class="{ active: selectedStory === $el.dataset.storyId }"
+              :aria-pressed="selectedStory === $el.dataset.storyId"
+              @click="selectStory($el.dataset.storyId)">
         <div class="story-sidebar-title">{{ story.title }}</div>
         <div class="story-sidebar-meta">{{ story.activities | length }} activities · {{ scns | length }} scenario{{ 's' if scns | length != 1 else '' }}</div>
-      </div>
+      </button>
       {% endfor %}
     </div>
     {{ sidebar_resizer() }}
@@ -349,8 +362,10 @@
           <div class="activity-row" id="activity-{{ story.id }}-{{ activity.id }}"
                data-activity-id="{{ activity.id }}"
                :class="{ 'activity-row-highlight': highlightedActivities[$el.dataset.activityId] }">
-            <div class="activity-num" data-activity-id="{{ activity.id }}"
-                 :class="{ 'activity-num-highlight': highlightedActivities[$el.dataset.activityId] }">{{ activity.id }}</div>
+            <button type="button" class="btn-reset activity-num" data-activity-id="{{ activity.id }}"
+                    :class="{ 'activity-num-highlight': highlightedActivities[$el.dataset.activityId] }"
+                    :aria-pressed="!!highlightedActivities[$el.dataset.activityId]"
+                    aria-label="Select activity {{ activity.id }}">{{ activity.id }}</button>
             <div class="activity-body">
               {% for path in activity.paths %}
               <div class="activity-path">
@@ -389,8 +404,8 @@
                x-show="activitySelectionMatches(JSON.parse($el.dataset.covers))">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
-                <span class="scenario-name scenario-name--goto"
-                      data-goto-scenario="{{ scn.id }}">{{ scn.narration | narration }}</span>
+                <button type="button" class="btn-reset scenario-name scenario-name--goto"
+                        data-goto-scenario="{{ scn.id }}">{{ scn.narration | narration }}</button>
               </div>
               <span class="scenario-meta">
                 <span class="scenario-status {{ scn.status }}">
@@ -402,8 +417,10 @@
             <div class="scn-act-strip">
               <span class="scn-act-label">Covers:</span>
               {% for act_id in scn_covers.get(scn.id, []) %}
-              <span class="use-chip" data-activity-id="{{ act_id }}"
-                    :class="{ 'use-chip-highlight': highlightedActivities[$el.dataset.activityId] }">{{ act_id }}</span>
+              <button type="button" class="btn-reset use-chip" data-activity-id="{{ act_id }}"
+                      :class="{ 'use-chip-highlight': highlightedActivities[$el.dataset.activityId] }"
+                      :aria-pressed="!!highlightedActivities[$el.dataset.activityId]"
+                      aria-label="Select activity {{ act_id }}">{{ act_id }}</button>
               {% endfor %}
             </div>
             {% endif %}
@@ -419,7 +436,7 @@
   </div>
   {% endif %}
   </div>
-  <div id="view-glossary" x-show="mainView === 'glossary'" x-cloak>
+  <div id="view-glossary" {% if visible_count > 1 %}role="tabpanel" aria-labelledby="tab-glossary"{% endif %} x-show="mainView === 'glossary'" x-cloak>
   {% if glossary %}
   <div class="view-layout">
     <div class="sidebar">
@@ -477,9 +494,9 @@
       <div class="sidebar-section">
         <div class="sidebar-label">Definitions</div>
         <div class="seg-toggle">
-          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'all' }" @click="glossaryDefinitionFilter = 'all'">All</div>
-          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'defined' }" @click="glossaryDefinitionFilter = 'defined'">Defined</div>
-          <div class="seg-btn" :class="{ active: glossaryDefinitionFilter === 'undefined' }" @click="glossaryDefinitionFilter = 'undefined'">Undefined</div>
+          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'all' }" :aria-pressed="glossaryDefinitionFilter === 'all'" @click="glossaryDefinitionFilter = 'all'">All</button>
+          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'defined' }" :aria-pressed="glossaryDefinitionFilter === 'defined'" @click="glossaryDefinitionFilter = 'defined'">Defined</button>
+          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'undefined' }" :aria-pressed="glossaryDefinitionFilter === 'undefined'" @click="glossaryDefinitionFilter = 'undefined'">Undefined</button>
         </div>
       </div>
       {% endif %}
@@ -511,11 +528,11 @@
       {% set kind_terms = glossary.terms | selectattr('kind', 'equalto', kind_key) | list %}
       {% endif %}
       {% if kind_terms %}
-      <div x-show="glossaryKindFilter.{{ kind_key }}">
+      <div x-show="glossaryKindFilter.{{ kind_key }} && visibleTermCount('{{ kind_key }}') > 0">
         {% if not all_uncategorized %}
         <div class="kind-header">
           <span class="kind-title {{ kind_cls }}">{{ kind_label }}</span>
-          <span class="kind-meta">{{ kind_terms | length }} term{{ 's' if kind_terms | length != 1 else '' }}</span>
+          <span class="kind-meta" x-text="visibleTermLabel('{{ kind_key }}')"></span>
         </div>
         {% endif %}
         {% for term in kind_terms %}
@@ -526,8 +543,12 @@
         <div class="entry" id="term-{{ term.id }}"
              data-search="{{ term.canonical | lower }}"
              x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" data-term-id="{{ term.id }}" @click="expandedTerms[$el.dataset.termId] ? delete expandedTerms[$el.dataset.termId] : (expandedTerms[$el.dataset.termId] = true)">
-            <span class="scenario-chevron" data-term-id="{{ term.id }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span>
+          <div class="entry-head" data-term-id="{{ term.id }}" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="{{ term.id }}"
+                    aria-controls="term-refs-{{ term.id }}"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ term.id }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
               <span class="term-pill {{ kind_cls }}">{{ term.canonical }}</span>
             </span>
@@ -552,14 +573,14 @@
             </div>
             {{ anchor_link('view=glossary&term=' ~ term.id) }}
           </div>
-          <div class="refs scenario-body" data-term-id="{{ term.id }}" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+          <div class="refs scenario-body" id="term-refs-{{ term.id }}" data-term-id="{{ term.id }}" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
                 {% if agg and agg.stories %}
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   {% for sid in agg.stories %}
-                  <a class="use-chip" href="#" data-story-id="{{ sid }}" @click.prevent="mainView = 'stories'; selectedStory = $el.dataset.storyId">{{ sid }}</a>
+                  <a class="use-chip" href="#" data-story-id="{{ sid }}" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">{{ sid }}</a>
                   {% endfor %}
                 </div>
                 {% endif %}
@@ -598,6 +619,7 @@
       </div>
       {% endif %}
       {% endfor %}
+      <div class="glossary-empty" x-show="!anyTermsVisible" x-cloak>No terms match this filter.</div>
     </div>
   </div>
   {% endif %}
