@@ -131,9 +131,7 @@
     {%- for att in step.attachments -%}
     {%- if att is attachment_ref -%}
     <div>
-      <span class="attachment-badge attachment-badge--static" data-param="{{ att.column_id }}"
-            @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-            @mouseleave="setHoverParam(null, $event.currentTarget)">{{ attachment_icon(att.content_type) }}{{ att.label }}</span>
+      <span class="attachment-badge attachment-badge--static" data-param="{{ att.column_id }}">{{ attachment_icon(att.content_type) }}{{ att.label }}</span>
     </div>
     {%- else -%}
     <div>

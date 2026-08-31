@@ -495,6 +495,16 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   transition: grid-template-rows 200ms ease-out;
 }
 .scenario-body.expanded { grid-template-rows: 1fr; }
+/* `0fr` sizes the row but does not skip the content, which on a large report
+   is most of the layout cost. On the body, not the card: a card keeps a real
+   height, so `#scenario=` still scrolls to the right place. Buys ~1.8x on
+   filtering and costs ~1.5x on expand/collapse all — the right way round,
+   since filtering is constant and expanding 3k scenarios is worth least on
+   exactly the reports this helps most. */
+.scenario-body:not(.expanded) .scenario-body-inner {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 0;
+}
 .scenario-body-inner {
   overflow: hidden;
   min-height: 0;
@@ -1464,7 +1474,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L148">examples/hotel-booking/test_hotel_booking.py:148</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L148">examples/hotel-booking/test_hotel_booking.py:148</a></div>
       
     </div>
     </div>
@@ -1518,7 +1528,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L163">examples/hotel-booking/test_hotel_booking.py:163</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L163">examples/hotel-booking/test_hotel_booking.py:163</a></div>
       
     </div>
     </div>
@@ -1558,9 +1568,9 @@ span.param-highlight {
           </div><div class="phase-steps">
             <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer" data-term-name="Organizer" data-term-def="Person booking accommodation on behalf of a group.">Carol</span> has <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="add" data-term-name="add" data-term-def="Attach a member to a collection.">added</span> <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="Individual traveler in the group.">Alice</span> and <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="Individual traveler in the group.">Bob</span> to the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking" data-term-name="Booking" data-term-def="A reservation for one or more rooms.">Booking</span></div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer" data-term-name="Organizer" data-term-def="Person booking accommodation on behalf of a group.">Carol</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="submit" data-term-name="submit" data-term-def="Send to the system for processing.">submits</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment" data-term-name="Payment" data-term-def="Money transferred for a booking.">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{payment_method}</span> for the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking" data-term-name="Booking" data-term-def="A reservation for one or more rooms.">Booking</span></div>
+            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer" data-term-name="Organizer" data-term-def="Person booking accommodation on behalf of a group.">Carol</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="submit" data-term-name="submit" data-term-def="Send to the system for processing.">submits</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment" data-term-name="Payment" data-term-def="Money transferred for a booking.">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method">{payment_method}</span> for the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking" data-term-name="Booking" data-term-def="A reservation for one or more rooms.">Booking</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system" data-term-name="Booking System" data-term-def="Automated reservation back-end.">Booking System</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="reject" data-term-name="reject" data-term-def="Refuse to process or accept.">rejects</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment" data-term-name="Payment" data-term-def="Money transferred for a booking.">Payment</span> because of <span class="param-color-1" data-param="decline_reason" data-subst="decline_reason" @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)" @mouseleave="setHoverParam(null, $event.currentTarget)">{decline_reason}</span></div>
+            <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system" data-term-name="Booking System" data-term-def="Automated reservation back-end.">Booking System</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="reject" data-term-name="reject" data-term-def="Refuse to process or accept.">rejects</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment" data-term-name="Payment" data-term-def="Money transferred for a booking.">Payment</span> because of <span class="param-color-1" data-param="decline_reason" data-subst="decline_reason">{decline_reason}</span></div>
           </div><div class="phase-steps">
             <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking" data-term-name="Booking" data-term-def="A reservation for one or more rooms.">Booking</span> stays pending and no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation" data-term-name="Confirmation" data-term-def="Notification of a successful booking.">Confirmation</span> is sent to <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="Individual traveler in the group.">Alice</span> or <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-name="Guest" data-term-def="Individual traveler in the group.">Bob</span></div>
           </div></div>
@@ -1571,34 +1581,24 @@ span.param-highlight {
         <thead>
           <tr>
             
-            <th class="param-color-0" data-param="payment_method"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">payment_method</th>
+            <th class="param-color-0" data-param="payment_method">payment_method</th>
             
-            <th class="param-color-1" data-param="decline_reason"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">decline_reason</th>
+            <th class="param-color-1" data-param="decline_reason">decline_reason</th>
             
             <th style="text-align:right">status</th>
           </tr>
         </thead>
         <tbody>
-          <tr class=""
-              @mouseenter="setHoverRow($event.currentTarget)"
-              @mouseleave="clearHoverRow($event.currentTarget)">
+          <tr data-case-row class="">
             
             
             
-            <td data-param="payment_method" data-subst="payment_method"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">credit card</td>
+            <td data-param="payment_method" data-subst="payment_method">credit card</td>
             
             
             
             
-            <td data-param="decline_reason" data-subst="decline_reason"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">insufficient funds</td>
+            <td data-param="decline_reason" data-subst="decline_reason">insufficient funds</td>
             
             
             <td style="text-align:right">
@@ -1610,22 +1610,16 @@ span.param-highlight {
           
           
           
-          <tr class=""
-              @mouseenter="setHoverRow($event.currentTarget)"
-              @mouseleave="clearHoverRow($event.currentTarget)">
+          <tr data-case-row class="">
             
             
             
-            <td data-param="payment_method" data-subst="payment_method"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">debit card</td>
+            <td data-param="payment_method" data-subst="payment_method">debit card</td>
             
             
             
             
-            <td data-param="decline_reason" data-subst="decline_reason"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">expired card</td>
+            <td data-param="decline_reason" data-subst="decline_reason">expired card</td>
             
             
             <td style="text-align:right">
@@ -1637,22 +1631,16 @@ span.param-highlight {
           
           
           
-          <tr class=""
-              @mouseenter="setHoverRow($event.currentTarget)"
-              @mouseleave="clearHoverRow($event.currentTarget)">
+          <tr data-case-row class="">
             
             
             
-            <td data-param="payment_method" data-subst="payment_method"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">bank transfer</td>
+            <td data-param="payment_method" data-subst="payment_method">bank transfer</td>
             
             
             
             
-            <td data-param="decline_reason" data-subst="decline_reason"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">fraud check failed</td>
+            <td data-param="decline_reason" data-subst="decline_reason">fraud check failed</td>
             
             
             <td style="text-align:right">
@@ -1664,22 +1652,16 @@ span.param-highlight {
           
           
           
-          <tr class="failed-row"
-              @mouseenter="setHoverRow($event.currentTarget)"
-              @mouseleave="clearHoverRow($event.currentTarget)">
+          <tr data-case-row class="failed-row">
             
             
             
-            <td data-param="payment_method" data-subst="payment_method"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">gift card</td>
+            <td data-param="payment_method" data-subst="payment_method">gift card</td>
             
             
             
             
-            <td data-param="decline_reason" data-subst="decline_reason"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">partial balance</td>
+            <td data-param="decline_reason" data-subst="decline_reason">partial balance</td>
             
             
             <td style="text-align:right">
@@ -1710,7 +1692,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L198">examples/hotel-booking/test_hotel_booking.py:198</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L198">examples/hotel-booking/test_hotel_booking.py:198</a></div>
       
     </div>
     </div>
@@ -1758,7 +1740,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L240">examples/hotel-booking/test_hotel_booking.py:240</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L240">examples/hotel-booking/test_hotel_booking.py:240</a></div>
       
     </div>
     </div>
@@ -2126,7 +2108,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
         
       </div>
       
@@ -2268,7 +2250,7 @@ span.param-highlight {
           
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L116">examples/hotel-booking/test_hotel_booking.py:116</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L116">examples/hotel-booking/test_hotel_booking.py:116</a></div>
         
       </div>
       
@@ -2439,7 +2421,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L56">examples/hotel-booking/test_hotel_booking.py:56</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L56">examples/hotel-booking/test_hotel_booking.py:56</a></div>
                 
               </div>
             </div>
@@ -2518,7 +2500,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L57">examples/hotel-booking/test_hotel_booking.py:57</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L57">examples/hotel-booking/test_hotel_booking.py:57</a></div>
                 
               </div>
             </div>
@@ -2585,7 +2567,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L58">examples/hotel-booking/test_hotel_booking.py:58</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L58">examples/hotel-booking/test_hotel_booking.py:58</a></div>
                 
               </div>
             </div>
@@ -2675,7 +2657,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L60">examples/hotel-booking/test_hotel_booking.py:60</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L60">examples/hotel-booking/test_hotel_booking.py:60</a></div>
                 
               </div>
             </div>
@@ -2742,7 +2724,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L61">examples/hotel-booking/test_hotel_booking.py:61</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L61">examples/hotel-booking/test_hotel_booking.py:61</a></div>
                 
               </div>
             </div>
@@ -2809,7 +2791,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L62">examples/hotel-booking/test_hotel_booking.py:62</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L62">examples/hotel-booking/test_hotel_booking.py:62</a></div>
                 
               </div>
             </div>
@@ -2876,7 +2858,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L63">examples/hotel-booking/test_hotel_booking.py:63</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L63">examples/hotel-booking/test_hotel_booking.py:63</a></div>
                 
               </div>
             </div>
@@ -2931,7 +2913,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L107">examples/hotel-booking/test_hotel_booking.py:107</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L107">examples/hotel-booking/test_hotel_booking.py:107</a></div>
                 
               </div>
             </div>
@@ -3018,7 +3000,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
                 
               </div>
             </div>
@@ -3090,7 +3072,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
                 
               </div>
             </div>
@@ -3162,7 +3144,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
                 
               </div>
             </div>
@@ -3234,7 +3216,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L68">examples/hotel-booking/test_hotel_booking.py:68</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L68">examples/hotel-booking/test_hotel_booking.py:68</a></div>
                 
               </div>
             </div>
@@ -3306,7 +3288,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
                 
               </div>
             </div>
@@ -3380,7 +3362,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
                 
               </div>
             </div>
@@ -3435,7 +3417,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
                 
               </div>
             </div>
@@ -3507,7 +3489,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L75">examples/hotel-booking/test_hotel_booking.py:75</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L75">examples/hotel-booking/test_hotel_booking.py:75</a></div>
                 
               </div>
             </div>
@@ -3579,7 +3561,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
                 
               </div>
             </div>
@@ -3634,7 +3616,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/b7af009c815b33c1e92e54a993f4cced04520a77/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/bdf4e2c9794a7287333013a85d97453518959efa/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
                 
               </div>
             </div>
@@ -3665,1487 +3647,7 @@ span.param-highlight {
 </div>
 
 <script>
-window.__REPORT_DATA__ = {
-  "metadata": {
-    "project": "pytest-given",
-    "timestamp": "2026-08-31T08:40:34.361292+00:00",
-    "pytest_version": "9.0.3",
-    "plugin_version": "0.1.0",
-    "commit_sha": "b7af009c815b33c1e92e54a993f4cced04520a77",
-    "title": "Hotel Booking Example"
-  },
-  "scenarios": [
-    {
-      "id": "examples/hotel-booking/test_hotel_booking.py::test_pick_suite",
-      "narration": {
-        "text": "Carol picks a suite for the group",
-        "parts": []
-      },
-      "module": "test_hotel_booking",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "our organizer Carol",
-            "parts": [
-              {
-                "value": "our organizer "
-              },
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "carol"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "the Deluxe Suite is listed as available",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "room",
-                "display": "Deluxe Suite",
-                "expression": "room(\"Deluxe Suite\")"
-              },
-              {
-                "value": " is listed as available"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "Carol searches for a Room",
-            "parts": [
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "search",
-                "display": "searches for",
-                "expression": "search(\"searches for\")"
-              },
-              {
-                "value": " a "
-              },
-              {
-                "term_id": "room",
-                "display": "Room",
-                "expression": "room"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "Carol selects the Deluxe Suite",
-            "parts": [
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "select",
-                "display": "selects",
-                "expression": "select(\"selects\")"
-              },
-              {
-                "value": " the "
-              },
-              {
-                "term_id": "room",
-                "display": "Deluxe Suite",
-                "expression": "room(\"Deluxe Suite\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Deluxe Suite is held for Carol",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "room",
-                "display": "Deluxe Suite",
-                "expression": "room(\"Deluxe Suite\")"
-              },
-              {
-                "value": " is held for "
-              },
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 148
-      },
-      "story_id": "book-a-group-trip",
-      "activity_ids": []
-    },
-    {
-      "id": "examples/hotel-booking/test_hotel_booking.py::test_complete_booking",
-      "narration": {
-        "text": "Carol completes the booking for both guests",
-        "parts": []
-      },
-      "module": "test_hotel_booking",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "our organizer Carol",
-            "parts": [
-              {
-                "value": "our organizer "
-              },
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "carol"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "our guest Alice",
-            "parts": [
-              {
-                "value": "our guest "
-              },
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "alice"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "our guest Bob",
-            "parts": [
-              {
-                "value": "our guest "
-              },
-              {
-                "term_id": "guest",
-                "display": "Bob",
-                "expression": "guest(\"Bob\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "bob"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "Carol has selected the Deluxe Suite",
-            "parts": [
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
-              },
-              {
-                "value": " has "
-              },
-              {
-                "term_id": "select",
-                "display": "selected",
-                "expression": "select(\"selected\")"
-              },
-              {
-                "value": " the "
-              },
-              {
-                "term_id": "room",
-                "display": "Deluxe Suite",
-                "expression": "room(\"Deluxe Suite\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "Carol adds Alice and Bob to the Booking",
-            "parts": [
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "add",
-                "display": "adds",
-                "expression": "add(\"adds\")"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              },
-              {
-                "value": " and "
-              },
-              {
-                "term_id": "guest",
-                "display": "Bob",
-                "expression": "guest(\"Bob\")"
-              },
-              {
-                "value": " to the "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "Carol submits the Payment for the Booking",
-            "parts": [
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "submit",
-                "display": "submits",
-                "expression": "submit(\"submits\")"
-              },
-              {
-                "value": " the "
-              },
-              {
-                "term_id": "payment",
-                "display": "Payment",
-                "expression": "payment"
-              },
-              {
-                "value": " for the "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Booking System confirms the Booking",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "booking-system",
-                "display": "Booking System",
-                "expression": "booking_system"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "confirm",
-                "display": "confirms",
-                "expression": "confirm(\"confirms\")"
-              },
-              {
-                "value": " the "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Booking System sends the Confirmation to Alice and Bob",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "booking-system",
-                "display": "Booking System",
-                "expression": "booking_system"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "send",
-                "display": "sends",
-                "expression": "send(\"sends\")"
-              },
-              {
-                "value": " the "
-              },
-              {
-                "term_id": "confirmation",
-                "display": "Confirmation",
-                "expression": "confirmation"
-              },
-              {
-                "value": " to "
-              },
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              },
-              {
-                "value": " and "
-              },
-              {
-                "term_id": "guest",
-                "display": "Bob",
-                "expression": "guest(\"Bob\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 163
-      },
-      "story_id": "book-a-group-trip",
-      "activity_ids": []
-    },
-    {
-      "id": "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]",
-      "narration": {
-        "text": "Payment is declined \u2014 the booking is not finalized",
-        "parts": []
-      },
-      "module": "test_hotel_booking",
-      "tags": [],
-      "status": "failed",
-      "duration_ms": 9,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "our organizer Carol",
-            "parts": [
-              {
-                "value": "our organizer "
-              },
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "carol"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "our guest Alice",
-            "parts": [
-              {
-                "value": "our guest "
-              },
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "alice"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "our guest Bob",
-            "parts": [
-              {
-                "value": "our guest "
-              },
-              {
-                "term_id": "guest",
-                "display": "Bob",
-                "expression": "guest(\"Bob\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "bob"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "Carol has added Alice and Bob to the Booking",
-            "parts": [
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
-              },
-              {
-                "value": " has "
-              },
-              {
-                "term_id": "add",
-                "display": "added",
-                "expression": "add(\"added\")"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              },
-              {
-                "value": " and "
-              },
-              {
-                "term_id": "guest",
-                "display": "Bob",
-                "expression": "guest(\"Bob\")"
-              },
-              {
-                "value": " to the "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "Carol submits the Payment by {payment_method} for the Booking",
-            "parts": [
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "submit",
-                "display": "submits",
-                "expression": "submit(\"submits\")"
-              },
-              {
-                "value": " the "
-              },
-              {
-                "term_id": "payment",
-                "display": "Payment",
-                "expression": "payment"
-              },
-              {
-                "value": " by "
-              },
-              {
-                "name": "payment_method",
-                "column_id": "payment_method",
-                "format_spec": "",
-                "conversion": null
-              },
-              {
-                "value": " for the "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Booking System rejects the Payment because of {decline_reason}",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "booking-system",
-                "display": "Booking System",
-                "expression": "booking_system"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "reject",
-                "display": "rejects",
-                "expression": "reject(\"rejects\")"
-              },
-              {
-                "value": " the "
-              },
-              {
-                "term_id": "payment",
-                "display": "Payment",
-                "expression": "payment"
-              },
-              {
-                "value": " because of "
-              },
-              {
-                "name": "decline_reason",
-                "column_id": "decline_reason",
-                "format_spec": "",
-                "conversion": null
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Booking stays pending and no Confirmation is sent to Alice or Bob",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              },
-              {
-                "value": " stays pending and no "
-              },
-              {
-                "term_id": "confirmation",
-                "display": "Confirmation",
-                "expression": "confirmation"
-              },
-              {
-                "value": " is sent to "
-              },
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              },
-              {
-                "value": " or "
-              },
-              {
-                "term_id": "guest",
-                "display": "Bob",
-                "expression": "guest(\"Bob\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": {
-        "columns": [
-          {
-            "id": "payment_method",
-            "name": "payment_method",
-            "kind": "param"
-          },
-          {
-            "id": "decline_reason",
-            "name": "decline_reason",
-            "kind": "param"
-          }
-        ],
-        "cases": [
-          {
-            "values": [
-              "credit card",
-              "insufficient funds"
-            ],
-            "status": "passed",
-            "error": null
-          },
-          {
-            "values": [
-              "debit card",
-              "expired card"
-            ],
-            "status": "passed",
-            "error": null
-          },
-          {
-            "values": [
-              "bank transfer",
-              "fraud check failed"
-            ],
-            "status": "passed",
-            "error": null
-          },
-          {
-            "values": [
-              "gift card",
-              "partial balance"
-            ],
-            "status": "failed",
-            "error": {
-              "message": "assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}",
-              "frames": [
-                {
-                  "path": "examples/hotel-booking/test_hotel_booking.py",
-                  "lineno": 230,
-                  "func": "test_payment_declined",
-                  "code": "    assert payment_method in SUPPORTED_PAYMENT_METHODS",
-                  "is_internal": false
-                }
-              ],
-              "error_tail": "E   AssertionError: assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}"
-            }
-          }
-        ]
-      },
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 198
-      },
-      "story_id": "book-a-group-trip",
-      "activity_ids": []
-    },
-    {
-      "id": "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking",
-      "narration": {
-        "text": "Alice cancels her booking and is refunded",
-        "parts": []
-      },
-      "module": "test_hotel_booking",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "our guest Alice",
-            "parts": [
-              {
-                "value": "our guest "
-              },
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": "alice"
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "Alice has a confirmed Booking she paid for",
-            "parts": [
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              },
-              {
-                "value": " has a confirmed "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              },
-              {
-                "value": " she paid for"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "Alice cancels the Booking",
-            "parts": [
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "cancel",
-                "display": "cancels",
-                "expression": "cancel(\"cancels\")"
-              },
-              {
-                "value": " the "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Booking System refunds the Payment for the Booking",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "booking-system",
-                "display": "Booking System",
-                "expression": "booking_system"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "refund",
-                "display": "refunds",
-                "expression": "refund(\"refunds\")"
-              },
-              {
-                "value": " the "
-              },
-              {
-                "term_id": "payment",
-                "display": "Payment",
-                "expression": "payment"
-              },
-              {
-                "value": " for the "
-              },
-              {
-                "term_id": "booking",
-                "display": "Booking",
-                "expression": "booking"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Booking System sends a Confirmation to Alice",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "booking-system",
-                "display": "Booking System",
-                "expression": "booking_system"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "send",
-                "display": "sends",
-                "expression": "send(\"sends\")"
-              },
-              {
-                "value": " a "
-              },
-              {
-                "term_id": "confirmation",
-                "display": "Confirmation",
-                "expression": "confirmation"
-              },
-              {
-                "value": " to "
-              },
-              {
-                "term_id": "guest",
-                "display": "Alice",
-                "expression": "guest(\"Alice\")"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 240
-      },
-      "story_id": "cancel-a-booking",
-      "activity_ids": []
-    }
-  ],
-  "glossary": {
-    "terms": [
-      {
-        "id": "organizer",
-        "kind": "actor",
-        "canonical": "Organizer",
-        "definition": "Person booking accommodation on behalf of a group.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 56
-        }
-      },
-      {
-        "id": "guest",
-        "kind": "actor",
-        "canonical": "Guest",
-        "definition": "Individual traveler in the group.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 57
-        }
-      },
-      {
-        "id": "booking-system",
-        "kind": "actor",
-        "canonical": "Booking System",
-        "definition": "Automated reservation back-end.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 58
-        }
-      },
-      {
-        "id": "room",
-        "kind": "object",
-        "canonical": "Room",
-        "definition": "A bookable hotel room.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 60
-        }
-      },
-      {
-        "id": "booking",
-        "kind": "object",
-        "canonical": "Booking",
-        "definition": "A reservation for one or more rooms.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 61
-        }
-      },
-      {
-        "id": "payment",
-        "kind": "object",
-        "canonical": "Payment",
-        "definition": "Money transferred for a booking.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 62
-        }
-      },
-      {
-        "id": "confirmation",
-        "kind": "object",
-        "canonical": "Confirmation",
-        "definition": "Notification of a successful booking.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 63
-        }
-      },
-      {
-        "id": "search",
-        "kind": "verb",
-        "canonical": "search",
-        "definition": "Look up available options.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 65
-        }
-      },
-      {
-        "id": "select",
-        "kind": "verb",
-        "canonical": "select",
-        "definition": "Choose one option from a set.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 66
-        }
-      },
-      {
-        "id": "add",
-        "kind": "verb",
-        "canonical": "add",
-        "definition": "Attach a member to a collection.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 67
-        }
-      },
-      {
-        "id": "submit",
-        "kind": "verb",
-        "canonical": "submit",
-        "definition": "Send to the system for processing.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 68
-        }
-      },
-      {
-        "id": "confirm",
-        "kind": "verb",
-        "canonical": "confirm",
-        "definition": "Finalize and acknowledge.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 69
-        }
-      },
-      {
-        "id": "send",
-        "kind": "verb",
-        "canonical": "send",
-        "definition": "Deliver to a recipient.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 70
-        }
-      },
-      {
-        "id": "reject",
-        "kind": "verb",
-        "canonical": "reject",
-        "definition": "Refuse to process or accept.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 73
-        }
-      },
-      {
-        "id": "cancel",
-        "kind": "verb",
-        "canonical": "cancel",
-        "definition": "Withdraw a booking before arrival.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 75
-        }
-      },
-      {
-        "id": "refund",
-        "kind": "verb",
-        "canonical": "refund",
-        "definition": "Return money for a cancelled booking.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 76
-        }
-      },
-      {
-        "id": "redeems",
-        "kind": "verb",
-        "canonical": "redeems",
-        "definition": null,
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 106
-        }
-      },
-      {
-        "id": "loyalty-points",
-        "kind": "object",
-        "canonical": "loyalty points",
-        "definition": null,
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 107
-        }
-      }
-    ]
-  },
-  "stories": [
-    {
-      "id": "book-a-group-trip",
-      "title": "Book a Group Trip",
-      "activities": [
-        {
-          "id": 1,
-          "paths": [
-            {
-              "parts": [
-                {
-                  "term_id": "organizer",
-                  "display": "Carol"
-                },
-                {
-                  "term_id": "search",
-                  "display": "searches for"
-                },
-                {
-                  "term_id": "room",
-                  "display": "Room"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "paths": [
-            {
-              "parts": [
-                {
-                  "term_id": "organizer",
-                  "display": "Carol"
-                },
-                {
-                  "term_id": "select",
-                  "display": "selects"
-                },
-                {
-                  "term_id": "room",
-                  "display": "Deluxe Suite"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": 3,
-          "paths": [
-            {
-              "parts": [
-                {
-                  "term_id": "organizer",
-                  "display": "Carol"
-                },
-                {
-                  "term_id": "add",
-                  "display": "adds"
-                },
-                {
-                  "term_id": "guest",
-                  "display": "Alice"
-                },
-                {
-                  "text": "to"
-                },
-                {
-                  "term_id": "booking",
-                  "display": "Booking"
-                }
-              ]
-            },
-            {
-              "parts": [
-                {
-                  "term_id": "organizer",
-                  "display": "Carol"
-                },
-                {
-                  "term_id": "add",
-                  "display": "adds"
-                },
-                {
-                  "term_id": "guest",
-                  "display": "Bob"
-                },
-                {
-                  "text": "to"
-                },
-                {
-                  "term_id": "booking",
-                  "display": "Booking"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": 4,
-          "paths": [
-            {
-              "parts": [
-                {
-                  "term_id": "organizer",
-                  "display": "Carol"
-                },
-                {
-                  "term_id": "submit",
-                  "display": "submits"
-                },
-                {
-                  "term_id": "payment",
-                  "display": "Payment"
-                },
-                {
-                  "text": "for"
-                },
-                {
-                  "term_id": "booking",
-                  "display": "Booking"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": 5,
-          "paths": [
-            {
-              "parts": [
-                {
-                  "term_id": "booking-system",
-                  "display": "Booking System"
-                },
-                {
-                  "term_id": "confirm",
-                  "display": "confirms"
-                },
-                {
-                  "term_id": "booking",
-                  "display": "Booking"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": 6,
-          "paths": [
-            {
-              "parts": [
-                {
-                  "term_id": "booking-system",
-                  "display": "Booking System"
-                },
-                {
-                  "term_id": "send",
-                  "display": "sends"
-                },
-                {
-                  "term_id": "confirmation",
-                  "display": "Confirmation"
-                },
-                {
-                  "text": "to"
-                },
-                {
-                  "term_id": "guest",
-                  "display": "Alice"
-                }
-              ]
-            },
-            {
-              "parts": [
-                {
-                  "term_id": "booking-system",
-                  "display": "Booking System"
-                },
-                {
-                  "term_id": "send",
-                  "display": "sends"
-                },
-                {
-                  "term_id": "confirmation",
-                  "display": "Confirmation"
-                },
-                {
-                  "text": "to"
-                },
-                {
-                  "term_id": "guest",
-                  "display": "Bob"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": 7,
-          "paths": [
-            {
-              "parts": [
-                {
-                  "term_id": "organizer",
-                  "display": "Carol"
-                },
-                {
-                  "term_id": "redeems",
-                  "display": "redeems"
-                },
-                {
-                  "term_id": "loyalty-points",
-                  "display": "loyalty points"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "source": {
-        "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 79
-      }
-    },
-    {
-      "id": "cancel-a-booking",
-      "title": "Cancel a Booking",
-      "activities": [
-        {
-          "id": 1,
-          "paths": [
-            {
-              "parts": [
-                {
-                  "term_id": "guest",
-                  "display": "Alice"
-                },
-                {
-                  "term_id": "cancel",
-                  "display": "cancels"
-                },
-                {
-                  "term_id": "booking",
-                  "display": "Booking"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "paths": [
-            {
-              "parts": [
-                {
-                  "term_id": "booking-system",
-                  "display": "Booking System"
-                },
-                {
-                  "term_id": "refund",
-                  "display": "refunds"
-                },
-                {
-                  "term_id": "payment",
-                  "display": "Payment"
-                },
-                {
-                  "text": "for"
-                },
-                {
-                  "term_id": "booking",
-                  "display": "Booking"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": 3,
-          "paths": [
-            {
-              "parts": [
-                {
-                  "term_id": "booking-system",
-                  "display": "Booking System"
-                },
-                {
-                  "term_id": "send",
-                  "display": "sends"
-                },
-                {
-                  "term_id": "confirmation",
-                  "display": "Confirmation"
-                },
-                {
-                  "text": "to"
-                },
-                {
-                  "term_id": "guest",
-                  "display": "Alice"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "source": {
-        "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 116
-      }
-    }
-  ]
-};
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-08-31T10:26:09.665229+00:00\"},\"glossary\":{\"terms\":[{\"id\":\"organizer\",\"canonical\":\"Organizer\",\"kind\":\"actor\",\"definition\":\"Person booking accommodation on behalf of a group.\"},{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Individual traveler in the group.\"},{\"id\":\"booking-system\",\"canonical\":\"Booking System\",\"kind\":\"actor\",\"definition\":\"Automated reservation back-end.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one or more rooms.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"Notification of a successful booking.\"},{\"id\":\"search\",\"canonical\":\"search\",\"kind\":\"verb\",\"definition\":\"Look up available options.\"},{\"id\":\"select\",\"canonical\":\"select\",\"kind\":\"verb\",\"definition\":\"Choose one option from a set.\"},{\"id\":\"add\",\"canonical\":\"add\",\"kind\":\"verb\",\"definition\":\"Attach a member to a collection.\"},{\"id\":\"submit\",\"canonical\":\"submit\",\"kind\":\"verb\",\"definition\":\"Send to the system for processing.\"},{\"id\":\"confirm\",\"canonical\":\"confirm\",\"kind\":\"verb\",\"definition\":\"Finalize and acknowledge.\"},{\"id\":\"send\",\"canonical\":\"send\",\"kind\":\"verb\",\"definition\":\"Deliver to a recipient.\"},{\"id\":\"reject\",\"canonical\":\"reject\",\"kind\":\"verb\",\"definition\":\"Refuse to process or accept.\"},{\"id\":\"cancel\",\"canonical\":\"cancel\",\"kind\":\"verb\",\"definition\":\"Withdraw a booking before arrival.\"},{\"id\":\"refund\",\"canonical\":\"refund\",\"kind\":\"verb\",\"definition\":\"Return money for a cancelled booking.\"},{\"id\":\"redeems\",\"canonical\":\"redeems\",\"kind\":\"verb\",\"definition\":null},{\"id\":\"loyalty-points\",\"canonical\":\"loyalty points\",\"kind\":\"object\",\"definition\":null}]},\"scenarios\":[{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"story_id\":\"book-a-group-trip\",\"narration\":{\"text\":\"Carol picks a suite for the group\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"story_id\":\"book-a-group-trip\",\"narration\":{\"text\":\"Carol completes the booking for both guests\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"failed\",\"story_id\":\"book-a-group-trip\",\"narration\":{\"text\":\"Payment is declined \\u2014 the booking is not finalized\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"story_id\":\"cancel-a-booking\",\"narration\":{\"text\":\"Alice cancels her booking and is refunded\"}}]}");
 window.__storyIds = ["book-a-group-trip", "cancel-a-booking"];
 window.__termIds = ["organizer", "guest", "booking-system", "room", "booking", "payment", "confirmation", "search", "select", "add", "submit", "confirm", "send", "reject", "cancel", "refund", "redeems", "loyalty-points"];
 window.__termScenarios = {"organizer": ["examples/hotel-booking/test_hotel_booking.py::test_pick_suite", "examples/hotel-booking/test_hotel_booking.py::test_complete_booking", "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "room": ["examples/hotel-booking/test_hotel_booking.py::test_pick_suite", "examples/hotel-booking/test_hotel_booking.py::test_complete_booking"], "search": ["examples/hotel-booking/test_hotel_booking.py::test_pick_suite"], "select": ["examples/hotel-booking/test_hotel_booking.py::test_pick_suite", "examples/hotel-booking/test_hotel_booking.py::test_complete_booking"], "guest": ["examples/hotel-booking/test_hotel_booking.py::test_complete_booking", "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]", "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking"], "add": ["examples/hotel-booking/test_hotel_booking.py::test_complete_booking", "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "booking": ["examples/hotel-booking/test_hotel_booking.py::test_complete_booking", "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]", "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking"], "submit": ["examples/hotel-booking/test_hotel_booking.py::test_complete_booking", "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "payment": ["examples/hotel-booking/test_hotel_booking.py::test_complete_booking", "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]", "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking"], "booking-system": ["examples/hotel-booking/test_hotel_booking.py::test_complete_booking", "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]", "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking"], "confirm": ["examples/hotel-booking/test_hotel_booking.py::test_complete_booking"], "send": ["examples/hotel-booking/test_hotel_booking.py::test_complete_booking", "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking"], "confirmation": ["examples/hotel-booking/test_hotel_booking.py::test_complete_booking", "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]", "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking"], "reject": ["examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]"], "cancel": ["examples/hotel-booking/test_hotel_booking.py::test_cancel_booking"], "refund": ["examples/hotel-booking/test_hotel_booking.py::test_cancel_booking"]};
@@ -5219,7 +3721,21 @@ const SIDEBAR_MAX = 480;
 const SIDEBAR_DEFAULT = 260;
 const clampSidebar = w => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, Math.round(w)));
 
+// Segments every module shares carry no information — `tests` above a suite
+// rooted there is a row and an indent that say nothing. Never eats a module's
+// last segment, or a lone module would render nameless.
+function commonDepth(modules) {
+  if (!modules.length) return 0;
+  const split = modules.map(m => m.split('.'));
+  const first = split[0];
+  let i = 0;
+  while (i < first.length - 1
+         && split.every(parts => parts.length > i + 1 && parts[i] === first[i])) i++;
+  return i;
+}
+
 function reportApp() {
+  // The slim projection `html_renderer._app_data` emits, not the whole report.
   const data = window.__REPORT_DATA__;
   const storyIds = window.__storyIds || [];
   const glossaryTerms = (data.glossary && data.glossary.terms) || [];
@@ -5249,9 +3765,11 @@ function reportApp() {
     failed: data.scenarios.filter(s => s.status === 'failed').length,
     skipped: data.scenarios.filter(s => s.status === 'skipped').length,
   };
-  // A closure variable, not state: writing it from inside a reactive effect
+  const moduleSkipDepth = commonDepth(allModules);
+  // Closure variables, not state: writing one from inside a reactive effect
   // that also reads it would re-trigger that effect.
   let visibleCache = null;
+  let termCountCache = null;
   return {
     search: '',
     // Modules is the only axis every report has: a suite may carry no tags and
@@ -5322,25 +3840,33 @@ function reportApp() {
     // headings and their counts are Jinja-rendered report totals, so without
     // this a search matching nothing leaves them standing over an empty page.
     visibleTermCount(kind) {
+      return this._termCounts()[kind] || 0;
+    },
+    // One pass per filter change, not the twelve the four kind sections ask
+    // for. Cached as `_visible` is, and for the same reason.
+    _termCounts() {
+      const key = this.glossarySearch + '\u0000' + this.glossaryDefinitionFilter;
+      if (termCountCache && termCountCache.key === key) return termCountCache.value;
       const q = this.glossarySearch.toLowerCase();
       const wantUndefined = this.glossaryDefinitionFilter === 'undefined';
-      let n = 0;
+      const counts = {};
       for (const t of glossaryTerms) {
-        if ((t.kind || 'kindless') !== kind) continue;
         if (this.glossaryDefinitionFilter !== 'all'
             && wantUndefined !== (t.definition === null || t.definition === undefined)) continue;
         if (q && !t.canonical.toLowerCase().includes(q)) continue;
-        n++;
+        const kind = t.kind || 'kindless';
+        counts[kind] = (counts[kind] || 0) + 1;
       }
-      return n;
+      termCountCache = { key, value: counts };
+      return counts;
     },
     visibleTermLabel(kind) {
       const n = this.visibleTermCount(kind);
       return n + (n === 1 ? ' term' : ' terms');
     },
     get anyTermsVisible() {
-      return ['actor', 'object', 'verb', 'kindless']
-        .some(k => this.visibleTermCount(k) > 0);
+      const counts = this._termCounts();
+      return ['actor', 'object', 'verb', 'kindless'].some(k => counts[k] > 0);
     },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
@@ -5389,21 +3915,23 @@ function reportApp() {
     },
     // Computed once per filter change instead of once per reader. Reading the
     // filter state here still registers each caller's reactive dependencies;
-    // the cache only stops the O(n) scan repeating within one pass. Control
-    // characters delimit the key — a tag and the search box carry any text.
+    // the cache only stops the O(n) scan repeating within one pass. The array
+    // filters compare by identity — both are replaced, never mutated.
     _visible() {
-      const key = [
+      const state = [
         this.showPassed, this.showFailed, this.showSkipped,
         this.moduleFilter, this.activityFilter, this.search,
-        this.tagFilters.join('\u0001'), this.termFilters.join('\u0001'),
-      ].join('\u0000');
-      if (visibleCache && visibleCache.key === key) return visibleCache.value;
+        this.tagFilters, this.termFilters,
+      ];
+      if (visibleCache && visibleCache.state.every((v, i) => v === state[i])) {
+        return visibleCache.value;
+      }
       const query = this.search.toLowerCase();
       const value = new Set();
       for (let i = 0; i < data.scenarios.length; i++) {
         if (this._matchesFilters(data.scenarios[i], i, query)) value.add(i);
       }
-      visibleCache = { key, value };
+      visibleCache = { state, value };
       return value;
     },
     // Every axis renders as the same flat list of rows carrying their own
@@ -5448,7 +3976,7 @@ function reportApp() {
       // Depth comes from every module in the report, not the filtered subset:
       // selecting a package narrows the tree to it, and a prefix recomputed
       // from that subset would strip the selected row itself out of view.
-      const skip = this._commonDepth(allModules);
+      const skip = moduleSkipDepth;
       const root = {};
       for (const m of modules) {
         let node = root;
@@ -5486,19 +4014,6 @@ function reportApp() {
       return Object.values(node.__kids).reduce(
         (n, kid) => n + (counts[kid.__id] || 0) + this._subtreeCount(kid, counts), 0);
     },
-    // Segments every module shares carry no information — `tests` above a
-    // suite rooted there is a row and an indent that say nothing. Never eats
-    // a module's last segment, or a lone module would render nameless.
-    _commonDepth(modules) {
-      const first = modules[0].split('.');
-      let i = 0;
-      while (i < first.length - 1
-             && modules.every(m => {
-               const parts = m.split('.');
-               return parts.length > i + 1 && parts[i] === first[i];
-             })) i++;
-      return i;
-    },
     // Selected groups pin to the top so what you filtered by stays in view:
     // arriving from the Glossary tab, the term you came for is the first row
     // rather than somewhere down the list. Below the pin the sort toggle
@@ -5528,11 +4043,17 @@ function reportApp() {
           if (s.tags.length) return false;
         } else if (!s.tags.includes(tag)) return false;
       }
-      for (const termId of this.termFilters) {
-        if (termId === NO_TERMS) {
-          if ((scenarioTerms[s.id] || []).length) return false;
-        } else if (!lookup(termScenarios, termId, []).includes(s.id)) {
-          return false;
+      // Read off the scenario's own term list, not the term's scenario list:
+      // one index either way, but a term names thousands of scenarios and a
+      // scenario a handful, and the long side made the pass quadratic.
+      if (this.termFilters.length) {
+        const own = lookup(scenarioTerms, s.id, []);
+        for (const termId of this.termFilters) {
+          if (termId === NO_TERMS) {
+            if (own.length) return false;
+          } else if (!own.includes(termId)) {
+            return false;
+          }
         }
       }
       if (this.activityFilter) {
@@ -5771,8 +4292,11 @@ function reportApp() {
         return false;
       }
     },
+    // Scoped to one card; the `document` fallback this replaces queried the
+    // whole report.
     setHoverParam(name, el) {
-      const scope = el?.closest('.scenario') || document;
+      const scope = el?.closest('.scenario');
+      if (!scope) return;
       scope.querySelectorAll('.param-highlight').forEach(e => e.classList.remove('param-highlight'));
       if (!name) return;
       const safe = CSS.escape(name);
@@ -5855,6 +4379,36 @@ function reportApp() {
         this.goToScenarioFresh(link.dataset.gotoScenario);
       });
       this._initTermTooltip();
+      this._initParamHover();
+    },
+    // Parameter-table hover, delegated. A per-cell `@mouseenter` pair was
+    // ~60% of every Alpine directive on a large report, and seconds of its
+    // startup. `pointerover`, not `mouseenter`, because only it bubbles.
+    _initParamHover() {
+      let cell = null;
+      let row = null;
+      const leaveCell = () => { if (cell) { this.setHoverParam(null, cell); cell = null; } };
+      const leaveRow = () => { if (row) { this.clearHoverRow(row); row = null; } };
+      document.addEventListener('pointerover', (event) => {
+        const nextRow = event.target.closest('tr[data-case-row]');
+        if (nextRow !== row) {
+          leaveRow();
+          row = nextRow;
+          if (row) this.setHoverRow(row);
+        }
+        const nextCell = event.target.closest('[data-param]');
+        if (nextCell !== cell) {
+          leaveCell();
+          cell = nextCell;
+          if (cell) this.setHoverParam(cell.dataset.param, cell);
+        }
+      });
+      // A pointer leaving the window fires no further `pointerover`.
+      document.addEventListener('pointerout', (event) => {
+        if (event.relatedTarget) return;
+        leaveRow();
+        leaveCell();
+      });
     },
     // One shared tooltip for every term ref, positioned `fixed` from the
     // ref's bounding box rather than done in CSS: term refs live inside
@@ -5865,7 +4419,7 @@ function reportApp() {
       if (!tip) return;
       const nameEl = tip.querySelector('.term-tip-name');
       const defEl = tip.querySelector('.term-tip-def');
-      const hide = () => { tip.hidden = true; };
+      const hide = () => { if (!tip.hidden) tip.hidden = true; };
       document.addEventListener('pointerover', (event) => {
         const pill = event.target.closest('[data-term-name]');
         if (!pill) { return; }
@@ -5897,7 +4451,7 @@ function reportApp() {
         hide();
       });
       // Tooltip is positioned in viewport coords; any scroll invalidates it.
-      window.addEventListener('scroll', hide, true);
+      window.addEventListener('scroll', hide, { capture: true, passive: true });
     },
     _readHash() {
       // Applying state from the hash must not itself write the hash (which

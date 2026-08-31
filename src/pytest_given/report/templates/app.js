@@ -65,7 +65,21 @@ const SIDEBAR_MAX = 480;
 const SIDEBAR_DEFAULT = 260;
 const clampSidebar = w => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, Math.round(w)));
 
+// Segments every module shares carry no information — `tests` above a suite
+// rooted there is a row and an indent that say nothing. Never eats a module's
+// last segment, or a lone module would render nameless.
+function commonDepth(modules) {
+  if (!modules.length) return 0;
+  const split = modules.map(m => m.split('.'));
+  const first = split[0];
+  let i = 0;
+  while (i < first.length - 1
+         && split.every(parts => parts.length > i + 1 && parts[i] === first[i])) i++;
+  return i;
+}
+
 function reportApp() {
+  // The slim projection `html_renderer._app_data` emits, not the whole report.
   const data = window.__REPORT_DATA__;
   const storyIds = window.__storyIds || [];
   const glossaryTerms = (data.glossary && data.glossary.terms) || [];
@@ -95,9 +109,11 @@ function reportApp() {
     failed: data.scenarios.filter(s => s.status === 'failed').length,
     skipped: data.scenarios.filter(s => s.status === 'skipped').length,
   };
-  // A closure variable, not state: writing it from inside a reactive effect
+  const moduleSkipDepth = commonDepth(allModules);
+  // Closure variables, not state: writing one from inside a reactive effect
   // that also reads it would re-trigger that effect.
   let visibleCache = null;
+  let termCountCache = null;
   return {
     search: '',
     // Modules is the only axis every report has: a suite may carry no tags and
@@ -168,25 +184,33 @@ function reportApp() {
     // headings and their counts are Jinja-rendered report totals, so without
     // this a search matching nothing leaves them standing over an empty page.
     visibleTermCount(kind) {
+      return this._termCounts()[kind] || 0;
+    },
+    // One pass per filter change, not the twelve the four kind sections ask
+    // for. Cached as `_visible` is, and for the same reason.
+    _termCounts() {
+      const key = this.glossarySearch + '\u0000' + this.glossaryDefinitionFilter;
+      if (termCountCache && termCountCache.key === key) return termCountCache.value;
       const q = this.glossarySearch.toLowerCase();
       const wantUndefined = this.glossaryDefinitionFilter === 'undefined';
-      let n = 0;
+      const counts = {};
       for (const t of glossaryTerms) {
-        if ((t.kind || 'kindless') !== kind) continue;
         if (this.glossaryDefinitionFilter !== 'all'
             && wantUndefined !== (t.definition === null || t.definition === undefined)) continue;
         if (q && !t.canonical.toLowerCase().includes(q)) continue;
-        n++;
+        const kind = t.kind || 'kindless';
+        counts[kind] = (counts[kind] || 0) + 1;
       }
-      return n;
+      termCountCache = { key, value: counts };
+      return counts;
     },
     visibleTermLabel(kind) {
       const n = this.visibleTermCount(kind);
       return n + (n === 1 ? ' term' : ' terms');
     },
     get anyTermsVisible() {
-      return ['actor', 'object', 'verb', 'kindless']
-        .some(k => this.visibleTermCount(k) > 0);
+      const counts = this._termCounts();
+      return ['actor', 'object', 'verb', 'kindless'].some(k => counts[k] > 0);
     },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
@@ -235,21 +259,23 @@ function reportApp() {
     },
     // Computed once per filter change instead of once per reader. Reading the
     // filter state here still registers each caller's reactive dependencies;
-    // the cache only stops the O(n) scan repeating within one pass. Control
-    // characters delimit the key — a tag and the search box carry any text.
+    // the cache only stops the O(n) scan repeating within one pass. The array
+    // filters compare by identity — both are replaced, never mutated.
     _visible() {
-      const key = [
+      const state = [
         this.showPassed, this.showFailed, this.showSkipped,
         this.moduleFilter, this.activityFilter, this.search,
-        this.tagFilters.join('\u0001'), this.termFilters.join('\u0001'),
-      ].join('\u0000');
-      if (visibleCache && visibleCache.key === key) return visibleCache.value;
+        this.tagFilters, this.termFilters,
+      ];
+      if (visibleCache && visibleCache.state.every((v, i) => v === state[i])) {
+        return visibleCache.value;
+      }
       const query = this.search.toLowerCase();
       const value = new Set();
       for (let i = 0; i < data.scenarios.length; i++) {
         if (this._matchesFilters(data.scenarios[i], i, query)) value.add(i);
       }
-      visibleCache = { key, value };
+      visibleCache = { state, value };
       return value;
     },
     // Every axis renders as the same flat list of rows carrying their own
@@ -294,7 +320,7 @@ function reportApp() {
       // Depth comes from every module in the report, not the filtered subset:
       // selecting a package narrows the tree to it, and a prefix recomputed
       // from that subset would strip the selected row itself out of view.
-      const skip = this._commonDepth(allModules);
+      const skip = moduleSkipDepth;
       const root = {};
       for (const m of modules) {
         let node = root;
@@ -332,19 +358,6 @@ function reportApp() {
       return Object.values(node.__kids).reduce(
         (n, kid) => n + (counts[kid.__id] || 0) + this._subtreeCount(kid, counts), 0);
     },
-    // Segments every module shares carry no information — `tests` above a
-    // suite rooted there is a row and an indent that say nothing. Never eats
-    // a module's last segment, or a lone module would render nameless.
-    _commonDepth(modules) {
-      const first = modules[0].split('.');
-      let i = 0;
-      while (i < first.length - 1
-             && modules.every(m => {
-               const parts = m.split('.');
-               return parts.length > i + 1 && parts[i] === first[i];
-             })) i++;
-      return i;
-    },
     // Selected groups pin to the top so what you filtered by stays in view:
     // arriving from the Glossary tab, the term you came for is the first row
     // rather than somewhere down the list. Below the pin the sort toggle
@@ -374,11 +387,17 @@ function reportApp() {
           if (s.tags.length) return false;
         } else if (!s.tags.includes(tag)) return false;
       }
-      for (const termId of this.termFilters) {
-        if (termId === NO_TERMS) {
-          if ((scenarioTerms[s.id] || []).length) return false;
-        } else if (!lookup(termScenarios, termId, []).includes(s.id)) {
-          return false;
+      // Read off the scenario's own term list, not the term's scenario list:
+      // one index either way, but a term names thousands of scenarios and a
+      // scenario a handful, and the long side made the pass quadratic.
+      if (this.termFilters.length) {
+        const own = lookup(scenarioTerms, s.id, []);
+        for (const termId of this.termFilters) {
+          if (termId === NO_TERMS) {
+            if (own.length) return false;
+          } else if (!own.includes(termId)) {
+            return false;
+          }
         }
       }
       if (this.activityFilter) {
@@ -617,8 +636,11 @@ function reportApp() {
         return false;
       }
     },
+    // Scoped to one card; the `document` fallback this replaces queried the
+    // whole report.
     setHoverParam(name, el) {
-      const scope = el?.closest('.scenario') || document;
+      const scope = el?.closest('.scenario');
+      if (!scope) return;
       scope.querySelectorAll('.param-highlight').forEach(e => e.classList.remove('param-highlight'));
       if (!name) return;
       const safe = CSS.escape(name);
@@ -701,6 +723,36 @@ function reportApp() {
         this.goToScenarioFresh(link.dataset.gotoScenario);
       });
       this._initTermTooltip();
+      this._initParamHover();
+    },
+    // Parameter-table hover, delegated. A per-cell `@mouseenter` pair was
+    // ~60% of every Alpine directive on a large report, and seconds of its
+    // startup. `pointerover`, not `mouseenter`, because only it bubbles.
+    _initParamHover() {
+      let cell = null;
+      let row = null;
+      const leaveCell = () => { if (cell) { this.setHoverParam(null, cell); cell = null; } };
+      const leaveRow = () => { if (row) { this.clearHoverRow(row); row = null; } };
+      document.addEventListener('pointerover', (event) => {
+        const nextRow = event.target.closest('tr[data-case-row]');
+        if (nextRow !== row) {
+          leaveRow();
+          row = nextRow;
+          if (row) this.setHoverRow(row);
+        }
+        const nextCell = event.target.closest('[data-param]');
+        if (nextCell !== cell) {
+          leaveCell();
+          cell = nextCell;
+          if (cell) this.setHoverParam(cell.dataset.param, cell);
+        }
+      });
+      // A pointer leaving the window fires no further `pointerover`.
+      document.addEventListener('pointerout', (event) => {
+        if (event.relatedTarget) return;
+        leaveRow();
+        leaveCell();
+      });
     },
     // One shared tooltip for every term ref, positioned `fixed` from the
     // ref's bounding box rather than done in CSS: term refs live inside
@@ -711,7 +763,7 @@ function reportApp() {
       if (!tip) return;
       const nameEl = tip.querySelector('.term-tip-name');
       const defEl = tip.querySelector('.term-tip-def');
-      const hide = () => { tip.hidden = true; };
+      const hide = () => { if (!tip.hidden) tip.hidden = true; };
       document.addEventListener('pointerover', (event) => {
         const pill = event.target.closest('[data-term-name]');
         if (!pill) { return; }
@@ -743,7 +795,7 @@ function reportApp() {
         hide();
       });
       // Tooltip is positioned in viewport coords; any scroll invalidates it.
-      window.addEventListener('scroll', hide, true);
+      window.addEventListener('scroll', hide, { capture: true, passive: true });
     },
     _readHash() {
       // Applying state from the hash must not itself write the hash (which

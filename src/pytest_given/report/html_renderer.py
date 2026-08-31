@@ -20,7 +20,6 @@ from ..model import (
     ReportData,
     Scenario,
     SourceLocation,
-    report_to_dict,
 )
 from .aggregations import (
     build_activity_labels,
@@ -59,13 +58,59 @@ def _neutralize_script_data(text: str) -> str:
     return text.replace('</', '<\\/').replace('<!--', '\\u003C!--')
 
 
-def _script_json(value: object, *, indent: int | None = None) -> Markup:
+def _script_json(value: object) -> Markup:
     """Serialize `value` to JSON for embedding in an inline `<script>`, with the
     tokenizer-steering sequences neutralized. `json.dumps` escapes neither of
     them inside string literals, and these blobs carry user-controlled node ids
-    and attachment payloads.
+    and activity prose.
     """
-    return Markup(_neutralize_script_data(json.dumps(value, indent=indent)))
+    return Markup(_neutralize_script_data(json.dumps(value)))
+
+
+def _script_json_parse(value: object) -> Markup:
+    """Serialize `value` as a `JSON.parse(...)` call rather than a JS object
+    literal: an engine reads a JSON string faster than the equivalent source,
+    and this is the largest blob on the page."""
+    payload = json.dumps(json.dumps(value, separators=(',', ':')))
+    return Markup('JSON.parse(' + _neutralize_script_data(payload) + ')')
+
+
+def _app_data(report: ReportData) -> dict[str, object]:
+    """The projection of the report that `app.js` seeds its state from.
+
+    Not the whole report: everything the page displays is already rendered into
+    the markup, and a second copy of every step, traceback and attachment
+    payload was the biggest single thing in a large report's HTML. Adding a
+    field to `reportApp` means adding it here."""
+    return {
+        'metadata': {'timestamp': report.metadata.timestamp},
+        'glossary': (
+            {
+                'terms': [
+                    {
+                        'id': term.id,
+                        'canonical': term.canonical,
+                        'kind': term.kind,
+                        'definition': term.definition,
+                    }
+                    for term in report.glossary.terms
+                ]
+            }
+            if report.glossary is not None
+            else None
+        ),
+        'scenarios': [
+            {
+                'id': scenario.id,
+                'module': scenario.module,
+                'tags': scenario.tags,
+                'status': scenario.status,
+                'story_id': scenario.story_id,
+                'narration': {'text': scenario.narration.text},
+            }
+            for scenario in report.scenarios
+        ],
+    }
 
 
 def _inline_md(text: str | None) -> Markup:
@@ -167,7 +212,7 @@ def _render_context(
         'scenario_slugs_json': _script_json(
             {slug: node_id for node_id, slug in scenario_slugs.items()}
         ),
-        'report_json': _script_json(report_to_dict(report), indent=2),
+        'app_data_js': _script_json_parse(_app_data(report)),
         **_bundled_assets(),
     }
 
@@ -271,18 +316,15 @@ def _render_narration_part(
             # palette keys on `name` instead, so one parameter reads the same
             # color everywhere. `data-subst` is row-hover substitution's own.
             #
-            # Both go in data-* and are read back off the element: interpolating
-            # into the Alpine expression would be an injection, since Alpine
-            # compiles a directive's *decoded* attribute text as JS.
+            # Both are plain data-*, read back by the delegated hover listener
+            # in `app.js`. No Alpine directive here: interpolating into one
+            # would be an injection, since Alpine compiles a directive's
+            # *decoded* attribute text as JS.
             safe_id = escape(column_id)
-            enter = 'setHoverParam($el.dataset.param, $event.currentTarget)'
-            leave = 'setHoverParam(null, $event.currentTarget)'
             return (
                 f'<span class="param-color-{color_idx}" '
                 f'data-param="{safe_id}" '
-                f'data-subst="{safe_id}" '
-                f'@mouseenter="{enter}" '
-                f'@mouseleave="{leave}"'
+                f'data-subst="{safe_id}"'
                 f'>{escape(label)}</span>'
             )
         case NarrationTermRef():

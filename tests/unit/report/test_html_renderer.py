@@ -489,9 +489,10 @@ def test_render_value_part_uses_value_highlight_class(tmp_path: Path) -> None:
 
 
 def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
-    """Attachment content containing `</script>` must not break out of the
-    inline `<script>` block — JSON doesn't escape `</` inside string literals,
-    so the renderer must escape it on the way in."""
+    """Report text containing `</script>` must not break out of its block on
+    either path: the attachment payload is escaped as markup, and the narration
+    the data blob carries is escaped on the way in — JSON escapes `</` in
+    neither."""
     json_path = tmp_path / 'data.json'
     json_path.write_text(
         json.dumps(
@@ -505,7 +506,7 @@ def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
                 'scenarios': [
                     {
                         'id': 'i',
-                        'narration': _narration('XSS'),
+                        'narration': _narration('</script><script>alert(1)</script>'),
                         'module': 'm',
                         'tags': [],
                         'status': 'passed',
@@ -536,7 +537,7 @@ def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     # The template emits exactly two `</script>` tags (data block + alpine block).
-    # An unescaped attachment payload would add a third.
+    # An unescaped attachment payload or narration would add more.
     assert content.count('</script>') == 2
     # The escaped form must be present in the embedded JSON.
     assert '<\\/script>' in content

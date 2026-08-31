@@ -221,6 +221,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A step pinned with `given(..., activity=N)` now covers an under-anchored
   activity as well; the two-distinct-terms rule gates narration matching only,
   and a covered activity no longer renders as "not coverage-tracked".
+- The report opens and filters substantially faster on large suites, and its file
+  is smaller.
 
 #### Bundled skills
 

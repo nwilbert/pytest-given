@@ -231,9 +231,7 @@
         <thead>
           <tr>
             {% for col in scenario.parameters.columns %}
-            <th {% if col.kind != 'attachment' %}class="param-color-{{ param_color_map.get(col.name, 0) }}" {% endif %}data-param="{{ col.id }}"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">{{ col.name }}</th>
+            <th {% if col.kind != 'attachment' %}class="param-color-{{ param_color_map.get(col.name, 0) }}" {% endif %}data-param="{{ col.id }}">{{ col.name }}</th>
             {% endfor %}
             <th style="text-align:right">status</th>
           </tr>
@@ -241,14 +239,10 @@
         <tbody>
           {% for case in scenario.parameters.cases %}
           {%- set case_idx = loop.index0 -%}
-          <tr class="{{ 'failed-row' if case.status == 'failed' else '' }}"
-              @mouseenter="setHoverRow($event.currentTarget)"
-              @mouseleave="clearHoverRow($event.currentTarget)">
+          <tr data-case-row class="{{ 'failed-row' if case.status == 'failed' else '' }}">
             {% for col, val in zip(scenario.parameters.columns, case.values) %}
             {% if col.kind == 'attachment' %}
-            <td data-param="{{ col.id }}"
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">
+            <td data-param="{{ col.id }}">
               {% if val %}
               {# Keyed on the column's position, never on `col.id`: the id is report data and this lands inside an Alpine expression. #}
               {{ attachment_badge('s' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0, col.name, val.content_type) }}
@@ -260,9 +254,7 @@
                substituting that blank would erase the step's {token} instead of
                replacing it. A `param` cell always substitutes — `None` there is
                a real parametrize value. #}
-            <td data-param="{{ col.id }}"{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}
-                @mouseenter="setHoverParam($el.dataset.param, $event.currentTarget)"
-                @mouseleave="setHoverParam(null, $event.currentTarget)">{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
+            <td data-param="{{ col.id }}"{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
             {% endif %}
             {% endfor %}
             <td style="text-align:right">
@@ -635,7 +627,7 @@
 </div>
 
 <script>
-window.__REPORT_DATA__ = {{ report_json }};
+window.__REPORT_DATA__ = {{ app_data_js }};
 window.__storyIds = {{ story_ids_json }};
 window.__termIds = {{ term_ids_json }};
 window.__termScenarios = {{ term_scenarios_json }};
