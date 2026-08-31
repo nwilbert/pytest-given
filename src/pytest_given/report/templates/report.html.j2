@@ -94,16 +94,21 @@
       <div class="nav-tree">
         {#- Rows key on `group.id`, not the display name: a term row shows its
             canonical name but filters by term id, and a module row shows one
-            path segment but filters by the whole path. The chevron stops
-            propagation so it expands without touching the filter; only a
-            module package has children, so only it renders one. Indenting by
-            `depth` is what makes the flat row list read as a tree. -#}
+            path segment but filters by the whole path. The row filters and the
+            chevron expands — the chevron stops propagation so it opens a
+            package without filtering by it, and selecting a package opens it
+            too (see `onGroupClick`), so the common case needs no aim. Only a
+            module package has children, so only it renders a chevron.
+            `--nav-indent` is what makes the flat row list read as a tree. -#}
         <template x-for="group in groups" :key="group.id">
           <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }"
-               :style="'padding-left:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
-            <span class="nav-group-toggle" x-show="group.hasChildren"
-                  :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }" @click.stop="toggleGroup(group.id)"></span>
-            <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren"></span>
+               :style="'--nav-indent:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
+            <button type="button" class="nav-group-toggle" x-show="group.hasChildren"
+                    :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }"
+                    :aria-expanded="!!expandedGroups[group.id]"
+                    :aria-label="(expandedGroups[group.id] ? 'Collapse ' : 'Expand ') + group.name"
+                    @click.stop="toggleGroup(group.id)"></button>
+            <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren && view === 'modules'"></span>
             <span class="nav-group-name" x-text="group.name"></span>
             <span class="nav-group-count" x-text="group.count"></span>
           </div>

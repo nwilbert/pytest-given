@@ -1,7 +1,7 @@
 # pytest-given — pytest-given Self-Report
 
 ## ✓ A test without `@scenario` stays out of the «report»
-`tests/integration/test_plugin.py:137::test_unannotated_test_not_in_report`
+`tests/integration/test_plugin.py:136::test_unannotated_test_not_in_report`
 
 - **given** a suite whose only test is undecorated
 - **when** the suite runs with --given-json
@@ -9,7 +9,7 @@
 - **then** the «report» holds no «scenario»
 
 ## ✓ A «step fixture» is «grafted» in as a given «step»
-`tests/integration/test_plugin.py:206::test_step_fixture_appears_as_given_step`
+`tests/integration/test_plugin.py:205::test_step_fixture_appears_as_given_step`
 
 - **given** a «scenario» consuming a «step fixture»
   - 📎 suite:
@@ -32,7 +32,7 @@
 - **then** the «step» from the fixture leads the recorded steps
 
 ## ✓ The «cases» of a «parametrized scenario» become one «scenario» with a «parameter table»
-`tests/integration/test_plugin.py:244::test_parametrized_test_as_table` · parametrization
+`tests/integration/test_plugin.py:243::test_parametrized_test_as_table` · parametrization
 
 - **given** a «parametrized scenario» over two «cases»
   - 📎 suite:
@@ -56,7 +56,7 @@
 - **then** the grouped steps carry a placeholder per matching name
 
 ## ✓ A refused run discards the previous run's «report»
-`tests/integration/test_plugin.py:383::test_a_grouping_error_discards_the_previous_report` · validation
+`tests/integration/test_plugin.py:382::test_a_grouping_error_discards_the_previous_report` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -76,7 +76,7 @@
 - **then** the stale files are gone rather than left reading as current
 
 ## ✓ An unknown «source link» preset stops the run before it collects
-`tests/integration/test_plugin.py:451::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:450::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
   - 📎 suite:
@@ -93,7 +93,7 @@
 - **then** no test ran: the run stopped at configure, before collection
 
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2263::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2262::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -116,14 +116,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2276::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2275::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2297::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2296::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -131,7 +131,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2329::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2328::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -151,7 +151,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:2361::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:2360::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -160,7 +160,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:2547::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:2546::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:

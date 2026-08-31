@@ -428,7 +428,13 @@ function reportApp() {
       } else if (this.view === 'tags') {
         this.filterByTag(group.id);
       } else {
-        this.moduleFilter = this.moduleFilter === group.id ? null : group.id;
+        const selecting = this.moduleFilter !== group.id;
+        this.moduleFilter = selecting ? group.id : null;
+        // Selecting a package opens it as well: the click that narrows to a
+        // package is nearly always the one that wants to see what is in it,
+        // and hitting the chevron is the fussier target. Deselecting leaves
+        // the tree open — collapsing under the cursor loses the reader's place.
+        if (selecting && group.hasChildren) this.expandedGroups[group.id] = true;
       }
     },
     filterByTag(tag) {

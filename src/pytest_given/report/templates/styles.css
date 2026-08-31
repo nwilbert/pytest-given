@@ -212,9 +212,14 @@ body {
 /* Navigation tree */
 .nav-tree { font-size: var(--font-size-base); margin-top: var(--space-md); }
 .nav-group {
-  /* Same vertical inset as a filter chip, so a selected row and the chip it
-     mirrors come out near enough the same height. Also tightens the list. */
-  padding: 2px var(--space-xs);
+  /* Roomy enough to hit without aiming: these rows are the report's primary
+     navigation, and the tree's chevrons sit inside them. */
+  padding: var(--space-xs);
+  /* `--nav-indent` carries the tree depth (the template sets it per row), so
+     the indent adds to the row's own padding instead of replacing it. Set as
+     padding-left directly it replaced it, and a depth-0 row lost its inset:
+     the selected tint then started flush against the chevron. */
+  padding-left: calc(var(--space-xs) + var(--nav-indent, 0px));
   /* Bleed the row into the sidebar's own padding: the selected pill needs
      horizontal padding, but the label should stay aligned with the section
      heading above it. The 2px bottom margin keeps two selected rows from
@@ -229,19 +234,49 @@ body {
   align-items: center;
   color: var(--text-primary);
 }
+/* Hovering the row previews the selection it would make — quiet, and clearly
+   not the accent tint of a real selection. The chevron inside it lights up
+   differently, which is what separates "expand" from "filter by". */
+.nav-group:not(.nav-group-active):hover {
+  background: var(--bg-page);
+  border-color: var(--border);
+}
+/* The chevron is a control inside a clickable row, so it gets a real button
+   box: an 18px target around a 7px glyph, wide enough to hit but shorter than
+   the row's line box, so the row keeps its height. */
 .nav-group-toggle {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
+  margin-right: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.nav-group-toggle::before {
+  content: '';
+  width: 7px;
+  height: 7px;
   border-right: 1.5px solid currentColor;
   border-bottom: 1.5px solid currentColor;
-  color: var(--text-muted);
   transform: rotate(-45deg);
   transition: transform 0.15s ease;
-  margin-right: 6px;
 }
-.nav-group-toggle-open { transform: rotate(45deg); }
+.nav-group-toggle-open::before { transform: rotate(45deg); }
+.nav-group-toggle:hover { background: var(--color-accent-bg); color: var(--color-accent-text); }
+/* On a selected row the accent tint is already the background, so a hovered
+   chevron inverts instead — a light square inset into the selection. */
+.nav-group-active .nav-group-toggle:hover { background: var(--bg-card); }
+.nav-group-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
 /* Dotted module paths are single unbreakable tokens: without a shrink
    allowance and a break opportunity they widen the row past the sidebar.
    Wrapped rather than ellipsized — module names share long prefixes, so
@@ -261,8 +296,9 @@ body {
    name fills the row and the auto margin collapses to zero. */
 .nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); }
 /* Keeps a childless row's name aligned with its siblings that carry a
-   chevron, so one level reads as one column. */
-.nav-group-toggle-placeholder { width: 8px; flex-shrink: 0; margin-right: 6px; }
+   chevron, so one level reads as one column. Only the module tree has any, so
+   the flat axes leave it out rather than indent every row past nothing. */
+.nav-group-toggle-placeholder { width: 18px; flex-shrink: 0; margin-right: 2px; }
 .nav-status-icon { font-size: 0.625rem; }
 
 /* === Main === */
