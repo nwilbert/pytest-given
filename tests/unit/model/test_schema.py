@@ -344,7 +344,7 @@ def test_glossary_register_appends_and_indexes() -> None:
 def test_glossary_register_rejects_id_collision() -> None:
     g = Glossary()
     g._register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
-    with pytest.raises(ValueError, match='already registered'):
+    with pytest.raises(AssertionError, match='already registered'):
         g._register(GlossaryTerm(id=TermId('x'), kind='verb', canonical='X'))
 
 
@@ -472,3 +472,16 @@ def test_attachment_ref_has_no_content_field() -> None:
     )
     assert not hasattr(ref, 'content')
     assert ref.column_id == 'attachment:0'
+
+
+def test_glossary_get_sees_a_term_appended_without_register() -> None:
+    """`terms` has to stay a public list — the reflective serializer reads it
+    by name — so `get` re-indexes when the two fall out of step rather than
+    letting an outside append silently make it lie."""
+    glossary = Glossary(
+        terms=[GlossaryTerm(id=TermId('a'), kind='actor', canonical='A')]
+    )
+    glossary.terms.append(GlossaryTerm(id=TermId('b'), kind='actor', canonical='B'))
+    found = glossary.get(TermId('b'))
+    assert found is not None
+    assert found.canonical == 'B'

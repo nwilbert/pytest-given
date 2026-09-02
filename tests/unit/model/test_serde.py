@@ -29,6 +29,7 @@ from pytest_given.model import (
     Story,
     StoryId,
     TermId,
+    TracebackFrame,
     report_from_dict,
     report_to_dict,
 )
@@ -798,3 +799,140 @@ def test_metadata_title_round_trips() -> None:
     report = report_from_dict({'metadata': md, 'scenarios': []})
     assert report.metadata.title == 'Coffee Shop Example'
     assert report_to_dict(report)['metadata']['title'] == 'Coffee Shop Example'
+
+
+def _every_field_populated() -> ReportData:
+    """A report exercising every optional field and every union variant.
+
+    Deliberately maximal: the writer is reflective over the dataclasses while
+    the reader is hand-written, so a field added to the schema starts appearing
+    in the JSON automatically and is silently dropped on the way back in. Only
+    a round trip over a fully populated report catches that.
+    """
+    term = GlossaryTerm(
+        id=TermId('guest'),
+        kind='actor',
+        canonical='Guest',
+        definition='someone who books',
+        source=SourceLocation(relpath='g.py', line=3),
+    )
+    story = Story(
+        id=StoryId('booking'),
+        title='Booking',
+        source=SourceLocation(relpath='s.py', line=1),
+        activities=(
+            Activity(
+                id=ActivityId(1),
+                paths=(
+                    ActivityPath(
+                        parts=(
+                            ActivityTermRef(term_id=TermId('guest'), display='Guest'),
+                            ActivityWord(text='books'),
+                            ActivityTermRef(term_id=TermId('room'), display='Room'),
+                        )
+                    ),
+                ),
+            ),
+        ),
+    )
+    step = Step(
+        phase='given',
+        narration=Narration(
+            text='a Guest with 2 rooms',
+            parts=[
+                NarrationLiteral(value='a '),
+                NarrationTermRef(
+                    term_id=TermId('guest'), display='Guest', expression='pg'
+                ),
+                NarrationValue(
+                    rendered='2', expression='count', conversion='r', format_spec='d'
+                ),
+                NarrationPlaceholder(
+                    name='rooms',
+                    column_id='rooms',
+                    conversion='s',
+                    format_spec='>4',
+                ),
+            ],
+        ),
+        attachments=[
+            Attachment(label='payload', content='{"a": 1}', content_type='json'),
+            AttachmentRef(
+                label='varies', content_type='text', column_id='attachment:0'
+            ),
+        ],
+        fixture_name='shop',
+        activity_ids=(ActivityId(1),),
+        source=SourceLocation(relpath='t.py', line=9),
+        children=[Step(phase='then', narration=Narration(text='it holds'))],
+    )
+    scenario = Scenario(
+        id=NodeId('t.py::test_a[1]'),
+        narration=Narration(
+            text='A booking', parts=[NarrationLiteral(value='A booking')]
+        ),
+        module='t',
+        tags=['smoke'],
+        status='failed',
+        duration_ms=12,
+        steps=[step],
+        parameters=ParameterTable(
+            columns=[
+                ParameterColumn(id='rooms', name='rooms', kind='param'),
+                ParameterColumn(id='derived:0', name='total', kind='derived'),
+                ParameterColumn(id='attachment:0', name='varies', kind='attachment'),
+            ],
+            cases=[
+                ParameterCase(
+                    values=[
+                        2,
+                        'four',
+                        Attachment(label='varies', content='x', content_type='text'),
+                    ],
+                    status='failed',
+                    error=ErrorInfo(
+                        message='boom',
+                        frames=[
+                            TracebackFrame(
+                                path='t.py',
+                                lineno=9,
+                                func='test_a',
+                                code='assert x',
+                                is_internal=False,
+                            )
+                        ],
+                        error_tail='E   AssertionError',
+                    ),
+                )
+            ],
+        ),
+        error=ErrorInfo(message='boom', frames=[], error_tail=None),
+        skip_reason=None,
+        source=SourceLocation(relpath='t.py', line=5),
+        story_id=StoryId('booking'),
+        activity_ids=(ActivityId(1),),
+    )
+    return ReportData(
+        metadata=Metadata(
+            project='p',
+            timestamp='2026-09-02',
+            pytest_version='9',
+            plugin_version='0.1',
+            commit_sha='abc123',
+            title='A title',
+        ),
+        scenarios=[scenario],
+        stories=[story],
+        glossary=Glossary(terms=[term]),
+    )
+
+
+def test_a_fully_populated_report_survives_the_round_trip() -> None:
+    """Every field the writer emits, the reader has to read back.
+
+    `report_to_dict` is reflective and `report_from_dict` is hand-written, so
+    without this a field added to the schema is written and silently dropped,
+    and `pytest-given report` on a saved JSON quietly loses it.
+    """
+    once = report_to_dict(_every_field_populated())
+    assert report_to_dict(report_from_dict(once)) == once

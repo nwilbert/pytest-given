@@ -1,6 +1,13 @@
+"""The report schema: everything here is serialized into the JSON report.
+
+The runtime-only carriers capture and grouping pass between themselves live in
+`runtime.py`, so what reaches a consumer is answerable from this file alone —
+which matters because the serializer is reflective over these dataclasses.
+"""
+
 from dataclasses import dataclass, field
 from pathlib import PurePosixPath
-from typing import Literal, NamedTuple, NewType
+from typing import Literal, NewType
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -150,21 +157,27 @@ class Glossary:
     needs the caller's source location — capture's business, not the leaf's.
     """
 
+    # Public and mutable because the reflective serializer reads it by name.
+    # `_by_id` therefore re-indexes whenever the two fall out of step, so an
+    # append made without going through `_register` cannot leave `get` lying.
     terms: list[GlossaryTerm] = field(default_factory=list)
     _by_id: dict[TermId, GlossaryTerm] = field(
         init=False, repr=False, compare=False, default_factory=dict
     )
 
     def __post_init__(self) -> None:
-        for term in self.terms:
-            self._by_id[term.id] = term
+        self._reindex()
 
     def get(self, key: TermId) -> GlossaryTerm | None:
+        if len(self._by_id) != len(self.terms):
+            self._reindex()
         return self._by_id.get(key)
 
+    def _reindex(self) -> None:
+        self._by_id = {term.id: term for term in self.terms}
+
     def _register(self, term: GlossaryTerm) -> None:
-        if term.id in self._by_id:
-            raise ValueError(f'term id {term.id!r} already registered')
+        assert self.get(term.id) is None, f'term id {term.id!r} already registered'
         self.terms.append(term)
         self._by_id[term.id] = term
 
@@ -179,48 +192,17 @@ type Phase = Literal['given', 'when', 'then']
 # `== 'passed'` reads false.
 type Status = Literal['passed', 'failed', 'skipped']
 
-# Lifecycle state of the collector — determines where push_step/attach route.
-type RecordingState = Literal['idle', 'test', 'fixture_setup', 'fixture_teardown']
-
 # A @pytest.mark.parametrize value as captured for the report: JSON primitives
 # pass through; anything else (dates, objects) is coerced to its str() when the
 # cell is built, since parametrize values only feed display and the JSON sink
 # must serialize them.
 type ParamValue = str | int | float | bool | None
 
-# A parametrize argument as pytest handed it over — an arbitrary object. Kept
-# raw on ParamSpec so grouping can re-apply an interpolation's conversion and
-# format spec to the value the t-string actually saw (see the rebound-parameter
-# rule in the per-case-columns design).
-type RawParamValue = object
-
-
-class ParamSpec(NamedTuple):
-    """Parameter names and raw values for a single parametrized test run.
-
-    `group` carries `@scenario(group_parametrized=...)`: False declines the
-    merge and emits this case as its own scenario. It rides here rather than on
-    `Scenario` because `param_info` is runtime-only, so the report schema stays
-    untouched.
-    """
-
-    names: list[str]
-    values: list[RawParamValue]
-    group: bool = True
-
-    def mapping(self) -> dict[str, RawParamValue]:
-        """This case's parameters by name — the pairing of the two lists."""
-        return dict(zip(self.names, self.values, strict=True))
-
-
-# Maps node IDs to their parameter specification
-type ParamInfo = dict[NodeId, ParamSpec]
-
 
 type ContentType = Literal['text', 'json']
 
 
-@dataclass
+@dataclass(frozen=True)
 class Attachment:
     label: str
     content: str
@@ -309,24 +291,6 @@ class Step:
     source: SourceLocation | None = field(
         default=None, metadata={'serde_exclude': True}
     )
-
-
-@dataclass
-class FixtureRecording:
-    """A captured subtree of steps/attachments for one fixture instance.
-
-    `root` is the labeled step from @given/@when/@then on the fixture; its
-    `children` accumulate as the fixture body runs. `stack` mirrors the
-    collector's step stack while the recording is active, so nested
-    `with given(...)` inside the body works.
-    """
-
-    root: Step
-    stack: list[Step] = field(default_factory=list)
-
-    def __post_init__(self) -> None:
-        if not self.stack:
-            self.stack.append(self.root)
 
 
 # Which kind of variance a parameter-table column records.

@@ -11,7 +11,7 @@ attachment — each discriminated on read by the keys its variants do not share.
 """
 
 import dataclasses
-from typing import Any, cast
+from typing import Any
 
 from .errors import PytestGivenError
 from .schema import (
@@ -155,12 +155,13 @@ def _activity_part_from_dict(d: dict[str, Any]) -> ActivityPart:
 
 
 def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
+    status: Status = d.get('status', 'passed')
     return Scenario(
         id=NodeId(d['id']),
         narration=_narration_from_dict(d['narration']),
         module=d['module'],
         tags=list(d.get('tags', [])),
-        status=cast('Status', d.get('status', 'passed')),
+        status=status,
         duration_ms=d.get('duration_ms', 0),
         steps=[_step_from_dict(s) for s in d.get('steps', [])],
         parameters=_param_table_from_dict(d.get('parameters')),
@@ -255,9 +256,10 @@ def _param_column_from_dict(d: dict[str, Any]) -> ParameterColumn:
 
 
 def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
+    status: Status = d.get('status', 'passed')
     return ParameterCase(
         values=[_cell_from_json(v) for v in d['values']],
-        status=cast('Status', d.get('status', 'passed')),
+        status=status,
         error=_error_from_dict(d.get('error')),
     )
 

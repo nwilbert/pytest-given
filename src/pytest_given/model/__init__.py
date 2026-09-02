@@ -7,6 +7,13 @@ from .narration import (
     rebuilt,
     render_interpolation,
 )
+from .runtime import (
+    FixtureRecording,
+    ParamInfo,
+    ParamSpec,
+    RawParamValue,
+    RecordingState,
+)
 from .schema import (
     Activity,
     ActivityId,
@@ -20,7 +27,6 @@ from .schema import (
     ColumnKind,
     ContentType,
     ErrorInfo,
-    FixtureRecording,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -34,12 +40,8 @@ from .schema import (
     ParameterCase,
     ParameterColumn,
     ParameterTable,
-    ParamInfo,
-    ParamSpec,
     ParamValue,
     Phase,
-    RawParamValue,
-    RecordingState,
     ReportData,
     Scenario,
     SourceLocation,
