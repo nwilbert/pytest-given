@@ -15,6 +15,8 @@ from ..model import (
     ActivityPath,
     ActivityTermRef,
     Glossary,
+    GlossaryTerm,
+    Narration,
     NarrationTermRef,
     NodeId,
     ReportData,
@@ -22,11 +24,12 @@ from ..model import (
     Story,
     StoryId,
     TermId,
-    iter_narrations,
     walk_steps,
 )
 from .coverage import (
-    StepRef,
+    CoverageMap,
+    StoryIndex,
+    build_story_index,
     compute_coverage,
     is_coverage_eligible,
 )
@@ -111,39 +114,159 @@ class StoryRollup:
     per_activity: dict[ActivityId, ActivityCoverage] = field(default_factory=dict)
 
 
-def tab_visibility(report: ReportData) -> dict[str, bool]:
-    return {
-        'scenarios': True,
-        'stories': bool(report.stories),
-        'glossary': bool(report.glossary is not None and report.glossary.terms),
-    }
+@dataclass(frozen=True)
+class TabVisibility:
+    """Which browse tabs a report has anything to show in."""
+
+    scenarios: bool
+    stories: bool
+    glossary: bool
+
+    @property
+    def visible_count(self) -> int:
+        return sum((self.scenarios, self.stories, self.glossary))
 
 
-def build_coverage_maps(
-    report: ReportData,
-) -> dict[NodeId, dict[ActivityId, set[StepRef]]]:
-    """Every scenario's coverage map, keyed by node id — empty for one bound to
-    no story, or a report carrying no glossary to match term refs against."""
+def tab_visibility(report: ReportData) -> TabVisibility:
+    return TabVisibility(
+        scenarios=True,
+        stories=bool(report.stories),
+        glossary=bool(report.glossary is not None and report.glossary.terms),
+    )
+
+
+@dataclass(frozen=True)
+class TermEntry:
+    """One row of the Glossary view."""
+
+    term: GlossaryTerm
+    aggregation: GlossaryAggregation
+    scenario_ids: list[NodeId]
+    show_instances: bool
+    summary: str
+
+
+@dataclass(frozen=True)
+class KindGroup:
+    """The Glossary view's terms under one kind heading."""
+
+    label: str
+    key: str
+    css_class: str
+    entries: list[TermEntry]
+
+
+@dataclass(frozen=True)
+class GlossaryView:
+    """Everything the Glossary tab renders, computed here rather than in Jinja.
+
+    `all_uncategorized` says the kind grouping carries no information — every
+    term is kindless — so the template drops the filter section and the
+    'Uncategorized' heading and shows a flat list.
+    """
+
+    groups: list[KindGroup]
+    counts: dict[str, int]
+    undefined_count: int
+    all_uncategorized: bool
+
+
+# Heading label, filter key, and pill class for each kind, in display order.
+_KIND_GROUPS: tuple[tuple[str, str, str], ...] = (
+    ('Actors', 'actor', 'term-actor'),
+    ('Work Objects', 'object', 'term-obj'),
+    ('Verbs', 'verb', 'term-verb'),
+    ('Uncategorized', 'kindless', 'term-kindless'),
+)
+
+# Only an entity has instances worth listing; a verb's surface forms are its
+# own section.
+_INSTANCE_KINDS = frozenset({'actor', 'object'})
+
+
+def build_glossary_view(report: ReportData, views: GlossaryViews) -> GlossaryView:
+    terms = report.glossary.terms if report.glossary is not None else []
+    by_kind: dict[str, list[GlossaryTerm]] = {key: [] for _l, key, _c in _KIND_GROUPS}
+    for term in terms:
+        by_kind[term.kind or 'kindless'].append(term)
+    counts = {key: len(group) for key, group in by_kind.items()}
+    groups = [
+        KindGroup(
+            label=label,
+            key=key,
+            css_class=css_class,
+            entries=[_term_entry(term, key, views) for term in by_kind[key]],
+        )
+        for label, key, css_class in _KIND_GROUPS
+        if by_kind[key]
+    ]
+    return GlossaryView(
+        groups=groups,
+        counts=counts,
+        undefined_count=sum(1 for term in terms if term.definition is None),
+        all_uncategorized=bool(
+            counts['kindless']
+            and not (counts['actor'] or counts['object'] or counts['verb'])
+        ),
+    )
+
+
+def _term_entry(term: GlossaryTerm, kind_key: str, views: GlossaryViews) -> TermEntry:
+    aggregation = views.aggregations.get(term.id, GlossaryAggregation())
+    scenario_ids = views.term_scenarios.get(term.id, [])
+    show_instances = kind_key in _INSTANCE_KINDS and bool(aggregation.instances)
+    return TermEntry(
+        term=term,
+        aggregation=aggregation,
+        scenario_ids=scenario_ids,
+        show_instances=show_instances,
+        summary=' · '.join(
+            part
+            for part in (
+                _plural(len(aggregation.instances), 'instance')
+                if show_instances
+                else '',
+                _plural(len(aggregation.stories), 'story', 'stories'),
+                _plural(len(scenario_ids), 'scenario'),
+            )
+            if part
+        ),
+    )
+
+
+def _plural(n: int, singular: str, plural: str | None = None) -> str:
+    """`'3 scenarios'`, or empty for a count of zero — the summary lists only
+    what a term actually has."""
+    if not n:
+        return ''
+    return f'{n} {singular}' if n == 1 else f'{n} {plural or singular + "s"}'
+
+
+def build_coverage_maps(report: ReportData) -> CoverageMap:
+    """Which activities each scenario covers, keyed by node id — empty for one
+    bound to no story, or a report with no glossary to match term refs against.
+
+    Each story is indexed once and reused across the scenarios bound to it.
+    """
     glossary = report.glossary
-    story_index: dict[StoryId, Story] = {s.id: s for s in report.stories}
-    result: dict[NodeId, dict[ActivityId, set[StepRef]]] = {}
+    if glossary is None:
+        return {scenario.id: set() for scenario in report.scenarios}
+    stories = {story.id: story for story in report.stories}
+    indexes: dict[StoryId, StoryIndex] = {}
+    result: CoverageMap = {}
     for scenario in report.scenarios:
-        story = (
-            story_index.get(scenario.story_id)
-            if scenario.story_id is not None
-            else None
-        )
-        result[scenario.id] = (
-            compute_coverage(glossary, scenario, story)
-            if glossary is not None and story is not None
-            else {}
-        )
+        story = stories.get(scenario.story_id) if scenario.story_id else None
+        if story is None:
+            result[scenario.id] = set()
+            continue
+        if story.id not in indexes:
+            indexes[story.id] = build_story_index(glossary, story)
+        result[scenario.id] = compute_coverage(glossary, scenario, indexes[story.id])
     return result
 
 
 def build_story_rollups(
-    report: ReportData,
-    coverage_maps: dict[NodeId, dict[ActivityId, set[StepRef]]],
+    report: ReportData, coverage_maps: CoverageMap
 ) -> dict[StoryId, StoryRollup]:
     """Per-story view-data: bound scenarios + per-activity coverage rollup."""
     scenarios_by_story: dict[StoryId, list[Scenario]] = {}
@@ -179,10 +302,10 @@ def build_story_rollups(
 
 
 def build_scenario_activity_index(
-    coverage_maps: dict[NodeId, dict[ActivityId, set[StepRef]]],
+    coverage_maps: CoverageMap,
 ) -> dict[NodeId, list[ActivityId]]:
     """For each scenario, the sorted list of activity ids it covers."""
-    return {scn_id: sorted(amap.keys()) for scn_id, amap in coverage_maps.items()}
+    return {scn_id: sorted(covered) for scn_id, covered in coverage_maps.items()}
 
 
 def build_activity_labels(report: ReportData) -> dict[ActivityKey, str]:
@@ -210,27 +333,45 @@ def _path_text(path: ActivityPath) -> str:
     )
 
 
-def build_glossary_aggregations(
-    report: ReportData,
-) -> dict[TermId, GlossaryAggregation]:
-    """Build per-term aggregations from scenarios and stories.
+@dataclass(frozen=True)
+class GlossaryViews:
+    """What the Glossary view reads: per-term aggregations, and which scenarios
+    reference each term.
 
-    Two walks feed one index: scenario steps contribute entity instances, and
-    story activity prose contributes story refs, more instances, and verb
-    surface forms.
+    Built from one walk, so the two cannot disagree about what counts as a
+    reference — they did when one walked only the steps and the other the
+    scenario's own narration too, and a term used solely in a `@scenario` title
+    was listed as used by a scenario while contributing no instance.
+    """
+
+    aggregations: dict[TermId, GlossaryAggregation]
+    term_scenarios: dict[TermId, list[NodeId]]
+
+
+def build_glossary_views(report: ReportData) -> GlossaryViews:
+    """Per-term aggregations and the term-to-scenarios index.
+
+    Scenario narrations contribute entity instances; story activity prose
+    contributes story refs, more instances, and verb surface forms. Scenario
+    render order is preserved and each scenario appears at most once per term.
     """
     glossary = report.glossary
     if glossary is None:
-        return {}
+        return GlossaryViews(aggregations={}, term_scenarios={})
     index = _GlossaryIndex(glossary)
+    term_scenarios: dict[TermId, list[NodeId]] = {}
     for scenario in report.scenarios:
-        for _path, step in walk_steps(scenario.steps):
-            for part in step.narration.parts:
+        seen: set[TermId] = set()
+        for narration, fixture_name in _scenario_narrations(scenario):
+            for part in narration.parts:
                 if not isinstance(part, NarrationTermRef):
                     continue
                 index.record_instance(
-                    part.term_id, part.display, fixture_name=step.fixture_name
+                    part.term_id, part.display, fixture_name=fixture_name
                 )
+                if part.term_id not in seen:
+                    seen.add(part.term_id)
+                    term_scenarios.setdefault(part.term_id, []).append(scenario.id)
     for story in report.stories:
         for ref in _story_term_refs(story):
             # Each `record_*` no-ops for a term of the wrong kind, so the walk
@@ -238,7 +379,15 @@ def build_glossary_aggregations(
             index.record_story_ref(ref.term_id, story.id)
             index.record_instance(ref.term_id, ref.display)
             index.record_form(ref.term_id, ref.display)
-    return index.result()
+    return GlossaryViews(aggregations=index.result(), term_scenarios=term_scenarios)
+
+
+def _scenario_narrations(scenario: Scenario) -> Iterator[tuple[Narration, str | None]]:
+    """Every narration a scenario carries, with the fixture that recorded it —
+    the scenario's own title first, then each step's."""
+    yield scenario.narration, None
+    for _path, step in walk_steps(scenario.steps):
+        yield step.narration, step.fixture_name
 
 
 def _story_term_refs(story: Story) -> Iterator[ActivityTermRef]:
@@ -317,23 +466,3 @@ class _GlossaryIndex:
 
     def _agg(self, term_id: TermId) -> GlossaryAggregation:
         return self._aggs.setdefault(term_id, GlossaryAggregation())
-
-
-def build_term_scenario_index(report: ReportData) -> dict[TermId, list[NodeId]]:
-    """For each glossary term, the scenarios whose narration or steps reference
-    it. Scenario render order is preserved; each scenario appears at most once
-    per term. Terms never referenced are absent; no glossary → empty."""
-    if report.glossary is None:
-        return {}
-    index: dict[TermId, list[NodeId]] = {}
-    for scenario in report.scenarios:
-        seen: set[TermId] = set()
-        for narration in iter_narrations(scenario):
-            for part in narration.parts:
-                if not isinstance(part, NarrationTermRef):
-                    continue
-                if part.term_id in seen:
-                    continue
-                seen.add(part.term_id)
-                index.setdefault(part.term_id, []).append(scenario.id)
-    return index

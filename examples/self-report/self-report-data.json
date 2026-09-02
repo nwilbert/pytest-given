@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-02T20:38:46.743546+00:00",
+    "timestamp": "2026-09-02T20:49:15.159736+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "db66a1d88ad45ede4c69992843896fd0cf97d719",
+    "commit_sha": "3c72747abdd7eec871d23786d9b648706ce686cc",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -26,7 +26,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -134,7 +134,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -272,7 +272,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -440,7 +440,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -549,7 +549,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -814,7 +814,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 64,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -900,7 +900,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -984,7 +984,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -1154,7 +1154,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -1354,7 +1354,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -1476,7 +1476,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -14886,7 +14886,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 159
+        "line": 158
       },
       "story_id": null,
       "activity_ids": []
@@ -15004,7 +15004,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 263
+        "line": 262
       },
       "story_id": null,
       "activity_ids": []
@@ -15144,7 +15144,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 293
+        "line": 292
       },
       "story_id": null,
       "activity_ids": []
@@ -15249,7 +15249,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 363
+        "line": 362
       },
       "story_id": null,
       "activity_ids": []
@@ -15405,7 +15405,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 449
+        "line": 448
       },
       "story_id": null,
       "activity_ids": []
@@ -15529,7 +15529,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 482
+        "line": 481
       },
       "story_id": null,
       "activity_ids": []
@@ -15644,7 +15644,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 575
+        "line": 574
       },
       "story_id": null,
       "activity_ids": []
@@ -15748,7 +15748,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 616
+        "line": 615
       },
       "story_id": null,
       "activity_ids": []
@@ -15870,7 +15870,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 660
+        "line": 659
       },
       "story_id": null,
       "activity_ids": []
@@ -15991,7 +15991,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 762
+        "line": 761
       },
       "story_id": null,
       "activity_ids": []
@@ -16105,7 +16105,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 66
+        "line": 67
       },
       "story_id": null,
       "activity_ids": []
@@ -16226,7 +16226,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 149
+        "line": 150
       },
       "story_id": null,
       "activity_ids": []
@@ -16344,7 +16344,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 200
+        "line": 201
       },
       "story_id": null,
       "activity_ids": []
@@ -16445,7 +16445,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 215
+        "line": 216
       },
       "story_id": null,
       "activity_ids": []
@@ -16543,7 +16543,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 227
+        "line": 228
       },
       "story_id": null,
       "activity_ids": []
@@ -16674,7 +16674,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 251
+        "line": 252
       },
       "story_id": null,
       "activity_ids": []
@@ -17103,7 +17103,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 361
+        "line": 369
       },
       "story_id": null,
       "activity_ids": []
@@ -17230,7 +17230,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 407
+        "line": 415
       },
       "story_id": null,
       "activity_ids": []
@@ -17346,7 +17346,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 429
+        "line": 437
       },
       "story_id": null,
       "activity_ids": []
@@ -17447,7 +17447,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 459
+        "line": 467
       },
       "story_id": null,
       "activity_ids": []
@@ -17573,7 +17573,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 483
+        "line": 491
       },
       "story_id": null,
       "activity_ids": []
@@ -17691,7 +17691,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 518
+        "line": 525
       },
       "story_id": null,
       "activity_ids": []
@@ -17804,7 +17804,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 546
+        "line": 553
       },
       "story_id": null,
       "activity_ids": []
@@ -17829,7 +17829,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -17933,7 +17933,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 208
+        "line": 223
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -18725,7 +18725,7 @@
           "attachments": [
             {
               "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 proj\n\n## \u293c Later \u00b7 skipped\n`tests/t.py::test_skip` \u2014 reason: needs fixture data\n\n- **when** act\n",
+              "content": "# pytest-given \u2014 proj\n\n## \u25cb Later \u00b7 skipped\n`tests/t.py::test_skip` \u2014 reason: needs fixture data\n\n- **when** act\n",
               "content_type": "text"
             }
           ],

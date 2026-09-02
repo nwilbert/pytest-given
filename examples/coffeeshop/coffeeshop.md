@@ -203,15 +203,15 @@
 > assert 10 == 20
 > test_coffeeshop.py:251 in test_failing
 
-## ⤼ Skipped scenario rendering · skipped
+## ○ Skipped scenario rendering · skipped
 `examples/coffeeshop/test_coffeeshop.py:254::test_skipped` — reason: demonstrates skipped status
 
 
-## ⤼ All cases skipped · skipped
+## ○ All cases skipped · skipped
 `examples/coffeeshop/test_coffeeshop.py:261::test_parametrized_all_skipped`
 
 
 | n | |
 |---|---|
-| 1 | ⤼ |
-| 2 | ⤼ |
+| 1 | ○ |
+| 2 | ○ |

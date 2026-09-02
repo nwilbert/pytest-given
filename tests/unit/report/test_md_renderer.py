@@ -510,7 +510,7 @@ def test_skipped_scenario_shows_reason() -> None:
         md = render_md(_report(scn))
     with then('the heading is marked skipped and the reason follows the node id'):
         attach('Rendered Markdown', md)
-        assert '## ⤼ Later · skipped' in md
+        assert '## ○ Later · skipped' in md
         assert '`tests/t.py::test_skip` — reason: needs fixture data' in md
 
 

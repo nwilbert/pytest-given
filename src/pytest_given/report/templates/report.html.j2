@@ -28,7 +28,7 @@
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist
       exists to belong to. -#}
-  {%- set visible_count = (tab_visibility.scenarios|int) + (tab_visibility.stories|int) + (tab_visibility.glossary|int) -%}
+  {%- set visible_count = tab_visibility.visible_count -%}
   {% if visible_count > 1 %}
   {#- The class paints the active tab; `aria-selected` announces it. No roving
       tabindex: three tabs do not earn the arrow-key handling. -#}
@@ -440,14 +440,12 @@
         </button>
       </label>
 
-      {% set actor_count = glossary.terms | selectattr('kind', 'equalto', 'actor') | list | length %}
-      {% set object_count = glossary.terms | selectattr('kind', 'equalto', 'object') | list | length %}
-      {% set verb_count = glossary.terms | selectattr('kind', 'equalto', 'verb') | list | length %}
-      {% set kindless_count = glossary.terms | selectattr('kind', 'none') | list | length %}
-      {% set undefined_count = glossary.terms | selectattr('definition', 'none') | list | length %}
-      {# When no term is categorized, the kind grouping is pure noise: drop the
-         filter section and the 'Uncategorized' header, leaving a flat list. #}
-      {% set all_uncategorized = kindless_count and not (actor_count or object_count or verb_count) %}
+      {% set actor_count = glossary_view.counts.actor %}
+      {% set object_count = glossary_view.counts.object %}
+      {% set verb_count = glossary_view.counts.verb %}
+      {% set kindless_count = glossary_view.counts.kindless %}
+      {% set undefined_count = glossary_view.undefined_count %}
+      {% set all_uncategorized = glossary_view.all_uncategorized %}
       {% if not all_uncategorized %}
       <div class="sidebar-section">
         <div class="sidebar-label">Show kinds</div>
@@ -513,13 +511,8 @@
         </div>
       </div>
 
-      {% for kind_label, kind_key, kind_cls in [('Actors', 'actor', 'term-actor'), ('Work Objects', 'object', 'term-obj'), ('Verbs', 'verb', 'term-verb'), ('Uncategorized', 'kindless', 'term-kindless')] %}
-      {% if kind_key == 'kindless' %}
-      {% set kind_terms = glossary.terms | selectattr('kind', 'none') | list %}
-      {% else %}
-      {% set kind_terms = glossary.terms | selectattr('kind', 'equalto', kind_key) | list %}
-      {% endif %}
-      {% if kind_terms %}
+      {% for group in glossary_view.groups %}
+      {% set kind_label, kind_key, kind_cls = group.label, group.key, group.css_class %}
       <div x-show="glossaryKindFilter.{{ kind_key }} && visibleTermCount('{{ kind_key }}') > 0">
         {% if not all_uncategorized %}
         <div class="kind-header">
@@ -527,11 +520,11 @@
           <span class="kind-meta" x-text="visibleTermLabel('{{ kind_key }}')"></span>
         </div>
         {% endif %}
-        {% for term in kind_terms %}
-        {% set agg = glossary_aggregations.get(term.id) %}
-        {% set scn_ids = term_scenario_index.get(term.id, []) %}
-        {% set show_instances = agg and kind_key in ('actor', 'object') and agg.instances %}
-        {% set q = 'glossarySearch' %}
+        {% for entry in group.entries %}
+        {% set term = entry.term %}
+        {% set agg = entry.aggregation %}
+        {% set scn_ids = entry.scenario_ids %}
+        {% set show_instances = entry.show_instances %}
         <div class="entry" id="term-{{ term.id }}"
              data-search="{{ term.canonical | lower }}"
              x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
@@ -546,22 +539,7 @@
             </span>
             <div class="entry-body">
               <div class="entry-def">{{ term.definition | inline_md }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
-              <div class="entry-summary">
-                {% set summary_parts = [] %}
-                {% if show_instances %}
-                {% set n = agg.instances | length %}
-                {% set _ = summary_parts.append('%d instance%s' | format(n, 's' if n != 1 else '')) %}
-                {% endif %}
-                {% if agg and agg.stories %}
-                {% set n = agg.stories | length %}
-                {% set _ = summary_parts.append('%d stor%s' | format(n, 'ies' if n != 1 else 'y')) %}
-                {% endif %}
-                {% if scn_ids %}
-                {% set n = scn_ids | length %}
-                {% set _ = summary_parts.append('%d scenario%s' | format(n, 's' if n != 1 else '')) %}
-                {% endif %}
-                {{ summary_parts | join(' · ') }}
-              </div>
+              <div class="entry-summary">{{ entry.summary }}</div>
             </div>
             {{ anchor_link('view=glossary&term=' ~ term.id) }}
           </div>
@@ -609,7 +587,6 @@
         </div>
         {% endfor %}
       </div>
-      {% endif %}
       {% endfor %}
       <div class="glossary-empty" x-show="!anyTermsVisible" x-cloak>No terms match this filter.</div>
     </div>
@@ -628,12 +605,6 @@
 
 <script>
 window.__REPORT_DATA__ = {{ app_data_js }};
-window.__storyIds = {{ story_ids_json }};
-window.__termIds = {{ term_ids_json }};
-window.__termScenarios = {{ term_scenarios_json }};
-window.__scenarioActivities = {{ scenario_activities_json }};
-window.__activityLabels = {{ activity_labels_json }};
-window.__scenarioSlugs = {{ scenario_slugs_json }};
 {{ app_js }}
 </script>
 <script>{{ alpine_js }}</script>

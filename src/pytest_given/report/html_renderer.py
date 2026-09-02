@@ -1,3 +1,10 @@
+"""Rendering the HTML report: the Jinja environment, the context its
+templates read, and the filters that turn model parts into markup.
+
+Everything the page displays is rendered into the markup here; the one
+JSON blob beside it is what `app.js` seeds its state from.
+"""
+
 import json
 from collections.abc import Callable
 from pathlib import Path
@@ -11,6 +18,7 @@ from ..model import (
     ActivityWord,
     AttachmentRef,
     Glossary,
+    GlossaryTerm,
     Narration,
     NarrationLiteral,
     NarrationPart,
@@ -20,14 +28,15 @@ from ..model import (
     ReportData,
     Scenario,
     SourceLocation,
+    TermId,
 )
 from .aggregations import (
     build_activity_labels,
     build_coverage_maps,
-    build_glossary_aggregations,
+    build_glossary_view,
+    build_glossary_views,
     build_scenario_activity_index,
     build_story_rollups,
-    build_term_scenario_index,
     tab_visibility,
 )
 from .inline_markdown import render_inline_markdown
@@ -42,77 +51,6 @@ _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 type ParamColorMap = dict[str, int]
 
 
-def _neutralize_script_data(text: str) -> str:
-    """Escape the two sequences that let text embedded in an inline `<script>`
-    steer the HTML tokenizer out of plain script-data state.
-
-    - `</` closes the tag outright.
-    - `<!--` opens script-data-*escaped* state; a `<script` after it reaches
-      double-escaped state, where the template's own `</script>` no longer
-      terminates the element and the rest of the document — the Alpine bundle
-      included — is swallowed as script text.
-
-    `\\/` and `\\u003C` are both valid JSON *and* JS escapes, so the blob stays
-    parseable and the parsed value is unchanged, while the HTML parser sees
-    neither sequence."""
-    return text.replace('</', '<\\/').replace('<!--', '\\u003C!--')
-
-
-def _script_json(value: object) -> Markup:
-    """Serialize `value` to JSON for embedding in an inline `<script>`, with the
-    tokenizer-steering sequences neutralized. `json.dumps` escapes neither of
-    them inside string literals, and these blobs carry user-controlled node ids
-    and activity prose.
-    """
-    return Markup(_neutralize_script_data(json.dumps(value)))
-
-
-def _script_json_parse(value: object) -> Markup:
-    """Serialize `value` as a `JSON.parse(...)` call rather than a JS object
-    literal: an engine reads a JSON string faster than the equivalent source,
-    and this is the largest blob on the page."""
-    payload = json.dumps(json.dumps(value, separators=(',', ':')))
-    return Markup('JSON.parse(' + _neutralize_script_data(payload) + ')')
-
-
-def _app_data(report: ReportData) -> dict[str, object]:
-    """The projection of the report that `app.js` seeds its state from.
-
-    Not the whole report: everything the page displays is already rendered into
-    the markup, and a second copy of every step, traceback and attachment
-    payload was the biggest single thing in a large report's HTML. Adding a
-    field to `reportApp` means adding it here."""
-    return {
-        'metadata': {'timestamp': report.metadata.timestamp},
-        'glossary': (
-            {
-                'terms': [
-                    {
-                        'id': term.id,
-                        'canonical': term.canonical,
-                        'kind': term.kind,
-                        'definition': term.definition,
-                    }
-                    for term in report.glossary.terms
-                ]
-            }
-            if report.glossary is not None
-            else None
-        ),
-        'scenarios': [
-            {
-                'id': scenario.id,
-                'module': scenario.module,
-                'tags': scenario.tags,
-                'status': scenario.status,
-                'story_id': scenario.story_id,
-                'narration': {'text': scenario.narration.text},
-            }
-            for scenario in report.scenarios
-        ],
-    }
-
-
 def _inline_md(text: str | None) -> Markup:
     """Jinja filter: render a term description's inline Markdown to safe HTML.
 
@@ -125,7 +63,7 @@ def _inline_md(text: str | None) -> Markup:
 
 def render_html_string(
     report: ReportData,
-    source_link_template: str | None = None,
+    source_link_template: str | None,
 ) -> str:
     """Render a report model to a self-contained HTML document.
 
@@ -138,11 +76,9 @@ def render_html_string(
     # with it, and the template emits the matching `.param-color-N` rules.
     param_color_map = _build_param_color_map(report.scenarios)
     env = _build_env(report, source_link_template, param_color_map)
-    html = env.get_template('report.html.j2').render(
+    return env.get_template('report.html.j2').render(
         **_render_context(report, param_color_map)
     )
-    assert isinstance(html, str)
-    return html
 
 
 def _build_env(
@@ -183,7 +119,7 @@ def _render_context(
     coverage_maps = build_coverage_maps(report)
     scn_covers = build_scenario_activity_index(coverage_maps)
     activity_labels = build_activity_labels(report)
-    term_scenario_index = build_term_scenario_index(report)
+    glossary_views = build_glossary_views(report)
     scenario_slugs = build_scenario_slug_index(report)
     term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
     return {
@@ -191,12 +127,10 @@ def _render_context(
         'scenarios': report.scenarios,
         'stories': report.stories,
         'glossary': report.glossary,
-        'coverage_maps': coverage_maps,
-        'glossary_aggregations': build_glossary_aggregations(report),
+        'glossary_view': build_glossary_view(report, glossary_views),
         'tab_visibility': tab_visibility(report),
         'story_rollups': build_story_rollups(report, coverage_maps),
         'scn_covers': scn_covers,
-        'term_scenario_index': term_scenario_index,
         'scenario_slugs': scenario_slugs,
         'param_color_map': param_color_map,
         # The colors themselves, emitted as `.param-color-N` rules beside the
@@ -204,16 +138,94 @@ def _render_context(
         # styles.css, because how many a report needs is a property of the
         # report.
         'param_colors': param_column_colors(len(param_color_map)),
-        'scenario_activities_json': _script_json(scn_covers),
-        'activity_labels_json': _script_json(activity_labels),
-        'story_ids_json': _script_json([story.id for story in report.stories]),
-        'term_ids_json': _script_json(term_ids),
-        'term_scenarios_json': _script_json(term_scenario_index),
-        'scenario_slugs_json': _script_json(
-            {slug: node_id for node_id, slug in scenario_slugs.items()}
+        'app_data_js': _script_json_parse(
+            _app_data(report)
+            | {
+                'story_ids': [story.id for story in report.stories],
+                'term_ids': term_ids,
+                'term_scenarios': glossary_views.term_scenarios,
+                'scenario_activities': scn_covers,
+                'activity_labels': activity_labels,
+                'scenario_slugs': {
+                    slug: node_id for node_id, slug in scenario_slugs.items()
+                },
+            }
         ),
-        'app_data_js': _script_json_parse(_app_data(report)),
         **_bundled_assets(),
+    }
+
+
+def _neutralize_script_data(text: str) -> str:
+    """Escape the two sequences that let text embedded in an inline `<script>`
+    steer the HTML tokenizer out of plain script-data state.
+
+    - `</` closes the tag outright.
+    - `<!--` opens script-data-*escaped* state; a `<script` after it reaches
+      double-escaped state, where the template's own `</script>` no longer
+      terminates the element and the rest of the document — the Alpine bundle
+      included — is swallowed as script text.
+
+    `\\/` and `\\u003C` are both valid JSON *and* JS escapes, so the blob stays
+    parseable and the parsed value is unchanged, while the HTML parser sees
+    neither sequence."""
+    return text.replace('</', '<\\/').replace('<!--', '\\u003C!--')
+
+
+def _script_json_parse(value: object) -> Markup:
+    """Serialize `value` as a `JSON.parse(...)` call rather than a JS object
+    literal: an engine reads a JSON string faster than the equivalent source,
+    and this is the largest blob on the page.
+
+    The tokenizer-steering sequences are neutralized on the way out —
+    `json.dumps` escapes neither inside a string literal, and this blob carries
+    user-controlled node ids and activity prose.
+    """
+    payload = json.dumps(json.dumps(value, separators=(',', ':')))
+    return Markup('JSON.parse(' + _neutralize_script_data(payload) + ')')
+
+
+def _app_data(report: ReportData) -> dict[str, object]:
+    """The projection of the report that `app.js` seeds its state from.
+
+    Not the whole report: everything the page displays is already rendered into
+    the markup, and a second copy of every step, traceback and attachment
+    payload was the biggest single thing in a large report's HTML. Adding a
+    field to `reportApp` means adding it here."""
+    return {
+        'metadata': {'timestamp': report.metadata.timestamp},
+        'glossary': (
+            {
+                'terms': [
+                    {
+                        'id': term.id,
+                        'canonical': term.canonical,
+                        'kind': term.kind,
+                        'definition': term.definition,
+                        # Pre-rendered once per term, for the hover tooltip.
+                        # `render_inline_markdown` escapes the text and
+                        # re-admits only <br>/<code>/<strong>/<em>, which is
+                        # what lets app.js assign it as innerHTML.
+                        'definition_html': render_inline_markdown(
+                            term.definition or ''
+                        ),
+                    }
+                    for term in report.glossary.terms
+                ]
+            }
+            if report.glossary is not None
+            else None
+        ),
+        'scenarios': [
+            {
+                'id': scenario.id,
+                'module': scenario.module,
+                'tags': scenario.tags,
+                'status': scenario.status,
+                'story_id': scenario.story_id,
+                'narration': {'text': scenario.narration.text},
+            }
+            for scenario in report.scenarios
+        ],
     }
 
 
@@ -276,7 +288,7 @@ def _make_source_url_filter(
 
 def _make_narration_filter(
     param_color_map: ParamColorMap,
-    glossary: Glossary | None = None,
+    glossary: Glossary | None,
 ) -> Callable[[Narration], Markup]:
     """Jinja filter: renders a `Narration` to HTML, part by part.
 
@@ -345,44 +357,30 @@ def _term_kind_class(kind: str | None) -> str:
     return _TERM_KIND_CLASSES.get(kind, 'term-ref-unknown')
 
 
-def _term_ref_span(
-    *,
-    classes: list[str],
-    display: str,
-    term_id: str | None = None,
-    tooltip_name: str = '',
-    tooltip_def: str = '',
-) -> str:
-    ref_classes = list(classes)
-    if term_id is not None:
-        ref_classes.append('term-ref--link')
-    if tooltip_name:
-        ref_classes.append('has-term-tip')
-    attrs = [f'class="{" ".join(ref_classes)}"']
-    if term_id is not None:
-        attrs.append(f'data-term-id="{escape(term_id)}"')
-    # The custom hover tooltip (see app.js) reads the canonical name and
-    # definition off these attributes; it replaces the native `title` so the
-    # term name can show as a styled heading above its definition.
-    if tooltip_name:
-        attrs.append(f'data-term-name="{escape(tooltip_name)}"')
-        if tooltip_def:
-            rendered_def = render_inline_markdown(tooltip_def)
-            attrs.append(f'data-term-def="{escape(rendered_def)}"')
-    return f'<span {" ".join(attrs)}>{escape(display)}</span>'
+def _term_ref_span(term: GlossaryTerm | None, term_id: TermId, display: str) -> str:
+    """One term reference.
+
+    A term the glossary does not hold gets a plain span: no `data-term-id`, so
+    the deep-link handler cannot navigate to a `#term=` that does not exist,
+    and no tooltip marker. The tooltip's name and definition are *not* written
+    here — `app.js` looks them up by id in the glossary `_app_data` already
+    ships, which is what keeps a term used 900 times from carrying 900 copies
+    of its definition.
+    """
+    if term is None:
+        return f'<span class="term-ref-unknown">{escape(display)}</span>'
+    classes = f'{_term_kind_class(term.kind)} term-ref--link has-term-tip'
+    return (
+        f'<span class="{classes}" data-term-id="{escape(term_id)}">'
+        f'{escape(display)}</span>'
+    )
 
 
 def _render_term_ref(part: NarrationTermRef, glossary: Glossary | None) -> str:
     term = glossary.get(part.term_id) if glossary is not None else None
     if term is None:
         return str(escape(part.display))
-    return _term_ref_span(
-        classes=[_term_kind_class(term.kind)],
-        display=part.display,
-        term_id=part.term_id,
-        tooltip_name=term.canonical,
-        tooltip_def=term.definition or '',
-    )
+    return _term_ref_span(term, part.term_id, part.display)
 
 
 def _placeholder_token(part: NarrationPlaceholder) -> str:
@@ -408,15 +406,7 @@ def _make_activity_part_filter(
         match part:
             case ActivityTermRef(term_id=tid, display=display):
                 term = glossary.get(tid) if glossary else None
-                return Markup(
-                    _term_ref_span(
-                        classes=[_term_kind_class(term.kind if term else None)],
-                        display=display,
-                        term_id=tid,
-                        tooltip_name=term.canonical if term else '',
-                        tooltip_def=term.definition or '' if term else '',
-                    )
-                )
+                return Markup(_term_ref_span(term, tid, display))
             case ActivityWord(text=text):
                 return Markup(f'<span class="activity-word">{escape(text)}</span>')
 

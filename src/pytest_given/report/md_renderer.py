@@ -1,3 +1,5 @@
+"""Rendering the Markdown report: the deterministic, diffable view of a run."""
+
 import re
 from collections.abc import Iterator
 from pathlib import Path
@@ -18,12 +20,15 @@ from ..model import (
     ParameterTable,
     ReportData,
     Scenario,
+    Status,
     Step,
     StepAttachment,
     node_base,
 )
 
-_STATUS_GLYPH = {'passed': '✓', 'failed': '✗', 'skipped': '⤼'}
+# The same three glyphs the HTML view paints, so one run reads alike in
+# both sinks.
+_STATUS_GLYPH: dict[Status, str] = {'passed': '✓', 'failed': '✗', 'skipped': '○'}
 
 
 def render_md(report: ReportData) -> str:
@@ -35,7 +40,7 @@ def render_md(report: ReportData) -> str:
 
 
 def _scenario_md(scenario: Scenario) -> str:
-    glyph = _STATUS_GLYPH.get(scenario.status, '✗')
+    glyph = _STATUS_GLYPH[scenario.status]
     suffix = ''
     if scenario.status == 'skipped':
         suffix = ' · skipped'
@@ -93,9 +98,7 @@ def _param_table_md(table: ParameterTable) -> str:
     blocks: list[str] = []
     for case in table.cases:
         cells = [_case_cell(column, value) for column, value in _cells(table, case)]
-        rows.append(
-            '| ' + ' | '.join([*cells, _STATUS_GLYPH.get(case.status, '✗')]) + ' |'
-        )
+        rows.append('| ' + ' | '.join([*cells, _STATUS_GLYPH[case.status]]) + ' |')
         blocks.extend(_case_error_block(table, case))
         blocks.extend(_case_attachment_blocks(table, case))
     return '\n'.join([header, separator, *rows, *blocks])

@@ -23,6 +23,7 @@ from pytest_given.model import (
 from pytest_given.report.coverage import (
     Identity,
     a_refs,
+    build_story_index,
     compute_coverage,
     identity_of_part,
     instance_id_of,
@@ -273,10 +274,9 @@ def test_compute_coverage_covers_canonical_activity_via_instance_step(g):
                 _term_ref('room', 'Room'),
             ),
         )
-        coverage = compute_coverage(g, scenario, story)
+        coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} reports the {pg["Activity"]} as covered'):
         assert ActivityId(1) in coverage
-        assert len(coverage[ActivityId(1)]) == 1
 
 
 @scenario(
@@ -305,9 +305,9 @@ def test_compute_coverage_does_not_cover_instance_activity_with_canonical_step(g
                 _term_ref('room', 'Room'),
             ),
         )
-        coverage = compute_coverage(g, scenario, story)
+        coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} leaves the more specific instance activity uncovered'):
-        assert coverage.get(ActivityId(1), set()) == set()
+        assert ActivityId(1) not in coverage
 
 
 @scenario(
@@ -347,10 +347,16 @@ def test_compute_coverage_lost_when_activity_gains_a_term(g):
         )
     with when(t'{pg["Coverage"]} is computed against each {pg["Story"]}'):
         before = compute_coverage(
-            g, scenario, Story(id=StoryId('s'), title='S', activities=(bare,))
+            g,
+            scenario,
+            build_story_index(g, Story(id=StoryId('s'), title='S', activities=(bare,))),
         )
         after = compute_coverage(
-            g, scenario, Story(id=StoryId('s'), title='S', activities=(promoted,))
+            g,
+            scenario,
+            build_story_index(
+                g, Story(id=StoryId('s'), title='S', activities=(promoted,))
+            ),
         )
     with then(t'the two-ref {pg["Activity"]} is covered'):
         assert ActivityId(1) in before
@@ -398,7 +404,7 @@ def test_compute_coverage_scenario_constrained_to_activity_ids(g):
             ),
             activity_ids=[1],
         )
-        coverage = compute_coverage(g, scenario, story)
+        coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} considers only the bound {pg["Activity"]}'):
         assert ActivityId(1) in coverage
         assert ActivityId(2) not in coverage
@@ -475,7 +481,7 @@ def test_compute_coverage_excludes_under_anchored_activity(g):
             _step('given', _term_ref('guest', 'Guest')),
             _step('when'),
         )
-        coverage = compute_coverage(g, scenario, story)
+        coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} excludes the under-anchored {pg["Activity"]}'):
         assert ActivityId(1) not in coverage
 
@@ -507,12 +513,11 @@ def test_compute_coverage_nested_steps_are_walked(g):
         )
         parent.children.append(child)
         scenario = _scenario_with_steps(parent)
-        coverage = compute_coverage(g, scenario, story)
+        coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(
         t'the nested {pg["Step"]} still counts and the {pg["Activity"]} is covered'
     ):
         assert ActivityId(1) in coverage
-        assert len(coverage[ActivityId(1)]) == 1
 
 
 @scenario(
@@ -538,7 +543,7 @@ def test_compute_coverage_explicit_step_binding_covers_eligible_activity(g):
         t'to it explicitly by id'
     ):
         scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
-        coverage = compute_coverage(g, scenario, story)
+        coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} counts it directly, without identity matching'):
         assert ActivityId(1) in coverage
 
@@ -566,6 +571,6 @@ def test_compute_coverage_explicit_binding_covers_under_anchored_activity(g):
         t'to it explicitly by id'
     ):
         scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
-        coverage = compute_coverage(g, scenario, story)
+        coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} counts it, despite the missing anchors'):
         assert ActivityId(1) in coverage

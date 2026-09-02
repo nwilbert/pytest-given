@@ -29,6 +29,7 @@ from pytest_given.model import (
     report_to_dict,
 )
 from pytest_given.report.html_renderer import (
+    _app_data,
     _build_param_color_map,
     _inline_md,
     _make_activity_part_filter,
@@ -37,6 +38,20 @@ from pytest_given.report.html_renderer import (
     render_html_string,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
+
+
+def _embedded_app_data(content: str) -> dict:
+    """The `window.__REPORT_DATA__` payload, decoded.
+
+    Asserting on the parsed value rather than on the emitted text: the blob is
+    a `JSON.parse("…")` call, so every quote in it is escaped twice and a
+    substring match would pin the encoding rather than the data.
+    """
+    start = content.index('window.__REPORT_DATA__ = JSON.parse(') + len(
+        'window.__REPORT_DATA__ = JSON.parse('
+    )
+    end = content.index(');\n', start)
+    return json.loads(json.loads(content[start:end]))
 
 
 def render_html(
@@ -1337,7 +1352,11 @@ def test_narration_filter_renders_verb_term_ref_with_verb_class() -> None:
     assert 'term-ref-verb' in str(f(n))
 
 
-def test_narration_filter_emits_tooltip_definition_when_term_has_one() -> None:
+def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
+    """The tooltip's name and definition are shipped once, on the term in the
+    app data; a ref carries only the marker and the id app.js looks up. A term
+    referenced hundreds of times would otherwise carry hundreds of copies of
+    its definition."""
     g = Glossary()
     g._register(
         GlossaryTerm(
@@ -1350,13 +1369,25 @@ def test_narration_filter_emits_tooltip_definition_when_term_has_one() -> None:
     f = _make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='Guest',
-        parts=[
-            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
-        ],
+        parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
     )
     out = str(f(n))
-    assert 'data-term-name="Guest"' in out
-    assert 'data-term-def="A person staying at the hotel."' in out
+    assert 'data-term-id="guest"' in out
+    assert 'has-term-tip' in out
+    assert 'A person staying at the hotel.' not in out
+
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+        ),
+        scenarios=[],
+        glossary=g,
+    )
+    glossary_data = _app_data(report)['glossary']
+    assert isinstance(glossary_data, dict)
+    [term] = glossary_data['terms']
+    assert term['canonical'] == 'Guest'
+    assert term['definition_html'] == 'A person staying at the hotel.'
 
 
 def test_narration_filter_handles_term_ref_with_no_glossary_match() -> None:
@@ -1376,7 +1407,7 @@ def test_narration_filter_handles_term_ref_with_no_glossary_match() -> None:
 def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
     """When the renderer is invoked with glossary=None (e.g. no glossary
     declared), NarrationTermRef still renders as escaped text."""
-    f = _make_narration_filter(param_color_map={})  # glossary defaults to None
+    f = _make_narration_filter(param_color_map={}, glossary=None)
     n = Narration(
         text='X',
         parts=[
@@ -1827,9 +1858,9 @@ def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> N
     # Anchor carries the short slug, not the raw node id.
     assert 'scenario=booking/make' in content
     assert 'scenario=pkg/test_booking.py::test_make' not in content
-    # Reverse map global resolves slug -> node id.
-    assert 'window.__scenarioSlugs = {' in content
-    assert '"booking/make": "pkg/test_booking.py::test_make"' in content
+    # The app data resolves slug -> node id.
+    slugs = _embedded_app_data(content)['scenario_slugs']
+    assert slugs['booking/make'] == 'pkg/test_booking.py::test_make'
 
 
 # ---------------------------------------------------------------------------
@@ -2172,8 +2203,6 @@ def test_render_embeds_activity_filter_data(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
-    assert 'window.__scenarioActivities = {"test.py::test_x": [1]};' in content
-    assert (
-        'window.__activityLabels = {"book-a-room:1": "Carol searches for Room"};'
-        in content
-    )
+    app_data = _embedded_app_data(content)
+    assert app_data['scenario_activities'] == {'test.py::test_x': [1]}
+    assert app_data['activity_labels'] == {'book-a-room:1': 'Carol searches for Room'}

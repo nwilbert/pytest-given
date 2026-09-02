@@ -21,11 +21,11 @@ from pytest_given.model import (
     report_to_dict,
 )
 from pytest_given.report.aggregations import (
+    TabVisibility,
     build_activity_labels,
     build_coverage_maps,
-    build_glossary_aggregations,
+    build_glossary_views,
     build_story_rollups,
-    build_term_scenario_index,
     tab_visibility,
 )
 from tests.ubiquitous_language import pg
@@ -53,11 +53,10 @@ def _meta() -> Metadata:
 
 def test_tab_visibility_only_scenarios_visible_with_empty_report() -> None:
     rd = ReportData(metadata=_meta())
-    assert tab_visibility(rd) == {
-        'scenarios': True,
-        'stories': False,
-        'glossary': False,
-    }
+    assert tab_visibility(rd) == TabVisibility(
+        scenarios=True, stories=False, glossary=False
+    )
+    assert tab_visibility(rd).visible_count == 1
 
 
 def test_tab_visibility_stories_visible_when_stories_non_empty() -> None:
@@ -75,17 +74,17 @@ def test_tab_visibility_stories_visible_when_stories_non_empty() -> None:
     )
     s = Story(id=StoryId('s'), title='S', activities=(a,))
     rd = ReportData(metadata=_meta(), stories=[s])
-    assert tab_visibility(rd)['stories'] is True
+    assert tab_visibility(rd).stories is True
 
 
 def test_tab_visibility_glossary_visible_when_glossary_has_terms() -> None:
     rd = ReportData(metadata=_meta(), glossary=_g())
-    assert tab_visibility(rd)['glossary'] is True
+    assert tab_visibility(rd).glossary is True
 
 
 def test_tab_visibility_glossary_hidden_when_glossary_is_empty() -> None:
     rd = ReportData(metadata=_meta(), glossary=Glossary())
-    assert tab_visibility(rd)['glossary'] is False
+    assert tab_visibility(rd).glossary is False
 
 
 def test_build_coverage_maps_produces_per_scenario_dicts() -> None:
@@ -136,7 +135,7 @@ def test_build_coverage_maps_empty_for_scenario_without_story() -> None:
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
     maps = build_coverage_maps(rd)
-    assert maps[NodeId('t')] == {}
+    assert maps[NodeId('t')] == set()
 
 
 def test_build_coverage_maps_empty_when_no_glossary() -> None:
@@ -148,12 +147,12 @@ def test_build_coverage_maps_empty_when_no_glossary() -> None:
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn])
     maps = build_coverage_maps(rd)
-    assert maps == {NodeId('t'): {}}
+    assert maps == {NodeId('t'): set()}
 
 
 def test_build_glossary_aggregations_empty_when_no_glossary() -> None:
     rd = ReportData(metadata=_meta())
-    assert build_glossary_aggregations(rd) == {}
+    assert build_glossary_views(rd).aggregations == {}
 
 
 @scenario(
@@ -202,7 +201,7 @@ def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
         rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
         attach('Report data', report_to_dict(rd))
     with when(t'the {pg["Glossary"]} aggregations are built'):
-        aggs = build_glossary_aggregations(rd)
+        aggs = build_glossary_views(rd).aggregations
     with then(t'the entity terms collect their {pg["Instance"]}s'):
         assert 'Alice' in [i.display for i in aggs[TermId('guest')].instances]
         assert 'Deluxe Suite' in [i.display for i in aggs[TermId('room')].instances]
@@ -232,7 +231,7 @@ def test_build_glossary_aggregations_skips_unknown_term_in_scenario_narration() 
         steps=[step],
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
-    aggs = build_glossary_aggregations(rd)
+    aggs = build_glossary_views(rd).aggregations
     # missing term has no aggregation entry.
     assert TermId('missing') not in aggs
 
@@ -256,7 +255,7 @@ def test_build_glossary_aggregations_walks_nested_steps() -> None:
         steps=[outer],
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
-    aggs = build_glossary_aggregations(rd)
+    aggs = build_glossary_views(rd).aggregations
     assert 'Alice' in [i.display for i in aggs[TermId('guest')].instances]
 
 
@@ -284,7 +283,7 @@ def test_build_glossary_aggregations_records_story_refs_via_activities() -> None
         story = Story(id=StoryId('book'), title='Book', activities=(a,))
         rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
     with when(t'the {pg["Glossary"]} aggregations are built'):
-        aggs = build_glossary_aggregations(rd)
+        aggs = build_glossary_views(rd).aggregations
     with then(t'the actor and the verb each list that {pg["Story"]}'):
         assert aggs[TermId('guest')].stories == [StoryId('book')]
         assert aggs[TermId('search')].stories == [StoryId('book')]
@@ -314,7 +313,7 @@ def test_repeated_references_within_one_story_are_recorded_once() -> None:
         )
         rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
     with when(t'the {pg["Glossary"]} aggregations are built'):
-        aggs = build_glossary_aggregations(rd)
+        aggs = build_glossary_views(rd).aggregations
     with then(t'the {pg["Story"]} and the {pg["Inflection"]} appear once each'):
         assert aggs[TermId('guest')].stories == [StoryId('book')]
         assert list(aggs[TermId('search')].forms) == ['searches for']
@@ -332,7 +331,7 @@ def test_build_coverage_maps_empty_for_scenario_with_unknown_story_id() -> None:
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
     maps = build_coverage_maps(rd)
-    assert maps[NodeId('t')] == {}
+    assert maps[NodeId('t')] == set()
 
 
 def test_build_glossary_aggregations_verb_in_step_not_collected_as_instance() -> None:
@@ -355,7 +354,7 @@ def test_build_glossary_aggregations_verb_in_step_not_collected_as_instance() ->
         steps=[step],
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
-    aggs = build_glossary_aggregations(rd)
+    aggs = build_glossary_views(rd).aggregations
     # Verb terms from scenario steps are not added to aggs as instances.
     assert TermId('search') not in aggs
 
@@ -400,7 +399,7 @@ def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -
         )
         rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
     with when(t'the {pg["Glossary"]} aggregations are built'):
-        aggs = build_glossary_aggregations(rd)
+        aggs = build_glossary_views(rd).aggregations
     with then(t'neither entity term records an {pg["Instance"]}'):
         assert aggs[TermId('guest')].instances == []
         assert aggs[TermId('room')].instances == []
@@ -423,7 +422,7 @@ def test_build_glossary_aggregations_skips_non_term_ref_narration_parts() -> Non
         steps=[step],
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
-    aggs = build_glossary_aggregations(rd)
+    aggs = build_glossary_views(rd).aggregations
     assert aggs == {}
 
 
@@ -442,7 +441,7 @@ def test_build_glossary_aggregations_skips_unknown_term_ref_in_activity() -> Non
     )
     story = Story(id=StoryId('s'), title='S', activities=(a,))
     rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
-    aggs = build_glossary_aggregations(rd)
+    aggs = build_glossary_views(rd).aggregations
     assert TermId('unknown-term') not in aggs
 
 
@@ -463,7 +462,7 @@ def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> N
         story = Story(id=StoryId('book'), title='Book', activities=(a,))
         rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
     with when(t'the {pg["Glossary"]} aggregations are built'):
-        aggs = build_glossary_aggregations(rd)
+        aggs = build_glossary_views(rd).aggregations
     with then(
         t'the {pg["Term"]} lists the {pg["Story"]} but no {pg["Instance"]} '
         t'and no {pg["Inflection"]}'
@@ -530,7 +529,7 @@ def test_glossary_aggregations_annotates_fixture_provenance() -> None:
         story = Story(id=StoryId('book'), title='Book', activities=(a,))
         rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
     with when(t'the {pg["Glossary"]} aggregations are built'):
-        aggs = build_glossary_aggregations(rd)
+        aggs = build_glossary_views(rd).aggregations
     with then(t'the {pg["Instance"]} carries the fixture name'):
         alice = next(i for i in aggs[TermId('guest')].instances if i.display == 'Alice')
         assert alice.fixture_name == 'alice'
@@ -544,7 +543,7 @@ def test_build_term_scenario_index_empty_when_no_glossary() -> None:
         steps=[],
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn])
-    assert build_term_scenario_index(rd) == {}
+    assert build_glossary_views(rd).term_scenarios == {}
 
 
 def test_build_term_scenario_index_maps_terms_to_scenarios() -> None:
@@ -566,7 +565,7 @@ def test_build_term_scenario_index_maps_terms_to_scenarios() -> None:
         steps=[step],
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
-    index = build_term_scenario_index(rd)
+    index = build_glossary_views(rd).term_scenarios
     assert index[TermId('guest')] == [NodeId('test::a')]
     assert index[TermId('room')] == [NodeId('test::a')]
     assert TermId('search') not in index
@@ -607,7 +606,7 @@ def test_build_term_scenario_index_dedups_and_includes_scenario_narration() -> N
         )
         rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
     with when('the term-scenario index is built'):
-        index = build_term_scenario_index(rd)
+        index = build_glossary_views(rd).term_scenarios
     with then(t'each {pg["Term"]} maps to the scenario exactly once'):
         assert index[TermId('guest')] == [NodeId('test::a')]  # dedup across steps
         assert index[TermId('room')] == [NodeId('test::a')]  # narration counts

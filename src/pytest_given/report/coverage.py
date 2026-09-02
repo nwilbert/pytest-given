@@ -1,5 +1,6 @@
 """Scenario ↔ story-activity coverage matching."""
 
+from dataclasses import dataclass
 from typing import NamedTuple
 
 from ..model import (
@@ -16,7 +17,7 @@ from ..model import (
     Story,
     TermId,
     id_derive,
-    walk_steps,
+    iter_steps,
 )
 
 
@@ -25,7 +26,8 @@ class Identity(NamedTuple):
     instance_id: str | None
 
 
-type StepRef = tuple[NodeId, tuple[int, ...]]
+# Which activities a scenario covers.
+type CoverageMap = dict[NodeId, set[ActivityId]]
 
 
 def instance_id_of(
@@ -114,54 +116,75 @@ def s_for_step(glossary: Glossary, step: Step) -> set[Identity]:
     return out
 
 
-def compute_coverage(
-    glossary: Glossary,
-    scenario: Scenario,
-    story: Story,
-) -> dict[ActivityId, set[StepRef]]:
-    """Per-scenario activity-coverage map.
+@dataclass(frozen=True)
+class StoryIndex:
+    """A story's activities reduced to what matching needs, built once.
 
-    Each activity covered by at least one step appears in the result, valued
-    by the StepRefs of the covering steps. A non-empty `scenario.activity_ids`
-    bounds which activities can appear at all.
+    Depends only on the story and the glossary, so it is shared across every
+    scenario bound to that story instead of rebuilt per scenario — which also
+    computes `a_refs` and `is_coverage_eligible` once per activity rather than
+    once per activity per scenario.
+    """
+
+    refs_by_activity: dict[ActivityId, set[Identity]]
+    activities_by_identity: dict[Identity, set[ActivityId]]
+    eligible: dict[ActivityId, bool]
+    ids: set[ActivityId]
+
+
+def build_story_index(glossary: Glossary, story: Story) -> StoryIndex:
+    """Index *story* for matching.
 
     Under-anchored activities (fewer than 2 distinct term refs) are excluded
     from *narration* matching — the ``A_refs ⊆ S`` rule would let one term, or
     none, be covered by almost any step. An explicit ``activity=`` pin says
     what the narration cannot, so it reaches them too.
     """
+    eligible = {a.id: is_coverage_eligible(a) for a in story.activities}
+    refs_by_activity = {
+        activity.id: a_refs(glossary, activity)
+        for activity in story.activities
+        if eligible[activity.id]
+    }
+    activities_by_identity: dict[Identity, set[ActivityId]] = {}
+    for aid, refs in refs_by_activity.items():
+        for ident in refs:
+            activities_by_identity.setdefault(ident, set()).add(aid)
+    return StoryIndex(
+        refs_by_activity=refs_by_activity,
+        activities_by_identity=activities_by_identity,
+        eligible=eligible,
+        ids={a.id for a in story.activities},
+    )
+
+
+def compute_coverage(
+    glossary: Glossary, scenario: Scenario, index: StoryIndex
+) -> set[ActivityId]:
+    """The activities this scenario covers.
+
+    A non-empty `scenario.activity_ids` bounds which can appear at all.
+    """
     # Intersected with the story's own ids, never taken verbatim: `scope` is
     # the only guard the pin path below has, and an id naming no activity in
     # this story would render a `Covers:` chip pointing at a timeline row that
     # does not exist. Collection rules that out for a live run, but a saved
     # report replayed through `pytest-given report` is deserialized unvalidated.
-    story_ids = {a.id for a in story.activities}
     scope = (
-        set(scenario.activity_ids) & story_ids if scenario.activity_ids else story_ids
+        set(scenario.activity_ids) & index.ids if scenario.activity_ids else index.ids
     )
-    refs_by_activity: dict[ActivityId, set[Identity]] = {}
-    for activity in story.activities:
-        if activity.id not in scope or not is_coverage_eligible(activity):
-            continue
-        refs_by_activity[activity.id] = a_refs(glossary, activity)
-    identity_to_activities: dict[Identity, set[ActivityId]] = {}
-    for aid, refs in refs_by_activity.items():
-        for ident in refs:
-            identity_to_activities.setdefault(ident, set()).add(aid)
-
-    result: dict[ActivityId, set[StepRef]] = {}
-    for path_index, step in walk_steps(scenario.steps):
-        ref: StepRef = (scenario.id, path_index)
+    covered: set[ActivityId] = set()
+    for step in iter_steps(scenario.steps):
         if step.activity_ids:
-            for aid in step.activity_ids:
-                if aid in scope:
-                    result.setdefault(aid, set()).add(ref)
+            covered |= {aid for aid in step.activity_ids if aid in scope}
             continue
         s_cache = s_for_step(glossary, step)
         candidates: set[ActivityId] = set()
         for ident in s_cache:
-            candidates |= identity_to_activities.get(ident, set())
-        for aid in candidates:
-            if refs_by_activity[aid].issubset(s_cache):
-                result.setdefault(aid, set()).add(ref)
-    return result
+            candidates |= index.activities_by_identity.get(ident, set())
+        covered |= {
+            aid
+            for aid in candidates
+            if aid in scope and index.refs_by_activity[aid].issubset(s_cache)
+        }
+    return covered

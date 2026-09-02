@@ -105,7 +105,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
   column — and the sidebar, its filter chips and the attachment badges are
   tidied along with it.
 - The report opens and filters substantially faster on large suites, and its file
-  is smaller.
+  is smaller — a term reference now points at its glossary entry instead of
+  repeating the entry's definition, which takes about 18% off a term-heavy
+  report.
+- A glossary term referenced only in a `@scenario` title now contributes an
+  instance to the Glossary view, where it previously counted toward the term's
+  scenario tally while showing no instance.
 
 #### Bundled skills
 

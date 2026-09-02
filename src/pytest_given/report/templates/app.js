@@ -16,11 +16,11 @@ function serializeHash(params, mode = 'push') {
 
 // Mirrors `tab_visibility`: these are the reports that render each tab.
 function hasStories() {
-  return (window.__storyIds || []).length > 0;
+  return (window.__REPORT_DATA__.story_ids || []).length > 0;
 }
 
 function hasTerms() {
-  return (window.__termIds || []).length > 0;
+  return (window.__REPORT_DATA__.term_ids || []).length > 0;
 }
 
 function deserializeView(params) {
@@ -34,7 +34,7 @@ function deserializeView(params) {
 
 function deserializeStory(params) {
   const s = params.get('story');
-  const ids = window.__storyIds || [];
+  const ids = window.__REPORT_DATA__.story_ids || [];
   if (s && ids.includes(s)) return s;
   // An activity filter names the story it came from. A pasted `#activity-filter=`
   // link carries no `story=` (the Scenarios view doesn't write one), so read it
@@ -81,18 +81,22 @@ function commonDepth(modules) {
 function reportApp() {
   // The slim projection `html_renderer._app_data` emits, not the whole report.
   const data = window.__REPORT_DATA__;
-  const storyIds = window.__storyIds || [];
+  const storyIds = data.story_ids || [];
   const glossaryTerms = (data.glossary && data.glossary.terms) || [];
   // Scenario -> covered activity ids, and activity key -> its prose. The story
   // markup paints that prose as pills, unreadable as a filter label.
-  const scenarioActivities = window.__scenarioActivities || {};
-  const activityLabels = window.__activityLabels || {};
+  const scenarioActivities = data.scenario_activities || {};
+  const activityLabels = data.activity_labels || {};
   const hasGlossary = glossaryTerms.length > 0;
   const allModules = [...new Set(data.scenarios.map(s => s.module))];
   // Term id -> canonical display name, for the Terms browse axis.
   const termNames = {};
   for (const t of glossaryTerms) termNames[t.id] = t.canonical;
-  const termScenarios = window.__termScenarios || {};
+  // Term id -> the term itself, for the hover tooltip. Looked up by id rather
+  // than carried on every ref: a term used N times would otherwise repeat its
+  // whole definition N times in the markup.
+  const termsById = new Map(glossaryTerms.map((t) => [t.id, t]));
+  const termScenarios = data.term_scenarios || {};
   // __termScenarios is term -> scenarios; the sidebar needs the inverse.
   const scenarioTerms = {};
   for (const [termId, ids] of Object.entries(termScenarios)) {
@@ -217,7 +221,7 @@ function reportApp() {
     },
     toggleAllTerms() {
       const expand = !this.anyTermsExpanded;
-      const ids = window.__termIds || [];
+      const ids = window.__REPORT_DATA__.term_ids || [];
       if (expand) {
         ids.forEach(id => { this.expandedTerms[id] = true; });
       } else {
@@ -765,10 +769,12 @@ function reportApp() {
       const defEl = tip.querySelector('.term-tip-def');
       const hide = () => { if (!tip.hidden) tip.hidden = true; };
       document.addEventListener('pointerover', (event) => {
-        const pill = event.target.closest('[data-term-name]');
+        const pill = event.target.closest('.has-term-tip[data-term-id]');
         if (!pill) { return; }
-        nameEl.textContent = pill.dataset.termName;
-        const def = pill.dataset.termDef || '';
+        const term = termsById.get(pill.dataset.termId);
+        if (!term) { return; }
+        nameEl.textContent = term.canonical;
+        const def = term.definition_html || '';
         // innerHTML because a definition carries inline markup. Safe not
         // because the source is trusted, but because render_inline_markdown
         // escapes the text first and only re-admits <br>/<code>/<strong>/<em>,
@@ -789,7 +795,7 @@ function reportApp() {
         tip.style.left = left + 'px';
       });
       document.addEventListener('pointerout', (event) => {
-        const pill = event.target.closest('[data-term-name]');
+        const pill = event.target.closest('.has-term-tip[data-term-id]');
         if (!pill) return;
         if (event.relatedTarget && pill.contains(event.relatedTarget)) return;
         hide();
@@ -842,7 +848,7 @@ function reportApp() {
       else if (this.moduleFilter) this.view = 'modules';
       const targetSlug = params.get('scenario');
       const targetScenario = targetSlug
-        ? lookup(window.__scenarioSlugs || {}, targetSlug, null)
+        ? lookup(window.__REPORT_DATA__.scenario_slugs || {}, targetSlug, null)
         : null;
       const targetTerm = params.get('term');
       if (targetTerm) {
