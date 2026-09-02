@@ -13,9 +13,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
-- `pytest_given.PytestGivenWarning` is a top-level export. A step or `attach()`
-  recorded in a test without `@scenario` warns with it instead of
-  `pytest.PytestWarning`, so a suite can filter it by name.
+- `pytest_given.PytestGivenWarning` is a top-level export, and a step or
+  `attach()` recorded in a test without `@scenario` now warns with it instead of
+  `pytest.PytestWarning`.
 - `--given-title=TEXT` (or the `given_title` ini) names the report, replacing the
   rootdir name.
 - A parametrized scenario's parameter table now carries a typed column per varying
@@ -25,11 +25,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
   as its own scenario, titled by its parametrize id.
 - The HTML report's sidebar gains **Terms** as a third browse axis, and all three
   axes — Tags, Terms, Modules — now filter the Scenarios view the same way, with
-  each active filter carried in the sharable URL.
-- The sidebar's browse list can be ordered by group size as well as by name, via
-  an **A–Z / Count** toggle.
-- The sidebar is resizable — drag the seam between it and the content, or focus
-  it and use the arrow keys.
+  each active filter carried in the URL.
+- The sidebar can be ordered by group size as well as by name, and resized by
+  dragging its seam or with the arrow keys.
 - A selected activity in the Stories view offers **Open in Scenarios**, filtering
   the Scenarios view down to the scenarios covering it.
 
@@ -47,31 +45,27 @@ form `## [x.y.z] - YYYY-MM-DD`.
   - a t-string narrating a parametrize name that no longer holds the case's
     value — either a local rebound it, or the body mutated it in place;
   - a step whose set of `attach` labels differs between cases;
-  - a glossary term ref that names a different term or reads differently
-    between cases — including one bound to a parametrize column, which the
-    grouped tree cannot show per case;
+  - a glossary term ref that names a different term or reads differently between
+    cases, including one bound to a parametrize column;
   - passed cases that narrate different templates altogether.
 
   Every one but the last is fixed by binding the varying part to a local and
-  narrating it with a t-string, keeping labels and term refs constant; content
-  may still vary freely, which is what the new `attachment` column is for. The
-  last needs `@scenario(..., group_parametrized=False)`, giving each case its
-  own scenario.
+  narrating it with a t-string, keeping labels and term refs constant; varying
+  content belongs in the new `attachment` column. The last needs
+  `@scenario(..., group_parametrized=False)`, giving each case its own scenario.
 - **Breaking.** `attach()` now takes a plain `str` label; a t-string label raises
   `PytestGivenError` — use an f-string.
 - **Breaking.** `attach()` called with no step open now raises `PytestGivenError`
-  instead of silently discarding the payload; move the call inside the `given` /
-  `when` / `then` block it belongs to.
+  instead of silently discarding the payload; move the call inside the step it
+  belongs to.
 - **Breaking.** `activity(..., id=N)` is now `activity(..., activity_id=N)`; the
   `Activity.id` field itself is unchanged.
-- A glossary term placed in an activity slot its declared kind forbids now
-  raises `PytestGivenError` when `activity(...)` is built rather than at session
-  finish, naming the term and its kind instead of dumping handle reprs.
+- A glossary term placed in an activity slot its declared kind forbids now raises
+  `PytestGivenError` when `activity(...)` is built rather than at session finish.
 - `@scenario(activities=...)` now rejects a `str` and non-`int` members with a
-  `TypeError`; `activities='13'` previously became the ids 1 and 3 and failed
-  later against a story that listed both as valid.
+  `TypeError`.
 - `@scenario` now returns the test function itself rather than a wrapper, so the
-  test keeps its own signature and its traceback loses a frame.
+  test keeps its own signature.
 
 #### Plugin and run behavior
 
@@ -84,45 +78,33 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - **Breaking (JSON report).** `parameters.names` becomes `parameters.columns`
   (`{id, name, kind}`), cells may hold an attachment object, placeholder parts
-  gain `column_id`, term-ref parts lose `param_column` (no term ref may vary
-  across cases, so none is bound to a column), and a grouped step's
+  gain `column_id`, term-ref parts lose `param_column`, and a grouped step's
   `narration.text` is the template rather than case 1's rendering.
 - **Breaking (JSON report).** A step no longer carries `status` or `error`;
   failure lives on the scenario and on the parameter table's cases. A consumer
   reading `step.status` should read `scenario.status` instead.
-- The Markdown report now shows a scenario's failure reason — the message and
-  the failing frame — under the scenario, and under the parameter table for each
-  failed case. A failure outside a step, or in any case but the one the grouped
-  tree came from, previously showed as a bare ✗.
+- The Markdown report now shows a scenario's failure reason — the message and the
+  failing frame — under the scenario, and under the parameter table for each
+  failed case.
 
 #### HTML report
 
-- The browse sidebar leads with **Modules** and opens there — the one axis every
-  report has, so no report opens on an empty tree — and renders modules as a
-  collapsible package tree whose nodes filter by path prefix, so selecting a
-  package takes every scenario beneath it, and opens it to show what is in it.
-- The browse sidebar no longer lists individual scenarios under each group; the
-  Scenarios view already lists them, collapsed, one click away.
-- A selected filter now reads the same in the sidebar and in the header chip
-  that mirrors it, and the `×` marker on a selected row is gone — the row itself
-  toggles, and the chip carries the real dismiss button.
-- The HTML report's colors are retuned into one system, so glossary term kinds,
-  statuses and parametrize columns can no longer land on the same color: a term
-  ref in a step or a scenario title reads as a word under a light wash rather
-  than a bordered pill (the Glossary view keeps its pills), and column colors are
-  generated per column, so a seventh column no longer wraps back onto the first.
-- An attachment badge now takes its icon from the payload's content type —
-  braces for JSON, a page for text — instead of a paperclip for both. The
-  Markdown report keeps its `📎`.
-- Filtering a large report is cheaper: a keystroke in the search box now scans
-  the scenarios once instead of six times.
+- The browse sidebar leads with **Modules** and renders them as a collapsible
+  package tree whose nodes filter by path prefix; it no longer lists individual
+  scenarios under each group.
+- The report's colors are retuned into one system — a term ref in a step or a
+  scenario title reads as a word under a light wash rather than a bordered pill
+  (the Glossary view keeps its pills), and column colors are generated per
+  column — and the sidebar, its filter chips and the attachment badges are
+  tidied along with it.
+- The report opens and filters substantially faster on large suites, and its file
+  is smaller.
 
 #### Bundled skills
 
-- The authoring skill's tagging guidance now argues for sparse tagging: a tag
-  should cut across modules and cover a minority of the suite.
-- The authoring and reviewing skills gain the report mechanics their rules
-  depend on, a symptom index, and a completeness audit.
+- The authoring and reviewing skills gain the report mechanics their rules depend
+  on, a symptom index, a completeness audit, the full lint rule catalog, and
+  guidance for sparser tagging.
 
 ### Removed
 
@@ -134,9 +116,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Authoring API
 
-- `@scenario(activities=...)` is now typed `int | Sequence[int] | None`, matching
-  a step's `activity=` and the documented "an int or a sequence of them"; a bare
-  `activities=2` already worked at runtime but failed type checking.
+- `@scenario(activities=...)` is now typed `int | Sequence[int] | None`, so a
+  bare `activities=2` type-checks.
 - Glossary term handles are now hashable, and equal for the same term whichever
   accessor produced them.
 - A `when_then` step in a test without `@scenario` now points its warning at the
@@ -144,71 +125,62 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Plugin and run behavior
 
-- A `git` on PATH that cannot be executed no longer fails the run; the
-  commit-SHA lookup reads it as no answer.
+- A `git` on PATH that cannot be executed no longer fails the run.
 - A nested in-process pytest run that dies while parsing its arguments no longer
   strands the outer session's captured rootdir, which silently dropped every
   later step's source anchor.
 - `@given`/`@when`/`@then` on an `async def` helper now records around the
-  awaited body; the step previously closed before the body ran, so anything it
-  recorded landed elsewhere. Async generator fixtures are handled too.
+  awaited body, and async generator fixtures are handled too.
 - The narration lint now inspects `async def` step helpers, whose bodies were
-  invisible to every AST rule — and an unresolved async `when` additionally
-  disabled `action-in-then` for the whole scenario around it.
-- An explicit `--given-source-link=` now disables source links instead of
-  falling through to the `given_source_link` ini.
+  invisible to every AST rule.
+- An explicit `--given-source-link=` now disables source links instead of falling
+  through to the `given_source_link` ini.
 - A finished scenario no longer leaves its collector — and every scenario and
-  step it recorded — reachable from a process-global for the rest of the
-  process.
-- `pytest-given report` now reports a bad input file as a CLI error instead of a
-  traceback — missing, unparsable, or JSON that is not a pytest-given report (a
-  report from an incompatible version among them) — as does an unknown
-  `--source-link` preset.
+  step it recorded — reachable from a process-global for the rest of the process.
+- `pytest-given report` now reports a bad input file — missing, unparsable, or
+  JSON that is not a pytest-given report — as a CLI error instead of a traceback,
+  as does an unknown `--source-link` preset.
 - A fixture that raises after its `yield` now fails the scenario it tore down,
   instead of leaving it green in a report pytest counted as an error.
 - An error-level narration-lint finding now counts as an error in the run's
-  summary line, which previously read green over the non-zero exit code.
+  summary line.
 - Every failure building or writing a report — a suite reaching two glossaries, a
   term used in incompatible slots, an unusable source-link template, an
   unwritable output path — now surfaces as a terminal summary and a failing exit
   code, where only grouping errors did.
 - The sinks are now rendered in full before any is written, and a failure on
-  either side discards all of them, so a run can no longer leave its JSON beside
-  the previous run's HTML.
+  either side discards all of them.
 
 #### Report content (all formats)
 
 - A parametrized scenario now keeps its place in source order instead of moving
   below every unparametrized one.
 - A glossary term written as a code span keeps the markup inside it, so
-  `` `a*b*c` `` canonicalizes to `a*b*c` and matches how a definition cell
-  renders the same span.
-- A parameter-table cell now reads the way the step pointing at it read,
-  carrying the interpolation's own format spec and, under `indirect=True`, the
-  bound test argument.
+  `` `a*b*c` `` canonicalizes to `a*b*c`.
+- A parameter-table cell now reads the way the step pointing at it read, carrying
+  the interpolation's own format spec and, under `indirect=True`, the bound test
+  argument.
 - A `Template` narration's `text` is now what its parts render, so the report's
   search box and `jq` queries match what the page displays.
 - The grouped step tree now comes from the first case that *passed*, where a
   skipped case 1 used to render an empty tree.
 - A parametrize value that is a glossary term instance now narrates as its
-  display — in a step's `Template` slot, in a scenario name, and in the label of
-  an `Annotated[..., given(Template(...))]` parameter. All three previously
-  rendered the whole `Glossary` dataclass repr.
+  display rather than the whole `Glossary` dataclass repr — in a step's
+  `Template` slot, in a scenario name, and in an
+  `Annotated[..., given(Template(...))]` parameter label.
 
 #### HTML report
 
 - Two test files sharing a basename across directories no longer abort the HTML
   report; the scenarios' `#scenario=` slugs gain directory components instead.
 - A `#view=stories`, `#view=glossary` or `#term=` link opened against a report
-  that has no such tab now falls back to the Scenarios view, instead of
-  stranding the reader on an empty one with no tab bar to leave by.
+  that has no such tab now falls back to the Scenarios view.
 - The Glossary view's kind headings and their term counts now follow the search
-  and definition filters, rather than showing the report's totals over a list
-  the filter emptied; a filter matching nothing now says so.
-- Content reaching past a scenario card's right edge is no longer clipped beyond
-  reach: a wide parameter table and an attachment payload scroll, a source path and a
-  traceback's frame location wrap, and the source link sits under the card's last
-  element instead of on top of it.
+  and definition filters, and a filter matching nothing says so.
+- Content reaching past a scenario card's right edge is no longer clipped: a wide
+  parameter table and an attachment payload scroll, a source path and a
+  traceback's frame location wrap, and the source link no longer overlaps the
+  card's last element.
 - Jumping to a scenario from a story activity, or to a term's scenarios from the
   Glossary tab, now clears filters that would hide the target; the filters in a
   `#scenario=` deep link still win.
@@ -218,17 +190,13 @@ form `## [x.y.z] - YYYY-MM-DD`.
   browse-tree rows, tag pills, story sidebar entries, activity and attachment
   badges, and every expand/collapse chevron are now real buttons, and the view
   tabs report which one is selected.
-- A step pinned with `given(..., activity=N)` now covers an under-anchored
-  activity as well; the two-distinct-terms rule gates narration matching only,
-  and a covered activity no longer renders as "not coverage-tracked".
-- The report opens and filters substantially faster on large suites, and its file
-  is smaller.
+- A step pinned with `given(..., activity=N)` now covers an activity regardless
+  of its term count; an under-anchored activity previously still rendered as
+  "not coverage-tracked".
 
 #### Bundled skills
 
-- The bundled skills are corrected against the shipped behavior, and the
-  authoring skill now carries the lint rule catalog in full rather than pointing
-  at the README.
+- The bundled skills are corrected against the shipped behavior.
 
 ## [0.1.0] - 2026-08-08
 

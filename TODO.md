@@ -6,14 +6,13 @@
 
 ## Next
 
+- [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] check support for https://library-skills.io/
 - [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
-- [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] How to handle work objects appearing multiple times in Domain Storytelling?
-- [ ] `Plain fixture` is the last term nothing references, which is fine in itself — it is real vocabulary, the natural contrast to *Step fixture*, and the `dead-term` rule is off by default for exactly that reason. The open question is narrower: its definition asserts behavior ("produces no step in the report") that no scenario demonstrates. Either narrow the row to vocabulary and let the behavioral half go, or pin the claim with a scenario.
 
 ## Later
 
