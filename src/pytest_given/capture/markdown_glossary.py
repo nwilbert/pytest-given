@@ -50,8 +50,18 @@ def parse_glossary_tables(
         if index + 1 >= len(lines) or not _is_separator_row(lines[index + 1]):
             index += 1
             continue
-        saw_table = True
         header = _split_row(line)
+        specs = (term_column, description_column) + (
+            () if kind_column is None else (kind_column,)
+        )
+        if _addresses_another_table(specs, header):
+            # A table this spec cannot address at all is somebody else's — a
+            # glossary file is a document, and named columns are what lets one
+            # hold prose tables beside the glossary. An index spec cannot make
+            # the distinction, so under one every table still contributes.
+            index += 1
+            continue
+        saw_table = True
         term_idx = _resolve_column(term_column, header)
         desc_idx = _resolve_column(description_column, header)
         kind_idx = (
@@ -131,6 +141,21 @@ def _split_row(line: str) -> list[str]:
         stripped = stripped[:-1]
     cells = _SPLIT_ON_UNESCAPED_PIPE.split(stripped)
     return [cell.replace('\\|', '|').strip() for cell in cells]
+
+
+def _addresses_another_table(specs: tuple[ColumnSpec, ...], header: list[str]) -> bool:
+    """Whether *header* belongs to a table this spec is not about.
+
+    Only decidable when every column is named and none of the names is there:
+    then the table is somebody else's, which is what lets a glossary file hold
+    prose tables beside the glossary. Resolving *some* of the names is a real
+    glossary table with a wrong column, and an index spec addresses any table
+    at all — both still raise.
+    """
+    if not all(isinstance(spec, str) for spec in specs):
+        return False
+    lowered = {cell.lower() for cell in header}
+    return not any(str(spec).lower() in lowered for spec in specs)
 
 
 def _resolve_column(spec: ColumnSpec, header: list[str]) -> int:

@@ -312,3 +312,26 @@ def test_nested_emphasis_unwraps_all_the_way():
         text, term_column=0, description_column=1, kind_column=None
     )
     assert rows[0].term == 'Scenario'
+
+
+def test_a_named_spec_skips_a_table_it_cannot_address() -> None:
+    """A glossary file is a document; named columns are what lets one hold
+    prose tables beside the glossary. Resolving one named column but not the
+    other is a real glossary table with a wrong column, and still raises."""
+    doc = (
+        '| Term | Description |\n'
+        '|------|-------------|\n'
+        '| Guest | someone |\n'
+        '\n'
+        '| Option | Default |\n'
+        '|--------|---------|\n'
+        '| --flag | off |\n'
+    )
+    rows = parse_glossary_tables(
+        doc, term_column='Term', description_column='Description', kind_column=None
+    )
+    assert [(r.term, r.definition) for r in rows] == [('Guest', 'someone')]
+    with pytest.raises(PytestGivenError, match='Nope'):
+        parse_glossary_tables(
+            doc, term_column='Term', description_column='Nope', kind_column=None
+        )

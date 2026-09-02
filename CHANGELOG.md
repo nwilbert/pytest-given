@@ -64,6 +64,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
   `PytestGivenError` when `activity(...)` is built rather than at session finish.
 - A glossary file whose table has a header and separator but no data rows now
   says so, instead of reporting that no table was found.
+- A `FileGlossary` whose columns are all named now skips a Markdown table that
+  carries none of those names, so a glossary file may hold prose tables beside
+  the glossary; a table carrying some of them still raises, as does any table
+  under an index-based column spec.
 - `@scenario(activities=...)` now rejects a `str` and non-`int` members with a
   `TypeError`.
 - `@scenario` now returns the test function itself rather than a wrapper, so the
