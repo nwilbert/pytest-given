@@ -21,8 +21,10 @@ from ..capture import (
 )
 from ..grouping import group_parametrized
 from ..lint import (
+    Finding,
     apply_config,
     error_count,
+    has_errors,
     run_ast_rules,
     run_runtime_rules,
     summary_rows,
@@ -41,19 +43,17 @@ from ..model import (
 )
 from ..report import (
     RenderedSinks,
-    SinkConfig,
     detect_commit_sha,
     discard_stale_sinks,
     render_sinks,
     write_sinks,
 )
 from .state import (
-    SessionOutcome,
     SessionState,
     collector_key,
-    given_config_key,
+    given_config,
     session_collector,
-    session_outcome_key,
+    session_outcome,
     session_state,
     session_state_key,
 )
@@ -92,10 +92,11 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
 
 def pytest_sessionstart(session: pytest.Session) -> None:
     """Give the session its own collector and hook bookkeeping."""
-    collector = Collector()
-    collector.capture_step_source = session.config.stash[given_config_key].lint_enabled
-    session.config.stash[collector_key] = collector
-    session.config.stash[session_state_key] = SessionState()
+    config = session.config
+    config.stash[collector_key] = Collector(
+        capture_step_source=given_config(config).lint_enabled
+    )
+    config.stash[session_state_key] = SessionState()
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -114,7 +115,7 @@ class _SessionReport:
     sinks: RenderedSinks
 
 
-def pytest_sessionfinish(session: pytest.Session) -> None:
+def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     """Build the report and write the configured sinks.
 
     Building a report fails with a `PytestGivenError` and writing one with an
@@ -128,24 +129,35 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     file at a time, so only discarding both puts a run whose disk filled
     mid-write back to having no report rather than half of one.
     """
-    collector = session_collector(session.config)
-    state = session_state(session.config)
+    config = session.config
+    state = session_state(config)
     try:
-        built = _build_report(session, collector, state.param_info)
+        built = _build_report(session, session_collector(config), state.param_info)
         write_sinks(built.sinks)
     except (PytestGivenError, OSError) as error:
-        session.config.stash[session_outcome_key].report_error = '\n'.join(
-            [str(error), *discard_stale_sinks(_sink_config(session.config))]
+        session_outcome(config).report_error = '\n'.join(
+            [str(error), *discard_stale_sinks(given_config(config).sinks)]
         )
-        session.exitstatus = pytest.ExitCode.TESTS_FAILED
+        _fail_run(session, exitstatus)
         return
     finally:
         # Every way out drops the captured parametrize values: they are read
         # only here, and a nested in-process run must not inherit them.
         state.param_info.clear()
     if built.sinks.md_stdout is not None:
-        session.config.stash[session_outcome_key].md_stdout = built.sinks.md_stdout
-    _run_lint(session, built.scenarios, built.glossary, built.stories)
+        session_outcome(config).md_stdout = built.sinks.md_stdout
+    _run_lint(session, exitstatus, built)
+
+
+def _fail_run(session: pytest.Session, exitstatus: int) -> None:
+    """Fail a run pytest was otherwise about to call successful.
+
+    Only escalates from OK: pytest binds `exitstatus` before this hook, so
+    overwriting it unconditionally would report an interrupted or
+    nothing-collected run as a plain test failure.
+    """
+    if exitstatus == pytest.ExitCode.OK:
+        session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
 def _build_report(
@@ -158,35 +170,32 @@ def _build_report(
     authoring forms. Everything after them is sink-only work, so a run with no
     sink skips it and keeps just what the lint reads.
     """
+    config = session.config
+    given = given_config(config)
     scenarios = group_parametrized(collector.scenarios, param_info)
     stories = collector.stories
-    glossary = resolve_glossary(stories, session.config.pluginmanager.get_plugins())
+    glossary = resolve_glossary(stories, config.pluginmanager.get_plugins())
     if glossary is not None:
         glossary = infer_glossary_kinds(glossary, stories)
-    sink_config = _sink_config(session.config)
-    if not sink_config.writes_anything():
-        return _SessionReport(
+    sinks = RenderedSinks()
+    if given.sinks.writes_anything():
+        report = ReportData(
+            metadata=Metadata(
+                project=config.rootpath.name,
+                timestamp=datetime.now(tz=UTC).isoformat(),
+                pytest_version=pytest.__version__,
+                plugin_version=version('pytest-given'),
+                commit_sha=detect_commit_sha(),
+                title=given.title,
+            ),
             scenarios=scenarios,
-            glossary=glossary,
             stories=stories,
-            sinks=RenderedSinks(),
+            glossary=glossary,
         )
-    report = ReportData(
-        metadata=Metadata(
-            project=session.config.rootpath.name,
-            timestamp=datetime.now(tz=UTC).isoformat(),
-            pytest_version=pytest.__version__,
-            plugin_version=version('pytest-given'),
-            commit_sha=detect_commit_sha(),
-            title=session.config.stash[given_config_key].title,
-        ),
-        scenarios=scenarios,
-        stories=stories,
-        glossary=glossary,
-    )
-    report_dict = report_to_dict(report)
-    rendered = report_from_dict(report_dict)  # serde round-trip = fidelity guarantee
-    sinks = render_sinks(rendered, report_dict, sink_config)
+        report_dict = report_to_dict(report)
+        # Render from the deserialized copy, so every sink shows only what the
+        # JSON can express and the JSON sink can write the dict verbatim.
+        sinks = render_sinks(report_from_dict(report_dict), report_dict, given.sinks)
     return _SessionReport(
         scenarios=scenarios,
         glossary=glossary,
@@ -195,72 +204,64 @@ def _build_report(
     )
 
 
-def _sink_config(config: pytest.Config) -> SinkConfig:
-    """This run's sink options, resolved into the pytest-free shape `report/`
-    reads.
-
-    The source-link template is the one `pytest_configure` already resolved —
-    only an HTML run resolves one, and only an HTML run asks for it.
-    """
-    md_opt = config.getoption('given_md')
-    json_opt = config.getoption('given_json')
-    html_opt = config.getoption('given_html')
-    return SinkConfig(
-        json_path=Path(json_opt) if json_opt is not None else None,
-        html_path=Path(html_opt) if html_opt is not None else None,
-        md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
-        md_to_stdout=md_opt == '-',
-        source_link_template=config.stash[given_config_key].source_link_template,
-    )
-
-
-def _run_lint(
-    session: pytest.Session,
-    scenarios: list[Scenario],
-    glossary: Glossary | None,
-    stories: list[Story],
-) -> None:
+def _run_lint(session: pytest.Session, exitstatus: int, built: _SessionReport) -> None:
     """Run the narration lint; stash the findings for the terminal summary
     and fail the run when any is error-level."""
     config = session.config
-    given = config.stash[given_config_key]
+    given = given_config(config)
     if not given.lint_enabled:
         return
     findings = apply_config(
-        run_runtime_rules(scenarios, glossary, stories)
-        + run_ast_rules(scenarios, Path(config.rootpath)),
-        given.rule_levels,
-        given.ignore_entries,
+        run_runtime_rules(built.scenarios, built.glossary, built.stories)
+        + run_ast_rules(built.scenarios, Path(config.rootpath)),
+        given.lint,
     )
     if not findings:
         return
-    config.stash[session_outcome_key].findings = findings
-    if any(finding.severity == 'error' for finding in findings):
-        session.exitstatus = pytest.ExitCode.TESTS_FAILED
+    session_outcome(config).findings = findings
+    if has_errors(findings):
+        _fail_run(session, exitstatus)
 
 
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
-    outcome = terminalreporter.config.stash.get(session_outcome_key, SessionOutcome())
-    report_error = outcome.report_error
-    if report_error is not None:
-        terminalreporter.write_sep('=', 'pytest-given: report not written', red=True)
-        terminalreporter.line(report_error)
-        _count_as_error(terminalreporter, 'pytest-given: report not written')
-    findings = outcome.findings
-    if findings:
-        errors = error_count(findings)
-        title = summary_title(findings)
-        if errors:
-            _count_as_error(terminalreporter, title)
-        terminalreporter.write_sep('=', title, red=errors > 0, yellow=errors == 0)
-        for row in summary_rows(findings):
-            terminalreporter.line(row)
-    md = outcome.md_stdout
-    if md is not None:
-        terminalreporter.write_line('<!-- pytest-given:md:start -->')
-        for line in md.splitlines():
-            terminalreporter.write_line(line)
-        terminalreporter.write_line('<!-- pytest-given:md:end -->')
+    outcome = session_outcome(terminalreporter.config)
+    _write_report_error(terminalreporter, outcome.report_error)
+    _write_lint_findings(terminalreporter, outcome.findings)
+    _write_md(terminalreporter, outcome.md_stdout)
+
+
+def _write_report_error(
+    terminalreporter: pytest.TerminalReporter, report_error: str | None
+) -> None:
+    if report_error is None:
+        return
+    title = 'pytest-given: report not written'
+    terminalreporter.write_sep('=', title, red=True)
+    terminalreporter.line(report_error)
+    _count_as_error(terminalreporter, title)
+
+
+def _write_lint_findings(
+    terminalreporter: pytest.TerminalReporter, findings: list[Finding]
+) -> None:
+    if not findings:
+        return
+    errors = error_count(findings)
+    title = summary_title(findings)
+    if errors:
+        _count_as_error(terminalreporter, title)
+    terminalreporter.write_sep('=', title, red=errors > 0, yellow=errors == 0)
+    for row in summary_rows(findings):
+        terminalreporter.line(row)
+
+
+def _write_md(terminalreporter: pytest.TerminalReporter, md: str | None) -> None:
+    if md is None:
+        return
+    terminalreporter.write_line('<!-- pytest-given:md:start -->')
+    for line in md.splitlines():
+        terminalreporter.write_line(line)
+    terminalreporter.write_line('<!-- pytest-given:md:end -->')
 
 
 def _count_as_error(terminalreporter: pytest.TerminalReporter, summary: str) -> None:

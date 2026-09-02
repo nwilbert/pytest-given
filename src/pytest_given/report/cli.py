@@ -1,3 +1,5 @@
+"""The `pytest-given report` subcommand: re-render a saved JSON report."""
+
 import argparse
 import json
 import sys
@@ -5,8 +7,10 @@ from pathlib import Path
 from typing import Any
 
 from ..model import PytestGivenError, ReportData, report_from_dict
-from .sinks import SinkConfig, render_sinks, write_sinks
+from .sinks import SinkConfig, discard_stale_sinks, render_sinks, write_sinks
 from .source_link import resolve_template
+
+DEFAULT_HTML_OUTPUT = Path('given-report/report.html')
 
 
 def add_report_parser(
@@ -15,6 +19,7 @@ def add_report_parser(
     report_parser = subparsers.add_parser(
         'report', help='Generate HTML report from JSON data'
     )
+    report_parser.set_defaults(handler=run_report)
     report_parser.add_argument('json_file', type=Path, help='Path to JSON report data')
     report_parser.add_argument(
         '-o',
@@ -40,21 +45,53 @@ def add_report_parser(
 
 
 def run_report(args: argparse.Namespace) -> int:
+    return render_saved_report(
+        json_file=args.json_file,
+        output=args.output,
+        source_link=args.source_link,
+        fmt=args.format,
+    )
+
+
+def render_saved_report(
+    *,
+    json_file: Path,
+    output: Path | None,
+    source_link: str,
+    fmt: str | None,
+) -> int:
     """Render a saved JSON report to HTML or Markdown.
 
-    Input problems are reported as CLI errors rather than tracebacks.
+    Goes through `SinkConfig` rather than calling a renderer directly, so this
+    entry point gets the same render-then-write guarantee the plugin has: a
+    render that raises leaves no half-written file, and a write that fails
+    takes the stale previous report with it. Input and output problems are
+    reported as CLI errors rather than tracebacks.
     """
-    if not args.json_file.exists():
-        print(f'Error: {args.json_file} not found', file=sys.stderr)
+    if not json_file.exists():
+        print(f'Error: {json_file} not found', file=sys.stderr)
         return 1
     try:
-        return _render_report(args)
+        config = _sink_config(output, source_link, fmt)
+        report, report_dict = _load_report(json_file)
+        rendered = render_sinks(report, report_dict, config)
     except json.JSONDecodeError as error:
-        print(f'Error: {args.json_file} is not valid JSON — {error}', file=sys.stderr)
+        print(f'Error: {json_file} is not valid JSON — {error}', file=sys.stderr)
         return 1
     except PytestGivenError as error:
         print(f'Error: {error}', file=sys.stderr)
         return 1
+    try:
+        write_sinks(rendered)
+    except OSError as error:
+        for note in [f'Error: {error}', *discard_stale_sinks(config)]:
+            print(note, file=sys.stderr)
+        return 1
+    if rendered.md_stdout is not None:
+        print(rendered.md_stdout)
+    for rendered_file in rendered.files:
+        print(f'Report generated: {rendered_file.path}')
+    return 0
 
 
 def _load_report(json_file: Path) -> tuple[ReportData, dict[str, Any]]:
@@ -80,36 +117,17 @@ def _load_report(json_file: Path) -> tuple[ReportData, dict[str, Any]]:
         ) from error
 
 
-def _render_report(args: argparse.Namespace) -> int:
-    """Render the requested sink through the same render-then-write path the
-    plugin uses.
-
-    Going through `SinkConfig` rather than calling a renderer directly is what
-    keeps the two entry points honest with each other: a render that raises
-    leaves no half-written file. Only one sink is ever configured — this
-    command renders one format per invocation.
-    """
-    report, report_dict = _load_report(args.json_file)
-    rendered = render_sinks(report, report_dict, _sink_config(args))
-    write_sinks(rendered)
-    if rendered.md_stdout is not None:
-        print(rendered.md_stdout)
-    for path, _text in rendered.files:
-        print(f'Report generated: {path}')
-    return 0
-
-
-def _sink_config(args: argparse.Namespace) -> SinkConfig:
+def _sink_config(output: Path | None, source_link: str, fmt: str | None) -> SinkConfig:
     """The one sink this invocation writes.
 
     Markdown with no `-o` goes to stdout; HTML always needs a file, so it falls
     back to the default path rather than to stdout.
     """
-    if (args.format or _infer_format(args.output)) == 'md':
-        return SinkConfig(md_path=args.output, md_to_stdout=args.output is None)
+    if (fmt or _infer_format(output)) == 'md':
+        return SinkConfig(md_path=output, md_to_stdout=output is None)
     return SinkConfig(
-        html_path=args.output or Path('given-report/report.html'),
-        source_link_template=resolve_template(args.source_link),
+        html_path=output or DEFAULT_HTML_OUTPUT,
+        source_link_template=resolve_template(source_link),
     )
 
 

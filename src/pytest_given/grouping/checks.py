@@ -27,10 +27,19 @@ from ..model import (
     location_suffix,
     node_base,
     render_interpolation,
-    structure_signature,
     walk_steps,
 )
 from .columns import GroupContext
+
+# A step tree reduced to nested phase tuples — narration text and values
+# ignored. Two cases with equal signatures render truthfully in the grouped
+# parameter-table view.
+type StepSignature = tuple[tuple[Phase, StepSignature], ...]
+
+
+def structure_signature(steps: list[Step]) -> StepSignature:
+    """The tree's shape alone — phases and nesting, no narration."""
+    return tuple((step.phase, structure_signature(step.children)) for step in steps)
 
 
 def check_varying_str_narration(baseline: Scenario, ctx: GroupContext) -> None:

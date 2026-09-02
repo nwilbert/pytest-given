@@ -29,6 +29,7 @@ from pytest_given.capture.story import (
 from pytest_given.capture.story import (
     story as story_fn,
 )
+from pytest_given.lint import LintConfig
 from pytest_given.model import (
     ActivityId,
     FixtureRecording,
@@ -38,6 +39,7 @@ from pytest_given.model import (
     Step,
 )
 from pytest_given.plugin import collection, fixtures, runtest, session, state
+from pytest_given.report import SinkConfig
 
 
 @pytest.fixture
@@ -277,11 +279,10 @@ def _fake_session() -> Any:
     """
     config = SimpleNamespace(stash=pytest.Stash())
     config.stash[state.given_config_key] = state.GivenConfig(
-        rule_levels={},
-        ignore_entries=[],
-        source_link_template=None,
-        title=None,
+        lint=LintConfig(levels={}, ignores=[]),
         lint_enabled=False,
+        sinks=SinkConfig(),
+        title=None,
     )
     return SimpleNamespace(config=config)
 

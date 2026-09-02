@@ -6,14 +6,12 @@ import contextlib
 import functools
 import inspect
 from collections.abc import Callable, Generator
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import pytest
-from _pytest.fixtures import SubRequest
 
 from ..capture import (
     Collector,
-    StepDecorated,
     StepDescriptor,
     annotated_given_descriptors,
 )
@@ -23,6 +21,9 @@ from ..model import (
     Step,
 )
 from .state import FixtureInstanceKey, session_collector, session_state
+
+if TYPE_CHECKING:
+    from _pytest.fixtures import SubRequest
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -83,11 +84,9 @@ def _ensure_teardown_wrapped(
         return
     if not inspect.isgeneratorfunction(func):
         return
-    original = func
-    desc = cast('StepDecorated', original)._step_descriptor
-    original_typed = cast('Callable[..., Generator[object]]', original)
+    original_typed = cast('Callable[..., Generator[object]]', func)
 
-    @functools.wraps(original)
+    @functools.wraps(func)
     def wrapped(*args: object, **kwargs: object) -> Generator[object]:
         gen = original_typed(*args, **kwargs)
         try:
@@ -105,9 +104,9 @@ def _ensure_teardown_wrapped(
         finally:
             collector.exit_fixture(token)
 
-    wrapped_typed = cast('StepDecorated', wrapped)
-    wrapped_typed._pytest_given_teardown_wrapped = True  # type: ignore[attr-defined]
-    wrapped_typed._step_descriptor = desc
+    # `functools.wraps` copies `__dict__`, so the wrapper already carries the
+    # original's `_step_descriptor`; only the idempotence flag is new.
+    wrapped._pytest_given_teardown_wrapped = True  # type: ignore[attr-defined]
     fixturedef.func = wrapped  # type: ignore[misc]
 
 
@@ -117,7 +116,7 @@ def _setup_instance_key(
 ) -> FixtureInstanceKey:
     """The key at setup time, deriving the cache key from the live request."""
     return _fixture_instance_key(
-        fixturedef, fixturedef.cache_key(cast(SubRequest, request))
+        fixturedef, fixturedef.cache_key(cast('SubRequest', request))
     )
 
 

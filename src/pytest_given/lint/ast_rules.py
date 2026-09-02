@@ -4,7 +4,7 @@ body is inspected for structural lies."""
 
 import ast
 import keyword
-from collections.abc import Iterator
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -15,10 +15,18 @@ from ..model import (
     Scenario,
     SourceLocation,
     Step,
-    iter_steps,
-    location_suffix,
+    StepPath,
+    walk_steps,
 )
-from .base import Finding, RuleId, finding
+from .base import (
+    ACTION_IN_THEN,
+    CHECK_OUTSIDE_THEN,
+    EMPTY_STEP,
+    THEN_WITHOUT_CHECK,
+    UNUSED_INTERPOLATION,
+    RawFinding,
+    RuleId,
+)
 
 # A step body's anchored AST node: the `with` statement of an inline step, or
 # the decorated helper function whose body is the step body. `AsyncFunctionDef`
@@ -28,7 +36,7 @@ from .base import Finding, RuleId, finding
 type _BodyNode = ast.With | ast.FunctionDef | ast.AsyncFunctionDef
 
 
-def run_ast_rules(scenarios: list[Scenario], rootdir: Path) -> list[Finding]:
+def run_ast_rules(scenarios: list[Scenario], rootdir: Path) -> list[RawFinding]:
     """Run the AST-surface rules over every step that carries a source anchor.
 
     Each file is parsed once (cached across scenarios) and every anchored step
@@ -38,39 +46,20 @@ def run_ast_rules(scenarios: list[Scenario], rootdir: Path) -> list[Finding]:
     crash the run.
     """
     indexes: dict[str, dict[int, _BodyNode] | None] = {}
-    findings: list[Finding] = []
+    findings: list[RawFinding] = []
     for scenario in scenarios:
-        resolved: list[tuple[_AnchoredStep, _BodyNode]] = []
-        node_by_step: dict[int, _BodyNode] = {}
-        for anchored in _anchored_steps(scenario):
-            relpath = anchored.source.relpath
-            if relpath not in indexes:
-                indexes[relpath] = _index_body_nodes(rootdir / relpath)
-            index = indexes[relpath]
-            node = index.get(anchored.source.line) if index is not None else None
-            if node is not None:
-                resolved.append((anchored, node))
-                node_by_step[id(anchored.step)] = node
-        for anchored, node in resolved:
-            findings.extend(
-                finding
-                for finding in (
-                    _empty_step_finding(anchored, node),
-                    _then_without_check_finding(anchored, node),
-                    _check_outside_then_finding(anchored, node, node_by_step),
-                )
-                if finding is not None
-            )
-            findings.extend(_unused_interpolation_findings(anchored, node))
-        scenario_finding = _action_in_then_finding(scenario, resolved)
-        if scenario_finding is not None:
-            findings.append(scenario_finding)
+        scan = _scan_scenario(scenario, rootdir, indexes)
+        for resolved in scan.steps:
+            for step_rule in _STEP_RULES:
+                findings.extend(step_rule(resolved, scan))
+        for scenario_rule in _SCENARIO_RULES:
+            findings.extend(scenario_rule(scan))
     return findings
 
 
 @dataclass(frozen=True, kw_only=True)
-class _AnchoredStep:
-    """A recorded step that carries a source anchor, with its pair role.
+class _Resolved:
+    """An anchored step paired with the AST node its body resolved to.
 
     A `when_then` pair is recognized as sibling `when`+`then` steps sharing
     one anchor — unambiguous, because cross-phase nesting is rejected at
@@ -78,36 +67,86 @@ class _AnchoredStep:
     """
 
     node_id: NodeId
+    path: StepPath
+    step: Step
+    source: SourceLocation
+    node: _BodyNode
+    pair_when: bool
+    pair_then: bool
+
+
+@dataclass(frozen=True, kw_only=True)
+class _Scan:
+    """One scenario's resolved steps, plus the path index the rules look
+    siblings and children up in."""
+
+    scenario: Scenario
+    steps: list[_Resolved]
+    by_path: dict[StepPath, _Resolved]
+
+
+def _scan_scenario(
+    scenario: Scenario,
+    rootdir: Path,
+    indexes: dict[str, dict[int, _BodyNode] | None],
+) -> _Scan:
+    steps: list[_Resolved] = []
+    for anchored in _anchored_steps(scenario):
+        relpath = anchored.source.relpath
+        if relpath not in indexes:
+            indexes[relpath] = _index_body_nodes(rootdir / relpath)
+        index = indexes[relpath]
+        node = index.get(anchored.source.line) if index is not None else None
+        if node is not None:
+            steps.append(_Resolved(**vars(anchored), node=node))
+    return _Scan(
+        scenario=scenario,
+        steps=steps,
+        by_path={resolved.path: resolved for resolved in steps},
+    )
+
+
+@dataclass(frozen=True, kw_only=True)
+class _Anchored:
+    node_id: NodeId
+    path: StepPath
     step: Step
     source: SourceLocation
     pair_when: bool
     pair_then: bool
 
 
-def _anchored_steps(scenario: Scenario) -> Iterator[_AnchoredStep]:
-    def walk(steps: list[Step]) -> Iterator[_AnchoredStep]:
-        for i, step in enumerate(steps):
-            if step.source is not None:
-                yield _AnchoredStep(
-                    node_id=scenario.id,
-                    step=step,
-                    source=step.source,
-                    pair_when=(
-                        step.phase == 'when'
-                        and i + 1 < len(steps)
-                        and steps[i + 1].phase == 'then'
-                        and steps[i + 1].source == step.source
-                    ),
-                    pair_then=(
-                        step.phase == 'then'
-                        and i > 0
-                        and steps[i - 1].phase == 'when'
-                        and steps[i - 1].source == step.source
-                    ),
-                )
-            yield from walk(step.children)
+def _anchored_steps(scenario: Scenario) -> Iterator[_Anchored]:
+    """Every step carrying a source anchor, tagged with its `when_then` role.
 
-    return walk(scenario.steps)
+    Siblings are reached through the path index rather than by walking a level
+    at a time: a step's neighbours are the paths differing only in the last
+    component.
+    """
+    by_path = dict(walk_steps(scenario.steps))
+    for path, step in by_path.items():
+        if step.source is None:
+            continue
+        before = by_path.get((*path[:-1], path[-1] - 1)) if path[-1] else None
+        after = by_path.get((*path[:-1], path[-1] + 1))
+        yield _Anchored(
+            node_id=scenario.id,
+            path=path,
+            step=step,
+            source=step.source,
+            pair_when=(
+                step.phase == 'when'
+                and after is not None
+                and after.phase == 'then'
+                and after.source == step.source
+            ),
+            pair_then=(
+                step.phase == 'then'
+                and before is not None
+                and before.phase == 'when'
+                and before.source == step.source
+            ),
+        )
 
 
 def _index_body_nodes(path: Path) -> dict[int, _BodyNode] | None:
@@ -138,7 +177,7 @@ def _index_body_nodes(path: Path) -> dict[int, _BodyNode] | None:
     return index
 
 
-def _empty_step_finding(anchored: _AnchoredStep, node: _BodyNode) -> Finding | None:
+def _empty_step(resolved: _Resolved, _scan: _Scan) -> Iterable[RawFinding]:
     """Rule `empty-step`: the step's body contains no executable code.
 
     Nested steps count as content for their parent (only leaves fire), and a
@@ -146,43 +185,29 @@ def _empty_step_finding(anchored: _AnchoredStep, node: _BodyNode) -> Finding | N
     `pytest.raises` with-item is not body content, so the acting expression
     must still be there.
     """
-    if anchored.pair_then:
-        return None
-    body = [stmt for stmt in node.body if not _is_constant_stmt(stmt)]
+    if resolved.pair_then:
+        return
+    body = [stmt for stmt in resolved.node.body if not _is_constant_stmt(stmt)]
     if not body:
-        return _step_finding(RuleId('empty-step'), anchored, 'has no code')
-    if anchored.step.phase != 'given' and all(_is_attach_stmt(s) for s in body):
+        yield _step_finding(EMPTY_STEP, resolved, 'has no code')
+    elif resolved.step.phase != 'given' and all(_is_attach_stmt(s) for s in body):
         # Attaching is not acting or checking; a `given` that only attaches
         # its arranged artifact is legitimate.
-        return _step_finding(
-            RuleId('empty-step'), anchored, 'contains only attach() calls'
-        )
-    return None
+        yield _step_finding(EMPTY_STEP, resolved, 'contains only attach() calls')
 
 
-def _then_without_check_finding(
-    anchored: _AnchoredStep, node: _BodyNode
-) -> Finding | None:
+def _then_without_check(resolved: _Resolved, _scan: _Scan) -> Iterable[RawFinding]:
     """Rule `then-without-check`: a `then` body contains no assertion.
 
     A parent whose nested `then` child checks passes (the walk sees the whole
     subtree), and a `when_then`-produced `then` passes naturally: the
     `pytest.raises` with-item sits on its anchored `with`.
     """
-    if anchored.step.phase != 'then':
-        return None
-    if _contains_check(node):
-        return None
-    return _step_finding(
-        RuleId('then-without-check'), anchored, 'contains no assertion'
-    )
+    if resolved.step.phase == 'then' and not _contains_check(resolved.node):
+        yield _step_finding(THEN_WITHOUT_CHECK, resolved, 'contains no assertion')
 
 
-def _check_outside_then_finding(
-    anchored: _AnchoredStep,
-    node: _BodyNode,
-    node_by_step: dict[int, _BodyNode],
-) -> Finding | None:
+def _check_outside_then(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
     """Rule `check-outside-then`: an `assert` sits in a `given` or `when` body.
 
     `when_then` bodies are exempt — the shared body belongs to the pair's
@@ -190,25 +215,22 @@ def _check_outside_then_finding(
     business (it is scanned as its own anchored step), so the parent's scan
     excludes resolved child subtrees.
     """
-    if anchored.step.phase == 'then' or anchored.pair_when:
-        return None
+    if resolved.step.phase == 'then' or resolved.pair_when:
+        return
     child_nodes = {
-        id(node_by_step[id(child)])
-        for child in anchored.step.children
-        if id(child) in node_by_step
+        id(child.node)
+        for index in range(len(resolved.step.children))
+        if (child := scan.by_path.get((*resolved.path, index))) is not None
     }
-    if not _contains_assert_outside(node.body, child_nodes):
-        return None
-    return _anchored_finding(
-        RuleId('check-outside-then'),
-        anchored,
-        f'assert inside {anchored.step.phase} {anchored.step.narration.text!r}',
-    )
+    if _contains_assert_outside(resolved.node.body, child_nodes):
+        yield _anchored_finding(
+            CHECK_OUTSIDE_THEN,
+            resolved,
+            f'assert inside {resolved.step.phase} {resolved.step.narration.text!r}',
+        )
 
 
-def _unused_interpolation_findings(
-    anchored: _AnchoredStep, node: _BodyNode
-) -> list[Finding]:
+def _unused_interpolation(resolved: _Resolved, _scan: _Scan) -> Iterable[RawFinding]:
     """Rule `unused-interpolation`: a t-string step interpolates a bare
     identifier its body never uses.
 
@@ -224,17 +246,17 @@ def _unused_interpolation_findings(
     scenarios. A placeholder names its column, so a disambiguated name
     (`price #2`) drops out with the complex expressions.
     """
+    node = resolved.node
     if not isinstance(node, ast.With):
-        return []
+        return
     expressions = [
         part.expression if isinstance(part, NarrationValue) else part.name
-        for part in anchored.step.narration.parts
+        for part in resolved.step.narration.parts
         if isinstance(part, (NarrationValue, NarrationPlaceholder))
     ]
     if not expressions:
-        return []
-    used = _names_used(node, include_stores=anchored.step.phase == 'given')
-    findings: list[Finding] = []
+        return
+    used = _names_used(node, include_stores=resolved.step.phase == 'given')
     seen: set[str] = set()
     for expression in expressions:
         name = _bare_identifier(expression)
@@ -242,19 +264,14 @@ def _unused_interpolation_findings(
             continue
         seen.add(name)
         if name not in used:
-            findings.append(
-                _step_finding(
-                    RuleId('unused-interpolation'),
-                    anchored,
-                    f'interpolates {{{name}}} but never uses it',
-                )
+            yield _step_finding(
+                UNUSED_INTERPOLATION,
+                resolved,
+                f'interpolates {{{name}}} but never uses it',
             )
-    return findings
 
 
-def _action_in_then_finding(
-    scenario: Scenario, resolved: list[tuple[_AnchoredStep, _BodyNode]]
-) -> Finding | None:
+def _action_in_then(scan: _Scan) -> Iterable[RawFinding]:
     """Rule `action-in-then` (per scenario): a `then` assertion contains a
     call, and no `when` step acts.
 
@@ -266,48 +283,57 @@ def _action_in_then_finding(
     `when_then`'s `then` is excluded from the then-side scan: it anchors to
     the shared `with`, so any call there *is* the act.
     """
-    node_of = {id(a.step): (a, node) for a, node in resolved}
     acts = False
-    for step in iter_steps(scenario.steps):
+    for path, step in walk_steps(scan.scenario.steps):
         if step.phase != 'when':
             continue
-        entry = node_of.get(id(step))
-        if entry is None:
-            return None
-        anchored, node = entry
-        if anchored.pair_when or _body_performs_action(node):
+        resolved = scan.by_path.get(path)
+        if resolved is None:
+            return
+        if resolved.pair_when or _body_performs_action(resolved.node):
             acts = True
     if acts:
-        return None
-    for anchored, node in resolved:
-        if anchored.step.phase != 'then' or anchored.pair_then:
+        return
+    for resolved in scan.steps:
+        if resolved.step.phase != 'then' or resolved.pair_then:
             continue
-        if _assert_with_call(node):
-            return _anchored_finding(
-                RuleId('action-in-then'),
-                anchored,
-                f'then {anchored.step.narration.text!r} folds the action into '
+        if _assert_with_call(resolved.node):
+            yield _anchored_finding(
+                ACTION_IN_THEN,
+                resolved,
+                f'then {resolved.step.narration.text!r} folds the action into '
                 f'its assertion; no when acts',
             )
-    return None
+            return
 
 
-def _step_finding(rule: RuleId, anchored: _AnchoredStep, problem: str) -> Finding:
+type _StepRule = Callable[[_Resolved, _Scan], Iterable[RawFinding]]
+type _ScenarioRule = Callable[[_Scan], Iterable[RawFinding]]
+
+_STEP_RULES: tuple[_StepRule, ...] = (
+    _empty_step,
+    _then_without_check,
+    _check_outside_then,
+    _unused_interpolation,
+)
+
+_SCENARIO_RULES: tuple[_ScenarioRule, ...] = (_action_in_then,)
+
+
+def _step_finding(rule: RuleId, resolved: _Resolved, problem: str) -> RawFinding:
     return _anchored_finding(
         rule,
-        anchored,
-        f'{anchored.step.phase} {anchored.step.narration.text!r} {problem}',
+        resolved,
+        f'{resolved.step.phase} {resolved.step.narration.text!r} {problem}',
     )
 
 
-def _anchored_finding(rule: RuleId, anchored: _AnchoredStep, text: str) -> Finding:
-    """A finding about one anchored step, located at the step's own anchor."""
-    return finding(
-        rule,
-        subject=anchored.node_id,
-        node_id=anchored.node_id,
-        location=anchored.source,
-        message=f'{text}{location_suffix(anchored.source)}',
+def _anchored_finding(rule: RuleId, resolved: _Resolved, text: str) -> RawFinding:
+    return RawFinding(
+        rule=rule,
+        subject=resolved.node_id,
+        location=resolved.source,
+        message=text,
     )
 
 

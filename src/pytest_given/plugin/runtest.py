@@ -44,8 +44,10 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
         yield
         return
 
-    mod = getattr(item, 'module', None)
-    module = mod.__name__ if mod else item.nodeid.split('::')[0]
+    # A @scenario marker was read off `item.function`, so the item is a
+    # Function collected from a Module and `.module` is always there.
+    assert isinstance(item, pytest.Function)
+    module = item.module.__name__
     node_id = NodeId(item.nodeid)
     relpath_raw, lineno0, _ = item.location
     source = item_source(relpath_raw, (lineno0 or 0) + 1)
@@ -131,7 +133,16 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
     collector = session_collector(item.config)
     node_id = NodeId(item.nodeid)
     teardown = call.when == 'teardown'
-    if not teardown and collector.active_scenario_id != node_id:
+    # Checked before any traceback work: `getrepr` below is the expensive
+    # per-frame scan, and an item this plugin recorded nothing for — an
+    # undecorated test in a suite that merely installs pytest-given — would
+    # otherwise pay it on every teardown error only to discard the result.
+    tracked = (
+        collector.has_scenario(node_id)
+        if teardown
+        else collector.active_scenario_id == node_id
+    )
+    if not tracked:
         return
     # A skip's traceback is pure skip machinery — the scenario carries a
     # structured skip_reason instead. Short-circuited before getrepr, whose

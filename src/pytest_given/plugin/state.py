@@ -13,52 +13,26 @@ from dataclasses import dataclass, field
 
 import pytest
 
-from ..capture import (
-    Collector,
-)
-from ..lint import (
-    Finding,
-    IgnoreEntry,
-    Level,
-    RuleId,
-)
-from ..model import (
-    FixtureRecording,
-    NodeId,
-    ParamInfo,
-)
-
-collector_key: pytest.StashKey[Collector] = pytest.StashKey()
-
-
-def session_collector(config: pytest.Config) -> Collector:
-    """The collector owned by this session, created at `pytest_sessionstart`."""
-    return config.stash[collector_key]
+from ..capture import Collector
+from ..lint import Finding, LintConfig
+from ..model import FixtureRecording, NodeId, ParamInfo
+from ..report import SinkConfig
 
 
 @dataclass(frozen=True, kw_only=True)
 class GivenConfig:
-    """This run's pytest-given options, parsed once.
+    """This run's pytest-given options, every one of them resolved at
+    configure time so no read site re-derives a precedence or a default."""
 
-    One bundle rather than a key apiece: every option this plugin takes is
-    resolved once, the CLI-over-ini ones included, rather than at each read site.
-    """
-
-    rule_levels: dict[RuleId, Level]
-    ignore_entries: list[IgnoreEntry]
-    source_link_template: str | None
-    title: str | None
+    lint: LintConfig
     lint_enabled: bool
+    sinks: SinkConfig
+    title: str | None
 
 
 @dataclass(kw_only=True)
 class SessionOutcome:
-    """What session finish leaves for the terminal summary to print.
-
-    Filled at up to three points on the way out and read in one place. Mutable
-    and stashed once at configure time, so the summary never has to distinguish
-    "nothing happened" from "the hook never ran".
-    """
+    """What session finish leaves for the terminal summary to print."""
 
     report_error: str | None = None
     md_stdout: str | None = None
@@ -93,16 +67,23 @@ class SessionState:
     )
 
 
+collector_key: pytest.StashKey[Collector] = pytest.StashKey()
 given_config_key: pytest.StashKey[GivenConfig] = pytest.StashKey()
-
-
 session_outcome_key: pytest.StashKey[SessionOutcome] = pytest.StashKey()
-
-
 session_state_key: pytest.StashKey[SessionState] = pytest.StashKey()
 
 
+def session_collector(config: pytest.Config) -> Collector:
+    return config.stash[collector_key]
+
+
+def given_config(config: pytest.Config) -> GivenConfig:
+    return config.stash[given_config_key]
+
+
+def session_outcome(config: pytest.Config) -> SessionOutcome:
+    return config.stash[session_outcome_key]
+
+
 def session_state(config: pytest.Config) -> SessionState:
-    """This session's hook bookkeeping, created at `pytest_sessionstart`
-    alongside its collector."""
     return config.stash[session_state_key]

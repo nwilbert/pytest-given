@@ -54,7 +54,6 @@ from .steps import (
     iter_narrations,
     iter_steps,
     step_narrations,
-    structure_signature,
     walk_steps,
 )
 
@@ -119,6 +118,5 @@ __all__ = [
     'report_from_dict',
     'report_to_dict',
     'step_narrations',
-    'structure_signature',
     'walk_steps',
 ]

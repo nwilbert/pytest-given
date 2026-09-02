@@ -1,15 +1,16 @@
-"""The terminal presentation of a run's lint findings.
+"""The terminal presentation of a run's lint findings — the title, the aligned
+rows, the error tally. The plugin owns the writing and the exit code."""
 
-Formatting only — the title, the aligned finding rows, the error tally. The
-plugin owns the writing and the exit code.
-"""
-
+from ..model import location_suffix
 from .base import Finding
 
 
 def error_count(findings: list[Finding]) -> int:
-    """How many findings are error-level — what fails the run."""
     return sum(1 for finding in findings if finding.severity == 'error')
+
+
+def has_errors(findings: list[Finding]) -> bool:
+    return any(finding.severity == 'error' for finding in findings)
 
 
 def summary_title(findings: list[Finding]) -> str:
@@ -22,7 +23,7 @@ def summary_title(findings: list[Finding]) -> str:
 
 
 def summary_rows(findings: list[Finding]) -> list[str]:
-    """One aligned row per finding: severity, rule, subject, message.
+    """One aligned row per finding: severity, rule, subject, message, location.
 
     Rule and subject are padded to the widest in *this* run rather than to a
     fixed width, so the messages line up without a short run carrying columns
@@ -35,6 +36,7 @@ def summary_rows(findings: list[Finding]) -> list[str]:
     return [
         f'{finding.severity.upper():<5} {finding.rule:<{rule_width}}  '
         f'{finding.subject:<{subject_width}}  {finding.message}'
+        f'{location_suffix(finding.location)}'
         for finding in findings
     ]
 

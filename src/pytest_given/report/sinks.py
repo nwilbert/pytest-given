@@ -14,7 +14,7 @@ Pytest-free like the rest of `report/`: the caller resolves its options into a
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 from ..model import ReportData
 from .html_renderer import render_html_string
@@ -50,11 +50,16 @@ class SinkConfig:
         return bool(self.file_paths()) or self.md_to_stdout
 
 
+class RenderedFile(NamedTuple):
+    path: Path
+    text: str
+
+
 @dataclass(frozen=True)
 class RenderedSinks:
     """Every configured sink rendered to text, before any of them is written."""
 
-    files: list[tuple[Path, str]] = field(default_factory=list)
+    files: list[RenderedFile] = field(default_factory=list)
     md_stdout: str | None = None
 
 
@@ -66,12 +71,12 @@ def render_sinks(
     `report_dict` is the already-serialized report — the JSON sink writes it
     verbatim, so the two sinks cannot disagree about what was serialized.
     """
-    files: list[tuple[Path, str]] = []
+    files: list[RenderedFile] = []
     if config.json_path is not None:
-        files.append((config.json_path, json.dumps(report_dict, indent=2)))
+        files.append(RenderedFile(config.json_path, json.dumps(report_dict, indent=2)))
     if config.html_path is not None:
         files.append(
-            (
+            RenderedFile(
                 config.html_path,
                 render_html_string(
                     report, source_link_template=config.source_link_template
@@ -84,7 +89,7 @@ def render_sinks(
         if config.md_to_stdout:
             md_stdout = md
         if config.md_path is not None:
-            files.append((config.md_path, md))
+            files.append(RenderedFile(config.md_path, md))
     return RenderedSinks(files=files, md_stdout=md_stdout)
 
 
@@ -95,16 +100,22 @@ def write_sinks(rendered: RenderedSinks) -> None:
 
 
 def discard_stale_sinks(config: SinkConfig) -> list[str]:
-    """Delete the sinks this run would have written, and say which.
+    """Delete the sinks this run would have written, and say what happened.
 
     Writing no report leaves the *previous* run's in place, where it reads as
     current — the one outcome worse than no report at all. Only the paths this
-    run was told to write are touched.
+    run was told to write are touched. Cannot raise: the caller is already
+    handling a failure, and the usual reason a write failed (an unwritable
+    directory) is also a reason the unlink will.
     """
-    removed = []
+    notes = []
     for path in config.file_paths():
         if not path.is_file():
             continue
-        path.unlink()
-        removed.append(f'Removed the previous {path} — it would read as current.')
-    return removed
+        try:
+            path.unlink()
+        except OSError as error:
+            notes.append(f'Could not remove the previous {path}: {error}')
+        else:
+            notes.append(f'Removed the previous {path} — it would read as current.')
+    return notes

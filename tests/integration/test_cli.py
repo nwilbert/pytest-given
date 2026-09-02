@@ -33,9 +33,13 @@ def test_cli_missing_input_file(tmp_path: Path) -> None:
     assert rc == 1
 
 
-def test_cli_no_command() -> None:
-    rc = main([])
-    assert rc == 1
+def test_cli_no_command(capsys) -> None:
+    """argparse owns the usage error, so a bare invocation exits 2 like any
+    other CLI rather than printing help and calling it a failure."""
+    with pytest.raises(SystemExit) as excinfo:
+        main([])
+    assert excinfo.value.code == 2
+    assert 'report' in capsys.readouterr().err
 
 
 def _scenario_with_source(relpath: str = 'tests/x.py', line: int = 2) -> dict:
@@ -278,3 +282,37 @@ def test_cli_reports_an_unknown_source_link_preset_without_a_traceback(
     err = capsys.readouterr().err
     assert 'Error' in err
     assert 'Traceback' not in err
+
+
+def test_cli_write_failure_discards_the_stale_report(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    """`pytest-given report` gets the plugin's all-or-nothing guarantee: a
+    failed write must not leave the previous run's report reading as current.
+    """
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(_minimal_report()), encoding='utf-8')
+    html_path = tmp_path / 'out.html'
+    html_path.write_text('previous run', encoding='utf-8')
+
+    def refuse(self: Path, *args: object, **kwargs: object) -> None:
+        raise PermissionError('read-only file system')
+
+    monkeypatch.setattr(Path, 'write_text', refuse)
+    rc = main(['report', str(json_path), '-o', str(html_path)])
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert 'read-only file system' in err
+    assert 'would read as current' in err
+
+
+def _minimal_report() -> dict:
+    return {
+        'metadata': {
+            'project': 'cli-test',
+            'timestamp': '2026-04-09',
+            'pytest_version': '9',
+            'plugin_version': '0.1',
+        },
+        'scenarios': [],
+    }

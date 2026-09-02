@@ -15,22 +15,18 @@ from ..model import (
     id_derive,
     iter_narrations,
     iter_steps,
-    location_suffix,
 )
-from .base import Finding, RuleId, finding
+from .base import DEAD_TERM, MISSING_PHASE, TAG_SHADOWS_TERM, RawFinding, RuleId
 
 
 def run_runtime_rules(
     grouped: list[Scenario],
     glossary: Glossary | None,
     stories: list[Story],
-) -> list[Finding]:
-    """Run the runtime-surface rules over the recorded report model.
-
-    Every rule here evaluates the grouped scenario list — one evaluation per
-    logical scenario.
-    """
-    findings: list[Finding] = []
+) -> list[RawFinding]:
+    """Every rule here evaluates the grouped scenario list — one evaluation
+    per logical scenario."""
+    findings: list[RawFinding] = []
     findings.extend(_missing_phase_findings(grouped))
     if glossary is not None:
         findings.extend(_tag_shadows_term_findings(grouped, glossary))
@@ -43,13 +39,13 @@ def run_runtime_rules(
 _PHASE_ORDER: tuple[Phase, ...] = ('given', 'when', 'then')
 
 
-def _missing_phase_findings(grouped: list[Scenario]) -> list[Finding]:
+def _missing_phase_findings(grouped: list[Scenario]) -> list[RawFinding]:
     """Rule `missing-phase`: a passed scenario lacks a Given, When, or Then.
 
     Non-passed scenarios are skipped — a skipped one records no steps and a
     failed one may be missing a phase only because it aborted mid-body.
     """
-    findings: list[Finding] = []
+    findings: list[RawFinding] = []
     for scenario in grouped:
         if scenario.status != 'passed':
             continue
@@ -58,9 +54,7 @@ def _missing_phase_findings(grouped: list[Scenario]) -> list[Finding]:
         if missing:
             findings.append(
                 _scenario_finding(
-                    RuleId('missing-phase'),
-                    scenario,
-                    f'missing: {", ".join(missing)}',
+                    MISSING_PHASE, scenario, f'missing: {", ".join(missing)}'
                 )
             )
     return findings
@@ -81,7 +75,7 @@ class _ShadowingTag:
 
 def _tag_shadows_term_findings(
     grouped: list[Scenario], glossary: Glossary
-) -> list[Finding]:
+) -> list[RawFinding]:
     """Rule `tag-shadows-term`: a scenario tag duplicates a glossary term.
 
     One finding per unique tag (subject = tag slug) — the fix is renaming the
@@ -98,16 +92,15 @@ def _tag_shadows_term_findings(
                 shadowing[slug] = _ShadowingTag(tag=tag, example=scenario.id)
             else:
                 seen.scenarios += 1
-    findings: list[Finding] = []
+    findings: list[RawFinding] = []
     for slug, shadow in shadowing.items():
         term = glossary.get(slug)
         assert term is not None
         noun = 'scenario' if shadow.scenarios == 1 else 'scenarios'
         findings.append(
-            finding(
-                RuleId('tag-shadows-term'),
+            RawFinding(
+                rule=TAG_SHADOWS_TERM,
                 subject=slug,
-                node_id=shadow.example,
                 location=None,
                 message=(
                     f'tag {shadow.tag!r} duplicates glossary term '
@@ -121,7 +114,7 @@ def _tag_shadows_term_findings(
 
 def _dead_term_findings(
     grouped: list[Scenario], glossary: Glossary, stories: list[Story]
-) -> list[Finding]:
+) -> list[RawFinding]:
     """Rule `dead-term`: a glossary term is referenced by no step and no
     story. Default `off`: for a file-backed glossary, unreferenced terms are
     often intentionally present (documented behavior)."""
@@ -138,10 +131,9 @@ def _dead_term_findings(
                     if isinstance(ref, ActivityTermRef):
                         referenced.add(ref.term_id)
     return [
-        finding(
-            RuleId('dead-term'),
+        RawFinding(
+            rule=DEAD_TERM,
             subject=term.id,
-            node_id=None,
             location=term.source,
             message=f'term {term.canonical!r} is referenced by no step and no story',
         )
@@ -150,13 +142,10 @@ def _dead_term_findings(
     ]
 
 
-def _scenario_finding(rule: RuleId, scenario: Scenario, text: str) -> Finding:
-    """A finding about a whole scenario, located and suffixed like a lint
-    message anywhere else."""
-    return finding(
-        rule,
+def _scenario_finding(rule: RuleId, scenario: Scenario, text: str) -> RawFinding:
+    return RawFinding(
+        rule=rule,
         subject=scenario.id,
-        node_id=scenario.id,
         location=scenario.source,
-        message=f'{text}{location_suffix(scenario.source)}',
+        message=text,
     )

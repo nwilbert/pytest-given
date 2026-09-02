@@ -6,7 +6,7 @@ import textwrap
 import pytest
 
 from pytest_given import attach, given, scenario, then, when
-from pytest_given.lint import RuleId, run_ast_rules
+from pytest_given.lint import DEFAULTS, RuleId, run_ast_rules
 from pytest_given.model import (
     Narration,
     NarrationPlaceholder,
@@ -83,13 +83,10 @@ def test_empty_step_fires_on_pass_only_body(tmp_path) -> None:
         [finding] = findings
         assert finding.rule == RuleId('empty-step')
         assert finding.subject == 'test_x.py::test_a'
-        assert finding.node_id == NodeId('test_x.py::test_a')
         assert finding.location == SourceLocation(relpath='test_x.py', line=with_line)
-        assert finding.message == (
-            f"given 'a value' has no code (test_x.py:{with_line})"
-        )
+        assert finding.message == ("given 'a value' has no code")
     with then(t'its {pg["Severity"].low} is error'):
-        assert finding.severity == 'error'
+        assert DEFAULTS[finding.rule] == 'error'
 
 
 def test_empty_step_fires_on_docstring_and_ellipsis_only_body(tmp_path) -> None:
@@ -249,9 +246,7 @@ def test_then_without_check_fires(tmp_path) -> None:
     with then(t'a then-without-check {pg["Finding"].low} reports the unchecked then'):
         [finding] = findings
         assert finding.rule == RuleId('then-without-check')
-        assert finding.message == (
-            f"then 'it is one' contains no assertion (test_x.py:{with_line})"
-        )
+        assert finding.message == ("then 'it is one' contains no assertion")
 
 
 def test_then_with_pytest_raises_item_passes(tmp_path) -> None:
@@ -415,10 +410,7 @@ def test_check_outside_then_fires_on_assert_in_given_or_when(tmp_path, phase) ->
         )
     with then(t'a warn {pg["Finding"].low} names the {phase} step holding the assert'):
         [finding] = findings
-        assert finding.severity == 'warn'
-        assert finding.message == (
-            f"assert inside {phase} 'a stocked machine' (test_x.py:{with_line})"
-        )
+        assert finding.message == (f"assert inside {phase} 'a stocked machine'")
 
 
 def test_check_outside_then_reports_one_finding_for_many_asserts(tmp_path) -> None:
@@ -561,12 +553,10 @@ def test_action_in_then_fires_when_no_when_exists(tmp_path) -> None:
         findings = _rule_findings(run_ast_rules([folded], tmp_path), 'action-in-then')
     with then(t'a warn {pg["Finding"].low} points at the then and says no when acts'):
         [finding] = findings
-        assert finding.severity == 'warn'
         assert finding.subject == 'test_x.py::test_a'
         assert finding.location == SourceLocation(relpath='test_x.py', line=then_line)
         assert finding.message == (
-            f"then 'it brews' folds the action into its assertion; "
-            f'no when acts (test_x.py:{then_line})'
+            "then 'it brews' folds the action into its assertion; no when acts"
         )
 
 
@@ -737,11 +727,10 @@ def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
         )
     with then(t'a warn {pg["Finding"].low} names the interpolation the body ignores'):
         [finding] = findings
-        assert finding.severity == 'warn'
         assert finding.message == (
-            f"given 'a 200 ml cup' interpolates {{size}} but never uses it "
-            f'(test_x.py:{with_line})'
+            "given 'a 200 ml cup' interpolates {size} but never uses it"
         )
+        assert finding.location == SourceLocation(relpath='test_x.py', line=with_line)
 
 
 def test_unused_interpolation_fires_on_a_grouped_placeholder(tmp_path) -> None:

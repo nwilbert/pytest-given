@@ -1,22 +1,28 @@
 """Unit tests for the lint findings' terminal presentation (`lint/summary.py`)."""
 
-from pytest_given.lint import Finding, Level, RuleId, error_count, summary_rows
-from pytest_given.lint.summary import summary_title
-from pytest_given.model import NodeId
+from pytest_given.lint import (
+    Finding,
+    RuleId,
+    Severity,
+    error_count,
+    summary_rows,
+    summary_title,
+)
+from pytest_given.model import SourceLocation
 
 
 def _finding(
     rule: str = 'empty-step',
-    severity: Level = 'error',
+    severity: Severity = 'error',
     subject: str = 'tests/t.py::test_a',
     message: str = 'has no code',
+    location: SourceLocation | None = None,
 ) -> Finding:
     return Finding(
         rule=RuleId(rule),
         severity=severity,
         subject=subject,
-        node_id=NodeId(subject),
-        location=None,
+        location=location,
         message=message,
     )
 
@@ -56,6 +62,15 @@ def test_summary_rows_pad_rule_and_subject_to_the_widest_in_the_run() -> None:
         'ERROR empty-step          t.py::a       first',
         'ERROR then-without-check  t.py::longer  2nd',
     ]
+
+
+def test_summary_rows_append_the_location_when_a_finding_has_one() -> None:
+    """The location is a column of its own, not text baked into the message —
+    so a rule that forgets to mention it still shows where it fired."""
+    rows = summary_rows(
+        [_finding(location=SourceLocation(relpath='pkg/t.py', line=12))]
+    )
+    assert rows == ['ERROR empty-step  tests/t.py::test_a  has no code (t.py:12)']
 
 
 def test_summary_rows_of_nothing_is_nothing() -> None:

@@ -1,74 +1,63 @@
-"""Shared lint vocabulary: the Finding model and the rule catalog.
+"""Shared lint vocabulary: the finding models and the rule catalog.
 
-The catalog is data (`RULES`), so config validation, severity defaults, and
-docs stay in sync with one table.
+Rules emit `RawFinding`s; `config.apply_config` is the only thing that turns
+one into a `Finding`, which is why severity narrows to what can actually be
+printed. Rule ids are constants so a typo is an import-time NameError.
 """
 
 from dataclasses import dataclass
 from typing import Literal, NewType
 
-from ..model import NodeId, SourceLocation
+from ..model import SourceLocation
 
 type Level = Literal['off', 'warn', 'error']
-type Surface = Literal['runtime', 'ast']
+type Severity = Literal['warn', 'error']
 
 RuleId = NewType('RuleId', str)
 
+MISSING_PHASE = RuleId('missing-phase')
+EMPTY_STEP = RuleId('empty-step')
+THEN_WITHOUT_CHECK = RuleId('then-without-check')
+CHECK_OUTSIDE_THEN = RuleId('check-outside-then')
+ACTION_IN_THEN = RuleId('action-in-then')
+UNUSED_INTERPOLATION = RuleId('unused-interpolation')
+TAG_SHADOWS_TERM = RuleId('tag-shadows-term')
+DEAD_TERM = RuleId('dead-term')
+
 # Pseudo-rule for ignore-list entries that suppressed nothing; always an
-# error, never configurable or ignorable — the list stays honest by
-# construction.
+# error, never configurable or ignorable — so it is absent from DEFAULTS.
 STALE_IGNORE = RuleId('stale-ignore')
 
 LEVELS: tuple[Level, ...] = ('off', 'warn', 'error')
 
+DEFAULTS: dict[RuleId, Level] = {
+    MISSING_PHASE: 'warn',
+    EMPTY_STEP: 'error',
+    THEN_WITHOUT_CHECK: 'error',
+    CHECK_OUTSIDE_THEN: 'warn',
+    ACTION_IN_THEN: 'warn',
+    UNUSED_INTERPOLATION: 'warn',
+    TAG_SHADOWS_TERM: 'warn',
+    DEAD_TERM: 'off',
+}
+
 
 @dataclass(frozen=True, kw_only=True)
-class Finding:
-    """One lint finding, ready for the terminal summary."""
+class RawFinding:
+    """What a rule emits, before configured severities and ignores apply."""
 
     rule: RuleId
-    severity: Level
     subject: str
-    node_id: NodeId | None
     location: SourceLocation | None
     message: str
 
 
 @dataclass(frozen=True, kw_only=True)
-class LintRule:
-    id: RuleId
-    surface: Surface
-    default: Level
+class Finding:
+    """A raw finding resolved against the configuration, ready to print."""
 
-
-RULES: tuple[LintRule, ...] = (
-    LintRule(id=RuleId('missing-phase'), surface='runtime', default='warn'),
-    LintRule(id=RuleId('empty-step'), surface='ast', default='error'),
-    LintRule(id=RuleId('then-without-check'), surface='ast', default='error'),
-    LintRule(id=RuleId('check-outside-then'), surface='ast', default='warn'),
-    LintRule(id=RuleId('action-in-then'), surface='ast', default='warn'),
-    LintRule(id=RuleId('unused-interpolation'), surface='ast', default='warn'),
-    LintRule(id=RuleId('tag-shadows-term'), surface='runtime', default='warn'),
-    LintRule(id=RuleId('dead-term'), surface='runtime', default='off'),
-)
-
-RULES_BY_ID: dict[RuleId, LintRule] = {rule.id: rule for rule in RULES}
-
-
-def finding(
-    rule: RuleId,
-    *,
-    subject: str,
-    node_id: NodeId | None,
-    location: SourceLocation | None,
-    message: str,
-) -> Finding:
-    """A finding at its rule's catalog-default severity."""
-    return Finding(
-        rule=rule,
-        severity=RULES_BY_ID[rule].default,
-        subject=subject,
-        node_id=node_id,
-        location=location,
-        message=message,
-    )
+    rule: RuleId
+    severity: Severity
+    subject: str
+    location: SourceLocation | None
+    message: str

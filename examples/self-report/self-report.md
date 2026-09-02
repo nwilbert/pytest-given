@@ -242,6 +242,27 @@
 - **then** the run still passes
 - **then** the «finding» is printed anyway
 
+## ✓ An error «finding» leaves a more specific exit code alone
+`tests/integration/test_plugin_lint.py:422::test_lint_error_does_not_mask_a_more_specific_exit_code`
+
+- **given** a suite whose lint would fail, deselected so nothing is collected
+  - 📎 suite:
+    ```
+    
+    from pytest_given import scenario, given, when, then
+    
+    @scenario("Empty given")
+    def test_empty_given():
+        with given("a value"):
+            pass
+        with when("computing"):
+            x = 2
+        with then("it is two"):
+            assert x == 2
+    ```
+- **when** the run collects no test but still trips a stale ignore
+- **then** the run keeps NO_TESTS_COLLECTED rather than reporting a test failure
+
 ## ✓ A «scenario» records under its «node ID»
 `tests/unit/capture/test_collector.py:26::test_start_and_finish_scenario`
 
@@ -312,29 +333,29 @@
 - **when** its fixture then also fails in teardown
 - **then** the body failure is what the report shows
 
-## ✓ A teardown failure under an unknown «Node ID» is ignored
-`tests/unit/capture/test_collector.py:498::test_fail_recorded_scenario_ignores_unknown_node_id`
+## ✓ A «Collector» reports which «node ids» it recorded
+`tests/unit/capture/test_collector.py:498::test_has_scenario_reports_only_recorded_node_ids`
 
 - **given** a «Collector» that recorded one «scenario»
-- **when** a teardown fails under a node id no scenario claimed
-- **then** the recorded scenario is untouched
+- **when** the recorded and an unrecorded node id are both asked about
+- **then** only the recorded node id is claimed
 
 ## ✓ A leaf given is «grafted» as a childless given «step»
-`tests/unit/capture/test_collector.py:513::test_graft_leaf_given_appends_childless_given_step`
+`tests/unit/capture/test_collector.py:516::test_graft_leaf_given_appends_childless_given_step`
 
 - **given** an «Active scenario» is being recorded
 - **when** a leaf «Graft» appends a childless «Step»
 - **then** the step is a given with no children
 
 ## ✓ «Grafting» with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:531::test_graft_recording_override_replaces_root_narration_keeps_children`
+`tests/unit/capture/test_collector.py:534::test_graft_recording_override_replaces_root_narration_keeps_children`
 
 - **given** a «Fixture recording» whose root has a label and a child
 - **when** a «Graft» supplies an override «Narration»
 - **then** the grafted root shows the override text and keeps its children
 
 ## ✓ «Grafting» with no «active scenario» is refused
-`tests/unit/capture/test_collector.py:556::test_graft_leaf_given_without_scenario_is_refused`
+`tests/unit/capture/test_collector.py:559::test_graft_leaf_given_without_scenario_is_refused`
 
 - **given** a collector with no «Active scenario»
 - **when** a leaf «Graft» runs
@@ -1447,7 +1468,7 @@
 - **then** its «severity» is error
 
 ## ✓ «Narration lint» flags a then «step» that checks nothing
-`tests/unit/lint/test_ast_rules.py:227::test_then_without_check_fires`
+`tests/unit/lint/test_ast_rules.py:224::test_then_without_check_fires`
 
 - **given** a then «step» whose body only calls
   - 📎 step body:
@@ -1461,7 +1482,7 @@
 - **then** a then-without-check «finding» reports the unchecked then
 
 ## ✓ «Narration lint» flags an assert outside a then «step» · 2 cases
-`tests/unit/lint/test_ast_rules.py:393::test_check_outside_then_fires_on_assert_in_given_or_when`
+`tests/unit/lint/test_ast_rules.py:388::test_check_outside_then_fires_on_assert_in_given_or_when`
 
 - **given** a {phase} «step» whose body asserts
   - 📎 step body — *see parameter table*
@@ -1490,7 +1511,7 @@
   ```
 
 ## ✓ «Narration lint» flags a then «step» that folds in the action
-`tests/unit/lint/test_ast_rules.py:536::test_action_in_then_fires_when_no_when_exists`
+`tests/unit/lint/test_ast_rules.py:528::test_action_in_then_fires_when_no_when_exists`
 
 - **given** a «scenario» with no when, acting inside its then
   - 📎 step body:
@@ -1505,7 +1526,7 @@
 - **then** a warn «finding» points at the then and says no when acts
 
 ## ✓ «Narration lint» flags a «narration» interpolating a name the body never uses
-`tests/unit/lint/test_ast_rules.py:714::test_unused_interpolation_fires_on_unused_bare_identifier`
+`tests/unit/lint/test_ast_rules.py:704::test_unused_interpolation_fires_on_unused_bare_identifier`
 
 - **given** a given «step» whose body never loads the name
   - 📎 step body:
@@ -1534,7 +1555,7 @@
 - **then** a single warn «finding» names the «tag», the «term» it shadows, and both scenarios
 
 ## ✓ «Narration lint» flags a «term» that no «step» or «story» references
-`tests/unit/lint/test_runtime_rules.py:200::test_dead_term_flags_unreferenced_term`
+`tests/unit/lint/test_runtime_rules.py:199::test_dead_term_flags_unreferenced_term`
 
 - **given** a «glossary» holding one unreferenced «term»
 - **when** the runtime «rules» run over no scenarios and no stories

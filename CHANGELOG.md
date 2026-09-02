@@ -73,6 +73,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
   suite runs.
 - The collection-time `@scenario` checks now report as a `UsageError` instead of
   an `INTERNALERROR` traceback.
+- The narration lint summary prints each finding's location in its own column
+  rather than appended to the message.
+- `pytest-given` with no subcommand, and `pytest-given skills` with no
+  subcommand, now print that parser's usage and exit 2 instead of the root help
+  and exit 1.
 
 #### Report content (all formats)
 
@@ -137,6 +142,13 @@ form `## [x.y.z] - YYYY-MM-DD`.
   through to the `given_source_link` ini.
 - A finished scenario no longer leaves its collector — and every scenario and
   step it recorded — reachable from a process-global for the rest of the process.
+- An error-level lint finding no longer overwrites a more specific exit code, so
+  an interrupted or nothing-collected run keeps reporting as one.
+- A report that cannot be written into an unwritable directory now reports
+  through the terminal summary instead of escaping as a bare traceback.
+- `pytest-given report` and `pytest-given skills install` now report a failed
+  write as a CLI error, and a failed `report` write discards the previous run's
+  report rather than leaving it to read as current.
 - `pytest-given report` now reports a bad input file — missing, unparsable, or
   JSON that is not a pytest-given report — as a CLI error instead of a traceback,
   as does an unknown `--source-link` preset.

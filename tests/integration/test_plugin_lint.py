@@ -417,3 +417,22 @@ def test_removed_phase_check_ini_key_is_unknown(pytester):
     result.assert_outcomes(passed=1)
     assert 'incomplete scenarios' not in result.stdout.str()
     assert 'Unknown config option: given_phase_check' in result.stdout.str()
+
+
+@scenario(
+    t'An error {pg["Finding"].low} leaves a more specific exit code alone',
+    story=adopt_pytest_given,
+)
+def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
+    with given('a suite whose lint would fail, deselected so nothing is collected'):
+        attach('suite', EMPTY_GIVEN)
+    with when('the run collects no test but still trips a stale ignore', activity=11):
+        pytester.makeini(
+            '[pytest]\ngiven_lint = true\ngiven_lint_ignore = ["never-matches-*"]\n'
+        )
+        pytester.makepyfile(test_sample=EMPTY_GIVEN)
+        result = pytester.runpytest_inprocess('-k', 'no-such-test')
+    with then('the run keeps NO_TESTS_COLLECTED rather than reporting a test failure'):
+        # pytest binds exitstatus before sessionfinish, so overwriting it
+        # unconditionally would report 5 as a plain 1.
+        assert result.ret == pytest.ExitCode.NO_TESTS_COLLECTED

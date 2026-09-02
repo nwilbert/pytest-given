@@ -5,20 +5,14 @@ suite runs, so a typo in a rule name or a source-link preset is a `UsageError`
 up front rather than a surprise after the last test.
 """
 
+from pathlib import Path
 from typing import cast
 
 import pytest
 
-from ..lint import (
-    parse_ignore_entries,
-    parse_rule_levels,
-)
-from ..model import (
-    PytestGivenError,
-)
-from ..report import (
-    resolve_template,
-)
+from ..lint import parse_lint_config
+from ..model import PytestGivenError
+from ..report import SinkConfig, resolve_template
 from .state import GivenConfig, SessionOutcome, given_config_key, session_outcome_key
 
 _LINT_CHOICES = ('true', 'false')
@@ -133,8 +127,9 @@ def _cli_over_ini(config: pytest.Config, name: str) -> str | bool:
 
     Presence is `is not None`, never truthiness: the flags all default to None,
     so an explicitly empty one still wins over the ini — `--given-source-link=`
-    disables links rather than falling through. The ini value comes back as
-    pytest typed it, so each caller converts its own.
+    disables links rather than falling through. Each option's argparse `dest`
+    is its ini name, so one lookup name serves both. The ini value comes back
+    as pytest typed it, so each caller converts its own.
     """
     cli = config.getoption(name)
     if cli is not None:
@@ -166,29 +161,44 @@ def _resolve_source_link(config: pytest.Config) -> str:
     return cast('str', _cli_over_ini(config, 'given_source_link'))
 
 
-def pytest_configure(config: pytest.Config) -> None:
-    # Parsed eagerly (fail fast), even when the lint itself is disabled for
-    # this run, so session finish reuses the parse.
-    try:
-        rule_levels = parse_rule_levels(config.getini('given_lint_rules'))
-        ignore_entries = parse_ignore_entries(config.getini('given_lint_ignore'))
-    except ValueError as error:
-        raise pytest.UsageError(str(error)) from error
-    # Same reason, for the source-link config: an unknown preset is a typo in a
-    # flag, and learning about it only once the suite has finished is the worst
-    # moment to learn it. Only an HTML run resolves one — `github` would
-    # otherwise run its org/repo detection for a run that never asks.
-    source_link_template = None
-    if config.getoption('given_html') is not None:
-        try:
-            source_link_template = resolve_template(_resolve_source_link(config))
-        except PytestGivenError as error:
-            raise pytest.UsageError(str(error)) from error
-    config.stash[given_config_key] = GivenConfig(
-        rule_levels=rule_levels,
-        ignore_entries=ignore_entries,
+def _resolve_sinks(
+    config: pytest.Config, source_link_template: str | None
+) -> SinkConfig:
+    """The three sink flags, resolved into the pytest-free shape `report/`
+    reads. CLI-only, so there is no ini precedence to settle here."""
+    md_opt = config.getoption('given_md')
+    json_opt = config.getoption('given_json')
+    html_opt = config.getoption('given_html')
+    return SinkConfig(
+        json_path=Path(json_opt) if json_opt is not None else None,
+        html_path=Path(html_opt) if html_opt is not None else None,
+        md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
+        md_to_stdout=md_opt == '-',
         source_link_template=source_link_template,
-        title=_resolve_title(config),
+    )
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    # Everything is parsed eagerly (fail fast), even when the lint itself is
+    # disabled for this run: a typo in a rule name or a source-link preset is a
+    # UsageError up front rather than a surprise after the last test. Only an
+    # HTML run resolves a source link — `github` would otherwise run its
+    # org/repo detection for a run that never asks.
+    try:
+        lint = parse_lint_config(
+            config.getini('given_lint_rules'), config.getini('given_lint_ignore')
+        )
+        source_link_template = (
+            resolve_template(_resolve_source_link(config))
+            if config.getoption('given_html') is not None
+            else None
+        )
+    except PytestGivenError as error:
+        raise pytest.UsageError(str(error)) from error
+    config.stash[given_config_key] = GivenConfig(
+        lint=lint,
         lint_enabled=_resolve_lint_enabled(config),
+        sinks=_resolve_sinks(config, source_link_template),
+        title=_resolve_title(config),
     )
     config.stash[session_outcome_key] = SessionOutcome()

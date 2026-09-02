@@ -1,16 +1,18 @@
 """Command-line entry point for the ``pytest-given`` console script.
 
 Top-level orchestrator like the ``plugin`` package: allowed to import from any
-subpackage. Owns the argparse root; subcommands register themselves here.
+subpackage. Owns the argparse root; every subcommand registers its own parser
+and binds its handler with ``set_defaults``, so dispatch stays one call.
 """
 
 import argparse
 import sys
+from collections.abc import Callable
 from importlib.resources import files
 from importlib.resources.abc import Traversable
 from pathlib import Path, PurePosixPath
 
-from .report import add_report_parser, run_report
+from .report import add_report_parser
 
 type SkillTree = dict[PurePosixPath, bytes]
 
@@ -22,29 +24,22 @@ def main(argv: list[str] | None = None) -> int:
         prog='pytest-given',
         description='pytest-given command-line tools.',
     )
-    subparsers = parser.add_subparsers(dest='command')
+    subparsers = parser.add_subparsers(required=True)
     add_report_parser(subparsers)
     _add_skills_parser(subparsers)
     args = parser.parse_args(argv)
-    if args.command == 'report':
-        return run_report(args)
-    if args.command == 'skills' and args.skills_command == 'install':
-        return install_skills(args.dest, check=args.check)
-    parser.print_help()
-    return 1
+    handler: Callable[[argparse.Namespace], int] = args.handler
+    return handler(args)
 
 
-def install_skills(dest: Path, *, check: bool = False) -> int:
+def _install_skills(dest: Path) -> int:
     """Mirror the bundled skill directories into ``dest``.
 
     Touches only the bundled ``pytest-given-*`` directories: sibling skills in
-    ``dest`` are never read or written. With ``check=True`` nothing is written;
-    the exit code reports drift instead.
+    ``dest`` are never read or written.
     """
     bundled = _bundled_skill_tree()
     stale = _stale_files(dest, bundled)
-    if check:
-        return _report_drift(dest, bundled, stale)
     for rel, data in bundled.items():
         target = dest.joinpath(*rel.parts)
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -56,16 +51,32 @@ def install_skills(dest: Path, *, check: bool = False) -> int:
     return 0
 
 
+def _check_skills(dest: Path) -> int:
+    """Report drift of ``dest`` against the bundled skills, writing nothing."""
+    bundled = _bundled_skill_tree()
+    return _report_drift(dest, bundled, _stale_files(dest, bundled))
+
+
+def _run_skills_install(args: argparse.Namespace) -> int:
+    dest: Path = args.dest
+    try:
+        return _check_skills(dest) if args.check else _install_skills(dest)
+    except OSError as error:
+        print(f'Error: {error}', file=sys.stderr)
+        return 1
+
+
 def _add_skills_parser(
     subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
 ) -> None:
     skills_parser = subparsers.add_parser(
         'skills', help='Manage the bundled agent skills'
     )
-    skills_subparsers = skills_parser.add_subparsers(dest='skills_command')
+    skills_subparsers = skills_parser.add_subparsers(required=True)
     install_parser = skills_subparsers.add_parser(
         'install', help='Install the bundled agent skills into a project'
     )
+    install_parser.set_defaults(handler=_run_skills_install)
     install_parser.add_argument(
         '--dest',
         type=Path,

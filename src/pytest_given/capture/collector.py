@@ -64,7 +64,10 @@ class Collector:
     """Accumulates a session's scenarios, and the open step stack each one is
     recorded into."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, capture_step_source: bool = False) -> None:
+        # Whether steps record their body's source anchor (narration lint
+        # only); off is the zero-cost default — no frame walking happens.
+        self.capture_step_source = capture_step_source
         self._scenarios: list[Scenario] = []
         self._scenarios_by_id: dict[NodeId, Scenario] = {}
         self._current_scenario: Scenario | None = None
@@ -77,11 +80,6 @@ class Collector:
         self._active_recording: FixtureRecording | None = None
         self._active_fixture_descriptor: StepDescriptor | None = None
         self.inside_unannotated_test: bool = False
-        # Whether steps record their body's source anchor (narration lint
-        # only); off is the zero-cost default — no frame walking happens.
-        self.capture_step_source: bool = False
-        self.active_scenario_story: Story | None = None
-        self.active_scenario_activity_ids: tuple[ActivityId, ...] = ()
         self._discovered_stories: dict[StoryId, Story] = {}
 
     @property
@@ -96,7 +94,7 @@ class Collector:
 
     @property
     def scenarios(self) -> list[Scenario]:
-        return self._scenarios
+        return list(self._scenarios)
 
     @property
     def stories(self) -> list[Story]:
@@ -136,8 +134,6 @@ class Collector:
         self._started_at = None
         self._state = 'test'
         self.inside_unannotated_test = False
-        self.active_scenario_story = story
-        self.active_scenario_activity_ids = activity_ids
         if story is not None:
             self._discovered_stories[story.id] = story
 
@@ -174,8 +170,6 @@ class Collector:
         self._step_stack = []
         self._started_at = None
         self._state = 'idle'
-        self.active_scenario_story = None
-        self.active_scenario_activity_ids = ()
         return scenario
 
     def _elapsed_ms(self) -> int:
@@ -297,13 +291,15 @@ class Collector:
         activity_ids: tuple[ActivityId, ...],
     ) -> None:
         """Validate step activity_ids against the active scenario's story scope."""
-        story = self.active_scenario_story
+        assert self._current_scenario is not None
+        story_id = self._current_scenario.story_id
+        story = self._discovered_stories[story_id] if story_id is not None else None
         if story is None:
             raise PytestGivenError(
                 f'step activity= requires a story on the scenario '
                 f'(phase={phase!r}, ids={list(activity_ids)}).'
             )
-        scope = self.active_scenario_activity_ids
+        scope = self._current_scenario.activity_ids
         valid = scope or tuple(a.id for a in story.activities)
         valid_set = set(valid)
         for aid in activity_ids:
@@ -397,14 +393,16 @@ class Collector:
         error.
 
         An error already on the scenario is kept: a call-phase failure is what
-        the reader opened the scenario for. Unknown ids are ignored.
+        the reader opened the scenario for.
         """
-        scenario = self._scenarios_by_id.get(node_id)
-        if scenario is None:
-            return
+        scenario = self._scenarios_by_id[node_id]
         scenario.status = 'failed'
         if scenario.error is None:
             scenario.error = _error_info(message, frames, error_tail)
+
+    def has_scenario(self, node_id: NodeId) -> bool:
+        """Whether a finished scenario was recorded for *node_id*."""
+        return node_id in self._scenarios_by_id
 
 
 def _error_info(

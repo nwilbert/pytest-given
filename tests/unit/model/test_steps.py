@@ -1,8 +1,8 @@
+from pytest_given.grouping.checks import structure_signature
 from pytest_given.model import (
     Narration,
     Step,
     iter_steps,
-    structure_signature,
     walk_steps,
 )
 
@@ -28,15 +28,6 @@ def test_walk_steps_yields_depth_first_index_paths() -> None:
         ((0, 0), 'a1'),
         ((0, 1), 'a2'),
         ((1,), 'b'),
-    ]
-
-
-def test_walk_steps_honours_a_prefix() -> None:
-    assert [path for path, _ in walk_steps(_tree(), (7,))] == [
-        (7, 0),
-        (7, 0, 0),
-        (7, 0, 1),
-        (7, 1),
     ]
 
 

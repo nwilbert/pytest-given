@@ -78,8 +78,12 @@ def test_check_writes_nothing(tmp_path: Path) -> None:
     assert not dest.exists()
 
 
-def test_skills_without_subcommand_prints_help_and_fails() -> None:
-    assert main(['skills']) == 1
+def test_skills_without_subcommand_reports_its_own_usage(capsys) -> None:
+    """The usage names `install` — the root parser's help never did."""
+    with pytest.raises(SystemExit) as excinfo:
+        main(['skills'])
+    assert excinfo.value.code == 2
+    assert 'install' in capsys.readouterr().err
 
 
 REPO_SKILLS = Path(__file__).resolve().parents[2] / '.claude' / 'skills'
@@ -88,3 +92,16 @@ REPO_SKILLS = Path(__file__).resolve().parents[2] / '.claude' / 'skills'
 def test_repo_dogfood_copy_is_in_sync() -> None:
     """`.claude/skills/` is regenerated via `uv run pytest-given skills install`."""
     assert main(['skills', 'install', '--dest', str(REPO_SKILLS), '--check']) == 0
+
+
+def test_skills_install_reports_a_write_failure_as_a_cli_error(
+    tmp_path, monkeypatch, capsys
+) -> None:
+    """An unwritable destination is a CLI error, not a traceback."""
+
+    def refuse(self: Path, data: bytes) -> int:
+        raise PermissionError('read-only file system')
+
+    monkeypatch.setattr(Path, 'write_bytes', refuse)
+    assert main(['skills', 'install', '--dest', str(tmp_path)]) == 1
+    assert 'read-only file system' in capsys.readouterr().err

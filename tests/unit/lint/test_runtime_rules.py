@@ -3,7 +3,7 @@
 import dataclasses
 
 from pytest_given import given, scenario, then, when
-from pytest_given.lint import RuleId, run_runtime_rules
+from pytest_given.lint import DEFAULTS, RuleId, run_runtime_rules
 from pytest_given.model import (
     Activity,
     ActivityId,
@@ -76,9 +76,9 @@ def test_missing_phase_fires_on_passed_two_phase_scenario() -> None:
         assert finding.rule == RuleId('missing-phase')
         assert finding.subject == 'test_x.py::test_a'
         assert finding.location == SourceLocation(relpath='test_x.py', line=7)
-        assert finding.message == 'missing: when (test_x.py:7)'
+        assert finding.message == 'missing: when'
     with then(t'its {pg["Severity"].low} is the catalog default, warn'):
-        assert finding.severity == 'warn'
+        assert DEFAULTS[finding.rule] == 'warn'
 
 
 def test_missing_phase_passes_a_complete_scenario() -> None:
@@ -153,7 +153,6 @@ def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
         t'{pg["Term"].low} it shadows, and both scenarios'
     ):
         [finding] = findings
-        assert finding.severity == 'warn'
         assert finding.subject == 'file-glossary'
         assert finding.message == (
             "tag 'File Glossary' duplicates glossary term 'File glossary' "
@@ -218,7 +217,7 @@ def test_dead_term_flags_unreferenced_term() -> None:
         )
     with then(t'its {pg["Severity"].low} is off — the rule is opt-in'):
         # Catalog default; `apply_config` drops it unless the suite opts in.
-        assert finding.severity == 'off'
+        assert DEFAULTS[finding.rule] == 'off'
 
 
 def test_dead_term_passes_term_referenced_by_a_step() -> None:

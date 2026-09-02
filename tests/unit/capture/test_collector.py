@@ -496,18 +496,21 @@ def test_fail_recorded_scenario_keeps_an_existing_error() -> None:
 
 
 @scenario(
-    t'A teardown failure under an unknown {pg["Node ID"]} is ignored',
+    t'A {pg["Collector"]} reports which {pg["Node ID"]("node ids")} it recorded',
 )
-def test_fail_recorded_scenario_ignores_unknown_node_id() -> None:
+def test_has_scenario_reports_only_recorded_node_ids() -> None:
+    """The teardown hook asks this before doing any traceback work, so an item
+    the plugin recorded nothing for never pays for a report it would discard."""
     with given(t'a {pg["Collector"]} that recorded one {pg["Scenario"].low}'):
         collector = Collector()
         collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
-        recorded = collector.finish_scenario(status='passed')
-    with when('a teardown fails under a node id no scenario claimed'):
-        collector.fail_recorded_scenario(NodeId('test.py::test_other'), message='boom')
-    with then('the recorded scenario is untouched'):
-        assert recorded.status == 'passed'
-        assert recorded.error is None
+        collector.finish_scenario(status='passed')
+    with when('the recorded and an unrecorded node id are both asked about'):
+        recorded = collector.has_scenario(NodeId('test.py::test_x'))
+        unrecorded = collector.has_scenario(NodeId('test.py::test_other'))
+    with then('only the recorded node id is claimed'):
+        assert recorded
+        assert not unrecorded
 
 
 @scenario(
