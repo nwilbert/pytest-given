@@ -25,7 +25,7 @@ from ..model import (
 )
 from .collection import scenario_marker
 from .fixtures import graft_fixture_recordings
-from .state import session_collector, session_state
+from .state import given_config, session_collector, session_state
 
 if TYPE_CHECKING:
     from _pytest._code.code import TracebackEntry
@@ -150,7 +150,7 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
     # gated on --given-all-frames: a skip never wants a traceback regardless.
     if call.excinfo.errisinstance(pytest.skip.Exception):
         return
-    if not item.config.getoption('given_all_frames'):
+    if not given_config(item.config).all_frames:
         _filter_internal_frames(call.excinfo)
     error_repr = call.excinfo.getrepr(style='short')
     message = str(call.excinfo.value)

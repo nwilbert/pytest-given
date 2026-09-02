@@ -21,13 +21,11 @@ from ..report import SinkConfig
 
 @dataclass(frozen=True, kw_only=True)
 class GivenConfig:
-    """This run's pytest-given options, every one of them resolved at
-    configure time so no read site re-derives a precedence or a default."""
-
     lint: LintConfig
     lint_enabled: bool
     sinks: SinkConfig
     title: str | None
+    all_frames: bool
 
 
 @dataclass(kw_only=True)

@@ -22,10 +22,8 @@ from ..model import (
 type Slot = Literal['actor', 'verb', 'noun']
 
 # What each slot accepts, as declared kinds — the other half of the positional
-# rule `slot_for` names. `story.path` checks a declared kind against it at
-# construction; `_verify_declared` checks the same table against the positions
-# a term was actually used in. A term whose kind is not yet known declares
-# nothing and is valid anywhere.
+# rule `slot_for` names. A term whose kind is not yet known declares nothing
+# and is valid anywhere.
 ROLE_ACCEPTS: dict[Slot, tuple[TermKind, ...]] = {
     'actor': ('actor',),
     'verb': ('verb',),
@@ -39,12 +37,7 @@ _SLOT_ORDER: tuple[Slot, ...] = ('verb', 'actor', 'noun')
 
 def slot_for(position: int) -> Slot:
     """Which slot an activity-path position is: 0 is the actor node, odd
-    positions are edges (verbs), even positions from 2 on are further nodes.
-
-    The single definition of the path grammar's positional rule: `story.path`
-    validates a declared kind against it at construction, and this module infers
-    an undeclared one from it afterwards.
-    """
+    positions are edges (verbs), even positions from 2 on are further nodes."""
     if position == 0:
         return 'actor'
     if position % 2 == 1:

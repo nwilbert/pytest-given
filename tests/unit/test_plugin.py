@@ -283,6 +283,7 @@ def _fake_session() -> Any:
         lint_enabled=False,
         sinks=SinkConfig(),
         title=None,
+        all_frames=False,
     )
     return SimpleNamespace(config=config)
 

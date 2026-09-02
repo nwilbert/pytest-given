@@ -1,9 +1,8 @@
-"""Precomputed aggregations for the HTML report renderer.
+"""Precomputed views of a report, for the HTML renderer.
 
-Everything the Jinja templates would otherwise have to compute per render:
-coverage maps, story rollups and glossary cross-references. Each `build_*`
-takes the report and returns one indexed view of it. The URL-fragment slugs
-are `slugs.py`'s.
+Derived values belong here rather than in a Jinja expression: a template
+cannot be type-checked or unit-tested, and recomputes per render. Each
+`build_*` takes the report and returns one indexed view of it.
 """
 
 from collections.abc import Iterator

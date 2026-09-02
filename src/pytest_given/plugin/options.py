@@ -204,5 +204,6 @@ def pytest_configure(config: pytest.Config) -> None:
         lint_enabled=_resolve_lint_enabled(config),
         sinks=_resolve_sinks(config, source_link_template),
         title=_resolve_title(config),
+        all_frames=bool(config.getoption('given_all_frames')),
     )
     config.stash[session_outcome_key] = SessionOutcome()
