@@ -99,6 +99,8 @@ def test_order():
 
 Pick the phase by **role**, not syntax: all arrangement belongs in `given` — including state-mutating setup calls (`machine.insert(200)`, seeding a database) — `when` performs the one action under test, and `then` only observes its outcome. A scenario with two `when` steps usually hides an arrangement in the first one, and a `then` that calls the action (`assert machine.buy() == …`) hides the action inside a check.
 
+A step recorded in a test with no `@scenario` is a no-op that warns with `pytest_given.PytestGivenWarning` — silence it with `filterwarnings = ["ignore::pytest_given.PytestGivenWarning"]` if a shared helper is used from both narrated and plain tests.
+
 As a fixture decorator (**only `@given` is allowed** — fixtures are setup, so `@when`/`@then` on a fixture is rejected at runtime):
 
 ```python
@@ -395,6 +397,14 @@ given_lint_ignore = [
 ```
 
 An ignore entry that suppresses no finding is itself an error-level `stale-ignore` finding — the list can only shrink, never rot. The `--given-lint` CLI flag overrides the `given_lint` ini value for a single run.
+
+Findings print one aligned row each — severity, rule, subject, message, and the source location the rule fired at:
+
+```
+============= pytest-given: narration lint (2 findings, 1 error) ==============
+ERROR empty-step          tests/test_shop.py::test_buy   given 'a coin' has no code (test_shop.py:12)
+WARN  missing-phase       tests/test_shop.py::test_idle  missing: when (test_shop.py:31)
+```
 
 The lint is zero-cost when off: nothing extra is captured, and report artifacts are byte-identical with the lint on or off.
 

@@ -1,5 +1,11 @@
 """The fixture side: recording a decorated fixture's body, and grafting what
 it recorded onto the test that requested it.
+
+Where the plugin's coupling to pytest internals concentrates, so a pytest
+upgrade's blast radius is greppable: `fixturedef.func` is reassigned to wrap a
+generator body, `fixturedef.cache_key(request)` identifies one fixture
+instance, and `item.session._fixturemanager.getfixturedefs` resolves what a
+test requested. Each is unavoidable and none is public API.
 """
 
 import contextlib
@@ -143,7 +149,6 @@ def _fixture_instance_key(
 
 
 def graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
-    """Graft this item's fixture step-recordings and Annotated `given` labels."""
     func = getattr(item, 'function', None)
     descriptors = annotated_given_descriptors(func) if func is not None else {}
     grafted = _graft_recorded_fixtures(item, collector, descriptors)

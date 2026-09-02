@@ -115,8 +115,6 @@ class StepDescriptor:
         self._pinned_source: SourceLocation | None = None
 
     def pin_source(self, source: SourceLocation | None) -> None:
-        """Anchor this step at a source location the composing construct
-        captured, rather than at its own caller frame."""
         self._pinned_source = source
 
     @property

@@ -24,7 +24,7 @@ from pytest_given.capture.scenario import (
 from pytest_given.capture.source import file_source
 from pytest_given.capture.steps import StepDescriptor
 from pytest_given.capture.story import (
-    clear_story_registry,
+    restore_story_registry,
 )
 from pytest_given.capture.story import (
     story as story_fn,
@@ -406,9 +406,9 @@ def test_extract_skip_reason_returns_none_for_unrecognized_shapes() -> None:
 
 @pytest.fixture
 def _reset_story_registry_plugin() -> Any:
-    clear_story_registry()
+    restore_story_registry({})
     yield
-    clear_story_registry()
+    restore_story_registry({})
 
 
 @pytest.mark.usefixtures('_reset_story_registry_plugin')

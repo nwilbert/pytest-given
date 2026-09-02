@@ -326,5 +326,4 @@ def _grouping_error(anchor: Scenario, body: str) -> PytestGivenError:
 
 
 def _test_name(scenario: Scenario) -> str:
-    """The bare test function name, for error messages: `test_brew`."""
     return node_base(scenario.id).rpartition('::')[2]

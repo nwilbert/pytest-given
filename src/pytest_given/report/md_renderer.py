@@ -24,6 +24,7 @@ from ..model import (
     Step,
     StepAttachment,
     node_base,
+    placeholder_token,
 )
 
 # The same three glyphs the HTML view paints, so one run reads alike in
@@ -276,7 +277,7 @@ def _part_md(part: NarrationPart) -> str:
             return value
         case NarrationValue(rendered=rendered):
             return rendered
-        case NarrationPlaceholder(name=name):
-            return '{' + name + '}'
+        case NarrationPlaceholder():
+            return placeholder_token(part)
         case NarrationTermRef(display=display):
             return f'«{display}»'

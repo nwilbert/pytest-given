@@ -84,7 +84,6 @@ def set_rootdir(path: Path) -> None:
 
 
 def current_rootdir() -> Path | None:
-    """The rootdir as last set (already resolved)."""
     return _rootdir
 
 

@@ -15,8 +15,8 @@ from pytest_given import (
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.story import (
     activity,
-    clear_story_registry,
     path,
+    restore_story_registry,
     story,
 )
 from pytest_given.model import (
@@ -31,9 +31,9 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 
 @pytest.fixture(autouse=True)
 def _reset_story_registry():
-    clear_story_registry()
+    restore_story_registry({})
     yield
-    clear_story_registry()
+    restore_story_registry({})
 
 
 @pytest.fixture
@@ -523,7 +523,7 @@ def test_story_id_collision_reports_a_rootdir_relative_site():
 
 def test_story_id_collision_does_not_fire_after_registry_clear():
     story('Book', [])
-    clear_story_registry()
+    restore_story_registry({})
     story('Book', [])
 
 

@@ -29,6 +29,7 @@ from ..model import (
     Scenario,
     SourceLocation,
     TermId,
+    placeholder_token,
 )
 from .aggregations import (
     build_activity_labels,
@@ -321,7 +322,7 @@ def _render_narration_part(
             return f'<span class="value-highlight">{escape(rendered)}</span>'
         case NarrationPlaceholder(name=name, column_id=column_id):
             color_idx = param_color_map.get(name, 0)
-            label = _placeholder_token(part)
+            label = placeholder_token(part)
             # `data-param` keys the hover highlight and carries the column *id*
             # — two steps can interpolate the same expression with different
             # values, which would cross-wire if the name were the key. The
@@ -381,17 +382,6 @@ def _render_term_ref(part: NarrationTermRef, glossary: Glossary | None) -> str:
     if term is None:
         return str(escape(part.display))
     return _term_ref_span(term, part.term_id, part.display)
-
-
-def _placeholder_token(part: NarrationPlaceholder) -> str:
-    """Render the grouped-template slot as a bare `{name}`.
-
-    The grouped view is schematic — it marks *which* column varies, not how any
-    one value prints. Conversion and format spec are already applied in the
-    concrete per-case rows, so they are noise in the collapsed slot and are
-    dropped here (still stored on the placeholder for the paths that need
-    them)."""
-    return '{' + part.name + '}'
 
 
 def _make_activity_part_filter(

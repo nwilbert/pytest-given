@@ -304,7 +304,6 @@ def build_story_rollups(
 def build_scenario_activity_index(
     coverage_maps: CoverageMap,
 ) -> dict[NodeId, list[ActivityId]]:
-    """For each scenario, the sorted list of activity ids it covers."""
     return {scn_id: sorted(covered) for scn_id, covered in coverage_maps.items()}
 
 
@@ -383,8 +382,6 @@ def build_glossary_views(report: ReportData) -> GlossaryViews:
 
 
 def _scenario_narrations(scenario: Scenario) -> Iterator[tuple[Narration, str | None]]:
-    """Every narration a scenario carries, with the fixture that recorded it —
-    the scenario's own title first, then each step's."""
     yield scenario.narration, None
     for _path, step in walk_steps(scenario.steps):
         yield step.narration, step.fixture_name
@@ -433,12 +430,13 @@ class _GlossaryIndex:
         term = self._glossary.get(term_id)
         if term is None or term.kind not in ('actor', 'object'):
             return
-        if display == term.canonical or (term_id, display) in self._instances:
+        if (term_id, display) in self._instances:
             return
         self._instances.add((term_id, display))
-        self._agg(term_id).instances.append(
-            TermOccurrence(display=display, fixture_name=fixture_name)
-        )
+        if display != term.canonical:
+            self._agg(term_id).instances.append(
+                TermOccurrence(display=display, fixture_name=fixture_name)
+            )
 
     def record_form(self, term_id: TermId, display: str) -> None:
         """Note one surface form of a verb term.

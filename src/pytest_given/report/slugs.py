@@ -30,13 +30,9 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
     defining `test_y`) falls back to the node id, which is unique by
     construction.
     """
-    base_counts = Counter(
-        _scenario_slug(s.id, with_tail=False) for s in report.scenarios
-    )
-    tails = {
-        s.id: base_counts[_scenario_slug(s.id, with_tail=False)] > 1
-        for s in report.scenarios
-    }
+    bases = {s.id: _scenario_slug(s.id, with_tail=False) for s in report.scenarios}
+    base_counts = Counter(bases.values())
+    tails = {node_id: base_counts[base] > 1 for node_id, base in bases.items()}
     slugs = {
         s.id: _scenario_slug(s.id, with_tail=tails[s.id]) for s in report.scenarios
     }
@@ -57,13 +53,11 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
 
 
 def _colliding_ids(slugs: dict[NodeId, str]) -> list[NodeId]:
-    """The node ids whose slug another scenario also holds, in report order."""
     counts = Counter(slugs.values())
     return [node_id for node_id, slug in slugs.items() if counts[slug] > 1]
 
 
 def _scenario_slug(node_id: NodeId, *, with_tail: bool, depth: int = 0) -> str:
-    """The slug for one node id, carrying `depth` of its parent directories."""
     file_part, _, func_part = node_id.partition('::')
     segments = file_part.split('/')
     basename = segments[-1].removesuffix('.py').removeprefix('test_')

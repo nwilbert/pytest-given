@@ -102,7 +102,6 @@ def _templatize_part(
 
 
 def _param_slot(part: NarrationValue) -> NarrationPlaceholder:
-    """The `param` column slot an interpolation of that column's value becomes."""
     return NarrationPlaceholder(
         name=part.expression,
         column_id=part.expression,

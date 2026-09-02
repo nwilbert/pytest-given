@@ -128,13 +128,18 @@ def _cli_over_ini(config: pytest.Config, name: str) -> str | bool:
     Presence is `is not None`, never truthiness: the flags all default to None,
     so an explicitly empty one still wins over the ini — `--given-source-link=`
     disables links rather than falling through. Each option's argparse `dest`
-    is its ini name, so one lookup name serves both. The ini value comes back
-    as pytest typed it, so each caller converts its own.
+    is its ini name, so one lookup name serves both.
     """
     cli = config.getoption(name)
-    if cli is not None:
-        return cast('str', cli)
-    return cast('str | bool', config.getini(name))
+    return cast('str | bool', config.getini(name) if cli is None else cli)
+
+
+def _cli_over_ini_str(config: pytest.Config, name: str) -> str:
+    """`_cli_over_ini` for an option whose ini is declared `type='string'`, so
+    both sources are already `str`."""
+    value = _cli_over_ini(config, name)
+    assert isinstance(value, str), f'{name} is declared a string ini'
+    return value
 
 
 def _resolve_title(config: pytest.Config) -> str | None:
@@ -146,7 +151,7 @@ def _resolve_title(config: pytest.Config) -> str | None:
     other. Coalescing here rather than in `_cli_over_ini` keeps it this
     option's own rule: `--given-source-link=` means the opposite.
     """
-    return cast('str', _cli_over_ini(config, 'given_title')) or None
+    return _cli_over_ini_str(config, 'given_title') or None
 
 
 def _resolve_lint_enabled(config: pytest.Config) -> bool:
@@ -157,8 +162,7 @@ def _resolve_lint_enabled(config: pytest.Config) -> bool:
 
 
 def _resolve_source_link(config: pytest.Config) -> str:
-    """The source-link template or preset name."""
-    return cast('str', _cli_over_ini(config, 'given_source_link'))
+    return _cli_over_ini_str(config, 'given_source_link')
 
 
 def _resolve_sinks(

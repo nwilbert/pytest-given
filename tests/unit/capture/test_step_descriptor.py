@@ -29,7 +29,7 @@ from pytest_given.capture.story import (
     activity as activity_fn,
 )
 from pytest_given.capture.story import (
-    clear_story_registry,
+    restore_story_registry,
 )
 from pytest_given.capture.story import (
     story as story_fn,
@@ -51,9 +51,9 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 
 @pytest.fixture(autouse=True)
 def _reset_story_registry():
-    clear_story_registry()
+    restore_story_registry({})
     yield
-    clear_story_registry()
+    restore_story_registry({})
 
 
 @scenario(

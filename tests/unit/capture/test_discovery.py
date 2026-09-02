@@ -13,7 +13,7 @@ from pytest_given.capture import (
     resolve_glossary,
     story,
 )
-from pytest_given.capture.story import clear_story_registry
+from pytest_given.capture.story import restore_story_registry
 from pytest_given.model import PytestGivenError
 
 
@@ -32,9 +32,9 @@ class _FakeConftest:
 
 @pytest.fixture
 def _clean_story_registry() -> Iterator[None]:
-    clear_story_registry()
+    restore_story_registry({})
     yield
-    clear_story_registry()
+    restore_story_registry({})
 
 
 @pytest.mark.usefixtures('_clean_story_registry')

@@ -108,20 +108,18 @@ def merge_glossaries(
     return merged
 
 
+# Which story ids this process has seen declared, and where. Process-global,
+# so `process_state` — its only sanctioned caller — swaps it around a nested
+# in-process run.
 _STORY_REGISTRY: dict[StoryId, str] = {}
 
 
-def clear_story_registry() -> None:
-    _STORY_REGISTRY.clear()
-
-
 def snapshot_story_registry() -> dict[StoryId, str]:
-    """A copy of the registry, to hand back to `restore_story_registry`."""
     return dict(_STORY_REGISTRY)
 
 
 def restore_story_registry(snapshot: dict[StoryId, str]) -> None:
-    """Reinstate a snapshot taken with `snapshot_story_registry`."""
+    """Reinstate a snapshot; `{}` clears the registry for a fresh session."""
     _STORY_REGISTRY.clear()
     _STORY_REGISTRY.update(snapshot)
 
@@ -215,7 +213,6 @@ _ROLE_LABEL = {'actor': 'an actor', 'verb': 'a verb', 'noun': 'a noun'}
 
 
 def _term_name(value: object) -> str:
-    """The canonical term name behind a term ref, for error text."""
     return value.term.canonical if isinstance(value, TermRef) else type(value).__name__
 
 

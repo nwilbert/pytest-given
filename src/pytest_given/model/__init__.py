@@ -3,6 +3,7 @@ from .ids import case_suffix, id_derive, node_base
 from .markup import EMPHASIS
 from .narration import (
     narration_text,
+    placeholder_token,
     placeholder_value,
     rebuilt,
     render_interpolation,
@@ -120,6 +121,7 @@ __all__ = [
     'narration_text',
     'node_base',
     'placeholder_mismatch',
+    'placeholder_token',
     'placeholder_value',
     'rebuilt',
     'render_interpolation',

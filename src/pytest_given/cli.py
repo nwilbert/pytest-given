@@ -52,7 +52,6 @@ def _install_skills(dest: Path) -> int:
 
 
 def _check_skills(dest: Path) -> int:
-    """Report drift of ``dest`` against the bundled skills, writing nothing."""
     bundled = _bundled_skill_tree()
     return _report_drift(dest, bundled, _stale_files(dest, bundled))
 

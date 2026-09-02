@@ -214,8 +214,6 @@ def _build_report(
 
 
 def _run_lint(session: pytest.Session, exitstatus: int, built: _SessionReport) -> None:
-    """Run the narration lint; stash the findings for the terminal summary
-    and fail the run when any is error-level."""
     config = session.config
     given = given_config(config)
     if not given.lint_enabled:

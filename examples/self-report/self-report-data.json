@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-02T20:49:15.159736+00:00",
+    "timestamp": "2026-09-02T20:59:39.246729+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "3c72747abdd7eec871d23786d9b648706ce686cc",
+    "commit_sha": "9515d0325366807d6dcdeb24430b41e9613c623a",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -26,7 +26,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -134,7 +134,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -272,7 +272,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -814,7 +814,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 53,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -900,7 +900,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 19,
       "steps": [
         {
           "phase": "given",
@@ -984,7 +984,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -1154,7 +1154,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -1354,7 +1354,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -17103,7 +17103,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 369
+        "line": 367
       },
       "story_id": null,
       "activity_ids": []
@@ -17230,7 +17230,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 415
+        "line": 413
       },
       "story_id": null,
       "activity_ids": []
@@ -17346,7 +17346,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 437
+        "line": 435
       },
       "story_id": null,
       "activity_ids": []
@@ -17447,7 +17447,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 467
+        "line": 465
       },
       "story_id": null,
       "activity_ids": []
@@ -17573,7 +17573,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 491
+        "line": 489
       },
       "story_id": null,
       "activity_ids": []
@@ -17691,7 +17691,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 525
+        "line": 523
       },
       "story_id": null,
       "activity_ids": []
@@ -17804,7 +17804,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 553
+        "line": 551
       },
       "story_id": null,
       "activity_ids": []
@@ -17829,7 +17829,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",

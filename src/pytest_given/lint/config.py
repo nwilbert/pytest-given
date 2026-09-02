@@ -48,7 +48,6 @@ def parse_lint_config(rule_lines: list[str], ignore_lines: list[str]) -> LintCon
 
 
 def parse_rule_levels(lines: list[str]) -> dict[RuleId, Level]:
-    """Parse `given_lint_rules` entries of the form ``rule-id=level``."""
     levels: dict[RuleId, Level] = {}
     for line in lines:
         rule_part, sep, level_part = line.partition('=')

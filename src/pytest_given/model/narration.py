@@ -25,6 +25,17 @@ from .schema import (
 _FORMATTER = Formatter()
 
 
+def placeholder_token(part: NarrationPlaceholder) -> str:
+    """A grouped-template slot as its bare `{name}` token.
+
+    The grouped view is schematic: it marks *which* column varies, not how any
+    one value prints, so the conversion and format spec are dropped — they are
+    already applied in the concrete per-case rows. Both renderers print the
+    slot this way, and `narration_text` derives `text` from it.
+    """
+    return '{' + part.name + '}'
+
+
 def narration_text(parts: list[NarrationPart]) -> str:
     """The text those parts render.
 
@@ -43,8 +54,8 @@ def narration_text(parts: list[NarrationPart]) -> str:
                 out.append(value)
             case NarrationValue(rendered=rendered):
                 out.append(rendered)
-            case NarrationPlaceholder(name=name):
-                out.append('{' + name + '}')
+            case NarrationPlaceholder():
+                out.append(placeholder_token(part))
             case NarrationTermRef(display=display):
                 out.append(display)
             case _:

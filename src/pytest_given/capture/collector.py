@@ -300,7 +300,6 @@ class Collector:
         phase: Phase,
         activity_ids: tuple[ActivityId, ...],
     ) -> None:
-        """Validate step activity_ids against the active scenario's story scope."""
         assert self._current_scenario is not None
         story_id = self._current_scenario.story_id
         story = self._discovered_stories[story_id] if story_id is not None else None
@@ -373,7 +372,6 @@ class Collector:
             )
 
     def _target_stack(self) -> list[Step]:
-        """Return the step stack that push/pop/attach should mutate, per state."""
         if self._state == 'fixture_setup' and self._active_recording is not None:
             return self._active_recording.stack
         return self._step_stack
@@ -411,7 +409,6 @@ class Collector:
             scenario.error = _error_info(message, frames, error_tail)
 
     def has_scenario(self, node_id: NodeId) -> bool:
-        """Whether a finished scenario was recorded for *node_id*."""
         return node_id in self._scenarios_by_id
 
 

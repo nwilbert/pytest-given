@@ -1,8 +1,17 @@
 """Unit tests for lint config parsing and application (`lint/config.py`)."""
 
+import re
+from pathlib import Path
+
 import pytest
 
-from pytest_given.lint import LintConfig, RawFinding, RuleId, apply_config
+from pytest_given.lint import (
+    DEFAULTS,
+    LintConfig,
+    RawFinding,
+    RuleId,
+    apply_config,
+)
 from pytest_given.lint.config import parse_ignore_entries, parse_rule_levels
 from pytest_given.model import PytestGivenError, SourceLocation
 
@@ -168,3 +177,30 @@ def test_apply_config_stale_entries_come_last() -> None:
         RuleId('empty-step'),
         RuleId('stale-ignore'),
     ]
+
+
+def test_the_documented_rule_tables_match_the_catalog() -> None:
+    """README and the bundled authoring skill each hand-maintain a rule table.
+
+    Nothing else notices when a rule is added, renamed, or has its default
+    changed, and a downstream agent reads the skill's copy instead of the
+    README — so both are checked against `DEFAULTS` here.
+    """
+    root = Path(__file__).resolve().parents[3]
+    skill = (
+        root
+        / 'src/pytest_given/skills_data/pytest-given-authoring'
+        / 'references/scenarios.md'
+    )
+    for doc in (root / 'README.md', skill):
+        rows = dict(
+            re.findall(
+                r'^\| `([a-z][a-z0-9-]*)` \| `?(off|warn|error)`? \|',
+                doc.read_text(encoding='utf-8'),
+                re.MULTILINE,
+            )
+        )
+        assert rows, f'no rule table found in {doc.name}'
+        assert rows == {str(rule): level for rule, level in DEFAULTS.items()}, (
+            f'{doc.name} rule table is out of sync with lint.DEFAULTS'
+        )

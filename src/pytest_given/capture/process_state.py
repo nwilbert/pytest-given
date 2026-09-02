@@ -11,6 +11,10 @@ They are saved and restored together rather than a call site at a time because
 missing one is a silent bug the *outer* session pays for: a stranded rootdir
 makes every later step record `source=None`, which quietly takes the lint's
 whole AST surface down with it.
+
+This module is the only sanctioned caller of the accessors it imports; the
+state itself stays where it is used, because the rootdir carries a resolve
+cache and the path-form folding that keeps it correct (see `source.py`).
 """
 
 from dataclasses import dataclass
@@ -19,11 +23,7 @@ from pathlib import Path
 from ..model import StoryId
 from .collector import Collector, get_active_collector, set_active_collector
 from .source import current_rootdir, restore_rootdir, set_rootdir
-from .story import (
-    clear_story_registry,
-    restore_story_registry,
-    snapshot_story_registry,
-)
+from .story import restore_story_registry, snapshot_story_registry
 
 
 @dataclass(frozen=True)
@@ -36,7 +36,6 @@ class CaptureState:
 
 
 def capture_snapshot() -> CaptureState:
-    """The process-global capture state as it currently stands."""
     return CaptureState(
         rootdir=current_rootdir(),
         stories=snapshot_story_registry(),
@@ -62,4 +61,4 @@ def begin_capture_session(rootdir: Path) -> None:
     another run, and `restore_capture_state` when this one is done.
     """
     set_rootdir(rootdir)
-    clear_story_registry()
+    restore_story_registry({})
