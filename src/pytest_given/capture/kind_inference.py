@@ -21,6 +21,21 @@ from ..model import (
 
 type Slot = Literal['actor', 'verb', 'noun']
 
+# What each slot accepts, as declared kinds — the other half of the positional
+# rule `slot_for` names. `story.path` checks a declared kind against it at
+# construction; `_verify_declared` checks the same table against the positions
+# a term was actually used in. A term whose kind is not yet known declares
+# nothing and is valid anywhere.
+ROLE_ACCEPTS: dict[Slot, tuple[TermKind, ...]] = {
+    'actor': ('actor',),
+    'verb': ('verb',),
+    'noun': ('actor', 'object'),
+}
+
+# Slot order for a conflict message, so a term used in several bad positions
+# always names the same one first.
+_SLOT_ORDER: tuple[Slot, ...] = ('verb', 'actor', 'noun')
+
 
 def slot_for(position: int) -> Slot:
     """Which slot an activity-path position is: 0 is the actor node, odd
@@ -81,14 +96,9 @@ def _infer_one(
 
 
 def _verify_declared(term: GlossaryTerm, stories_by_slot: dict[Slot, set[str]]) -> None:
-    declared = term.kind
-    slots = set(stories_by_slot)
-    if 'verb' in slots and declared != 'verb':
-        _raise_declared(term, 'verb slot', _where(stories_by_slot, 'verb'))
-    if 'actor' in slots and declared != 'actor':
-        _raise_declared(term, 'actor slot', _where(stories_by_slot, 'actor'))
-    if 'noun' in slots and declared == 'verb':
-        _raise_declared(term, 'noun slot', _where(stories_by_slot, 'noun'))
+    for slot in _SLOT_ORDER:
+        if slot in stories_by_slot and term.kind not in ROLE_ACCEPTS[slot]:
+            _raise_declared(term, f'{slot} slot', _where(stories_by_slot, slot))
 
 
 def _raise_declared(term: GlossaryTerm, slot: str, where: str) -> None:

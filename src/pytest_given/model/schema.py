@@ -117,7 +117,7 @@ class GlossaryPinned:
     """
 
     _glossaries: dict[int, Glossary] = field(
-        init=False, repr=False, compare=False, default_factory=dict
+        repr=False, compare=False, default_factory=dict
     )
 
 

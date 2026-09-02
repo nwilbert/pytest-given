@@ -1,6 +1,7 @@
 """User-facing Glossary API: id derivation, value classes, registration."""
 
 import difflib
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 
 from ..model import (
@@ -26,8 +27,40 @@ def normalize_definition(definition: str | None) -> str | None:
     return stripped or None
 
 
+class TermRef(ABC):
+    """Something that names a glossary term and knows how it should read.
+
+    Two shapes implement it — a bare `TermHandle` reading as its canonical
+    name, and a `TermInstance` wearing a surface form — and every consumer
+    outside this module goes through `id` / `display` rather than branching on
+    which it got.
+    """
+
+    @property
+    @abstractmethod
+    def term(self) -> GlossaryTerm: ...
+
+    @property
+    @abstractmethod
+    def glossary(self) -> BaseGlossary: ...
+
+    @property
+    @abstractmethod
+    def display(self) -> str: ...
+
+    @property
+    def id(self) -> TermId:
+        return self.term.id
+
+    @property
+    def declared_kind(self) -> TermKind | None:
+        """The kind the term claims, or None until `infer_glossary_kinds`
+        settles it."""
+        return self.term.kind
+
+
 @dataclass(frozen=True)
-class TermHandle:
+class TermHandle(TermRef):
     """A `GlossaryTerm` plus a back-ref to its owning `Glossary`.
 
     One type for every kind and every accessor: the registration methods differ
@@ -48,7 +81,7 @@ class TermHandle:
         actor's `Alice` is its own identity, a verb's `books` is the same verb
         in another form.
         """
-        return TermInstance(handle=self, display=display)
+        return TermInstance(handle=self, surface=display)
 
     @property
     def low(self) -> TermInstance:
@@ -65,26 +98,23 @@ class TermHandle:
         return self._glossary
 
     @property
-    def id(self) -> TermId:
-        return self._term.id
-
-    @property
     def canonical(self) -> str:
         return self._term.canonical
 
     @property
-    def declared_kind(self) -> TermKind | None:
-        """The kind the term claims, or None until `infer_glossary_kinds`
-        settles it."""
-        return self._term.kind
+    def display(self) -> str:
+        """A bare handle reads as its canonical name."""
+        return self._term.canonical
 
 
 @dataclass(frozen=True)
-class TermInstance:
+class TermInstance(TermRef):
     """A term wearing one surface form: the handle it came from, plus display."""
 
     handle: TermHandle
-    display: str
+    # Named apart from the `display` accessor it backs, so the field does not
+    # shadow the base's property.
+    surface: str
 
     @property
     def term(self) -> GlossaryTerm:
@@ -95,8 +125,8 @@ class TermInstance:
         return self.handle.glossary
 
     @property
-    def declared_kind(self) -> TermKind | None:
-        return self.handle.declared_kind
+    def display(self) -> str:
+        return self.surface
 
 
 def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:

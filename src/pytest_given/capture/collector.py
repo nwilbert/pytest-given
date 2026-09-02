@@ -1,3 +1,6 @@
+"""The recorder: a session's scenarios, and the open step stack each one
+is recorded into."""
+
 import copy
 import time
 from contextvars import ContextVar
@@ -85,6 +88,13 @@ class Collector:
     @property
     def state(self) -> RecordingState:
         return self._state
+
+    @property
+    def recording(self) -> bool:
+        """Whether a step pushed right now would be recorded — the one answer
+        the step `__enter__`, `__exit__` and decorator paths all ask, so they
+        cannot drift into disagreeing about it."""
+        return self._state != 'idle'
 
     @property
     def active_scenario_id(self) -> NodeId | None:
@@ -181,7 +191,7 @@ class Collector:
     def enter_fixture_setup(
         self,
         recording: FixtureRecording,
-        descriptor: StepDescriptor | None = None,
+        descriptor: StepDescriptor,
     ) -> StateToken:
         """Route recording into `recording` until the matching exit."""
         return self._enter('fixture_setup', recording=recording, descriptor=descriptor)

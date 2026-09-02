@@ -34,6 +34,7 @@ def parse_glossary_tables(
     kind_column: ColumnSpec | None,
 ) -> list[GlossaryRow]:
     rows: list[GlossaryRow] = []
+    saw_table = False
     lines = text.splitlines()
     in_code = False
     index = 0
@@ -49,6 +50,7 @@ def parse_glossary_tables(
         if index + 1 >= len(lines) or not _is_separator_row(lines[index + 1]):
             index += 1
             continue
+        saw_table = True
         header = _split_row(line)
         term_idx = _resolve_column(term_column, header)
         desc_idx = _resolve_column(description_column, header)
@@ -84,8 +86,10 @@ def parse_glossary_tables(
             index += 1
     if not rows:
         raise PytestGivenError(
-            'found no Markdown pipe table in the glossary file (a table needs a '
-            'header row followed by a |---|---| separator row).'
+            "the glossary file's Markdown table has no data rows."
+            if saw_table
+            else 'found no Markdown pipe table in the glossary file (a table '
+            'needs a header row followed by a |---|---| separator row).'
         )
     return rows
 

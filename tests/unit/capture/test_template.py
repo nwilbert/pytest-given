@@ -6,8 +6,12 @@ import pytest
 
 from pytest_given import Glossary, given, scenario, then, when, when_then
 from pytest_given.capture.file_glossary import FileGlossary
-from pytest_given.capture.steps import _resolve_template_parts
-from pytest_given.capture.template import Template, narration_from, parse_tstring
+from pytest_given.capture.template import (
+    Template,
+    narration_from,
+    parse_tstring,
+    resolve_template_parts,
+)
 from pytest_given.model import (
     Narration,
     NarrationLiteral,
@@ -70,7 +74,7 @@ def test_template_parses_format_spec_and_conversion() -> None:
 def _rendered(template: Template, mapping: dict[str, object]) -> str:
     """A Template rendered the way production renders one: its placeholders
     resolved against a mapping, then the text read off the resulting parts."""
-    return narration_text(_resolve_template_parts(template.parts, mapping))
+    return narration_text(resolve_template_parts(template.parts, mapping))
 
 
 def test_template_get_identifiers() -> None:
@@ -423,16 +427,11 @@ def test_tstring_with_file_term_instance_emits_term_ref_with_override_display(
     assert term_refs[0].display == 'Alice'
 
 
-def test_resolve_template_parts_passes_a_term_ref_through() -> None:
-    # Template parses only literals and placeholders today, so a term ref
-    # cannot arrive from it — but it is in the NarrationPart union, and the
-    # match dropping it silently would lose the word from the narration.
+def test_resolve_template_parts_rejects_a_part_template_cannot_produce() -> None:
+    # Template parses only literals and placeholders; anything else reaching
+    # here is a bug, and the asserts say so rather than dropping the part.
     ref = NarrationTermRef(term_id=TermId('guest'), display='Guest', expression='g')
-    assert _resolve_template_parts([ref], {}) == [ref]
-
-
-def test_resolve_template_parts_rejects_unknown_variant() -> None:
-    # The exhaustive match guards against a NarrationPart variant being added
-    # without a branch here. assert_never fires at runtime.
     with pytest.raises(AssertionError):
-        _resolve_template_parts([cast(Any, object())], {})
+        resolve_template_parts([ref], {})
+    with pytest.raises(AssertionError):
+        resolve_template_parts([cast(Any, object())], {})

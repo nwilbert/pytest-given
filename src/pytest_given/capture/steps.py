@@ -17,7 +17,6 @@ from typing import (
     Any,
     Protocol,
     Self,
-    assert_never,
     cast,
     runtime_checkable,
 )
@@ -25,11 +24,6 @@ from typing import (
 from ..model import (
     ActivityId,
     Narration,
-    NarrationLiteral,
-    NarrationPart,
-    NarrationPlaceholder,
-    NarrationTermRef,
-    NarrationValue,
     Phase,
     PytestGivenError,
     PytestGivenWarning,
@@ -38,7 +32,13 @@ from ..model import (
 )
 from .collector import Collector, get_active_collector, no_scenario_error
 from .source import capture_caller_source, code_source
-from .template import Template, narration_from, resolved_placeholder_part
+from .template import (
+    StepText,
+    Template,
+    narration_from,
+    reject_baked_values,
+    resolve_template_parts,
+)
 
 
 @runtime_checkable
@@ -65,7 +65,7 @@ def _recording_collector(
     user's own line; a composed descriptor adds one more frame.
     """
     collector = get_active_collector()
-    if collector is not None and collector.state != 'idle':
+    if collector is not None and collector.recording:
         return collector
     if collector is not None and collector.inside_unannotated_test:
         warnings.warn(warning, PytestGivenWarning, stacklevel=stacklevel)
@@ -98,20 +98,26 @@ class StepDescriptor:
     def __init__(
         self,
         phase: Phase,
-        text: str | templatelib.Template | Template,
+        text: StepText,
         *,
         activity_ids: tuple[ActivityId, ...] = (),
+        composed: bool = False,
     ) -> None:
         self.phase = phase
-        self._source: str | templatelib.Template | Template = text
+        self._source: StepText = text
         self.narration: Narration = narration_from(text)
         self.activity_ids: tuple[ActivityId, ...] = activity_ids
-        # Set when another construct drives this descriptor — `when_then`,
+        # `composed` marks a descriptor another construct drives — `when_then`,
         # which enters both halves one frame above the user's `with`. That
         # frame is what the caller-frame walk and the warning have to reach
         # past, and why the shared lint anchor is pinned rather than walked for.
-        self._composed: bool = False
+        self._composed = composed
         self._pinned_source: SourceLocation | None = None
+
+    def pin_source(self, source: SourceLocation | None) -> None:
+        """Anchor this step at a source location the composing construct
+        captured, rather than at its own caller frame."""
+        self._pinned_source = source
 
     @property
     def is_deferred_template(self) -> bool:
@@ -157,7 +163,7 @@ class StepDescriptor:
         exc_tb: types.TracebackType | None,
     ) -> None:
         collector = get_active_collector()
-        if collector is None or collector.inside_unannotated_test:
+        if collector is None or not collector.recording:
             return
         collector.pop_step()
 
@@ -262,14 +268,16 @@ class StepDescriptor:
         """Open this step for one helper call, returning the collector to pop
         it with — or None when the call passes straight through.
 
-        The least obvious of the transparent cases is pytest invoking this
+        Nothing recording is a pass-through rather than an error here: a
+        decorated helper is an ordinary function its module may call outside
+        any test. The least obvious transparent case is pytest invoking this
         very descriptor as a fixture body, whose root the fixture hook has
         already recorded from the same narration.
         """
         collector = get_active_collector()
         if (
             collector is None
-            or collector.state == 'idle'
+            or not collector.recording
             or collector.active_fixture_descriptor is self
         ):
             return None
@@ -287,28 +295,7 @@ class StepDescriptor:
         return collector
 
     def _check_tstring_decorator_safety(self) -> None:
-        """A t-string passed to a decorator is evaluated once at module load;
-        any non-glossary interpolation captures its value frozen there.
-
-        Glossary handles render as `NarrationTermRef` and are safe to bake in
-        (they identify a concept, not a per-call datum). Anything else surfaces
-        as `NarrationValue`, which means the author probably expected per-call
-        substitution and won't get it — point them at the right form.
-        """
-        for part in self.narration.parts:
-            if not isinstance(part, NarrationValue):
-                continue
-            raise PytestGivenError(
-                f'@{self.phase}(t"...") interpolates non-glossary value '
-                f'{{{part.expression}}} (rendered as {part.rendered!r}); '
-                f't-strings on a decorator evaluate once at module load, '
-                f'so the value is baked into every recorded step. '
-                f'Use a glossary handle (g.actor/g.work_object/g.verb) for a '
-                f'term reference; pytest_given.Template('
-                f"'...{{{part.expression}}}...') for a helper arg bound "
-                f'per call; or move the step into the test body (with '
-                f'given/when/then(t"...")) where the value is in scope.'
-            )
+        reject_baked_values(self.narration, f'@{self.phase}', 'module load')
 
     def _validate_template_against_signature(
         self, func: Callable[..., object]
@@ -341,7 +328,7 @@ class StepDescriptor:
         assert isinstance(self._source, Template)
         bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()
-        parts = _resolve_template_parts(self.narration.parts, bound.arguments)
+        parts = resolve_template_parts(self.narration.parts, bound.arguments)
         return Narration(text=narration_text(parts), parts=parts)
 
 
@@ -377,7 +364,7 @@ def normalize_activity(
 
 
 def given(
-    text: str | templatelib.Template | Template,
+    text: StepText,
     *,
     activity: int | Sequence[int] | None = None,
 ) -> StepDescriptor:
@@ -386,7 +373,7 @@ def given(
 
 
 def when(
-    text: str | templatelib.Template | Template,
+    text: StepText,
     *,
     activity: int | Sequence[int] | None = None,
 ) -> StepDescriptor:
@@ -395,7 +382,7 @@ def when(
 
 
 def then(
-    text: str | templatelib.Template | Template,
+    text: StepText,
     *,
     activity: int | Sequence[int] | None = None,
 ) -> StepDescriptor:
@@ -426,13 +413,11 @@ class WhenThen:
 
     def __init__(
         self,
-        when_text: str | templatelib.Template | Template,
-        then_text: str | templatelib.Template | Template,
+        when_text: StepText,
+        then_text: StepText,
     ) -> None:
-        self._when = StepDescriptor('when', when_text)
-        self._then = StepDescriptor('then', then_text)
-        self._when._composed = True
-        self._then._composed = True
+        self._when = StepDescriptor('when', when_text, composed=True)
+        self._then = StepDescriptor('then', then_text, composed=True)
 
     def __enter__(self) -> Self:
         collector = get_active_collector()
@@ -441,8 +426,8 @@ class WhenThen:
             # captured here because the composed descriptors' own caller frame
             # would be this method, not user code.
             source = capture_caller_source(skip=2)
-            self._when._pinned_source = source
-            self._then._pinned_source = source
+            self._when.pin_source(source)
+            self._then.pin_source(source)
         self._when.__enter__()
         return self
 
@@ -459,40 +444,11 @@ class WhenThen:
 
 
 def when_then(
-    when_text: str | templatelib.Template | Template,
-    then_text: str | templatelib.Template | Template,
+    when_text: StepText,
+    then_text: StepText,
 ) -> WhenThen:
     """Pair a When action with its Then outcome as two sibling steps."""
     return WhenThen(when_text, then_text)
-
-
-def _resolve_template_parts(
-    parts: list[NarrationPart],
-    mapping: Mapping[str, Any],
-) -> list[NarrationPart]:
-    """Each `Template` part resolved against the value bound to its name.
-
-    The `case _` guard is load-bearing: the match appends in a loop, so a new
-    part kind would otherwise vanish silently.
-    """
-    out: list[NarrationPart] = []
-    for part in parts:
-        assert not isinstance(part, NarrationValue), (
-            'pytest_given.Template never yields NarrationValue'
-        )
-        match part:
-            case NarrationLiteral():
-                out.append(part)
-            case NarrationPlaceholder(name=name):
-                out.append(resolved_placeholder_part(part, mapping[name]))
-            case NarrationTermRef():
-                # Unreachable while `Template` parses only literals and
-                # placeholders; a term ref carries its own display and has
-                # nothing to resolve anyway.
-                out.append(part)
-            case _:
-                assert_never(part)
-    return out
 
 
 def attach(label: str, content: object) -> None:

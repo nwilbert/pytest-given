@@ -62,6 +62,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
   `Activity.id` field itself is unchanged.
 - A glossary term placed in an activity slot its declared kind forbids now raises
   `PytestGivenError` when `activity(...)` is built rather than at session finish.
+- A glossary file whose table has a header and separator but no data rows now
+  says so, instead of reporting that no table was found.
 - `@scenario(activities=...)` now rejects a `str` and non-`int` members with a
   `TypeError`.
 - `@scenario` now returns the test function itself rather than a wrapper, so the

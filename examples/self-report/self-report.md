@@ -264,98 +264,98 @@
 - **then** the run keeps NO_TESTS_COLLECTED rather than reporting a test failure
 
 ## ✓ A «scenario» records under its «node ID»
-`tests/unit/capture/test_collector.py:26::test_start_and_finish_scenario`
+`tests/unit/capture/test_collector.py:32::test_start_and_finish_scenario`
 
 - **given** a fresh «Collector»
 - **when** a «Scenario» starts under its «Node ID» and finishes
 - **then** it carries its «Node ID», name, status and «Tag»
 
 ## ✓ A «scenario» is timed from past its «step fixture» setup
-`tests/unit/capture/test_collector.py:42::test_duration_excludes_fixture_setup`
+`tests/unit/capture/test_collector.py:48::test_duration_excludes_fixture_setup`
 
 - **given** a «Collector» whose clock reads 100.3s once setup is done
 - **when** the clock is started past setup and the body runs 0.2s
 - **then** the recorded duration is the body alone, not the setup before it
 
 ## ✓ «Steps» record with their «phases»
-`tests/unit/capture/test_collector.py:64::test_collect_steps`
+`tests/unit/capture/test_collector.py:70::test_collect_steps`
 
 - **given** an «Active scenario» in a fresh «Collector»
 - **when** a given and a when «Step» are pushed
 - **then** each «Step» carries its «Phase»
 
 ## ✓ «Steps» pushed during fixture setup record into the «fixture recording»
-`tests/unit/capture/test_collector.py:208::test_push_step_during_fixture_setup_records_into_recording`
+`tests/unit/capture/test_collector.py:214::test_push_step_during_fixture_setup_records_into_recording`
 
 - **given** a «Fixture recording» under setup
 - **when** a «Step» is pushed inside the fixture body
 - **then** it is recorded as a child of the recording root
 
 ## ✓ An «attachment» lands on the «step» being recorded
-`tests/unit/capture/test_collector.py:228::test_attach_during_fixture_setup_records_into_recording`
+`tests/unit/capture/test_collector.py:234::test_attach_during_fixture_setup_records_into_recording`
 
 - **given** a «Fixture recording» under setup
 - **when** an «Attachment» is attached inside the fixture body
 - **then** the «Attachment» lands on the recording root
 
 ## ✓ Fixture-body «steps» do not leak into the «active scenario»
-`tests/unit/capture/test_collector.py:246::test_push_step_routing_isolates_recording_from_scenario`
+`tests/unit/capture/test_collector.py:252::test_push_step_routing_isolates_recording_from_scenario`
 
 - **given** an «Active scenario» with a «Fixture recording»
 - **when** a «Step» is pushed inside the fixture body
 - **then** the step lives only in the recording, not the scenario
 
 ## ✓ An «attachment» outside every «step» is refused
-`tests/unit/capture/test_collector.py:300::test_attach_outside_any_step_raises`
+`tests/unit/capture/test_collector.py:306::test_attach_outside_any_step_raises`
 
 - **given** an «Active scenario» with no «Step» open
 - **when** an «attachment» is made from the test body
 - **then** it is refused rather than dropped
 
 ## ✓ A «fixture recording» is deep-copied when «grafted»
-`tests/unit/capture/test_collector.py:317::test_graft_recording_deep_copies_into_scenario`
+`tests/unit/capture/test_collector.py:323::test_graft_recording_deep_copies_into_scenario`
 
 - **given** a «Fixture recording» with a nested child «Step»
 - **when** a «Graft» copies it into the «Active scenario»
 - **then** the scenario gains a deep copy of the recorded steps
 
 ## ✓ A «step fixture» failing in teardown fails its finished «scenario»
-`tests/unit/capture/test_collector.py:461::test_fail_recorded_scenario_marks_a_finished_scenario_failed`
+`tests/unit/capture/test_collector.py:467::test_fail_recorded_scenario_marks_a_finished_scenario_failed`
 
 - **given** a «Scenario» that already finished as passed
 - **when** a fixture raises past its yield, after the scenario finished
 - **then** the recorded «scenario» carries the failure
 
 ## ✓ A teardown failure keeps the error the «scenario» already carries
-`tests/unit/capture/test_collector.py:480::test_fail_recorded_scenario_keeps_an_existing_error`
+`tests/unit/capture/test_collector.py:486::test_fail_recorded_scenario_keeps_an_existing_error`
 
 - **given** a «Scenario» that already failed in its body
 - **when** its fixture then also fails in teardown
 - **then** the body failure is what the report shows
 
 ## ✓ A «Collector» reports which «node ids» it recorded
-`tests/unit/capture/test_collector.py:498::test_has_scenario_reports_only_recorded_node_ids`
+`tests/unit/capture/test_collector.py:504::test_has_scenario_reports_only_recorded_node_ids`
 
 - **given** a «Collector» that recorded one «scenario»
 - **when** the recorded and an unrecorded node id are both asked about
 - **then** only the recorded node id is claimed
 
 ## ✓ A leaf given is «grafted» as a childless given «step»
-`tests/unit/capture/test_collector.py:516::test_graft_leaf_given_appends_childless_given_step`
+`tests/unit/capture/test_collector.py:522::test_graft_leaf_given_appends_childless_given_step`
 
 - **given** an «Active scenario» is being recorded
 - **when** a leaf «Graft» appends a childless «Step»
 - **then** the step is a given with no children
 
 ## ✓ «Grafting» with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:534::test_graft_recording_override_replaces_root_narration_keeps_children`
+`tests/unit/capture/test_collector.py:540::test_graft_recording_override_replaces_root_narration_keeps_children`
 
 - **given** a «Fixture recording» whose root has a label and a child
 - **when** a «Graft» supplies an override «Narration»
 - **then** the grafted root shows the override text and keeps its children
 
 ## ✓ «Grafting» with no «active scenario» is refused
-`tests/unit/capture/test_collector.py:559::test_graft_leaf_given_without_scenario_is_refused`
+`tests/unit/capture/test_collector.py:565::test_graft_leaf_given_without_scenario_is_refused`
 
 - **given** a collector with no «Active scenario»
 - **when** a leaf «Graft» runs
@@ -1371,21 +1371,21 @@
 - **then** a PytestGivenError names the offending type and the path
 
 ## ✓ A Template parses a bare placeholder
-`tests/unit/capture/test_template.py:37::test_template_parses_single_placeholder` · parametrization
+`tests/unit/capture/test_template.py:41::test_template_parses_single_placeholder` · parametrization
 
 - **given** a deferred «Templatize» template with one placeholder
 - **when** the template is parsed
 - **then** it splits into literal and placeholder «Narration» parts
 
 ## ✓ A Template substitutes parametrize values
-`tests/unit/capture/test_template.py:81::test_template_substitute_basic` · parametrization
+`tests/unit/capture/test_template.py:85::test_template_substitute_basic` · parametrization
 
 - **given** a «Templatize» template referencing a «Case» column
 - **when** a «Parameter table» value is substituted in
 - **then** the placeholder is filled with that value
 
 ## ✓ A Template accepts bare identifiers only · 3 cases
-`tests/unit/capture/test_template.py:118::test_template_non_identifier_raises_pytest_given_error` · validation
+`tests/unit/capture/test_template.py:122::test_template_non_identifier_raises_pytest_given_error` · validation
 
 - **given** the placeholder {text}
 - **when** a «Templatize» template is built from it
@@ -1398,56 +1398,56 @@
 | {x + 1} | ✓ |
 
 ## ✓ A t-string interpolation becomes a value part
-`tests/unit/capture/test_template.py:147::test_parse_tstring_single_interpolation`
+`tests/unit/capture/test_template.py:151::test_parse_tstring_single_interpolation`
 
 - **given** a t-string step with one interpolated value
 - **when** the t-string is parsed at runtime
 - **then** the interpolation becomes a «Narration» value part
 
 ## ✓ A t-string can interpolate an arbitrary expression
-`tests/unit/capture/test_template.py:210::test_parse_tstring_expression`
+`tests/unit/capture/test_template.py:214::test_parse_tstring_expression`
 
 - **given** a t-string step interpolating a computed expression
 - **when** the t-string is parsed
 - **then** the «Value highlight» part records the full expression
 
 ## ✓ A «glossary» handle in a t-string emits a «term ref»
-`tests/unit/capture/test_template.py:249::test_tstring_with_actor_emits_term_ref`
+`tests/unit/capture/test_template.py:253::test_tstring_with_actor_emits_term_ref`
 
 - **given** an «Actor» handle from the glossary
 - **when** the handle is interpolated into a t-string step
 - **then** the step carries a «Term ref» for that «Actor»
 
 ## ✓ A «work object» handle in a t-string emits a «term ref»
-`tests/unit/capture/test_template.py:277::test_tstring_with_work_object_emits_term_ref`
+`tests/unit/capture/test_template.py:281::test_tstring_with_work_object_emits_term_ref`
 
 - **given** a «Work Object» handle from the glossary
 - **when** it is interpolated into a t-string step
 - **then** the step carries a «Term ref» for that «Work Object»
 
 ## ✓ A bare «verb» handle keeps its canonical display
-`tests/unit/capture/test_template.py:298::test_tstring_with_verb_emits_term_ref_with_canonical_display`
+`tests/unit/capture/test_template.py:302::test_tstring_with_verb_emits_term_ref_with_canonical_display`
 
 - **given** a «Verb» handle used without an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the canonical verb
 
 ## ✓ An inflected «verb» in a t-string shows the «inflection»
-`tests/unit/capture/test_template.py:313::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display`
+`tests/unit/capture/test_template.py:317::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display`
 
 - **given** a «Verb» handle called with an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the inflection but keeps the verb id
 
 ## ✓ A «term ref» may not carry a format spec
-`tests/unit/capture/test_template.py:353::test_tstring_term_ref_with_format_spec_raises` · validation
+`tests/unit/capture/test_template.py:357::test_tstring_term_ref_with_format_spec_raises` · validation
 
 - **given** an «Actor» handle interpolated with a format spec
 - **when** the t-string is parsed
 - **then** a PytestGivenError says a «Term ref» takes no format spec
 
 ## ✓ A «FileGlossary» handle works in a t-string «step»
-`tests/unit/capture/test_template.py:396::test_tstring_with_file_term_handle_emits_term_ref`
+`tests/unit/capture/test_template.py:400::test_tstring_with_file_term_handle_emits_term_ref`
 
 - **given** a «Deferred term» from a «File glossary»
 - **when** it is interpolated into a t-string step

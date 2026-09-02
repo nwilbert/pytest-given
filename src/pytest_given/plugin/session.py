@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from importlib.metadata import version
 from pathlib import Path
+from types import ModuleType
 
 import pytest
 
@@ -174,7 +175,15 @@ def _build_report(
     given = given_config(config)
     scenarios = group_parametrized(collector.scenarios, param_info)
     stories = collector.stories
-    glossary = resolve_glossary(stories, config.pluginmanager.get_plugins())
+    # Registered plugins include class instances; only modules can declare a
+    # conftest glossary, so the filter is the caller's and `resolve_glossary`
+    # keeps a precise signature.
+    conftests = [
+        plugin
+        for plugin in config.pluginmanager.get_plugins()
+        if isinstance(plugin, ModuleType)
+    ]
+    glossary = resolve_glossary(stories, conftests)
     if glossary is not None:
         glossary = infer_glossary_kinds(glossary, stories)
     sinks = RenderedSinks()

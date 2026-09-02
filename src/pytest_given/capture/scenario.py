@@ -12,13 +12,16 @@ from typing import Any, cast, get_type_hints
 
 from ..model import (
     ActivityId,
-    Narration,
-    NarrationValue,
     PytestGivenError,
     Story,
 )
 from .steps import StepDescriptor, normalize_activity
-from .template import Template, narration_from
+from .template import (
+    ResolvedName,
+    StepText,
+    narration_from,
+    reject_baked_values,
+)
 
 
 class ScenarioDecorator:
@@ -26,14 +29,14 @@ class ScenarioDecorator:
 
     def __init__(
         self,
-        name: str | Template | Narration,
+        name: ResolvedName,
         tags: list[str],
         *,
         story: Story | None = None,
         activity_ids: tuple[ActivityId, ...] = (),
         group_parametrized: bool = True,
     ) -> None:
-        self.name: str | Template | Narration = name
+        self.name: ResolvedName = name
         self.tags = tags
         self.story = story
         self.activity_ids = activity_ids
@@ -51,7 +54,7 @@ class ScenarioDecorator:
 
 
 def scenario(
-    name: str | templatelib.Template | Template,
+    name: StepText,
     tags: list[str] | None = None,
     *,
     story: Story | None = None,
@@ -59,25 +62,12 @@ def scenario(
     group_parametrized: bool = True,
 ) -> ScenarioDecorator:
     """Mark a test for inclusion in the report."""
-    resolved_name: str | Template | Narration
+    resolved_name: ResolvedName
     if isinstance(name, templatelib.Template):
-        # @scenario runs at module-import time. Glossary handles are in scope
-        # then and render eagerly to term refs; a parametrize value is not,
-        # so it would be baked into the name frozen. Accept the first, reject
-        # the second — mirrors the step-decorator rule.
-        narration = narration_from(name)
-        for part in narration.parts:
-            if isinstance(part, NarrationValue):
-                raise PytestGivenError(
-                    f'@scenario(t"...") interpolates non-glossary value '
-                    f'{{{part.expression}}} (rendered as {part.rendered!r}); '
-                    f'@scenario runs at module-import time, so parametrize '
-                    f'values are not in scope. Use pytest_given.Template(...) '
-                    f'for a parametrized name, a glossary handle '
-                    f'(g.actor/g.work_object/g.verb) for a term ref, or a '
-                    f'plain string for a static name.'
-                )
-        resolved_name = narration
+        # Glossary handles are in scope at import time and render eagerly to
+        # term refs; a parametrize value is not, so it would be baked in.
+        resolved_name = narration_from(name)
+        reject_baked_values(resolved_name, '@scenario', 'module import')
     else:
         resolved_name = name
     if story is not None and not isinstance(story, Story):

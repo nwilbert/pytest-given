@@ -5,6 +5,7 @@ import pytest
 from pytest_given import Template, given, scenario, then, when, when_then
 from pytest_given.capture import collector as collector_mod
 from pytest_given.capture.collector import Collector
+from pytest_given.capture.steps import StepDescriptor
 from pytest_given.model import (
     FixtureRecording,
     Narration,
@@ -21,6 +22,11 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 
 def _n(text: str) -> Narration:
     return Narration(text=text)
+
+
+def _descriptor(text: str = 'a shop') -> StepDescriptor:
+    """The descriptor a fixture graft pins; only its identity matters here."""
+    return StepDescriptor('given', text)
 
 
 @scenario(
@@ -181,7 +187,7 @@ def test_collector_state_transitions_idle_test_idle() -> None:
 def test_enter_fixture_setup_transitions_state() -> None:
     collector = Collector()
     recording = FixtureRecording(root=Step(phase='given', narration=_n('a shop')))
-    token = collector.enter_fixture_setup(recording)
+    token = collector.enter_fixture_setup(recording, _descriptor())
     assert collector.state == 'fixture_setup'
     collector.exit_fixture(token)
     assert collector.state == 'idle'
@@ -191,7 +197,7 @@ def test_enter_fixture_setup_nests_inside_test() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
     recording = FixtureRecording(root=Step(phase='given', narration=_n('a shop')))
-    token = collector.enter_fixture_setup(recording)
+    token = collector.enter_fixture_setup(recording, _descriptor())
     assert collector.state == 'fixture_setup'
     collector.exit_fixture(token)
     assert collector.state == 'test'  # restored
@@ -215,7 +221,7 @@ def test_push_step_during_fixture_setup_records_into_recording() -> None:
     with given(t'a {pg["Fixture recording"]} under setup'):
         root = Step(phase='given', narration=_n('a shop'))
         recording = FixtureRecording(root=root)
-        token = collector.enter_fixture_setup(recording)
+        token = collector.enter_fixture_setup(recording, _descriptor())
     with when(t'a {pg["Step"]} is pushed inside the fixture body', activity=7):
         collector.push_step('given', _n('with 3 items'))
         collector.pop_step()
@@ -234,7 +240,7 @@ def test_attach_during_fixture_setup_records_into_recording() -> None:
     with given(t'a {pg["Fixture recording"]} under setup'):
         root = Step(phase='given', narration=_n('a shop'))
         recording = FixtureRecording(root=root)
-        token = collector.enter_fixture_setup(recording)
+        token = collector.enter_fixture_setup(recording, _descriptor())
     with when(t'an {pg["Attachment"]} is attached inside the fixture body', activity=6):
         collector.attach('snapshot', 'data')
         collector.exit_fixture(token)
@@ -254,7 +260,7 @@ def test_push_step_routing_isolates_recording_from_scenario() -> None:
     with given(t'an {pg["Active scenario"]} with a {pg["Fixture recording"]}'):
         root = Step(phase='given', narration=_n('a shop'))
         recording = FixtureRecording(root=root)
-        token = collector.enter_fixture_setup(recording)
+        token = collector.enter_fixture_setup(recording, _descriptor())
     with when(t'a {pg["Step"]} is pushed inside the fixture body', activity=7):
         collector.push_step('given', _n('fixture-internal'))
         collector.pop_step()
@@ -352,7 +358,7 @@ def test_pop_step_protects_recording_root() -> None:
     as the labeled parent for grafting."""
     collector = Collector()
     recording = FixtureRecording(root=Step(phase='given', narration=_n('label')))
-    token = collector.enter_fixture_setup(recording)
+    token = collector.enter_fixture_setup(recording, _descriptor())
     try:
         # Stack has just the root; pop should refuse to remove it.
         assert collector.pop_step() is None

@@ -16,15 +16,13 @@ from ..model import (
     StoryId,
     id_derive,
 )
-from .glossary import TermHandle, TermInstance
-from .kind_inference import Slot, slot_for
+from .glossary import TermRef
+from .kind_inference import ROLE_ACCEPTS, Slot, slot_for
 from .source import capture_caller_source
-
-type _PathArg = TermHandle | TermInstance | str
 
 # What every slot accepts structurally: a glossary reference of some sort, or a
 # bare connective. Which *kind* fits a given position is `_check_position`'s.
-_TERM_TYPES = (TermHandle, TermInstance)
+type _PathArg = TermRef | str
 
 
 def path(*parts: _PathArg) -> ActivityPath:
@@ -56,26 +54,11 @@ def path(*parts: _PathArg) -> ActivityPath:
         for owner in (_glossary_of(part) for part in parts)
         if owner is not None
     }
-    path_obj = ActivityPath(parts=schema_parts)
-    _pin_glossaries(path_obj, glossaries)
-    return path_obj
-
-
-def _pin_glossaries(
-    node: ActivityPath | Activity | Story, glossaries: dict[int, Glossary]
-) -> None:
-    """Record which live `Glossary` objects a story node references.
-
-    The field is `init=False` on a frozen dataclass, so this is the one way to
-    fill it, and the one place that names it.
-    """
-    object.__setattr__(node, '_glossaries', glossaries)
+    return ActivityPath(parts=schema_parts, _glossaries=glossaries)
 
 
 def _glossary_of(value: object) -> Glossary | None:
-    if isinstance(value, _TERM_TYPES):
-        return value.glossary
-    return None
+    return value.glossary if isinstance(value, TermRef) else None
 
 
 def activity(
@@ -107,11 +90,11 @@ def activity(
             'use activity_id=1.. or omit to take the auto-assigned sequence '
             'number.'
         )
-    a = Activity(
-        id=ActivityId(activity_id if activity_id is not None else 0), paths=paths
+    return Activity(
+        id=ActivityId(activity_id if activity_id is not None else 0),
+        paths=paths,
+        _glossaries=glossaries,
     )
-    _pin_glossaries(a, glossaries)
-    return a
 
 
 def merge_glossaries(
@@ -176,9 +159,13 @@ def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     _check_unique_ids(numbered)
     glossaries = merge_glossaries(a._glossaries for a in numbered)
     _check_single_glossary(title, glossaries)
-    result = Story(id=sid, title=title, activities=numbered, source=source)
-    _pin_glossaries(result, glossaries)
-    return result
+    return Story(
+        id=sid,
+        title=title,
+        activities=numbered,
+        source=source,
+        _glossaries=glossaries,
+    )
 
 
 def _assign_sequence_numbers(
@@ -196,9 +183,9 @@ def _assign_sequence_numbers(
             continue
         while ActivityId(next_seq) in taken:
             next_seq += 1
-        new = Activity(id=ActivityId(next_seq), paths=a.paths)
-        _pin_glossaries(new, a._glossaries)
-        out.append(new)
+        out.append(
+            Activity(id=ActivityId(next_seq), paths=a.paths, _glossaries=a._glossaries)
+        )
         next_seq += 1
     return tuple(out)
 
@@ -221,33 +208,15 @@ def _check_single_glossary(title: str, glossaries: dict[int, Glossary]) -> None:
         )
 
 
-# What each slot role accepts, as declared kinds. A term whose kind is not yet
-# known declares nothing and is valid anywhere — `infer_glossary_kinds`
-# classifies it from these same slot positions later.
-_ROLE_ACCEPTS: dict[Slot, tuple[str, ...]] = {
-    'actor': ('actor',),
-    'verb': ('verb',),
-    'noun': ('actor', 'object'),
-}
-
 _KIND_LABEL = {'actor': 'an actor', 'object': 'a work object', 'verb': 'a verb'}
 
 # The slot itself, phrased for the message ('must be …').
 _ROLE_LABEL = {'actor': 'an actor', 'verb': 'a verb', 'noun': 'a noun'}
 
 
-def _declared_kind(value: object) -> str | None:
-    """The kind a part already claims, or None when it is still deferred."""
-    if isinstance(value, _TERM_TYPES):
-        return value.declared_kind
-    return None
-
-
 def _term_name(value: object) -> str:
-    """The canonical term name behind a handle or instance, for error text."""
-    if isinstance(value, _TERM_TYPES):
-        return value.term.canonical
-    return type(value).__name__
+    """The canonical term name behind a term ref, for error text."""
+    return value.term.canonical if isinstance(value, TermRef) else type(value).__name__
 
 
 def _render_path(parts: tuple[object, ...]) -> str:
@@ -270,12 +239,12 @@ def _check_position(
     construction; only a genuinely undeclared one is deferred to
     `infer_glossary_kinds`.
     """
-    declared = _declared_kind(value)
+    declared = value.declared_kind if isinstance(value, TermRef) else None
     if declared is not None:
-        if declared in _ROLE_ACCEPTS[role]:
+        if declared in ROLE_ACCEPTS[role]:
             return
         problem = f'{_term_name(value)!r} is declared {_KIND_LABEL[declared]}'
-    elif isinstance(value, _TERM_TYPES):
+    elif isinstance(value, TermRef):
         return
     else:
         problem = f'got {type(value).__name__}'
@@ -303,10 +272,6 @@ def _suggestion_for(role: Slot) -> str:
 
 
 def _to_part(value: _PathArg) -> ActivityPart:
-    match value:
-        case TermHandle():
-            return ActivityTermRef(term_id=value.id, display=value.canonical)
-        case TermInstance(handle=handle, display=display):
-            return ActivityTermRef(term_id=handle.id, display=display)
-        case str():
-            return ActivityWord(text=value)
+    if isinstance(value, TermRef):
+        return ActivityTermRef(term_id=value.id, display=value.display)
+    return ActivityWord(text=value)

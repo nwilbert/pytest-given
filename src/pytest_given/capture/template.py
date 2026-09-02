@@ -1,4 +1,9 @@
+"""Step text: the authoring forms, what they parse to, and the two rules
+that apply to a decorator-time t-string."""
+
+from collections.abc import Mapping
 from string import Formatter, templatelib
+from typing import assert_never
 
 from ..model import (
     Narration,
@@ -12,14 +17,39 @@ from ..model import (
     placeholder_value,
     render_interpolation,
 )
-from .glossary import TermHandle, TermInstance
+from .glossary import TermRef
 
 _FORMATTER = Formatter()
 
+# What an author may write as step or scenario text.
+type StepText = str | templatelib.Template | Template
+# What `@scenario` hands on once a decorator-time t-string has been rendered.
+type ResolvedName = str | Template | Narration
 
-def narration_from(
-    value: str | Template | templatelib.Template | Narration,
-) -> Narration:
+
+def reject_baked_values(narration: Narration, form: str, when: str) -> None:
+    """Refuse a decorator-time t-string that interpolates a non-glossary value.
+
+    Such a t-string evaluates once, at *when*, so the value is frozen into
+    every recorded step. Glossary handles render as term refs and are safe to
+    bake in — they identify a concept, not a per-call datum.
+    """
+    for part in narration.parts:
+        if not isinstance(part, NarrationValue):
+            continue
+        raise PytestGivenError(
+            f'{form}(t"...") interpolates non-glossary value '
+            f'{{{part.expression}}} (rendered as {part.rendered!r}); '
+            f't-strings on a decorator evaluate once at {when}, so the value '
+            f'is baked in. Use a glossary handle '
+            f'(g.actor/g.work_object/g.verb) for a term reference; '
+            f"pytest_given.Template('...{{{part.expression}}}...') for a "
+            f'value bound per call; or move the text into the test body '
+            f'(with given/when/then(t"...")) where the value is in scope.'
+        )
+
+
+def narration_from(value: StepText | Narration) -> Narration:
     """Build a Narration from a plain string, a Template, a t-string, or an
     already-rendered Narration (which passes through unchanged — used for eager
     glossary-t-string scenario names)."""
@@ -132,14 +162,9 @@ def try_term_ref(
     meaningful target on a term ref, so a non-empty value is rejected at
     parse time rather than silently dropped.
     """
-    match value:
-        case TermHandle():
-            display = value.canonical
-            term_id = value.id
-        case TermInstance(handle=handle, display=display):
-            term_id = handle.id
-        case _:
-            return None
+    if not isinstance(value, TermRef):
+        return None
+    display = value.display
     if format_spec or conversion:
         suffix = f':{format_spec}' if format_spec else ''
         conv = f'!{conversion}' if conversion else ''
@@ -149,7 +174,27 @@ def try_term_ref(
             f'render as kind-colored term refs with a fixed display ({display!r}). '
             f'Drop the spec, or interpolate the underlying value separately.'
         )
-    return NarrationTermRef(term_id=term_id, display=display, expression=expression)
+    return NarrationTermRef(term_id=value.id, display=display, expression=expression)
+
+
+def resolve_template_parts(
+    parts: list[NarrationPart],
+    mapping: Mapping[str, object],
+) -> list[NarrationPart]:
+    """Each `Template` part resolved against the value bound to its name."""
+    out: list[NarrationPart] = []
+    for part in parts:
+        assert not isinstance(part, (NarrationValue, NarrationTermRef)), (
+            'pytest_given.Template yields only literals and placeholders'
+        )
+        match part:
+            case NarrationLiteral():
+                out.append(part)
+            case NarrationPlaceholder(name=name):
+                out.append(resolved_placeholder_part(part, mapping[name]))
+            case _:
+                assert_never(part)
+    return out
 
 
 def resolved_placeholder_part(

@@ -8,6 +8,7 @@ the run collected, the second reads plain module objects the caller supplies.
 
 from collections.abc import Iterable
 from pathlib import Path
+from types import ModuleType
 
 from ..model import Glossary, PytestGivenError, Story
 from .file_glossary import FileGlossary
@@ -15,7 +16,7 @@ from .story import merge_glossaries
 
 
 def resolve_glossary(
-    stories: list[Story], modules: Iterable[object]
+    stories: list[Story], modules: Iterable[ModuleType]
 ) -> Glossary | None:
     """Pick the report's glossary: off the story tree, else off the conftests.
 
@@ -40,13 +41,13 @@ def resolve_glossary(
     return _glossary_from_modules(modules)
 
 
-def _glossary_from_modules(modules: Iterable[object]) -> Glossary | None:
+def _glossary_from_modules(modules: Iterable[ModuleType]) -> Glossary | None:
     """The single `Glossary` declared across the given conftest modules.
 
     Deduped by object identity, so one glossary imported into several conftests
     is still one glossary. A `FileGlossary` contributes the `Glossary` it wraps.
     """
-    found: list[tuple[str, Glossary]] = []
+    distinct: dict[int, tuple[str, Glossary]] = {}
     for module in modules:
         module_file = getattr(module, '__file__', None)
         if module_file is None or Path(module_file).name != 'conftest.py':
@@ -54,12 +55,9 @@ def _glossary_from_modules(modules: Iterable[object]) -> Glossary | None:
         for attr_name in dir(module):
             attr = getattr(module, attr_name, None)
             if isinstance(attr, FileGlossary):
-                found.append((module_file, attr.glossary))
+                distinct.setdefault(id(attr.glossary), (module_file, attr.glossary))
             elif isinstance(attr, Glossary):
-                found.append((module_file, attr))
-    distinct: dict[int, tuple[str, Glossary]] = {}
-    for path, glossary in found:
-        distinct.setdefault(id(glossary), (path, glossary))
+                distinct.setdefault(id(attr), (module_file, attr))
     if len(distinct) > 1:
         details = ', '.join(
             f'{path} ({len(glossary.terms)} term(s))'
