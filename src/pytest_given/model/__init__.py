@@ -1,7 +1,12 @@
 from .errors import PytestGivenError, PytestGivenWarning, placeholder_mismatch
 from .ids import case_suffix, id_derive, node_base
 from .markup import EMPHASIS
-from .narration import narration_text, placeholder_value, render_interpolation
+from .narration import (
+    narration_text,
+    placeholder_value,
+    rebuilt,
+    render_interpolation,
+)
 from .schema import (
     Activity,
     ActivityId,
@@ -114,6 +119,7 @@ __all__ = [
     'node_base',
     'placeholder_mismatch',
     'placeholder_value',
+    'rebuilt',
     'render_interpolation',
     'report_from_dict',
     'report_to_dict',

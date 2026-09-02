@@ -16,7 +16,6 @@ from ..model import (
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
-    ParamSpec,
     Phase,
     PytestGivenError,
     RawParamValue,
@@ -29,7 +28,7 @@ from ..model import (
     render_interpolation,
     walk_steps,
 )
-from .columns import GroupContext
+from .context import Group
 
 # A step tree reduced to nested phase tuples — narration text and values
 # ignored. Two cases with equal signatures render truthfully in the grouped
@@ -42,46 +41,25 @@ def structure_signature(steps: list[Step]) -> StepSignature:
     return tuple((step.phase, structure_signature(step.children)) for step in steps)
 
 
-def check_varying_str_narration(baseline: Scenario, ctx: GroupContext) -> None:
-    """Rule 1: a `str` narration whose rendered value varies across cases.
-
-    A `str` records `parts == []` however it was built, so there is nothing to
-    promote and the whole narration would be the baseline's. An f-string is the
-    usual cause, but a helper call or a lookup looks identical from here.
-    """
-    for path, step in walk_steps(baseline.steps):
-        if step.narration.parts:
-            continue
-        for case in ctx.comparable:
-            # A comparable case has the baseline's exact structure, so every
-            # baseline path exists in it — index, never `.get`.
-            if ctx.indexed[case.id][path].narration.text == step.narration.text:
-                continue
-            raise grouping_error(
-                ctx.anchor,
-                f'step narration in {_test_name(ctx.anchor)!r} varies across '
-                f'parametrize cases but records no parts — a plain str bakes '
-                f"case 1's values (an f-string is the usual cause). Use a "
-                f't-string: {step.phase}(t"…").',
-            )
-
-
-def check_same_template(baseline: Scenario, ctx: GroupContext) -> None:
-    """Rule 6: every comparable case must narrate the baseline's template.
+def check_same_template(group: Group) -> None:
+    """Rules 6 and 1: every comparable case must narrate the baseline's
+    template, and a part-less narration must render the same text in each.
 
     A column carries what varies *within* a sentence. A case that narrates a
     different sentence, or a different tree of them, has nothing a column can
-    hold: the grouped view would show one case's words for all of them. Four
+    hold: the grouped view would show one case's words for all of them. Five
     shapes reach that state (a different step structure, a differently shaped
     narration under a matching one, different wording, a different interpolated
-    expression) and all four have the same answer, so they share a rule and a
-    fix.
+    expression, and a plain `str` that renders differently per case). The first
+    four have the same answer and share a message; the fifth has a better one
+    of its own, but the same walk finds it.
 
     Runs first, against the very tree `templatize_steps` goes on to walk: the
     other rules index a case by the baseline's path without a `.get` and read
     the part there as the baseline's kind, both of which hold only because this
-    ran. A non-passed case is exempt — which is exactly `ctx.comparable`.
+    ran. A non-passed case is exempt — which is exactly `group.comparable`.
     """
+    baseline = group.baseline
     signature = structure_signature(baseline.steps)
     # Walked and keyed once per group: every case is compared against the same
     # baseline, and rebuilding its keys per case is the bulk of this rule's work.
@@ -90,32 +68,51 @@ def check_same_template(baseline: Scenario, ctx: GroupContext) -> None:
         [_part_key(part) for part in step.narration.parts]
         for _path, step in baseline_steps
     ]
-    for case in ctx.comparable:
+    for case in group.comparable:
         if case.id == baseline.id:
             continue
         if structure_signature(case.steps) != signature:
-            raise _divergence_error(baseline, case, 'a different step structure', ctx)
+            raise _divergence_error(case, 'a different step structure', group)
         for (path, step), keys in zip(baseline_steps, baseline_keys, strict=True):
-            difference = _narration_difference(
-                keys, ctx.indexed[case.id][path].narration
-            )
+            # A comparable case has the baseline's exact structure, so every
+            # baseline path exists in it — index, never `.get`.
+            other = group.indexed[case.id][path].narration
+            if not keys and not other.parts:
+                # Rule 1: nothing to compare as a template, so compare the text
+                # and answer with the fix that names this step's own phase.
+                if other.text != step.narration.text:
+                    raise _varying_str_error(step, group)
+                continue
+            difference = _narration_difference(keys, other)
             if difference is not None:
                 raise _divergence_error(
-                    baseline, case, f'{difference} in its {step.phase} step', ctx
+                    case, f'{difference} in its {step.phase} step', group
                 )
 
 
-def _narration_difference(baseline: list[PartKey], case: Narration) -> str | None:
-    """How the case's narration differs from the baseline's keys as a template,
-    or None when they agree.
+def _varying_str_error(step: Step, group: Group) -> PytestGivenError:
+    """Rule 1: a `str` narration whose rendered text varies across cases.
 
-    A `str` narration contributes no parts on either side, so this stays silent
-    on it and rule 1 keeps its own better diagnosis.
+    A `str` records `parts == []` however it was built, so there is nothing to
+    promote and the whole narration would be the baseline's. An f-string is the
+    usual cause, but a helper call or a lookup looks identical from here.
     """
+    return _grouping_error(
+        group.anchor,
+        f'step narration in {_test_name(group.anchor)!r} varies across '
+        f'parametrize cases but records no parts — a plain str bakes '
+        f"case 1's values (an f-string is the usual cause). Use a "
+        f't-string: {step.phase}(t"…").',
+    )
+
+
+def _narration_difference(baseline_keys: list[PartKey], case: Narration) -> str | None:
+    """How the case's narration differs from the baseline's keys as a template,
+    or None when they agree."""
     case_keys = [_part_key(part) for part in case.parts]
-    if [key.kind for key in baseline] != [key.kind for key in case_keys]:
+    if [key.kind for key in baseline_keys] != [key.kind for key in case_keys]:
         return 'a differently shaped narration'
-    for baseline_key, case_key in zip(baseline, case_keys, strict=True):
+    for baseline_key, case_key in zip(baseline_keys, case_keys, strict=True):
         if baseline_key == case_key:
             continue
         if baseline_key.kind == 'literal':
@@ -154,12 +151,12 @@ def _part_key(part: NarrationPart) -> PartKey:
 
 
 def _divergence_error(
-    baseline: Scenario, case: Scenario, difference: str, ctx: GroupContext
+    case: Scenario, difference: str, group: Group
 ) -> PytestGivenError:
-    return grouping_error(
-        ctx.anchor,
-        f'case {case_suffix(case.id)} of {_test_name(ctx.anchor)!r} narrates '
-        f'{difference} than case {case_suffix(baseline.id)} — a grouped '
+    return _grouping_error(
+        group.anchor,
+        f'case {case_suffix(case.id)} of {_test_name(group.anchor)!r} narrates '
+        f'{difference} than case {case_suffix(group.baseline.id)} — a grouped '
         f'scenario renders one tree for every row, so the cases cannot be '
         f'merged honestly. Use @scenario(..., group_parametrized=False) to '
         f'emit one scenario per case.',
@@ -167,7 +164,7 @@ def _divergence_error(
 
 
 def check_promotable_expression(
-    part: NarrationValue, phase: Phase, ctx: GroupContext
+    part: NarrationValue, phase: Phase, group: Group
 ) -> None:
     """Rule 2: a varying interpolation whose expression is not a bare name.
 
@@ -179,17 +176,15 @@ def check_promotable_expression(
     """
     if part.expression.isidentifier():
         return
-    raise grouping_error(
-        ctx.anchor,
-        f'{part.expression!r} in {_test_name(ctx.anchor)!r} varies across '
+    raise _grouping_error(
+        group.anchor,
+        f'{part.expression!r} in {_test_name(group.anchor)!r} varies across '
         f'parametrize cases — bind it to a local and narrate that: '
         f'value = {part.expression}; {phase}(t"… {{value}} …").',
     )
 
 
-def check_rebound_params(
-    scenario: Scenario, spec: ParamSpec, ctx: GroupContext
-) -> None:
+def check_rebound_params(group: Group) -> None:
     """Rule 3: an expression that matches a parametrize name but not its value.
 
     A param match discards `rendered` and renders from the cell instead, so a
@@ -205,8 +200,13 @@ def check_rebound_params(
     rebinding the name is one cause, a body mutating the value in place before
     narrating it the other. The message offers both remedies.
     """
-    params = spec.mapping()
-    for _path, step in walk_steps(scenario.steps):
+    for scenario in group.comparable:
+        _check_case_params(scenario, group)
+
+
+def _check_case_params(scenario: Scenario, group: Group) -> None:
+    params = group.case_params[scenario.id]
+    for step in group.indexed[scenario.id].values():
         for part in step.narration.parts:
             if not isinstance(part, NarrationValue) or part.expression not in params:
                 continue
@@ -220,9 +220,9 @@ def check_rebound_params(
                 continue
             if reformatted == part.rendered:
                 continue
-            raise grouping_error(
-                ctx.anchor,
-                f'{part.expression!r} in {_test_name(ctx.anchor)!r} matches a '
+            raise _grouping_error(
+                group.anchor,
+                f'{part.expression!r} in {_test_name(group.anchor)!r} matches a '
                 f'parametrize column but narrates a value that column does not '
                 f'hold (case {case_suffix(scenario.id)} narrates '
                 f'{part.rendered!r}) — the cell and the step would disagree, '
@@ -245,21 +245,7 @@ def _reformat(value: RawParamValue, part: NarrationValue) -> str | None:
         return None
 
 
-def grouping_error(anchor: Scenario, body: str) -> PytestGivenError:
-    """A rejected-form error, located the way a lint finding is.
-
-    A step-level anchor is not available: `Step.source` is captured only when
-    lint is enabled, and these rules must hold with lint off.
-    """
-    return PytestGivenError(f'{body}{location_suffix(anchor.source)}')
-
-
-def _test_name(scenario: Scenario) -> str:
-    """The bare test function name, for error messages: `test_brew`."""
-    return node_base(scenario.id).rpartition('::')[2]
-
-
-def check_attachment_labels(step: Step, path: StepPath, ctx: GroupContext) -> None:
+def check_attachment_labels(step: Step, path: StepPath, group: Group) -> None:
     """Rule 5: a step whose set of attachment labels differs across cases.
 
     A label names its payload; the payload is what varies, and the row already
@@ -269,14 +255,14 @@ def check_attachment_labels(step: Step, path: StepPath, ctx: GroupContext) -> No
     number of times does not raise.
     """
     labels = {a.label for a in step.attachments}
-    for case in ctx.comparable:
-        other_labels = {a.label for a in ctx.indexed[case.id][path].attachments}
-        missing = sorted(labels ^ other_labels)
-        if not missing:
+    for case in group.comparable:
+        other_labels = {a.label for a in group.indexed[case.id][path].attachments}
+        differing = sorted(labels ^ other_labels)
+        if not differing:
             continue
-        raise grouping_error(
-            ctx.anchor,
-            f'attachment label {missing[0]!r} in {_test_name(ctx.anchor)!r} is '
+        raise _grouping_error(
+            group.anchor,
+            f'attachment label {differing[0]!r} in {_test_name(group.anchor)!r} is '
             f'attached in some parametrize cases but not others — a label names '
             f'the payload and must read the same in every case. Use a constant '
             f'label and let the content vary: attach("<constant>", …).',
@@ -288,7 +274,7 @@ def check_constant_term_ref(
     index: int,
     path: StepPath,
     phase: Phase,
-    ctx: GroupContext,
+    group: Group,
 ) -> None:
     """Rule 4: a term ref must name the same term and read the same in every case.
 
@@ -299,13 +285,13 @@ def check_constant_term_ref(
     would file every case's value under the first case's.
     """
     identity = (part.term_id, part.display)
-    for case_part in _case_term_refs(index, path, ctx):
+    for case_part in _case_term_refs(index, path, group):
         if (case_part.term_id, case_part.display) == identity:
             continue
-        raise grouping_error(
-            ctx.anchor,
+        raise _grouping_error(
+            group.anchor,
             f'glossary term ref {{{part.expression}}} in '
-            f'{_test_name(ctx.anchor)!r} varies across parametrize '
+            f'{_test_name(group.anchor)!r} varies across parametrize '
             f'cases — a term ref must name the same term and read the '
             f'same in every case. Split the term ref from the value: '
             f'{phase}(t"{{pg[\'Term\']}} {{value}} …"), or use @scenario(..., '
@@ -314,7 +300,7 @@ def check_constant_term_ref(
 
 
 def _case_term_refs(
-    index: int, path: StepPath, ctx: GroupContext
+    index: int, path: StepPath, group: Group
 ) -> Iterator[NarrationTermRef]:
     """The part at the baseline's position in each comparable case.
 
@@ -322,9 +308,23 @@ def _case_term_refs(
     here is a term ref there; what may still differ is which term it names and
     how it reads.
     """
-    for case in ctx.comparable:
-        case_part = ctx.indexed[case.id][path].narration.parts[index]
+    for case in group.comparable:
+        case_part = group.indexed[case.id][path].narration.parts[index]
         assert isinstance(case_part, NarrationTermRef), (
             'rule 6 admits only cases shaped like the baseline'
         )
         yield case_part
+
+
+def _grouping_error(anchor: Scenario, body: str) -> PytestGivenError:
+    """A rejected-form error, located the way a lint finding is.
+
+    A step-level anchor is not available: `Step.source` is captured only when
+    lint is enabled, and these rules must hold with lint off.
+    """
+    return PytestGivenError(f'{body}{location_suffix(anchor.source)}')
+
+
+def _test_name(scenario: Scenario) -> str:
+    """The bare test function name, for error messages: `test_brew`."""
+    return node_base(scenario.id).rpartition('::')[2]

@@ -20,8 +20,8 @@ from ..model import (
     Scenario,
     Step,
     case_suffix,
-    narration_text,
     placeholder_mismatch,
+    rebuilt,
 )
 
 
@@ -46,49 +46,38 @@ def _substituted(scenario: Scenario, spec: ParamSpec) -> Scenario:
     params = spec.mapping()
     return replace(
         scenario,
-        narration=_substituted_narration(scenario.narration, params, spec.names),
-        steps=_substituted_steps(scenario.steps, params, spec.names),
+        narration=_substituted_narration(scenario.narration, params),
+        steps=_substituted_steps(scenario.steps, params),
     )
 
 
 def _substituted_steps(
-    steps: list[Step], params: dict[str, RawParamValue], names: list[str]
+    steps: list[Step], params: dict[str, RawParamValue]
 ) -> list[Step]:
     return [
         replace(
             step,
-            narration=_substituted_narration(step.narration, params, names),
-            children=_substituted_steps(step.children, params, names),
+            narration=_substituted_narration(step.narration, params),
+            children=_substituted_steps(step.children, params),
         )
         for step in steps
     ]
 
 
 def _substituted_narration(
-    narration: Narration, params: dict[str, RawParamValue], names: list[str]
+    narration: Narration, params: dict[str, RawParamValue]
 ) -> Narration:
-    """Every placeholder replaced by what this case's parameters render.
-
-    Left alone when there is none to fill: a `str` narration carries its text
-    with no parts to rebuild it from.
-    """
-    if not _has_placeholder(narration):
-        return narration
-    parts = [_substituted_part(part, params, names) for part in narration.parts]
-    return Narration(text=narration_text(parts), parts=parts)
-
-
-def _has_placeholder(narration: Narration) -> bool:
-    return any(isinstance(part, NarrationPlaceholder) for part in narration.parts)
+    """Every placeholder replaced by what this case's parameters render."""
+    return rebuilt(narration, lambda part: _substituted_part(part, params))
 
 
 def _substituted_part(
-    part: NarrationPart, params: dict[str, RawParamValue], names: list[str]
+    part: NarrationPart, params: dict[str, RawParamValue]
 ) -> NarrationPart:
     if not isinstance(part, NarrationPlaceholder):
         return part
     if part.name not in params:
-        raise placeholder_mismatch(part.name, names)
+        raise placeholder_mismatch(part.name, list(params))
     return resolved_placeholder_part(part, params[part.name])
 
 

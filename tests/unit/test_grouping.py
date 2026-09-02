@@ -6,7 +6,14 @@ from datetime import UTC, datetime
 import pytest
 
 from pytest_given import Glossary, given, scenario, then, when, when_then
-from pytest_given.grouping import checks, columns, group, group_parametrized, templatize
+from pytest_given.grouping import (
+    checks,
+    columns,
+    group_parametrized,
+    promotion,
+    templatize,
+)
+from pytest_given.grouping.context import build_group
 from pytest_given.model import (
     Attachment,
     AttachmentRef,
@@ -29,6 +36,20 @@ from pytest_given.model import (
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
+def _promotion(param_names: list[str]) -> promotion.Promotion:
+    """A Promotion over a one-case group — enough for the scenario-name pass,
+    which reads only `param_names` and each case's bindings."""
+    case = Scenario(id=NodeId('t.py::t[1]'), narration=Narration(text='x'), module='m')
+    spec = ParamSpec(names=param_names, values=[0] * len(param_names))
+    group = build_group([case], {case.id: spec})
+    builder = columns.ColumnBuilder.for_params(param_names)
+    # The real pass fills the param cells before it walks, because the slots it
+    # reconciles are compared against them.
+    for name, value in group.case_params[case.id].items():
+        builder.set_cell(name, case.id, columns.param_cell(value, None))
+    return promotion.Promotion(group=group, columns=builder)
+
+
 def test_templatize_narration_rejects_unknown_placeholder() -> None:
     """Safety-net guard: a NarrationPlaceholder whose name isn't a parametrize
     column raises. Defense in depth on top of the collection-time hook, which
@@ -39,7 +60,7 @@ def test_templatize_narration_rejects_unknown_placeholder() -> None:
         text='', parts=[NarrationPlaceholder(name='cup_zize', column_id='cup_zize')]
     )
     with pytest.raises(PytestGivenError, match='cup_zize'):
-        templatize.templatize_narration(narration, ['cup_size'])
+        templatize.templatize_narration(narration, _promotion(['cup_size']))
 
 
 def test_group_parametrized_all_skipped_groups_as_skipped() -> None:
@@ -197,7 +218,7 @@ def test_templatize_keeps_a_scenario_name_term_ref_verbatim() -> None:
         ],
     )
     for param_names in (['guest'], ['euros']):
-        out = templatize.templatize_narration(narration, param_names=param_names)
+        out = templatize.templatize_narration(narration, _promotion(param_names))
         ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
         assert ref == narration.parts[0]
 
@@ -320,6 +341,12 @@ def test_with_no_passed_case_the_baseline_is_one_that_recorded_a_tree() -> None:
     assert [s.narration.text for s in grouped.steps] == ['it brews']
 
 
+def _comparable(cases: list[Scenario]) -> list[Scenario]:
+    return build_group(
+        cases, {case.id: ParamSpec(names=[], values=[]) for case in cases}
+    ).comparable
+
+
 def test_comparable_is_every_passed_case() -> None:
     """Rule 6 refuses a group whose passed cases differ in shape, so by the
     time cells are filled every passed case is comparable by construction."""
@@ -331,7 +358,7 @@ def test_comparable_is_every_passed_case() -> None:
         steps=[Step(phase='given', narration=Narration(text='a'))],
     )
     other = dataclasses.replace(base, id=NodeId('t.py::t[2]'))
-    assert group._comparable([base, other]) == [base, other]
+    assert _comparable([base, other]) == [base, other]
 
 
 def test_comparable_excludes_a_non_passed_case() -> None:
@@ -351,7 +378,7 @@ def test_comparable_excludes_a_non_passed_case() -> None:
         status='failed',
         steps=[Step(phase='given', narration=Narration(text='a'))],
     )
-    assert group._comparable([base, other]) == [base]
+    assert _comparable([base, other]) == [base]
 
 
 def test_test_name_drops_the_path_and_the_case_suffix() -> None:
@@ -971,7 +998,7 @@ def test_templatize_narration_converts_a_matching_value_to_a_placeholder() -> No
             NarrationValue(rendered='12.5', expression='price'),
         ],
     )
-    out = templatize.templatize_narration(narration, param_names=['cup_size'])
+    out = templatize.templatize_narration(narration, _promotion(['cup_size']))
     placeholder = out.parts[1]
     assert isinstance(placeholder, NarrationPlaceholder)
     assert (placeholder.name, placeholder.column_id) == ('cup_size', 'cup_size')

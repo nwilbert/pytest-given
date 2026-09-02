@@ -9,10 +9,12 @@ Only rules that need nothing but the parts. `try_term_ref` stays in
 `capture/template.py`, where the glossary handle types it matches on live.
 """
 
+from collections.abc import Callable
 from string import Formatter
 from typing import Any, assert_never
 
 from .schema import (
+    Narration,
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
@@ -48,6 +50,21 @@ def narration_text(parts: list[NarrationPart]) -> str:
             case _:
                 assert_never(part)
     return ''.join(out)
+
+
+def rebuilt(
+    narration: Narration, part_of: Callable[[NarrationPart], NarrationPart]
+) -> Narration:
+    """The narration with every part mapped, and its text re-derived from them.
+
+    Lives here with `narration_text`, which is the rule it has to reapply. A
+    part-less narration passes through: its text is all it has, and there is
+    nothing to rebuild it from.
+    """
+    if not narration.parts:
+        return narration
+    parts = [part_of(part) for part in narration.parts]
+    return Narration(text=narration_text(parts), parts=parts)
 
 
 def render_interpolation(value: Any, conversion: str | None, format_spec: str) -> str:

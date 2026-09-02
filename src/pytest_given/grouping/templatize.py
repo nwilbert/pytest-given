@@ -10,8 +10,6 @@ so has nothing to be compared against.
 from dataclasses import replace
 
 from ..model import (
-    Attachment,
-    AttachmentRef,
     Narration,
     NarrationLiteral,
     NarrationPart,
@@ -23,22 +21,21 @@ from ..model import (
     Phase,
     RawParamValue,
     Step,
-    StepAttachment,
     StepPath,
     narration_text,
     placeholder_mismatch,
+    rebuilt,
 )
+from .attachments import templatize_attachments
 from .checks import (
-    check_attachment_labels,
     check_constant_term_ref,
     check_promotable_expression,
 )
-from .columns import Format, GroupContext, cell_text, param_cell
+from .columns import Format, cell_text, param_cell
+from .promotion import Promotion
 
 
-def templatize_steps(
-    steps: list[Step], prefix: StepPath, ctx: GroupContext
-) -> list[Step]:
+def templatize_steps(steps: list[Step], prefix: StepPath, ctx: Promotion) -> list[Step]:
     """Walk the baseline tree, promoting anything that varies into a column."""
     out: list[Step] = []
     for index, step in enumerate(steps):
@@ -47,129 +44,14 @@ def templatize_steps(
             replace(
                 step,
                 narration=_templatize_step_narration(step, path, ctx),
-                attachments=_templatize_attachments(step, path, ctx),
+                attachments=templatize_attachments(step, path, ctx),
                 children=templatize_steps(step.children, path, ctx),
             )
         )
     return out
 
 
-def _templatize_attachments(
-    step: Step, path: StepPath, ctx: GroupContext
-) -> list[StepAttachment]:
-    """Baseline attachments, with any whose payload varies promoted to a column.
-
-    Paired **by label** — rule 5 guarantees the label set is shared, and
-    position does not survive a case attaching the same labels in a different
-    order. Same-label attachments pair by occurrence order.
-
-    Rule 5 checks the label *set* only, so another case may attach a label more
-    times than the baseline. Those extra occurrences get a column-only
-    promotion — no badge, since the baseline tree has no slot for an occurrence
-    it never recorded — appended right after that label's baseline occurrences
-    so column ids keep following the walk.
-    """
-    check_attachment_labels(step, path, ctx)
-    baseline = _by_label(step)
-    others = {case.id: _by_label(ctx.indexed[case.id][path]) for case in ctx.comparable}
-
-    out: list[StepAttachment] = []
-    seen: dict[str, int] = {}
-    for attachment in step.attachments:
-        assert isinstance(attachment, Attachment), 'a recorded tree holds no refs'
-        occurrence = seen.get(attachment.label, 0)
-        seen[attachment.label] = occurrence + 1
-        out.append(_promote_occurrence(attachment, occurrence, others, ctx))
-        if occurrence == len(baseline[attachment.label]) - 1:
-            _promote_extra_occurrences(attachment.label, baseline, others, ctx)
-    return out
-
-
-def _by_label(step: Step) -> dict[str, list[Attachment]]:
-    """That step's attachments grouped by label, in the order it recorded them —
-    the one shape everything below reads: a count is a `len`, an occurrence an
-    index, and a label the case never attached a missing key."""
-    out: dict[str, list[Attachment]] = {}
-    for attachment in step.attachments:
-        assert isinstance(attachment, Attachment), 'a recorded tree holds no refs'
-        out.setdefault(attachment.label, []).append(attachment)
-    return out
-
-
-def _promote_occurrence(
-    attachment: Attachment,
-    occurrence: int,
-    others: dict[NodeId, dict[str, list[Attachment]]],
-    ctx: GroupContext,
-) -> StepAttachment:
-    """The baseline's `occurrence`-th attachment of `attachment.label`: stays
-    inline when every comparable case's occurrence matches it byte for byte,
-    otherwise promoted to a column with a content-less badge left in its place.
-    """
-    theirs = {
-        node_id: _occurrence(by_label, attachment.label, occurrence)
-        for node_id, by_label in others.items()
-    }
-    if all(
-        other is not None
-        and (other.content, other.content_type)
-        == (attachment.content, attachment.content_type)
-        for other in theirs.values()
-    ):
-        return attachment
-    column = ctx.new_column('attachment', attachment.label)
-    for node_id, other in theirs.items():
-        ctx.set_cell(column.id, node_id, other)
-    # The badge is labeled with the *column* name, not the attachment's own
-    # label: a label attached twice gives two columns, and a badge repeating
-    # the bare label points the reader at the wrong one.
-    return AttachmentRef(
-        label=column.name,
-        content_type=attachment.content_type,
-        column_id=column.id,
-    )
-
-
-def _promote_extra_occurrences(
-    label: str,
-    baseline: dict[str, list[Attachment]],
-    others: dict[NodeId, dict[str, list[Attachment]]],
-    ctx: GroupContext,
-) -> None:
-    """Occurrences of `label` past the baseline's own count: one column each,
-    with the baseline's cell left `None` and nothing appended to the grouped
-    step's attachments.
-
-    The count comes from `baseline`, never from `others[first case]`: the
-    baseline is the first *passed* case, so a skipped first case would put the
-    range at 0 and re-promote occurrences the baseline already carries a badge
-    for.
-    """
-    for occurrence in range(len(baseline.get(label, [])), _max_count(label, others)):
-        column = ctx.new_column('attachment', label)
-        for node_id, by_label in others.items():
-            ctx.set_cell(column.id, node_id, _occurrence(by_label, label, occurrence))
-
-
-def _max_count(label: str, others: dict[NodeId, dict[str, list[Attachment]]]) -> int:
-    """The greatest number of times any comparable case attaches `label`."""
-    return max(
-        (len(by_label.get(label, [])) for by_label in others.values()), default=0
-    )
-
-
-def _occurrence(
-    by_label: dict[str, list[Attachment]], label: str, index: int
-) -> Attachment | None:
-    """That case's `index`-th attachment carrying `label`, or None when the case
-    attached that label fewer times than `index` requires."""
-    matching = by_label.get(label, [])
-    return matching[index] if index < len(matching) else None
-
-
-def _templatize_step_narration(
-    step: Step, path: StepPath, ctx: GroupContext
-) -> Narration:
+def _templatize_step_narration(step: Step, path: StepPath, ctx: Promotion) -> Narration:
     """The baseline step's narration with varying values promoted.
 
     A step with no parts is a `str` narration: rule 1 has already rejected it if
@@ -187,7 +69,7 @@ def _templatize_step_narration(
 
 
 def _templatize_part(
-    part: NarrationPart, index: int, path: StepPath, phase: Phase, ctx: GroupContext
+    part: NarrationPart, index: int, path: StepPath, phase: Phase, ctx: Promotion
 ) -> NarrationPart:
     """One baseline part, against the same position in every comparable case.
 
@@ -198,13 +80,15 @@ def _templatize_part(
     match part:
         case NarrationLiteral():
             return part
-        case NarrationValue(expression=expression) if expression in ctx.param_names:
+        case NarrationValue(expression=expression) if (
+            expression in ctx.group.param_names
+        ):
             return _templatize_param_value(part, index, path, ctx)
         case NarrationValue():
             return _templatize_value(part, index, path, phase, ctx)
         case NarrationPlaceholder(name=name):
-            if name not in ctx.param_names:
-                raise placeholder_mismatch(name, ctx.param_names)
+            if name not in ctx.group.param_names:
+                raise placeholder_mismatch(name, ctx.group.param_names)
             # A `Template` slot in a step body (an `Annotated[..., given(...)]`
             # label). It records no per-case rendering, so it reconciles the
             # way the scenario name's slots do rather than the way a
@@ -213,7 +97,7 @@ def _templatize_part(
         case NarrationTermRef():
             # Rule 4 requires it to read identically across cases whether a
             # column binds it or not, so it is always compared.
-            check_constant_term_ref(part, index, path, phase, ctx)
+            check_constant_term_ref(part, index, path, phase, ctx.group)
             return part
 
 
@@ -231,7 +115,7 @@ def _templatize_param_value(
     part: NarrationValue,
     index: int,
     path: StepPath,
-    ctx: GroupContext,
+    ctx: Promotion,
 ) -> NarrationPart:
     """A slot bound to a `param` column: it keeps pointing there when the cell
     reads the way this slot rendered, and gets a column of its own when it does
@@ -243,7 +127,8 @@ def _templatize_param_value(
     cell can serve.
     """
     rendered = {
-        case.id: _value_at(ctx.indexed[case.id][path], index) for case in ctx.comparable
+        case.id: _value_at(ctx.group.indexed[case.id][path], index)
+        for case in ctx.group.comparable
     }
     column = _promoted_column(rendered, part.expression, part.expression, ctx)
     if column is None:
@@ -257,22 +142,24 @@ def _templatize_param_value(
 
 
 def _templatize_value(
-    part: NarrationValue, index: int, path: StepPath, phase: Phase, ctx: GroupContext
+    part: NarrationValue, index: int, path: StepPath, phase: Phase, ctx: Promotion
 ) -> NarrationPart:
     """An interpolation no parametrize column binds: kept as it is when every
     case renders it the same, promoted to a `derived` column when they do not."""
     if all(
-        _value_at(ctx.indexed[case.id][path], index) == part.rendered
-        for case in ctx.comparable
+        _value_at(ctx.group.indexed[case.id][path], index) == part.rendered
+        for case in ctx.group.comparable
     ):
         # Checked before the cells are collected: nothing varies in the
         # overwhelming majority of parts, and only a promotion needs every
         # case's rendering kept.
         return part
-    check_promotable_expression(part, phase, ctx)
-    column = ctx.new_column('derived', part.expression)
-    for case in ctx.comparable:
-        ctx.set_cell(column.id, case.id, _value_at(ctx.indexed[case.id][path], index))
+    check_promotable_expression(part, phase, ctx.group)
+    column = ctx.columns.new_column('derived', part.expression)
+    for case in ctx.group.comparable:
+        ctx.columns.set_cell(
+            column.id, case.id, _value_at(ctx.group.indexed[case.id][path], index)
+        )
     # The token names the *column*, not the expression: one expression promoted
     # in two steps gives two columns, and `{price}` in both tokens points the
     # reader at the first one twice.
@@ -298,20 +185,21 @@ def _value_at(step: Step, index: int) -> str:
     return part.rendered
 
 
-def templatize_narration(
-    narration: Narration,
-    param_names: list[str],
-) -> Narration:
-    """Convert matching NarrationValue entries to NarrationPlaceholder.
+def templatize_narration(narration: Narration, ctx: Promotion) -> Narration:
+    """The **scenario** name as a template, its slots pointed at columns that
+    read the way they do.
 
-    For the **scenario** narration only — a name is evaluated once at
-    decoration time, so it cannot vary and has nothing to be compared against.
-    Every part therefore stays verbatim but the one a parametrize column binds.
+    A name is evaluated once at decoration time, so it cannot vary and has
+    nothing to be compared against: every part stays verbatim but the one a
+    parametrize column binds. That slot is then reconciled like any step's —
+    a `{price:.2f}` slot over a cell holding `1.5` would read `charge 1.5
+    euros` on hover, a sentence no case narrated — and gets a `derived` column
+    of its own where the shared cell cannot serve it.
     """
-    if not narration.parts:
-        return narration
-    out = [_name_part(part, param_names) for part in narration.parts]
-    return Narration(text=narration_text(out), parts=out)
+    return rebuilt(
+        narration,
+        lambda part: _reconciled_slot(_name_part(part, ctx.group.param_names), ctx),
+    )
 
 
 def _name_part(part: NarrationPart, param_names: list[str]) -> NarrationPart:
@@ -325,33 +213,19 @@ def _name_part(part: NarrationPart, param_names: list[str]) -> NarrationPart:
     return part
 
 
-def reconcile_name_slots(
-    narration: Narration,
-    ctx: GroupContext,
-) -> Narration:
-    """The scenario name's slots re-pointed at columns that read the way they do.
-
-    The name is a hover-substitution slot like any step's: a `{price:.2f}` slot
-    over a cell holding `1.5` would read `charge 1.5 euros` on hover, a
-    sentence no case narrated. A slot the shared cell cannot serve gets a
-    `derived` column of its own, holding what it renders for each case.
-    """
-    if not narration.parts:
-        return narration
-    out = [_reconciled_slot(part, ctx) for part in narration.parts]
-    return Narration(text=narration_text(out), parts=out)
-
-
-def _reconciled_slot(part: NarrationPart, ctx: GroupContext) -> NarrationPart:
+def _reconciled_slot(part: NarrationPart, ctx: Promotion) -> NarrationPart:
     """One `Template` slot re-pointed at a column that reads the way it does.
 
     Shared by the scenario name and by a step's `Template` slots: neither
     records a per-case rendering to compare against, so both recompute what
     the slot renders from each case's raw parameter.
     """
-    if not isinstance(part, NarrationPlaceholder) or part.column_id not in ctx.cells:
+    # Every placeholder that survives `_name_part` names a known column: both
+    # callers reject a name absent from `param_names`, and a column exists for
+    # each of those.
+    if not isinstance(part, NarrationPlaceholder):
         return part
-    rendered = _slot_renderings(part, ctx.case_params)
+    rendered = _slot_renderings(part, ctx.group.case_params)
     column = _promoted_column(rendered, part.column_id, part.name, ctx)
     if column is None:
         return part
@@ -394,7 +268,7 @@ def _slot_format(part: NarrationPlaceholder) -> Format | None:
 
 
 def _promoted_column(
-    rendered: dict[NodeId, str], column_id: str, name: str, ctx: GroupContext
+    rendered: dict[NodeId, str], column_id: str, name: str, ctx: Promotion
 ) -> ParameterColumn | None:
     """The `derived` column a slot needs when the cell it points at does not
     read the way the slot renders — or None when that cell already serves it.
@@ -403,11 +277,11 @@ def _promoted_column(
     the renderings come from differs.
     """
     if all(
-        text == cell_text(ctx.cells[column_id][case_id])
+        text == cell_text(ctx.columns.cells[column_id][case_id])
         for case_id, text in rendered.items()
     ):
         return None
-    column = ctx.new_column('derived', name)
+    column = ctx.columns.new_column('derived', name)
     for case_id, text in rendered.items():
-        ctx.set_cell(column.id, case_id, text)
+        ctx.columns.set_cell(column.id, case_id, text)
     return column

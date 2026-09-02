@@ -16,14 +16,11 @@ from ..model import (
     node_base,
     step_narrations,
 )
-from .checks import (
-    check_rebound_params,
-    check_same_template,
-    check_varying_str_narration,
-)
-from .columns import GroupContext, param_cell, param_cell_formats
+from .checks import check_rebound_params, check_same_template
+from .columns import ColumnBuilder, param_cell, param_cell_formats
+from .context import build_group
 from .percase import per_case_scenarios
-from .templatize import reconcile_name_slots, templatize_narration, templatize_steps
+from .templatize import Promotion, templatize_narration, templatize_steps
 
 # What cases group on: one test function, one name.
 type GroupKey = tuple[str, str]
@@ -63,88 +60,46 @@ def group_parametrized(
     return result
 
 
-def _grouped_scenario(group: list[Scenario], param_info: ParamInfo) -> Scenario:
-    first = group[0]
-    param_names = list(param_info[first.id].names)
-    baseline = _baseline(group)
-    ctx = GroupContext(
-        param_names=param_names,
-        comparable=_comparable(group),
-        anchor=first,
-        case_params={s.id: param_info[s.id].mapping() for s in group},
-    )
-    check_same_template(baseline, ctx)
-    check_varying_str_narration(baseline, ctx)
-    for scenario in group:
-        if scenario.status == 'passed':
-            check_rebound_params(scenario, param_info[scenario.id], ctx)
-    # Before the walk, not with the other cells below: a `param` cell is what
-    # its slots substitute, so the walk compares against it. The scenario name
-    # is scanned alongside the steps — a `Template` name's spec is a slot's
-    # spec, and often the only one in play.
+def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
+    group = build_group(cases, param_info)
+    check_same_template(group)
+    check_rebound_params(group)
+    anchor, baseline = group.anchor, group.baseline
+    ctx = Promotion(group=group, columns=ColumnBuilder.for_params(group.param_names))
+    # Filled before the walk, not after: a `param` cell is what its slots
+    # substitute, so the walk compares against it. The scenario name is scanned
+    # alongside the steps — a `Template` name's spec is a slot's spec, and
+    # often the only one in play.
     formats = param_cell_formats(
-        [first.narration, *step_narrations(baseline.steps)], param_names
+        [anchor.narration, *step_narrations(baseline.steps)], group.param_names
     )
-    for scenario in group:
-        spec = param_info[scenario.id]
-        for name, value in zip(spec.names, spec.values, strict=True):
-            ctx.set_cell(name, scenario.id, param_cell(value, formats.get(name)))
+    for case in group.cases:
+        for name, value in group.case_params[case.id].items():
+            ctx.columns.set_cell(name, case.id, param_cell(value, formats.get(name)))
     template_steps = templatize_steps(baseline.steps, (), ctx)
-    grouped_narration = reconcile_name_slots(
-        templatize_narration(first.narration, param_names), ctx
-    )
+    grouped_narration = templatize_narration(anchor.narration, ctx)
 
-    cases: list[ParameterCase] = []
-    total_duration = 0
-    for scenario in group:
-        cases.append(
-            ParameterCase(
-                values=[ctx.cells[c.id].get(scenario.id) for c in ctx.columns],
-                status=scenario.status,
-                error=scenario.error,
-            )
+    table_cases = [
+        ParameterCase(
+            values=[ctx.columns.cell(c.id, case.id) for c in ctx.columns.columns],
+            status=case.status,
+            error=case.error,
         )
-        total_duration += scenario.duration_ms
-
+        for case in group.cases
+    ]
     return Scenario(
-        id=first.id,
+        id=anchor.id,
         narration=grouped_narration,
-        module=first.module,
-        tags=first.tags,
-        status=_grouped_status(cases),
-        duration_ms=total_duration,
+        module=anchor.module,
+        tags=anchor.tags,
+        status=_grouped_status(table_cases),
+        duration_ms=sum(case.duration_ms for case in group.cases),
         steps=template_steps,
-        parameters=ParameterTable(columns=ctx.columns, cases=cases),
-        source=first.source,
-        story_id=first.story_id,
-        activity_ids=first.activity_ids,
+        parameters=ParameterTable(columns=ctx.columns.columns, cases=table_cases),
+        source=anchor.source,
+        story_id=anchor.story_id,
+        activity_ids=anchor.activity_ids,
     )
-
-
-def _baseline(group: list[Scenario]) -> Scenario:
-    """The first passed case; failing that, the first case that recorded a
-    tree; failing that, `group[0]`.
-
-    A skipped case records no steps and a failed one may abort mid-tree, so
-    neither can define the shared structure. Which one to fall back on still
-    matters: a skipped case has *no* steps, so preferring it over a failed one
-    renders the scenario step-less and hides the failure a reader opened it for.
-    """
-    passed = next((s for s in group if s.status == 'passed'), None)
-    if passed is not None:
-        return passed
-    return next((s for s in group if s.steps), group[0])
-
-
-def _comparable(group: list[Scenario]) -> list[Scenario]:
-    """The passed cases — every one of them.
-
-    Rule 6 has already refused any group whose passed cases narrate different
-    templates, so positional comparison is safe by construction. A non-passed
-    case drops out: a skipped one records no steps and a failed one may abort
-    mid-tree.
-    """
-    return [s for s in group if s.status == 'passed']
 
 
 def _grouped_status(cases: list[ParameterCase]) -> Status:

@@ -1,10 +1,9 @@
 """The parameter table a group accumulates: its typed columns and their cells.
 
-`GroupContext` is the single registry — column ids, disambiguated names, and
-the cell store — threaded through the baseline walk. The rest is cell
-construction, which answers to one rule: a `param` cell has to read the way the
-placeholder pointing at it rendered, since row hover substitutes the one into
-the other.
+`ColumnBuilder` is the single registry — column ids, disambiguated names, and
+the cell store. The rest is cell construction, which answers to one rule: a
+`param` cell has to read the way the placeholder pointing at it rendered, since
+row hover substitutes the one into the other.
 """
 
 from collections.abc import Iterable
@@ -23,45 +22,28 @@ from ..model import (
     ParameterColumn,
     ParamValue,
     RawParamValue,
-    Scenario,
-    Step,
-    StepPath,
     render_interpolation,
-    walk_steps,
 )
 
 
 @dataclass
-class GroupContext:
-    """Everything the baseline walk needs, plus the columns it accumulates."""
+class ColumnBuilder:
+    """The columns and cells a group's walk accumulates."""
 
-    param_names: list[str]
-    comparable: list[Scenario]
-    anchor: Scenario
-    # Each case's raw parametrize arguments by name. A `Template` slot — in a
-    # step or in the scenario name — records no per-case rendering to compare
-    # against, so what it renders has to be recomputed from these; see
-    # `templatize._reconciled_slot`.
-    case_params: dict[NodeId, dict[str, RawParamValue]]
     columns: list[ParameterColumn] = field(default_factory=list)
     cells: dict[str, dict[NodeId, CellValue | None]] = field(default_factory=dict)
-    # Each comparable case's tree keyed by position, so "the same position in
-    # every other case" is a lookup rather than a parallel descent through
-    # several trees. Derived from `comparable` rather than passed alongside it,
-    # so the two cannot disagree about which cases are in play.
-    indexed: dict[NodeId, dict[StepPath, Step]] = field(init=False)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
     _taken_names: set[str] = field(default_factory=set)
 
-    def __post_init__(self) -> None:
-        self.indexed = {
-            case.id: dict(walk_steps(case.steps)) for case in self.comparable
-        }
-        # The parametrize columns come first and keep their argname as id: a
-        # step's placeholder points at them by name (`column_id=expression`),
-        # and the baseline walk emits every generated column after them.
-        for name in self.param_names:
-            self.new_column('param', name)
+    @classmethod
+    def for_params(cls, param_names: list[str]) -> ColumnBuilder:
+        """A builder holding the parametrize columns, which come first and keep
+        their argname as id: a step's placeholder points at them by name
+        (`column_id=expression`), and the walk emits generated columns after."""
+        builder = cls()
+        for name in param_names:
+            builder.new_column('param', name)
+        return builder
 
     def new_column(self, kind: ColumnKind, name: str) -> ParameterColumn:
         """Add a column and return it.
@@ -86,6 +68,9 @@ class GroupContext:
         self, column_id: str, node_id: NodeId, value: CellValue | None
     ) -> None:
         self.cells[column_id][node_id] = value
+
+    def cell(self, column_id: str, node_id: NodeId) -> CellValue | None:
+        return self.cells[column_id].get(node_id)
 
     def _unique_name(self, name: str) -> str:
         """`name`, or `name #2`, `name #3`, … once it is already taken.
