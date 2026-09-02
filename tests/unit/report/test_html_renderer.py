@@ -1321,9 +1321,7 @@ def test_narration_filter_renders_actor_term_ref_with_actor_class() -> None:
     f = _make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='Guest',
-        parts=[
-            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
-        ],
+        parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
     )
     assert 'term-ref-actor' in str(f(n))
 
@@ -1333,9 +1331,7 @@ def test_narration_filter_renders_object_term_ref_with_object_class() -> None:
     f = _make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='Room',
-        parts=[
-            NarrationTermRef(term_id=TermId('room'), display='Room'),
-        ],
+        parts=(NarrationTermRef(term_id=TermId('room'), display='Room'),),
     )
     assert 'term-ref-object' in str(f(n))
 
@@ -1345,9 +1341,7 @@ def test_narration_filter_renders_verb_term_ref_with_verb_class() -> None:
     f = _make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='search',
-        parts=[
-            NarrationTermRef(term_id=TermId('search'), display='searches'),
-        ],
+        parts=(NarrationTermRef(term_id=TermId('search'), display='searches'),),
     )
     assert 'term-ref-verb' in str(f(n))
 
@@ -1369,7 +1363,7 @@ def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
     f = _make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='Guest',
-        parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
+        parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
     )
     out = str(f(n))
     assert 'data-term-id="guest"' in out
@@ -1395,9 +1389,7 @@ def test_narration_filter_handles_term_ref_with_no_glossary_match() -> None:
     f = _make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='X',
-        parts=[
-            NarrationTermRef(term_id=TermId('missing'), display='X'),
-        ],
+        parts=(NarrationTermRef(term_id=TermId('missing'), display='X'),),
     )
     out = str(f(n))
     assert 'X' in out
@@ -1410,9 +1402,7 @@ def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
     f = _make_narration_filter(param_color_map={}, glossary=None)
     n = Narration(
         text='X',
-        parts=[
-            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
-        ],
+        parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
     )
     out = str(f(n))
     assert 'Guest' in out
@@ -1687,11 +1677,11 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
                 phase='when',
                 narration=Narration(
                     text='Guest searches',
-                    parts=[
+                    parts=(
                         NarrationTermRef(term_id=TermId('guest'), display='Guest'),
                         NarrationLiteral(value=' '),
                         NarrationTermRef(term_id=TermId('search'), display='searches'),
-                    ],
+                    ),
                 ),
             )
         ],

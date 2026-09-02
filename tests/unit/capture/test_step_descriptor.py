@@ -229,7 +229,7 @@ def test_attach_non_string_content_serializes_as_json() -> None:
 def test_step_descriptor_with_plain_str_has_empty_narration_parts() -> None:
     desc = StepDescriptor('given', 'a thing')
     assert desc.narration.text == 'a thing'
-    assert desc.narration.parts == []
+    assert desc.narration.parts == ()
 
 
 def test_step_descriptor_decorator_accepts_tstring() -> None:
@@ -540,14 +540,14 @@ def test_step_descriptor_with_tstring_no_interpolations_still_has_parts() -> Non
     non-empty iff the author used a t-string, not iff the text was dynamic."""
     desc = given(t'just a label')
     assert desc.narration.text == 'just a label'
-    assert desc.narration.parts == [NarrationLiteral(value='just a label')]
+    assert desc.narration.parts == (NarrationLiteral(value='just a label'),)
 
 
 def test_step_descriptor_with_tstring_records_rendered_text_and_parts() -> None:
     cup_size = 200
     desc = given(t'a {cup_size} ml cup')
     assert desc.narration.text == 'a 200 ml cup'
-    assert desc.narration.parts == [
+    assert desc.narration.parts == (
         NarrationLiteral(value='a '),
         NarrationValue(
             rendered='200',
@@ -556,7 +556,7 @@ def test_step_descriptor_with_tstring_records_rendered_text_and_parts() -> None:
             conversion=None,
         ),
         NarrationLiteral(value=' ml cup'),
-    ]
+    )
 
 
 @pytest.mark.parametrize('phase_factory', [given, when, then])
@@ -797,7 +797,7 @@ def test_decorator_template_records_structured_value_parts() -> None:
         set_active_collector(None)
     [step] = scenario.steps
     assert step.narration.text == 'I insert $7'
-    assert step.narration.parts == [
+    assert step.narration.parts == (
         NarrationLiteral(value='I insert $'),
         NarrationValue(
             rendered='7',
@@ -805,7 +805,7 @@ def test_decorator_template_records_structured_value_parts() -> None:
             format_spec='',
             conversion=None,
         ),
-    ]
+    )
 
 
 def test_decorator_template_uses_default_when_caller_omits_arg() -> None:

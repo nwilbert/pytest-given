@@ -9,7 +9,7 @@ Only rules that need nothing but the parts. `try_term_ref` stays in
 `capture/template.py`, where the glossary handle types it matches on live.
 """
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from string import Formatter
 from typing import Any, assert_never
 
@@ -36,7 +36,7 @@ def placeholder_token(part: NarrationPlaceholder) -> str:
     return '{' + part.name + '}'
 
 
-def narration_text(parts: list[NarrationPart]) -> str:
+def narration_text(parts: Sequence[NarrationPart]) -> str:
     """The text those parts render.
 
     A placeholder stands for a value not yet known, so it renders as its own
@@ -74,7 +74,7 @@ def rebuilt(
     """
     if not narration.parts:
         return narration
-    parts = [part_of(part) for part in narration.parts]
+    parts = tuple(part_of(part) for part in narration.parts)
     return Narration(text=narration_text(parts), parts=parts)
 
 

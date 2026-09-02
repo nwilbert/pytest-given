@@ -106,11 +106,11 @@ def test_build_coverage_maps_produces_per_scenario_dicts() -> None:
         phase='when',
         narration=Narration(
             text='x',
-            parts=[
+            parts=(
                 NarrationTermRef(term_id=TermId('guest'), display='Guest'),
                 NarrationTermRef(term_id=TermId('search'), display='search'),
                 NarrationTermRef(term_id=TermId('room'), display='Room'),
-            ],
+            ),
         ),
     )
     scn = Scenario(
@@ -184,11 +184,11 @@ def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
             phase='when',
             narration=Narration(
                 text='x',
-                parts=[
+                parts=(
                     NarrationTermRef(term_id=TermId('guest'), display='Alice'),
                     NarrationTermRef(term_id=TermId('search'), display='searches'),
                     NarrationTermRef(term_id=TermId('room'), display='Deluxe Suite'),
-                ],
+                ),
             ),
         )
         scn = Scenario(
@@ -219,9 +219,7 @@ def test_build_glossary_aggregations_skips_unknown_term_in_scenario_narration() 
         phase='when',
         narration=Narration(
             text='x',
-            parts=[
-                NarrationTermRef(term_id=TermId('missing'), display='X'),
-            ],
+            parts=(NarrationTermRef(term_id=TermId('missing'), display='X'),),
         ),
     )
     scn = Scenario(
@@ -242,9 +240,7 @@ def test_build_glossary_aggregations_walks_nested_steps() -> None:
         phase='when',
         narration=Narration(
             text='x',
-            parts=[
-                NarrationTermRef(term_id=TermId('guest'), display='Alice'),
-            ],
+            parts=(NarrationTermRef(term_id=TermId('guest'), display='Alice'),),
         ),
     )
     outer = Step(phase='when', narration=Narration(text='y'), children=[inner])
@@ -342,9 +338,7 @@ def test_build_glossary_aggregations_verb_in_step_not_collected_as_instance() ->
         phase='when',
         narration=Narration(
             text='x',
-            parts=[
-                NarrationTermRef(term_id=TermId('search'), display='searches'),
-            ],
+            parts=(NarrationTermRef(term_id=TermId('search'), display='searches'),),
         ),
     )
     scn = Scenario(
@@ -387,7 +381,7 @@ def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -
             phase='when',
             narration=Narration(
                 text='x',
-                parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
+                parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
             ),
         )
         scn = Scenario(
@@ -412,7 +406,7 @@ def test_build_glossary_aggregations_skips_non_term_ref_narration_parts() -> Non
         phase='when',
         narration=Narration(
             text='plain text step',
-            parts=[NarrationLiteral(value='plain text step')],
+            parts=(NarrationLiteral(value='plain text step'),),
         ),
     )
     scn = Scenario(
@@ -492,9 +486,7 @@ def test_glossary_aggregations_annotates_fixture_provenance() -> None:
             phase='given',
             narration=Narration(
                 text='our guest Alice',
-                parts=[
-                    NarrationTermRef(term_id=TermId('guest'), display='Alice'),
-                ],
+                parts=(NarrationTermRef(term_id=TermId('guest'), display='Alice'),),
             ),
             fixture_name='alice',
         )
@@ -502,9 +494,7 @@ def test_glossary_aggregations_annotates_fixture_provenance() -> None:
             phase='when',
             narration=Narration(
                 text='Alice does',
-                parts=[
-                    NarrationTermRef(term_id=TermId('guest'), display='Alice'),
-                ],
+                parts=(NarrationTermRef(term_id=TermId('guest'), display='Alice'),),
             ),
         )
         scn = Scenario(
@@ -552,10 +542,10 @@ def test_build_term_scenario_index_maps_terms_to_scenarios() -> None:
         phase='when',
         narration=Narration(
             text='x',
-            parts=[
+            parts=(
                 NarrationTermRef(term_id=TermId('guest'), display='Guest'),
                 NarrationTermRef(term_id=TermId('room'), display='Room'),
-            ],
+            ),
         ),
     )
     scn = Scenario(
@@ -585,21 +575,21 @@ def test_build_term_scenario_index_dedups_and_includes_scenario_narration() -> N
             phase='when',
             narration=Narration(
                 text='x',
-                parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
+                parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
             ),
         )
         step_two = Step(
             phase='then',
             narration=Narration(
                 text='y',
-                parts=[NarrationTermRef(term_id=TermId('guest'), display='Guest')],
+                parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
             ),
         )
         scn = Scenario(
             id=NodeId('test::a'),
             narration=Narration(
                 text='scn',
-                parts=[NarrationTermRef(term_id=TermId('room'), display='Room')],
+                parts=(NarrationTermRef(term_id=TermId('room'), display='Room'),),
             ),
             module='m',
             steps=[step_one, step_two],
@@ -711,11 +701,11 @@ def _covering_scn(node_id: str, status: str) -> Scenario:
         phase='when',
         narration=Narration(
             text='x',
-            parts=[
+            parts=(
                 NarrationTermRef(term_id=TermId('guest'), display='Guest'),
                 NarrationTermRef(term_id=TermId('search'), display='search'),
                 NarrationTermRef(term_id=TermId('room'), display='Room'),
-            ],
+            ),
         ),
     )
     return Scenario(

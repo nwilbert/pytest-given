@@ -183,7 +183,10 @@ def _step(phase, *term_refs, activity_ids=()):
         phase=phase,
         narration=Narration(
             text='x',
-            parts=[NarrationLiteral(value='x'), *list(term_refs)],
+            parts=(
+                NarrationLiteral(value='x'),
+                *list(term_refs),
+            ),
         ),
         activity_ids=tuple(ActivityId(i) for i in activity_ids),
     )

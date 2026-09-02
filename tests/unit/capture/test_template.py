@@ -28,14 +28,14 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 def test_narration_from_passes_through_narration() -> None:
     """A pre-rendered Narration (an eager glossary-t-string scenario name)
     flows through unchanged, without a second parse."""
-    narration = Narration(text='hi', parts=[NarrationLiteral(value='hi')])
+    narration = Narration(text='hi', parts=(NarrationLiteral(value='hi'),))
     assert narration_from(narration) is narration
 
 
 def test_template_parses_literal_only() -> None:
     t = Template('hello world')
     assert t.template == 'hello world'
-    assert t.parts == [NarrationLiteral(value='hello world')]
+    assert t.parts == (NarrationLiteral(value='hello world'),)
 
 
 @scenario(
@@ -48,18 +48,18 @@ def test_template_parses_single_placeholder() -> None:
     with when('the template is parsed'):
         t = Template(source)
     with then(t'it splits into literal and placeholder {pg["Narration"]} parts'):
-        assert t.parts == [
+        assert t.parts == (
             NarrationLiteral(value='Brew '),
             NarrationPlaceholder(
                 name='cup_size', column_id='cup_size', format_spec='', conversion=None
             ),
             NarrationLiteral(value=' ml'),
-        ]
+        )
 
 
 def test_template_parses_format_spec_and_conversion() -> None:
     t = Template('n={n:03d} r={obj!r}')
-    assert t.parts == [
+    assert t.parts == (
         NarrationLiteral(value='n='),
         NarrationPlaceholder(
             name='n', column_id='n', format_spec='03d', conversion=None
@@ -68,7 +68,7 @@ def test_template_parses_format_spec_and_conversion() -> None:
         NarrationPlaceholder(
             name='obj', column_id='obj', format_spec='', conversion='r'
         ),
-    ]
+    )
 
 
 def _rendered(template: Template, mapping: dict[str, object]) -> str:
@@ -145,7 +145,7 @@ def test_parse_tstring_literal_only() -> None:
     cup_size = 200  # noqa: F841
     rendered, parts = parse_tstring(t'just a label')
     assert rendered == 'just a label'
-    assert parts == [NarrationLiteral(value='just a label')]
+    assert parts == (NarrationLiteral(value='just a label'),)
 
 
 @scenario(
@@ -158,7 +158,7 @@ def test_parse_tstring_single_interpolation() -> None:
         rendered, parts = parse_tstring(t'a {cup_size} ml cup')
     with then(t'the interpolation becomes a {pg["Narration"]} value part'):
         assert rendered == 'a 200 ml cup'
-        assert parts == [
+        assert parts == (
             NarrationLiteral(value='a '),
             NarrationValue(
                 rendered='200',
@@ -167,14 +167,14 @@ def test_parse_tstring_single_interpolation() -> None:
                 conversion=None,
             ),
             NarrationLiteral(value=' ml cup'),
-        ]
+        )
 
 
 def test_parse_tstring_format_spec() -> None:
     n = 7
     rendered, parts = parse_tstring(t'n={n:03d}')
     assert rendered == 'n=007'
-    assert parts == [
+    assert parts == (
         NarrationLiteral(value='n='),
         NarrationValue(
             rendered='007',
@@ -182,14 +182,14 @@ def test_parse_tstring_format_spec() -> None:
             format_spec='03d',
             conversion=None,
         ),
-    ]
+    )
 
 
 def test_parse_tstring_conversion() -> None:
     obj = 'hi'
     rendered, parts = parse_tstring(t'r={obj!r}')
     assert rendered == "r='hi'"
-    assert parts == [
+    assert parts == (
         NarrationLiteral(value='r='),
         NarrationValue(
             rendered="'hi'",
@@ -197,7 +197,7 @@ def test_parse_tstring_conversion() -> None:
             format_spec='',
             conversion='r',
         ),
-    ]
+    )
 
 
 def test_parse_tstring_consecutive_interpolations() -> None:
@@ -205,10 +205,10 @@ def test_parse_tstring_consecutive_interpolations() -> None:
     b = 2
     rendered, parts = parse_tstring(t'{a}{b}')
     assert rendered == '12'
-    assert parts == [
+    assert parts == (
         NarrationValue(rendered='1', expression='a', format_spec='', conversion=None),
         NarrationValue(rendered='2', expression='b', format_spec='', conversion=None),
-    ]
+    )
 
 
 @scenario(

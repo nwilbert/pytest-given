@@ -275,7 +275,7 @@ def _cell_from_json(value: Any) -> CellValue | None:
 def _narration_from_dict(d: dict[str, Any]) -> Narration:
     return Narration(
         text=d['text'],
-        parts=[_narration_part_from_dict(p) for p in d.get('parts', [])],
+        parts=tuple(_narration_part_from_dict(p) for p in d.get('parts', [])),
     )
 
 

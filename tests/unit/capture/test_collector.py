@@ -400,7 +400,7 @@ def test_push_step_with_plain_narration_has_empty_parts() -> None:
     collector.push_step('given', _n('plain'))
     collector.pop_step()
     scenario = collector.finish_scenario(status='passed')
-    assert scenario.steps[0].narration.parts == []
+    assert scenario.steps[0].narration.parts == ()
 
 
 def test_start_scenario_with_template_stores_structured_narration() -> None:
@@ -411,7 +411,7 @@ def test_start_scenario_with_template_stores_structured_narration() -> None:
     collector.pop_step()
     scenario = collector.finish_scenario(status='passed')
     assert scenario.narration.text == 'Brew {cup_size} ml'  # raw template string
-    assert scenario.narration.parts == list(tmpl.parts)
+    assert scenario.narration.parts == tmpl.parts
 
 
 def test_start_scenario_with_plain_str_has_empty_parts() -> None:
@@ -421,7 +421,7 @@ def test_start_scenario_with_plain_str_has_empty_parts() -> None:
     collector.pop_step()
     scenario = collector.finish_scenario(status='passed')
     assert scenario.narration.text == 'plain name'
-    assert scenario.narration.parts == []
+    assert scenario.narration.parts == ()
 
 
 def test_finish_scenario_records_skip_reason() -> None:

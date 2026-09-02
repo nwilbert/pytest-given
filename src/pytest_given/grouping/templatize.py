@@ -61,10 +61,10 @@ def _templatize_step_narration(step: Step, path: StepPath, ctx: Promotion) -> Na
     narration = step.narration
     if not narration.parts:
         return narration
-    out = [
+    out = tuple(
         _templatize_part(part, index, path, step.phase, ctx)
         for index, part in enumerate(narration.parts)
-    ]
+    )
     return Narration(text=narration_text(out), parts=out)
 
 

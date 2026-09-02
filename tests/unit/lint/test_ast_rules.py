@@ -752,7 +752,7 @@ def test_unused_interpolation_fires_on_a_grouped_placeholder(tmp_path) -> None:
         step,
         narration=Narration(
             text='a {size} ml cup',
-            parts=[NarrationPlaceholder(name='size', column_id='size')],
+            parts=(NarrationPlaceholder(name='size', column_id='size'),),
         ),
     )
     findings = _rule_findings(
@@ -781,7 +781,7 @@ def test_unused_interpolation_skips_a_disambiguated_column_name(tmp_path) -> Non
         step,
         narration=Narration(
             text='a {size #2} ml cup',
-            parts=[NarrationPlaceholder(name='size #2', column_id='derived:0')],
+            parts=(NarrationPlaceholder(name='size #2', column_id='derived:0'),),
         ),
     )
     assert (
@@ -884,13 +884,13 @@ def test_unused_interpolation_skips_term_refs(tmp_path) -> None:
         step,
         narration=Narration(
             text='a File glossary on disk',
-            parts=[
+            parts=(
                 NarrationTermRef(
                     term_id=TermId('file-glossary'),
                     display='File glossary',
                     expression='pg["File glossary"]',
-                )
-            ],
+                ),
+            ),
         ),
     )
     assert (

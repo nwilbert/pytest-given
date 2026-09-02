@@ -186,7 +186,7 @@ def _term_ref_step(term):
         step,
         narration=Narration(
             text=f'a {term}',
-            parts=[NarrationTermRef(term_id=id_derive(term), display=term)],
+            parts=(NarrationTermRef(term_id=id_derive(term), display=term),),
         ),
     )
 
@@ -236,9 +236,9 @@ def test_dead_term_passes_term_referenced_by_a_scenario_name() -> None:
         scenario,
         narration=Narration(
             text='about Ghost term',
-            parts=[
-                NarrationTermRef(term_id=id_derive('Ghost term'), display='Ghost term')
-            ],
+            parts=(
+                NarrationTermRef(term_id=id_derive('Ghost term'), display='Ghost term'),
+            ),
         ),
     )
     assert _dead_term_findings(_glossary('Ghost term'), grouped=[scenario]) == []

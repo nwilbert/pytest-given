@@ -147,12 +147,12 @@ def test_suffixed_glossary_name_keeps_its_term_ref_and_carries_the_suffix() -> N
     text still reads as what the parts render."""
     name = Narration(
         text='Barista brews',
-        parts=[
+        parts=(
             NarrationTermRef(
                 term_id=TermId('barista'), display='Barista', expression='pg["Barista"]'
             ),
             NarrationLiteral(value=' brews'),
-        ],
+        ),
     )
     scenarios, param_info = _opted_out_group(name, values=(200,), statuses=('passed',))
 

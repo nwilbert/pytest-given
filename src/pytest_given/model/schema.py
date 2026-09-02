@@ -73,7 +73,7 @@ class Narration:
     """
 
     text: str
-    parts: list[NarrationPart] = field(default_factory=list)
+    parts: tuple[NarrationPart, ...] = ()
 
 
 # What a glossary term is: who acts, what is acted on, or the action itself.

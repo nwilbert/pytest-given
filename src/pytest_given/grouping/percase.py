@@ -85,7 +85,7 @@ def _suffixed(narration: Narration, suffix: str) -> Narration:
     """The parametrize id appended as text and, when the narration is built
     from parts, as one more literal — so a term ref survives the suffixing and
     the text still reads as what the parts render."""
-    parts = list(narration.parts)
+    parts = narration.parts
     if parts:
-        parts.append(NarrationLiteral(value=f' {suffix}'))
+        parts = (*parts, NarrationLiteral(value=f' {suffix}'))
     return Narration(text=f'{narration.text} {suffix}', parts=parts)

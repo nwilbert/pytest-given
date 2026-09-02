@@ -57,7 +57,7 @@ def test_templatize_narration_rejects_unknown_placeholder() -> None:
     Template can't happen since given/when/then reject Template). The runtime
     guard covers any future code path that might construct parts directly."""
     narration = Narration(
-        text='', parts=[NarrationPlaceholder(name='cup_zize', column_id='cup_zize')]
+        text='', parts=(NarrationPlaceholder(name='cup_zize', column_id='cup_zize'),)
     )
     with pytest.raises(PytestGivenError, match='cup_zize'):
         templatize.templatize_narration(narration, _promotion(['cup_size']))
@@ -208,14 +208,14 @@ def test_templatize_keeps_a_scenario_name_term_ref_verbatim() -> None:
     """
     narration = Narration(
         text='Alice arrives',
-        parts=[
+        parts=(
             NarrationTermRef(
                 term_id=TermId('guest'),
                 display='Alice',
                 expression='guest',
             ),
             NarrationLiteral(value=' arrives'),
-        ],
+        ),
     )
     for param_names in (['guest'], ['euros']):
         out = templatize.templatize_narration(narration, _promotion(param_names))
@@ -553,7 +553,7 @@ def _value_step(
         phase='then',
         narration=Narration(
             text=f'the drink costs {rendered} euros',
-            parts=[
+            parts=(
                 NarrationLiteral(value='the drink costs '),
                 NarrationValue(
                     rendered=rendered,
@@ -562,7 +562,7 @@ def _value_step(
                     conversion=conversion,
                 ),
                 NarrationLiteral(value=' euros'),
-            ],
+            ),
         ),
     )
 
@@ -625,7 +625,7 @@ def test_a_plain_str_steps_text_survives_grouping_when_another_step_promotes() -
     scenarios, info = _two_case_group(steps('2.0'), steps('3.5'))
     grouped = group_parametrized(scenarios, info)[0]
     assert grouped.steps[0].narration.text == 'a fresh cup'
-    assert grouped.steps[0].narration.parts == []
+    assert grouped.steps[0].narration.parts == ()
 
 
 def test_a_param_placeholders_step_text_is_rebuilt_too() -> None:
@@ -635,7 +635,7 @@ def test_a_param_placeholders_step_text_is_rebuilt_too() -> None:
         phase='when',
         narration=Narration(
             text='I insert $   200',
-            parts=[
+            parts=(
                 NarrationLiteral(value='I insert $'),
                 NarrationValue(
                     rendered='   200',
@@ -643,14 +643,14 @@ def test_a_param_placeholders_step_text_is_rebuilt_too() -> None:
                     format_spec='>6',
                     conversion='r',
                 ),
-            ],
+            ),
         ),
     )
     other = dataclasses.replace(
         step,
         narration=Narration(
             text='I insert $   350',
-            parts=[
+            parts=(
                 NarrationLiteral(value='I insert $'),
                 NarrationValue(
                     rendered='   350',
@@ -658,7 +658,7 @@ def test_a_param_placeholders_step_text_is_rebuilt_too() -> None:
                     format_spec='>6',
                     conversion='r',
                 ),
-            ],
+            ),
         ),
     )
     scenarios, info = _two_case_group([step], [other])
@@ -716,11 +716,11 @@ def test_rule_two_names_the_violating_steps_own_phase() -> None:
                 phase='given',
                 narration=Narration(
                     text='a 2.0 euro cup',
-                    parts=[
+                    parts=(
                         NarrationLiteral(value='a '),
                         NarrationValue(rendered='2.0', expression='cup_size * 0.01'),
                         NarrationLiteral(value=' euro cup'),
-                    ],
+                    ),
                 ),
             )
         ],
@@ -729,11 +729,11 @@ def test_rule_two_names_the_violating_steps_own_phase() -> None:
                 phase='given',
                 narration=Narration(
                     text='a 3.5 euro cup',
-                    parts=[
+                    parts=(
                         NarrationLiteral(value='a '),
                         NarrationValue(rendered='3.5', expression='cup_size * 0.01'),
                         NarrationLiteral(value=' euro cup'),
-                    ],
+                    ),
                 ),
             )
         ],
@@ -798,24 +798,24 @@ def test_derived_column_ids_are_assigned_pre_order_across_nesting() -> None:
                 phase='then',
                 narration=Narration(
                     text=f'the drink costs {parent_price} euros',
-                    parts=[
+                    parts=(
                         NarrationLiteral(value='the drink costs '),
                         NarrationValue(rendered=parent_price, expression='price'),
                         NarrationLiteral(value=' euros'),
-                    ],
+                    ),
                 ),
                 children=[
                     Step(
                         phase='then',
                         narration=Narration(
                             text=f'a {child_discount} discount applies',
-                            parts=[
+                            parts=(
                                 NarrationLiteral(value='a '),
                                 NarrationValue(
                                     rendered=child_discount, expression='discount'
                                 ),
                                 NarrationLiteral(value=' discount applies'),
-                            ],
+                            ),
                         ),
                     ),
                 ],
@@ -911,14 +911,14 @@ def test_a_step_placeholder_naming_an_unknown_column_raises() -> None:
         phase='given',
         narration=Narration(
             text='',
-            parts=[NarrationPlaceholder(name='cup_zize', column_id='cup_zize')],
+            parts=(NarrationPlaceholder(name='cup_zize', column_id='cup_zize'),),
         ),
     )
     other = Step(
         phase='given',
         narration=Narration(
             text='',
-            parts=[NarrationPlaceholder(name='cup_zize', column_id='cup_zize')],
+            parts=(NarrationPlaceholder(name='cup_zize', column_id='cup_zize'),),
         ),
     )
     scenarios, info = _two_case_group([step], [other])
@@ -934,11 +934,11 @@ def test_a_same_length_case_with_a_different_part_kind_refuses_the_merge() -> No
         phase='then',
         narration=Narration(
             text='the drink costs 2.0 euros',
-            parts=[
+            parts=(
                 NarrationLiteral(value='the drink costs '),
                 NarrationLiteral(value='2.0'),
                 NarrationLiteral(value=' euros'),
-            ],
+            ),
         ),
     )
     scenarios, info = _two_case_group([_value_step('2.0')], [other_step])
@@ -959,7 +959,7 @@ def test_a_grouped_steps_text_rebuild_covers_every_part_kind() -> None:
             phase='then',
             narration=Narration(
                 text=f'cost {price} for Alice at 1.2 with Bob tax',
-                parts=[
+                parts=(
                     NarrationLiteral(value='cost '),
                     NarrationValue(rendered=price, expression='price'),
                     NarrationLiteral(value=' for '),
@@ -973,7 +973,7 @@ def test_a_grouped_steps_text_rebuild_covers_every_part_kind() -> None:
                         term_id=TermId('host'), display='Bob', expression='unrelated'
                     ),
                     NarrationLiteral(value=' tax'),
-                ],
+                ),
             ),
         )
 
@@ -991,12 +991,12 @@ def test_templatize_narration_converts_a_matching_value_to_a_placeholder() -> No
     a placeholder; one that doesn't match stays an inline value."""
     narration = Narration(
         text='Brew 200 ml for $12.5',
-        parts=[
+        parts=(
             NarrationLiteral(value='Brew '),
             NarrationValue(rendered='200', expression='cup_size'),
             NarrationLiteral(value=' ml for $'),
             NarrationValue(rendered='12.5', expression='price'),
-        ],
+        ),
     )
     out = templatize.templatize_narration(narration, _promotion(['cup_size']))
     placeholder = out.parts[1]
@@ -1012,7 +1012,7 @@ def _param_value_step(
         phase='when',
         narration=Narration(
             text=f'the machine brews {rendered} ml',
-            parts=[
+            parts=(
                 NarrationLiteral(value='the machine brews '),
                 NarrationValue(
                     rendered=rendered,
@@ -1021,7 +1021,7 @@ def _param_value_step(
                     conversion=conv,
                 ),
                 NarrationLiteral(value=' ml'),
-            ],
+            ),
         ),
     )
 
@@ -1273,7 +1273,7 @@ def test_rule_three_applies_the_conversion_before_comparing() -> None:
             phase='when',
             narration=Narration(
                 text=f'the guest is {rendered}',
-                parts=[
+                parts=(
                     NarrationLiteral(value='the guest is '),
                     NarrationValue(
                         rendered=rendered,
@@ -1281,7 +1281,7 @@ def test_rule_three_applies_the_conversion_before_comparing() -> None:
                         format_spec='>8',
                         conversion='r',
                     ),
-                ],
+                ),
             ),
         )
 
@@ -1320,12 +1320,12 @@ def test_rule_three_reformats_a_non_scalar_parameter() -> None:
             phase='when',
             narration=Narration(
                 text=f'it happens in {rendered}',
-                parts=[
+                parts=(
                     NarrationLiteral(value='it happens in '),
                     NarrationValue(
                         rendered=rendered, expression='when', format_spec='%Y'
                     ),
-                ],
+                ),
             ),
         )
 
@@ -1526,12 +1526,12 @@ def _term_ref_step(
         phase='given',
         narration=Narration(
             text=f'{display} places an order',
-            parts=[
+            parts=(
                 NarrationTermRef(
                     term_id=TermId(term_id), display=display, expression=expression
                 ),
                 NarrationLiteral(value=' places an order'),
-            ],
+            ),
         ),
     )
 
@@ -1643,10 +1643,10 @@ def test_a_same_length_term_ref_with_a_different_part_kind_refuses_the_merge() -
         phase='given',
         narration=Narration(
             text='Bob places an order',
-            parts=[
+            parts=(
                 NarrationLiteral(value='Bob'),
                 NarrationLiteral(value=' places an order'),
-            ],
+            ),
         ),
     )
     scenarios, info = _two_case_group(
@@ -1717,27 +1717,27 @@ def test_a_varying_term_ref_in_a_nested_step_raises_rule_four() -> None:
                 phase='given',
                 narration=Narration(
                     text='an order for Coffee',
-                    parts=[
+                    parts=(
                         NarrationTermRef(
                             term_id=TermId('item'),
                             display='Coffee',
                             expression="pg['Item'](item)",
                         ),
                         NarrationLiteral(value=' order'),
-                    ],
+                    ),
                 ),
                 children=[
                     Step(
                         phase='given',
                         narration=Narration(
                             text=f'contains {child_display}',
-                            parts=[
+                            parts=(
                                 NarrationTermRef(
                                     term_id=TermId('item'),
                                     display=child_display,
                                     expression="pg['Item'](item)",
                                 ),
-                            ],
+                            ),
                         ),
                     )
                 ],
@@ -2491,10 +2491,10 @@ def _tstring_step(phase: str, literal: str, expression: str, rendered: str) -> S
         phase=phase,
         narration=Narration(
             text=f'{rendered}{literal}',
-            parts=[
+            parts=(
                 NarrationValue(rendered=rendered, expression=expression),
                 NarrationLiteral(value=literal),
-            ],
+            ),
         ),
     )
 

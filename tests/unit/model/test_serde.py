@@ -390,7 +390,7 @@ def test_narration_literal_part() -> None:
         }
     )
     parts = report.scenarios[0].narration.parts
-    assert parts == [NarrationLiteral(value='hello')]
+    assert parts == (NarrationLiteral(value='hello'),)
 
 
 def test_narration_value_part() -> None:
@@ -423,14 +423,14 @@ def test_narration_value_part() -> None:
         }
     )
     parts = report.scenarios[0].narration.parts
-    assert parts == [
+    assert parts == (
         NarrationValue(
             rendered='12.0',
             expression='price * 1.2',
             format_spec='',
             conversion=None,
-        )
-    ]
+        ),
+    )
 
 
 def test_narration_placeholder_part() -> None:
@@ -463,11 +463,11 @@ def test_narration_placeholder_part() -> None:
         }
     )
     parts = report.scenarios[0].narration.parts
-    assert parts == [
+    assert parts == (
         NarrationPlaceholder(
             name='euros', column_id='euros', format_spec='03d', conversion='r'
-        )
-    ]
+        ),
+    )
 
 
 def test_narration_unknown_part_shape_raises() -> None:
@@ -531,12 +531,12 @@ def test_round_trip_via_to_dict() -> None:
                 id=NodeId('i'),
                 narration=Narration(
                     text='S',
-                    parts=[
+                    parts=(
                         NarrationLiteral(value='Brew '),
                         NarrationPlaceholder(
                             name='cup', column_id='cup', format_spec='', conversion=None
                         ),
-                    ],
+                    ),
                 ),
                 module='m',
                 tags=['t'],
@@ -592,14 +592,14 @@ def test_glossary_round_trips_and_rebuilds_index():
 def test_narration_term_ref_round_trips():
     narration = Narration(
         text='Alice arrives',
-        parts=[
+        parts=(
             NarrationLiteral(value='Hello '),
             NarrationTermRef(
                 term_id=TermId('guest'),
                 display='Alice',
                 expression='guest',
             ),
-        ],
+        ),
     )
     scn = Scenario(id=NodeId('n'), narration=narration, module='m')
     report = ReportData(metadata=_meta(), scenarios=[scn])
@@ -764,10 +764,10 @@ def test_round_trip_preserves_attachment_ref_and_inline_attachment() -> None:
 def test_round_trip_preserves_placeholder_column_id() -> None:
     narration = Narration(
         text='costs {price}',
-        parts=[
+        parts=(
             NarrationLiteral(value='costs '),
             NarrationPlaceholder(name='price', column_id='derived:0'),
-        ],
+        ),
     )
     scenario = Scenario(id=NodeId('t.py::t'), narration=narration, module='m')
     restored = _restored(scenario)
@@ -839,7 +839,7 @@ def _every_field_populated() -> ReportData:
         phase='given',
         narration=Narration(
             text='a Guest with 2 rooms',
-            parts=[
+            parts=(
                 NarrationLiteral(value='a '),
                 NarrationTermRef(
                     term_id=TermId('guest'), display='Guest', expression='pg'
@@ -853,7 +853,7 @@ def _every_field_populated() -> ReportData:
                     conversion='s',
                     format_spec='>4',
                 ),
-            ],
+            ),
         ),
         attachments=[
             Attachment(label='payload', content='{"a": 1}', content_type='json'),
@@ -869,7 +869,7 @@ def _every_field_populated() -> ReportData:
     scenario = Scenario(
         id=NodeId('t.py::test_a[1]'),
         narration=Narration(
-            text='A booking', parts=[NarrationLiteral(value='A booking')]
+            text='A booking', parts=(NarrationLiteral(value='A booking'),)
         ),
         module='t',
         tags=['smoke'],

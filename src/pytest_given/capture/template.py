@@ -1,7 +1,7 @@
 """Step text: the authoring forms, what they parse to, and the two rules
 that apply to a decorator-time t-string."""
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from string import Formatter, templatelib
 from typing import assert_never
 
@@ -63,7 +63,7 @@ def narration_from(value: StepText | Narration) -> Narration:
         # placeholder renders as its bare `{name}` token, so `'{amount:.2f}'`
         # would otherwise leave a `text` carrying a spec that nothing displays
         # — and `text` is what the report's search box and a `jq` query read.
-        parts = list(value.parts)
+        parts = tuple(value.parts)
         return Narration(text=narration_text(parts), parts=parts)
     return Narration(text=value)
 
@@ -98,7 +98,7 @@ class Template:
                         conversion=conversion,
                     )
                 )
-        self.parts: list[NarrationPart] = parts
+        self.parts: tuple[NarrationPart, ...] = tuple(parts)
 
     def get_identifiers(self) -> list[str]:
         return [p.name for p in self.parts if isinstance(p, NarrationPlaceholder)]
@@ -106,7 +106,7 @@ class Template:
 
 def parse_tstring(
     tstring: templatelib.Template,
-) -> tuple[str, list[NarrationPart]]:
+) -> tuple[str, tuple[NarrationPart, ...]]:
     """Convert a t-string Template into (rendered text, structured parts).
 
     An interpolation of a glossary handle (or one of its instances) records a
@@ -143,7 +143,7 @@ def parse_tstring(
                     )
                 )
                 rendered_chunks.append(rendered)
-    return ''.join(rendered_chunks), parts
+    return ''.join(rendered_chunks), tuple(parts)
 
 
 def try_term_ref(
@@ -178,9 +178,9 @@ def try_term_ref(
 
 
 def resolve_template_parts(
-    parts: list[NarrationPart],
+    parts: Sequence[NarrationPart],
     mapping: Mapping[str, object],
-) -> list[NarrationPart]:
+) -> tuple[NarrationPart, ...]:
     """Each `Template` part resolved against the value bound to its name."""
     out: list[NarrationPart] = []
     for part in parts:
@@ -194,7 +194,7 @@ def resolve_template_parts(
                 out.append(resolved_placeholder_part(part, mapping[name]))
             case _:
                 assert_never(part)
-    return out
+    return tuple(out)
 
 
 def resolved_placeholder_part(

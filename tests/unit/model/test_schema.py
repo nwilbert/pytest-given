@@ -45,7 +45,7 @@ def test_step_defaults() -> None:
     step = Step(phase='given', narration=_n('a coffee machine'))
     assert step.phase == 'given'
     assert step.narration.text == 'a coffee machine'
-    assert step.narration.parts == []
+    assert step.narration.parts == ()
     assert step.children == []
     assert step.attachments == []
     assert step.fixture_name is None
@@ -164,7 +164,7 @@ def test_fixture_recording_holds_root_step_and_stack() -> None:
 
 def test_step_narration_defaults_to_plain_text() -> None:
     step = Step(phase='given', narration=_n('hello'))
-    assert step.narration.parts == []
+    assert step.narration.parts == ()
 
 
 def test_step_narration_accepts_parts() -> None:
@@ -179,7 +179,7 @@ def test_step_narration_accepts_parts() -> None:
 
 def test_scenario_narration_defaults_to_plain_text() -> None:
     s = Scenario(id='id', narration=_n('hello'), module='m')
-    assert s.narration.parts == []
+    assert s.narration.parts == ()
 
 
 def test_scenario_skip_reason_defaults_to_none() -> None:

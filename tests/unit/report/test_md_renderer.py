@@ -185,12 +185,12 @@ def test_narration_parts_resolve_terms_and_values() -> None:
                     phase='when',
                     narration=Narration(
                         text='fallback',
-                        parts=[
+                        parts=(
                             NarrationLiteral(value='a '),
                             NarrationTermRef(term_id='guest', display='Guest'),
                             NarrationValue(rendered='42', expression='n'),
                             NarrationPlaceholder(name='amount', column_id='amount'),
-                        ],
+                        ),
                     ),
                 )
             ],
