@@ -23,7 +23,7 @@ from ..model import (
     Story,
     StoryId,
     TermId,
-    walk_steps,
+    iter_steps,
 )
 from .coverage import (
     CoverageMap,
@@ -382,7 +382,7 @@ def build_glossary_views(report: ReportData) -> GlossaryViews:
 
 def _scenario_narrations(scenario: Scenario) -> Iterator[tuple[Narration, str | None]]:
     yield scenario.narration, None
-    for _path, step in walk_steps(scenario.steps):
+    for step in iter_steps(scenario.steps):
         yield step.narration, step.fixture_name
 
 
