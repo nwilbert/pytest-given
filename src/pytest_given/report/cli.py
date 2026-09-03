@@ -45,21 +45,6 @@ def add_report_parser(
 
 
 def run_report(args: argparse.Namespace) -> int:
-    return render_saved_report(
-        json_file=args.json_file,
-        output=args.output,
-        source_link=args.source_link,
-        fmt=args.format,
-    )
-
-
-def render_saved_report(
-    *,
-    json_file: Path,
-    output: Path | None,
-    source_link: str,
-    fmt: str | None,
-) -> int:
     """Render a saved JSON report to HTML or Markdown.
 
     Goes through `SinkConfig` rather than calling a renderer directly, so this
@@ -68,11 +53,12 @@ def render_saved_report(
     takes the stale previous report with it. Input and output problems are
     reported as CLI errors rather than tracebacks.
     """
+    json_file: Path = args.json_file
     if not json_file.exists():
         print(f'Error: {json_file} not found', file=sys.stderr)
         return 1
     try:
-        config = _sink_config(output, source_link, fmt)
+        config = _sink_config(args.output, args.source_link, args.format)
         report, report_dict = _load_report(json_file)
         rendered = render_sinks(report, report_dict, config)
     except json.JSONDecodeError as error:
