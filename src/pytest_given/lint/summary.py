@@ -9,10 +9,6 @@ def error_count(findings: list[Finding]) -> int:
     return sum(1 for finding in findings if finding.severity == 'error')
 
 
-def has_errors(findings: list[Finding]) -> bool:
-    return any(finding.severity == 'error' for finding in findings)
-
-
 def summary_title(findings: list[Finding]) -> str:
     """The separator headline: how much was found, and how much of it fails."""
     errors = error_count(findings)

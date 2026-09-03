@@ -16,7 +16,7 @@ from .config import (
     parse_lint_config,
 )
 from .runtime_rules import run_runtime_rules
-from .summary import error_count, has_errors, summary_rows, summary_title
+from .summary import error_count, summary_rows, summary_title
 
 __all__ = [
     'DEFAULTS',
@@ -29,7 +29,6 @@ __all__ = [
     'Severity',
     'apply_config',
     'error_count',
-    'has_errors',
     'parse_lint_config',
     'run_ast_rules',
     'run_runtime_rules',

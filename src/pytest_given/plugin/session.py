@@ -25,7 +25,6 @@ from ..lint import (
     Finding,
     apply_config,
     error_count,
-    has_errors,
     run_ast_rules,
     run_runtime_rules,
     summary_rows,
@@ -226,7 +225,7 @@ def _run_lint(session: pytest.Session, exitstatus: int, built: _SessionReport) -
     if not findings:
         return
     session_outcome(config).findings = findings
-    if has_errors(findings):
+    if error_count(findings):
         _fail_run(session, exitstatus)
 
 
