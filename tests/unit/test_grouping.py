@@ -2688,3 +2688,38 @@ def test_a_formatted_step_slot_over_a_term_instance_falls_back_to_the_display() 
     slot = grouped.steps[0].narration.parts[1]
     assert isinstance(slot, NarrationPlaceholder)
     assert slot.column_id == 'who'
+
+
+def _sig_step(phase: str, text: str, children: list[Step] | None = None) -> Step:
+    return Step(
+        phase=phase,  # type: ignore[arg-type]
+        narration=Narration(text=text),
+        children=children or [],
+    )
+
+
+def _sig_tree() -> list[Step]:
+    return [
+        _sig_step('given', 'a', [_sig_step('given', 'a1'), _sig_step('when', 'a2')]),
+        _sig_step('then', 'b'),
+    ]
+
+
+def test_structure_signature_ignores_narration() -> None:
+    other = [
+        _sig_step(
+            'given', 'different', [_sig_step('given', 'x'), _sig_step('when', 'y')]
+        ),
+        _sig_step('then', 'also different'),
+    ]
+    assert checks.structure_signature(_sig_tree()) == checks.structure_signature(other)
+
+
+def test_structure_signature_separates_different_shapes() -> None:
+    assert checks.structure_signature(_sig_tree()) != checks.structure_signature(
+        [_sig_step('given', 'a')]
+    )
+
+
+def test_structure_signature_of_an_empty_tree_is_empty() -> None:
+    assert checks.structure_signature([]) == ()
