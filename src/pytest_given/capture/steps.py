@@ -293,7 +293,13 @@ class StepDescriptor:
         return collector
 
     def _check_tstring_decorator_safety(self) -> None:
-        reject_baked_values(self.narration, f'@{self.phase}', 'module load')
+        reject_baked_values(
+            self.narration,
+            f'@{self.phase}',
+            'module load',
+            'move the text into the test body (with given/when/then(t"...")) '
+            'where the value is in scope',
+        )
 
     def _validate_template_against_signature(
         self, func: Callable[..., object]

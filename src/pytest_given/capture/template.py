@@ -27,12 +27,18 @@ type StepText = str | templatelib.Template | Template
 type ResolvedName = str | Template | Narration
 
 
-def reject_baked_values(narration: Narration, form: str, when: str) -> None:
+def reject_baked_values(
+    narration: Narration, form: str, when: str, remedy: str
+) -> None:
     """Refuse a decorator-time t-string that interpolates a non-glossary value.
 
     Such a t-string evaluates once, at *when*, so the value is frozen into
     every recorded step. Glossary handles render as term refs and are safe to
     bake in — they identify a concept, not a per-call datum.
+
+    Detection and the two remedies both forms share are stated here; *remedy*
+    is the caller's own third, because what a step's text can fall back to and
+    what a scenario *name* can are not the same thing.
     """
     for part in narration.parts:
         if not isinstance(part, NarrationValue):
@@ -44,8 +50,7 @@ def reject_baked_values(narration: Narration, form: str, when: str) -> None:
             f'is baked in. Use a glossary handle '
             f'(g.actor/g.work_object/g.verb) for a term reference; '
             f"pytest_given.Template('...{{{part.expression}}}...') for a "
-            f'value bound per call; or move the text into the test body '
-            f'(with given/when/then(t"...")) where the value is in scope.'
+            f'value bound per call; or {remedy}.'
         )
 
 

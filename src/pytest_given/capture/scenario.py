@@ -67,7 +67,12 @@ def scenario(
         # Glossary handles are in scope at import time and render eagerly to
         # term refs; a parametrize value is not, so it would be baked in.
         resolved_name = narration_from(name)
-        reject_baked_values(resolved_name, '@scenario', 'module import')
+        reject_baked_values(
+            resolved_name,
+            '@scenario',
+            'module import',
+            'a plain string for a static name',
+        )
     else:
         resolved_name = name
     if story is not None and not isinstance(story, Story):
