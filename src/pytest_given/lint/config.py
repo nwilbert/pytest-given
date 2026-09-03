@@ -95,13 +95,30 @@ def parse_ignore_entries(lines: list[str]) -> list[IgnoreEntry]:
     return entries
 
 
+def enabled_rules(config: LintConfig) -> frozenset[RuleId]:
+    """The rules whose effective level is not ``off``.
+
+    Handed to the rule runners so a disabled rule does not run at all, which
+    is what the spec means by ``off``. Resolving severities afterwards still
+    drops an ``off`` finding — `apply_config` stays the authority for a caller
+    that assembled findings itself — but nothing computes one in a normal run.
+    """
+    effective = DEFAULTS | config.levels
+    return frozenset(rule for rule, level in effective.items() if level != 'off')
+
+
 def apply_config(findings: list[RawFinding], config: LintConfig) -> list[Finding]:
     """Resolve raw rule findings against the configuration, in report order.
 
     Rules configured ``off`` are dropped *before* ignore matching, so an entry
-    scoped to a disabled rule counts as stale. Every entry that suppressed
-    nothing earns an error-level ``stale-ignore`` finding, appended after the
-    errors-first, then file/line ordering.
+    scoped to a disabled rule counts as stale — the same outcome as a rule the
+    runners skipped for being off, which produces no finding to suppress.
+
+    The ordering lives here, not in `summary`, because it cannot be
+    reconstructed downstream: the ``stale-ignore`` findings are appended
+    *after* the sort so they come last, and they carry no location, so a
+    consumer re-sorting the whole list would pull them to the front.
+    `summary_rows` renders the order it is given.
     """
     effective = DEFAULTS | config.levels
     used: set[int] = set()
@@ -135,13 +152,7 @@ def apply_config(findings: list[RawFinding], config: LintConfig) -> list[Finding
 
 
 def _resolved(raw: RawFinding, level: Severity) -> Finding:
-    return Finding(
-        rule=raw.rule,
-        severity=level,
-        subject=raw.subject,
-        location=raw.location,
-        message=raw.message,
-    )
+    return Finding(**vars(raw), severity=level)
 
 
 def _report_order(finding: Finding) -> tuple[int, str, int, str, str]:

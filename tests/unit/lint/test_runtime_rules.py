@@ -55,7 +55,7 @@ def _phases_scenario(node_id, phases, *, status='passed', steps=None, tags=None)
 
 
 def _runtime(grouped=(), glossary=None, stories=()):
-    return run_runtime_rules(list(grouped), glossary, list(stories))
+    return run_runtime_rules(list(grouped), glossary, list(stories), set(DEFAULTS))
 
 
 @scenario(

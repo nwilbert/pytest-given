@@ -1,6 +1,7 @@
 """Runtime-surface rules: pure inspection of the recorded report model, no
 source access needed."""
 
+from collections.abc import Container
 from dataclasses import dataclass
 
 from ..model import (
@@ -23,14 +24,24 @@ def run_runtime_rules(
     grouped: list[Scenario],
     glossary: Glossary | None,
     stories: list[Story],
+    enabled: Container[RuleId],
 ) -> list[RawFinding]:
-    """Every rule here evaluates the grouped scenario list — one evaluation
-    per logical scenario."""
+    """Every `enabled` rule here evaluates the grouped scenario list — one
+    evaluation per logical scenario.
+
+    A rule that is off is not evaluated at all. `dead-term` ships off and
+    walks every narration part of every scenario plus every activity path of
+    every story, so computing its findings only to discard them was the bulk
+    of the lint's cost on a default run.
+    """
     findings: list[RawFinding] = []
-    findings.extend(_missing_phase_findings(grouped))
+    if MISSING_PHASE in enabled:
+        findings.extend(_missing_phase_findings(grouped))
     if glossary is not None:
-        findings.extend(_tag_shadows_term_findings(grouped, glossary))
-        findings.extend(_dead_term_findings(grouped, glossary, stories))
+        if TAG_SHADOWS_TERM in enabled:
+            findings.extend(_tag_shadows_term_findings(grouped, glossary))
+        if DEAD_TERM in enabled:
+            findings.extend(_dead_term_findings(grouped, glossary, stories))
     return findings
 
 
@@ -84,6 +95,12 @@ def _tag_shadows_term_findings(
     shadowing: dict[TermId, _ShadowingTag] = {}
     for scenario in grouped:
         for tag in scenario.tags:
+            # Tags are stored as written, and `id_derive` raises on a name it
+            # cannot slugify — which from here would escape as a bare
+            # traceback. A tag with no derivable slug also cannot collide with
+            # a term id, so there is nothing to check.
+            if not _slugifiable(tag):
+                continue
             slug = TermId(id_derive(tag))
             if glossary.get(slug) is None:
                 continue
@@ -149,3 +166,8 @@ def _scenario_finding(rule: RuleId, scenario: Scenario, text: str) -> RawFinding
         location=scenario.source,
         message=text,
     )
+
+
+def _slugifiable(name: str) -> bool:
+    """Whether `id_derive` will return a slug for `name` rather than raise."""
+    return any(char.isascii() and char.isalnum() for char in name)

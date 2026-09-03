@@ -1,5 +1,9 @@
 """The terminal presentation of a run's lint findings — the title, the aligned
-rows, the error tally. The plugin owns the writing and the exit code."""
+rows, the error tally. The plugin owns the writing and the exit code.
+
+Not the order: `config.apply_config` sorts, because it is the only place that
+can (see its docstring). Everything here renders the sequence it is handed.
+"""
 
 from ..model import location_suffix
 from .base import Finding

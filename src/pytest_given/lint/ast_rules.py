@@ -4,7 +4,7 @@ body is inspected for structural lies."""
 
 import ast
 import keyword
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Container, Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -36,30 +36,46 @@ from .base import (
 type _BodyNode = ast.With | ast.FunctionDef | ast.AsyncFunctionDef
 
 
-def run_ast_rules(scenarios: list[Scenario], rootdir: Path) -> list[RawFinding]:
-    """Run the AST-surface rules over every step that carries a source anchor.
+def run_ast_rules(
+    scenarios: list[Scenario], rootdir: Path, enabled: Container[RuleId]
+) -> list[RawFinding]:
+    """Run the `enabled` AST-surface rules over every step with a source anchor.
 
     Each file is parsed once (cached across scenarios) and every anchored step
     resolves to its `with` statement or helper `FunctionDef` by recorded line.
     Failure-tolerant by design: an unreadable or unparseable file, or a line
     with no matching node, silently skips that step's rules — lint must never
     crash the run.
+
+    Nothing is parsed when every rule here is off: the whole point of `off` is
+    that the rule does not run, and reading and parsing every test file to
+    build findings that would then be discarded is the expensive half.
     """
+    step_rules = [(rule, fn) for rule, fn in _STEP_RULES if rule in enabled]
+    scenario_rules = [(rule, fn) for rule, fn in _SCENARIO_RULES if rule in enabled]
+    if not step_rules and not scenario_rules:
+        return []
     indexes: dict[str, dict[int, _BodyNode] | None] = {}
     findings: list[RawFinding] = []
     for scenario in scenarios:
         scan = _scan_scenario(scenario, rootdir, indexes)
         for resolved in scan.steps:
-            for step_rule in _STEP_RULES:
+            for _rule, step_rule in step_rules:
                 findings.extend(step_rule(resolved, scan))
-        for scenario_rule in _SCENARIO_RULES:
+        for _rule, scenario_rule in scenario_rules:
             findings.extend(scenario_rule(scan))
     return findings
 
 
 @dataclass(frozen=True, kw_only=True)
-class _Anchored:
-    """A step carrying a source anchor, tagged with its `when_then` role."""
+class _Resolved:
+    """A step carrying a source anchor, the AST node its body resolved to, and
+    its `when_then` role.
+
+    A `when_then` pair is recognized as sibling `when`+`then` steps sharing
+    one anchor — unambiguous, because cross-phase nesting is rejected at
+    record time, so no other construct produces that shape.
+    """
 
     node_id: NodeId
     path: StepPath
@@ -67,21 +83,6 @@ class _Anchored:
     source: SourceLocation
     pair_when: bool
     pair_then: bool
-
-
-@dataclass(frozen=True, kw_only=True)
-class _Resolved(_Anchored):
-    """An anchored step paired with the AST node its body resolved to.
-
-    Extends `_Anchored` rather than restating its fields, so the `**vars()`
-    splat that builds one supplies exactly the base's own fields by
-    construction.
-
-    A `when_then` pair is recognized as sibling `when`+`then` steps sharing
-    one anchor — unambiguous, because cross-phase nesting is rejected at
-    record time, so no other construct produces that shape.
-    """
-
     node: _BodyNode
 
 
@@ -100,53 +101,53 @@ def _scan_scenario(
     rootdir: Path,
     indexes: dict[str, dict[int, _BodyNode] | None],
 ) -> _Scan:
-    steps: list[_Resolved] = []
-    for anchored in _anchored_steps(scenario):
-        relpath = anchored.source.relpath
-        if relpath not in indexes:
-            indexes[relpath] = _index_body_nodes(rootdir / relpath)
-        index = indexes[relpath]
-        node = index.get(anchored.source.line) if index is not None else None
-        if node is not None:
-            steps.append(_Resolved(**vars(anchored), node=node))
-    return _Scan(
-        scenario=scenario,
-        steps=steps,
-        by_path={resolved.path: resolved for resolved in steps},
-    )
-
-
-def _anchored_steps(scenario: Scenario) -> Iterator[_Anchored]:
-    """Every step carrying a source anchor, tagged with its `when_then` role.
+    """Every step of `scenario` that carries a source anchor *and* resolves to
+    an AST node, tagged with its `when_then` role.
 
     Siblings are reached through the path index rather than by walking a level
     at a time: a step's neighbours are the paths differing only in the last
     component.
     """
     by_path = dict(walk_steps(scenario.steps))
+    steps: list[_Resolved] = []
     for path, step in by_path.items():
-        if step.source is None:
+        source = step.source
+        if source is None:
+            continue
+        if source.relpath not in indexes:
+            indexes[source.relpath] = _index_body_nodes(rootdir / source.relpath)
+        index = indexes[source.relpath]
+        node = index.get(source.line) if index is not None else None
+        if node is None:
             continue
         before = by_path.get((*path[:-1], path[-1] - 1)) if path[-1] else None
         after = by_path.get((*path[:-1], path[-1] + 1))
-        yield _Anchored(
-            node_id=scenario.id,
-            path=path,
-            step=step,
-            source=step.source,
-            pair_when=(
-                step.phase == 'when'
-                and after is not None
-                and after.phase == 'then'
-                and after.source == step.source
-            ),
-            pair_then=(
-                step.phase == 'then'
-                and before is not None
-                and before.phase == 'when'
-                and before.source == step.source
-            ),
+        steps.append(
+            _Resolved(
+                node_id=scenario.id,
+                path=path,
+                step=step,
+                source=source,
+                pair_when=(
+                    step.phase == 'when'
+                    and after is not None
+                    and after.phase == 'then'
+                    and after.source == source
+                ),
+                pair_then=(
+                    step.phase == 'then'
+                    and before is not None
+                    and before.phase == 'when'
+                    and before.source == source
+                ),
+                node=node,
+            )
         )
+    return _Scan(
+        scenario=scenario,
+        steps=steps,
+        by_path={resolved.path: resolved for resolved in steps},
+    )
 
 
 def _index_body_nodes(path: Path) -> dict[int, _BodyNode] | None:
@@ -310,14 +311,18 @@ def _action_in_then(scan: _Scan) -> Iterable[RawFinding]:
 type _StepRule = Callable[[_Resolved, _Scan], Iterable[RawFinding]]
 type _ScenarioRule = Callable[[_Scan], Iterable[RawFinding]]
 
-_STEP_RULES: tuple[_StepRule, ...] = (
-    _empty_step,
-    _then_without_check,
-    _check_outside_then,
-    _unused_interpolation,
+# Each rule paired with its id, so `run_ast_rules` can drop the ones that are
+# off before it parses anything.
+_STEP_RULES: tuple[tuple[RuleId, _StepRule], ...] = (
+    (EMPTY_STEP, _empty_step),
+    (THEN_WITHOUT_CHECK, _then_without_check),
+    (CHECK_OUTSIDE_THEN, _check_outside_then),
+    (UNUSED_INTERPOLATION, _unused_interpolation),
 )
 
-_SCENARIO_RULES: tuple[_ScenarioRule, ...] = (_action_in_then,)
+_SCENARIO_RULES: tuple[tuple[RuleId, _ScenarioRule], ...] = (
+    (ACTION_IN_THEN, _action_in_then),
+)
 
 
 def _step_finding(rule: RuleId, resolved: _Resolved, problem: str) -> RawFinding:

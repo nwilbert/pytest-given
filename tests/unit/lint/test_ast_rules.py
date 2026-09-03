@@ -2,11 +2,13 @@
 
 import dataclasses
 import textwrap
+from collections.abc import Container
+from pathlib import Path
 
 import pytest
 
 from pytest_given import attach, given, scenario, then, when
-from pytest_given.lint import DEFAULTS, RuleId, run_ast_rules
+from pytest_given.lint import DEFAULTS, RawFinding, RuleId, run_ast_rules
 from pytest_given.model import (
     Narration,
     NarrationPlaceholder,
@@ -19,6 +21,18 @@ from pytest_given.model import (
     TermId,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
+
+
+def _ast_rules(
+    scenarios: list[Scenario], rootdir: Path, enabled: Container[RuleId] = DEFAULTS
+) -> list[RawFinding]:
+    """`run_ast_rules` with every catalogued rule enabled.
+
+    The runner takes the enabled set so an `off` rule never runs; these tests
+    are about what each rule reports when it does, so they all opt in.
+    """
+    return run_ast_rules(scenarios, rootdir, enabled)
+
 
 # --- AST pass: anchoring, when_then pairs, rules 1-2 ---
 
@@ -78,7 +92,7 @@ def test_empty_step_fires_on_pass_only_body(tmp_path) -> None:
         with_line = _line(src, "with given('a value')")
         empty = _scenario([_step('given', 'a value', with_line)])
     with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
-        findings = run_ast_rules([empty], tmp_path)
+        findings = _ast_rules([empty], tmp_path)
     with then(t'an empty-step {pg["Finding"].low} points at the {pg["Step"].low} line'):
         [finding] = findings
         assert finding.rule == RuleId('empty-step')
@@ -100,7 +114,7 @@ def test_empty_step_fires_on_docstring_and_ellipsis_only_body(tmp_path) -> None:
         ''',
     )
     scenario = _scenario([_step('given', 'a value', _line(src, 'with given'))])
-    [finding] = run_ast_rules([scenario], tmp_path)
+    [finding] = _ast_rules([scenario], tmp_path)
     assert finding.rule == RuleId('empty-step')
 
 
@@ -114,7 +128,7 @@ def test_empty_step_passes_with_real_statement(tmp_path) -> None:
         """,
     )
     scenario = _scenario([_step('given', 'a value', _line(src, 'with given'))])
-    assert run_ast_rules([scenario], tmp_path) == []
+    assert _ast_rules([scenario], tmp_path) == []
 
 
 def test_empty_step_parent_with_nested_step_child_does_not_fire(tmp_path) -> None:
@@ -129,7 +143,7 @@ def test_empty_step_parent_with_nested_step_child_does_not_fire(tmp_path) -> Non
     )
     inner = _step('given', 'inner', _line(src, "with given('inner')"))
     outer = _step('given', 'outer', _line(src, "with given('outer')"), [inner])
-    assert run_ast_rules([_scenario([outer])], tmp_path) == []
+    assert _ast_rules([_scenario([outer])], tmp_path) == []
 
 
 @pytest.mark.parametrize(
@@ -152,7 +166,7 @@ def test_empty_step_attach_only_body_fires_for_when_and_then(
         """,
     )
     scenario = _scenario([_step(phase, 'the step', _line(src, 'with '))])
-    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'empty-step')
+    findings = _rule_findings(_ast_rules([scenario], tmp_path), 'empty-step')
     assert bool(findings) is fires
 
 
@@ -167,7 +181,7 @@ def test_empty_step_fires_on_empty_helper_function(tmp_path) -> None:
     )
     # A decorated helper anchors at its first decorator line (co_firstlineno).
     scenario = _scenario([_step('when', 'inserting money', _line(src, '@when'))])
-    [finding] = run_ast_rules([scenario], tmp_path)
+    [finding] = _ast_rules([scenario], tmp_path)
     assert finding.rule == RuleId('empty-step')
 
 
@@ -186,7 +200,7 @@ def test_empty_step_when_then_pair_is_reported_once(tmp_path) -> None:
     scenario = _scenario(
         [_step('when', 'acting', line), _step('then', 'outcome', line)]
     )
-    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'empty-step')
+    findings = _rule_findings(_ast_rules([scenario], tmp_path), 'empty-step')
     assert len(findings) == 1
 
 
@@ -205,7 +219,7 @@ def test_when_then_pair_with_acting_body_passes_both_rules(tmp_path) -> None:
     scenario = _scenario(
         [_step('when', 'acting', line), _step('then', 'outcome', line)]
     )
-    assert run_ast_rules([scenario], tmp_path) == []
+    assert _ast_rules([scenario], tmp_path) == []
 
 
 def test_then_with_bare_assert_passes(tmp_path) -> None:
@@ -218,7 +232,7 @@ def test_then_with_bare_assert_passes(tmp_path) -> None:
         """,
     )
     scenario = _scenario([_step('then', 'it is one', _line(src, 'with then'))])
-    assert run_ast_rules([scenario], tmp_path) == []
+    assert _ast_rules([scenario], tmp_path) == []
 
 
 @scenario(
@@ -242,7 +256,7 @@ def test_then_without_check_fires(tmp_path) -> None:
         with_line = _line(src, 'with then')
         unchecked = _scenario([_step('then', 'it is one', with_line)])
     with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
-        findings = run_ast_rules([unchecked], tmp_path)
+        findings = _ast_rules([unchecked], tmp_path)
     with then(t'a then-without-check {pg["Finding"].low} reports the unchecked then'):
         [finding] = findings
         assert finding.rule == RuleId('then-without-check')
@@ -259,7 +273,7 @@ def test_then_with_pytest_raises_item_passes(tmp_path) -> None:
         """,
     )
     scenario = _scenario([_step('then', 'it rejects', _line(src, 'with then'))])
-    assert run_ast_rules([scenario], tmp_path) == []
+    assert _ast_rules([scenario], tmp_path) == []
 
 
 @pytest.mark.parametrize('check', ['assert_valid(x)', 'helpers.assert_valid(x)'])
@@ -273,7 +287,7 @@ def test_then_with_assert_helper_call_passes(tmp_path, check) -> None:
         """,
     )
     scenario = _scenario([_step('then', 'it is valid', _line(src, 'with then'))])
-    assert run_ast_rules([scenario], tmp_path) == []
+    assert _ast_rules([scenario], tmp_path) == []
 
 
 def test_then_with_pytest_fail_passes(tmp_path) -> None:
@@ -288,7 +302,7 @@ def test_then_with_pytest_fail_passes(tmp_path) -> None:
         """,
     )
     scenario = _scenario([_step('then', 'it never happens', _line(src, 'with then'))])
-    assert run_ast_rules([scenario], tmp_path) == []
+    assert _ast_rules([scenario], tmp_path) == []
 
 
 def test_then_parent_with_checked_nested_child_passes(tmp_path) -> None:
@@ -303,7 +317,7 @@ def test_then_parent_with_checked_nested_child_passes(tmp_path) -> None:
     )
     inner = _step('then', 'inner', _line(src, "with then('inner')"))
     outer = _step('then', 'outer', _line(src, "with then('outer')"), [inner])
-    assert run_ast_rules([_scenario([outer])], tmp_path) == []
+    assert _ast_rules([_scenario([outer])], tmp_path) == []
 
 
 def test_plain_siblings_on_separate_lines_are_not_a_pair(tmp_path) -> None:
@@ -323,7 +337,7 @@ def test_plain_siblings_on_separate_lines_are_not_a_pair(tmp_path) -> None:
             _step('then', 'outcome', _line(src, 'with then')),
         ]
     )
-    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'empty-step')
+    findings = _rule_findings(_ast_rules([scenario], tmp_path), 'empty-step')
     assert len(findings) == 2
 
 
@@ -342,7 +356,7 @@ def test_multiline_with_header_anchors_by_context_expression_line(
     )
     # The recorded anchor is the context-expression line, not the `with (` line.
     scenario = _scenario([_step('given', 'a value', _line(src, "given('a value')"))])
-    [finding] = run_ast_rules([scenario], tmp_path)
+    [finding] = _ast_rules([scenario], tmp_path)
     assert finding.rule == RuleId('empty-step')
 
 
@@ -356,18 +370,18 @@ def test_steps_without_source_are_skipped(tmp_path) -> None:
         """,
     )
     scenario = _scenario([_step('given', 'a value', None)])
-    assert run_ast_rules([scenario], tmp_path) == []
+    assert _ast_rules([scenario], tmp_path) == []
 
 
 def test_missing_source_file_is_silently_skipped(tmp_path) -> None:
     scenario = _scenario([_step('given', 'a value', 2)])
-    assert run_ast_rules([scenario], tmp_path) == []
+    assert _ast_rules([scenario], tmp_path) == []
 
 
 def test_unparseable_source_file_is_silently_skipped(tmp_path) -> None:
     (tmp_path / 'test_x.py').write_text('def broken(:\n', encoding='utf-8')
     scenario = _scenario([_step('given', 'a value', 1)])
-    assert run_ast_rules([scenario], tmp_path) == []
+    assert _ast_rules([scenario], tmp_path) == []
 
 
 def test_anchor_line_with_no_matching_node_is_skipped(tmp_path) -> None:
@@ -379,7 +393,7 @@ def test_anchor_line_with_no_matching_node_is_skipped(tmp_path) -> None:
         """,
     )
     scenario = _scenario([_step('given', 'a value', _line(src, 'x = 1'))])
-    assert run_ast_rules([scenario], tmp_path) == []
+    assert _ast_rules([scenario], tmp_path) == []
 
 
 # --- Rule 3: check-outside-then ---
@@ -406,7 +420,7 @@ def test_check_outside_then_fires_on_assert_in_given_or_when(tmp_path, phase) ->
         checking = _scenario([_step(phase, 'a stocked machine', with_line)])
     with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
         findings = _rule_findings(
-            run_ast_rules([checking], tmp_path), 'check-outside-then'
+            _ast_rules([checking], tmp_path), 'check-outside-then'
         )
     with then(t'a warn {pg["Finding"].low} names the {phase} step holding the assert'):
         [finding] = findings
@@ -425,7 +439,7 @@ def test_check_outside_then_reports_one_finding_for_many_asserts(tmp_path) -> No
         """,
     )
     scenario = _scenario([_step('given', 'a machine', _line(src, 'with given'))])
-    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then')
+    findings = _rule_findings(_ast_rules([scenario], tmp_path), 'check-outside-then')
     assert len(findings) == 1
 
 
@@ -439,9 +453,7 @@ def test_check_outside_then_ignores_assert_in_then(tmp_path) -> None:
         """,
     )
     scenario = _scenario([_step('then', 'it is one', _line(src, 'with then'))])
-    assert (
-        _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then') == []
-    )
+    assert _rule_findings(_ast_rules([scenario], tmp_path), 'check-outside-then') == []
 
 
 def test_check_outside_then_exempts_when_then_body(tmp_path) -> None:
@@ -460,9 +472,7 @@ def test_check_outside_then_exempts_when_then_body(tmp_path) -> None:
     scenario = _scenario(
         [_step('when', 'acting', line), _step('then', 'outcome', line)]
     )
-    assert (
-        _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then') == []
-    )
+    assert _rule_findings(_ast_rules([scenario], tmp_path), 'check-outside-then') == []
 
 
 def test_check_outside_then_conditional_assert_still_fires(tmp_path) -> None:
@@ -477,7 +487,7 @@ def test_check_outside_then_conditional_assert_still_fires(tmp_path) -> None:
         """,
     )
     scenario = _scenario([_step('when', 'acting', _line(src, 'with when'))])
-    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then')
+    findings = _rule_findings(_ast_rules([scenario], tmp_path), 'check-outside-then')
     assert len(findings) == 1
 
 
@@ -500,7 +510,7 @@ def test_check_outside_then_child_assert_reported_on_the_child_only(
     inner = _step('given', 'inner', inner_line)
     outer = _step('given', 'outer', _line(src, "with given('outer')"), [inner])
     findings = _rule_findings(
-        run_ast_rules([_scenario([outer])], tmp_path), 'check-outside-then'
+        _ast_rules([_scenario([outer])], tmp_path), 'check-outside-then'
     )
     [finding] = findings
     assert finding.location == SourceLocation(relpath='test_x.py', line=inner_line)
@@ -518,7 +528,7 @@ def test_check_outside_then_fires_on_helper_body_assert(tmp_path) -> None:
         """,
     )
     scenario = _scenario([_step('given', 'a validated machine', _line(src, '@given'))])
-    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'check-outside-then')
+    findings = _rule_findings(_ast_rules([scenario], tmp_path), 'check-outside-then')
     assert len(findings) == 1
 
 
@@ -550,7 +560,7 @@ def test_action_in_then_fires_when_no_when_exists(tmp_path) -> None:
             ]
         )
     with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
-        findings = _rule_findings(run_ast_rules([folded], tmp_path), 'action-in-then')
+        findings = _rule_findings(_ast_rules([folded], tmp_path), 'action-in-then')
     with then(t'a warn {pg["Finding"].low} points at the then and says no when acts'):
         [finding] = findings
         assert finding.subject == 'test_x.py::test_a'
@@ -579,7 +589,7 @@ def test_action_in_then_fires_when_no_when_acts(tmp_path) -> None:
             _step('then', 'it brews', _line(src, 'with then')),
         ]
     )
-    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then')
+    findings = _rule_findings(_ast_rules([scenario], tmp_path), 'action-in-then')
     assert len(findings) == 1
 
 
@@ -602,7 +612,7 @@ def test_action_in_then_passes_when_a_when_acts(tmp_path) -> None:
             _step('then', 'it is close enough', _line(src, 'with then')),
         ]
     )
-    assert _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then') == []
+    assert _rule_findings(_ast_rules([scenario], tmp_path), 'action-in-then') == []
 
 
 def test_action_in_then_passes_without_a_call_in_the_assert(tmp_path) -> None:
@@ -622,7 +632,7 @@ def test_action_in_then_passes_without_a_call_in_the_assert(tmp_path) -> None:
             _step('then', 'it stays one', _line(src, 'with then')),
         ]
     )
-    assert _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then') == []
+    assert _rule_findings(_ast_rules([scenario], tmp_path), 'action-in-then') == []
 
 
 def test_action_in_then_when_then_pair_acts_without_a_call(tmp_path) -> None:
@@ -646,7 +656,7 @@ def test_action_in_then_when_then_pair_acts_without_a_call(tmp_path) -> None:
             _step('then', 'the log calls it out', _line(src, "with then('the log")),
         ]
     )
-    assert _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then') == []
+    assert _rule_findings(_ast_rules([scenario], tmp_path), 'action-in-then') == []
 
 
 def test_action_in_then_skips_scenario_with_anchorless_when(tmp_path) -> None:
@@ -665,7 +675,7 @@ def test_action_in_then_skips_scenario_with_anchorless_when(tmp_path) -> None:
             _step('then', 'it brews', _line(src, 'with then')),
         ]
     )
-    assert _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then') == []
+    assert _rule_findings(_ast_rules([scenario], tmp_path), 'action-in-then') == []
 
 
 def test_action_in_then_reports_once_per_scenario(tmp_path) -> None:
@@ -685,7 +695,7 @@ def test_action_in_then_reports_once_per_scenario(tmp_path) -> None:
             _step('then', 'it grinds', _line(src, "with then('it grinds')")),
         ]
     )
-    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then')
+    findings = _rule_findings(_ast_rules([scenario], tmp_path), 'action-in-then')
     assert len(findings) == 1
 
 
@@ -723,7 +733,7 @@ def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
         unused = _scenario([_value_step('given', 'a 200 ml cup', with_line, ['size'])])
     with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
         findings = _rule_findings(
-            run_ast_rules([unused], tmp_path), 'unused-interpolation'
+            _ast_rules([unused], tmp_path), 'unused-interpolation'
         )
     with then(t'a warn {pg["Finding"].low} names the interpolation the body ignores'):
         [finding] = findings
@@ -756,7 +766,7 @@ def test_unused_interpolation_fires_on_a_grouped_placeholder(tmp_path) -> None:
         ),
     )
     findings = _rule_findings(
-        run_ast_rules([_scenario([step])], tmp_path), 'unused-interpolation'
+        _ast_rules([_scenario([step])], tmp_path), 'unused-interpolation'
     )
     [finding] = findings
     assert 'interpolates {size} but never uses it' in finding.message
@@ -786,7 +796,7 @@ def test_unused_interpolation_skips_a_disambiguated_column_name(tmp_path) -> Non
     )
     assert (
         _rule_findings(
-            run_ast_rules([_scenario([step])], tmp_path), 'unused-interpolation'
+            _ast_rules([_scenario([step])], tmp_path), 'unused-interpolation'
         )
         == []
     )
@@ -805,8 +815,7 @@ def test_unused_interpolation_passes_when_the_name_is_loaded(tmp_path) -> None:
         [_value_step('given', 'a 200 ml cup', _line(src, 'with given'), ['size'])]
     )
     assert (
-        _rule_findings(run_ast_rules([scenario], tmp_path), 'unused-interpolation')
-        == []
+        _rule_findings(_ast_rules([scenario], tmp_path), 'unused-interpolation') == []
     )
 
 
@@ -824,8 +833,7 @@ def test_unused_interpolation_store_counts_for_given(tmp_path) -> None:
         [_value_step('given', 'a 200 ml cup', _line(src, 'with given'), ['size'])]
     )
     assert (
-        _rule_findings(run_ast_rules([scenario], tmp_path), 'unused-interpolation')
-        == []
+        _rule_findings(_ast_rules([scenario], tmp_path), 'unused-interpolation') == []
     )
 
 
@@ -841,9 +849,7 @@ def test_unused_interpolation_store_does_not_count_for_when(tmp_path) -> None:
     scenario = _scenario(
         [_value_step('when', 'inserting 2', _line(src, 'with when'), ['amount'])]
     )
-    findings = _rule_findings(
-        run_ast_rules([scenario], tmp_path), 'unused-interpolation'
-    )
+    findings = _rule_findings(_ast_rules([scenario], tmp_path), 'unused-interpolation')
     assert len(findings) == 1
 
 
@@ -865,8 +871,7 @@ def test_unused_interpolation_skips_complex_expressions(tmp_path, expression) ->
         ]
     )
     assert (
-        _rule_findings(run_ast_rules([scenario], tmp_path), 'unused-interpolation')
-        == []
+        _rule_findings(_ast_rules([scenario], tmp_path), 'unused-interpolation') == []
     )
 
 
@@ -895,7 +900,7 @@ def test_unused_interpolation_skips_term_refs(tmp_path) -> None:
     )
     assert (
         _rule_findings(
-            run_ast_rules([_scenario([step])], tmp_path), 'unused-interpolation'
+            _ast_rules([_scenario([step])], tmp_path), 'unused-interpolation'
         )
         == []
     )
@@ -917,7 +922,7 @@ def test_unused_interpolation_counts_use_in_nested_step_body(tmp_path) -> None:
     )
     assert (
         _rule_findings(
-            run_ast_rules([_scenario([outer])], tmp_path), 'unused-interpolation'
+            _ast_rules([_scenario([outer])], tmp_path), 'unused-interpolation'
         )
         == []
     )
@@ -941,7 +946,7 @@ def test_unused_interpolation_nested_narration_does_not_count_as_use(
         'given', 'a 1 thing', _line(src, "with given(t'a"), ['x'], [inner]
     )
     findings = _rule_findings(
-        run_ast_rules([_scenario([outer])], tmp_path), 'unused-interpolation'
+        _ast_rules([_scenario([outer])], tmp_path), 'unused-interpolation'
     )
     assert len(findings) == 1
 
@@ -960,8 +965,7 @@ def test_unused_interpolation_use_in_a_with_item_counts(tmp_path) -> None:
         [_value_step('then', 'rejects 404', _line(src, 'with then'), ['code'])]
     )
     assert (
-        _rule_findings(run_ast_rules([scenario], tmp_path), 'unused-interpolation')
-        == []
+        _rule_findings(_ast_rules([scenario], tmp_path), 'unused-interpolation') == []
     )
 
 
@@ -980,8 +984,7 @@ def test_unused_interpolation_skips_template_helper_steps(tmp_path) -> None:
         [_value_step('when', 'I insert $2', _line(src, '@when'), ['amount'])]
     )
     assert (
-        _rule_findings(run_ast_rules([scenario], tmp_path), 'unused-interpolation')
-        == []
+        _rule_findings(_ast_rules([scenario], tmp_path), 'unused-interpolation') == []
     )
 
 
@@ -997,9 +1000,7 @@ def test_unused_interpolation_dedupes_repeated_names(tmp_path) -> None:
     scenario = _scenario(
         [_value_step('given', '200 of 200', _line(src, 'with given'), ['size', 'size'])]
     )
-    findings = _rule_findings(
-        run_ast_rules([scenario], tmp_path), 'unused-interpolation'
-    )
+    findings = _rule_findings(_ast_rules([scenario], tmp_path), 'unused-interpolation')
     assert len(findings) == 1
 
 
@@ -1025,7 +1026,7 @@ def test_action_in_then_plain_when_acts_via_subscript(tmp_path) -> None:
             _step('then', 'every lookup resolves', _line(src, 'with then')),
         ]
     )
-    assert _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then') == []
+    assert _rule_findings(_ast_rules([scenario], tmp_path), 'action-in-then') == []
 
 
 def test_empty_step_fires_on_empty_async_helper_function(tmp_path) -> None:
@@ -1041,7 +1042,7 @@ def test_empty_step_fires_on_empty_async_helper_function(tmp_path) -> None:
         """,
     )
     scenario = _scenario([_step('when', 'inserting money', _line(src, '@when'))])
-    [finding] = run_ast_rules([scenario], tmp_path)
+    [finding] = _ast_rules([scenario], tmp_path)
     assert finding.rule == RuleId('empty-step')
 
 
@@ -1067,5 +1068,5 @@ def test_action_in_then_sees_through_an_async_when(tmp_path) -> None:
             _step('then', 'it dispenses', _line(src, 'with then(')),
         ]
     )
-    findings = _rule_findings(run_ast_rules([scenario], tmp_path), 'action-in-then')
+    findings = _rule_findings(_ast_rules([scenario], tmp_path), 'action-in-then')
     assert len(findings) == 1

@@ -24,6 +24,7 @@ from ..grouping import group_parametrized
 from ..lint import (
     Finding,
     apply_config,
+    enabled_rules,
     error_count,
     run_ast_rules,
     run_runtime_rules,
@@ -115,7 +116,7 @@ class _SessionReport:
     sinks: RenderedSinks
 
 
-def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
+def pytest_sessionfinish(session: pytest.Session) -> None:
     """Build the report and write the configured sinks.
 
     Building a report fails with a `PytestGivenError` and writing one with an
@@ -134,29 +135,28 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     try:
         built = _build_report(session, session_collector(config), state.param_info)
         write_sinks(built.sinks)
+        if built.sinks.md_stdout is not None:
+            session_outcome(config).md_stdout = built.sinks.md_stdout
+        _run_lint(session, built)
     except (PytestGivenError, OSError) as error:
         session_outcome(config).report_error = '\n'.join(
             [str(error), *discard_stale_sinks(given_config(config).sinks)]
         )
-        _fail_run(session, exitstatus)
+        _fail_run(session)
         return
-    finally:
-        # Every way out drops the captured parametrize values: they are read
-        # only here, and a nested in-process run must not inherit them.
-        state.param_info.clear()
-    if built.sinks.md_stdout is not None:
-        session_outcome(config).md_stdout = built.sinks.md_stdout
-    _run_lint(session, exitstatus, built)
 
 
-def _fail_run(session: pytest.Session, exitstatus: int) -> None:
+def _fail_run(session: pytest.Session) -> None:
     """Fail a run pytest was otherwise about to call successful.
 
-    Only escalates from OK: pytest binds `exitstatus` before this hook, so
-    overwriting it unconditionally would report an interrupted or
-    nothing-collected run as a plain test failure.
+    Only escalates from OK: overwriting the status unconditionally would
+    report an interrupted or nothing-collected run as a plain test failure.
+    Reads `session.exitstatus` rather than the hook's `exitstatus` argument —
+    pytest passes the same value, but a plugin ordered before us may already
+    have escalated it, which leaves the argument stale and the attribute
+    current.
     """
-    if exitstatus == pytest.ExitCode.OK:
+    if session.exitstatus == pytest.ExitCode.OK:
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
@@ -212,21 +212,22 @@ def _build_report(
     )
 
 
-def _run_lint(session: pytest.Session, exitstatus: int, built: _SessionReport) -> None:
+def _run_lint(session: pytest.Session, built: _SessionReport) -> None:
     config = session.config
     given = given_config(config)
     if not given.lint_enabled:
         return
+    enabled = enabled_rules(given.lint)
     findings = apply_config(
-        run_runtime_rules(built.scenarios, built.glossary, built.stories)
-        + run_ast_rules(built.scenarios, Path(config.rootpath)),
+        run_runtime_rules(built.scenarios, built.glossary, built.stories, enabled)
+        + run_ast_rules(built.scenarios, Path(config.rootpath), enabled),
         given.lint,
     )
     if not findings:
         return
     session_outcome(config).findings = findings
     if error_count(findings):
-        _fail_run(session, exitstatus)
+        _fail_run(session)
 
 
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:

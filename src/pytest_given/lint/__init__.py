@@ -13,6 +13,7 @@ from .config import (
     IgnoreEntry,
     LintConfig,
     apply_config,
+    enabled_rules,
     parse_lint_config,
 )
 from .runtime_rules import run_runtime_rules
@@ -28,6 +29,7 @@ __all__ = [
     'RuleId',
     'Severity',
     'apply_config',
+    'enabled_rules',
     'error_count',
     'parse_lint_config',
     'run_ast_rules',
