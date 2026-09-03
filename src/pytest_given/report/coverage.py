@@ -128,7 +128,6 @@ class StoryIndex:
 
     refs_by_activity: dict[ActivityId, set[Identity]]
     activities_by_identity: dict[Identity, set[ActivityId]]
-    eligible: dict[ActivityId, bool]
     ids: set[ActivityId]
 
 
@@ -153,7 +152,6 @@ def build_story_index(glossary: Glossary, story: Story) -> StoryIndex:
     return StoryIndex(
         refs_by_activity=refs_by_activity,
         activities_by_identity=activities_by_identity,
-        eligible=eligible,
         ids={a.id for a in story.activities},
     )
 
