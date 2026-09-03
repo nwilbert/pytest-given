@@ -58,21 +58,31 @@ def run_ast_rules(scenarios: list[Scenario], rootdir: Path) -> list[RawFinding]:
 
 
 @dataclass(frozen=True, kw_only=True)
-class _Resolved:
+class _Anchored:
+    """A step carrying a source anchor, tagged with its `when_then` role."""
+
+    node_id: NodeId
+    path: StepPath
+    step: Step
+    source: SourceLocation
+    pair_when: bool
+    pair_then: bool
+
+
+@dataclass(frozen=True, kw_only=True)
+class _Resolved(_Anchored):
     """An anchored step paired with the AST node its body resolved to.
+
+    Extends `_Anchored` rather than restating its fields, so the `**vars()`
+    splat that builds one supplies exactly the base's own fields by
+    construction.
 
     A `when_then` pair is recognized as sibling `when`+`then` steps sharing
     one anchor — unambiguous, because cross-phase nesting is rejected at
     record time, so no other construct produces that shape.
     """
 
-    node_id: NodeId
-    path: StepPath
-    step: Step
-    source: SourceLocation
     node: _BodyNode
-    pair_when: bool
-    pair_then: bool
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -104,16 +114,6 @@ def _scan_scenario(
         steps=steps,
         by_path={resolved.path: resolved for resolved in steps},
     )
-
-
-@dataclass(frozen=True, kw_only=True)
-class _Anchored:
-    node_id: NodeId
-    path: StepPath
-    step: Step
-    source: SourceLocation
-    pair_when: bool
-    pair_then: bool
 
 
 def _anchored_steps(scenario: Scenario) -> Iterator[_Anchored]:
