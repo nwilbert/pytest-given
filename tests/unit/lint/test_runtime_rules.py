@@ -160,6 +160,25 @@ def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
         )
 
 
+def test_tag_shadows_term_skips_a_tag_with_no_derivable_slug() -> None:
+    """Tags are stored as written and `id_derive` raises on a name with no
+    ASCII alphanumerics, which from here escaped as a bare traceback. Such a
+    tag cannot collide with a term id anyway."""
+    glossary = _glossary('Guest')
+    scenarios = [
+        _phases_scenario(
+            'test_x.py::test_a',
+            ['given', 'when', 'then'],
+            tags=['日本語', '++', 'Guest'],
+        )
+    ]
+    findings = _rule_findings(
+        _runtime(grouped=scenarios, glossary=glossary), 'tag-shadows-term'
+    )
+    [finding] = findings
+    assert finding.subject == 'guest'
+
+
 def test_tag_shadows_term_passes_orthogonal_tags() -> None:
     glossary = _glossary('File glossary')
     scenarios = [

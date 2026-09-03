@@ -373,7 +373,7 @@ Each rule has a fixed default severity; there is no master level. A `warn` findi
 | Rule | Default | Catches |
 |------|---------|---------|
 | `empty-step` | `error` | A step whose body does nothing (only constants/`pass`, or — for `when`/`then` — only an `attach(...)` call). |
-| `then-without-check` | `error` | A `then` whose body contains no `assert` and no checking call (`pytest.raises`, `pytest.approx`, …). |
+| `then-without-check` | `error` | A `then` whose body contains no `assert` and no checking call — a call whose name starts with `assert`, or `pytest.raises` / `pytest.warns` / `pytest.fail`. Nothing else counts, `pytest.approx` included. |
 | `missing-phase` | `warn` | A passed scenario that doesn't cover all three Given/When/Then phases. Fixture `@given`s and `Annotated[..., given(...)]` parameters count; each logical scenario is evaluated once regardless of parametrization. |
 | `check-outside-then` | `warn` | An `assert` inside a `given` or `when` (the `when` half of a `when_then` pair is exempt). |
 | `action-in-then` | `warn` | A scenario where no `when` performs an action and a `then` folds the action into its assertion. |

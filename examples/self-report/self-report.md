@@ -93,7 +93,7 @@
 - **then** no test ran: the run stopped at configure, before collection
 
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2262::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2265::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -116,14 +116,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2275::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2278::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2296::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2299::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -131,7 +131,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2328::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2331::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -151,7 +151,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:2360::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:2363::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -160,7 +160,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:2546::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:2549::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -1044,13 +1044,13 @@
 - **then** the span unwraps once and its contents stay literal
 
 ## ✓ A «step» pairs its «narration» with a «phase»
-`tests/unit/capture/test_step_descriptor.py:59::test_context_manager_basic`
+`tests/unit/capture/test_step_descriptor.py:60::test_context_manager_basic`
 
 - **when** a given «Step» descriptor is created
 - **then** it carries the given «Phase» and its «Narration»
 
 ## ✓ A «step» opened outside a «scenario» warns rather than raising
-`tests/unit/capture/test_step_descriptor.py:151::test_context_manager_unannotated_test_warns_instead_of_raises`
+`tests/unit/capture/test_step_descriptor.py:152::test_context_manager_unannotated_test_warns_instead_of_raises`
 
 - **given** a «collector» recording inside an undecorated test
 - **when** a given «step» is opened against it
@@ -1058,28 +1058,28 @@
 - **then** it names the missing `@scenario`, so a suite can filter it
 
 ## ✓ «when_then» records the action and its outcome as siblings
-`tests/unit/capture/test_step_descriptor.py:279::test_when_then_records_two_sibling_steps_on_clean_exit`
+`tests/unit/capture/test_step_descriptor.py:280::test_when_then_records_two_sibling_steps_on_clean_exit`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a «when_then» block exits cleanly
 - **then** a when and a sibling then «Step» are recorded
 
 ## ✓ «when_then» pairs with an inner pytest.raises
-`tests/unit/capture/test_step_descriptor.py:304::test_when_then_pairs_with_inner_pytest_raises`
+`tests/unit/capture/test_step_descriptor.py:305::test_when_then_pairs_with_inner_pytest_raises`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises and an inner pytest.raises swallows it
 - **then** both sibling steps are still recorded
 
 ## ✓ «when_then» omits the then when the body raises uncaught
-`tests/unit/capture/test_step_descriptor.py:332::test_when_then_omits_then_when_body_raises_uncaught` · validation
+`tests/unit/capture/test_step_descriptor.py:333::test_when_then_omits_then_when_body_raises_uncaught` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises with nothing catching inside
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ A cross-phase «step» cannot open inside a «when_then» body · 2 cases
-`tests/unit/capture/test_step_descriptor.py:374::test_when_then_rejects_cross_phase_nested_step` · validation
+`tests/unit/capture/test_step_descriptor.py:375::test_when_then_rejects_cross_phase_nested_step` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a given or then opens inside the «when_then» body
@@ -1092,14 +1092,14 @@
 | then | ✓ |
 
 ## ✓ A nested when becomes a child of the «when_then» action
-`tests/unit/capture/test_step_descriptor.py:406::test_when_then_allows_nested_when_as_child_sub_step`
+`tests/unit/capture/test_step_descriptor.py:407::test_when_then_allows_nested_when_as_child_sub_step`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a when opens inside the «when_then» body
 - **then** the sub-action is a child of the action and the then still follows
 
 ## ✓ `@scenario` marks the test function without wrapping it
-`tests/unit/capture/test_step_descriptor.py:450::test_scenario_marks_the_function_without_wrapping_it`
+`tests/unit/capture/test_step_descriptor.py:451::test_scenario_marks_the_function_without_wrapping_it`
 
 - **given** a test function taking one fixture
 - **when** the function is decorated
@@ -1107,7 +1107,7 @@
 - **then** it carries the «scenario» marker, and a plain one does not
 
 ## ✓ An «attachment» label must be plain text · 3 cases
-`tests/unit/capture/test_step_descriptor.py:520::test_attach_rejects_a_non_str_label` · validation
+`tests/unit/capture/test_step_descriptor.py:521::test_attach_rejects_a_non_str_label` · validation
 
 - **given** a non-str «Attachment» label of kind {label_kind}
 - **when** it is attached
@@ -1120,7 +1120,7 @@
 | not-a-string | ✓ |
 
 ## ✓ A string `activities=` argument is refused by `@scenario`
-`tests/unit/capture/test_step_descriptor.py:911::test_scenario_rejects_a_string_activities_argument` · validation
+`tests/unit/capture/test_step_descriptor.py:922::test_scenario_rejects_a_string_activities_argument` · validation
 
 - **given** a string where a sequence of «activity» ids goes
 - **when** the «scenario» is declared
@@ -1454,7 +1454,7 @@
 - **then** the step carries a single «Term ref»
 
 ## ✓ «Narration lint» flags a «step» whose body does nothing
-`tests/unit/lint/test_ast_rules.py:63::test_empty_step_fires_on_pass_only_body`
+`tests/unit/lint/test_ast_rules.py:99::test_empty_step_fires_on_pass_only_body`
 
 - **given** a given «step» whose body is only `pass`
   - 📎 step body:
@@ -1468,7 +1468,7 @@
 - **then** its «severity» is error
 
 ## ✓ «Narration lint» flags a then «step» that checks nothing
-`tests/unit/lint/test_ast_rules.py:224::test_then_without_check_fires`
+`tests/unit/lint/test_ast_rules.py:260::test_then_without_check_fires`
 
 - **given** a then «step» whose body only calls
   - 📎 step body:
@@ -1482,7 +1482,7 @@
 - **then** a then-without-check «finding» reports the unchecked then
 
 ## ✓ «Narration lint» flags an assert outside a then «step» · 2 cases
-`tests/unit/lint/test_ast_rules.py:388::test_check_outside_then_fires_on_assert_in_given_or_when`
+`tests/unit/lint/test_ast_rules.py:424::test_check_outside_then_fires_on_assert_in_given_or_when`
 
 - **given** a {phase} «step» whose body asserts
   - 📎 step body — *see parameter table*
@@ -1511,7 +1511,7 @@
   ```
 
 ## ✓ «Narration lint» flags a then «step» that folds in the action
-`tests/unit/lint/test_ast_rules.py:528::test_action_in_then_fires_when_no_when_exists`
+`tests/unit/lint/test_ast_rules.py:560::test_action_in_then_fires_when_no_when_exists`
 
 - **given** a «scenario» with no when, acting inside its then
   - 📎 step body:
@@ -1526,7 +1526,7 @@
 - **then** a warn «finding» points at the then and says no when acts
 
 ## ✓ «Narration lint» flags a «narration» interpolating a name the body never uses
-`tests/unit/lint/test_ast_rules.py:704::test_unused_interpolation_fires_on_unused_bare_identifier`
+`tests/unit/lint/test_ast_rules.py:736::test_unused_interpolation_fires_on_unused_bare_identifier`
 
 - **given** a given «step» whose body never loads the name
   - 📎 step body:
@@ -1555,15 +1555,122 @@
 - **then** a single warn «finding» names the «tag», the «term» it shadows, and both scenarios
 
 ## ✓ «Narration lint» flags a «term» that no «step» or «story» references
-`tests/unit/lint/test_runtime_rules.py:199::test_dead_term_flags_unreferenced_term`
+`tests/unit/lint/test_runtime_rules.py:218::test_dead_term_flags_unreferenced_term`
 
 - **given** a «glossary» holding one unreferenced «term»
 - **when** the runtime «rules» run over no scenarios and no stories
 - **then** the «finding» names the unreferenced «term»
 - **then** its «severity» is off — the rule is opt-in
 
+## ✓ A «verb» «activity» ref has one identity regardless of «inflection»
+`tests/unit/report/test_coverage.py:67::test_identity_of_activity_term_ref_verb_ignores_display`
+
+- **given** a «Verb» written canonically and as an «Inflection»
+- **when** «Coverage» derives each «Term ref» identity
+- **then** both collapse to the one canonical verb identity
+
+## ✓ A branching «activity» unions references across its «paths»
+`tests/unit/report/test_coverage.py:150::test_a_refs_unions_across_multi_path_activity`
+
+- **given** an «Activity» that branches into two «Path» alternatives
+- **when** «Coverage» collects the «Activity» references
+- **then** both «Instance» identities across the branches are present
+
+## ✓ An «instance» «step» ref adds a canonical fallback
+`tests/unit/report/test_coverage.py:204::test_s_for_step_instance_entity_ref_adds_canonical_fallback`
+
+- **given** a «Step» referring to a named «Instance»
+- **when** «Coverage» computes the identity set for the «Step»
+- **then** it includes the canonical «Term ref» fallback
+
+## ✓ A «verb» ref always resolves to its canonical identity
+`tests/unit/report/test_coverage.py:219::test_s_for_step_verb_ref_always_canonical`
+
+- **given** a «Step» using an «Inflection» of a «Verb»
+- **when** «Coverage» computes its identity set
+- **then** the identity ignores the surface form and stays canonical
+
+## ✓ An unknown «term ref» is skipped
+`tests/unit/report/test_coverage.py:231::test_s_for_step_unknown_term_ref_skipped` · validation
+
+- **given** a «Step» referencing a «Term» not in the glossary
+- **when** «Coverage» computes its identity set
+- **then** the unknown ref contributes nothing to the identity set
+
+## ✓ An «instance» «step» covers a canonical «activity»
+`tests/unit/report/test_coverage.py:255::test_compute_coverage_covers_canonical_activity_via_instance_step`
+
+- **given** a «Story» with a canonical «Activity»
+- **when** a «Scenario» step names a specific «Instance»
+- **then** «Coverage» reports the «Activity» as covered
+
+## ✓ A canonical «step» does not cover an «instance» «activity»
+`tests/unit/report/test_coverage.py:285::test_compute_coverage_does_not_cover_instance_activity_with_canonical_step`
+
+- **given** an «Activity» anchored to a named «Instance»
+- **when** a «Scenario» step only names the canonical «Actor»
+- **then** «Coverage» leaves the more specific instance activity uncovered
+
+## ✓ Promoting a bare word to a «verb» ref drops «coverage» from a «step» that matched
+`tests/unit/report/test_coverage.py:316::test_compute_coverage_lost_when_activity_gains_a_term`
+
+- **given** a «Step» naming two «term refs»
+- **given** the same «Activity» with that middle slot a bare word, then a «Verb» ref
+- **when** «Coverage» is computed against each «Story»
+- **then** the two-ref «Activity» is covered
+- **then** the widened «Activity» is no longer covered
+
+## ✓ A «scenario» «activity» binding constrains «coverage»
+`tests/unit/report/test_coverage.py:370::test_compute_coverage_scenario_constrained_to_activity_ids`
+
+- **given** a «Story» with two matching activities
+- **when** the «Scenario» «binds» only to activity 1
+- **then** «Coverage» considers only the bound «Activity»
+
+## ✓ An «activity» with two distinct «terms» is «coverage»-eligible
+`tests/unit/report/test_coverage.py:416::test_is_coverage_eligible_true_for_two_distinct_terms`
+
+- **given** an «Activity» anchored by two distinct «Term» refs
+- **when** its «Coverage» eligibility is checked
+- **then** it is eligible for «Coverage» tracking
+
+## ✓ An under-anchored «activity» is not «coverage»-eligible
+`tests/unit/report/test_coverage.py:438::test_is_coverage_eligible_false_for_one_distinct_term`
+
+- **given** an «Activity» that mentions only one distinct «Term»
+- **when** its «Coverage» eligibility is checked
+- **then** it is ineligible — «Coverage» needs at least two anchors
+
+## ✓ An under-anchored «activity» is never covered by narration matching
+`tests/unit/report/test_coverage.py:468::test_compute_coverage_excludes_under_anchored_activity`
+
+- **given** a «Story» whose «Activity» is all bare words
+- **when** coverage is computed against a scenario
+- **then** «Coverage» excludes the under-anchored «Activity»
+
+## ✓ Nested «steps» are walked for «coverage»
+`tests/unit/report/test_coverage.py:492::test_compute_coverage_nested_steps_are_walked`
+
+- **given** a «Story» with one canonical «Activity»
+- **when** the covering «Term ref»s live in a nested child «Step»
+- **then** the nested «Step» still counts and the «Activity» is covered
+
+## ✓ An explicit «step» binding covers an eligible «activity»
+`tests/unit/report/test_coverage.py:526::test_compute_coverage_explicit_step_binding_covers_eligible_activity`
+
+- **given** a «Story» with a coverage-eligible «Activity»
+- **when** a «Step» «binds» to it explicitly by id
+- **then** «Coverage» counts it directly, without identity matching
+
+## ✓ An explicit binding covers an under-anchored «activity»
+`tests/unit/report/test_coverage.py:554::test_compute_coverage_explicit_binding_covers_under_anchored_activity`
+
+- **given** a «Story» whose «Activity» is under-anchored
+- **when** a «Step» «binds» to it explicitly by id
+- **then** «Coverage» counts it, despite the missing anchors
+
 ## ✓ The «glossary» view aggregates «instances» and «verb» forms
-`tests/unit/report/test_aggregations.py:158::test_build_glossary_aggregations_collects_instances_and_forms`
+`tests/unit/report/test_glossary_view.py:53::test_build_glossary_aggregations_collects_instances_and_forms`
 
 - **given** a «Report» whose «Story» and «Scenario» reference entity «Instance»s and an «Inflection»
   - 📎 Report data:
@@ -1687,175 +1794,46 @@
 - **then** the verb collects its «Inflection» but not its canonical form
 
 ## ✓ «Terms» referenced by an «activity» record the «story»
-`tests/unit/report/test_aggregations.py:258::test_build_glossary_aggregations_records_story_refs_via_activities`
+`tests/unit/report/test_glossary_view.py:153::test_build_glossary_aggregations_records_story_refs_via_activities`
 
 - **given** a «Story» whose «Activity» references an actor and a verb
 - **when** the «Glossary» aggregations are built
 - **then** the actor and the verb each list that «Story»
 
 ## ✓ A «story» referencing a «term» twice lists it once
-`tests/unit/report/test_aggregations.py:288::test_repeated_references_within_one_story_are_recorded_once`
+`tests/unit/report/test_glossary_view.py:183::test_repeated_references_within_one_story_are_recorded_once`
 
 - **given** a «Story» whose two «activities» repeat the same «Term» and the same «Inflection»
 - **when** the «Glossary» aggregations are built
 - **then** the «Story» and the «Inflection» appear once each
 
 ## ✓ A canonical entity reference is not an «instance»
-`tests/unit/report/test_aggregations.py:356::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
+`tests/unit/report/test_glossary_view.py:236::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
 
 - **given** a «Story» activity and a «Step» referencing entities by canonical name only
 - **when** the «Glossary» aggregations are built
 - **then** neither entity term records an «Instance»
 
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_aggregations.py:442::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
+`tests/unit/report/test_glossary_view.py:322::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
 
 - **given** a «Kindless» «Term» referenced by a «Story» activity
 - **when** the «Glossary» aggregations are built
 - **then** the «Term» lists the «Story» but no «Instance» and no «Inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_aggregations.py:475::test_glossary_aggregations_annotates_fixture_provenance`
+`tests/unit/report/test_glossary_view.py:355::test_glossary_aggregations_annotates_fixture_provenance`
 
 - **given** a «Scenario» whose fixture-sourced «Step» names an «Instance»
 - **when** the «Glossary» aggregations are built
 - **then** the «Instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_aggregations.py:564::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
+`tests/unit/report/test_glossary_view.py:444::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
 
 - **given** a «Scenario» referencing one «Term» in two steps and another in its name
 - **when** the term-scenario index is built
 - **then** each «Term» maps to the scenario exactly once
-
-## ✓ An under-anchored «activity» is flagged ineligible in rollups
-`tests/unit/report/test_aggregations.py:605::test_build_story_rollups_flags_under_anchored_activity_ineligible`
-
-- **given** a «Story» with an anchored and an under-anchored «Activity»
-- **when** the story rollups are built
-- **then** only the anchored «Activity» is «Coverage»-eligible
-
-## ✓ A pinned under-anchored «activity» stops reading as untracked
-`tests/unit/report/test_aggregations.py:649::test_build_story_rollups_pinned_under_anchored_activity_is_tracked`
-
-- **given** a «Story» whose only «Activity» is under-anchored
-- **given** a «Scenario» whose «step» pins it by id
-- **when** the story rollups are built
-- **then** it stays narration-ineligible but is no longer untracked
-
-## ✓ An «Activity» is labeled by the prose of its «paths»
-`tests/unit/report/test_aggregations.py:751::test_build_activity_labels_joins_parts_into_prose`
-
-- **given** a «Story» with a two-«path» «activity»
-- **when** the «activity» labels are built
-- **then** the label reads as prose under a story-scoped key, with the «path» texts joined
-
-## ✓ A «verb» «activity» ref has one identity regardless of «inflection»
-`tests/unit/report/test_coverage.py:67::test_identity_of_activity_term_ref_verb_ignores_display`
-
-- **given** a «Verb» written canonically and as an «Inflection»
-- **when** «Coverage» derives each «Term ref» identity
-- **then** both collapse to the one canonical verb identity
-
-## ✓ A branching «activity» unions references across its «paths»
-`tests/unit/report/test_coverage.py:150::test_a_refs_unions_across_multi_path_activity`
-
-- **given** an «Activity» that branches into two «Path» alternatives
-- **when** «Coverage» collects the «Activity» references
-- **then** both «Instance» identities across the branches are present
-
-## ✓ An «instance» «step» ref adds a canonical fallback
-`tests/unit/report/test_coverage.py:204::test_s_for_step_instance_entity_ref_adds_canonical_fallback`
-
-- **given** a «Step» referring to a named «Instance»
-- **when** «Coverage» computes the identity set for the «Step»
-- **then** it includes the canonical «Term ref» fallback
-
-## ✓ A «verb» ref always resolves to its canonical identity
-`tests/unit/report/test_coverage.py:219::test_s_for_step_verb_ref_always_canonical`
-
-- **given** a «Step» using an «Inflection» of a «Verb»
-- **when** «Coverage» computes its identity set
-- **then** the identity ignores the surface form and stays canonical
-
-## ✓ An unknown «term ref» is skipped
-`tests/unit/report/test_coverage.py:231::test_s_for_step_unknown_term_ref_skipped` · validation
-
-- **given** a «Step» referencing a «Term» not in the glossary
-- **when** «Coverage» computes its identity set
-- **then** the unknown ref contributes nothing to the identity set
-
-## ✓ An «instance» «step» covers a canonical «activity»
-`tests/unit/report/test_coverage.py:255::test_compute_coverage_covers_canonical_activity_via_instance_step`
-
-- **given** a «Story» with a canonical «Activity»
-- **when** a «Scenario» step names a specific «Instance»
-- **then** «Coverage» reports the «Activity» as covered
-
-## ✓ A canonical «step» does not cover an «instance» «activity»
-`tests/unit/report/test_coverage.py:285::test_compute_coverage_does_not_cover_instance_activity_with_canonical_step`
-
-- **given** an «Activity» anchored to a named «Instance»
-- **when** a «Scenario» step only names the canonical «Actor»
-- **then** «Coverage» leaves the more specific instance activity uncovered
-
-## ✓ Promoting a bare word to a «verb» ref drops «coverage» from a «step» that matched
-`tests/unit/report/test_coverage.py:316::test_compute_coverage_lost_when_activity_gains_a_term`
-
-- **given** a «Step» naming two «term refs»
-- **given** the same «Activity» with that middle slot a bare word, then a «Verb» ref
-- **when** «Coverage» is computed against each «Story»
-- **then** the two-ref «Activity» is covered
-- **then** the widened «Activity» is no longer covered
-
-## ✓ A «scenario» «activity» binding constrains «coverage»
-`tests/unit/report/test_coverage.py:370::test_compute_coverage_scenario_constrained_to_activity_ids`
-
-- **given** a «Story» with two matching activities
-- **when** the «Scenario» «binds» only to activity 1
-- **then** «Coverage» considers only the bound «Activity»
-
-## ✓ An «activity» with two distinct «terms» is «coverage»-eligible
-`tests/unit/report/test_coverage.py:416::test_is_coverage_eligible_true_for_two_distinct_terms`
-
-- **given** an «Activity» anchored by two distinct «Term» refs
-- **when** its «Coverage» eligibility is checked
-- **then** it is eligible for «Coverage» tracking
-
-## ✓ An under-anchored «activity» is not «coverage»-eligible
-`tests/unit/report/test_coverage.py:438::test_is_coverage_eligible_false_for_one_distinct_term`
-
-- **given** an «Activity» that mentions only one distinct «Term»
-- **when** its «Coverage» eligibility is checked
-- **then** it is ineligible — «Coverage» needs at least two anchors
-
-## ✓ An under-anchored «activity» is never covered by narration matching
-`tests/unit/report/test_coverage.py:468::test_compute_coverage_excludes_under_anchored_activity`
-
-- **given** a «Story» whose «Activity» is all bare words
-- **when** coverage is computed against a scenario
-- **then** «Coverage» excludes the under-anchored «Activity»
-
-## ✓ Nested «steps» are walked for «coverage»
-`tests/unit/report/test_coverage.py:492::test_compute_coverage_nested_steps_are_walked`
-
-- **given** a «Story» with one canonical «Activity»
-- **when** the covering «Term ref»s live in a nested child «Step»
-- **then** the nested «Step» still counts and the «Activity» is covered
-
-## ✓ An explicit «step» binding covers an eligible «activity»
-`tests/unit/report/test_coverage.py:526::test_compute_coverage_explicit_step_binding_covers_eligible_activity`
-
-- **given** a «Story» with a coverage-eligible «Activity»
-- **when** a «Step» «binds» to it explicitly by id
-- **then** «Coverage» counts it directly, without identity matching
-
-## ✓ An explicit binding covers an under-anchored «activity»
-`tests/unit/report/test_coverage.py:554::test_compute_coverage_explicit_binding_covers_under_anchored_activity`
-
-- **given** a «Story» whose «Activity» is under-anchored
-- **when** a «Step» «binds» to it explicitly by id
-- **then** «Coverage» counts it, despite the missing anchors
 
 ## ✓ «Parameter coloring» marks placeholders and table headers
 `tests/unit/report/test_html_renderer.py:223::test_render_parametrized_step_with_structured_narration` · parametrization
@@ -2076,29 +2054,51 @@
 - **then** the preset is refused
 - **then** the error points at the env var and the raw-template escape hatch
 
+## ✓ An under-anchored «activity» is flagged ineligible in rollups
+`tests/unit/report/test_story_view.py:167::test_build_story_rollups_flags_under_anchored_activity_ineligible`
+
+- **given** a «Story» with an anchored and an under-anchored «Activity»
+- **when** the story rollups are built
+- **then** only the anchored «Activity» is «Coverage»-eligible
+
+## ✓ A pinned under-anchored «activity» stops reading as untracked
+`tests/unit/report/test_story_view.py:211::test_build_story_rollups_pinned_under_anchored_activity_is_tracked`
+
+- **given** a «Story» whose only «Activity» is under-anchored
+- **given** a «Scenario» whose «step» pins it by id
+- **when** the story rollups are built
+- **then** it stays narration-ineligible but is no longer untracked
+
+## ✓ An «Activity» is labeled by the prose of its «paths»
+`tests/unit/report/test_story_view.py:313::test_build_activity_labels_joins_parts_into_prose`
+
+- **given** a «Story» with a two-«path» «activity»
+- **when** the «activity» labels are built
+- **then** the label reads as prose under a story-scoped key, with the «path» texts joined
+
 ## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
-`tests/unit/test_grouping.py:95::test_group_parametrized_any_failed_groups_as_failed` · parametrization
+`tests/unit/test_grouping.py:93::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
 - **given** three «Case» records of one «Parametrized scenario»
 - **when** the «grouping» pass collapses them
 - **then** one scenario remains and any failed «Case» fails it
 
 ## ✓ A «parametrized scenario» keeps its place among the «scenarios» around it
-`tests/unit/test_grouping.py:127::test_group_parametrized_keeps_source_order` · parametrization
+`tests/unit/test_grouping.py:125::test_group_parametrized_keeps_source_order` · parametrization
 
 - **given** a plain «scenario» between two parametrized ones
 - **when** the «grouping» pass runs
 - **then** the «report» lists them in the order the file declares
 
 ## ✓ The grouped tree comes from the first passed «case»
-`tests/unit/test_grouping.py:226::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
+`tests/unit/test_grouping.py:224::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
 
 - **given** a skipped first «Case» and a second one that ran
 - **when** the «cases» are «grouped»
 - **then** the tree is the one the passed «Case» recorded
 
 ## ✓ A plain-str «narration» that varies across «cases» is refused
-`tests/unit/test_grouping.py:453::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
+`tests/unit/test_grouping.py:451::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
 
 - **given** two «cases» whose text differs but records no parts
 - **when** the «cases» are «grouped»
@@ -2106,7 +2106,7 @@
 - **then** the error names the test, the missing parts and the t-string fix
 
 ## ✓ A narrated value that varies becomes a derived «parameter table» column
-`tests/unit/test_grouping.py:570::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
+`tests/unit/test_grouping.py:568::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
 
 - **given** two «cases» narrating a value that differs
 - **when** «templatizing» walks the «cases»
@@ -2114,7 +2114,7 @@
 - **then** the «Step» keeps a placeholder pointing at that column
 
 ## ✓ A varying interpolation that is not a bare name is refused
-`tests/unit/test_grouping.py:682::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
+`tests/unit/test_grouping.py:680::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
 
 - **given** two «cases» narrating a computed expression
 - **when** the «cases» are «grouped»
@@ -2122,14 +2122,14 @@
 - **then** the error quotes the expression and shows the bind-a-local fix
 
 ## ✓ A «parameter table» cell reads the way the scenario name formats it
-`tests/unit/test_grouping.py:1048::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
+`tests/unit/test_grouping.py:1046::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
 
 - **given** a Template scenario name formatting its parameter
 - **when** the «cases» are «grouped»
 - **then** the cells carry the formatting the name declared
 
 ## ✓ A scenario name formatting a parameter a «step» reads plainly gets its own column
-`tests/unit/test_grouping.py:1063::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1061::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
 
 - **given** a name formatting the parameter and a step reading it plainly
 - **when** the «cases» are «grouped»
@@ -2137,7 +2137,7 @@
 - **then** the name renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» formatting a parameter the scenario name reads plainly gets its own column
-`tests/unit/test_grouping.py:1106::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1104::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
 
 - **given** a step formatting the parameter and a name reading it plainly
 - **when** the «cases» are «grouped»
@@ -2145,7 +2145,7 @@
 - **then** the step renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» narrating a parameter its column no longer holds is refused
-`tests/unit/test_grouping.py:1188::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
+`tests/unit/test_grouping.py:1186::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
 
 - **given** two «cases» narrating a value their column lacks
 - **when** the «cases» are «grouped»
@@ -2153,7 +2153,7 @@
 - **then** the error names the column and what the case actually narrated
 
 ## ✓ A «term ref» whose display differs between «cases» is refused
-`tests/unit/test_grouping.py:1539::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1537::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» reads differently
 - **when** the «cases» are «grouped»
@@ -2161,7 +2161,7 @@
 - **then** the error names the «Term ref» and the split-it-out fix
 
 ## ✓ A «term ref» that *is* the parametrize value is refused too
-`tests/unit/test_grouping.py:1596::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1594::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» is the parameter itself
 - **when** the «cases» are «grouped»
@@ -2169,7 +2169,7 @@
 - **then** the error points at the per-case «scenario» opt-out
 
 ## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py:1760::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+`tests/unit/test_grouping.py:1758::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
 
 - **given** two «cases» attaching a label with differing payloads
 - **when** «templatizing» walks the «cases»
@@ -2177,7 +2177,7 @@
 - **then** the «Step» keeps a content-less badge pointing at it
 
 ## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py:1816::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+`tests/unit/test_grouping.py:1814::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
 
 - **given** an «Attachment» label only one «Case» attaches
 - **when** the «cases» are «grouped»
@@ -2185,7 +2185,7 @@
 - **then** the error names the label and asks for a constant one
 
 ## ✓ A «parameter table» cell reads the way the «step» that points at it read
-`tests/unit/test_grouping.py:2364::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+`tests/unit/test_grouping.py:2362::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec
 - **when** «grouping» builds the «parameter table»
@@ -2193,7 +2193,7 @@
 - **then** the step keeps its placeholder, which that cell substitutes into
 
 ## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py:2502::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+`tests/unit/test_grouping.py:2519::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
 
 - **given** two «cases» whose «step» trees differ
 - **when** the «cases» are «grouped»
@@ -2201,7 +2201,7 @@
 - **then** the error names the divergence and the opt-out that answers it
 
 ## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
-`tests/unit/test_grouping.py:2630::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
+`tests/unit/test_grouping.py:2670::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
 
 - **given** a step narrating a parameter bound to a glossary term instance
 - **when** the «cases» are «grouped»

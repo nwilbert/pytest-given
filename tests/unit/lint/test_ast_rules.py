@@ -34,6 +34,28 @@ def _ast_rules(
     return run_ast_rules(scenarios, rootdir, enabled)
 
 
+def test_ast_rules_parse_nothing_when_every_rule_is_off(tmp_path) -> None:
+    """`off` means the rule does not run — and the AST pass's expensive half is
+    reading and parsing every test file, before any rule sees a node."""
+    src = _write(
+        tmp_path,
+        """
+        def test_x():
+            pass
+    """,
+    )
+    scenario_obj = _scenario(
+        [
+            Step(
+                phase='given',
+                narration=Narration(text='a thing'),
+                source=SourceLocation(relpath='test_x.py', line=_line(src, 'pass')),
+            )
+        ]
+    )
+    assert run_ast_rules([scenario_obj], tmp_path, set()) == []
+
+
 # --- AST pass: anchoring, when_then pairs, rules 1-2 ---
 
 

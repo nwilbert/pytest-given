@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-02T21:16:51.800149+00:00",
+    "timestamp": "2026-09-03T20:56:07.399004+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "552effa4e892d86e20a77e72fa554f61760303c6",
+    "commit_sha": "ec3f7ae7ae5bbfe205ee72c8ac158bc06944f867",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -134,7 +134,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -272,7 +272,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -712,7 +712,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2262
+        "line": 2265
       },
       "story_id": null,
       "activity_ids": []
@@ -738,7 +738,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 19,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -788,7 +788,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2275
+        "line": 2278
       },
       "story_id": null,
       "activity_ids": []
@@ -814,7 +814,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -875,7 +875,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2296
+        "line": 2299
       },
       "story_id": null,
       "activity_ids": []
@@ -900,7 +900,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -958,7 +958,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2328
+        "line": 2331
       },
       "story_id": null,
       "activity_ids": []
@@ -1056,7 +1056,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2360
+        "line": 2363
       },
       "story_id": null,
       "activity_ids": []
@@ -1131,7 +1131,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2546
+        "line": 2549
       },
       "story_id": null,
       "activity_ids": []
@@ -1154,7 +1154,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -1255,7 +1255,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 19,
       "steps": [
         {
           "phase": "given",
@@ -1354,7 +1354,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -1476,7 +1476,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -8385,7 +8385,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 59
+        "line": 60
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -8495,7 +8495,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 151
+        "line": 152
       },
       "story_id": null,
       "activity_ids": []
@@ -8602,7 +8602,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 279
+        "line": 280
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -8695,7 +8695,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 304
+        "line": 305
       },
       "story_id": null,
       "activity_ids": []
@@ -8790,7 +8790,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 332
+        "line": 333
       },
       "story_id": null,
       "activity_ids": []
@@ -8943,7 +8943,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 374
+        "line": 375
       },
       "story_id": null,
       "activity_ids": []
@@ -9041,7 +9041,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 406
+        "line": 407
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -9123,7 +9123,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 450
+        "line": 451
       },
       "story_id": null,
       "activity_ids": []
@@ -9257,7 +9257,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 520
+        "line": 521
       },
       "story_id": null,
       "activity_ids": []
@@ -9342,7 +9342,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 911
+        "line": 922
       },
       "story_id": null,
       "activity_ids": []
@@ -13730,7 +13730,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 63
+        "line": 99
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -13846,7 +13846,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 224
+        "line": 260
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14016,7 +14016,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 388
+        "line": 424
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14132,7 +14132,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 528
+        "line": 560
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14248,7 +14248,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 704
+        "line": 736
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14709,1291 +14709,9 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
-        "line": 199
+        "line": 218
       },
       "story_id": "adopt-pytest-given",
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_collects_instances_and_forms",
-      "narration": {
-        "text": "The glossary view aggregates instances and verb forms",
-        "parts": [
-          {
-            "value": "The "
-          },
-          {
-            "term_id": "glossary",
-            "display": "glossary",
-            "expression": "pg[\"Glossary\"].low"
-          },
-          {
-            "value": " view aggregates "
-          },
-          {
-            "term_id": "instance",
-            "display": "instances",
-            "expression": "pg[\"Instance\"](\"instances\")"
-          },
-          {
-            "value": " and "
-          },
-          {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
-          },
-          {
-            "value": " forms"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_aggregations",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Report whose Story and Scenario reference entity Instances and an Inflection",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "report",
-                "display": "Report",
-                "expression": "pg[\"Report\"]"
-              },
-              {
-                "value": " whose "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              },
-              {
-                "value": " and "
-              },
-              {
-                "term_id": "scenario",
-                "display": "Scenario",
-                "expression": "pg[\"Scenario\"]"
-              },
-              {
-                "value": " reference entity "
-              },
-              {
-                "term_id": "instance",
-                "display": "Instance",
-                "expression": "pg[\"Instance\"]"
-              },
-              {
-                "value": "s and an "
-              },
-              {
-                "term_id": "inflection",
-                "display": "Inflection",
-                "expression": "pg[\"Inflection\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "Report data",
-              "content": "{\n  \"metadata\": {\n    \"project\": \"p\",\n    \"timestamp\": \"t\",\n    \"pytest_version\": \"8\",\n    \"plugin_version\": \"0\",\n    \"commit_sha\": null,\n    \"title\": null\n  },\n  \"scenarios\": [\n    {\n      \"id\": \"t\",\n      \"narration\": {\n        \"text\": \"s\",\n        \"parts\": []\n      },\n      \"module\": \"m\",\n      \"tags\": [],\n      \"status\": \"passed\",\n      \"duration_ms\": 0,\n      \"steps\": [\n        {\n          \"phase\": \"when\",\n          \"narration\": {\n            \"text\": \"x\",\n            \"parts\": [\n              {\n                \"term_id\": \"guest\",\n                \"display\": \"Alice\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"search\",\n                \"display\": \"searches\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"room\",\n                \"display\": \"Deluxe Suite\",\n                \"expression\": \"\"\n              }\n            ]\n          },\n          \"children\": [],\n          \"attachments\": [],\n          \"activity_ids\": [],\n          \"fixture_name\": null\n        }\n      ],\n      \"parameters\": null,\n      \"error\": null,\n      \"skip_reason\": null,\n      \"source\": null,\n      \"story_id\": \"book\",\n      \"activity_ids\": []\n    }\n  ],\n  \"glossary\": {\n    \"terms\": [\n      {\n        \"id\": \"guest\",\n        \"kind\": \"actor\",\n        \"canonical\": \"Guest\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"room\",\n        \"kind\": \"object\",\n        \"canonical\": \"Room\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"search\",\n        \"kind\": \"verb\",\n        \"canonical\": \"search\",\n        \"definition\": null,\n        \"source\": null\n      }\n    ]\n  },\n  \"stories\": [\n    {\n      \"id\": \"book\",\n      \"title\": \"Book\",\n      \"activities\": [\n        {\n          \"id\": 1,\n          \"paths\": [\n            {\n              \"parts\": [\n                {\n                  \"term_id\": \"guest\",\n                  \"display\": \"Alice\"\n                },\n                {\n                  \"term_id\": \"search\",\n                  \"display\": \"searches for\"\n                },\n                {\n                  \"term_id\": \"room\",\n                  \"display\": \"Deluxe Suite\"\n                }\n              ]\n            }\n          ]\n        }\n      ],\n      \"source\": null\n    }\n  ]\n}",
-              "content_type": "json"
-            }
-          ],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the Glossary aggregations are built",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "glossary",
-                "display": "Glossary",
-                "expression": "pg[\"Glossary\"]"
-              },
-              {
-                "value": " aggregations are built"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the entity terms collect their Instances",
-            "parts": [
-              {
-                "value": "the entity terms collect their "
-              },
-              {
-                "term_id": "instance",
-                "display": "Instance",
-                "expression": "pg[\"Instance\"]"
-              },
-              {
-                "value": "s"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the verb collects its Inflection but not its canonical form",
-            "parts": [
-              {
-                "value": "the verb collects its "
-              },
-              {
-                "term_id": "inflection",
-                "display": "Inflection",
-                "expression": "pg[\"Inflection\"]"
-              },
-              {
-                "value": " but not its canonical form"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 158
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_records_story_refs_via_activities",
-      "narration": {
-        "text": "Terms referenced by an activity record the story",
-        "parts": [
-          {
-            "term_id": "term",
-            "display": "Terms",
-            "expression": "pg[\"Term\"](\"Terms\")"
-          },
-          {
-            "value": " referenced by an "
-          },
-          {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
-          },
-          {
-            "value": " record the "
-          },
-          {
-            "term_id": "story",
-            "display": "story",
-            "expression": "pg[\"Story\"].low"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_aggregations",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Story whose Activity references an actor and a verb",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              },
-              {
-                "value": " whose "
-              },
-              {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
-              },
-              {
-                "value": " references an actor and a verb"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the Glossary aggregations are built",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "glossary",
-                "display": "Glossary",
-                "expression": "pg[\"Glossary\"]"
-              },
-              {
-                "value": " aggregations are built"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the actor and the verb each list that Story",
-            "parts": [
-              {
-                "value": "the actor and the verb each list that "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 258
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_aggregations.py::test_repeated_references_within_one_story_are_recorded_once",
-      "narration": {
-        "text": "A story referencing a term twice lists it once",
-        "parts": [
-          {
-            "value": "A "
-          },
-          {
-            "term_id": "story",
-            "display": "story",
-            "expression": "pg[\"Story\"].low"
-          },
-          {
-            "value": " referencing a "
-          },
-          {
-            "term_id": "term",
-            "display": "term",
-            "expression": "pg[\"Term\"].low"
-          },
-          {
-            "value": " twice lists it once"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_aggregations",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Story whose two activities repeat the same Term and the same Inflection",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              },
-              {
-                "value": " whose two "
-              },
-              {
-                "term_id": "activity",
-                "display": "activities",
-                "expression": "pg[\"Activity\"](\"activities\")"
-              },
-              {
-                "value": " repeat the same "
-              },
-              {
-                "term_id": "term",
-                "display": "Term",
-                "expression": "pg[\"Term\"]"
-              },
-              {
-                "value": " and the same "
-              },
-              {
-                "term_id": "inflection",
-                "display": "Inflection",
-                "expression": "pg[\"Inflection\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the Glossary aggregations are built",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "glossary",
-                "display": "Glossary",
-                "expression": "pg[\"Glossary\"]"
-              },
-              {
-                "value": " aggregations are built"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Story and the Inflection appear once each",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              },
-              {
-                "value": " and the "
-              },
-              {
-                "term_id": "inflection",
-                "display": "Inflection",
-                "expression": "pg[\"Inflection\"]"
-              },
-              {
-                "value": " appear once each"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 288
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance",
-      "narration": {
-        "text": "A canonical entity reference is not an instance",
-        "parts": [
-          {
-            "value": "A canonical entity reference is not an "
-          },
-          {
-            "term_id": "instance",
-            "display": "instance",
-            "expression": "pg[\"Instance\"].low"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_aggregations",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Story activity and a Step referencing entities by canonical name only",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              },
-              {
-                "value": " activity and a "
-              },
-              {
-                "term_id": "step",
-                "display": "Step",
-                "expression": "pg[\"Step\"]"
-              },
-              {
-                "value": " referencing entities by canonical name only"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the Glossary aggregations are built",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "glossary",
-                "display": "Glossary",
-                "expression": "pg[\"Glossary\"]"
-              },
-              {
-                "value": " aggregations are built"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "neither entity term records an Instance",
-            "parts": [
-              {
-                "value": "neither entity term records an "
-              },
-              {
-                "term_id": "instance",
-                "display": "Instance",
-                "expression": "pg[\"Instance\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 356
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_aggregations.py::test_build_glossary_aggregations_kindless_term_records_only_story_ref",
-      "narration": {
-        "text": "A kindless term records only its story ref",
-        "parts": [
-          {
-            "value": "A "
-          },
-          {
-            "term_id": "kindless",
-            "display": "kindless",
-            "expression": "pg[\"Kindless\"].low"
-          },
-          {
-            "value": " "
-          },
-          {
-            "term_id": "term",
-            "display": "term",
-            "expression": "pg[\"Term\"].low"
-          },
-          {
-            "value": " records only its "
-          },
-          {
-            "term_id": "story",
-            "display": "story",
-            "expression": "pg[\"Story\"].low"
-          },
-          {
-            "value": " ref"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_aggregations",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Kindless Term referenced by a Story activity",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "kindless",
-                "display": "Kindless",
-                "expression": "pg[\"Kindless\"]"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "term",
-                "display": "Term",
-                "expression": "pg[\"Term\"]"
-              },
-              {
-                "value": " referenced by a "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              },
-              {
-                "value": " activity"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the Glossary aggregations are built",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "glossary",
-                "display": "Glossary",
-                "expression": "pg[\"Glossary\"]"
-              },
-              {
-                "value": " aggregations are built"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Term lists the Story but no Instance and no Inflection",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "term",
-                "display": "Term",
-                "expression": "pg[\"Term\"]"
-              },
-              {
-                "value": " lists the "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              },
-              {
-                "value": " but no "
-              },
-              {
-                "term_id": "instance",
-                "display": "Instance",
-                "expression": "pg[\"Instance\"]"
-              },
-              {
-                "value": " and no "
-              },
-              {
-                "term_id": "inflection",
-                "display": "Inflection",
-                "expression": "pg[\"Inflection\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 442
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_aggregations.py::test_glossary_aggregations_annotates_fixture_provenance",
-      "narration": {
-        "text": "An instance seen in a fixture step records its fixture provenance",
-        "parts": [
-          {
-            "value": "An "
-          },
-          {
-            "term_id": "instance",
-            "display": "instance",
-            "expression": "pg[\"Instance\"].low"
-          },
-          {
-            "value": " seen in a fixture "
-          },
-          {
-            "term_id": "step",
-            "display": "step",
-            "expression": "pg[\"Step\"].low"
-          },
-          {
-            "value": " records its fixture provenance"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_aggregations",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Scenario whose fixture-sourced Step names an Instance",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "scenario",
-                "display": "Scenario",
-                "expression": "pg[\"Scenario\"]"
-              },
-              {
-                "value": " whose fixture-sourced "
-              },
-              {
-                "term_id": "step",
-                "display": "Step",
-                "expression": "pg[\"Step\"]"
-              },
-              {
-                "value": " names an "
-              },
-              {
-                "term_id": "instance",
-                "display": "Instance",
-                "expression": "pg[\"Instance\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the Glossary aggregations are built",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "glossary",
-                "display": "Glossary",
-                "expression": "pg[\"Glossary\"]"
-              },
-              {
-                "value": " aggregations are built"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Instance carries the fixture name",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "instance",
-                "display": "Instance",
-                "expression": "pg[\"Instance\"]"
-              },
-              {
-                "value": " carries the fixture name"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 475
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_aggregations.py::test_build_term_scenario_index_dedups_and_includes_scenario_narration",
-      "narration": {
-        "text": "The term index maps each term to its scenarios once",
-        "parts": [
-          {
-            "value": "The "
-          },
-          {
-            "term_id": "term",
-            "display": "term",
-            "expression": "pg[\"Term\"].low"
-          },
-          {
-            "value": " index maps each "
-          },
-          {
-            "term_id": "term",
-            "display": "term",
-            "expression": "pg[\"Term\"].low"
-          },
-          {
-            "value": " to its "
-          },
-          {
-            "term_id": "scenario",
-            "display": "scenarios",
-            "expression": "pg[\"Scenario\"](\"scenarios\")"
-          },
-          {
-            "value": " once"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_aggregations",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Scenario referencing one Term in two steps and another in its name",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "scenario",
-                "display": "Scenario",
-                "expression": "pg[\"Scenario\"]"
-              },
-              {
-                "value": " referencing one "
-              },
-              {
-                "term_id": "term",
-                "display": "Term",
-                "expression": "pg[\"Term\"]"
-              },
-              {
-                "value": " in two steps and another in its name"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the term-scenario index is built",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "each Term maps to the scenario exactly once",
-            "parts": [
-              {
-                "value": "each "
-              },
-              {
-                "term_id": "term",
-                "display": "Term",
-                "expression": "pg[\"Term\"]"
-              },
-              {
-                "value": " maps to the scenario exactly once"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 564
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_aggregations.py::test_build_story_rollups_flags_under_anchored_activity_ineligible",
-      "narration": {
-        "text": "An under-anchored activity is flagged ineligible in rollups",
-        "parts": [
-          {
-            "value": "An under-anchored "
-          },
-          {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
-          },
-          {
-            "value": " is flagged ineligible in rollups"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_aggregations",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Story with an anchored and an under-anchored Activity",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              },
-              {
-                "value": " with an anchored and an under-anchored "
-              },
-              {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the story rollups are built",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "only the anchored Activity is Coverage-eligible",
-            "parts": [
-              {
-                "value": "only the anchored "
-              },
-              {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
-              },
-              {
-                "value": " is "
-              },
-              {
-                "term_id": "coverage",
-                "display": "Coverage",
-                "expression": "pg[\"Coverage\"]"
-              },
-              {
-                "value": "-eligible"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 605
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_aggregations.py::test_build_story_rollups_pinned_under_anchored_activity_is_tracked",
-      "narration": {
-        "text": "A pinned under-anchored activity stops reading as untracked",
-        "parts": [
-          {
-            "value": "A pinned under-anchored "
-          },
-          {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
-          },
-          {
-            "value": " stops reading as untracked"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_aggregations",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Story whose only Activity is under-anchored",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              },
-              {
-                "value": " whose only "
-              },
-              {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
-              },
-              {
-                "value": " is under-anchored"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Scenario whose step pins it by id",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "scenario",
-                "display": "Scenario",
-                "expression": "pg[\"Scenario\"]"
-              },
-              {
-                "value": " whose "
-              },
-              {
-                "term_id": "step",
-                "display": "step",
-                "expression": "pg[\"Step\"].low"
-              },
-              {
-                "value": " pins it by id"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the story rollups are built",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "it stays narration-ineligible but is no longer untracked",
-            "parts": [
-              {
-                "value": "it stays narration-ineligible but is no longer untracked"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 649
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_aggregations.py::test_build_activity_labels_joins_parts_into_prose",
-      "narration": {
-        "text": "An Activity is labeled by the prose of its paths",
-        "parts": [
-          {
-            "value": "An "
-          },
-          {
-            "term_id": "activity",
-            "display": "Activity",
-            "expression": "pg[\"Activity\"]"
-          },
-          {
-            "value": " is labeled by the prose of its "
-          },
-          {
-            "term_id": "path",
-            "display": "paths",
-            "expression": "pg[\"Path\"](\"paths\")"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_aggregations",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Story with a two-path activity",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              },
-              {
-                "value": " with a two-"
-              },
-              {
-                "term_id": "path",
-                "display": "path",
-                "expression": "pg[\"Path\"].low"
-              },
-              {
-                "value": " "
-              },
-              {
-                "term_id": "activity",
-                "display": "activity",
-                "expression": "pg[\"Activity\"].low"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the activity labels are built",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "activity",
-                "display": "activity",
-                "expression": "pg[\"Activity\"].low"
-              },
-              {
-                "value": " labels are built"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the label reads as prose under a story-scoped key, with the path texts joined",
-            "parts": [
-              {
-                "value": "the label reads as prose under a story-scoped key, with the "
-              },
-              {
-                "term_id": "path",
-                "display": "path",
-                "expression": "pg[\"Path\"].low"
-              },
-              {
-                "value": " texts joined"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_aggregations.py",
-        "line": 751
-      },
-      "story_id": null,
       "activity_ids": []
     },
     {
@@ -17810,6 +16528,941 @@
       "activity_ids": []
     },
     {
+      "id": "tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_collects_instances_and_forms",
+      "narration": {
+        "text": "The glossary view aggregates instances and verb forms",
+        "parts": [
+          {
+            "value": "The "
+          },
+          {
+            "term_id": "glossary",
+            "display": "glossary",
+            "expression": "pg[\"Glossary\"].low"
+          },
+          {
+            "value": " view aggregates "
+          },
+          {
+            "term_id": "instance",
+            "display": "instances",
+            "expression": "pg[\"Instance\"](\"instances\")"
+          },
+          {
+            "value": " and "
+          },
+          {
+            "term_id": "verb",
+            "display": "verb",
+            "expression": "pg[\"Verb\"].low"
+          },
+          {
+            "value": " forms"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_glossary_view",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Report whose Story and Scenario reference entity Instances and an Inflection",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "Report",
+                "expression": "pg[\"Report\"]"
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " and "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]"
+              },
+              {
+                "value": " reference entity "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]"
+              },
+              {
+                "value": "s and an "
+              },
+              {
+                "term_id": "inflection",
+                "display": "Inflection",
+                "expression": "pg[\"Inflection\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "Report data",
+              "content": "{\n  \"metadata\": {\n    \"project\": \"p\",\n    \"timestamp\": \"t\",\n    \"pytest_version\": \"8\",\n    \"plugin_version\": \"0\",\n    \"commit_sha\": null,\n    \"title\": null\n  },\n  \"scenarios\": [\n    {\n      \"id\": \"t\",\n      \"narration\": {\n        \"text\": \"s\",\n        \"parts\": []\n      },\n      \"module\": \"m\",\n      \"tags\": [],\n      \"status\": \"passed\",\n      \"duration_ms\": 0,\n      \"steps\": [\n        {\n          \"phase\": \"when\",\n          \"narration\": {\n            \"text\": \"x\",\n            \"parts\": [\n              {\n                \"term_id\": \"guest\",\n                \"display\": \"Alice\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"search\",\n                \"display\": \"searches\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"room\",\n                \"display\": \"Deluxe Suite\",\n                \"expression\": \"\"\n              }\n            ]\n          },\n          \"children\": [],\n          \"attachments\": [],\n          \"activity_ids\": [],\n          \"fixture_name\": null\n        }\n      ],\n      \"parameters\": null,\n      \"error\": null,\n      \"skip_reason\": null,\n      \"source\": null,\n      \"story_id\": \"book\",\n      \"activity_ids\": []\n    }\n  ],\n  \"glossary\": {\n    \"terms\": [\n      {\n        \"id\": \"guest\",\n        \"kind\": \"actor\",\n        \"canonical\": \"Guest\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"room\",\n        \"kind\": \"object\",\n        \"canonical\": \"Room\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"search\",\n        \"kind\": \"verb\",\n        \"canonical\": \"search\",\n        \"definition\": null,\n        \"source\": null\n      }\n    ]\n  },\n  \"stories\": [\n    {\n      \"id\": \"book\",\n      \"title\": \"Book\",\n      \"activities\": [\n        {\n          \"id\": 1,\n          \"paths\": [\n            {\n              \"parts\": [\n                {\n                  \"term_id\": \"guest\",\n                  \"display\": \"Alice\"\n                },\n                {\n                  \"term_id\": \"search\",\n                  \"display\": \"searches for\"\n                },\n                {\n                  \"term_id\": \"room\",\n                  \"display\": \"Deluxe Suite\"\n                }\n              ]\n            }\n          ]\n        }\n      ],\n      \"source\": null\n    }\n  ]\n}",
+              "content_type": "json"
+            }
+          ],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Glossary aggregations are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "Glossary",
+                "expression": "pg[\"Glossary\"]"
+              },
+              {
+                "value": " aggregations are built"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the entity terms collect their Instances",
+            "parts": [
+              {
+                "value": "the entity terms collect their "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]"
+              },
+              {
+                "value": "s"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the verb collects its Inflection but not its canonical form",
+            "parts": [
+              {
+                "value": "the verb collects its "
+              },
+              {
+                "term_id": "inflection",
+                "display": "Inflection",
+                "expression": "pg[\"Inflection\"]"
+              },
+              {
+                "value": " but not its canonical form"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_glossary_view.py",
+        "line": 53
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_records_story_refs_via_activities",
+      "narration": {
+        "text": "Terms referenced by an activity record the story",
+        "parts": [
+          {
+            "term_id": "term",
+            "display": "Terms",
+            "expression": "pg[\"Term\"](\"Terms\")"
+          },
+          {
+            "value": " referenced by an "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
+          },
+          {
+            "value": " record the "
+          },
+          {
+            "term_id": "story",
+            "display": "story",
+            "expression": "pg[\"Story\"].low"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_glossary_view",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Story whose Activity references an actor and a verb",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
+              },
+              {
+                "value": " references an actor and a verb"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Glossary aggregations are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "Glossary",
+                "expression": "pg[\"Glossary\"]"
+              },
+              {
+                "value": " aggregations are built"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the actor and the verb each list that Story",
+            "parts": [
+              {
+                "value": "the actor and the verb each list that "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_glossary_view.py",
+        "line": 153
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_glossary_view.py::test_repeated_references_within_one_story_are_recorded_once",
+      "narration": {
+        "text": "A story referencing a term twice lists it once",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "story",
+            "display": "story",
+            "expression": "pg[\"Story\"].low"
+          },
+          {
+            "value": " referencing a "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low"
+          },
+          {
+            "value": " twice lists it once"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_glossary_view",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Story whose two activities repeat the same Term and the same Inflection",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " whose two "
+              },
+              {
+                "term_id": "activity",
+                "display": "activities",
+                "expression": "pg[\"Activity\"](\"activities\")"
+              },
+              {
+                "value": " repeat the same "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]"
+              },
+              {
+                "value": " and the same "
+              },
+              {
+                "term_id": "inflection",
+                "display": "Inflection",
+                "expression": "pg[\"Inflection\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Glossary aggregations are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "Glossary",
+                "expression": "pg[\"Glossary\"]"
+              },
+              {
+                "value": " aggregations are built"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Story and the Inflection appear once each",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " and the "
+              },
+              {
+                "term_id": "inflection",
+                "display": "Inflection",
+                "expression": "pg[\"Inflection\"]"
+              },
+              {
+                "value": " appear once each"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_glossary_view.py",
+        "line": 183
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance",
+      "narration": {
+        "text": "A canonical entity reference is not an instance",
+        "parts": [
+          {
+            "value": "A canonical entity reference is not an "
+          },
+          {
+            "term_id": "instance",
+            "display": "instance",
+            "expression": "pg[\"Instance\"].low"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_glossary_view",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Story activity and a Step referencing entities by canonical name only",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " activity and a "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]"
+              },
+              {
+                "value": " referencing entities by canonical name only"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Glossary aggregations are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "Glossary",
+                "expression": "pg[\"Glossary\"]"
+              },
+              {
+                "value": " aggregations are built"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "neither entity term records an Instance",
+            "parts": [
+              {
+                "value": "neither entity term records an "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_glossary_view.py",
+        "line": 236
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_kindless_term_records_only_story_ref",
+      "narration": {
+        "text": "A kindless term records only its story ref",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "kindless",
+            "display": "kindless",
+            "expression": "pg[\"Kindless\"].low"
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low"
+          },
+          {
+            "value": " records only its "
+          },
+          {
+            "term_id": "story",
+            "display": "story",
+            "expression": "pg[\"Story\"].low"
+          },
+          {
+            "value": " ref"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_glossary_view",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Kindless Term referenced by a Story activity",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "kindless",
+                "display": "Kindless",
+                "expression": "pg[\"Kindless\"]"
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]"
+              },
+              {
+                "value": " referenced by a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " activity"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Glossary aggregations are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "Glossary",
+                "expression": "pg[\"Glossary\"]"
+              },
+              {
+                "value": " aggregations are built"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Term lists the Story but no Instance and no Inflection",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]"
+              },
+              {
+                "value": " lists the "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " but no "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]"
+              },
+              {
+                "value": " and no "
+              },
+              {
+                "term_id": "inflection",
+                "display": "Inflection",
+                "expression": "pg[\"Inflection\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_glossary_view.py",
+        "line": 322
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_glossary_view.py::test_glossary_aggregations_annotates_fixture_provenance",
+      "narration": {
+        "text": "An instance seen in a fixture step records its fixture provenance",
+        "parts": [
+          {
+            "value": "An "
+          },
+          {
+            "term_id": "instance",
+            "display": "instance",
+            "expression": "pg[\"Instance\"].low"
+          },
+          {
+            "value": " seen in a fixture "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].low"
+          },
+          {
+            "value": " records its fixture provenance"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_glossary_view",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Scenario whose fixture-sourced Step names an Instance",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]"
+              },
+              {
+                "value": " whose fixture-sourced "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]"
+              },
+              {
+                "value": " names an "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Glossary aggregations are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "Glossary",
+                "expression": "pg[\"Glossary\"]"
+              },
+              {
+                "value": " aggregations are built"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Instance carries the fixture name",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]"
+              },
+              {
+                "value": " carries the fixture name"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_glossary_view.py",
+        "line": 355
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_glossary_view.py::test_build_term_scenario_index_dedups_and_includes_scenario_narration",
+      "narration": {
+        "text": "The term index maps each term to its scenarios once",
+        "parts": [
+          {
+            "value": "The "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low"
+          },
+          {
+            "value": " index maps each "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low"
+          },
+          {
+            "value": " to its "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenarios",
+            "expression": "pg[\"Scenario\"](\"scenarios\")"
+          },
+          {
+            "value": " once"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_glossary_view",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Scenario referencing one Term in two steps and another in its name",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]"
+              },
+              {
+                "value": " referencing one "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]"
+              },
+              {
+                "value": " in two steps and another in its name"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the term-scenario index is built",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each Term maps to the scenario exactly once",
+            "parts": [
+              {
+                "value": "each "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]"
+              },
+              {
+                "value": " maps to the scenario exactly once"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_glossary_view.py",
+        "line": 444
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "tests/unit/report/test_html_renderer.py::test_render_parametrized_step_with_structured_narration",
       "narration": {
         "text": "Parameter coloring marks placeholders and table headers",
@@ -17829,7 +17482,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 55,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -19271,6 +18924,353 @@
       "activity_ids": []
     },
     {
+      "id": "tests/unit/report/test_story_view.py::test_build_story_rollups_flags_under_anchored_activity_ineligible",
+      "narration": {
+        "text": "An under-anchored activity is flagged ineligible in rollups",
+        "parts": [
+          {
+            "value": "An under-anchored "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
+          },
+          {
+            "value": " is flagged ineligible in rollups"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_story_view",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Story with an anchored and an under-anchored Activity",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " with an anchored and an under-anchored "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the story rollups are built",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "only the anchored Activity is Coverage-eligible",
+            "parts": [
+              {
+                "value": "only the anchored "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
+              },
+              {
+                "value": " is "
+              },
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]"
+              },
+              {
+                "value": "-eligible"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_story_view.py",
+        "line": 167
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_story_view.py::test_build_story_rollups_pinned_under_anchored_activity_is_tracked",
+      "narration": {
+        "text": "A pinned under-anchored activity stops reading as untracked",
+        "parts": [
+          {
+            "value": "A pinned under-anchored "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
+          },
+          {
+            "value": " stops reading as untracked"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_story_view",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Story whose only Activity is under-anchored",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " whose only "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
+              },
+              {
+                "value": " is under-anchored"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Scenario whose step pins it by id",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]"
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " pins it by id"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the story rollups are built",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it stays narration-ineligible but is no longer untracked",
+            "parts": [
+              {
+                "value": "it stays narration-ineligible but is no longer untracked"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_story_view.py",
+        "line": 211
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_story_view.py::test_build_activity_labels_joins_parts_into_prose",
+      "narration": {
+        "text": "An Activity is labeled by the prose of its paths",
+        "parts": [
+          {
+            "value": "An "
+          },
+          {
+            "term_id": "activity",
+            "display": "Activity",
+            "expression": "pg[\"Activity\"]"
+          },
+          {
+            "value": " is labeled by the prose of its "
+          },
+          {
+            "term_id": "path",
+            "display": "paths",
+            "expression": "pg[\"Path\"](\"paths\")"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_story_view",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Story with a two-path activity",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " with a two-"
+              },
+              {
+                "term_id": "path",
+                "display": "path",
+                "expression": "pg[\"Path\"].low"
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "activity",
+                "display": "activity",
+                "expression": "pg[\"Activity\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the activity labels are built",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "activity",
+                "display": "activity",
+                "expression": "pg[\"Activity\"].low"
+              },
+              {
+                "value": " labels are built"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the label reads as prose under a story-scoped key, with the path texts joined",
+            "parts": [
+              {
+                "value": "the label reads as prose under a story-scoped key, with the "
+              },
+              {
+                "term_id": "path",
+                "display": "path",
+                "expression": "pg[\"Path\"].low"
+              },
+              {
+                "value": " texts joined"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_story_view.py",
+        "line": 313
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "tests/unit/test_grouping.py::test_group_parametrized_any_failed_groups_as_failed",
       "narration": {
         "text": "Grouping collapses parametrize cases into one scenario",
@@ -19387,7 +19387,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 95
+        "line": 93
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -19502,7 +19502,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 127
+        "line": 125
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -19609,7 +19609,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 226
+        "line": 224
       },
       "story_id": null,
       "activity_ids": []
@@ -19727,7 +19727,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 453
+        "line": 451
       },
       "story_id": null,
       "activity_ids": []
@@ -19845,7 +19845,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 570
+        "line": 568
       },
       "story_id": null,
       "activity_ids": []
@@ -19948,7 +19948,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 682
+        "line": 680
       },
       "story_id": null,
       "activity_ids": []
@@ -20034,7 +20034,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1048
+        "line": 1046
       },
       "story_id": null,
       "activity_ids": []
@@ -20131,7 +20131,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1063
+        "line": 1061
       },
       "story_id": null,
       "activity_ids": []
@@ -20228,7 +20228,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1106
+        "line": 1104
       },
       "story_id": null,
       "activity_ids": []
@@ -20338,7 +20338,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1188
+        "line": 1186
       },
       "story_id": null,
       "activity_ids": []
@@ -20476,7 +20476,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1539
+        "line": 1537
       },
       "story_id": null,
       "activity_ids": []
@@ -20606,7 +20606,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1596
+        "line": 1594
       },
       "story_id": null,
       "activity_ids": []
@@ -20744,7 +20744,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1760
+        "line": 1758
       },
       "story_id": null,
       "activity_ids": []
@@ -20878,7 +20878,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1816
+        "line": 1814
       },
       "story_id": null,
       "activity_ids": []
@@ -20992,7 +20992,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2364
+        "line": 2362
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -21120,7 +21120,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2502
+        "line": 2519
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -21237,7 +21237,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2630
+        "line": 2670
       },
       "story_id": null,
       "activity_ids": []

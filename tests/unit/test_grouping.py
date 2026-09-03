@@ -32,6 +32,7 @@ from pytest_given.model import (
     Step,
     StepPath,
     TermId,
+    narration_of,
     narration_text,
     walk_steps,
 )
@@ -2482,6 +2483,25 @@ def test_a_format_that_reads_like_the_plain_cell_adds_no_column() -> None:
     ]
 
 
+def _formatted_step(
+    phase: str,
+    literal: str,
+    expression: str,
+    rendered: str,
+    *,
+    format_spec: str = '',
+    conversion: str | None = None,
+) -> Step:
+    """`_tstring_step` with the rendering details a `PartKey`'s `detail` holds."""
+    step = _tstring_step(phase, literal, expression, rendered)
+    part = dataclasses.replace(
+        step.narration.parts[0], format_spec=format_spec, conversion=conversion
+    )
+    return dataclasses.replace(
+        step, narration=narration_of((part, *step.narration.parts[1:]))
+    )
+
+
 def _tstring_step(phase: str, literal: str, expression: str, rendered: str) -> Step:
     """A step narrated `phase(t"{expr}<literal>")`, as the recorder records it."""
     return Step(
@@ -2523,6 +2543,29 @@ def test_divergent_step_structure_refuses_the_merge() -> None:
         message = str(excinfo.value)
         assert 'different step structure' in message
         assert 'group_parametrized=False' in message
+
+
+def test_a_divergent_format_spec_names_the_formatting() -> None:
+    """`when(t"{price:.2f}")` against `{price:.3f}` differs only in `PartKey`'s
+    `detail`, so a message branching on kind alone quoted 'price' twice."""
+    scenarios, info = _two_case_group(
+        [_formatted_step('when', ' charged', 'price', '1.50', format_spec='.2f')],
+        [_formatted_step('when', ' charged', 'price', '1.500', format_spec='.3f')],
+    )
+    with pytest.raises(PytestGivenError) as excinfo:
+        group_parametrized(scenarios, info)
+    message = str(excinfo.value)
+    assert "a different formatting of 'price'" in message
+    assert ':.2f vs :.3f' in message
+
+
+def test_a_divergent_conversion_reports_no_formatting_for_the_bare_side() -> None:
+    scenarios, info = _two_case_group(
+        [_formatted_step('when', ' shown', 'item', 'x')],
+        [_formatted_step('when', ' shown', 'item', "'x'", conversion='r')],
+    )
+    with pytest.raises(PytestGivenError, match='no formatting vs !r'):
+        group_parametrized(scenarios, info)
 
 
 def test_differently_shaped_narration_refuses_the_merge() -> None:

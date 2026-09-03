@@ -132,12 +132,40 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Authoring API
 
+- A `@given` fixture scoped wider than `function` no longer loses its step when
+  the first test to use it has no `@scenario`.
+- `@given`/`@when`/`@then` are signature-preserving, so a decorated helper stays
+  callable to a type checker (was: `"StepDecorated" not callable`).
+- `@given(...)` above `@pytest.fixture` now raises and names the fix, instead of
+  surfacing as `fixture '<name>' not found`.
 - `@scenario(activities=...)` is now typed `int | Sequence[int] | None`, so a
   bare `activities=2` type-checks.
+- `@scenario(activities=...)` with an unknown id, or without `story=`, is
+  rejected at the decorator rather than at collection.
+- A `-k`- or `--deselect`-narrowed run no longer fails on an authoring error in
+  a scenario it did not select.
 - Glossary term handles are now hashable, and equal for the same term whichever
   accessor produced them.
 - A `when_then` step in a test without `@scenario` now points its warning at the
   test rather than at pytest-given's own module.
+
+#### Narration lint
+
+- A rule configured `off` no longer runs; levels were applied only after every
+  rule had already produced its findings.
+- A scenario tag with no ASCII alphanumerics (`tags=['日本語']`) no longer takes
+  the run down with a traceback from `tag-shadows-term`.
+
+#### Report
+
+- `pytest-given report` reports an unreadable input as an error instead of a
+  traceback (a directory raised `IsADirectoryError` through the console script).
+- A JSON report with an out-of-range scenario `status` or term `kind` is
+  rejected by name, instead of crashing a renderer with a bare `KeyError`.
+- A `<br>` inside an inline code span in a glossary definition renders as text
+  rather than as a line break.
+- The Terms browse axis no longer lists a term the selected glossary does not
+  hold.
 
 #### Plugin and run behavior
 

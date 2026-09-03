@@ -556,6 +556,34 @@ def test_round_trip_via_to_dict() -> None:
     assert deserialized == original
 
 
+@pytest.mark.parametrize(
+    ('mutate', 'expected'),
+    [
+        (lambda d: d['scenarios'][0].update(status='errored'), 'scenario status'),
+        (
+            lambda d: d['glossary']['terms'][0].update(kind='thing'),
+            'glossary term kind',
+        ),
+    ],
+)
+def test_report_from_dict_rejects_an_out_of_range_literal(mutate, expected) -> None:
+    """`Status` and `TermKind` are erased at runtime, so a hand-edited report
+    used to reach the renderers and crash them with a bare `KeyError`."""
+    report = ReportData(
+        metadata=_meta(),
+        scenarios=[
+            Scenario(id=NodeId('t.py::t'), narration=Narration(text='x'), module='m')
+        ],
+        glossary=Glossary(
+            terms=[GlossaryTerm(id=TermId('g'), kind='actor', canonical='G')]
+        ),
+    )
+    payload = report_to_dict(report)
+    mutate(payload)
+    with pytest.raises(PytestGivenError, match=f'invalid {expected}'):
+        report_from_dict(payload)
+
+
 def test_activity_part_variants_round_trip():
     parts = (
         ActivityTermRef(term_id=TermId('guest'), display='Guest'),
