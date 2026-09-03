@@ -38,6 +38,9 @@ def parse_glossary_tables(
     lines = text.splitlines()
     in_code = False
     index = 0
+    specs = (term_column, description_column) + (
+        () if kind_column is None else (kind_column,)
+    )
     while index < len(lines):
         line = lines[index]
         if _FENCE.match(line):
@@ -51,9 +54,6 @@ def parse_glossary_tables(
             index += 1
             continue
         header = _split_row(line)
-        specs = (term_column, description_column) + (
-            () if kind_column is None else (kind_column,)
-        )
         if _addresses_another_table(specs, header):
             # A table this spec cannot address at all is somebody else's — a
             # glossary file is a document, and named columns are what lets one
@@ -152,10 +152,11 @@ def _addresses_another_table(specs: tuple[ColumnSpec, ...], header: list[str]) -
     glossary table with a wrong column, and an index spec addresses any table
     at all — both still raise.
     """
-    if not all(isinstance(spec, str) for spec in specs):
+    named = [spec for spec in specs if isinstance(spec, str)]
+    if len(named) != len(specs):
         return False
     lowered = {cell.lower() for cell in header}
-    return not any(str(spec).lower() in lowered for spec in specs)
+    return not any(name.lower() in lowered for name in named)
 
 
 def _resolve_column(spec: ColumnSpec, header: list[str]) -> int:
