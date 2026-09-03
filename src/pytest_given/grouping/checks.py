@@ -11,6 +11,7 @@ from typing import NamedTuple
 
 from ..model import (
     Attachment,
+    AttachmentLabel,
     Narration,
     NarrationLiteral,
     NarrationPart,
@@ -18,6 +19,7 @@ from ..model import (
     NarrationTermRef,
     NarrationValue,
     NodeId,
+    PartIndex,
     Phase,
     PytestGivenError,
     RawParamValue,
@@ -40,7 +42,7 @@ type StepSignature = tuple[tuple[Phase, StepSignature], ...]
 # One step's attachments grouped by label, in the order that case recorded
 # them. Built by the promotion walk (`attachments._by_label`), which is also
 # the only caller of the rule that reads it.
-type LabeledAttachments = dict[str, list[Attachment]]
+type LabeledAttachments = dict[AttachmentLabel, list[Attachment]]
 
 
 def structure_signature(steps: list[Step]) -> StepSignature:
@@ -284,7 +286,7 @@ def check_attachment_labels(
 
 def check_constant_term_ref(
     part: NarrationTermRef,
-    index: int,
+    index: PartIndex,
     path: StepPath,
     phase: Phase,
     group: Group,
@@ -313,7 +315,7 @@ def check_constant_term_ref(
 
 
 def _case_term_refs(
-    index: int, path: StepPath, group: Group
+    index: PartIndex, path: StepPath, group: Group
 ) -> Iterator[NarrationTermRef]:
     """The part at the baseline's position in each comparable case.
 

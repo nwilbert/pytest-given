@@ -10,6 +10,7 @@ so has nothing to be compared against.
 from dataclasses import replace
 
 from ..model import (
+    ColumnId,
     Narration,
     NarrationLiteral,
     NarrationPart,
@@ -18,6 +19,7 @@ from ..model import (
     NarrationValue,
     NodeId,
     ParameterColumn,
+    PartIndex,
     Phase,
     RawParamValue,
     Step,
@@ -64,7 +66,7 @@ def _templatize_step_narration(step: Step, path: StepPath, ctx: Promotion) -> Na
 
 
 def _templatize_part(
-    part: NarrationPart, index: int, path: StepPath, phase: Phase, ctx: Promotion
+    part: NarrationPart, index: PartIndex, path: StepPath, phase: Phase, ctx: Promotion
 ) -> NarrationPart:
     """One baseline part, against the same position in every comparable case.
 
@@ -99,7 +101,7 @@ def _templatize_part(
 def _param_slot(part: NarrationValue) -> NarrationPlaceholder:
     return NarrationPlaceholder(
         name=part.expression,
-        column_id=part.expression,
+        column_id=ColumnId(part.expression),
         format_spec=part.format_spec,
         conversion=part.conversion,
     )
@@ -107,7 +109,7 @@ def _param_slot(part: NarrationValue) -> NarrationPlaceholder:
 
 def _templatize_param_value(
     part: NarrationValue,
-    index: int,
+    index: PartIndex,
     path: StepPath,
     ctx: Promotion,
 ) -> NarrationPart:
@@ -124,7 +126,7 @@ def _templatize_param_value(
         case.id: _value_at(ctx.group.indexed[case.id][path], index)
         for case in ctx.group.comparable
     }
-    column = _promoted_column(rendered, part.expression, part.expression, ctx)
+    column = _promoted_column(rendered, ColumnId(part.expression), part.expression, ctx)
     if column is None:
         return _param_slot(part)
     return NarrationPlaceholder(
@@ -136,7 +138,7 @@ def _templatize_param_value(
 
 
 def _templatize_value(
-    part: NarrationValue, index: int, path: StepPath, phase: Phase, ctx: Promotion
+    part: NarrationValue, index: PartIndex, path: StepPath, phase: Phase, ctx: Promotion
 ) -> NarrationPart:
     """An interpolation no parametrize column binds: kept as it is when every
     case renders it the same, promoted to a `derived` column when they do not."""
@@ -165,7 +167,7 @@ def _templatize_value(
     )
 
 
-def _value_at(step: Step, index: int) -> str:
+def _value_at(step: Step, index: PartIndex) -> str:
     """That case's rendering of the interpolation at `index`.
 
     Rule 6 pins every passed case to the baseline's template, so the part is
@@ -264,7 +266,7 @@ def _slot_format(part: NarrationPlaceholder) -> Format | None:
 
 
 def _promoted_column(
-    rendered: dict[NodeId, str], column_id: str, name: str, ctx: Promotion
+    rendered: dict[NodeId, str], column_id: ColumnId, name: str, ctx: Promotion
 ) -> ParameterColumn | None:
     """The `derived` column a slot needs when the cell it points at does not
     read the way the slot renders — or None when that cell already serves it.

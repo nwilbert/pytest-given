@@ -22,8 +22,10 @@ from .schema import (
     ActivityTermRef,
     ActivityWord,
     Attachment,
+    AttachmentLabel,
     AttachmentRef,
     CellValue,
+    ColumnId,
     ColumnKind,
     ContentType,
     ErrorInfo,
@@ -197,13 +199,19 @@ def _step_attachment_from_dict(d: dict[str, Any]) -> StepAttachment:
         return _attachment_from_dict(d)
     content_type: ContentType = d.get('content_type', 'text')
     return AttachmentRef(
-        label=d['label'], content_type=content_type, column_id=d['column_id']
+        label=d['label'],
+        content_type=content_type,
+        column_id=ColumnId(d['column_id']),
     )
 
 
 def _attachment_from_dict(d: dict[str, Any]) -> Attachment:
     content_type: ContentType = d.get('content_type', 'text')
-    return Attachment(label=d['label'], content=d['content'], content_type=content_type)
+    return Attachment(
+        label=AttachmentLabel(d['label']),
+        content=d['content'],
+        content_type=content_type,
+    )
 
 
 def _error_from_dict(d: dict[str, Any] | None) -> ErrorInfo | None:
@@ -303,7 +311,7 @@ def _narration_part_from_dict(d: dict[str, Any]) -> NarrationPart:
             raise _stale_report_error("a placeholder part with no 'column_id'")
         return NarrationPlaceholder(
             name=d['name'],
-            column_id=d['column_id'],
+            column_id=ColumnId(d['column_id']),
             format_spec=d.get('format_spec', ''),
             conversion=d.get('conversion'),
         )

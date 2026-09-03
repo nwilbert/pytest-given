@@ -9,6 +9,12 @@ from dataclasses import dataclass, field
 from pathlib import PurePosixPath
 from typing import Literal, NewType
 
+# A parameter-table column's identity — what the DOM keys on and what a
+# placeholder or attachment badge points at. Distinct from the column's display
+# `name`, which the two conflate for a `param` column: both are the argname
+# there, so nothing but the type keeps a header from being passed as an id.
+ColumnId = NewType('ColumnId', str)
+
 
 @dataclass(frozen=True, kw_only=True)
 class NarrationLiteral:
@@ -36,7 +42,7 @@ class NarrationPlaceholder:
     """
 
     name: str
-    column_id: str
+    column_id: ColumnId
     format_spec: str = ''
     conversion: str | None = None
 
@@ -61,6 +67,13 @@ class NarrationTermRef:
 type NarrationPart = (
     NarrationLiteral | NarrationValue | NarrationPlaceholder | NarrationTermRef
 )
+
+# A part's position in its narration's `parts`. Distinct from a `StepPath`
+# component, which indexes a step among its siblings: grouping carries both at
+# once — the step the part is in, and the part within it — and reaches the same
+# position in every other case by this index, so mixing the two silently
+# compares the wrong things.
+PartIndex = NewType('PartIndex', int)
 
 
 @dataclass(frozen=True)
@@ -209,9 +222,19 @@ type ParamValue = str | int | float | bool | None
 type ContentType = Literal['text', 'json']
 
 
+# What an attachment's payload is called: the plain text an author passes as
+# `attach(label, content)`. Display *and* identity — the badge shows it, and it
+# is what pairs one case's attachment with another's, since position does not
+# survive a case attaching the same labels in a different order. Hence rule 5:
+# every case of a grouped scenario must attach the same set of them.
+AttachmentLabel = NewType('AttachmentLabel', str)
+
+
 @dataclass(frozen=True)
 class Attachment:
-    label: str
+    """A labeled blob bound to the step that was active when it was attached."""
+
+    label: AttachmentLabel
     content: str
     content_type: ContentType = 'text'
 
@@ -225,9 +248,12 @@ class AttachmentRef:
     then *cannot* speak for the baseline case.
     """
 
+    # The column's display name, not the attachment's own label: a label
+    # attached twice gives two columns, and a badge repeating the bare label
+    # would point the reader at the wrong one.
     label: str
     content_type: ContentType
-    column_id: str
+    column_id: ColumnId
 
 
 # What may sit on a grouped step: a real payload, or a pointer to a column.
@@ -314,7 +340,7 @@ class ParameterColumn:
     parametrize name, which is always a Python identifier.
     """
 
-    id: str
+    id: ColumnId
     name: str
     kind: ColumnKind
 

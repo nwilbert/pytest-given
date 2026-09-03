@@ -6,6 +6,7 @@ kept apart because the two share only the `Promotion` they are handed.
 
 from ..model import (
     Attachment,
+    AttachmentLabel,
     AttachmentRef,
     NodeId,
     Step,
@@ -39,7 +40,7 @@ def templatize_attachments(
     check_attachment_labels(baseline, others, ctx.group)
 
     out: list[StepAttachment] = []
-    seen: dict[str, int] = {}
+    seen: dict[AttachmentLabel, int] = {}
     for attachment in step.attachments:
         assert isinstance(attachment, Attachment), 'a recorded tree holds no refs'
         occurrence = seen.get(attachment.label, 0)
@@ -96,7 +97,7 @@ def _promote_occurrence(
 
 
 def _promote_extra_occurrences(
-    label: str,
+    label: AttachmentLabel,
     baseline: LabeledAttachments,
     others: dict[NodeId, LabeledAttachments],
     ctx: Promotion,
@@ -118,7 +119,7 @@ def _promote_extra_occurrences(
             )
 
 
-def _max_count(label: str, others: dict[NodeId, LabeledAttachments]) -> int:
+def _max_count(label: AttachmentLabel, others: dict[NodeId, LabeledAttachments]) -> int:
     """The greatest number of times any comparable case attaches `label`."""
     return max(
         (len(by_label.get(label, [])) for by_label in others.values()), default=0
@@ -126,7 +127,7 @@ def _max_count(label: str, others: dict[NodeId, LabeledAttachments]) -> int:
 
 
 def _occurrence(
-    by_label: LabeledAttachments, label: str, index: int
+    by_label: LabeledAttachments, label: AttachmentLabel, index: int
 ) -> Attachment | None:
     """That case's `index`-th attachment carrying `label`, or None when the case
     attached that label fewer times than `index` requires."""

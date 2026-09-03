@@ -13,6 +13,7 @@ from ..capture import try_term_ref
 from ..model import (
     Attachment,
     CellValue,
+    ColumnId,
     ColumnKind,
     Narration,
     NarrationPart,
@@ -31,7 +32,7 @@ class ColumnBuilder:
     """The columns and cells a group's walk accumulates."""
 
     columns: list[ParameterColumn] = field(default_factory=list)
-    cells: dict[str, dict[NodeId, CellValue | None]] = field(default_factory=dict)
+    cells: dict[ColumnId, dict[NodeId, CellValue | None]] = field(default_factory=dict)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
     _taken_names: set[str] = field(default_factory=set)
 
@@ -54,22 +55,22 @@ class ColumnBuilder:
         `callspec.params` keys, hence always Python identifiers.
         """
         if kind == 'param':
-            column_id = name
+            column_id = ColumnId(name)
         else:
             index = self._counts.get(kind, 0)
             self._counts[kind] = index + 1
-            column_id = f'{kind}:{index}'
+            column_id = ColumnId(f'{kind}:{index}')
         column = ParameterColumn(id=column_id, name=self._unique_name(name), kind=kind)
         self.columns.append(column)
         self.cells[column_id] = {}
         return column
 
     def set_cell(
-        self, column_id: str, node_id: NodeId, value: CellValue | None
+        self, column_id: ColumnId, node_id: NodeId, value: CellValue | None
     ) -> None:
         self.cells[column_id][node_id] = value
 
-    def cell(self, column_id: str, node_id: NodeId) -> CellValue | None:
+    def cell(self, column_id: ColumnId, node_id: NodeId) -> CellValue | None:
         """That case's cell, or None where it has none.
 
         Absence is ordinary: a `derived` column is filled from the comparable
@@ -77,7 +78,7 @@ class ColumnBuilder:
         """
         return self.cells[column_id].get(node_id)
 
-    def reads_as(self, column_id: str, rendered: dict[NodeId, str]) -> bool:
+    def reads_as(self, column_id: ColumnId, rendered: dict[NodeId, str]) -> bool:
         """Whether every case's cell in *column_id* already prints the way that
         case rendered it — the question a slot asks before promoting.
 

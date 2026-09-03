@@ -6,6 +6,7 @@ from string import Formatter, templatelib
 from typing import assert_never
 
 from ..model import (
+    ColumnId,
     Narration,
     NarrationLiteral,
     NarrationPart,
@@ -98,7 +99,7 @@ class Template:
                 parts.append(
                     NarrationPlaceholder(
                         name=name,
-                        column_id=name,
+                        column_id=ColumnId(name),
                         format_spec=spec or '',
                         conversion=conversion,
                     )

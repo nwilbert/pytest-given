@@ -8,6 +8,7 @@ baseline, comparable cases, cells, cases — happens here; the promoting is
 """
 
 from ..model import (
+    ColumnId,
     ParameterCase,
     ParameterTable,
     ParamInfo,
@@ -76,7 +77,9 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
     )
     for case in group.cases:
         for name, value in group.case_params[case.id].items():
-            ctx.columns.set_cell(name, case.id, param_cell(value, formats.get(name)))
+            ctx.columns.set_cell(
+                ColumnId(name), case.id, param_cell(value, formats.get(name))
+            )
     template_steps = templatize_steps(baseline.steps, (), ctx)
     grouped_narration = templatize_narration(anchor.narration, ctx)
 

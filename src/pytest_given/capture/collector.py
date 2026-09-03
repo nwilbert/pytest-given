@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 from ..model import (
     ActivityId,
     Attachment,
+    AttachmentLabel,
     ContentType,
     ErrorInfo,
     FixtureRecording,
@@ -354,7 +355,11 @@ class Collector:
                 'given/when/then block.'
             )
         stack[-1].attachments.append(
-            Attachment(label=label, content=content, content_type=content_type)
+            Attachment(
+                label=AttachmentLabel(label),
+                content=content,
+                content_type=content_type,
+            )
         )
 
     def _require_recordable(self, action: str) -> None:
