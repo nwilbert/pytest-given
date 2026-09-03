@@ -301,7 +301,7 @@ def examples(session: nox.Session) -> None:
             # returns a tolerated exit 1 (success_codes below), which masks
             # error-level lint findings. The printed summary is the signal
             # here.
-            '--given-lint=true',
+            '--given-lint',
             # `given_lint_ignore` in pyproject.toml scopes an exemption to the
             # backend suite in `tests/`. An entry that suppresses nothing is
             # an error-level `stale-ignore` by design, so leaving the list in
@@ -346,7 +346,7 @@ def self_report(session: nox.Session) -> None:
         '--given-source-link=github',
         # The backend suite has no intentional failures, so an error-level
         # lint finding turns this session red — a real gate.
-        '--given-lint=true',
+        '--given-lint',
         '--tb=no',
         '--no-header',
         '-q',

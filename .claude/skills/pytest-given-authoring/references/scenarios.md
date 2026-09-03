@@ -61,7 +61,7 @@ Step text may abstract; it must never overstate.
 
 ## Mechanical counterparts
 
-The narration lint (`pytest --given-lint=true`, or `given_lint = true` in `[tool.pytest]`) enforces the structural subset of these rules. A *warn* finding prints in the terminal summary; only an *error* finding fails the run.
+The narration lint (`pytest --given-lint`, or `given_lint = true` in `[tool.pytest]`; `--no-given-lint` turns an ini-enabled lint off for one run) enforces the structural subset of these rules. A *warn* finding prints in the terminal summary; only an *error* finding fails the run.
 
 | Rule | Default | Catches |
 |---|---|---|
@@ -78,4 +78,4 @@ Severities are overridable per rule via the `given_lint_rules` ini; that and the
 
 **A `then-without-check` finding on a step that does check is usually a naming problem.** The rule recognizes an assertion helper by its name alone, so `assert_totals(order)` passes where an identical `check_totals(order)` fires — rename the helper before reaching for the ignore list. What the rule genuinely cannot see is a third-party matcher under some other name (pytest's `result.stdout.fnmatch_lines(...)` is neither an `assert` statement nor an `assert*` call): there, either let the step carry a real `assert` as well, or ignore-list it.
 
-**Treat a `missing-phase` warning as a prompt to restructure, not to suppress.** It defaults to **warn**, so it never fails the run on its own, and it nearly always marks a hidden `when` rather than a genuinely two-phase scenario: apply the constructor rule above, or surface a parametrized input as `Annotated[..., given(Template('…'))]` so the inline block is free to narrate the action. `given_lint_ignore` (`missing-phase: <node-id glob>`) is a last resort, and it costs more than it looks: an entry that suppresses nothing raises `stale-ignore`, **always error-level, not downgradable via `given_lint_rules`, not itself ignorable**. Any selection that doesn't reach the suppressed node then fails on the stale entry alone — `pytest tests/one_file.py --given-lint=true` fails even when every collected scenario is clean.
+**Treat a `missing-phase` warning as a prompt to restructure, not to suppress.** It defaults to **warn**, so it never fails the run on its own, and it nearly always marks a hidden `when` rather than a genuinely two-phase scenario: apply the constructor rule above, or surface a parametrized input as `Annotated[..., given(Template('…'))]` so the inline block is free to narrate the action. `given_lint_ignore` (`missing-phase: <node-id glob>`) is a last resort, and it costs more than it looks: an entry that suppresses nothing raises `stale-ignore`, **always error-level, not downgradable via `given_lint_rules`, not itself ignorable**. Any selection that doesn't reach the suppressed node then fails on the stale entry alone — `pytest tests/one_file.py --given-lint` fails even when every collected scenario is clean.

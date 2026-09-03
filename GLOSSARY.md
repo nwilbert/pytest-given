@@ -63,7 +63,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Narration lint** | The `--given-lint` pass that checks recorded scenarios against the *Lint rule* catalog once the *Report* model is built. It enforces the structural subset of the narration conventions — it cannot check whether a *Step*'s text is semantically true. |
 | **Lint rule** | One named check, carrying a surface and a default *Severity*. A `runtime` rule reads the recorded scenarios; an `ast` rule parses the step bodies' source. The catalog in `lint/base.py` is data, so severities, config validation and docs stay in sync with one table. |
 | **Finding** | One *Lint rule* firing on one subject: the rule id, the *Severity* it fired at, the subject, a *Source link* location and a message naming the offender. |
-| **Severity** | A *Lint rule*'s level — `off`, `warn` or `error` — defaulted by the catalog and overridable per rule via `given_lint_rules`. Only `error` fails the run; `warn` reports in the terminal summary. |
+| **Severity** | A *Lint rule*'s level — `off`, `warn` or `error` — defaulted by the catalog and overridable per rule via `given_lint_rules`. Only `error` fails the run; `warn` reports in the terminal summary; an `off` rule is not evaluated at all. |
 
 ## Domain Storytelling
 

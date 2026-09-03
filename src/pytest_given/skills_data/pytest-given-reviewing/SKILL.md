@@ -10,9 +10,9 @@ Narration is **auditable, not verified**: nothing mechanical compares a step's t
 ## 1. Structural gate — run the lint first
 
 ```bash
-pytest <selection> --given-lint=true
+pytest <selection> --given-lint
 # plus the opt-in rule when the glossary is meant to be fully exercised:
-pytest <selection> --given-lint=true -o "given_lint_rules=dead-term=warn"
+pytest <selection> --given-lint -o "given_lint_rules=dead-term=warn"
 ```
 
 `warn` findings print in the summary; an `error` finding fails the run. The rule catalog and the honest-two-phase ignore convention live in the authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) under "Mechanical counterparts". A finding that is a deliberate exception belongs on the project's `given_lint_ignore` list, never silently waved through in review — stale entries fail the run, so the list cannot rot.

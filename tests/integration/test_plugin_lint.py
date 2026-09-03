@@ -110,7 +110,7 @@ def test_an_error_finding_shows_in_the_summary_line(pytester):
     instead. A CI log that shows `1 passed` in green over exit 1 is worse than
     no summary at all.
     """
-    result = _run(pytester, EMPTY_GIVEN, '--given-lint=true')
+    result = _run(pytester, EMPTY_GIVEN, '--given-lint')
     assert result.ret == pytest.ExitCode.TESTS_FAILED
     result.stdout.fnmatch_lines(['*1 passed*1 error*'])
 
@@ -123,7 +123,7 @@ def test_enabled_error_finding_fails_the_run(pytester):
     with given(t'a suite whose given {pg["Step"].low} has an empty body'):
         attach('suite', EMPTY_GIVEN)
     with when('the suite runs with the lint enabled', activity=11):
-        result = _run(pytester, EMPTY_GIVEN, '--given-lint=true')
+        result = _run(pytester, EMPTY_GIVEN, '--given-lint')
     with then(t'the run exits failed, naming the {pg["Lint rule"].low} and the step'):
         # The test itself passed; the error is pytest-given's own, registered
         # so the summary line cannot read green over a non-zero exit.
@@ -139,7 +139,7 @@ def test_enabled_error_finding_fails_the_run(pytester):
 
 
 def test_enabled_clean_suite_exits_zero_and_captures_sources(pytester):
-    result, steps = _run_observed(pytester, CLEAN, '--given-lint=true')
+    result, steps = _run_observed(pytester, CLEAN, '--given-lint')
     result.assert_outcomes(passed=1)
     assert result.ret == 0
     assert 'narration lint' not in result.stdout.str()
@@ -160,7 +160,7 @@ def test_warn_override_prints_but_does_not_fail(pytester):
         result = _run(
             pytester,
             EMPTY_GIVEN,
-            '--given-lint=true',
+            '--given-lint',
             '-o',
             'given_lint_rules=empty-step=warn',
         )
@@ -179,7 +179,7 @@ def test_off_override_disables_the_rule(pytester):
     result = _run(
         pytester,
         EMPTY_GIVEN,
-        '--given-lint=true',
+        '--given-lint',
         '-o',
         'given_lint_rules=empty-step=off',
     )
@@ -191,7 +191,7 @@ def test_bare_ignore_glob_suppresses_the_finding(pytester):
     result = _run(
         pytester,
         EMPTY_GIVEN,
-        '--given-lint=true',
+        '--given-lint',
         '-o',
         'given_lint_ignore=*::test_empty_given',
     )
@@ -203,7 +203,7 @@ def test_rule_scoped_ignore_glob_suppresses_the_finding(pytester):
     result = _run(
         pytester,
         EMPTY_GIVEN,
-        '--given-lint=true',
+        '--given-lint',
         '-o',
         'given_lint_ignore=empty-step: *::test_empty_given',
     )
@@ -215,7 +215,7 @@ def test_stale_ignore_entry_fails_the_run(pytester):
     result = _run(
         pytester,
         CLEAN,
-        '--given-lint=true',
+        '--given-lint',
         '-o',
         'given_lint_ignore=*::test_nothing',
     )
@@ -224,10 +224,23 @@ def test_stale_ignore_entry_fails_the_run(pytester):
     result.stdout.fnmatch_lines(['*stale-ignore*suppressed no finding*'])
 
 
-def test_cli_false_overrides_ini_true(pytester):
-    result = _run(pytester, EMPTY_GIVEN, '-o', 'given_lint=true', '--given-lint=false')
-    assert result.ret == 0
-    assert 'narration lint' not in result.stdout.str()
+@scenario(
+    t'Either {pg["Narration lint"].low} flag overrides the ini for one run',
+    story=adopt_pytest_given,
+)
+def test_the_flag_overrides_the_ini_in_both_directions(pytester):
+    with given(t'a suite with one flawed {pg["Step"].low}'):
+        attach('suite', EMPTY_GIVEN)
+    with when('the suite runs with the lint enabled by ini but off by flag'):
+        off = _run(pytester, EMPTY_GIVEN, '-o', 'given_lint=true', '--no-given-lint')
+    with then('the lint does not run'):
+        assert off.ret == 0
+        assert 'narration lint' not in off.stdout.str()
+    with when('the suite runs with the lint disabled by ini but on by flag'):
+        on = _run(pytester, EMPTY_GIVEN, '-o', 'given_lint=false', '--given-lint')
+    with then('the lint runs and its error finding fails the run'):
+        assert on.ret == pytest.ExitCode.TESTS_FAILED
+        on.stdout.fnmatch_lines(['*narration lint*'])
 
 
 def test_ini_alone_enables_the_lint(pytester):
@@ -254,7 +267,7 @@ def test_unknown_ignore_prefix_is_a_usage_error(pytester):
 
 
 def test_fixture_root_step_stays_unanchored_and_unflagged(pytester):
-    result, steps = _run_observed(pytester, FIXTURE_SUITE, '--given-lint=true')
+    result, steps = _run_observed(pytester, FIXTURE_SUITE, '--given-lint')
     result.assert_outcomes(passed=1)
     assert result.ret == 0
     roots = [s for s in steps if s.fixture_name == 'machine']
@@ -270,9 +283,7 @@ def test_report_outputs_are_identical_with_and_without_lint(pytester, tmp_path):
     off_json, off_md = tmp_path / 'off.json', tmp_path / 'off.md'
     on_json, on_md = tmp_path / 'on.json', tmp_path / 'on.md'
     pytester.runpytest(f'--given-json={off_json}', f'--given-md={off_md}')
-    pytester.runpytest(
-        f'--given-json={on_json}', f'--given-md={on_md}', '--given-lint=true'
-    )
+    pytester.runpytest(f'--given-json={on_json}', f'--given-md={on_md}', '--given-lint')
     assert on_md.read_bytes() == off_md.read_bytes()
 
     def normalized(path):
@@ -339,7 +350,7 @@ def test_tagged():
 
 
 def test_missing_phase_warns_by_default(pytester):
-    result = _run(pytester, TWO_PHASE, '--given-lint=true')
+    result = _run(pytester, TWO_PHASE, '--given-lint')
     result.assert_outcomes(passed=1)
     assert result.ret == 0
     result.stdout.fnmatch_lines(
@@ -351,7 +362,7 @@ def test_missing_phase_error_override_fails_the_run(pytester):
     result = _run(
         pytester,
         TWO_PHASE,
-        '--given-lint=true',
+        '--given-lint',
         '-o',
         'given_lint_rules=missing-phase=error',
     )
@@ -363,7 +374,7 @@ def test_missing_phase_honest_two_phase_is_ignorable(pytester):
     result = _run(
         pytester,
         TWO_PHASE,
-        '--given-lint=true',
+        '--given-lint',
         '-o',
         'given_lint_ignore=missing-phase: *::test_two_phase',
     )
@@ -372,14 +383,14 @@ def test_missing_phase_honest_two_phase_is_ignorable(pytester):
 
 
 def test_missing_phase_parametrized_scenario_reported_once(pytester):
-    result = _run(pytester, PARAMETRIZED_TWO_PHASE, '--given-lint=true')
+    result = _run(pytester, PARAMETRIZED_TWO_PHASE, '--given-lint')
     result.assert_outcomes(passed=2)
     assert result.stdout.str().count('missing: when') == 1
 
 
 def test_tag_shadows_term_warns_on_slug_collision(pytester):
     pytester.makeconftest(TAGGED_GLOSSARY_CONFTEST)
-    result = _run(pytester, TAGGED_SUITE, '--given-lint=true')
+    result = _run(pytester, TAGGED_SUITE, '--given-lint')
     result.assert_outcomes(passed=1)
     assert result.ret == 0
     result.stdout.fnmatch_lines(
@@ -389,7 +400,7 @@ def test_tag_shadows_term_warns_on_slug_collision(pytester):
 
 def test_dead_term_is_off_by_default(pytester):
     pytester.makeconftest(TAGGED_GLOSSARY_CONFTEST)
-    result = _run(pytester, TAGGED_SUITE, '--given-lint=true')
+    result = _run(pytester, TAGGED_SUITE, '--given-lint')
     assert 'dead-term' not in result.stdout.str()
 
 
@@ -398,7 +409,7 @@ def test_dead_term_opt_in_flags_unreferenced_term(pytester):
     result = _run(
         pytester,
         TAGGED_SUITE,
-        '--given-lint=true',
+        '--given-lint',
         '-o',
         'given_lint_rules=dead-term=warn',
     )

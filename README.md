@@ -358,7 +358,7 @@ The *checks* are not opt-in. Every run builds the report it would have written, 
 | `--given-title=TEXT` | rootdir name | Name the report, shown as the Markdown heading and the HTML tab title and topbar. Also settable as the `given_title` ini. |
 | `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. Also settable as the `given_source_link` ini. See [Source links](#source-links). |
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
-| `--given-lint=BOOL` | `false` | Run the narration lint (`true` \| `false`); an error-level finding fails the run. Also settable as the `given_lint` ini. See [Narration lint](#narration-lint). |
+| `--given-lint` / `--no-given-lint` | `false` | Run the narration lint; an error-level finding fails the run. Also settable as the `given_lint` ini, which either form overrides. See [Narration lint](#narration-lint). |
 
 Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection.
 
@@ -366,7 +366,7 @@ The ini settings live in `[tool.pytest]`, pytest 9's native TOML table. The lega
 
 ## Narration lint
 
-`--given-lint=true` runs a rule catalog over the scenarios the run just recorded, catching steps whose narration lies about their body — an empty `given`, a `then` that checks nothing, an action smuggled into an assertion. The AST rules analyze exactly the steps the run identified (there is no parallel static discovery), so decorated helpers, fixtures, and `when_then` pairs are all attributed correctly.
+`--given-lint` runs a rule catalog over the scenarios the run just recorded, catching steps whose narration lies about their body — an empty `given`, a `then` that checks nothing, an action smuggled into an assertion. The AST rules analyze exactly the steps the run identified (there is no parallel static discovery), so decorated helpers, fixtures, and `when_then` pairs are all attributed correctly.
 
 Each rule has a fixed default severity; there is no master level. A `warn` finding prints in the terminal summary; an `error` finding also fails the run.
 
@@ -396,7 +396,7 @@ given_lint_ignore = [
 ]
 ```
 
-An ignore entry that suppresses no finding is itself an error-level `stale-ignore` finding — the list can only shrink, never rot. The `--given-lint` CLI flag overrides the `given_lint` ini value for a single run.
+An ignore entry that suppresses no finding is itself an error-level `stale-ignore` finding — the list can only shrink, never rot. `--given-lint` and `--no-given-lint` each override the `given_lint` ini for a single run.
 
 Findings print one aligned row each — severity, rule, subject, message, and the source location the rule fired at:
 

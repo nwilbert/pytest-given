@@ -5,6 +5,7 @@ suite runs, so a typo in a rule name or a source-link preset is a `UsageError`
 up front rather than a surprise after the last test.
 """
 
+import argparse
 from pathlib import Path
 from typing import cast
 
@@ -14,8 +15,6 @@ from ..lint import parse_lint_config
 from ..model import PytestGivenError
 from ..report import SinkConfig, resolve_template
 from .state import GivenConfig, given_config_key
-
-_LINT_CHOICES = ('true', 'false')
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -78,11 +77,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
     group.addoption(
         '--given-lint',
+        action=argparse.BooleanOptionalAction,
         default=None,
-        choices=_LINT_CHOICES,
         help=(
-            'Run the narration lint: true | false. Overrides the given_lint '
-            'ini for one run.'
+            'Run the narration lint. --no-given-lint turns it off. Overrides '
+            'the given_lint ini for one run.'
         ),
     )
     parser.addini(
@@ -155,10 +154,16 @@ def _resolve_title(config: pytest.Config) -> str | None:
 
 
 def _resolve_lint_enabled(config: pytest.Config) -> bool:
-    """The lint switch. The flag spells it `'true'` / `'false'`; the ini is
-    already a bool."""
+    """The lint switch.
+
+    `BooleanOptionalAction` with `default=None` keeps the flag tri-state, so
+    "not given" stays distinguishable from `--no-given-lint` and the ini is
+    consulted only in the first case. It is also what makes this the one
+    option whose flag and ini agree on a type — every other paired option is
+    string on both sides.
+    """
     value = _cli_over_ini(config, 'given_lint')
-    return value == 'true' if isinstance(value, str) else bool(value)
+    return bool(value)
 
 
 def _resolve_sinks(

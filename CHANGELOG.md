@@ -33,6 +33,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Changed
 
+#### CLI
+
+- **Breaking.** `--given-lint` is a plain boolean flag: write `--given-lint` and
+  `--no-given-lint` instead of `--given-lint=true` / `--given-lint=false`. Either
+  form still overrides the `given_lint` ini for one run.
+
 #### Authoring API
 
 - **Breaking.** Step narration must now be uniform across parametrize cases;

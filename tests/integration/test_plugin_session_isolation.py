@@ -90,7 +90,7 @@ def test_lint_still_anchors_steps_after_nested_inprocess_run(pytester):
     nested run re-pointed it: the empty given executed after the nested run
     only reaches the AST rules if its `Step.source` was captured."""
     pytester.makepyfile(test_outer=OUTER_LINTED)
-    result = pytester.runpytest('--given-lint=true')
+    result = pytester.runpytest('--given-lint')
     result.assert_outcomes(passed=2, errors=1)
     assert result.ret == pytest.ExitCode.TESTS_FAILED
     result.stdout.fnmatch_lines(
@@ -208,7 +208,7 @@ def test_lint_still_anchors_steps_after_nested_run_aborts_at_argparse(pytester):
     config cleanup instead. Without that, every later step records
     `source=None` and the whole AST-rule surface goes silently dark."""
     pytester.makepyfile(test_outer=OUTER_ABORTED_NESTED)
-    result = pytester.runpytest('--given-lint=true')
+    result = pytester.runpytest('--given-lint')
     result.assert_outcomes(passed=2, errors=1)
     assert result.ret == pytest.ExitCode.TESTS_FAILED
     result.stdout.fnmatch_lines(

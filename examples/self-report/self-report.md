@@ -242,8 +242,31 @@
 - **then** the run still passes
 - **then** the «finding» is printed anyway
 
+## ✓ Either «narration lint» flag overrides the ini for one run
+`tests/integration/test_plugin_lint.py:227::test_the_flag_overrides_the_ini_in_both_directions`
+
+- **given** a suite with one flawed «step»
+  - 📎 suite:
+    ```
+    
+    from pytest_given import scenario, given, when, then
+    
+    @scenario("Empty given")
+    def test_empty_given():
+        with given("a value"):
+            pass
+        with when("computing"):
+            x = 2
+        with then("it is two"):
+            assert x == 2
+    ```
+- **when** the suite runs with the lint enabled by ini but off by flag
+- **then** the lint does not run
+- **when** the suite runs with the lint disabled by ini but on by flag
+- **then** the lint runs and its error finding fails the run
+
 ## ✓ An error «finding» leaves a more specific exit code alone
-`tests/integration/test_plugin_lint.py:422::test_lint_error_does_not_mask_a_more_specific_exit_code`
+`tests/integration/test_plugin_lint.py:433::test_lint_error_does_not_mask_a_more_specific_exit_code`
 
 - **given** a suite whose lint would fail, deselected so nothing is collected
   - 📎 suite:
