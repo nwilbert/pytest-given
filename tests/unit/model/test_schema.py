@@ -474,14 +474,20 @@ def test_attachment_ref_has_no_content_field() -> None:
     assert ref.column_id == 'attachment:0'
 
 
-def test_glossary_get_sees_a_term_appended_without_register() -> None:
+def test_glossary_reindex_picks_up_a_direct_mutation() -> None:
     """`terms` has to stay a public list — the reflective serializer reads it
-    by name — so `get` re-indexes when the two fall out of step rather than
-    letting an outside append silently make it lie."""
+    by name — so a caller that mutates it directly reindexes to make `get` see
+    the change. Both shapes count: an append, and a replacement in place, which
+    the length-comparing self-heal this replaced could not detect."""
     glossary = Glossary(
         terms=[GlossaryTerm(id=TermId('a'), kind='actor', canonical='A')]
     )
     glossary.terms.append(GlossaryTerm(id=TermId('b'), kind='actor', canonical='B'))
-    found = glossary.get(TermId('b'))
-    assert found is not None
-    assert found.canonical == 'B'
+    glossary.terms[0] = GlossaryTerm(id=TermId('a'), kind='actor', canonical='A2')
+    glossary.reindex()
+    appended = glossary.get(TermId('b'))
+    replaced = glossary.get(TermId('a'))
+    assert appended is not None
+    assert appended.canonical == 'B'
+    assert replaced is not None
+    assert replaced.canonical == 'A2'

@@ -158,22 +158,29 @@ class Glossary:
     """
 
     # Public and mutable because the reflective serializer reads it by name.
-    # `_by_id` therefore re-indexes whenever the two fall out of step, so an
-    # append made without going through `_register` cannot leave `get` lying.
+    # A caller that mutates it directly owes `reindex()`; the constructor and
+    # `_register` keep the index current on their own, and nothing in the
+    # package takes the direct route.
     terms: list[GlossaryTerm] = field(default_factory=list)
     _by_id: dict[TermId, GlossaryTerm] = field(
         init=False, repr=False, compare=False, default_factory=dict
     )
 
     def __post_init__(self) -> None:
-        self._reindex()
+        self.reindex()
 
     def get(self, key: TermId) -> GlossaryTerm | None:
-        if len(self._by_id) != len(self.terms):
-            self._reindex()
         return self._by_id.get(key)
 
-    def _reindex(self) -> None:
+    def reindex(self) -> None:
+        """Rebuild the id index from `terms`.
+
+        Explicit rather than a self-heal inside `get`: the length comparison
+        that used to trigger one saw an append but not a replacement in place,
+        which keeps the length equal and leaves `get` returning the term that
+        was swapped out — so it advertised a guarantee it could not keep, on
+        the hottest read in the report path.
+        """
         self._by_id = {term.id: term for term in self.terms}
 
     def _register(self, term: GlossaryTerm) -> None:
