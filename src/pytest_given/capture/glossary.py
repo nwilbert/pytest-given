@@ -2,6 +2,7 @@
 
 import difflib
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from ..model import (
@@ -163,18 +164,38 @@ def _register_kind(
         definition=normalize_definition(definition),
         source=source,
     )
-    existing = glossary.get(new.id)
-    if existing is not None:
-        if terms_match(existing, new):
-            return existing
-        raise PytestGivenError(
+    return register_or_conflict(
+        glossary,
+        new,
+        lambda existing: (
             f'term {name!r} (id {new.id!r}) conflicts with prior registration '
             f'(existing: kind={existing.kind!r}, canonical={existing.canonical!r}, '
             f'definition={existing.definition!r}; new: kind={new.kind!r}, '
             f'canonical={new.canonical!r}, definition={new.definition!r}).'
-        )
-    glossary._register(new)
-    return new
+        ),
+    )
+
+
+def register_or_conflict(
+    glossary: BaseGlossary,
+    term: GlossaryTerm,
+    conflict_message: Callable[[GlossaryTerm], str],
+) -> GlossaryTerm:
+    """Register `term`, or return the equal one already there.
+
+    First-registration wins, and `terms_match` decides what "equal" means. The
+    identity rule already lived in one place; this puts the flow around it
+    there too, so the code glossary and the file-backed one cannot drift on
+    what counts as a re-registration. Only the message differs, which is what
+    the callback is for.
+    """
+    existing = glossary.get(term.id)
+    if existing is not None:
+        if terms_match(existing, term):
+            return existing
+        raise PytestGivenError(conflict_message(existing))
+    glossary._register(term)
+    return term
 
 
 def handle_or_raise(

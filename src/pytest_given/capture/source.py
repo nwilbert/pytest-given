@@ -126,10 +126,16 @@ def _optional_source(abs_path: Path, line: int) -> SourceLocation | None:
 def capture_caller_source(skip: int = 1) -> SourceLocation | None:
     """Return a SourceLocation for the frame `skip` levels up the call stack.
 
-    `skip=1` (default) returns the immediate caller of `capture_caller_source`.
-    Use `skip=2` when called from a one-level-deep user-facing wrapper (e.g.
-    `g.actor("Guest")` -> wrapper -> this helper) so frame 2 is the user's
-    code.
+    `skip` counts the frames between the user's code and here, so every caller
+    passes its own depth: `skip=2` from a user-facing function that calls this
+    directly (`story()`, `given(...).__enter__`), `skip=3` from one that goes
+    through a shared helper (`g.actor("Guest")` -> `_declare` -> here).
+
+    Getting it wrong does not raise: the frame lands inside `pytest_given/`,
+    `_relativize` returns None, and the term or story records `source=None` —
+    losing its report link and, with it, the lint's AST surface. `skip=1`
+    (the immediate caller of this function) is the default only because it is
+    the floor; no production call site wants it.
     """
     frame = sys._getframe(skip)
     abs_path = _co_filename_to_path(frame.f_code.co_filename)

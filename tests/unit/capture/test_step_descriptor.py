@@ -1,5 +1,6 @@
 import asyncio
 import inspect
+import re
 import warnings
 from collections.abc import AsyncIterator
 from pathlib import Path
@@ -847,15 +848,25 @@ def test_decorator_template_preserves_format_spec_and_conversion() -> None:
     assert texts == ['a balance of 3.50', "the receipt says 'paid'"]
 
 
-def test_decorator_template_on_fixture_raises() -> None:
-    """pytest_given.Template on a fixture is rejected with the documented message."""
+@pytest.mark.parametrize('label', ['a plain label', Template('value ${x}')])
+def test_decorator_above_pytest_fixture_raises(label: str | Template) -> None:
+    """Decorating an already-made fixture means the decorators are the wrong way
+    round, whatever the label form.
+
+    The step never reaches the report either way, but the two orders used to
+    fail differently: a `Template` label got a "not yet supported" message that
+    belongs to the *correct* order (where `plugin.fixtures` raises it), and a
+    plain string fell through to the generic wrapper and came back a plain
+    function — so pytest reported the fixture as missing, naming neither
+    pytest-given nor the decorator order.
+    """
 
     @pytest.fixture
     def fixture_body() -> int:
         return 1
 
-    desc = StepDescriptor('given', Template('value ${x}'))
-    with pytest.raises(PytestGivenError, match='not yet supported'):
+    desc = StepDescriptor('given', label)
+    with pytest.raises(PytestGivenError, match=re.escape('above @pytest.fixture')):
         desc(fixture_body)
 
 

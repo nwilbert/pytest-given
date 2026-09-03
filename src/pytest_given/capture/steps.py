@@ -45,7 +45,11 @@ from .template import (
 class StepDecorated(Protocol):
     """A function carrying a pytest-given step descriptor.
 
-    Read sites cast to this Protocol rather than probing an untyped attribute.
+    Not a return type: the decorator is signature-preserving, and the two read
+    sites (`plugin.fixtures`) probe `_step_descriptor` with `getattr` because
+    they are asking whether the attribute is there at all. What is left is the
+    `runtime_checkable` shape itself, which is the marker contract written down
+    once.
     """
 
     _step_descriptor: StepDescriptor
@@ -165,9 +169,15 @@ class StepDescriptor:
             return
         collector.pop_step()
 
-    def __call__(self, func: Callable[..., object]) -> StepDecorated:
+    def __call__[F: Callable[..., object]](self, func: F) -> F:
         """Decorate `func`: reject the forms this label cannot take, then wrap
         it in whatever its own flavor needs.
+
+        Signature-preserving on purpose. Returning a Protocol here — one
+        carrying `_step_descriptor` and no `__call__` — left every decorated
+        helper uncallable to a type checker, which the in-repo mypy run could
+        not see because it checks `src` only. `@scenario` makes the same
+        promise by returning the function unwrapped.
 
         The signature crosses between the two halves only for a `Template`
         label, whose per-call substitution needs what validation inspected.
@@ -177,15 +187,17 @@ class StepDescriptor:
     def _validated(self, func: Callable[..., object]) -> inspect.Signature | None:
         """Reject the label forms `func` cannot carry, returning the signature
         a `Template` label binds against (None for every other label)."""
-        is_fixture = (
-            getattr(func, '_fixture_function_marker', None) is not None
-            or getattr(func, '_pytestfixturefunction', None) is not None
-        )
-        if self.is_deferred_template and is_fixture:
+        # pytest>=9 is the floor, so `_fixture_function_marker` is the only
+        # spelling; the pre-8.4 `_pytestfixturefunction` cannot appear.
+        if getattr(func, '_fixture_function_marker', None) is not None:
             raise PytestGivenError(
-                f'@{self.phase}(Template(...)) on a fixture is not yet '
-                'supported; use a plain string label, or move the step into a '
-                'helper function.'
+                f'@{self.phase}(...) is above @pytest.fixture on '
+                f'{func.__name__!r}, which leaves pytest with a plain '
+                f'function and no fixture by that name. Put @pytest.fixture '
+                f'outermost:\n\n'
+                f'    @pytest.fixture\n'
+                f'    @{self.phase}(...)\n'
+                f'    def {func.__name__}(): ...'
             )
         if self.is_tstring:
             self._check_tstring_decorator_safety()
@@ -193,9 +205,9 @@ class StepDescriptor:
             return self._validate_template_against_signature(func)
         return None
 
-    def _wrapped(
-        self, func: Callable[..., object], sig: inspect.Signature | None
-    ) -> StepDecorated:
+    def _wrapped[F: Callable[..., object]](
+        self, func: F, sig: inspect.Signature | None
+    ) -> F:
         """`func` behind the wrapper its flavor needs, carrying this descriptor.
 
         Four flavors, and the branch order matters: an async generator is
@@ -203,24 +215,11 @@ class StepDescriptor:
         asked about before the call-time wrappers can claim it.
         """
         # A generator function is a fixture body: `pytest_fixture_setup` has
-        # already made the recording's root from this descriptor, so the
-        # wrapper only carries the marker.
-        if inspect.isgeneratorfunction(func):
-
-            @functools.wraps(func)
-            def gen_wrapper(*args: Any, **kwargs: Any) -> Any:
-                yield from func(*args, **kwargs)
-
-            return self._marked(gen_wrapper)
-
-        if inspect.isasyncgenfunction(func):
-
-            @functools.wraps(func)
-            async def async_gen_wrapper(*args: Any, **kwargs: Any) -> Any:
-                async for value in func(*args, **kwargs):
-                    yield value
-
-            return self._marked(async_gen_wrapper)
+        # already made the recording's root from this descriptor, so there is
+        # nothing to do at call time and nothing to wrap — marking it in place
+        # keeps the real function, the way `@scenario` does.
+        if inspect.isgeneratorfunction(func) or inspect.isasyncgenfunction(func):
+            return self._marked(func)
 
         # A coroutine function needs its own wrapper: the sync one would call
         # `func(...)`, get back an un-awaited coroutine, and pop in `finally`
@@ -237,7 +236,7 @@ class StepDescriptor:
                 finally:
                     collector.pop_step()
 
-            return self._marked(async_wrapper)
+            return self._marked(cast('F', async_wrapper))
 
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -249,12 +248,12 @@ class StepDescriptor:
             finally:
                 collector.pop_step()
 
-        return self._marked(wrapper)
+        return self._marked(cast('F', wrapper))
 
-    def _marked(self, wrapper: Callable[..., object]) -> StepDecorated:
-        """Hang this descriptor on the wrapper, where the read sites find it."""
-        wrapper._step_descriptor = self  # type: ignore[attr-defined]
-        return cast('StepDecorated', wrapper)
+    def _marked[F: Callable[..., object]](self, func: F) -> F:
+        """Hang this descriptor on `func`, where the read sites find it."""
+        func._step_descriptor = self  # type: ignore[attr-defined]
+        return func
 
     def _push_call_step(
         self,

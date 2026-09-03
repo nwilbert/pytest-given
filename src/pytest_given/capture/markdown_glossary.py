@@ -83,7 +83,7 @@ def parse_glossary_tables(
                     f'but {required_width} column(s) required.'
                 )
             kind_value = (
-                _strip_emphasis(cells[kind_idx].strip()) if kind_idx is not None else ''
+                _strip_emphasis(cells[kind_idx]) if kind_idx is not None else ''
             )
             rows.append(
                 GlossaryRow(
@@ -131,8 +131,9 @@ def _is_table_row(line: str) -> bool:
 
 
 def _is_separator_row(line: str) -> bool:
-    cells = _split_row(line)
-    return len(cells) > 0 and all(_SEPARATOR_CELL.match(cell) for cell in cells)
+    # No emptiness guard: `_split_row` goes through `re.split`, which always
+    # returns at least one element.
+    return all(_SEPARATOR_CELL.match(cell) for cell in _split_row(line))
 
 
 def _split_row(line: str) -> list[str]:

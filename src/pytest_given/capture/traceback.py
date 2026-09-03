@@ -20,7 +20,10 @@ from dataclasses import dataclass, field
 from ..model import TracebackFrame
 from .source import to_relpath
 
-_FRAME_HEADER_RE = re.compile(r'^(?P<path>.+?):(?P<lineno>\d+): in (?P<func>.+)$')
+# `\S` anchors the path: `.+?` also accepted leading whitespace, so an
+# indented source line inside a frame body could pass for a new frame
+# header and split one frame into two garbage ones.
+_FRAME_HEADER_RE = re.compile(r'^(?P<path>\S.*?):(?P<lineno>\d+): in (?P<func>.+)$')
 
 # Substrings (after backslash → forward-slash normalization) that mark a
 # frame as internal. Suffix entries use endswith; others use substring.

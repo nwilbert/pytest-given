@@ -22,7 +22,6 @@ from .scenario import (
 )
 from .source import item_source
 from .steps import (
-    StepDecorated,
     StepDescriptor,
     attach,
     given,
@@ -49,7 +48,6 @@ __all__ = [
     'Glossary',
     'RecordingState',
     'ScenarioDecorator',
-    'StepDecorated',
     'StepDescriptor',
     'Template',
     'activity',

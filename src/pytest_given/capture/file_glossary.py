@@ -14,7 +14,7 @@ from .glossary import (
     TermHandle,
     handle_or_raise,
     normalize_definition,
-    terms_match,
+    register_or_conflict,
 )
 from .markdown_glossary import ColumnSpec, GlossaryRow, parse_glossary_tables
 from .source import file_source
@@ -72,15 +72,14 @@ class FileGlossary:
             definition=normalize_definition(row.definition),
             source=file_source(self._path, row.line),
         )
-        existing = self._glossary.get(term_id)
-        if existing is not None:
-            if not terms_match(existing, term):
-                raise PytestGivenError(
-                    f'{self._path}:{row.line}: term {row.term!r} (id {term_id!r}) '
-                    f'conflicts with an earlier row.'
-                )
-            return
-        self._glossary._register(term)
+        register_or_conflict(
+            self._glossary,
+            term,
+            lambda _existing: (
+                f'{self._path}:{row.line}: term {row.term!r} (id {term_id!r}) '
+                f'conflicts with an earlier row.'
+            ),
+        )
 
     def _parse_kind(self, raw: str | None, line: int) -> TermKind | None:
         if raw is None:

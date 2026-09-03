@@ -55,10 +55,17 @@ def restore_capture_state(state: CaptureState) -> None:
 
 
 def begin_capture_session(rootdir: Path) -> None:
-    """Point capture at a session's rootdir, on a cleared story registry.
+    """Point capture at a session's rootdir, on a cleared story registry and
+    with no collector active.
 
     Take a `capture_snapshot` first when the caller may be nested inside
     another run, and `restore_capture_state` when this one is done.
+
+    All three globals, symmetrically with `restore_capture_state`: leaving the
+    collector alone left an *outer* session's collector active across a nested
+    run's conftest import and collection, so anything that run recorded in that
+    window landed in the outer session's open scenario.
     """
     set_rootdir(rootdir)
     restore_story_registry({})
+    set_active_collector(None)
