@@ -68,13 +68,6 @@ type NarrationPart = (
     NarrationLiteral | NarrationValue | NarrationPlaceholder | NarrationTermRef
 )
 
-# A part's position in its narration's `parts`. Distinct from a `StepPath`
-# component, which indexes a step among its siblings: grouping carries both at
-# once — the step the part is in, and the part within it — and reaches the same
-# position in every other case by this index, so mixing the two silently
-# compares the wrong things.
-PartIndex = NewType('PartIndex', int)
-
 
 @dataclass(frozen=True)
 class Narration:
@@ -347,8 +340,9 @@ class ParameterColumn:
 
 # One table cell. A `param` cell holds the parametrize value as captured, a
 # `derived` cell the already-rendered string, an `attachment` cell the payload
-# object — which is also how serde tells the two apart on read. `None` marks a
-# case with no value for that column.
+# object — which is also how serde tells the two apart on read. `None` is a
+# real parametrize value in a `param` cell and "no value here" in a generated
+# one: the column's kind disambiguates, never the cell.
 type CellValue = ParamValue | Attachment
 
 
@@ -357,7 +351,7 @@ class ParameterCase:
     """One parametrize case: its cells, positionally aligned with the table's
     columns."""
 
-    values: list[CellValue | None]
+    values: list[CellValue]
     status: Status = 'passed'
     error: ErrorInfo | None = None
 

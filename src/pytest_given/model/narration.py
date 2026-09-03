@@ -9,9 +9,9 @@ Only rules that need nothing but the parts. `try_term_ref` stays in
 `capture/template.py`, where the glossary handle types it matches on live.
 """
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from string import Formatter
-from typing import Any, assert_never
+from typing import assert_never
 
 from .schema import (
     Narration,
@@ -20,8 +20,8 @@ from .schema import (
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
-    PartIndex,
 )
+from .steps import PartIndex
 
 _FORMATTER = Formatter()
 
@@ -64,6 +64,19 @@ def narration_text(parts: Sequence[NarrationPart]) -> str:
     return ''.join(out)
 
 
+def narration_of(parts: Iterable[NarrationPart]) -> Narration:
+    """A narration carrying those parts, with `text` derived from them.
+
+    The one constructor for a parts-carrying `Narration`: `text` must equal
+    `narration_text(parts)` — grouping partitions cases on it and the report's
+    search box reads it — and nothing about the dataclass enforces that, so
+    every caller that builds parts comes through here rather than pairing the
+    two by hand.
+    """
+    parts = tuple(parts)
+    return Narration(text=narration_text(parts), parts=parts)
+
+
 def rebuilt(
     narration: Narration, part_of: Callable[[PartIndex, NarrationPart], NarrationPart]
 ) -> Narration:
@@ -78,13 +91,14 @@ def rebuilt(
     """
     if not narration.parts:
         return narration
-    parts = tuple(
+    return narration_of(
         part_of(PartIndex(index), part) for index, part in enumerate(narration.parts)
     )
-    return Narration(text=narration_text(parts), parts=parts)
 
 
-def render_interpolation(value: Any, conversion: str | None, format_spec: str) -> str:
+def render_interpolation(
+    value: object, conversion: str | None, format_spec: str
+) -> str:
     """One interpolation rendered the way an f-string renders it: `!conv`
     first, then `:spec`.
 
@@ -95,7 +109,7 @@ def render_interpolation(value: Any, conversion: str | None, format_spec: str) -
     return format(_FORMATTER.convert_field(value, conversion), format_spec)
 
 
-def placeholder_value(part: NarrationPlaceholder, value: Any) -> NarrationValue:
+def placeholder_value(part: NarrationPlaceholder, value: object) -> NarrationValue:
     """One `Template` placeholder resolved against the value bound to its name.
 
     Each caller keeps its own lookup, since what a missing name means differs —

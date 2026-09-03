@@ -32,7 +32,7 @@ class ColumnBuilder:
     """The columns and cells a group's walk accumulates."""
 
     columns: list[ParameterColumn] = field(default_factory=list)
-    cells: dict[ColumnId, dict[NodeId, CellValue | None]] = field(default_factory=dict)
+    cells: dict[ColumnId, dict[NodeId, CellValue]] = field(default_factory=dict)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
     _taken_names: set[str] = field(default_factory=set)
 
@@ -65,12 +65,10 @@ class ColumnBuilder:
         self.cells[column_id] = {}
         return column
 
-    def set_cell(
-        self, column_id: ColumnId, node_id: NodeId, value: CellValue | None
-    ) -> None:
+    def set_cell(self, column_id: ColumnId, node_id: NodeId, value: CellValue) -> None:
         self.cells[column_id][node_id] = value
 
-    def cell(self, column_id: ColumnId, node_id: NodeId) -> CellValue | None:
+    def cell(self, column_id: ColumnId, node_id: NodeId) -> CellValue:
         """That case's cell, or None where it has none.
 
         Absence is ordinary: a `derived` column is filled from the comparable
@@ -196,7 +194,7 @@ def param_cell(value: RawParamValue, fmt: Format | None) -> ParamValue:
         return _param_value(value)
 
 
-def cell_text(cell: CellValue | None) -> str:
+def cell_text(cell: CellValue) -> str:
     """A cell as the renderers print it — what hover substitutes into a slot."""
     assert not isinstance(cell, Attachment), 'a param column holds no attachment'
     return str(cell)

@@ -121,7 +121,7 @@ def _case_error_block(table: ParameterTable, case: ParameterCase) -> list[str]:
     ]
 
 
-def _case_cell(column: ParameterColumn, value: CellValue | None) -> str:
+def _case_cell(column: ParameterColumn, value: CellValue) -> str:
     """One table cell.
 
     A `param` cell renders its value verbatim — `None` there is a real
@@ -172,7 +172,7 @@ def _case_key(table: ParameterTable, case: ParameterCase) -> str:
 
 def _cells(
     table: ParameterTable, case: ParameterCase
-) -> Iterator[tuple[ParameterColumn, CellValue | None]]:
+) -> Iterator[tuple[ParameterColumn, CellValue]]:
     """A case's cells paired with the columns they sit under.
 
     `ParameterCase.values` is positionally aligned with `table.columns`, so the

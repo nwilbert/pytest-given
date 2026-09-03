@@ -2,6 +2,7 @@ from .errors import PytestGivenError, PytestGivenWarning, placeholder_mismatch
 from .ids import case_suffix, id_derive, node_base
 from .markup import EMPHASIS
 from .narration import (
+    narration_of,
     narration_text,
     placeholder_token,
     placeholder_value,
@@ -9,11 +10,9 @@ from .narration import (
     render_interpolation,
 )
 from .runtime import (
-    FixtureRecording,
     ParamInfo,
     ParamSpec,
     RawParamValue,
-    RecordingState,
 )
 from .schema import (
     Activity,
@@ -44,7 +43,6 @@ from .schema import (
     ParameterColumn,
     ParameterTable,
     ParamValue,
-    PartIndex,
     Phase,
     ReportData,
     Scenario,
@@ -61,6 +59,7 @@ from .schema import (
 )
 from .serde import report_from_dict, report_to_dict
 from .steps import (
+    PartIndex,
     StepPath,
     iter_narrations,
     iter_steps,
@@ -84,7 +83,6 @@ __all__ = [
     'ColumnKind',
     'ContentType',
     'ErrorInfo',
-    'FixtureRecording',
     'Glossary',
     'GlossaryTerm',
     'Metadata',
@@ -106,7 +104,6 @@ __all__ = [
     'PytestGivenError',
     'PytestGivenWarning',
     'RawParamValue',
-    'RecordingState',
     'ReportData',
     'Scenario',
     'SourceLocation',
@@ -124,6 +121,7 @@ __all__ = [
     'iter_narrations',
     'iter_steps',
     'location_suffix',
+    'narration_of',
     'narration_text',
     'node_base',
     'placeholder_mismatch',

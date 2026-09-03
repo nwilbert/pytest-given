@@ -1,5 +1,7 @@
 from .collector import (
     Collector,
+    FixtureRecording,
+    RecordingState,
     get_active_collector,
     set_active_collector,
 )
@@ -43,7 +45,9 @@ from .traceback import is_internal_path, parse_short_repr
 __all__ = [
     'Collector',
     'FileGlossary',
+    'FixtureRecording',
     'Glossary',
+    'RecordingState',
     'ScenarioDecorator',
     'StepDecorated',
     'StepDescriptor',

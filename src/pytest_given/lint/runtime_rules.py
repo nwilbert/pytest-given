@@ -84,7 +84,7 @@ def _tag_shadows_term_findings(
     shadowing: dict[TermId, _ShadowingTag] = {}
     for scenario in grouped:
         for tag in scenario.tags:
-            slug = id_derive(tag)
+            slug = TermId(id_derive(tag))
             if glossary.get(slug) is None:
                 continue
             seen = shadowing.get(slug)

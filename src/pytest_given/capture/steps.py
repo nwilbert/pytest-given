@@ -28,7 +28,7 @@ from ..model import (
     PytestGivenError,
     PytestGivenWarning,
     SourceLocation,
-    narration_text,
+    narration_of,
 )
 from .collector import Collector, get_active_collector, no_scenario_error
 from .source import capture_caller_source, code_source
@@ -333,7 +333,7 @@ class StepDescriptor:
         bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()
         parts = resolve_template_parts(self.narration.parts, bound.arguments)
-        return Narration(text=narration_text(parts), parts=parts)
+        return narration_of(parts)
 
 
 def normalize_activity(

@@ -61,7 +61,7 @@ class FileGlossary:
 
     def _add_row(self, row: GlossaryRow) -> None:
         try:
-            term_id = id_derive(row.term)
+            term_id = TermId(id_derive(row.term))
         except PytestGivenError as exc:
             raise PytestGivenError(f'{self._path}:{row.line}: {exc}') from exc
         kind = self._parse_kind(row.kind, row.line)

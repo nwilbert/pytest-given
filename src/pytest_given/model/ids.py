@@ -3,19 +3,25 @@
 import re
 
 from .errors import PytestGivenError
-from .schema import TermId
 
 _NON_ALNUM = re.compile(r'[^a-z0-9]+')
 
 
-def id_derive(name: str) -> TermId:
+def id_derive(name: str) -> str:
+    """`name` as a slug: lowercased, every non-ASCII-alphanumeric run folded to
+    a single `-`.
+
+    Returns a bare `str`, not a `TermId`: a story id and a coverage instance id
+    are derived the same way, so the callers that do want a term id wrap it
+    themselves and the ones that don't no longer have a NewType to discard.
+    """
     slug = _NON_ALNUM.sub('-', name.lower()).strip('-')
     if not slug:
         raise PytestGivenError(
             f'derived id is empty for {name!r}; provide a name with at least '
             f'one ASCII alphanumeric character.'
         )
-    return TermId(slug)
+    return slug
 
 
 def node_base(node_id: str) -> str:

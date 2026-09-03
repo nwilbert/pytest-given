@@ -157,7 +157,7 @@ def _register_kind(
     `source`.
     """
     new = GlossaryTerm(
-        id=id_derive(name),
+        id=TermId(id_derive(name)),
         kind=kind,
         canonical=name,
         definition=normalize_definition(definition),
@@ -185,7 +185,7 @@ def handle_or_raise(
     """Name-based, case-insensitive get-only lookup. Raises PytestGivenError
     with a did-you-mean hint on an unknown name. Shared by the code glossary's
     g[...] / g(...) lookups and FileGlossary."""
-    term_id = id_derive(name)
+    term_id = TermId(id_derive(name))
     if handle_cache is not None and term_id in handle_cache:
         return handle_cache[term_id]
     term = glossary.get(term_id)

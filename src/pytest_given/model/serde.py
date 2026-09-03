@@ -1,8 +1,10 @@
 """ReportData ↔ JSON-shaped dict (de)serialization.
 
 `report_to_dict` serializes a `ReportData` to a JSON-shaped dict, filtering
-out underscore-prefixed fields (e.g. `_by_id` on `Glossary`, `_glossaries`
-on the story tree).
+out the two kinds of field that stay out of the report: underscore-prefixed
+ones (e.g. `_by_id` on `Glossary`, `_glossaries` on the story tree) and any
+field marked `metadata={'serde_exclude': True}` — which is how `Step.source`
+opts out while keeping a name the lint call sites can read.
 `report_from_dict` is the inverse; the renderer reads the JSON, calls it
 once, and operates on typed dataclasses from there.
 
@@ -73,8 +75,6 @@ def _asdict_filtered(obj: Any) -> Any:
         }
     if isinstance(obj, (list, tuple)):
         return [_asdict_filtered(x) for x in obj]
-    if isinstance(obj, dict):
-        return {k: _asdict_filtered(v) for k, v in obj.items()}
     return obj
 
 
@@ -260,7 +260,7 @@ def _stale_report_error(shape: str) -> PytestGivenError:
 
 def _param_column_from_dict(d: dict[str, Any]) -> ParameterColumn:
     kind: ColumnKind = d['kind']
-    return ParameterColumn(id=d['id'], name=d['name'], kind=kind)
+    return ParameterColumn(id=ColumnId(d['id']), name=d['name'], kind=kind)
 
 
 def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
@@ -272,11 +272,11 @@ def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
     )
 
 
-def _cell_from_json(value: Any) -> CellValue | None:
+def _cell_from_json(value: Any) -> CellValue:
     """An object cell is an attachment payload; anything else is a scalar."""
     if isinstance(value, dict):
         return _attachment_from_dict(value)
-    scalar: CellValue | None = value
+    scalar: CellValue = value
     return scalar
 
 

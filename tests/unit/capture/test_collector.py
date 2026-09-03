@@ -3,11 +3,11 @@ from types import SimpleNamespace
 import pytest
 
 from pytest_given import Template, given, scenario, then, when, when_then
+from pytest_given.capture import FixtureRecording
 from pytest_given.capture import collector as collector_mod
 from pytest_given.capture.collector import Collector
 from pytest_given.capture.steps import StepDescriptor
 from pytest_given.model import (
-    FixtureRecording,
     Narration,
     NarrationLiteral,
     NarrationPart,

@@ -4,8 +4,8 @@ that is active, and the error every step raises when there is none."""
 import copy
 import time
 from contextvars import ContextVar
-from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Literal
 
 from ..model import (
     ActivityId,
@@ -13,12 +13,10 @@ from ..model import (
     AttachmentLabel,
     ContentType,
     ErrorInfo,
-    FixtureRecording,
     Narration,
     NodeId,
     Phase,
     PytestGivenError,
-    RecordingState,
     Scenario,
     SourceLocation,
     Status,
@@ -33,6 +31,28 @@ if TYPE_CHECKING:
     # `steps` imports this module, so the descriptor type can only travel
     # one way at runtime; the annotation still gets the real type.
     from .steps import StepDescriptor
+
+
+# Lifecycle state of the collector — determines where push_step/attach route.
+type RecordingState = Literal['idle', 'test', 'fixture_setup', 'fixture_teardown']
+
+
+@dataclass
+class FixtureRecording:
+    """A captured subtree of steps/attachments for one fixture instance.
+
+    `root` is the labeled step from @given/@when/@then on the fixture; its
+    `children` accumulate as the fixture body runs. `stack` mirrors the
+    collector's step stack while the recording is active, so nested
+    `with given(...)` inside the body works.
+    """
+
+    root: Step
+    stack: list[Step] = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        if not self.stack:
+            self.stack.append(self.root)
 
 
 @dataclass(frozen=True)

@@ -14,6 +14,7 @@ from ..model import (
     NarrationTermRef,
     NarrationValue,
     PytestGivenError,
+    narration_of,
     narration_text,
     placeholder_value,
     render_interpolation,
@@ -69,8 +70,7 @@ def narration_from(value: StepText | Narration) -> Narration:
         # placeholder renders as its bare `{name}` token, so `'{amount:.2f}'`
         # would otherwise leave a `text` carrying a spec that nothing displays
         # — and `text` is what the report's search box and a `jq` query read.
-        parts = tuple(value.parts)
-        return Narration(text=narration_text(parts), parts=parts)
+        return narration_of(value.parts)
     return Narration(text=value)
 
 
@@ -119,13 +119,11 @@ def parse_tstring(
     `NarrationTermRef`; every other value records a `NarrationValue`.
     """
     parts: list[NarrationPart] = []
-    rendered_chunks: list[str] = []
     for chunk in tstring:
         match chunk:
             case str() as literal:
                 if literal:
                     parts.append(NarrationLiteral(value=literal))
-                    rendered_chunks.append(literal)
             case templatelib.Interpolation(
                 value=value,
                 expression=expression,
@@ -137,7 +135,6 @@ def parse_tstring(
                 )
                 if term_ref is not None:
                     parts.append(term_ref)
-                    rendered_chunks.append(term_ref.display)
                     continue
                 rendered = render_interpolation(value, conversion, format_spec)
                 parts.append(
@@ -148,8 +145,7 @@ def parse_tstring(
                         conversion=conversion,
                     )
                 )
-                rendered_chunks.append(rendered)
-    return ''.join(rendered_chunks), tuple(parts)
+    return narration_text(parts), tuple(parts)
 
 
 def try_term_ref(

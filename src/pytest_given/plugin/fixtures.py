@@ -18,11 +18,11 @@ import pytest
 
 from ..capture import (
     Collector,
+    FixtureRecording,
     StepDescriptor,
     annotated_given_descriptors,
 )
 from ..model import (
-    FixtureRecording,
     PytestGivenError,
     Step,
 )

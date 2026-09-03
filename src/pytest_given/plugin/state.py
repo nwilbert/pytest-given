@@ -13,9 +13,9 @@ from dataclasses import dataclass, field
 
 import pytest
 
-from ..capture import Collector
+from ..capture import Collector, FixtureRecording
 from ..lint import Finding, LintConfig
-from ..model import FixtureRecording, NodeId, ParamInfo
+from ..model import NodeId, ParamInfo
 from ..report import SinkConfig
 
 

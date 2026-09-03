@@ -35,7 +35,6 @@ from pytest_given.model import (
 )
 from pytest_given.model.serde import (
     _activity_part_from_dict,
-    _asdict_filtered,
     _narration_part_from_dict,
     _param_table_from_dict,
 )
@@ -555,12 +554,6 @@ def test_round_trip_via_to_dict() -> None:
     )
     deserialized = report_from_dict(report_to_dict(original))
     assert deserialized == original
-
-
-def test_asdict_filtered_handles_dict_values() -> None:
-    """_asdict_filtered handles plain dict values (not just lists/dataclasses)."""
-    result = _asdict_filtered({'key': 'value', 'nested': {'a': 1}})
-    assert result == {'key': 'value', 'nested': {'a': 1}}
 
 
 def test_activity_part_variants_round_trip():

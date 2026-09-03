@@ -2,6 +2,7 @@ import dataclasses
 
 import pytest
 
+from pytest_given.capture import FixtureRecording, RecordingState
 from pytest_given.model import (
     Activity,
     ActivityId,
@@ -12,7 +13,6 @@ from pytest_given.model import (
     Attachment,
     AttachmentRef,
     ErrorInfo,
-    FixtureRecording,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -25,7 +25,6 @@ from pytest_given.model import (
     ParameterCase,
     ParameterColumn,
     ParameterTable,
-    RecordingState,
     ReportData,
     Scenario,
     SourceLocation,

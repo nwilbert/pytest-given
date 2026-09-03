@@ -11,6 +11,7 @@ from typing import Annotated, Any, cast
 import pytest
 
 from pytest_given import Template, given, then, when
+from pytest_given.capture import FixtureRecording
 from pytest_given.capture.collector import (
     Collector,
     get_active_collector,
@@ -32,7 +33,6 @@ from pytest_given.capture.story import (
 from pytest_given.lint import LintConfig
 from pytest_given.model import (
     ActivityId,
-    FixtureRecording,
     Narration,
     NodeId,
     PytestGivenError,
