@@ -22,7 +22,6 @@ from ..model import (
     RawParamValue,
     Step,
     StepPath,
-    narration_text,
     placeholder_mismatch,
     rebuilt,
 )
@@ -58,14 +57,10 @@ def _templatize_step_narration(step: Step, path: StepPath, ctx: Promotion) -> Na
     it varies, so it passes through. Otherwise each part is compared against the
     same position in every comparable case.
     """
-    narration = step.narration
-    if not narration.parts:
-        return narration
-    out = tuple(
-        _templatize_part(part, index, path, step.phase, ctx)
-        for index, part in enumerate(narration.parts)
+    return rebuilt(
+        step.narration,
+        lambda index, part: _templatize_part(part, index, path, step.phase, ctx),
     )
-    return Narration(text=narration_text(out), parts=out)
 
 
 def _templatize_part(
@@ -197,7 +192,9 @@ def templatize_narration(narration: Narration, ctx: Promotion) -> Narration:
     """
     return rebuilt(
         narration,
-        lambda part: _reconciled_slot(_name_part(part, ctx.group.param_names), ctx),
+        lambda _index, part: _reconciled_slot(
+            _name_part(part, ctx.group.param_names), ctx
+        ),
     )
 
 
@@ -275,10 +272,7 @@ def _promoted_column(
     The one compare-and-promote rule, shared by both slot kinds — only where
     the renderings come from differs.
     """
-    if all(
-        text == cell_text(ctx.columns.cells[column_id][case_id])
-        for case_id, text in rendered.items()
-    ):
+    if ctx.columns.reads_as(column_id, rendered):
         return None
     column = ctx.columns.new_column('derived', name)
     for case_id, text in rendered.items():

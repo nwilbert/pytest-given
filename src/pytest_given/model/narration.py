@@ -64,17 +64,20 @@ def narration_text(parts: Sequence[NarrationPart]) -> str:
 
 
 def rebuilt(
-    narration: Narration, part_of: Callable[[NarrationPart], NarrationPart]
+    narration: Narration, part_of: Callable[[int, NarrationPart], NarrationPart]
 ) -> Narration:
     """The narration with every part mapped, and its text re-derived from them.
 
     Lives here with `narration_text`, which is the rule it has to reapply. A
     part-less narration passes through: its text is all it has, and there is
     nothing to rebuild it from.
+
+    `part_of` takes the part's index as well as the part: a grouping slot is
+    identified by its position, and a mapper that does not care ignores it.
     """
     if not narration.parts:
         return narration
-    parts = tuple(part_of(part) for part in narration.parts)
+    parts = tuple(part_of(index, part) for index, part in enumerate(narration.parts))
     return Narration(text=narration_text(parts), parts=parts)
 
 

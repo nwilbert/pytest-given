@@ -70,7 +70,26 @@ class ColumnBuilder:
         self.cells[column_id][node_id] = value
 
     def cell(self, column_id: str, node_id: NodeId) -> CellValue | None:
+        """That case's cell, or None where it has none.
+
+        Absence is ordinary: a `derived` column is filled from the comparable
+        cases only, so a failed or skipped case has no cell in one.
+        """
         return self.cells[column_id].get(node_id)
+
+    def reads_as(self, column_id: str, rendered: dict[NodeId, str]) -> bool:
+        """Whether every case's cell in *column_id* already prints the way that
+        case rendered it — the question a slot asks before promoting.
+
+        Indexed, not `.get`: the callers pass renderings from the comparable
+        cases against a `param` column, which is filled for every case in the
+        group, so a missing cell is a broken invariant rather than a case that
+        bound nothing.
+        """
+        cells = self.cells[column_id]
+        return all(
+            cell_text(cells[node_id]) == text for node_id, text in rendered.items()
+        )
 
     def _unique_name(self, name: str) -> str:
         """`name`, or `name #2`, `name #3`, … once it is already taken.

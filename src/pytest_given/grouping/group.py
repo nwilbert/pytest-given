@@ -20,7 +20,8 @@ from .checks import check_rebound_params, check_same_template
 from .columns import ColumnBuilder, param_cell, param_cell_formats
 from .context import build_group
 from .percase import per_case_scenarios
-from .templatize import Promotion, templatize_narration, templatize_steps
+from .promotion import Promotion
+from .templatize import templatize_narration, templatize_steps
 
 # What cases group on: one test function, one name.
 type GroupKey = tuple[str, str]

@@ -12,7 +12,7 @@ from ..model import (
     StepAttachment,
     StepPath,
 )
-from .checks import check_attachment_labels
+from .checks import LabeledAttachments, check_attachment_labels
 from .promotion import Promotion
 
 
@@ -31,12 +31,12 @@ def templatize_attachments(
     it never recorded — appended right after that label's baseline occurrences
     so column ids keep following the walk.
     """
-    check_attachment_labels(step, path, ctx.group)
     baseline = _by_label(step)
     others = {
         case.id: _by_label(ctx.group.indexed[case.id][path])
         for case in ctx.group.comparable
     }
+    check_attachment_labels(baseline, others, ctx.group)
 
     out: list[StepAttachment] = []
     seen: dict[str, int] = {}
@@ -50,11 +50,11 @@ def templatize_attachments(
     return out
 
 
-def _by_label(step: Step) -> dict[str, list[Attachment]]:
+def _by_label(step: Step) -> LabeledAttachments:
     """That step's attachments grouped by label, in the order it recorded them —
     the one shape everything below reads: a count is a `len`, an occurrence an
     index, and a label the case never attached a missing key."""
-    out: dict[str, list[Attachment]] = {}
+    out: LabeledAttachments = {}
     for attachment in step.attachments:
         assert isinstance(attachment, Attachment), 'a recorded tree holds no refs'
         out.setdefault(attachment.label, []).append(attachment)
@@ -64,7 +64,7 @@ def _by_label(step: Step) -> dict[str, list[Attachment]]:
 def _promote_occurrence(
     attachment: Attachment,
     occurrence: int,
-    others: dict[NodeId, dict[str, list[Attachment]]],
+    others: dict[NodeId, LabeledAttachments],
     ctx: Promotion,
 ) -> StepAttachment:
     """The baseline's `occurrence`-th attachment of `attachment.label`: stays
@@ -97,8 +97,8 @@ def _promote_occurrence(
 
 def _promote_extra_occurrences(
     label: str,
-    baseline: dict[str, list[Attachment]],
-    others: dict[NodeId, dict[str, list[Attachment]]],
+    baseline: LabeledAttachments,
+    others: dict[NodeId, LabeledAttachments],
     ctx: Promotion,
 ) -> None:
     """Occurrences of `label` past the baseline's own count: one column each,
@@ -118,7 +118,7 @@ def _promote_extra_occurrences(
             )
 
 
-def _max_count(label: str, others: dict[NodeId, dict[str, list[Attachment]]]) -> int:
+def _max_count(label: str, others: dict[NodeId, LabeledAttachments]) -> int:
     """The greatest number of times any comparable case attaches `label`."""
     return max(
         (len(by_label.get(label, [])) for by_label in others.values()), default=0
@@ -126,7 +126,7 @@ def _max_count(label: str, others: dict[NodeId, dict[str, list[Attachment]]]) ->
 
 
 def _occurrence(
-    by_label: dict[str, list[Attachment]], label: str, index: int
+    by_label: LabeledAttachments, label: str, index: int
 ) -> Attachment | None:
     """That case's `index`-th attachment carrying `label`, or None when the case
     attached that label fewer times than `index` requires."""

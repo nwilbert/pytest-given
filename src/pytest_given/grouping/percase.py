@@ -68,7 +68,7 @@ def _substituted_narration(
     narration: Narration, params: dict[str, RawParamValue]
 ) -> Narration:
     """Every placeholder replaced by what this case's parameters render."""
-    return rebuilt(narration, lambda part: _substituted_part(part, params))
+    return rebuilt(narration, lambda _index, part: _substituted_part(part, params))
 
 
 def _substituted_part(

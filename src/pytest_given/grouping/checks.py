@@ -10,12 +10,14 @@ from collections.abc import Iterator
 from typing import NamedTuple
 
 from ..model import (
+    Attachment,
     Narration,
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
+    NodeId,
     Phase,
     PytestGivenError,
     RawParamValue,
@@ -34,6 +36,11 @@ from .context import Group
 # ignored. Two cases with equal signatures render truthfully in the grouped
 # parameter-table view.
 type StepSignature = tuple[tuple[Phase, StepSignature], ...]
+
+# One step's attachments grouped by label, in the order that case recorded
+# them. Built by the promotion walk (`attachments._by_label`), which is also
+# the only caller of the rule that reads it.
+type LabeledAttachments = dict[str, list[Attachment]]
 
 
 def structure_signature(steps: list[Step]) -> StepSignature:
@@ -245,7 +252,11 @@ def _reformat(value: RawParamValue, part: NarrationValue) -> str | None:
         return None
 
 
-def check_attachment_labels(step: Step, path: StepPath, group: Group) -> None:
+def check_attachment_labels(
+    baseline: LabeledAttachments,
+    others: dict[NodeId, LabeledAttachments],
+    group: Group,
+) -> None:
     """Rule 5: a step whose set of attachment labels differs across cases.
 
     A label names its payload; the payload is what varies, and the row already
@@ -253,11 +264,13 @@ def check_attachment_labels(step: Step, path: StepPath, group: Group) -> None:
     design — varying those is what the `attachment` column is for. The
     comparison is over the *distinct* labels, so a label attached a different
     number of times does not raise.
+
+    Takes the label maps the promotion walk has already grouped rather than the
+    step, since deriving the label sets from the raw attachment lists a second
+    time is the whole of this rule's work.
     """
-    labels = {a.label for a in step.attachments}
     for case in group.comparable:
-        other_labels = {a.label for a in group.indexed[case.id][path].attachments}
-        differing = sorted(labels ^ other_labels)
+        differing = sorted(baseline.keys() ^ others[case.id].keys())
         if not differing:
             continue
         raise _grouping_error(
