@@ -1,7 +1,7 @@
 """Promoting a step's attachments: any whose payload varies becomes a column.
 
 The narration side is `templatize`'s; this is the other half of the same walk,
-kept apart because the two share only the `Promotion` they are handed.
+kept apart because the two share only the `ColumnBuilder` they are handed.
 """
 
 from ..model import (
@@ -14,11 +14,11 @@ from ..model import (
     StepPath,
 )
 from .checks import LabeledAttachments, check_attachment_labels
-from .promotion import Promotion
+from .columns import ColumnBuilder
 
 
 def templatize_attachments(
-    step: Step, path: StepPath, ctx: Promotion
+    step: Step, path: StepPath, ctx: ColumnBuilder
 ) -> list[StepAttachment]:
     """Baseline attachments, with any whose payload varies promoted to a column.
 
@@ -66,7 +66,7 @@ def _promote_occurrence(
     attachment: Attachment,
     occurrence: int,
     others: dict[NodeId, LabeledAttachments],
-    ctx: Promotion,
+    ctx: ColumnBuilder,
 ) -> StepAttachment:
     """The baseline's `occurrence`-th attachment of `attachment.label`: stays
     inline when every comparable case's occurrence matches it byte for byte,
@@ -83,9 +83,9 @@ def _promote_occurrence(
         for other in theirs.values()
     ):
         return attachment
-    column = ctx.columns.new_column('attachment', attachment.label)
+    column = ctx.new_column('attachment', attachment.label)
     for node_id, other in theirs.items():
-        ctx.columns.set_cell(column.id, node_id, other)
+        ctx.set_cell(column.id, node_id, other)
     # The badge is labeled with the *column* name, not the attachment's own
     # label: a label attached twice gives two columns, and a badge repeating
     # the bare label points the reader at the wrong one.
@@ -100,7 +100,7 @@ def _promote_extra_occurrences(
     label: AttachmentLabel,
     baseline: LabeledAttachments,
     others: dict[NodeId, LabeledAttachments],
-    ctx: Promotion,
+    ctx: ColumnBuilder,
 ) -> None:
     """Occurrences of `label` past the baseline's own count: one column each,
     with the baseline's cell left `None` and nothing appended to the grouped
@@ -111,12 +111,10 @@ def _promote_extra_occurrences(
     range at 0 and re-promote occurrences the baseline already carries a badge
     for.
     """
-    for occurrence in range(len(baseline.get(label, [])), _max_count(label, others)):
-        column = ctx.columns.new_column('attachment', label)
+    for occurrence in range(len(baseline[label]), _max_count(label, others)):
+        column = ctx.new_column('attachment', label)
         for node_id, by_label in others.items():
-            ctx.columns.set_cell(
-                column.id, node_id, _occurrence(by_label, label, occurrence)
-            )
+            ctx.set_cell(column.id, node_id, _occurrence(by_label, label, occurrence))
 
 
 def _max_count(label: AttachmentLabel, others: dict[NodeId, LabeledAttachments]) -> int:

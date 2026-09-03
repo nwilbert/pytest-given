@@ -32,11 +32,12 @@ from .checks import (
     check_constant_term_ref,
     check_promotable_expression,
 )
-from .columns import Format, cell_text, param_cell
-from .promotion import Promotion
+from .columns import ColumnBuilder, Format, cell_text, param_cell, param_id
 
 
-def templatize_steps(steps: list[Step], prefix: StepPath, ctx: Promotion) -> list[Step]:
+def templatize_steps(
+    steps: list[Step], prefix: StepPath, ctx: ColumnBuilder
+) -> list[Step]:
     """Walk the baseline tree, promoting anything that varies into a column."""
     out: list[Step] = []
     for index, step in enumerate(steps):
@@ -52,7 +53,9 @@ def templatize_steps(steps: list[Step], prefix: StepPath, ctx: Promotion) -> lis
     return out
 
 
-def _templatize_step_narration(step: Step, path: StepPath, ctx: Promotion) -> Narration:
+def _templatize_step_narration(
+    step: Step, path: StepPath, ctx: ColumnBuilder
+) -> Narration:
     """The baseline step's narration with varying values promoted.
 
     A step with no parts is a `str` narration: rule 1 has already rejected it if
@@ -66,7 +69,11 @@ def _templatize_step_narration(step: Step, path: StepPath, ctx: Promotion) -> Na
 
 
 def _templatize_part(
-    part: NarrationPart, index: PartIndex, path: StepPath, phase: Phase, ctx: Promotion
+    part: NarrationPart,
+    index: PartIndex,
+    path: StepPath,
+    phase: Phase,
+    ctx: ColumnBuilder,
 ) -> NarrationPart:
     """One baseline part, against the same position in every comparable case.
 
@@ -101,7 +108,7 @@ def _templatize_part(
 def _param_slot(part: NarrationValue) -> NarrationPlaceholder:
     return NarrationPlaceholder(
         name=part.expression,
-        column_id=ColumnId(part.expression),
+        column_id=param_id(part.expression),
         format_spec=part.format_spec,
         conversion=part.conversion,
     )
@@ -111,7 +118,7 @@ def _templatize_param_value(
     part: NarrationValue,
     index: PartIndex,
     path: StepPath,
-    ctx: Promotion,
+    ctx: ColumnBuilder,
 ) -> NarrationPart:
     """A slot bound to a `param` column: it keeps pointing there when the cell
     reads the way this slot rendered, and gets a column of its own when it does
@@ -126,7 +133,7 @@ def _templatize_param_value(
         case.id: _value_at(ctx.group.indexed[case.id][path], index)
         for case in ctx.group.comparable
     }
-    column = _promoted_column(rendered, ColumnId(part.expression), part.expression, ctx)
+    column = _promoted_column(rendered, param_id(part.expression), part.expression, ctx)
     if column is None:
         return _param_slot(part)
     return NarrationPlaceholder(
@@ -138,7 +145,11 @@ def _templatize_param_value(
 
 
 def _templatize_value(
-    part: NarrationValue, index: PartIndex, path: StepPath, phase: Phase, ctx: Promotion
+    part: NarrationValue,
+    index: PartIndex,
+    path: StepPath,
+    phase: Phase,
+    ctx: ColumnBuilder,
 ) -> NarrationPart:
     """An interpolation no parametrize column binds: kept as it is when every
     case renders it the same, promoted to a `derived` column when they do not."""
@@ -151,9 +162,9 @@ def _templatize_value(
         # case's rendering kept.
         return part
     check_promotable_expression(part, phase, ctx.group)
-    column = ctx.columns.new_column('derived', part.expression)
+    column = ctx.new_column('derived', part.expression)
     for case in ctx.group.comparable:
-        ctx.columns.set_cell(
+        ctx.set_cell(
             column.id, case.id, _value_at(ctx.group.indexed[case.id][path], index)
         )
     # The token names the *column*, not the expression: one expression promoted
@@ -181,7 +192,7 @@ def _value_at(step: Step, index: PartIndex) -> str:
     return part.rendered
 
 
-def templatize_narration(narration: Narration, ctx: Promotion) -> Narration:
+def templatize_narration(narration: Narration, ctx: ColumnBuilder) -> Narration:
     """The **scenario** name as a template, its slots pointed at columns that
     read the way they do.
 
@@ -211,7 +222,7 @@ def _name_part(part: NarrationPart, param_names: list[str]) -> NarrationPart:
     return part
 
 
-def _reconciled_slot(part: NarrationPart, ctx: Promotion) -> NarrationPart:
+def _reconciled_slot(part: NarrationPart, ctx: ColumnBuilder) -> NarrationPart:
     """One `Template` slot re-pointed at a column that reads the way it does.
 
     Shared by the scenario name and by a step's `Template` slots: neither
@@ -266,7 +277,7 @@ def _slot_format(part: NarrationPlaceholder) -> Format | None:
 
 
 def _promoted_column(
-    rendered: dict[NodeId, str], column_id: ColumnId, name: str, ctx: Promotion
+    rendered: dict[NodeId, str], column_id: ColumnId, name: str, ctx: ColumnBuilder
 ) -> ParameterColumn | None:
     """The `derived` column a slot needs when the cell it points at does not
     read the way the slot renders — or None when that cell already serves it.
@@ -274,9 +285,9 @@ def _promoted_column(
     The one compare-and-promote rule, shared by both slot kinds — only where
     the renderings come from differs.
     """
-    if ctx.columns.reads_as(column_id, rendered):
+    if ctx.reads_as(column_id, rendered):
         return None
-    column = ctx.columns.new_column('derived', name)
+    column = ctx.new_column('derived', name)
     for case_id, text in rendered.items():
-        ctx.columns.set_cell(column.id, case_id, text)
+        ctx.set_cell(column.id, case_id, text)
     return column

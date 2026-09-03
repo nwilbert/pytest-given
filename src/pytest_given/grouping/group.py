@@ -8,7 +8,6 @@ baseline, comparable cases, cells, cases — happens here; the promoting is
 """
 
 from ..model import (
-    ColumnId,
     ParameterCase,
     ParameterTable,
     ParamInfo,
@@ -18,10 +17,9 @@ from ..model import (
     step_narrations,
 )
 from .checks import check_rebound_params, check_same_template
-from .columns import ColumnBuilder, param_cell, param_cell_formats
+from .columns import ColumnBuilder, param_cell_formats
 from .context import build_group
 from .percase import per_case_scenarios
-from .promotion import Promotion
 from .templatize import templatize_narration, templatize_steps
 
 # What cases group on: one test function, one name.
@@ -67,25 +65,18 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
     check_same_template(group)
     check_rebound_params(group)
     anchor, baseline = group.anchor, group.baseline
-    ctx = Promotion(group=group, columns=ColumnBuilder.for_params(group.param_names))
-    # Filled before the walk, not after: a `param` cell is what its slots
-    # substitute, so the walk compares against it. The scenario name is scanned
-    # alongside the steps — a `Template` name's spec is a slot's spec, and
-    # often the only one in play.
+    # The scenario name is scanned alongside the steps — a `Template` name's
+    # spec is a slot's spec, and often the only one in play.
     formats = param_cell_formats(
         [anchor.narration, *step_narrations(baseline.steps)], group.param_names
     )
-    for case in group.cases:
-        for name, value in group.case_params[case.id].items():
-            ctx.columns.set_cell(
-                ColumnId(name), case.id, param_cell(value, formats.get(name))
-            )
+    ctx = ColumnBuilder.for_params(group, formats)
     template_steps = templatize_steps(baseline.steps, (), ctx)
     grouped_narration = templatize_narration(anchor.narration, ctx)
 
     table_cases = [
         ParameterCase(
-            values=[ctx.columns.cell(c.id, case.id) for c in ctx.columns.columns],
+            values=[ctx.cell(c.id, case.id) for c in ctx.columns],
             status=case.status,
             error=case.error,
         )
@@ -99,7 +90,7 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
         status=_grouped_status(table_cases),
         duration_ms=sum(case.duration_ms for case in group.cases),
         steps=template_steps,
-        parameters=ParameterTable(columns=ctx.columns.columns, cases=table_cases),
+        parameters=ParameterTable(columns=ctx.columns, cases=table_cases),
         source=anchor.source,
         story_id=anchor.story_id,
         activity_ids=anchor.activity_ids,

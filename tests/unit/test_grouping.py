@@ -10,11 +10,11 @@ from pytest_given.grouping import (
     checks,
     columns,
     group_parametrized,
-    promotion,
     templatize,
 )
 from pytest_given.grouping.context import build_group
 from pytest_given.model import (
+    ActivityId,
     Attachment,
     AttachmentRef,
     Narration,
@@ -30,24 +30,21 @@ from pytest_given.model import (
     Scenario,
     SourceLocation,
     Step,
+    StepPath,
     TermId,
     narration_text,
+    walk_steps,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
-def _promotion(param_names: list[str]) -> promotion.Promotion:
-    """A Promotion over a one-case group — enough for the scenario-name pass,
-    which reads only `param_names` and each case's bindings."""
+def _promotion(param_names: list[str]) -> columns.ColumnBuilder:
+    """A filled builder over a one-case group — enough for the scenario-name
+    pass, which reads only `param_names` and each case's bindings."""
     case = Scenario(id=NodeId('t.py::t[1]'), narration=Narration(text='x'), module='m')
     spec = ParamSpec(names=param_names, values=[0] * len(param_names))
     group = build_group([case], {case.id: spec})
-    builder = columns.ColumnBuilder.for_params(param_names)
-    # The real pass fills the param cells before it walks, because the slots it
-    # reconciles are compared against them.
-    for name, value in group.case_params[case.id].items():
-        builder.set_cell(name, case.id, columns.param_cell(value, None))
-    return promotion.Promotion(group=group, columns=builder)
+    return columns.ColumnBuilder.for_params(group, {})
 
 
 def test_templatize_narration_rejects_unknown_placeholder() -> None:
@@ -2698,6 +2695,12 @@ def _sig_step(phase: str, text: str, children: list[Step] | None = None) -> Step
     )
 
 
+def _shape_of(steps: list[Step]) -> list[tuple[StepPath, str, tuple[ActivityId, ...]]]:
+    """`checks._shape` over a freshly walked tree, the way `build_group` feeds
+    it."""
+    return checks._shape(walk_steps(steps))
+
+
 def _sig_tree() -> list[Step]:
     return [
         _sig_step('given', 'a', [_sig_step('given', 'a1'), _sig_step('when', 'a2')]),
@@ -2705,21 +2708,27 @@ def _sig_tree() -> list[Step]:
     ]
 
 
-def test_structure_signature_ignores_narration() -> None:
+def test_shape_ignores_narration() -> None:
     other = [
         _sig_step(
             'given', 'different', [_sig_step('given', 'x'), _sig_step('when', 'y')]
         ),
         _sig_step('then', 'also different'),
     ]
-    assert checks.structure_signature(_sig_tree()) == checks.structure_signature(other)
+    assert _shape_of(_sig_tree()) == _shape_of(other)
 
 
-def test_structure_signature_separates_different_shapes() -> None:
-    assert checks.structure_signature(_sig_tree()) != checks.structure_signature(
-        [_sig_step('given', 'a')]
-    )
+def test_shape_separates_different_shapes() -> None:
+    assert _shape_of(_sig_tree()) != _shape_of([_sig_step('given', 'a')])
 
 
-def test_structure_signature_of_an_empty_tree_is_empty() -> None:
-    assert checks.structure_signature([]) == ()
+def test_shape_separates_steps_claiming_different_activities() -> None:
+    """`activity=` is a per-call argument, so one case's step can claim an
+    activity another's does not — and the grouped tree keeps only one set."""
+    claimed = [_sig_step('given', 'a')]
+    claimed[0] = dataclasses.replace(claimed[0], activity_ids=(ActivityId(2),))
+    assert _shape_of(_sig_tree()[:1]) != _shape_of(claimed)
+
+
+def test_shape_of_an_empty_tree_is_empty() -> None:
+    assert _shape_of([]) == []

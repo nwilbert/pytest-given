@@ -6,10 +6,11 @@ sink is written. Some are checked up front against the whole group; the rest
 fire from the baseline walk, which is where the offending part is in hand.
 """
 
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from typing import NamedTuple
 
 from ..model import (
+    ActivityId,
     Attachment,
     AttachmentLabel,
     Narration,
@@ -30,24 +31,34 @@ from ..model import (
     location_suffix,
     node_base,
     render_interpolation,
-    walk_steps,
 )
 from .context import Group
 
 # A step tree reduced to nested phase tuples — narration text and values
 # ignored. Two cases with equal signatures render truthfully in the grouped
 # parameter-table view.
-type StepSignature = tuple[tuple[Phase, StepSignature], ...]
-
 # One step's attachments grouped by label, in the order that case recorded
 # them. Built by the promotion walk (`attachments._by_label`), which is also
 # the only caller of the rule that reads it.
 type LabeledAttachments = dict[AttachmentLabel, list[Attachment]]
 
 
-def structure_signature(steps: list[Step]) -> StepSignature:
-    """The tree's shape alone — phases and nesting, no narration."""
-    return tuple((step.phase, structure_signature(step.children)) for step in steps)
+def _shape(
+    indexed: Iterable[tuple[StepPath, Step]],
+) -> list[tuple[StepPath, Phase, tuple[ActivityId, ...]]]:
+    """A case's tree reduced to what a grouped tree must share: where each step
+    sits, its phase, and the activities it claims.
+
+    Paths carry the nesting, so this needs no recursion — a `walk_steps`
+    mapping is already DFS pre-order.
+
+    `activity_ids` is in here because `activity=` is a per-call argument, so
+    `given(t'…', activity=a if flag else b)` gives two cases genuinely
+    different ids at one path. The grouped tree keeps a single set, and
+    `report.coverage` reads exactly that field to credit story coverage — the
+    same lie rule 4 refuses a varying term ref to prevent.
+    """
+    return [(path, step.phase, step.activity_ids) for path, step in indexed]
 
 
 def check_same_template(group: Group) -> None:
@@ -68,11 +79,15 @@ def check_same_template(group: Group) -> None:
     the part there as the baseline's kind, both of which hold only because this
     ran. A non-passed case is exempt — which is exactly `group.comparable`.
     """
+    if not group.comparable:
+        return
     baseline = group.baseline
-    signature = structure_signature(baseline.steps)
-    # Walked and keyed once per group: every case is compared against the same
-    # baseline, and rebuilding its keys per case is the bulk of this rule's work.
-    baseline_steps = list(walk_steps(baseline.steps))
+    # `build_group` already walked and keyed every comparable case; the
+    # baseline is `comparable[0]`, so its own walk is in there too. A
+    # `walk_steps` mapping is keyed by DFS pre-order path, which makes the
+    # path/shape list below equivalent to a recursive structure signature.
+    baseline_steps = list(group.indexed[baseline.id].items())
+    signature = _shape(baseline_steps)
     baseline_keys = [
         [_part_key(part) for part in step.narration.parts]
         for _path, step in baseline_steps
@@ -80,12 +95,13 @@ def check_same_template(group: Group) -> None:
     for case in group.comparable:
         if case.id == baseline.id:
             continue
-        if structure_signature(case.steps) != signature:
+        case_steps = group.indexed[case.id]
+        if _shape(case_steps.items()) != signature:
             raise _divergence_error(case, 'a different step structure', group)
         for (path, step), keys in zip(baseline_steps, baseline_keys, strict=True):
             # A comparable case has the baseline's exact structure, so every
             # baseline path exists in it — index, never `.get`.
-            other = group.indexed[case.id][path].narration
+            other = case_steps[path].narration
             if not keys and not other.parts:
                 # Rule 1: nothing to compare as a template, so compare the text
                 # and answer with the fix that names this step's own phase.
@@ -107,7 +123,7 @@ def _varying_str_error(step: Step, group: Group) -> PytestGivenError:
     usual cause, but a helper call or a lookup looks identical from here.
     """
     return _grouping_error(
-        group.anchor,
+        group,
         f'step narration in {_test_name(group.anchor)!r} varies across '
         f'parametrize cases but records no parts — a plain str bakes '
         f"case 1's values (an f-string is the usual cause). Use a "
@@ -124,10 +140,27 @@ def _narration_difference(baseline_keys: list[PartKey], case: Narration) -> str 
     for baseline_key, case_key in zip(baseline_keys, case_keys, strict=True):
         if baseline_key == case_key:
             continue
+        if baseline_key.label == case_key.label:
+            # Same kind, same label: what differs is the `detail` — the
+            # conversion and format spec — so naming the labels would quote
+            # the same string twice.
+            return (
+                f'a different formatting of {baseline_key.label!r} '
+                f'({_detail_text(baseline_key)} vs {_detail_text(case_key)})'
+            )
         if baseline_key.kind == 'literal':
             return f'different wording ({baseline_key.label!r} vs {case_key.label!r})'
         return f'a different expression ({baseline_key.label!r} vs {case_key.label!r})'
     return None
+
+
+def _detail_text(key: PartKey) -> str:
+    """A part's conversion and format spec as an author wrote them."""
+    conversion, format_spec = key.detail
+    return (
+        f'{"!" + conversion if conversion else ""}'
+        f'{":" + format_spec if format_spec else ""}'
+    ) or 'no formatting'
 
 
 class PartKey(NamedTuple):
@@ -163,7 +196,7 @@ def _divergence_error(
     case: Scenario, difference: str, group: Group
 ) -> PytestGivenError:
     return _grouping_error(
-        group.anchor,
+        group,
         f'case {case_suffix(case.id)} of {_test_name(group.anchor)!r} narrates '
         f'{difference} than case {case_suffix(group.baseline.id)} — a grouped '
         f'scenario renders one tree for every row, so the cases cannot be '
@@ -186,7 +219,7 @@ def check_promotable_expression(
     if part.expression.isidentifier():
         return
     raise _grouping_error(
-        group.anchor,
+        group,
         f'{part.expression!r} in {_test_name(group.anchor)!r} varies across '
         f'parametrize cases — bind it to a local and narrate that: '
         f'value = {part.expression}; {phase}(t"… {{value}} …").',
@@ -230,7 +263,7 @@ def _check_case_params(scenario: Scenario, group: Group) -> None:
             if reformatted == part.rendered:
                 continue
             raise _grouping_error(
-                group.anchor,
+                group,
                 f'{part.expression!r} in {_test_name(group.anchor)!r} matches a '
                 f'parametrize column but narrates a value that column does not '
                 f'hold (case {case_suffix(scenario.id)} narrates '
@@ -276,7 +309,7 @@ def check_attachment_labels(
         if not differing:
             continue
         raise _grouping_error(
-            group.anchor,
+            group,
             f'attachment label {differing[0]!r} in {_test_name(group.anchor)!r} is '
             f'attached in some parametrize cases but not others — a label names '
             f'the payload and must read the same in every case. Use a constant '
@@ -304,7 +337,7 @@ def check_constant_term_ref(
         if (case_part.term_id, case_part.display) == identity:
             continue
         raise _grouping_error(
-            group.anchor,
+            group,
             f'glossary term ref {{{part.expression}}} in '
             f'{_test_name(group.anchor)!r} varies across parametrize '
             f'cases — a term ref must name the same term and read the '
@@ -317,27 +350,26 @@ def check_constant_term_ref(
 def _case_term_refs(
     index: PartIndex, path: StepPath, group: Group
 ) -> Iterator[NarrationTermRef]:
-    """The part at the baseline's position in each comparable case.
+    """The term ref at the baseline's position in each comparable case.
 
     Rule 6 pins every comparable case to the baseline's template, so a term ref
     here is a term ref there; what may still differ is which term it names and
     how it reads.
     """
-    for case in group.comparable:
-        case_part = group.indexed[case.id][path].narration.parts[index]
+    for _node_id, case_part in group.parts_at(path, index):
         assert isinstance(case_part, NarrationTermRef), (
             'rule 6 admits only cases shaped like the baseline'
         )
         yield case_part
 
 
-def _grouping_error(anchor: Scenario, body: str) -> PytestGivenError:
+def _grouping_error(group: Group, body: str) -> PytestGivenError:
     """A rejected-form error, located the way a lint finding is.
 
     A step-level anchor is not available: `Step.source` is captured only when
     lint is enabled, and these rules must hold with lint off.
     """
-    return PytestGivenError(f'{body}{location_suffix(anchor.source)}')
+    return PytestGivenError(f'{body}{location_suffix(group.anchor.source)}')
 
 
 def _test_name(scenario: Scenario) -> str:

@@ -25,25 +25,54 @@ from ..model import (
     RawParamValue,
     render_interpolation,
 )
+from .context import Group
+
+
+def param_id(name: str) -> ColumnId:
+    """The column id a parametrize argname takes.
+
+    Its own function because four places used to spell it: the builder that
+    creates the column, the fill that seeds its cells, and both of
+    `templatize`'s slot paths, which point a placeholder at it by name.
+    """
+    return ColumnId(name)
 
 
 @dataclass
 class ColumnBuilder:
-    """The columns and cells a group's walk accumulates."""
+    """The columns and cells a group's walk accumulates, and the group it reads.
 
+    Both halves of the walk — `templatize` and `attachments` — take this one
+    object, which is what it is for. `checks` still takes a bare `Group`, so a
+    module that only inspects a group does not also carry the ability to add a
+    column to it.
+    """
+
+    group: Group
     columns: list[ParameterColumn] = field(default_factory=list)
     cells: dict[ColumnId, dict[NodeId, CellValue]] = field(default_factory=dict)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
     _taken_names: set[str] = field(default_factory=set)
 
     @classmethod
-    def for_params(cls, param_names: list[str]) -> ColumnBuilder:
-        """A builder holding the parametrize columns, which come first and keep
-        their argname as id: a step's placeholder points at them by name
-        (`column_id=expression`), and the walk emits generated columns after."""
-        builder = cls()
-        for name in param_names:
+    def for_params(cls, group: Group, formats: dict[str, Format]) -> ColumnBuilder:
+        """A builder holding the parametrize columns, filled.
+
+        They come first and keep their argname as id: a step's placeholder
+        points at them by name (`column_id=expression`), and the walk emits
+        generated columns after.
+
+        Filled here rather than after the walk starts: a `param` cell is what
+        its slots substitute, so the walk compares against it.
+        """
+        builder = cls(group=group)
+        for name in group.param_names:
             builder.new_column('param', name)
+        for case in group.cases:
+            for name, value in group.case_params[case.id].items():
+                builder.set_cell(
+                    param_id(name), case.id, param_cell(value, formats.get(name))
+                )
         return builder
 
     def new_column(self, kind: ColumnKind, name: str) -> ParameterColumn:
@@ -55,7 +84,7 @@ class ColumnBuilder:
         `callspec.params` keys, hence always Python identifiers.
         """
         if kind == 'param':
-            column_id = ColumnId(name)
+            column_id = param_id(name)
         else:
             index = self._counts.get(kind, 0)
             self._counts[kind] = index + 1
