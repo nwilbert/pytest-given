@@ -1,8 +1,10 @@
 """Collection-time validation of what `@scenario` declared.
 
-Deferred to collection rather than decoration because `@scenario` and
+Only the checks that need the item's `callspec`: `@scenario` and
 `@pytest.mark.parametrize` can appear in either order, and decoration-time
-inspection only sees markers from earlier (bottom-up) decorators.
+inspection only sees markers from earlier (bottom-up) decorators. Anything
+decidable from `@scenario`'s own arguments is rejected in `capture.scenario`
+instead, where the traceback points at the decorator.
 """
 
 import pytest
@@ -17,8 +19,17 @@ from ..model import (
 )
 
 
+@pytest.hookimpl(trylast=True)
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
-    """Validate Template-named scenarios and story bindings eagerly at collection.
+    """Validate Template-named scenarios eagerly at collection.
+
+    `trylast`, so `items` is what the run will actually execute. Plain hook
+    impls are called LIFO and entry-point plugins register after core, so
+    without it this ran *before* `_pytest.mark` deselected anything and a
+    `-k`-narrowed run died on a bad scenario it had already dropped — while
+    selecting the same test by file, where the bad one is never collected,
+    passed. The hook's own rationale is that such a scenario does not reach
+    grouping; a deselected one does not either.
 
     Eagerly, because the alternative is late or never: a mistyped `Template`
     placeholder surfaces opaquely at session-finish grouping, and
@@ -42,7 +53,6 @@ def _validate_scenario_marker(item: pytest.Item) -> None:
     marker = scenario_marker(item)
     if marker is None:
         return
-    _validate_scenario_story_binding(item, marker)
     callspec = getattr(item, 'callspec', None)
     if not marker.group_parametrized and callspec is None:
         raise PytestGivenError(
@@ -66,27 +76,6 @@ def _validate_scenario_marker(item: pytest.Item) -> None:
                 placeholder,
                 param_names,
                 where=f'in @scenario(...) on {item.nodeid!r}',
-            )
-
-
-def _validate_scenario_story_binding(
-    item: pytest.Item, marker: ScenarioDecorator
-) -> None:
-    """Check scenario.activity_ids against the story; runtime covers step scope."""
-    if marker.story is None and marker.activity_ids:
-        raise PytestGivenError(
-            f'@scenario(activities=...) on {item.nodeid!r} requires story=; '
-            f'activity ids are meaningless without a story to look them up in.'
-        )
-    if marker.story is None:
-        return
-    valid_ids = {a.id for a in marker.story.activities}
-    for aid in marker.activity_ids:
-        if aid not in valid_ids:
-            raise PytestGivenError(
-                f'@scenario(activities=...) on {item.nodeid!r}: activity id '
-                f'{aid} not in story {marker.story.title!r} '
-                f'(valid: {sorted(valid_ids)}).'
             )
 
 

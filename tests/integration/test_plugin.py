@@ -1772,7 +1772,7 @@ def test_scenario_story_id_appears_in_report(pytester):
 # --- Story binding validated at collection and at runtime ---
 
 
-def test_scenario_activity_id_not_in_story_raises_at_collection(pytester):
+def test_scenario_activity_id_not_in_story_raises_at_import(pytester):
     pytester.makepyfile("""
         from pytest_given import Glossary, activity, scenario, story
 
@@ -1787,8 +1787,11 @@ def test_scenario_activity_id_not_in_story_raises_at_collection(pytester):
             pass
     """)
     result = pytester.runpytest('--collect-only')
-    assert result.ret == pytest.ExitCode.USAGE_ERROR
-    result.stderr.fnmatch_lines(['*activity id*99*not in story*'])
+    assert result.ret != 0
+    # Both arguments are the decorator's own, so this is rejected where it is
+    # written: the traceback points at the `@scenario(...)` line rather than
+    # naming a node id from a collection hook.
+    result.stdout.fnmatch_lines(['*activity id 99 not in story*'])
     assert 'INTERNALERROR' not in result.stdout.str()
 
 

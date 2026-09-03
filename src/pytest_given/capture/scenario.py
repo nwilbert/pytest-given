@@ -81,6 +81,7 @@ def scenario(
             f'got {type(story).__name__}: {story!r}'
         )
     activity_ids = normalize_activity(activities, 'activities')
+    _validate_story_binding(story, activity_ids)
     return ScenarioDecorator(
         resolved_name,
         tags or [],
@@ -88,6 +89,32 @@ def scenario(
         activity_ids=activity_ids,
         group_parametrized=group_parametrized,
     )
+
+
+def _validate_story_binding(
+    story: Story | None, activity_ids: tuple[ActivityId, ...]
+) -> None:
+    """Reject activity ids that no story can resolve.
+
+    Both arguments are `@scenario`'s own, fully known here, so this does not
+    wait for collection the way the parametrize-dependent checks must — and
+    the traceback points at the decorator that got it wrong rather than
+    naming a node id.
+    """
+    if story is None:
+        if activity_ids:
+            raise PytestGivenError(
+                '@scenario(activities=...) requires story=; activity ids are '
+                'meaningless without a story to look them up in.'
+            )
+        return
+    valid_ids = {activity.id for activity in story.activities}
+    for activity_id in activity_ids:
+        if activity_id not in valid_ids:
+            raise PytestGivenError(
+                f'@scenario(activities=...): activity id {activity_id} not in '
+                f'story {story.title!r} (valid: {sorted(valid_ids)}).'
+            )
 
 
 def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:

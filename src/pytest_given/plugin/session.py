@@ -50,11 +50,13 @@ from ..report import (
     write_sinks,
 )
 from .state import (
+    SessionOutcome,
     SessionState,
     collector_key,
     given_config,
     session_collector,
     session_outcome,
+    session_outcome_key,
     session_state,
     session_state_key,
 )
@@ -92,12 +94,18 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
-    """Give the session its own collector and hook bookkeeping."""
+    """Give the session its own collector and hook bookkeeping.
+
+    Three of the stash's four values are seeded here; only `GivenConfig` has to
+    be built in `pytest_configure`, because there is one such hook per plugin
+    and the collector above reads `lint_enabled` out of it.
+    """
     config = session.config
     config.stash[collector_key] = Collector(
         capture_step_source=given_config(config).lint_enabled
     )
     config.stash[session_state_key] = SessionState()
+    config.stash[session_outcome_key] = SessionOutcome()
 
 
 @dataclass(frozen=True, kw_only=True)

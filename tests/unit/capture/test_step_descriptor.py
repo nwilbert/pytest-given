@@ -958,16 +958,37 @@ def test_scenario_decorator_accepts_story_kwarg():
     assert deco.story is s
 
 
+def _activities_story(title: str, count: int):
+    """A story with `count` fully-formed activities, numbered from 1."""
+    g = Glossary()
+    guest, search, room = g.actor('Guest'), g.verb('search'), g.work_object('Room')
+    return story_fn(title, [activity_fn(guest, search, room) for _ in range(count)])
+
+
 def test_scenario_decorator_accepts_activities_kwarg():
-    deco = scenario('test activities', activities=[1, 2, 3])
+    s = _activities_story('Three Activities', 3)
+    deco = scenario('test activities', story=s, activities=[1, 2, 3])
     assert deco.activity_ids == (ActivityId(1), ActivityId(2), ActivityId(3))
 
 
 def test_scenario_decorator_accepts_a_bare_int_activities_argument():
     """`activities=` takes the same `int | Sequence[int]` as a step's
     `activity=`, so a scenario narrowed to one activity needs no list."""
-    deco = scenario('test one activity', activities=2)
+    s = _activities_story('Two Activities', 2)
+    deco = scenario('test one activity', story=s, activities=2)
     assert deco.activity_ids == (ActivityId(2),)
+
+
+def test_scenario_decorator_rejects_activities_without_a_story():
+    """Both arguments are the decorator's own, so this needs no collection."""
+    with pytest.raises(PytestGivenError, match='requires story='):
+        scenario('test', activities=[1])
+
+
+def test_scenario_decorator_rejects_an_activity_id_the_story_lacks():
+    s = _activities_story('One Activity', 1)
+    with pytest.raises(PytestGivenError, match='not in story'):
+        scenario('test', story=s, activities=[7])
 
 
 def test_scenario_decorator_defaults_story_none_and_activities_empty():

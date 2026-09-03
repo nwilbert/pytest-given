@@ -54,9 +54,16 @@ def pytest_fixture_setup(
             'helper function.'
         )
     collector = session_collector(request.config)
-    if collector.state == 'idle':
-        # Fixture is being set up outside any tracked scenario (e.g. unannotated
-        # test pulling in a step fixture). Don't record.
+    if collector.state == 'idle' and fixturedef.scope == 'function':
+        # Set up outside any tracked scenario — an unannotated test pulling in
+        # a step fixture. A function-scoped one will be set up again for the
+        # next test that wants it, so skipping costs nothing.
+        #
+        # A wider scope is set up *once*: skipping there left the fixture
+        # unwrapped and unrecorded, and pytest then served the cached value to
+        # every later scenario without firing this hook again — so the step
+        # silently vanished from all of them, and which test happened to touch
+        # the fixture first decided whether the report was right.
         yield
         return
     _ensure_teardown_wrapped(fixturedef, collector)

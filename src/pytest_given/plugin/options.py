@@ -13,7 +13,7 @@ import pytest
 from ..lint import parse_lint_config
 from ..model import PytestGivenError
 from ..report import SinkConfig, resolve_template
-from .state import GivenConfig, SessionOutcome, given_config_key, session_outcome_key
+from .state import GivenConfig, given_config_key
 
 _LINT_CHOICES = ('true', 'false')
 
@@ -161,10 +161,6 @@ def _resolve_lint_enabled(config: pytest.Config) -> bool:
     return value == 'true' if isinstance(value, str) else bool(value)
 
 
-def _resolve_source_link(config: pytest.Config) -> str:
-    return _cli_over_ini_str(config, 'given_source_link')
-
-
 def _resolve_sinks(
     config: pytest.Config, source_link_template: str | None
 ) -> SinkConfig:
@@ -193,7 +189,7 @@ def pytest_configure(config: pytest.Config) -> None:
             config.getini('given_lint_rules'), config.getini('given_lint_ignore')
         )
         source_link_template = (
-            resolve_template(_resolve_source_link(config))
+            resolve_template(_cli_over_ini_str(config, 'given_source_link'))
             if config.getoption('given_html') is not None
             else None
         )
@@ -206,4 +202,3 @@ def pytest_configure(config: pytest.Config) -> None:
         title=_resolve_title(config),
         all_frames=bool(config.getoption('given_all_frames')),
     )
-    config.stash[session_outcome_key] = SessionOutcome()

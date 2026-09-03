@@ -19,7 +19,6 @@ from pytest_given.capture.collector import (
 )
 from pytest_given.capture.params import snapshot_param_value
 from pytest_given.capture.scenario import (
-    ScenarioDecorator,
     annotated_given_descriptors,
 )
 from pytest_given.capture.source import file_source
@@ -32,7 +31,6 @@ from pytest_given.capture.story import (
 )
 from pytest_given.lint import LintConfig
 from pytest_given.model import (
-    ActivityId,
     Narration,
     NodeId,
     PytestGivenError,
@@ -105,10 +103,35 @@ def test_pytest_fixture_setup_skips_when_collector_idle(
     fresh_collector: Collector,
     fresh_state: state.SessionState,
 ) -> None:
-    fixturedef = SimpleNamespace(func=_fake_func(StepDescriptor('given', 'a thing')))
+    fixturedef = SimpleNamespace(
+        func=_fake_func(StepDescriptor('given', 'a thing')), scope='function'
+    )
     assert fresh_collector.state == 'idle'
     _drive_fixture_setup(fixturedef, SimpleNamespace(config=fake_config))
     assert fresh_state.fixture_recordings == {}
+
+
+def test_pytest_fixture_setup_records_a_cached_scope_while_idle(
+    fake_config: Any,
+    fresh_collector: Collector,
+    fresh_state: state.SessionState,
+) -> None:
+    """A wider-than-function scope is set up once for the whole session.
+
+    If an unannotated test pulls it in first, skipping the recording is
+    permanent: pytest serves the cached value to every later scenario without
+    firing this hook again, so the step would vanish from all of them.
+    """
+    fixturedef = SimpleNamespace(
+        func=_fake_func(StepDescriptor('given', 'a shared thing')),
+        scope='session',
+        argname='shared',
+        cache_key=lambda _request: None,
+    )
+    assert fresh_collector.state == 'idle'
+    _drive_fixture_setup(fixturedef, SimpleNamespace(config=fake_config))
+    [recording] = fresh_state.fixture_recordings.values()
+    assert recording.root.narration.text == 'a shared thing'
 
 
 def test_ensure_teardown_wrapped_is_idempotent() -> None:
@@ -410,16 +433,6 @@ def _reset_story_registry_plugin() -> Any:
     restore_story_registry({})
     yield
     restore_story_registry({})
-
-
-@pytest.mark.usefixtures('_reset_story_registry_plugin')
-def test_validate_scenario_story_binding_activities_without_story_raises() -> None:
-    """_validate_scenario_story_binding must raise when activities= is given
-    without story= (plugin.py line 141)."""
-    marker = ScenarioDecorator('x', [], activity_ids=(ActivityId(1),))
-    item = cast(pytest.Item, SimpleNamespace(nodeid='test_mod.py::test_x'))
-    with pytest.raises(PytestGivenError, match='requires story='):
-        collection._validate_scenario_story_binding(item, marker)
 
 
 def test_extract_given_descriptor_from_parametrize_param() -> None:
