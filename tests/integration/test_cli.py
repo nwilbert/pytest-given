@@ -304,15 +304,3 @@ def test_cli_write_failure_discards_the_stale_report(
     err = capsys.readouterr().err
     assert 'read-only file system' in err
     assert 'would read as current' in err
-
-
-def _minimal_report() -> dict:
-    return {
-        'metadata': {
-            'project': 'cli-test',
-            'timestamp': '2026-04-09',
-            'pytest_version': '9',
-            'plugin_version': '0.1',
-        },
-        'scenarios': [],
-    }
