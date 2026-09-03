@@ -1,5 +1,5 @@
-"""The recorder: a session's scenarios, and the open step stack each one
-is recorded into."""
+"""The recording seam: the `Collector` itself, the ContextVar naming the one
+that is active, and the error every step raises when there is none."""
 
 import copy
 import time
