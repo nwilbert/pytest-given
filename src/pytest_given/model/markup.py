@@ -12,8 +12,12 @@ keeps its own substitution function.
 
 import re
 
-# Code span first, so a `*` inside `code` is not treated as emphasis. The group
-# order is part of the contract every substitution function reads: code span,
-# **bold**, __bold__, *italic*. Only paired markers match, so a lone underscore
-# inside an identifier (`work_object`) is left untouched.
+# Code span first, so nothing inside `code` is treated as markup — neither a
+# `*` nor, on the render side, an escaped `<br>`. Callers get that only by
+# routing every other substitution through this one pass; `render_inline_markdown`
+# says what happens when they don't. The group order is part of the contract
+# every substitution function reads: code span, **bold**, __bold__, *italic*.
+# Only paired markers match, so a lone underscore inside an identifier
+# (`work_object`) is left untouched — a paired dunder (`__init__`) is strong
+# emphasis, which is what CommonMark makes it too.
 EMPHASIS = re.compile(r'`(.+?)`|\*\*(.+?)\*\*|__(.+?)__|\*(.+?)\*')

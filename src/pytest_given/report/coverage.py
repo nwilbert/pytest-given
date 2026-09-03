@@ -121,9 +121,15 @@ class StoryIndex:
     """A story's activities reduced to what matching needs, built once.
 
     Depends only on the story and the glossary, so it is shared across every
-    scenario bound to that story instead of rebuilt per scenario — which also
-    computes `a_refs` and `is_coverage_eligible` once per activity rather than
-    once per activity per scenario.
+    scenario bound to that story instead of rebuilt per scenario — which
+    computes `a_refs` once per activity rather than once per activity per
+    scenario.
+
+    Eligibility is *not* recorded, even though `refs_by_activity` is keyed by
+    exactly the eligible activities: the index is built lazily, only for a
+    story some scenario is bound to, so absence here does not distinguish
+    "ineligible" from "no scenario named this story". `build_story_rollups`
+    asks `is_coverage_eligible` again for that reason.
     """
 
     refs_by_activity: dict[ActivityId, set[Identity]]
@@ -139,11 +145,10 @@ def build_story_index(glossary: Glossary, story: Story) -> StoryIndex:
     none, be covered by almost any step. An explicit ``activity=`` pin says
     what the narration cannot, so it reaches them too.
     """
-    eligible = {a.id: is_coverage_eligible(a) for a in story.activities}
     refs_by_activity = {
         activity.id: a_refs(glossary, activity)
         for activity in story.activities
-        if eligible[activity.id]
+        if is_coverage_eligible(activity)
     }
     activities_by_identity: dict[Identity, set[ActivityId]] = {}
     for aid, refs in refs_by_activity.items():

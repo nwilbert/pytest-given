@@ -64,7 +64,7 @@ def run_report(args: argparse.Namespace) -> int:
     except json.JSONDecodeError as error:
         print(f'Error: {json_file} is not valid JSON — {error}', file=sys.stderr)
         return 1
-    except PytestGivenError as error:
+    except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
         return 1
     try:
@@ -87,6 +87,10 @@ def _load_report(json_file: Path) -> tuple[ReportData, dict[str, Any]]:
     Returns the model *and* the dict it was built from, because the file is
     already the serialized report: re-deriving it would hand the JSON sink a
     round-tripped copy rather than what was read.
+
+    An `OSError` here is the caller's problem too, not a bug: `exists()` is
+    true for a directory, and both the bundled assets and the Jinja templates
+    are read during render.
 
     `report_from_dict` indexes whatever it is handed, so a file that is not a
     pytest-given report surfaces as a builtin from deep inside serde.

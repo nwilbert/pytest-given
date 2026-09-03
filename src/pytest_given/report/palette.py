@@ -154,14 +154,12 @@ def _lab_to_rgb(
 ) -> tuple[float, float, float]:
     f_y = (lightness + 16) / 116
     f_x, f_z = f_y + a_star / 500, f_y - b_star / 200
+    # The y arm is `_inverse_f(f_y)`, not a special case: `_KAPPA * _EPSILON`
+    # and `116 * _EPSILON ** (1 / 3) - 16` are both 8, so the two guards are
+    # the same test and the two branches are the same expression.
     xyz = (
         _inverse_f(f_x) * _D65[0],
-        (
-            ((lightness + 16) / 116) ** 3
-            if lightness > _KAPPA * _EPSILON
-            else lightness / _KAPPA
-        )
-        * _D65[1],
+        _inverse_f(f_y) * _D65[1],
         _inverse_f(f_z) * _D65[2],
     )
     linear = tuple(sum(row[i] * xyz[i] for i in range(3)) for row in _XYZ_TO_RGB)

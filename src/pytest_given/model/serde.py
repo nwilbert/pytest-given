@@ -13,7 +13,7 @@ attachment — each discriminated on read by the keys its variants do not share.
 """
 
 import dataclasses
-from typing import Any
+from typing import Any, cast
 
 from .errors import PytestGivenError
 from .schema import (
@@ -54,6 +54,7 @@ from .schema import (
     Story,
     StoryId,
     TermId,
+    TermKind,
     TracebackFrame,
 )
 
@@ -109,7 +110,7 @@ def _glossary_from_dict(d: dict[str, Any] | None) -> Glossary | None:
 def _glossary_term_from_dict(d: dict[str, Any]) -> GlossaryTerm:
     return GlossaryTerm(
         id=TermId(d['id']),
-        kind=d['kind'],
+        kind=_term_kind(d['kind']),
         canonical=d['canonical'],
         definition=d.get('definition'),
         source=_source_from_dict(d.get('source')),
@@ -157,7 +158,7 @@ def _activity_part_from_dict(d: dict[str, Any]) -> ActivityPart:
 
 
 def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
-    status: Status = d.get('status', 'passed')
+    status = _literal(d.get('status', 'passed'), _STATUSES, 'scenario status')
     return Scenario(
         id=NodeId(d['id']),
         narration=_narration_from_dict(d['narration']),
@@ -245,6 +246,37 @@ def _param_table_from_dict(d: dict[str, Any] | None) -> ParameterTable | None:
     )
 
 
+def _literal[T: str](value: object, allowed: tuple[T, ...], field: str) -> T:
+    """`value` as one of `allowed`, or a `PytestGivenError` naming the field.
+
+    The `Status` / `TermKind` / `ColumnKind` annotations below are erased at
+    runtime, so this is the only thing standing between a hand-edited report
+    and a renderer indexing a lookup table with an unknown string — which used
+    to surface as a bare `KeyError` from inside the glyph map or the kind
+    grouping, well away from the file that caused it.
+    """
+    if value in allowed:
+        return cast('T', value)
+    raise PytestGivenError(
+        f'invalid {field} {value!r} in JSON report; expected one of '
+        f'{", ".join(repr(option) for option in allowed)}.'
+    )
+
+
+# The literal alphabets `_literal` checks against. Spelled out rather than
+# derived from the `Literal` aliases: `typing.get_args` on a PEP 695 `type`
+# alias needs the alias object at runtime, and one list per alphabet is
+# cheaper to read than the indirection.
+_STATUSES: tuple[Status, ...] = ('passed', 'failed', 'skipped')
+_TERM_KINDS: tuple[TermKind, ...] = ('actor', 'object', 'verb')
+_COLUMN_KINDS: tuple[ColumnKind, ...] = ('param', 'derived', 'attachment')
+
+
+def _term_kind(value: object) -> TermKind | None:
+    """A glossary term's kind, which is legitimately absent while deferred."""
+    return None if value is None else _literal(value, _TERM_KINDS, 'glossary term kind')
+
+
 def _stale_report_error(shape: str) -> PytestGivenError:
     """A JSON report predating the case-column change.
 
@@ -259,12 +291,12 @@ def _stale_report_error(shape: str) -> PytestGivenError:
 
 
 def _param_column_from_dict(d: dict[str, Any]) -> ParameterColumn:
-    kind: ColumnKind = d['kind']
+    kind = _literal(d['kind'], _COLUMN_KINDS, 'parameter column kind')
     return ParameterColumn(id=ColumnId(d['id']), name=d['name'], kind=kind)
 
 
 def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
-    status: Status = d.get('status', 'passed')
+    status = _literal(d.get('status', 'passed'), _STATUSES, 'parameter case status')
     return ParameterCase(
         values=[_cell_from_json(v) for v in d['values']],
         status=status,

@@ -4,6 +4,7 @@ Its own module rather than another rollup in `aggregations`: naming a scenario
 for a URL shares no input, no output and no vocabulary with those.
 """
 
+import re
 from collections import Counter
 
 from ..model import NodeId, ReportData, node_base
@@ -57,6 +58,14 @@ def _colliding_ids(slugs: dict[NodeId, str]) -> list[NodeId]:
     return [node_id for node_id, slug in slugs.items() if counts[slug] > 1]
 
 
+# What actually breaks a `#scenario=<slug>` round trip, rather than every
+# character a strict URI grammar would escape: `&` ends the value, `=`
+# splits it, `+` decodes to a space, and `#` ends the fragment. Brackets
+# and the rest of pytest's parametrize punctuation survive, so a slug
+# still reads like the node id it came from.
+_UNSAFE_IN_FRAGMENT = re.compile(r'[^A-Za-z0-9._~()\[\]!$\'*,;:@/-]+|[+&=#]')
+
+
 def _scenario_slug(node_id: NodeId, *, with_tail: bool, depth: int = 0) -> str:
     file_part, _, func_part = node_id.partition('::')
     segments = file_part.split('/')
@@ -65,4 +74,19 @@ def _scenario_slug(node_id: NodeId, *, with_tail: bool, depth: int = 0) -> str:
     func = func_part.removeprefix('test_')
     if not with_tail:
         func = node_base(func)
-    return '/'.join([*parents, basename, func])
+    return '/'.join([*parents, basename, _fragment_safe(func)])
+
+
+def _fragment_safe(text: str) -> str:
+    """`text` with anything that would break the fragment folded to a `-`.
+
+    The slug is addressed as `#scenario=<slug>` and the page parses the
+    fragment with `URLSearchParams`, so a parametrize tail carrying `&` would
+    truncate the value and one carrying `+` would decode to a space — either
+    way the reverse map misses and the deep link silently does nothing. pytest
+    keeps all three, plus `#` and spaces, in a node id.
+
+    Folding can make two tails collide; the escalation loop above already
+    handles that, down to the node-id fallback.
+    """
+    return _UNSAFE_IN_FRAGMENT.sub('-', text)

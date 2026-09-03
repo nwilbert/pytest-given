@@ -7,6 +7,7 @@ JSON blob beside it is what `app.js` seeds its state from.
 
 import json
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 
 import jinja2
@@ -31,25 +32,44 @@ from ..model import (
     TermId,
     placeholder_token,
 )
-from .aggregations import (
-    build_activity_labels,
-    build_coverage_maps,
-    build_glossary_view,
-    build_glossary_views,
-    build_scenario_activity_index,
-    build_story_rollups,
-    tab_visibility,
-)
+from .glossary_view import build_glossary_view, build_glossary_views
 from .inline_markdown import render_inline_markdown
 from .palette import param_column_colors
 from .slugs import build_scenario_slug_index
 from .source_link import compile_source_link
+from .story_view import (
+    build_activity_labels,
+    build_coverage_maps,
+    build_scenario_activity_index,
+    build_story_rollups,
+)
 
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 
 # Maps parameter name to its color index. The index resolves to a color via
 # `palette.param_column_colors`, which never runs out.
 type ParamColorMap = dict[str, int]
+
+
+@dataclass(frozen=True)
+class TabVisibility:
+    """Which browse tabs a report has anything to show in."""
+
+    scenarios: bool
+    stories: bool
+    glossary: bool
+
+    @property
+    def visible_count(self) -> int:
+        return sum((self.scenarios, self.stories, self.glossary))
+
+
+def tab_visibility(report: ReportData) -> TabVisibility:
+    return TabVisibility(
+        scenarios=True,
+        stories=bool(report.stories),
+        glossary=bool(report.glossary is not None and report.glossary.terms),
+    )
 
 
 def _inline_md(text: str | None) -> Markup:
@@ -359,14 +379,18 @@ def _term_kind_class(kind: str | None) -> str:
 
 
 def _term_ref_span(term: GlossaryTerm | None, term_id: TermId, display: str) -> str:
-    """One term reference.
+    """One term reference, as an activity part.
 
     A term the glossary does not hold gets a plain span: no `data-term-id`, so
     the deep-link handler cannot navigate to a `#term=` that does not exist,
-    and no tooltip marker. The tooltip's name and definition are *not* written
-    here — `app.js` looks them up by id in the glossary `_app_data` already
-    ships, which is what keeps a term used 900 times from carrying 900 copies
-    of its definition.
+    and no tooltip marker. That arm is reached only from the activity filter —
+    `_render_term_ref` handles the same case for a *narration* by returning
+    bare text, because narration prose wraps nothing, while every part of an
+    activity timeline is a span and a bare text node would break its layout.
+
+    The tooltip's name and definition are *not* written here — `app.js` looks
+    them up by id in the glossary `_app_data` already ships, which is what
+    keeps a term used 900 times from carrying 900 copies of its definition.
     """
     if term is None:
         return f'<span class="term-ref-unknown">{escape(display)}</span>'
