@@ -6,9 +6,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from ..model import PytestGivenError, ReportData, report_from_dict
-from .sinks import SinkConfig, discard_stale_sinks, render_sinks, write_sinks
-from .source_link import resolve_template
+from ..model import PytestGivenError, report_from_dict
+from .sinks import SinkConfig, emit_sinks
+from .source_link import resolve_source_link_template
 
 DEFAULT_HTML_OUTPUT = Path('given-report/report.html')
 
@@ -47,11 +47,11 @@ def add_report_parser(
 def run_report(args: argparse.Namespace) -> int:
     """Render a saved JSON report to HTML or Markdown.
 
-    Goes through `SinkConfig` rather than calling a renderer directly, so this
-    entry point gets the same render-then-write guarantee the plugin has: a
-    render that raises leaves no half-written file, and a write that fails
-    takes the stale previous report with it. Input and output problems are
-    reported as CLI errors rather than tracebacks.
+    Goes through `emit_sinks` rather than calling a renderer directly, so this
+    entry point gets exactly the guarantee the plugin has: a render or write
+    that fails leaves no half-written report behind, and takes the stale
+    previous one with it. Input and output problems are reported as CLI errors
+    rather than tracebacks.
     """
     json_file: Path = args.json_file
     if not json_file.exists():
@@ -59,19 +59,12 @@ def run_report(args: argparse.Namespace) -> int:
         return 1
     try:
         config = _sink_config(args.output, args.source_link, args.format)
-        report, report_dict = _load_report(json_file)
-        rendered = render_sinks(report, report_dict, config)
+        rendered = emit_sinks(_load_report(json_file), config)
     except json.JSONDecodeError as error:
         print(f'Error: {json_file} is not valid JSON — {error}', file=sys.stderr)
         return 1
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
-        return 1
-    try:
-        write_sinks(rendered)
-    except OSError as error:
-        for note in [f'Error: {error}', *discard_stale_sinks(config)]:
-            print(note, file=sys.stderr)
         return 1
     if rendered.md_stdout is not None:
         print(rendered.md_stdout)
@@ -80,31 +73,28 @@ def run_report(args: argparse.Namespace) -> int:
     return 0
 
 
-def _load_report(json_file: Path) -> tuple[ReportData, dict[str, Any]]:
-    """Deserialize the input file, mapping a shape mismatch to a
-    `PytestGivenError`.
+def _load_report(json_file: Path) -> dict[str, Any]:
+    """Read the input file and check that it really is a report.
 
-    Returns the model *and* the dict it was built from, because the file is
-    already the serialized report: re-deriving it would hand the JSON sink a
-    round-tripped copy rather than what was read.
+    The rendering path deserializes the dict itself, so the copy built here is
+    discarded — it is a shape check, not a conversion. Doing it as its own step
+    keeps the check tight around serde: the same builtins raised later by a
+    *renderer* stay visible as the bugs they would be, rather than being
+    reported as a malformed input file.
 
     An `OSError` here is the caller's problem too, not a bug: `exists()` is
     true for a directory, and both the bundled assets and the Jinja templates
     are read during render.
-
-    `report_from_dict` indexes whatever it is handed, so a file that is not a
-    pytest-given report surfaces as a builtin from deep inside serde.
-    Converting it here rather than widening the caller's handler keeps the same
-    builtins raised by a *renderer* visible as the bugs they would be.
     """
-    report_dict = json.loads(json_file.read_text(encoding='utf-8'))
+    report_dict: dict[str, Any] = json.loads(json_file.read_text(encoding='utf-8'))
     try:
-        return report_from_dict(report_dict), report_dict
+        report_from_dict(report_dict)
     except (AttributeError, KeyError, TypeError) as error:
         raise PytestGivenError(
             f'{json_file} is not a pytest-given report, or was written by an '
             f'incompatible version ({type(error).__name__}: {error}).'
         ) from error
+    return report_dict
 
 
 def _sink_config(output: Path | None, source_link: str, fmt: str | None) -> SinkConfig:
@@ -112,12 +102,17 @@ def _sink_config(output: Path | None, source_link: str, fmt: str | None) -> Sink
 
     Markdown with no `-o` goes to stdout; HTML always needs a file, so it falls
     back to the default path rather than to stdout.
+
+    `--source-link` is resolved whichever format was asked for, so a bogus
+    preset is refused rather than silently ignored on a Markdown run that has
+    nowhere to put the links.
     """
+    source_link_template = resolve_source_link_template(source_link, '--source-link')
     if (fmt or _infer_format(output)) == 'md':
         return SinkConfig(md_path=output, md_to_stdout=output is None)
     return SinkConfig(
         html_path=output or DEFAULT_HTML_OUTPUT,
-        source_link_template=resolve_template(source_link),
+        source_link_template=source_link_template,
     )
 
 

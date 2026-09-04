@@ -34,8 +34,13 @@ def _valid_vars() -> str:
     return ', '.join(sorted(_VALID_VARS))
 
 
-def resolve_template(value: str | None) -> str | None:
+def resolve_source_link_template(
+    value: str | None, setting: str = 'given_source_link'
+) -> str | None:
     """Resolve a config value into a template string (or None for 'none').
+
+    `setting` names the option in the error, so a CLI flag and an ini that feed
+    the same resolver each report under the spelling the user actually typed.
 
     Accepts a static preset name, the `github` preset (auto-detects org/repo
     via env or `git remote`), a raw template containing `{...}` placeholders,
@@ -53,7 +58,7 @@ def resolve_template(value: str | None) -> str | None:
         return value
     valid = ', '.join(sorted(_ALL_PRESET_NAMES))
     raise PytestGivenError(
-        f'Unknown given_source_link preset {value!r}. '
+        f'Unknown {setting} preset {value!r}. '
         f'Valid presets: {valid}, none. '
         f'Or pass a raw template string containing {{path}}, {{relpath}}, '
         f'{{line}}, {{project}}, or {{sha}}.'

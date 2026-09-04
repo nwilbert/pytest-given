@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from importlib.metadata import version
 from pathlib import Path
 from types import ModuleType
+from typing import Any
 
 import pytest
 
@@ -34,21 +35,13 @@ from ..lint import (
 from ..model import (
     Glossary,
     Metadata,
-    ParamInfo,
     PytestGivenError,
     ReportData,
     Scenario,
     Story,
-    report_from_dict,
     report_to_dict,
 )
-from ..report import (
-    RenderedSinks,
-    detect_commit_sha,
-    discard_stale_sinks,
-    render_sinks,
-    write_sinks,
-)
+from ..report import detect_commit_sha, discard_stale_sinks, emit_sinks
 from .state import (
     SessionOutcome,
     SessionState,
@@ -110,18 +103,19 @@ def pytest_sessionstart(session: pytest.Session) -> None:
 
 @dataclass(frozen=True, kw_only=True)
 class _SessionReport:
-    """A finished session's report: what the lint reads, and the sinks waiting
-    to be written.
+    """A finished session's report: what the lint reads, and the serialized
+    report the sinks are rendered from.
 
     `scenarios` is the grouped list as built, *before* the serde round-trip —
     `Step.source` is deliberately not serialized, and the AST lint rules have
-    nothing to anchor to without it.
+    nothing to anchor to without it. `report_dict` is None on a run with no
+    sink configured, which skips serializing entirely.
     """
 
     scenarios: list[Scenario]
     glossary: Glossary | None
     stories: list[Story]
-    sinks: RenderedSinks
+    report_dict: dict[str, Any] | None
 
 
 def pytest_sessionfinish(session: pytest.Session) -> None:
@@ -134,17 +128,18 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     that reports through the terminal summary, discards the sinks this run
     would have written, and fails the run.
 
-    `write_sinks` is inside that handler for a second reason: it writes one
-    file at a time, so only discarding both puts a run whose disk filled
-    mid-write back to having no report rather than half of one.
+    `emit_sinks` already discards on its own failure; the handler here also
+    covers a report that failed to *build*, where nothing reached the sinks and
+    a previous run's report would otherwise survive. Discarding twice is
+    harmless — the second pass finds the files already gone.
     """
     config = session.config
-    state = session_state(config)
     try:
-        built = _build_report(session, session_collector(config), state.param_info)
-        write_sinks(built.sinks)
-        if built.sinks.md_stdout is not None:
-            session_outcome(config).md_stdout = built.sinks.md_stdout
+        built = _build_report(session)
+        if built.report_dict is not None:
+            rendered = emit_sinks(built.report_dict, given_config(config).sinks)
+            if rendered.md_stdout is not None:
+                session_outcome(config).md_stdout = rendered.md_stdout
         _run_lint(session, built)
     except (PytestGivenError, OSError) as error:
         session_outcome(config).report_error = '\n'.join(
@@ -168,11 +163,9 @@ def _fail_run(session: pytest.Session) -> None:
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
-def _build_report(
-    session: pytest.Session, collector: Collector, param_info: ParamInfo
-) -> _SessionReport:
-    """Group, resolve, and render — everything that can fail, and nothing that
-    touches the filesystem.
+def _build_report(session: pytest.Session) -> _SessionReport:
+    """Group, resolve, and serialize — everything that can fail before a sink
+    is touched.
 
     Grouping and the glossary passes run on every run — each refuses its own
     authoring forms. Everything after them is sink-only work, so a run with no
@@ -180,7 +173,10 @@ def _build_report(
     """
     config = session.config
     given = given_config(config)
-    scenarios = group_parametrized(collector.scenarios, param_info)
+    collector = session_collector(config)
+    scenarios = group_parametrized(
+        collector.scenarios, session_state(config).param_info
+    )
     stories = collector.stories
     # Registered plugins include class instances; only modules can declare a
     # conftest glossary, so the filter is the caller's and `resolve_glossary`
@@ -193,7 +189,7 @@ def _build_report(
     glossary = resolve_glossary(stories, conftests)
     if glossary is not None:
         glossary = infer_glossary_kinds(glossary, stories)
-    sinks = RenderedSinks()
+    report_dict = None
     if given.sinks.writes_anything():
         report = ReportData(
             metadata=Metadata(
@@ -209,14 +205,11 @@ def _build_report(
             glossary=glossary,
         )
         report_dict = report_to_dict(report)
-        # Render from the deserialized copy, so every sink shows only what the
-        # JSON can express and the JSON sink can write the dict verbatim.
-        sinks = render_sinks(report_from_dict(report_dict), report_dict, given.sinks)
     return _SessionReport(
         scenarios=scenarios,
         glossary=glossary,
         stories=stories,
-        sinks=sinks,
+        report_dict=report_dict,
     )
 
 

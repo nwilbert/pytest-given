@@ -5,7 +5,12 @@ they have to agree with each other: a render that raises must not leave this
 run's JSON beside the previous run's HTML, with nothing on either saying so.
 So rendering and writing are separate steps — `render_sinks` does everything
 that can fail and touches no file, `write_sinks` touches files and cannot fail
-on content.
+on content, and `discard_stale_sinks` removes a previous run's report that
+would otherwise read as current.
+
+`emit_sinks` is the whole transaction and the entry point callers want: the
+sequencing *is* the guarantee, so keeping it here is what stops two callers
+from each spelling it out and drifting apart.
 
 Pytest-free like the rest of `report/`: the caller resolves its options into a
 `SinkConfig`, which is also what lets `pytest-given report` reach the same code.
@@ -16,7 +21,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, NamedTuple
 
-from ..model import PytestGivenError, ReportData
+from ..model import PytestGivenError, report_from_dict
 from .html_renderer import render_html_string
 from .md_renderer import render_md
 
@@ -86,14 +91,36 @@ class RenderedSinks:
     md_stdout: str | None = None
 
 
-def render_sinks(
-    report: ReportData, report_dict: dict[str, Any], config: SinkConfig
-) -> RenderedSinks:
+def emit_sinks(report_dict: dict[str, Any], config: SinkConfig) -> RenderedSinks:
+    """Render and write every configured sink, or leave none of them behind.
+
+    Rendering can fail on content and writing can fail on the filesystem, and
+    either failure has to take the whole set with it — including the *previous*
+    run's report, which would otherwise sit there reading as current. Callers
+    get that as one call rather than as a sequence they each reassemble.
+
+    The discard notes are folded into the raised message, so a caller reports
+    the failure by printing it.
+    """
+    try:
+        rendered = render_sinks(report_dict, config)
+        write_sinks(rendered)
+    except (PytestGivenError, OSError) as error:
+        raise PytestGivenError(
+            '\n'.join([str(error), *discard_stale_sinks(config)])
+        ) from error
+    return rendered
+
+
+def render_sinks(report_dict: dict[str, Any], config: SinkConfig) -> RenderedSinks:
     """Render the configured sinks to text. Nothing here touches the filesystem.
 
-    `report_dict` is the already-serialized report — the JSON sink writes it
-    verbatim, so the two sinks cannot disagree about what was serialized.
+    Takes only the serialized report and deserializes it here, so the JSON sink
+    can write the dict verbatim while the other two render from a copy that has
+    been through serde — every sink then shows exactly what the JSON can
+    express, and no caller has to keep two views of one run in agreement.
     """
+    report = report_from_dict(report_dict)
     files: list[RenderedFile] = []
     if config.json_path is not None:
         files.append(RenderedFile(config.json_path, json.dumps(report_dict, indent=2)))

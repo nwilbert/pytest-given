@@ -13,7 +13,7 @@ import pytest
 
 from ..lint import parse_lint_config
 from ..model import PytestGivenError
-from ..report import SinkConfig, resolve_template
+from ..report import SinkConfig, resolve_source_link_template
 from .state import GivenConfig, given_config_key
 
 
@@ -205,7 +205,7 @@ def pytest_configure(config: pytest.Config) -> None:
             config.getini('given_lint_rules'), config.getini('given_lint_ignore')
         )
         source_link_template = (
-            resolve_template(_cli_over_ini_str(config, 'given_source_link'))
+            resolve_source_link_template(_cli_over_ini_str(config, 'given_source_link'))
             if config.getoption('given_html') is not None
             else None
         )

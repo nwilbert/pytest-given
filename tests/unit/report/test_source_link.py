@@ -9,7 +9,7 @@ from pytest_given.model import PytestGivenError, SourceLocation
 from pytest_given.report.source_link import (
     compile_source_link,
     detect_commit_sha,
-    resolve_template,
+    resolve_source_link_template,
 )
 from tests.ubiquitous_language import pg
 
@@ -31,14 +31,14 @@ def test_resolve_template_none_returns_none() -> None:
     with given(t'the {pg["Source link"].low} config set to `none`'):
         value = 'none'
     with when('the config value is resolved'):
-        template = resolve_template(value)
+        template = resolve_source_link_template(value)
     with then('no template comes back, so no link is rendered'):
         assert template is None
 
 
 def test_resolve_template_empty_returns_none() -> None:
-    assert resolve_template('') is None
-    assert resolve_template(None) is None
+    assert resolve_source_link_template('') is None
+    assert resolve_source_link_template(None) is None
 
 
 @scenario(
@@ -58,7 +58,7 @@ def test_resolve_template_editor_preset(
     url_scheme: str,
 ) -> None:
     with when('the config value is resolved'):
-        template = resolve_template(preset)
+        template = resolve_source_link_template(preset)
     with then("the template is that editor's URL scheme"):
         assert template == url_scheme
 
@@ -68,7 +68,7 @@ def test_resolve_template_raw_template_passes_through() -> None:
     with given('a raw blob-URL template rather than a preset name'):
         raw = 'https://github.com/o/r/blob/{sha}/{relpath}#L{line}'
     with when('the config value is resolved'):
-        template = resolve_template(raw)
+        template = resolve_source_link_template(raw)
     with then('it comes back unchanged'):
         assert template == raw
 
@@ -84,7 +84,7 @@ def test_resolve_template_unknown_preset_raises() -> None:
         when_then('the config value is resolved', 'the value is refused'),
         pytest.raises(PytestGivenError) as exc,
     ):
-        resolve_template(value)
+        resolve_source_link_template(value)
     with then('the error names the offender and lists every valid preset'):
         msg = str(exc.value)
         assert 'emacs' in msg
@@ -105,7 +105,9 @@ def _clear_github_env(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_resolve_github_preset_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     _clear_github_env(monkeypatch)
     monkeypatch.setenv('GITHUB_REPOSITORY', 'myorg/myrepo')
-    assert resolve_template('github') == _GH_TEMPLATE.format(org='myorg', repo='myrepo')
+    assert resolve_source_link_template('github') == _GH_TEMPLATE.format(
+        org='myorg', repo='myrepo'
+    )
 
 
 @scenario('The github preset prefers GITHUB_REPOSITORY over the git remote')
@@ -126,7 +128,7 @@ def test_resolve_github_preset_env_beats_remote(
 
         monkeypatch.setattr(subprocess, 'run', fake_run)
     with when('the github preset is resolved'):
-        template = resolve_template('github')
+        template = resolve_source_link_template('github')
     with then("the template points at the environment's repository"):
         assert template == _GH_TEMPLATE.format(org='env-org', repo='env-repo')
 
@@ -147,7 +149,7 @@ def test_resolve_github_preset_from_https_remote(
 
         monkeypatch.setattr(subprocess, 'run', fake_run)
     with when('the github preset is resolved'):
-        template = resolve_template('github')
+        template = resolve_source_link_template('github')
     with then("the blob-URL template names the remote's org and repo"):
         assert template == _GH_TEMPLATE.format(org='o', repo='r')
 
@@ -163,7 +165,9 @@ def test_resolve_github_preset_from_https_remote_no_git_suffix(
         )
 
     monkeypatch.setattr(subprocess, 'run', fake_run)
-    assert resolve_template('github') == _GH_TEMPLATE.format(org='o', repo='r')
+    assert resolve_source_link_template('github') == _GH_TEMPLATE.format(
+        org='o', repo='r'
+    )
 
 
 def test_resolve_github_preset_from_ssh_remote(
@@ -177,7 +181,9 @@ def test_resolve_github_preset_from_ssh_remote(
         )
 
     monkeypatch.setattr(subprocess, 'run', fake_run)
-    assert resolve_template('github') == _GH_TEMPLATE.format(org='o', repo='r')
+    assert resolve_source_link_template('github') == _GH_TEMPLATE.format(
+        org='o', repo='r'
+    )
 
 
 @scenario(
@@ -202,7 +208,7 @@ def test_resolve_github_preset_non_github_remote_raises(
         when_then('the github preset is resolved', 'the preset is refused'),
         pytest.raises(PytestGivenError) as exc,
     ):
-        resolve_template('github')
+        resolve_source_link_template('github')
     with then('the error points at the env var and the raw-template escape hatch'):
         msg = str(exc.value)
         assert 'GITHUB_REPOSITORY' in msg
@@ -219,7 +225,7 @@ def test_resolve_github_preset_no_git_and_no_env_raises(
 
     monkeypatch.setattr(subprocess, 'run', fake_run)
     with pytest.raises(PytestGivenError):
-        resolve_template('github')
+        resolve_source_link_template('github')
 
 
 def _src(relpath: str = 'tests/test_x.py', line: int = 7) -> SourceLocation:
@@ -436,4 +442,4 @@ def test_resolve_github_preset_unrunnable_git_raises_the_plugin_error(
 
     monkeypatch.setattr(subprocess, 'run', fake_run)
     with pytest.raises(PytestGivenError, match='could not detect an org/repo'):
-        resolve_template('github')
+        resolve_source_link_template('github')

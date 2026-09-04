@@ -178,6 +178,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A `--given-json`/`--given-html`/`--given-md` path that could not be a report
   file is now refused before the suite runs, instead of a bare flag swallowing a
   following test path and overwriting — or, on a failed run, deleting — it.
+- `pytest-given report` now discards a stale report when the *render* fails, not
+  only when the write does.
+- `pytest-given report --source-link` is now validated on a `--format md` run
+  instead of being accepted and ignored, and an unknown preset is reported under
+  the name the user typed.
 - A `git` on PATH that cannot be executed no longer fails the run.
 - A nested in-process pytest run that dies while parsing its arguments no longer
   strands the outer session's captured rootdir, which silently dropped every

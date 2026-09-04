@@ -3,7 +3,9 @@ from pathlib import Path
 
 import pytest
 
+from pytest_given import PytestGivenError
 from pytest_given.cli import main
+from pytest_given.report import sinks
 
 
 def test_cli_generates_html(tmp_path: Path) -> None:
@@ -304,3 +306,49 @@ def test_cli_write_failure_discards_the_stale_report(
     err = capsys.readouterr().err
     assert 'read-only file system' in err
     assert 'would read as current' in err
+
+
+def test_cli_render_failure_also_discards_the_stale_report(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    """The all-or-nothing guarantee covers a failed *render*, not just a failed
+    write: a re-render that raises must not leave the previous report sitting
+    there reading as current."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(_minimal_report()), encoding='utf-8')
+    html_path = tmp_path / 'out.html'
+    html_path.write_text('previous run', encoding='utf-8')
+
+    def refuse(*args: object, **kwargs: object) -> str:
+        raise PytestGivenError('template exploded')
+
+    monkeypatch.setattr(sinks, 'render_html_string', refuse)
+    rc = main(['report', str(json_path), '-o', str(html_path)])
+    assert rc == 1
+    assert not html_path.exists()
+    err = capsys.readouterr().err
+    assert 'template exploded' in err
+    assert 'would read as current' in err
+
+
+def test_cli_refuses_an_unknown_source_link_preset_on_a_markdown_run(
+    tmp_path: Path, capsys
+) -> None:
+    """`--source-link` applies to the invocation, so a bogus preset is refused
+    whichever format was asked for rather than being silently ignored."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(_minimal_report()), encoding='utf-8')
+    rc = main(
+        [
+            'report',
+            str(json_path),
+            '-o',
+            str(tmp_path / 'o.md'),
+            '--source-link',
+            'no-such-editor',
+        ]
+    )
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert '--source-link' in err
+    assert 'Traceback' not in err
