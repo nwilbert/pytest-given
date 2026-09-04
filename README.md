@@ -72,13 +72,7 @@ Increasingly those tests aren't hand-written at all: a human describes a scenari
 
 ### `@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)`
 
-Mark a test for inclusion in the report. Required for any test you want to appear. `story=` / `activities=` bind it to a domain story (see [Domain Storytelling](#domain-storytelling)) — `activities=` takes an `int` or a sequence of them, never a string; `group_parametrized=False` declines parametrize merging. The decorated function is returned unwrapped.
-
-```python
-@scenario('Buy coffee', tags=['billing'])
-def test_buy_coffee(machine):
-    ...
-```
+Required for a test to appear in the report. `story=` / `activities=` bind it to a domain story (see [Domain Storytelling](#domain-storytelling)) — `activities=` takes an `int` or a sequence of them, never a string; `group_parametrized=False` declines parametrize merging. The decorated function is returned unwrapped.
 
 ### `given(text)`, `when(text)`, `then(text)`
 
@@ -87,17 +81,15 @@ Dual-purpose: use as a **context manager** inside a test body, or as a **decorat
 As context managers:
 
 ```python
-@scenario('Place order')
-def test_order():
-    with given('an empty cart'):
-        cart = []
-    with when('I add an item'):
-        cart.append('coffee')
-    with then('the cart has one item'):
-        assert len(cart) == 1
+with given('an empty cart'):
+    cart = []
+with when('I add an item'):
+    cart.append('coffee')
+with then('the cart has one item'):
+    assert len(cart) == 1
 ```
 
-Pick the phase by **role**, not syntax: all arrangement belongs in `given` — including state-mutating setup calls (`machine.insert(200)`, seeding a database) — `when` performs the one action under test, and `then` only observes its outcome. A scenario with two `when` steps usually hides an arrangement in the first one, and a `then` that calls the action (`assert machine.buy() == …`) hides the action inside a check.
+Pick the phase by **role**, not syntax: all arrangement belongs in `given` — including state-mutating setup calls (`machine.insert(200)`, seeding a database) — `when` performs the one action under test, and `then` only observes its outcome. The [narration lint](#narration-lint) catches the usual slips: an arrangement hiding in a second `when`, an action folded into a `then`'s assertion.
 
 A step recorded in a test with no `@scenario` is a no-op that warns with `pytest_given.PytestGivenWarning` — silence it with `filterwarnings = ["ignore::pytest_given.PytestGivenWarning"]` if a shared helper is used from both narrated and plain tests.
 
@@ -110,7 +102,7 @@ def machine():
     return {'coffees': 10, 'price': 2}
 ```
 
-Generator fixtures work too, but teardown is silent: the post-`yield` block runs and may not record steps.
+Generator fixtures work too, but only their setup is narrated: the post-`yield` block runs outside the recording, and a step or `attach` there raises `PytestGivenError`. A fixture's label must be a plain string — `@given(Template(...))` on a fixture raises; move the step into a helper function if the label has to vary.
 
 As a call-site label with `Annotated` (**only `given` is allowed**) — attach a `given` step to a fixture or a `@pytest.mark.parametrize` value from the test signature. This is the way to surface a parametrized input as a `given` (a direct parametrize value otherwise appears only in the parameter table), and it can label an undecorated or built-in fixture, or override a decorated fixture's label for one scenario:
 
@@ -144,7 +136,9 @@ def insert(amount):
     ...
 ```
 
-Steps can be nested freely:
+`async def` helpers decorate the same way — the step wraps the awaited body — as do async generator fixtures.
+
+Steps nest **within a phase** — a `when` inside a `when`, to break one action into named sub-actions:
 
 ```python
 with when('I place a large order'):
@@ -153,6 +147,8 @@ with when('I place a large order'):
     with when('I apply loyalty discount'):
         ...
 ```
+
+Crossing phases is rejected: a `then` opened inside a `when` raises `PytestGivenError`. That covers decorated helpers too — a `@when` helper called from inside a `given` block raises — so a helper used from more than one phase should stay undecorated and be narrated at its call site.
 
 ### `when_then(when_text, then_text)`
 
@@ -217,18 +213,9 @@ def test_brew(cup_size):
     ...
 ```
 
-A name can instead be a t-string of glossary handles — `@scenario(t'a {guest} checks in')` renders them as term refs in the title. The two don't combine: a title needing both a term ref and a per-case value isn't expressible today.
+The `Template` name and the glossary-handle t-string name from the table above don't combine: a title needing both a term ref and a per-case value isn't expressible today.
 
-What a column cannot carry is a case that narrates a *different sentence*. When the narration genuinely branches per case, decline the merge with `group_parametrized=False`:
-
-```python
-@scenario(Template('Brew {cup_size} ml'), group_parametrized=False)
-@pytest.mark.parametrize('cup_size', [200, 300])
-def test_brew(cup_size):
-    ...
-```
-
-Each case then becomes its own scenario with no parameter table, titled by its parametrize id — `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first (a plain-string name is suffixed the same way). Every case carries the id, including one whose name already renders its values. On a test that isn't parametrized the argument raises at collection.
+What a column cannot carry is a case that narrates a *different sentence*. When the narration genuinely branches per case, add `group_parametrized=False` to the `@scenario` above to decline the merge. Each case then becomes its own scenario with no parameter table, titled by its parametrize id — `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first (a plain-string name is suffixed the same way). Every case carries the id, including one whose name already renders its values. On a test that isn't parametrized the argument raises at collection.
 
 **Six authoring forms are rejected outright** in a parametrized scenario, because each would make the grouped tree lie. Every one fails the run and writes no report — the message names the fix:
 
@@ -237,7 +224,7 @@ Each case then becomes its own scenario with no parameter table, titled by its p
 | 1 | A plain `str` (usually an f-string) whose text differs per case | Narrate with a t-string so the varying part is a placeholder, not case 1's text |
 | 2 | A varying interpolation that isn't a bare name — `t'{cup_size * 0.01}'`, `t'{m.balance}'` | Bind it to a local and narrate that local |
 | 3 | An interpolation naming a parametrize column that no longer holds the case's value | Rename the local that rebound the name — or, if the body mutated the value in place before narrating it, bind the result to its own name and narrate that |
-| 4 | A glossary term ref whose display differs between cases (unless the term ref *is* the parametrize value) | Split the term ref from the value: `given(t"{pg['Customer']} {name} places an order")` |
+| 4 | A term ref that names a different term or reads differently between cases — including one bound to a parametrize column | Split the term ref from the value: `given(t"{pg['Customer']} {name} places an order")` |
 | 5 | A step whose set of `attach` labels differs between cases | Keep the label constant and let the content vary — that's what the attachment column is for |
 | 6 | Passed cases that narrate different templates — a different step structure, a differently shaped narration, different wording, or a different interpolated expression | Decline the merge with `@scenario(..., group_parametrized=False)` and let each case be its own scenario |
 
@@ -292,7 +279,7 @@ with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
 
 **Kinds** — a term's kind is either declared (`g.actor(...)` / `g.work_object(...)` / `g.verb(...)`, or a `kind_column`) or **inferred from story activity-slot positions** at session finish: position 0 → actor, odd positions → verb, even positions ≥ 2 → work object. A declared kind is never silently overridden — it is checked against its slot when `activity(...)` is constructed, so misplacing it raises `PytestGivenError` naming the term and its kind. Inference then handles only the undeclared terms, and raises at session finish if one turns up in both a verb slot and a noun slot; add a `kind_column` to disambiguate.
 
-**Kindless and undefined terms** — a term that no story activity references stays kindless. On a code-defined glossary `g('foo')` also declares a term the team hasn't classified yet (`g['foo']` only looks up, and raises if unknown); it shows an *Undefined* badge until `definition=` is supplied. Every declared term reaches the report, referenced or not; kindless ones render under a neutral wash instead of a kind color, and collect under **Uncategorized** in the Glossary tab with their own filter toggle.
+**Kindless and undefined terms** — a term no story activity references stays kindless; on a code-defined glossary `g('foo')` declares one the team hasn't classified yet (`g['foo']` only looks up, and raises if unknown), showing an *Undefined* badge until `definition=` is supplied. Every declared term reaches the report, referenced or not; kindless ones render under a neutral wash and collect under **Uncategorized** in the Glossary tab.
 
 **Discovery** — the plugin finds the glossary in one of two ways: off any `story(...)` that references it (a story records its glossary at construction), or, failing that, by scanning `conftest.py` module attributes for a `Glossary` / `FileGlossary` instance. A suite with no stories — glossary-only mode — therefore has to bind the instance **by name** in a `conftest.py`:
 
@@ -314,7 +301,18 @@ book_a_group_trip = story('Book a Group Trip', [
 ])
 ```
 
-An activity reads left-to-right: actor → verb → work object (with optional connective words). Any part may be a bare string instead of a glossary handle — but an activity needs at least two distinct glossary terms to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them explicitly. `path(...)` lets a story branch where alternate activity sequences share a prefix.
+An activity reads left-to-right: actor → verb → work object (with optional connective words). Any part may be a bare string instead of a glossary handle — but an activity needs at least two distinct glossary terms to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them explicitly.
+
+`path(...)` gives one activity **parallel branches** — alternate sentences that happen together, one per branch:
+
+```python
+activity(
+    path(organizer('Carol'), add('adds'), guest('Alice'), 'to', trip),
+    path(organizer('Carol'), add('adds'), guest('Bob'), 'to', trip),
+)
+```
+
+A path alternates node / edge / node …, so it has an odd length ≥ 3 and ends on an entity. Covering a multi-path activity takes a step referencing every term across all of its paths.
 
 **3. Scenario ↔ activity binding** — link a scenario (and individual steps) to the story it implements:
 
@@ -327,7 +325,7 @@ def test_select_suite(carol):
 
 Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it; selecting an activity offers *Open in Scenarios*, which filters the Scenarios view down to those scenarios. A step can also bind explicitly with `given(text, activity=...)`, naming an activity by its 1-based position in the story; pass `activity(..., activity_id=N)` to fix a row's number so inserting a row later doesn't renumber the pins after it. `@scenario(..., activities=[2, 3])` narrows a scenario to those 1-based activity numbers, so it can cover no others.
 
-See the [domain-storytelling design spec](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-07-domain-storytelling-design.md) and the [file-backed glossary design spec](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-18-file-backed-glossary-design.md) for the full surface, and the [hotel-booking](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/test_hotel_booking.py) and [file-glossary-booking](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/test_file_glossary_booking.py) examples for end-to-end usage.
+The [domain-storytelling](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-07-domain-storytelling-design.md) and [file-backed glossary](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-18-file-backed-glossary-design.md) design specs carry the full surface; the [examples](#examples) show it end to end.
 
 ### `attach(label, content)`
 
@@ -338,7 +336,7 @@ attach('Receipt', 'Coffee x1     $2.00')             # text
 attach('Machine state', {'coffees': 9, 'price': 2})  # JSON
 ```
 
-An attachment binds to the step being recorded, so the call belongs inside a `given` / `when` / `then` block. Attaching from the test body with no step open raises.
+An attachment binds to the step being recorded, so the call belongs inside a `given` / `when` / `then` block — attaching from the test body with no step open raises.
 
 The label is a plain `str`; a `Template` or t-string label raises — build it with an f-string if it needs interpolating.
 
@@ -348,25 +346,27 @@ In a parametrized scenario the label must read the same in every case; a payload
 
 All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-*` flag enables its own sink independently, and they combine freely (e.g. pass both `--given-json` and `--given-html` to get both files from one run).
 
-The *checks* are not opt-in. Every run builds the report it would have written, so an authoring form that cannot be narrated honestly — the parametrize rules above among them — fails the run whether or not a sink was configured. Learning about it from the first run that asks for HTML, long after the test was written, is the outcome that buys.
+The *checks* are not opt-in. Every run builds the report it would have written, so an authoring form that cannot be narrated honestly — the parametrize rules above among them — fails the run whether or not a sink was configured, rather than surfacing on the first run that happens to ask for HTML.
 
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--given-json[=PATH]` | off | Write JSON report data (bare → `given-report/report-data.json`). |
 | `--given-html[=PATH]` | off | Write the HTML report (bare → `given-report/report.html`). |
-| `--given-md[=PATH]` | off | Write the Markdown report; **bare renders to stdout** (fenced). |
+| `--given-md[=PATH]` | off | Write the Markdown report; **bare renders to stdout**, between `<!-- pytest-given:md:start -->` and `<!-- pytest-given:md:end -->` markers. |
 | `--given-title=TEXT` | rootdir name | Name the report, shown as the Markdown heading and the HTML tab title and topbar. Also settable as the `given_title` ini. |
-| `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template. Renders a clickable file:line anchor on each scenario card, on each story panel, and on expanded glossary term cards. Also settable as the `given_source_link` ini. See [Source links](#source-links). |
+| `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template, **HTML only**. Renders a clickable file:line anchor on each scenario card, story panel, and expanded glossary term card. Also settable as the `given_source_link` ini. See [Source links](#source-links). |
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
 | `--given-lint` / `--no-given-lint` | `false` | Run the narration lint; an error-level finding fails the run. Also settable as the `given_lint` ini, which either form overrides. See [Narration lint](#narration-lint). |
 
 Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection. A path that could not be a report file (a `.py` test path, say) is refused before the suite runs rather than written over.
 
+**Not compatible with `pytest-xdist`.** Under `-n`, tests run in worker processes whose recordings never reach the controller: the run passes and the report comes out empty. Generate reports from a non-distributed run.
+
 The ini settings live in `[tool.pytest]`, pytest 9's native TOML table. The legacy `[tool.pytest.ini_options]` is still read, but the two are mutually exclusive — pytest raises `UsageError` if both are present.
 
 ## Narration lint
 
-`--given-lint` runs a rule catalog over the scenarios the run just recorded, catching steps whose narration lies about their body — an empty `given`, a `then` that checks nothing, an action smuggled into an assertion. The AST rules analyze exactly the steps the run identified (there is no parallel static discovery), so decorated helpers, fixtures, and `when_then` pairs are all attributed correctly.
+`--given-lint` runs a rule catalog over the scenarios the run just recorded, catching steps whose narration lies about their body. The AST rules analyze exactly the steps the run identified (there is no parallel static discovery), so decorated helpers, fixtures, and `when_then` pairs are all attributed correctly.
 
 Each rule has a fixed default severity; there is no master level. A `warn` finding prints in the terminal summary; an `error` finding also fails the run.
 
@@ -402,8 +402,8 @@ Findings print one aligned row each — severity, rule, subject, message, and th
 
 ```
 ============= pytest-given: narration lint (2 findings, 1 error) ==============
-ERROR empty-step          tests/test_shop.py::test_buy   given 'a coin' has no code (test_shop.py:12)
-WARN  missing-phase       tests/test_shop.py::test_idle  missing: when (test_shop.py:31)
+ERROR empty-step     tests/test_shop.py::test_buy   given 'a coin' has no code (test_shop.py:12)
+WARN  missing-phase  tests/test_shop.py::test_idle  missing: when (test_shop.py:31)
 ```
 
 The lint is zero-cost when off: nothing extra is captured, and report artifacts are byte-identical with the lint on or off.
@@ -418,7 +418,7 @@ Skipped scenarios never capture a traceback at all — they carry their skip rea
 
 ## Source links
 
-Add a clickable file:line anchor to each scenario card, story panel, and expanded glossary term card so devs can jump straight to the source.
+Add a clickable file:line anchor to each scenario card, story panel, and expanded glossary term card so devs can jump straight to the source. Source links are an HTML-report feature: a run writing no HTML ignores the setting entirely — it isn't even validated there, so a mistyped preset surfaces only on a `--given-html` run.
 
 ```toml
 # pyproject.toml — pytest 9+ canonical form
@@ -447,16 +447,7 @@ For a raw template, use any of these variables:
 | `{project}`  | Basename of pytest's rootdir                                                                             |
 | `{sha}`      | Commit SHA from `GITHUB_SHA` / `CI_COMMIT_SHA` / `BUILDKITE_COMMIT`, falling back to `git rev-parse HEAD` |
 
-Examples:
-
-```toml
-# CI archives → SHA-pinned GitHub permalinks (preset auto-detects org/repo)
-given_source_link = "github"
-
-# Same as a raw template — pin org/repo explicitly. Useful when origin is a
-# mirror, fork URL, or non-standard remote that the preset can't parse:
-given_source_link = "https://github.com/myorg/myrepo/blob/{sha}/{relpath}#L{line}"
-```
+For CI archives, `given_source_link = "github"` gives SHA-pinned permalinks. Spell the same thing as a raw template when `origin` is a mirror, a fork, or a remote the preset cannot parse: `"https://github.com/myorg/myrepo/blob/{sha}/{relpath}#L{line}"`.
 
 Caveats:
 
@@ -472,7 +463,7 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
     --source-link=vscode
 ```
 
-`--source-link` accepts the same presets and raw templates as `--given-source-link` (see [Source links](#source-links)). Omit it (or pass `--source-link=none`) to render plain file:line text without an anchor.
+`--source-link` accepts the same presets and raw templates as `--given-source-link` (see [Source links](#source-links)); omit it (or pass `--source-link=none`) to render plain file:line text without an anchor. On a `--format md` run it is validated but unused.
 
 Pass `--format md` for Markdown instead of HTML; it is also inferred from the `-o` extension, so `-o report.md` needs no `--format`. Omit `-o` with `--format md` to print to stdout.
 
@@ -480,12 +471,12 @@ The same script owns `skills install` — see [Agent skills](#agent-skills).
 
 ## Examples
 
-Four example suites live under [`examples/`](https://github.com/nwilbert/pytest-given/tree/main/examples/), each with pre-rendered JSON + HTML committed — the rendered pages are linked at the top of this README:
+Four example suites live under [`examples/`](https://github.com/nwilbert/pytest-given/tree/main/examples/), each with its JSON, Markdown, and HTML output committed. The rendered reports are linked at the top of this README; the sources are:
 
-- [`coffeeshop/test_coffeeshop.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/coffeeshop/test_coffeeshop.py) — a tour of the core surface: nested step blocks, `@given` fixtures with teardown, text and JSON attachments, t-string interpolation, `Annotated[..., given(...)]` labels, step-recording helpers, parametrize tables, and failure / skip rendering. Output: [`coffeeshop.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/coffeeshop/coffeeshop.html).
-- [`hotel-booking/test_hotel_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/test_hotel_booking.py) — Domain Storytelling over a code-defined `Glossary`: a `story(...)` of `activity(...)` rows, scenarios bound to it with per-activity coverage, and kindless + undefined terms awaiting classification. Output: [`hotel-booking.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/hotel-booking.html).
-- [`file-glossary-booking/test_file_glossary_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/test_file_glossary_booking.py) — the same over a Markdown `FileGlossary`: name-based term access, kinds inferred from activity slots, one deliberately kindless term. Output: [`file-glossary-booking.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/file-glossary-booking.html).
-- [`self-report/`](https://github.com/nwilbert/pytest-given/tree/main/examples/self-report/) — pytest-given applied to its own backend suite, narrated in the vocabulary of [`GLOSSARY.md`](https://github.com/nwilbert/pytest-given/blob/main/GLOSSARY.md) (loaded as a `FileGlossary`). Generated from the whole suite rather than a hand-written test file. Output: [`self-report.html`](https://github.com/nwilbert/pytest-given/blob/main/examples/self-report/self-report.html).
+- [`coffeeshop/test_coffeeshop.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/coffeeshop/test_coffeeshop.py) — the core surface: nested step blocks, `@given` fixtures with teardown, text and JSON attachments, t-string interpolation, `Annotated[..., given(...)]` labels, step-recording helpers, parametrize tables, and failure / skip rendering.
+- [`hotel-booking/test_hotel_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/test_hotel_booking.py) — Domain Storytelling over a code-defined `Glossary`: single- and multi-path `activity(...)` rows, scenarios bound to them with per-activity coverage, and kindless + undefined terms awaiting classification.
+- [`file-glossary-booking/test_file_glossary_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/test_file_glossary_booking.py) — the same over a Markdown `FileGlossary`: name-based term access, kinds inferred from activity slots, one deliberately kindless term.
+- [`self-report/`](https://github.com/nwilbert/pytest-given/tree/main/examples/self-report/) — pytest-given applied to its own backend suite, narrated in the vocabulary of [`GLOSSARY.md`](https://github.com/nwilbert/pytest-given/blob/main/GLOSSARY.md) (loaded as a `FileGlossary`) and generated from the whole suite rather than a hand-written test file.
 
 Run `nox -s examples` to regenerate the first three, and `nox -s self_report` for the self-report.
 
@@ -509,15 +500,10 @@ Adopt selectively: decorate the tests that assert behavior, and leave plumbing (
 `pytest-given skills install` copies the bundled [Agent Skills](https://agentskills.io) into your repo's `.claude/skills/`, where Claude Code (and other harnesses following the same format) auto-discover them. Three ship:
 
 - **`pytest-given-authoring`** — a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories.
-- **`pytest-given-navigating`** — exploring a codebase through its rendered reports (`--given-md` for the prose spec, `--given-json` + `jq` for filtering by tag, term, or status) instead of grepping test bodies.
+- **`pytest-given-navigating`** — exploring a codebase through its rendered reports instead of grepping test bodies.
 - **`pytest-given-reviewing`** — a layered review of narrated tests: the narration lint as the structural gate, a semantic audit of step text against step bodies, a completeness audit of what the report leaves out, then a hygiene pass over the glossary, tags and stories.
 
-The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` detects drift in CI. Use `--dest` for a non-default skills directory.
-
-```bash
-pytest-given skills install            # copies into ./.claude/skills/
-pytest-given skills install --check    # exit 1 if the installed files drifted from the bundled ones
-```
+The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` exits 1 on drift, for a CI guard. Use `--dest` for a non-default skills directory.
 
 ## Development
 

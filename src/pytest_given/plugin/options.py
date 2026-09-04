@@ -46,8 +46,9 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         const='-',
         default=None,
         help=(
-            'Write the Markdown report. Bare renders to stdout (fenced); '
-            '=PATH writes a file. Off when absent.'
+            'Write the Markdown report. Bare renders to stdout between '
+            '<!-- pytest-given:md:start --> / <!-- pytest-given:md:end --> '
+            'markers; =PATH writes a file. Off when absent.'
         ),
     )
     group.addoption(
