@@ -113,6 +113,10 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     covers a report that failed to *build*, where nothing reached the sinks and
     a previous run's report would otherwise survive. Discarding twice is
     harmless — the second pass finds the files already gone.
+
+    The lint runs outside that handler: by then the sinks are written, and the
+    lint neither writes them nor owns them, so a failure in it must not delete
+    a report that is on disk and correct.
     """
     config = session.config
     try:
@@ -121,13 +125,17 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             rendered = emit_sinks(built.report_dict, given_config(config).sinks)
             if rendered.md_stdout is not None:
                 session_outcome(config).md_stdout = rendered.md_stdout
-        _run_lint(session, built)
     except (PytestGivenError, OSError) as error:
         session_outcome(config).report_error = '\n'.join(
             [str(error), *discard_stale_sinks(given_config(config).sinks)]
         )
         _fail_run(session)
         return
+    try:
+        _run_lint(session, built)
+    except (PytestGivenError, OSError) as error:
+        session_outcome(config).report_error = str(error)
+        _fail_run(session)
 
 
 def _fail_run(session: pytest.Session) -> None:
@@ -215,17 +223,30 @@ def _run_lint(session: pytest.Session, built: _SessionReport) -> None:
 
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
     outcome = session_outcome(terminalreporter.config)
-    _write_report_error(terminalreporter, outcome.report_error)
+    _write_report_error(
+        terminalreporter,
+        outcome.report_error,
+        wrote_sinks=given_config(terminalreporter.config).sinks.writes_anything(),
+    )
     _write_lint_findings(terminalreporter, outcome.findings)
     _write_md(terminalreporter, outcome.md_stdout)
 
 
 def _write_report_error(
-    terminalreporter: pytest.TerminalReporter, report_error: str | None
+    terminalreporter: pytest.TerminalReporter,
+    report_error: str | None,
+    *,
+    wrote_sinks: bool,
 ) -> None:
     if report_error is None:
         return
-    title = 'pytest-given: report not written'
+    # Grouping refuses on every run, sinks or not, so a run that was never
+    # going to write must not be told its report was skipped.
+    title = (
+        'pytest-given: report not written'
+        if wrote_sinks
+        else 'pytest-given: scenario refused'
+    )
     terminalreporter.write_sep('=', title, red=True)
     terminalreporter.line(report_error)
     _count_as_error(terminalreporter, title)

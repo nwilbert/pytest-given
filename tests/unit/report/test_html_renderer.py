@@ -1310,9 +1310,9 @@ def test_render_param_table_none_value_as_text_not_blank(tmp_path: Path) -> None
 
 def _glossary() -> Glossary:
     g = Glossary()
-    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
-    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
-    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    g.register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
     return g
 
 
@@ -1352,7 +1352,7 @@ def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
     referenced hundreds of times would otherwise carry hundreds of copies of
     its definition."""
     g = Glossary()
-    g._register(
+    g.register(
         GlossaryTerm(
             id=TermId('guest'),
             kind='actor',
@@ -1416,7 +1416,7 @@ def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
 
 def test_activity_part_filter_actor_term_ref():
     g = Glossary()
-    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
     f = _make_activity_part_filter(g)
     out = str(f(ActivityTermRef(term_id=TermId('guest'), display='Alice')))
     assert 'term-ref-actor' in out
@@ -1425,7 +1425,7 @@ def test_activity_part_filter_actor_term_ref():
 
 def test_activity_part_filter_object_term_ref():
     g = Glossary()
-    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
     f = _make_activity_part_filter(g)
     out = str(f(ActivityTermRef(term_id=TermId('room'), display='Room')))
     assert 'term-ref-object' in out
@@ -1439,7 +1439,7 @@ def test_activity_part_filter_unknown_term_ref_falls_back():
 
 def test_activity_part_filter_verb_term_ref_renders_verb_class():
     g = Glossary()
-    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    g.register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
     f = _make_activity_part_filter(g)
     out = str(f(ActivityTermRef(term_id=TermId('search'), display='searches')))
     assert 'term-ref-verb' in out
@@ -1645,9 +1645,9 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
     silent escape() fallbacks. Regression guard for the side-channel
     `_glossaries` stash that previously didn't round-trip."""
     g = Glossary()
-    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
-    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
-    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g.register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
     story = Story(
         id=StoryId('book-a-room'),
         title='Book a Room',

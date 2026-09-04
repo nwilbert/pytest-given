@@ -19,6 +19,47 @@ from ..model import (
 from .source import capture_caller_source
 
 
+class Glossary(BaseGlossary):
+    """The user-facing glossary: the model's storage plus the registration API.
+
+    Every registration below is idempotent for an *exactly* repeated one — kind,
+    canonical and definition all equal — and raises on anything else, a
+    definition supplied only the first time included. Re-reading a term declared
+    elsewhere is `g[name]`, which never registers.
+    """
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        self._handles: dict[TermId, TermHandle] = {}
+
+    def _declare(
+        self, kind: TermKind | None, name: str, definition: str | None
+    ) -> TermHandle:
+        """Register `name` under `kind` and hand back its handle."""
+        term = _register_kind(self, kind, name, definition, capture_caller_source())
+        return TermHandle(_term=term, _glossary=self)
+
+    def actor(self, name: str, definition: str | None = None) -> TermHandle:
+        """Register an actor — a participant in the domain."""
+        return self._declare('actor', name, definition)
+
+    def work_object(self, name: str, definition: str | None = None) -> TermHandle:
+        """Register a work object — a thing acted on."""
+        return self._declare('object', name, definition)
+
+    def verb(self, name: str, definition: str | None = None) -> TermHandle:
+        """Register a verb — an action."""
+        return self._declare('verb', name, definition)
+
+    def __call__(self, name: str, definition: str | None = None) -> TermHandle:
+        """Declare-or-get a term whose kind inference will settle later."""
+        return self._declare(None, name, definition)
+
+    def __getitem__(self, name: str) -> TermHandle:
+        """Get-only lookup; an unknown name raises with a did-you-mean hint."""
+        return handle_or_raise(self, name, self._handles)
+
+
 def normalize_definition(definition: str | None) -> str | None:
     """Collapse an empty or whitespace-only definition to None so 'undefined'
     has exactly one representation."""
@@ -70,8 +111,8 @@ class TermHandle(TermRef):
     """
 
     _term: GlossaryTerm
-    # Out of the identity: a handle is a public return value a user may put in
-    # a set, which the mutable — and so unhashable — `Glossary` would refuse.
+    # Out of the identity: a handle *is* its term, so two handles for the same
+    # term compare equal across the glossaries they came from.
     _glossary: BaseGlossary = field(compare=False)
 
     def __call__(self, display: str) -> TermInstance:
@@ -131,10 +172,8 @@ class TermInstance(TermRef):
 
 
 def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:
-    """Whether two terms are the same registration: kind, canonical, and
-    definition agree (`source` is intentionally excluded). Shared by the
-    code-defined and file-backed conflict checks, so the identity rule lives in
-    one place."""
+    """Whether two terms are the same registration: kind, canonical and
+    definition agree. `source` is intentionally excluded."""
     return (
         existing.kind == candidate.kind
         and existing.canonical == candidate.canonical
@@ -194,7 +233,7 @@ def register_or_conflict(
         if terms_match(existing, term):
             return existing
         raise PytestGivenError(conflict_message(existing))
-    glossary._register(term)
+    glossary.register(term)
     return term
 
 
@@ -220,44 +259,3 @@ def handle_or_raise(
     handle = TermHandle(_term=term, _glossary=glossary)
     handle_cache[term_id] = handle
     return handle
-
-
-class Glossary(BaseGlossary):
-    """The user-facing glossary: the model's storage plus the registration API.
-
-    Every registration below is idempotent for an *exactly* repeated one — kind,
-    canonical and definition all equal — and raises on anything else, a
-    definition supplied only the first time included. Re-reading a term declared
-    elsewhere is `g[name]`, which never registers.
-    """
-
-    def __post_init__(self) -> None:
-        super().__post_init__()
-        self._handles: dict[TermId, TermHandle] = {}
-
-    def _declare(
-        self, kind: TermKind | None, name: str, definition: str | None
-    ) -> TermHandle:
-        """Register `name` under `kind` and hand back its handle."""
-        term = _register_kind(self, kind, name, definition, capture_caller_source())
-        return TermHandle(_term=term, _glossary=self)
-
-    def actor(self, name: str, definition: str | None = None) -> TermHandle:
-        """Register an actor — a participant in the domain."""
-        return self._declare('actor', name, definition)
-
-    def work_object(self, name: str, definition: str | None = None) -> TermHandle:
-        """Register a work object — a thing acted on."""
-        return self._declare('object', name, definition)
-
-    def verb(self, name: str, definition: str | None = None) -> TermHandle:
-        """Register a verb — an action."""
-        return self._declare('verb', name, definition)
-
-    def __call__(self, name: str, definition: str | None = None) -> TermHandle:
-        """Declare-or-get a term whose kind inference will settle later."""
-        return self._declare(None, name, definition)
-
-    def __getitem__(self, name: str) -> TermHandle:
-        """Get-only lookup; an unknown name raises with a did-you-mean hint."""
-        return handle_or_raise(self, name, self._handles)

@@ -14,7 +14,6 @@ import jinja2
 from markupsafe import Markup, escape
 
 from ..model import (
-    STATUS_GLYPH,
     ActivityPart,
     ActivityTermRef,
     ActivityWord,
@@ -34,12 +33,11 @@ from ..model import (
     TermId,
     TermKind,
     placeholder_token,
-    plural,
 )
 from .coverage import build_coverage_map
 from .glossary_view import build_glossary_view
 from .inline_markdown import render_inline_markdown
-from .palette import param_column_colors
+from .palette import STATUS_GLYPH, param_column_colors
 from .slugs import build_scenario_slug_index
 from .source_link import compile_source_link
 from .story_view import (
@@ -48,6 +46,7 @@ from .story_view import (
     build_scenario_activity_index,
     build_story_rollups,
 )
+from .text import plural
 
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 
@@ -183,7 +182,6 @@ def _render_context(
         'story_rollups': build_story_rollups(report, coverage),
         'scn_covers': scn_covers,
         'scenario_slugs': scenario_slugs,
-        'param_color_map': param_color_map,
         # The colors themselves, emitted as `.param-color-N` rules beside the
         # stylesheet. They are generated per report rather than sitting in
         # styles.css, because how many a report needs is a property of the
@@ -240,8 +238,7 @@ def _app_data(report: ReportData) -> dict[str, object]:
 
     Not the whole report: everything the page displays is already rendered into
     the markup, and a second copy of every step, traceback and attachment
-    payload was the biggest single thing in a large report's HTML. Adding a
-    field to `reportApp` means adding it here."""
+    payload was the biggest single thing in a large report's HTML."""
     return {
         'metadata': {'timestamp': report.metadata.timestamp},
         'glossary': (
@@ -371,7 +368,7 @@ def _render_narration_part(
         case NarrationValue(rendered=rendered):
             return f'<span class="value-highlight">{escape(rendered)}</span>'
         case NarrationPlaceholder(name=name, column_id=column_id):
-            color_idx = param_color_map.get(name, 0)
+            color_idx = param_color_map[name]
             label = placeholder_token(part)
             # `data-param` keys the hover highlight and carries the column *id*
             # — two steps can interpolate the same expression with different

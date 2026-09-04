@@ -40,9 +40,9 @@ def _term(kind, name):
 @pytest.fixture
 def g():
     g = Glossary()
-    g._register(_term('actor', 'Guest'))
-    g._register(_term('object', 'Room'))
-    g._register(_term('verb', 'search'))
+    g.register(_term('actor', 'Guest'))
+    g.register(_term('object', 'Room'))
+    g.register(_term('verb', 'search'))
     return g
 
 
@@ -88,7 +88,7 @@ def test_identity_of_activity_term_ref_kindless_uses_instance_identity(g):
     logic — NOT the verb (term_id, None) path. The returned identity is derived
     from the display string, exactly as for actors and objects."""
     kindless_term = GlossaryTerm(id=TermId('widget'), kind=None, canonical='Widget')
-    g._register(kindless_term)
+    g.register(kindless_term)
     part = ActivityTermRef(term_id=TermId('widget'), display='My Widget')
     expected_instance_id = id_derive('My Widget')
     result = identity_of_part(g, part)

@@ -26,6 +26,7 @@ from ..model import (
     ParamValue,
     RawParamValue,
     Scenario,
+    param_id,
     render_interpolation,
 )
 from .context import Group
@@ -48,16 +49,6 @@ def trivial_format(fmt: Format) -> bool:
     return not conversion and not format_spec
 
 
-def param_id(name: str) -> ColumnId:
-    """The column id a parametrize argname takes.
-
-    Its own function because four places used to spell it: the builder that
-    creates the column, the fill that seeds its cells, and both of
-    `templatize`'s slot paths, which point a placeholder at it by name.
-    """
-    return ColumnId(name)
-
-
 @dataclass
 class ColumnBuilder:
     """The columns and cells a group's walk accumulates, and the group it reads.
@@ -69,8 +60,8 @@ class ColumnBuilder:
     """
 
     group: Group
-    columns: list[ParameterColumn] = field(default_factory=list)
-    cells: dict[ColumnId, dict[NodeId, CellValue]] = field(default_factory=dict)
+    _columns: list[ParameterColumn] = field(default_factory=list)
+    _cells: dict[ColumnId, dict[NodeId, CellValue]] = field(default_factory=dict)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
     _taken_names: set[str] = field(default_factory=set)
 
@@ -82,10 +73,10 @@ class ColumnBuilder:
         values are ordered by `columns`.
         """
         return ParameterTable(
-            columns=self.columns,
+            columns=self._columns,
             cases=[
                 ParameterCase(
-                    values=[self.cell(column.id, case.id) for column in self.columns],
+                    values=[self.cell(column.id, case.id) for column in self._columns],
                     status=case.status,
                     error=case.error,
                 )
@@ -141,12 +132,12 @@ class ColumnBuilder:
             self._counts[kind] = index + 1
             column_id = ColumnId(f'{kind}:{index}')
         column = ParameterColumn(id=column_id, name=self._unique_name(name), kind=kind)
-        self.columns.append(column)
-        self.cells[column_id] = {}
+        self._columns.append(column)
+        self._cells[column_id] = {}
         return column
 
     def set_cell(self, column_id: ColumnId, node_id: NodeId, value: CellValue) -> None:
-        self.cells[column_id][node_id] = value
+        self._cells[column_id][node_id] = value
 
     def cell(self, column_id: ColumnId, node_id: NodeId) -> CellValue:
         """That case's cell, or None where it has none.
@@ -154,7 +145,7 @@ class ColumnBuilder:
         Absence is ordinary: a `derived` column is filled from the comparable
         cases only, so a failed or skipped case has no cell in one.
         """
-        return self.cells[column_id].get(node_id)
+        return self._cells[column_id].get(node_id)
 
     def reads_as(self, column_id: ColumnId, rendered: dict[NodeId, str]) -> bool:
         """Whether every case's cell in *column_id* already prints the way that
@@ -165,7 +156,7 @@ class ColumnBuilder:
         group, so a missing cell is a broken invariant rather than a case that
         bound nothing.
         """
-        cells = self.cells[column_id]
+        cells = self._cells[column_id]
         return all(
             cell_text(cells[node_id]) == text for node_id, text in rendered.items()
         )
@@ -189,21 +180,6 @@ class ColumnBuilder:
             candidate = f'{name} #{suffix}'
         self._taken_names.add(candidate)
         return candidate
-
-
-def _param_value(value: RawParamValue) -> ParamValue:
-    """Coerce a raw parametrize argument into a table cell.
-
-    A glossary term instance unwraps to its display: `str()` on one would store
-    a dataclass repr of the whole `Glossary` in the table and the JSON report.
-    JSON primitives pass through; everything else is its `str()`.
-    """
-    term_ref = try_term_ref(value)
-    if term_ref is not None:
-        return term_ref.display
-    if value is None or isinstance(value, (str, int, float, bool)):
-        return value
-    return str(value)
 
 
 def param_cell_formats(
@@ -241,18 +217,6 @@ def param_cell_formats(
     }
 
 
-def _bound_slot(
-    part: NarrationPart, param_names: list[str]
-) -> tuple[str, Format] | None:
-    """The `param` column this part points at and the formatting it renders
-    with, or None when the part is not a slot bound to one."""
-    if isinstance(part, NarrationValue) and part.expression in param_names:
-        return part.expression, (part.conversion, part.format_spec)
-    if isinstance(part, NarrationPlaceholder) and part.name in param_names:
-        return part.name, (part.conversion, part.format_spec)
-    return None
-
-
 def param_cell(value: RawParamValue, fmt: Format | None) -> ParamValue:
     """One `param` cell: the value rendered the way its placeholders render it,
     or `_param_value`'s plain coercion when they carry no formatting of their
@@ -275,3 +239,30 @@ def cell_text(cell: CellValue) -> str:
     """A cell as the renderers print it — what hover substitutes into a slot."""
     assert not isinstance(cell, Attachment), 'a param column holds no attachment'
     return str(cell)
+
+
+def _param_value(value: RawParamValue) -> ParamValue:
+    """Coerce a raw parametrize argument into a table cell.
+
+    A glossary term instance unwraps to its display: `str()` on one would store
+    a dataclass repr of the whole `Glossary` in the table and the JSON report.
+    JSON primitives pass through; everything else is its `str()`.
+    """
+    term_ref = try_term_ref(value)
+    if term_ref is not None:
+        return term_ref.display
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    return str(value)
+
+
+def _bound_slot(
+    part: NarrationPart, param_names: list[str]
+) -> tuple[str, Format] | None:
+    """The `param` column this part points at and the formatting it renders
+    with, or None when the part is not a slot bound to one."""
+    if isinstance(part, NarrationValue) and part.expression in param_names:
+        return part.expression, (part.conversion, part.format_spec)
+    if isinstance(part, NarrationPlaceholder) and part.name in param_names:
+        return part.name, (part.conversion, part.format_spec)
+    return None

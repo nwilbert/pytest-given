@@ -1,9 +1,5 @@
 """The Glossary view's rollups: per-term instances, surface forms and story
 refs, grouped into the kind headings the template renders.
-
-Its own module rather than a shared `aggregations`, for the reason `slugs.py`
-gives for itself: this shares no input, no output and no vocabulary with the
-story rollups next door.
 """
 
 from collections.abc import Iterator
@@ -24,8 +20,8 @@ from ..model import (
     TermId,
     TermKind,
     iter_steps,
-    plural,
 )
+from .text import plural
 
 
 @dataclass
@@ -95,7 +91,6 @@ class GlossaryView:
 
     groups: list[KindGroup]
     kinds: list[KindTally]
-    counts: dict[KindKey, int]
     term_scenarios: dict[TermId, list[NodeId]]
     undefined_count: int
     all_uncategorized: bool
@@ -163,7 +158,6 @@ def build_glossary_view(report: ReportData) -> GlossaryView:
     return GlossaryView(
         groups=groups,
         kinds=_kind_tallies(counts),
-        counts=counts,
         term_scenarios=crossrefs.term_scenarios,
         undefined_count=sum(1 for term in terms if term.definition is None),
         all_uncategorized=bool(

@@ -97,8 +97,10 @@ def compile_source_link(
             'from a git working tree so `git rev-parse HEAD` can resolve.'
         )
 
+    cwd = Path.cwd()
+
     def substitute(source: SourceLocation) -> str:
-        abspath = (Path.cwd() / source.relpath).resolve().as_posix()
+        abspath = (cwd / source.relpath).resolve().as_posix()
         return template.format(
             path=abspath,
             relpath=source.relpath,

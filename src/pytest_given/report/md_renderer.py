@@ -4,7 +4,6 @@ import re
 from pathlib import Path
 
 from ..model import (
-    STATUS_GLYPH,
     Attachment,
     AttachmentRef,
     CellValue,
@@ -25,6 +24,8 @@ from ..model import (
     node_base,
     placeholder_token,
 )
+from .palette import STATUS_GLYPH
+from .text import plural
 
 
 def render_md(report: ReportData) -> str:
@@ -41,7 +42,7 @@ def _scenario_md(scenario: Scenario) -> str:
     if scenario.status == 'skipped':
         suffix = ' · skipped'
     elif scenario.parameters is not None:
-        suffix = f' · {len(scenario.parameters.cases)} cases'
+        suffix = f' · {plural(len(scenario.parameters.cases), "case")}'
     lines = [f'## {glyph} {_narration_md(scenario.narration)}{suffix}']
     subtitle = f'`{_source_md(scenario)}`'
     if scenario.tags:

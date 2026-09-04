@@ -1,3 +1,11 @@
+"""The leaf: the report schema, its serde, and the text rules packages that
+cannot import each other still have to agree on.
+
+Imports nothing else in the package — `capture`, `lint`, `report` and
+`grouping` all depend on this, so anything landing here is reachable from every
+one of them.
+"""
+
 from .errors import PytestGivenError, PytestGivenWarning, placeholder_mismatch
 from .narration import (
     narration_of,
@@ -13,7 +21,8 @@ from .runtime import (
     RawParamValue,
 )
 from .schema import (
-    STATUS_GLYPH,
+    CONTENT_TYPES,
+    PHASES,
     Activity,
     ActivityId,
     ActivityPart,
@@ -57,6 +66,7 @@ from .schema import (
     case_suffix,
     location_suffix,
     node_base,
+    param_id,
 )
 from .serde import report_from_dict, report_to_dict
 from .steps import (
@@ -66,11 +76,12 @@ from .steps import (
     iter_steps,
     walk_steps,
 )
-from .text import EMPHASIS, id_derive, plural
+from .text import EMPHASIS, derived_id, id_derive
 
 __all__ = [
+    'CONTENT_TYPES',
     'EMPHASIS',
-    'STATUS_GLYPH',
+    'PHASES',
     'Activity',
     'ActivityId',
     'ActivityPart',
@@ -119,6 +130,7 @@ __all__ = [
     'TermKind',
     'TracebackFrame',
     'case_suffix',
+    'derived_id',
     'id_derive',
     'iter_narrations',
     'iter_steps',
@@ -126,10 +138,10 @@ __all__ = [
     'narration_of',
     'narration_text',
     'node_base',
+    'param_id',
     'placeholder_mismatch',
     'placeholder_token',
     'placeholder_value',
-    'plural',
     'rebuilt',
     'render_interpolation',
     'report_from_dict',

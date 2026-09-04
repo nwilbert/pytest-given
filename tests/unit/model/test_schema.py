@@ -2,7 +2,8 @@ import dataclasses
 
 import pytest
 
-from pytest_given.capture import FixtureRecording, RecordingState
+from pytest_given.capture import FixtureRecording
+from pytest_given.capture.collector import RecordingState
 from pytest_given.model import (
     Activity,
     ActivityId,
@@ -348,7 +349,7 @@ def test_a_glossary_is_identified_by_object_not_by_value() -> None:
 def test_glossary_register_appends_and_indexes() -> None:
     g = Glossary()
     t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
-    g._register(t)
+    g.register(t)
     assert g.terms == [t]
     assert g.get(TermId('guest')) is t
     assert g.get(TermId('missing')) is None
@@ -356,15 +357,15 @@ def test_glossary_register_appends_and_indexes() -> None:
 
 def test_glossary_register_rejects_id_collision() -> None:
     g = Glossary()
-    g._register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
+    g.register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
     with pytest.raises(AssertionError, match='already registered'):
-        g._register(GlossaryTerm(id=TermId('x'), kind='verb', canonical='X'))
+        g.register(GlossaryTerm(id=TermId('x'), kind='verb', canonical='X'))
 
 
 def test_glossary_index_excluded_from_repr() -> None:
     """The index is derived from `terms`; showing it would double every term."""
     g = Glossary()
-    g._register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
+    g.register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
     assert '_by_id' not in repr(g)
 
 
@@ -416,7 +417,7 @@ def test_report_data_defaults_glossary_none_and_stories_empty() -> None:
 
 def test_report_data_accepts_glossary_and_stories() -> None:
     g = Glossary()
-    g._register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
+    g.register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
     rd = ReportData(metadata=_meta(), glossary=g, stories=[])
     assert rd.glossary is g
 

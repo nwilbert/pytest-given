@@ -10,6 +10,7 @@ from pytest_given.grouping import (
     checks,
     columns,
     group_parametrized,
+    step_shape,
     templatize,
 )
 from pytest_given.grouping.context import build_group
@@ -48,16 +49,14 @@ def _promotion(param_names: list[str]) -> columns.ColumnBuilder:
     return columns.ColumnBuilder.for_params(group, {})
 
 
-def test_templatize_scenario_name_rejects_unknown_placeholder() -> None:
-    """Safety-net guard: a NarrationPlaceholder whose name isn't a parametrize
-    column raises. Defense in depth on top of the collection-time hook, which
-    catches Template placeholders in scenario names (and step text from
-    Template can't happen since given/when/then reject Template). The runtime
-    guard covers any future code path that might construct parts directly."""
+def test_templatize_scenario_name_asserts_on_unknown_placeholder() -> None:
+    """An invariant, not a user error: collection validated these placeholders
+    already, and does it with a locator this code path cannot reproduce. A
+    future path that built parts directly should fail loudly here."""
     narration = Narration(
         text='', parts=(NarrationPlaceholder(name='cup_zize', column_id='cup_zize'),)
     )
-    with pytest.raises(PytestGivenError, match='cup_zize'):
+    with pytest.raises(AssertionError, match='cup_zize'):
         templatize.templatize_scenario_name(narration, _promotion(['cup_size']))
 
 
@@ -1854,12 +1853,10 @@ def test_a_label_present_in_one_case_only_raises_rule_five() -> None:
         pytest.raises(PytestGivenError) as excinfo,
     ):
         group_parametrized(scenarios, info)
-    with then('the error names the label and asks for a constant one'):
+    with then('the error names the label, the case, and asks for a constant one'):
         message = str(excinfo.value)
-        assert (
-            "attachment label 'vanilla log' in 'test_brew' is attached in some"
-            in message
-        )
+        assert "attachment label 'vanilla log' in 'test_brew' is attached in" in message
+        assert 'case [' in message
         assert 'attach("<constant>", …).' in message  # pins correction 4
         assert message.endswith('(t.py:12)')
 
@@ -2834,10 +2831,8 @@ def test_detail_text_reads_a_part_that_carries_no_formatting() -> None:
     """`detail` is the `(conversion, format_spec)` pair, absent for a literal
     or a term ref — which the divergence message renders as prose rather than
     unpacking a pair that is not there."""
-    assert (
-        checks._detail_text(checks.PartKey('literal', 'a machine')) == 'no formatting'
-    )
-    assert (
-        checks._detail_text(checks.PartKey('value', 'n', (None, ''))) == 'no formatting'
-    )
-    assert checks._detail_text(checks.PartKey('value', 'n', ('r', '>5'))) == '!r:>5'
+    detail_text = step_shape._detail_text
+    key = step_shape.PartKey
+    assert detail_text(key('literal', 'a machine')) == 'no formatting'
+    assert detail_text(key('value', 'n', (None, ''))) == 'no formatting'
+    assert detail_text(key('value', 'n', ('r', '>5'))) == '!r:>5'

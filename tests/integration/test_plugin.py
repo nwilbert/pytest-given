@@ -380,6 +380,34 @@ def test_a_mutated_parametrize_value_is_captured_as_it_was_at_setup(pytester, tm
 
 
 @scenario(
+    t'A refusal on a run with no sink does not claim a {pg["Report"].low} was skipped',
+    tags=['validation'],
+)
+def test_a_grouping_error_without_sinks_does_not_say_report_not_written(pytester):
+    """Grouping runs on every session, so a bare `pytest` can be refused with no
+    sink configured. Saying "report not written" there names an outcome the run
+    was never heading for."""
+    with given('a suite whose narration varies across parametrize cases'):
+        suite = """
+            import pytest
+            from pytest_given import scenario, when
+
+            @scenario("Brew")
+            @pytest.mark.parametrize("cup_size", [200, 350])
+            def test_brew(cup_size):
+                with when(f"it brews {cup_size} ml"):
+                    assert cup_size > 0
+            """
+        pytester.makepyfile(suite)
+    with when('the suite runs with no --given-* sink'):
+        result = pytester.runpytest()
+    with then('the refusal is reported without claiming a report was skipped'):
+        assert 'scenario refused' in result.stdout.str()
+        assert 'varies across parametrize cases' in result.stdout.str()
+        assert 'report not written' not in result.stdout.str()
+
+
+@scenario(
     t"A refused run discards the previous run's {pg['Report'].low}",
     tags=['validation'],
 )
@@ -472,11 +500,37 @@ def test_an_unknown_source_link_preset_fails_before_the_suite_runs(pytester):
         result = pytester.runpytest(
             '--given-html=report.html', '--given-source-link=bogus'
         )
-    with then('the run ends as a usage error, naming the preset'):
+    with then('the run ends as a usage error, naming the flag the user typed'):
         assert result.ret == pytest.ExitCode.USAGE_ERROR
-        result.stderr.fnmatch_lines(['*Unknown given_source_link preset*'])
+        result.stderr.fnmatch_lines(['*Unknown --given-source-link preset*'])
     with then('no test ran: the run stopped at configure, before collection'):
         assert 'passed' not in result.stdout.str()
+
+
+@scenario(
+    t'An unknown {pg["Source link"].low} preset in an ini reports the ini name',
+    tags=['validation'],
+)
+def test_an_unknown_source_link_preset_in_an_ini_names_the_ini(pytester):
+    """The flag and the ini feed one resolver, so the error has to name
+    whichever the user actually wrote."""
+    with given('a suite configured through the ini rather than the flag'):
+        pytester.makepyfile(
+            """
+            from pytest_given import scenario, then
+
+            @scenario("Brew")
+            def test_brew():
+                with then("it brews"):
+                    assert True
+            """
+        )
+        pytester.makepyprojecttoml('[tool.pytest]\ngiven_source_link = "bogus"\n')
+    with when('the suite runs with an HTML sink'):
+        result = pytester.runpytest('--given-html=report.html')
+    with then('the error names the ini setting, not a flag the user never typed'):
+        assert result.ret == pytest.ExitCode.USAGE_ERROR
+        result.stderr.fnmatch_lines(['*Unknown given_source_link preset*'])
 
 
 def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):

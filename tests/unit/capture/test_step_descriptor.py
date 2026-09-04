@@ -579,6 +579,26 @@ def test_phase_with_pytest_given_template_as_context_manager_raises(
         set_active_collector(None)
 
 
+@pytest.mark.parametrize('slot', ['when', 'then'])
+def test_when_then_with_pytest_given_template_raises(slot: str) -> None:
+    """`when_then` is a test-body form too, so it rejects a `Template` in either
+    half — it opens its steps through `_open`, which is the door the guard has
+    to sit behind."""
+    texts = {'when': 'the machine brews', 'then': 'coffee comes out'}
+    texts[slot] = Template('a {cup_size} ml cup')
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    set_active_collector(collector)
+    try:
+        with (
+            pytest.raises(PytestGivenError, match='not supported in a test body'),
+            when_then(texts['when'], texts['then']),
+        ):
+            pass
+    finally:
+        set_active_collector(None)
+
+
 def test_decorator_records_step_when_called_inside_scenario() -> None:
     """A @when-decorated plain helper pushes a step on call and pops on return."""
     collector = Collector()

@@ -447,3 +447,43 @@ def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
         # pytest binds exitstatus before sessionfinish, so overwriting it
         # unconditionally would report 5 as a plain 1.
         assert result.ret == pytest.ExitCode.NO_TESTS_COLLECTED
+
+
+@scenario(
+    t'A failure inside the lint keeps the {pg["Report"].low} it was handed',
+    tags=['validation'],
+)
+def test_a_lint_failure_is_reported_and_keeps_the_written_report(pytester):
+    """The lint runs after the sinks are written and owns none of them. Its
+    failure has to reach the terminal summary — an exception out of
+    `pytest_sessionfinish` is a bare traceback with no exit code — without
+    discarding a report that is on disk and correct."""
+    with given('a clean suite and a lint pass that raises'):
+        pytester.makepyfile(CLEAN)
+        # Patched for the duration of the inner sessionfinish only: the module
+        # object is shared with the outer run, whose own lint must still work.
+        pytester.makeconftest(
+            """
+            import pytest
+            from pytest_given.model import PytestGivenError
+            from pytest_given.plugin import session as given_session
+
+            @pytest.hookimpl(wrapper=True, tryfirst=True)
+            def pytest_sessionfinish(session, exitstatus):
+                original = given_session._run_lint
+                def boom(*_args):
+                    raise PytestGivenError('lint exploded')
+                given_session._run_lint = boom
+                try:
+                    return (yield)
+                finally:
+                    given_session._run_lint = original
+            """
+        )
+    with when('the suite runs with an HTML sink'):
+        result = pytester.runpytest('--given-html=report.html', '--given-lint')
+    with then('the failure is summarized rather than raised as a traceback'):
+        assert 'lint exploded' in result.stdout.str()
+        assert result.ret == pytest.ExitCode.TESTS_FAILED
+    with then('the report that was already written is still there'):
+        assert (pytester.path / 'report.html').is_file()

@@ -5,14 +5,14 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given.lint import (
-    DEFAULTS,
-    LintConfig,
-    RawFinding,
-    RuleId,
+from pytest_given.lint import DEFAULTS, LintConfig
+from pytest_given.lint.base import RawFinding, RuleId
+from pytest_given.lint.config import (
     apply_config,
+    parse_ignore_entries,
+    parse_rule_levels,
 )
-from pytest_given.lint.config import parse_ignore_entries, parse_rule_levels
+from pytest_given.lint.runner import RULE_SURFACE
 from pytest_given.model import PytestGivenError, SourceLocation
 
 
@@ -223,3 +223,10 @@ def test_a_rule_scoped_node_id_glob_still_parses_as_rule_scoped() -> None:
 def test_an_unknown_rule_prefix_without_a_node_id_is_still_reported() -> None:
     with pytest.raises(PytestGivenError, match='unknown rule prefix'):
         parse_ignore_entries(['emty-step:some-subject'])
+
+
+def test_every_catalogued_rule_has_a_runner() -> None:
+    """`DEFAULTS` is what `given_lint_rules` validates against and what the doc
+    tables are checked against, so a rule id listed there but wired into no
+    runner would configure, document and lint cleanly while never firing."""
+    assert set(DEFAULTS) == RULE_SURFACE

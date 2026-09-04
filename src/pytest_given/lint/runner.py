@@ -3,10 +3,20 @@
 from pathlib import Path
 
 from ..model import Glossary, Scenario, Story
-from .ast_rules import run_ast_rules
-from .base import Finding
+from .ast_rules import AST_RULE_IDS, run_ast_rules
+from .base import DEFAULTS, Finding, RuleId
 from .config import LintConfig, apply_config
-from .runtime_rules import run_runtime_rules
+from .runtime_rules import RUNTIME_RULE_IDS, run_runtime_rules
+
+# Every rule the two runners actually implement. `DEFAULTS` is what
+# `given_lint_rules` validates against and what the documented rule tables are
+# checked against, so the two sets have to be the same one: a catalogued rule
+# with no runner would configure and document cleanly while never firing.
+RULE_SURFACE: frozenset[RuleId] = AST_RULE_IDS | RUNTIME_RULE_IDS
+
+assert set(DEFAULTS) == RULE_SURFACE, (
+    f'lint rule catalog and runners disagree: {RULE_SURFACE ^ set(DEFAULTS)}'
+)
 
 
 def run_lint(

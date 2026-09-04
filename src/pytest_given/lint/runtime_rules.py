@@ -1,19 +1,19 @@
 """Runtime-surface rules: pure inspection of the recorded report model, no
 source access needed."""
 
-from collections.abc import Container
+from collections.abc import Callable, Container
 from dataclasses import dataclass
 
 from ..model import (
+    PHASES,
     ActivityTermRef,
     Glossary,
     NarrationTermRef,
     NodeId,
-    Phase,
     Scenario,
     Story,
     TermId,
-    id_derive,
+    derived_id,
     iter_narrations,
     iter_steps,
 )
@@ -34,34 +34,37 @@ def run_runtime_rules(
     every story, so computing its findings only to discard them was the bulk
     of the lint's cost on a default run.
     """
-    findings: list[RawFinding] = []
-    if MISSING_PHASE in enabled:
-        findings.extend(_missing_phase_findings(grouped))
-    if glossary is not None:
-        if TAG_SHADOWS_TERM in enabled:
-            findings.extend(_tag_shadows_term_findings(grouped, glossary))
-        if DEAD_TERM in enabled:
-            findings.extend(_dead_term_findings(grouped, glossary, stories))
-    return findings
+    context = _Context(grouped=grouped, glossary=glossary, stories=stories)
+    return [
+        finding
+        for rule, run in _RUNTIME_RULES.items()
+        if rule in enabled
+        for finding in run(context)
+    ]
 
 
-# Canonical Given/When/Then order, used both to test completeness and to
-# report missing phases in reading order rather than alphabetically.
-_PHASE_ORDER: tuple[Phase, ...] = ('given', 'when', 'then')
+@dataclass(frozen=True)
+class _Context:
+    """What every runtime rule reads. `glossary` is None when the run has no
+    glossary at all, which the two term rules treat as nothing to say."""
+
+    grouped: list[Scenario]
+    glossary: Glossary | None
+    stories: list[Story]
 
 
-def _missing_phase_findings(grouped: list[Scenario]) -> list[RawFinding]:
+def _missing_phase_findings(context: _Context) -> list[RawFinding]:
     """Rule `missing-phase`: a passed scenario lacks a Given, When, or Then.
 
     Non-passed scenarios are skipped — a skipped one records no steps and a
     failed one may be missing a phase only because it aborted mid-body.
     """
     findings: list[RawFinding] = []
-    for scenario in grouped:
+    for scenario in context.grouped:
         if scenario.status != 'passed':
             continue
         present = {step.phase for step in iter_steps(scenario.steps)}
-        missing = [phase for phase in _PHASE_ORDER if phase not in present]
+        missing = [phase for phase in PHASES if phase not in present]
         if missing:
             findings.append(
                 RawFinding(
@@ -87,24 +90,23 @@ class _ShadowingTag:
     scenarios: int = 1
 
 
-def _tag_shadows_term_findings(
-    grouped: list[Scenario], glossary: Glossary
-) -> list[RawFinding]:
+def _tag_shadows_term_findings(context: _Context) -> list[RawFinding]:
     """Rule `tag-shadows-term`: a scenario tag duplicates a glossary term.
 
     One finding per unique tag (subject = tag slug) — the fix is renaming the
     tag once, and per-scenario findings would be pure repetition.
     """
+    if context.glossary is None:
+        return []
+    grouped, glossary = context.grouped, context.glossary
     shadowing: dict[TermId, _ShadowingTag] = {}
     for scenario in grouped:
         for tag in scenario.tags:
-            # Tags are stored as written, and `id_derive` raises on a name it
-            # cannot slugify — which from here would escape as a bare
-            # traceback. A tag with no derivable slug also cannot collide with
-            # a term id, so there is nothing to check.
-            if not _slugifiable(tag):
+            # A tag with no derivable slug cannot collide with a term id.
+            derived = derived_id(tag)
+            if derived is None:
                 continue
-            slug = TermId(id_derive(tag))
+            slug = TermId(derived)
             if glossary.get(slug) is None:
                 continue
             seen = shadowing.get(slug)
@@ -132,12 +134,13 @@ def _tag_shadows_term_findings(
     return findings
 
 
-def _dead_term_findings(
-    grouped: list[Scenario], glossary: Glossary, stories: list[Story]
-) -> list[RawFinding]:
+def _dead_term_findings(context: _Context) -> list[RawFinding]:
     """Rule `dead-term`: a glossary term is referenced by no step and no
     story. Default `off`: for a file-backed glossary, unreferenced terms are
     often intentionally present (documented behavior)."""
+    if context.glossary is None:
+        return []
+    grouped, glossary, stories = context.grouped, context.glossary, context.stories
     referenced: set[TermId] = set()
     for scenario in grouped:
         for narration in iter_narrations(scenario):
@@ -162,6 +165,13 @@ def _dead_term_findings(
     ]
 
 
-def _slugifiable(name: str) -> bool:
-    """Whether `id_derive` will return a slug for `name` rather than raise."""
-    return any(char.isascii() and char.isalnum() for char in name)
+# Keyed by rule id so `run_runtime_rules` can skip a disabled rule without
+# evaluating it — `dead-term` walks every narration part and every activity
+# path, which was the bulk of the lint's cost on a default run.
+_RUNTIME_RULES: dict[RuleId, Callable[[_Context], list[RawFinding]]] = {
+    MISSING_PHASE: _missing_phase_findings,
+    TAG_SHADOWS_TERM: _tag_shadows_term_findings,
+    DEAD_TERM: _dead_term_findings,
+}
+
+RUNTIME_RULE_IDS = frozenset(_RUNTIME_RULES)

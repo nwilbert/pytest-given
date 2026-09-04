@@ -17,6 +17,8 @@ from typing import Any, cast
 
 from .errors import PytestGivenError
 from .schema import (
+    CONTENT_TYPES,
+    PHASES,
     Activity,
     ActivityId,
     ActivityPart,
@@ -29,7 +31,6 @@ from .schema import (
     CellValue,
     ColumnId,
     ColumnKind,
-    ContentType,
     ErrorInfo,
     Glossary,
     GlossaryTerm,
@@ -44,7 +45,6 @@ from .schema import (
     ParameterCase,
     ParameterColumn,
     ParameterTable,
-    Phase,
     ReportData,
     Scenario,
     SourceLocation,
@@ -79,13 +79,27 @@ def _asdict_filtered(obj: Any) -> Any:
     return obj
 
 
-def report_from_dict(d: dict[str, Any]) -> ReportData:
-    return ReportData(
-        metadata=_metadata_from_dict(d['metadata']),
-        scenarios=[_scenario_from_dict(s) for s in d['scenarios']],
-        stories=[_story_from_dict(s) for s in d.get('stories', [])],
-        glossary=_glossary_from_dict(d.get('glossary')),
-    )
+def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData:
+    """Rebuild a report from its serialized form.
+
+    A dict that is not one raises `PytestGivenError`, not the bare `KeyError`
+    or `TypeError` that reaching for a missing field produces. `source` names
+    where the dict came from, for the caller that read it from somewhere the
+    user can point at.
+    """
+    try:
+        return ReportData(
+            metadata=_metadata_from_dict(d['metadata']),
+            scenarios=[_scenario_from_dict(s) for s in d['scenarios']],
+            stories=[_story_from_dict(s) for s in d.get('stories', [])],
+            glossary=_glossary_from_dict(d.get('glossary')),
+        )
+    except (AttributeError, KeyError, TypeError) as error:
+        raise PytestGivenError(
+            f'{source + " is" if source else "input is"} not a pytest-given '
+            f'report, or was written by an incompatible version '
+            f'({type(error).__name__}: {error}).'
+        ) from error
 
 
 def _metadata_from_dict(d: dict[str, Any]) -> Metadata:
@@ -183,7 +197,7 @@ def _step_from_dict(d: dict[str, Any]) -> Step:
     An old report's `"status": "passed"` is noise to discard, not data to
     migrate.
     """
-    phase: Phase = d['phase']
+    phase = _literal(d['phase'], PHASES, 'step phase')
     return Step(
         phase=phase,
         narration=_narration_from_dict(d['narration']),
@@ -198,7 +212,9 @@ def _step_attachment_from_dict(d: dict[str, Any]) -> StepAttachment:
     """A promoted attachment carries no `content` — only a pointer to its column."""
     if 'content' in d:
         return _attachment_from_dict(d)
-    content_type: ContentType = d.get('content_type', 'text')
+    content_type = _literal(
+        d.get('content_type', 'text'), CONTENT_TYPES, 'attachment content type'
+    )
     return AttachmentRef(
         label=d['label'],
         content_type=content_type,
@@ -207,7 +223,9 @@ def _step_attachment_from_dict(d: dict[str, Any]) -> StepAttachment:
 
 
 def _attachment_from_dict(d: dict[str, Any]) -> Attachment:
-    content_type: ContentType = d.get('content_type', 'text')
+    content_type = _literal(
+        d.get('content_type', 'text'), CONTENT_TYPES, 'attachment content type'
+    )
     return Attachment(
         label=AttachmentLabel(d['label']),
         content=d['content'],
@@ -249,7 +267,7 @@ def _param_table_from_dict(d: dict[str, Any] | None) -> ParameterTable | None:
 def _literal[T: str](value: object, allowed: tuple[T, ...], field: str) -> T:
     """`value` as one of `allowed`, or a `PytestGivenError` naming the field.
 
-    The `Status` / `TermKind` / `ColumnKind` annotations below are erased at
+    The `Status` / `Phase` / `TermKind` / `ColumnKind` annotations are erased at
     runtime, so this is the only thing standing between a hand-edited report
     and a renderer indexing a lookup table with an unknown string — which used
     to surface as a bare `KeyError` from inside the glyph map or the kind

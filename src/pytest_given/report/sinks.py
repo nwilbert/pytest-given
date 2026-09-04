@@ -25,6 +25,12 @@ from ..model import PytestGivenError, report_from_dict
 from .html_renderer import render_html_string
 from .md_renderer import render_md
 
+# Where a bare --given-json / --given-html / `pytest-given report` writes.
+# Report-layout facts, so both entry points read them from here rather than
+# each spelling their own.
+DEFAULT_JSON_PATH = Path('given-report/report-data.json')
+DEFAULT_HTML_PATH = Path('given-report/report.html')
+
 
 @dataclass(frozen=True)
 class SinkConfig:
@@ -91,7 +97,9 @@ class RenderedSinks:
     md_stdout: str | None = None
 
 
-def emit_sinks(report_dict: dict[str, Any], config: SinkConfig) -> RenderedSinks:
+def emit_sinks(
+    report_dict: dict[str, Any], config: SinkConfig, source: str | None = None
+) -> RenderedSinks:
     """Render and write every configured sink, or leave none of them behind.
 
     Rendering can fail on content and writing can fail on the filesystem, and
@@ -103,16 +111,24 @@ def emit_sinks(report_dict: dict[str, Any], config: SinkConfig) -> RenderedSinks
     the failure by printing it.
     """
     try:
-        rendered = render_sinks(report_dict, config)
+        rendered = render_sinks(report_dict, config, source)
         write_sinks(rendered)
     except (PytestGivenError, OSError) as error:
         raise PytestGivenError(
             '\n'.join([str(error), *discard_stale_sinks(config)])
         ) from error
+    except Exception:
+        # A renderer bug (an undefined template name, a missing color key) is
+        # not a user error and keeps its own traceback — but it fails the same
+        # way for the stale report on disk, which must still go.
+        discard_stale_sinks(config)
+        raise
     return rendered
 
 
-def render_sinks(report_dict: dict[str, Any], config: SinkConfig) -> RenderedSinks:
+def render_sinks(
+    report_dict: dict[str, Any], config: SinkConfig, source: str | None = None
+) -> RenderedSinks:
     """Render the configured sinks to text. Nothing here touches the filesystem.
 
     Takes only the serialized report and deserializes it here, so the JSON sink
@@ -120,7 +136,7 @@ def render_sinks(report_dict: dict[str, Any], config: SinkConfig) -> RenderedSin
     been through serde — every sink then shows exactly what the JSON can
     express, and no caller has to keep two views of one run in agreement.
     """
-    report = report_from_dict(report_dict)
+    report = report_from_dict(report_dict, source)
     files: list[RenderedFile] = []
     if config.json_path is not None:
         files.append(RenderedFile(config.json_path, json.dumps(report_dict, indent=2)))

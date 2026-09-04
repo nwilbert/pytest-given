@@ -124,7 +124,7 @@ def activity(
         paths = tuple(p for p in parts_or_paths if isinstance(p, ActivityPath))
     else:
         paths = (path(*parts_or_paths),)  # type: ignore[arg-type]
-    glossaries = _union(pinned_glossaries(p) for p in paths)
+    glossaries = union_glossaries(pinned_glossaries(p) for p in paths)
     if activity_id == 0:
         raise PytestGivenError(
             'activity(activity_id=0) is reserved as the unset sentinel; '
@@ -138,7 +138,8 @@ def activity(
     )
 
 
-def _union(pins: Iterable[frozenset[Glossary]]) -> frozenset[Glossary]:
+def union_glossaries(pins: Iterable[frozenset[Glossary]]) -> frozenset[Glossary]:
+    """The distinct glossaries a group of pins reaches."""
     return frozenset[Glossary]().union(*pins)
 
 
@@ -189,7 +190,7 @@ def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     _register_story(sid, title, source)
     numbered = _assign_sequence_numbers(tuple(activities))
     _check_unique_ids(numbered)
-    glossaries = _union(pinned_glossaries(a) for a in numbered)
+    glossaries = union_glossaries(pinned_glossaries(a) for a in numbered)
     _check_single_glossary(title, glossaries)
     return _PinnedStory(
         id=sid,

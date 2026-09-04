@@ -6,10 +6,13 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from ..model import PytestGivenError, report_from_dict
-from ..report import SinkConfig, emit_sinks, resolve_source_link_template
-
-DEFAULT_HTML_OUTPUT = Path('given-report/report.html')
+from ..model import PytestGivenError
+from ..report import (
+    DEFAULT_HTML_PATH,
+    SinkConfig,
+    emit_sinks,
+    resolve_source_link_template,
+)
 
 
 def add_report_parser(
@@ -58,7 +61,7 @@ def run_report(args: argparse.Namespace) -> int:
         return 1
     try:
         config = _sink_config(args.output, args.source_link, args.format)
-        rendered = emit_sinks(_load_report(json_file), config)
+        rendered = emit_sinks(_load_report(json_file), config, str(json_file))
     except json.JSONDecodeError as error:
         print(f'Error: {json_file} is not valid JSON — {error}', file=sys.stderr)
         return 1
@@ -73,26 +76,13 @@ def run_report(args: argparse.Namespace) -> int:
 
 
 def _load_report(json_file: Path) -> dict[str, Any]:
-    """Read the input file and check that it really is a report.
+    """The input file as a dict. `report_from_dict` downstream is what rejects
+    a dict that is not a report.
 
-    The rendering path deserializes the dict itself, so the copy built here is
-    discarded — it is a shape check, not a conversion. Doing it as its own step
-    keeps the check tight around serde: the same builtins raised later by a
-    *renderer* stay visible as the bugs they would be, rather than being
-    reported as a malformed input file.
-
-    An `OSError` here is the caller's problem too, not a bug: `exists()` is
-    true for a directory, and both the bundled assets and the Jinja templates
-    are read during render.
+    An `OSError` here is the caller's problem, not a bug: `exists()` is true
+    for a directory.
     """
     report_dict: dict[str, Any] = json.loads(json_file.read_text(encoding='utf-8'))
-    try:
-        report_from_dict(report_dict)
-    except (AttributeError, KeyError, TypeError) as error:
-        raise PytestGivenError(
-            f'{json_file} is not a pytest-given report, or was written by an '
-            f'incompatible version ({type(error).__name__}: {error}).'
-        ) from error
     return report_dict
 
 
@@ -110,7 +100,7 @@ def _sink_config(output: Path | None, source_link: str, fmt: str | None) -> Sink
     if (fmt or _infer_format(output)) == 'md':
         return SinkConfig(md_path=output, md_to_stdout=output is None)
     return SinkConfig(
-        html_path=output or DEFAULT_HTML_OUTPUT,
+        html_path=output or DEFAULT_HTML_PATH,
         source_link_template=source_link_template,
     )
 

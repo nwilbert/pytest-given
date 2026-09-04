@@ -8,57 +8,29 @@ fire from the baseline walk, which is where the offending part is in hand.
 
 from collections.abc import Iterable, Iterator
 from collections.abc import Set as AbstractSet
-from typing import NamedTuple
 
 from ..model import (
-    ActivityId,
     AttachmentLabel,
-    Narration,
-    NarrationLiteral,
-    NarrationPart,
-    NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
+    NodeId,
     Phase,
     PytestGivenError,
     RawParamValue,
     Scenario,
     Step,
-    StepPath,
     case_suffix,
     location_suffix,
     node_base,
     render_interpolation,
 )
-from .columns import Format
 from .context import Group, PartSite
-
-
-class StepSignature(NamedTuple):
-    """What a grouped tree requires every case's step to share: where it sits,
-    its phase, and the activities it claims."""
-
-    path: StepPath
-    phase: Phase
-    activity_ids: tuple[ActivityId, ...]
-
-
-def _shape(indexed: Iterable[tuple[StepPath, Step]]) -> list[StepSignature]:
-    """A case's tree reduced to what a grouped tree must share: where each step
-    sits, its phase, and the activities it claims.
-
-    Paths carry the nesting, so this needs no recursion — a `walk_steps`
-    mapping is already DFS pre-order.
-
-    `activity_ids` is in here because `activity=` is a per-call argument, so
-    `given(t'…', activity=a if flag else b)` gives two cases genuinely
-    different ids at one path. The grouped tree keeps a single set, and
-    `report.coverage` reads exactly that field to credit story coverage — the
-    same lie rule 4 refuses a varying term ref to prevent.
-    """
-    return [
-        StepSignature(path, step.phase, step.activity_ids) for path, step in indexed
-    ]
+from .step_shape import (
+    _narration_difference,
+    _part_key,
+    _shape,
+    _structure,
+)
 
 
 def check_same_template(group: Group) -> None:
@@ -131,79 +103,12 @@ def _varying_str_error(step: Step, group: Group) -> PytestGivenError:
     return _grouping_error(
         group,
         f'step narration in {_test_name(group.anchor)!r} varies across '
-        f'parametrize cases but records no parts — a plain str bakes '
-        f"case 1's values (an f-string is the usual cause). Use a "
-        f't-string: {step.phase}(t"…").',
+        f'parametrize cases but records no parts — a plain str bakes case '
+        f"{case_suffix(group.baseline.id)}'s values (an f-string is the usual "
+        f'cause). Use a t-string: {step.phase}(t"…"), or '
+        f'@scenario(..., group_parametrized=False) to emit one scenario per '
+        f'case.',
     )
-
-
-def _narration_difference(baseline_keys: list[PartKey], case: Narration) -> str | None:
-    """How the case's narration differs from the baseline's keys as a template,
-    or None when they agree."""
-    case_keys = [_part_key(part) for part in case.parts]
-    if [key.kind for key in baseline_keys] != [key.kind for key in case_keys]:
-        return 'a differently shaped narration'
-    for baseline_key, case_key in zip(baseline_keys, case_keys, strict=True):
-        if baseline_key == case_key:
-            continue
-        if baseline_key.label == case_key.label:
-            # Same kind, same label: what differs is the `detail` — the
-            # conversion and format spec — so naming the labels would quote
-            # the same string twice.
-            return (
-                f'a different formatting of {baseline_key.label!r} '
-                f'({_detail_text(baseline_key)} vs {_detail_text(case_key)})'
-            )
-        if baseline_key.kind == 'literal':
-            return f'different wording ({baseline_key.label!r} vs {case_key.label!r})'
-        return f'a different expression ({baseline_key.label!r} vs {case_key.label!r})'
-    return None
-
-
-def _detail_text(key: PartKey) -> str:
-    """A part's conversion and format spec as an author wrote them."""
-    if key.detail is None:
-        return 'no formatting'
-    conversion, format_spec = key.detail
-    return (
-        f'{"!" + conversion if conversion else ""}'
-        f'{":" + format_spec if format_spec else ""}'
-    ) or 'no formatting'
-
-
-class PartKey(NamedTuple):
-    """What a part contributes to its narration's template: its kind, the text
-    a divergence message names it by, and the rendering details that must match
-    without being worth naming."""
-
-    kind: str
-    label: str
-    detail: Format | None = None
-
-
-def _part_key(part: NarrationPart) -> PartKey:
-    """A part reduced to its template.
-
-    Never `rendered`, which is exactly what grouping promotes into a column,
-    and never a term ref's `display` — rule 4 governs that, and names it as the
-    authoring error it is where a template divergence would only report that
-    two cases disagree.
-    """
-    match part:
-        case NarrationLiteral(value=value):
-            return PartKey('literal', value)
-        case NarrationValue(expression=e, conversion=c, format_spec=f):
-            return PartKey('value', e, (c, f))
-        case NarrationPlaceholder(name=n, conversion=c, format_spec=f):
-            return PartKey('placeholder', n, (c, f))
-        case NarrationTermRef(expression=expression):
-            return PartKey('term', expression)
-
-
-def _structure(signature: list[StepSignature]) -> list[tuple[StepPath, Phase]]:
-    """The signature without its activities — where the steps sit and what
-    phase each is."""
-    return [(step.path, step.phase) for step in signature]
 
 
 def _varying_activity_error(case: Scenario, group: Group) -> PytestGivenError:
@@ -315,7 +220,7 @@ def _reformat(value: RawParamValue, part: NarrationValue) -> str | None:
 
 def check_attachment_labels(
     baseline: AbstractSet[AttachmentLabel],
-    others: Iterable[AbstractSet[AttachmentLabel]],
+    others: Iterable[tuple[NodeId, AbstractSet[AttachmentLabel]]],
     group: Group,
 ) -> None:
     """Rule 5: a step whose set of attachment labels differs across cases.
@@ -328,18 +233,21 @@ def check_attachment_labels(
 
     Takes label *sets* rather than the maps the promotion walk grouped: those
     keys are all this reads, and asking for the whole map is what made this
-    module know the shape of an attachment store it never opens.
+    module know the shape of an attachment store it never opens. Each set
+    arrives with its case id so the message can name the case, as every other
+    refusal does.
     """
-    for other in others:
+    for case_id, other in others:
         differing = sorted(baseline ^ other)
         if not differing:
             continue
         raise _grouping_error(
             group,
             f'attachment label {differing[0]!r} in {_test_name(group.anchor)!r} is '
-            f'attached in some parametrize cases but not others — a label names '
-            f'the payload and must read the same in every case. Use a constant '
-            f'label and let the content vary: attach("<constant>", …).',
+            f'attached in case {case_suffix(case_id)} but not case '
+            f'{case_suffix(group.baseline.id)} (or the other way round) — a label '
+            f'names the payload and must read the same in every case. Use a '
+            f'constant label and let the content vary: attach("<constant>", …).',
         )
 
 

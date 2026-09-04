@@ -16,6 +16,16 @@ from typing import Literal, NewType
 ColumnId = NewType('ColumnId', str)
 
 
+def param_id(name: str) -> ColumnId:
+    """The column id a parametrize argname takes.
+
+    Both packages that mint one derive it the same way and cannot import each
+    other: `capture` points a placeholder at a column it has not seen yet,
+    `grouping` creates that column later and has to land on the same id.
+    """
+    return ColumnId(name)
+
+
 @dataclass(frozen=True, kw_only=True)
 class NarrationLiteral:
     value: str
@@ -185,7 +195,7 @@ class Glossary:
     """
 
     # Public and mutable because the reflective serializer reads it by name.
-    # `_register` and the constructor are the only writers, and both keep the
+    # `register` and the constructor are the only writers, and both keep the
     # index current; rebuild by constructing rather than by mutating in place.
     terms: list[GlossaryTerm] = field(default_factory=list)
     _by_id: dict[TermId, GlossaryTerm] = field(
@@ -198,7 +208,7 @@ class Glossary:
     def get(self, key: TermId) -> GlossaryTerm | None:
         return self._by_id.get(key)
 
-    def _register(self, term: GlossaryTerm) -> None:
+    def register(self, term: GlossaryTerm) -> None:
         assert self.get(term.id) is None, f'term id {term.id!r} already registered'
         self.terms.append(term)
         self._by_id[term.id] = term
@@ -207,17 +217,16 @@ class Glossary:
 # Step phase
 type Phase = Literal['given', 'when', 'then']
 
+# Canonical Given/When/Then order: the alphabet serde validates against and the
+# order the lint reports missing phases in.
+PHASES: tuple[Phase, ...] = ('given', 'when', 'then')
+
 # How a scenario or one parametrize case came out. A `str` here would let a
 # typo ('pass') through every comparison site. Static checking only: serde's
 # `cast` at the JSON boundary is a runtime no-op, so a hand-edited report.json
 # can still carry any string — the glyph lookup falls back and every
 # `== 'passed'` reads false.
 type Status = Literal['passed', 'failed', 'skipped']
-
-# How a status is painted, wherever it is painted. One map rather than a
-# constant in the Markdown renderer and three separately-ordered conditionals
-# in the HTML template, which agreed only by inspection.
-STATUS_GLYPH: dict[Status, str] = {'passed': '✓', 'failed': '✗', 'skipped': '○'}
 
 # A @pytest.mark.parametrize value as captured for the report: JSON primitives
 # pass through; anything else (dates, objects) is coerced to its str() when the
@@ -227,6 +236,8 @@ type ParamValue = str | int | float | bool | None
 
 
 type ContentType = Literal['text', 'json']
+
+CONTENT_TYPES: tuple[ContentType, ...] = ('text', 'json')
 
 
 # What an attachment's payload is called: the plain text an author passes as

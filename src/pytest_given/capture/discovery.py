@@ -11,7 +11,7 @@ from pathlib import Path
 from types import ModuleType
 
 from ..model import Glossary, PytestGivenError, Story
-from .story import pinned_glossaries
+from .story import pinned_glossaries, union_glossaries
 
 
 def resolve_glossary(
@@ -29,9 +29,7 @@ def resolve_glossary(
     the suite that declares a glossary and only ever uses term refs in
     narrations.
     """
-    reaching = frozenset[Glossary]().union(
-        *(pinned_glossaries(story) for story in stories)
-    )
+    reaching = union_glossaries(pinned_glossaries(story) for story in stories)
     if len(reaching) > 1:
         raise PytestGivenError(
             f'stories reach {len(reaching)} distinct Glossary instances; '

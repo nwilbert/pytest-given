@@ -8,7 +8,6 @@ import warnings
 from collections.abc import Iterator
 from contextvars import ContextVar
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import TYPE_CHECKING, Literal, NoReturn
 
 from ..model import (
@@ -29,6 +28,7 @@ from ..model import (
     Story,
     StoryId,
 )
+from .source import PACKAGE_ROOT
 from .template import Template, narration_from
 
 if TYPE_CHECKING:
@@ -76,18 +76,13 @@ def get_active_collector() -> Collector | None:
     return _collector_var.get()
 
 
-def no_scenario_error(action: str) -> PytestGivenError:
+def _no_scenario_error(action: str) -> PytestGivenError:
     """The single wording for "nothing is being recorded right now".
 
     An idle collector and no collector at all are the same situation to the
     author, so they say the same sentence.
     """
     return PytestGivenError(f'Cannot {action} — no active scenario or fixture.')
-
-
-# Every frame under here is ours, so `warnings.warn` reports the user's own
-# line without any call site counting frames to it.
-_PACKAGE_ROOT = f'{Path(__file__).parent.parent}/'
 
 
 def recording_collector(
@@ -116,13 +111,13 @@ def recording_collector(
         warnings.warn(
             _unannotated_warning(kind, subject),
             PytestGivenWarning,
-            skip_file_prefixes=(_PACKAGE_ROOT,),
+            skip_file_prefixes=(PACKAGE_ROOT,),
         )
         return None
     action = f'attach {subject!r}' if kind == 'attach' else f"enter '{kind}: {subject}'"
     if collector is not None:
         collector.refuse_recording(action)
-    raise no_scenario_error(action)
+    raise _no_scenario_error(action)
 
 
 def _unannotated_warning(kind: Phase | Literal['attach'], subject: str) -> str:
@@ -372,11 +367,13 @@ class Collector:
         )
         if stack:
             stack[-1].children.append(step)
-        elif self._state == 'test':
-            # `refuse_recording` has ruled out idle and teardown, so a
-            # recordable 'test' state always has a scenario. Asserted rather
-            # than re-tested: the step is already on the stack, so a miss
-            # would drop it from the report silently.
+        else:
+            # A fixture recording seeds its own stack, so an empty one means
+            # 'test' — and `refuse_recording` has ruled out idle and teardown,
+            # so that state always has a scenario. Asserted rather than
+            # re-tested: the step is already on the stack, so a miss would drop
+            # it from the report silently.
+            assert self._state == 'test', self._state
             assert self._current_scenario is not None
             self._current_scenario.steps.append(step)
         stack.append(step)
@@ -462,7 +459,7 @@ class Collector:
                 f'Cannot {action} from fixture teardown — teardown is '
                 'technical, not narrative.'
             )
-        raise no_scenario_error(action)
+        raise _no_scenario_error(action)
 
     def _target_stack(self) -> list[Step]:
         if self._state == 'fixture_setup' and self._active_recording is not None:

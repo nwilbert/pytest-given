@@ -222,6 +222,22 @@ def test_attachment_renders_under_step() -> None:
     assert '  - 📎 State — `{"n": 9}`' in md
 
 
+def test_single_case_heading_says_one_case_not_one_cases() -> None:
+    """A one-value parametrize is still grouped, so the count reaches the
+    heading and has to agree with its noun."""
+    scn = Scenario(
+        id='tests/t.py::test_price',
+        narration=Narration(text='Pricing'),
+        module='tests/t.py',
+        steps=[Step(phase='when', narration=Narration(text='insert'))],
+        parameters=ParameterTable(
+            columns=[ParameterColumn(id='euros', name='euros', kind='param')],
+            cases=[ParameterCase(values=[1], status='passed')],
+        ),
+    )
+    assert '## \u2713 Pricing \u00b7 1 case\n' in render_md(_report(scn))
+
+
 @scenario(
     t'A {pg["Parametrized scenario"].low} renders its {pg["Parameter table"].low}',
     tags=['parametrization'],

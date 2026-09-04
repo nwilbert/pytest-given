@@ -42,7 +42,9 @@ def templatize_attachments(
         for case in builder.group.comparable
     }
     check_attachment_labels(
-        baseline.keys(), [other.keys() for other in others.values()], builder.group
+        baseline.keys(),
+        [(case_id, other.keys()) for case_id, other in others.items()],
+        builder.group,
     )
 
     out: list[StepAttachment] = []

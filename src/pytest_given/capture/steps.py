@@ -38,6 +38,66 @@ from .template import (
 )
 
 
+def given(
+    text: StepText,
+    *,
+    activity: int | Sequence[int] | None = None,
+) -> StepDescriptor:
+    """Create a Given step (context manager or decorator)."""
+    return StepDescriptor('given', text, activity_ids=normalize_activity(activity))
+
+
+def when(
+    text: StepText,
+    *,
+    activity: int | Sequence[int] | None = None,
+) -> StepDescriptor:
+    """Create a When step (context manager or decorator)."""
+    return StepDescriptor('when', text, activity_ids=normalize_activity(activity))
+
+
+def then(
+    text: StepText,
+    *,
+    activity: int | Sequence[int] | None = None,
+) -> StepDescriptor:
+    """Create a Then step (context manager or decorator)."""
+    return StepDescriptor('then', text, activity_ids=normalize_activity(activity))
+
+
+def when_then(
+    when_text: StepText,
+    then_text: StepText,
+) -> WhenThen:
+    """Pair a When action with its Then outcome as two sibling steps."""
+    return WhenThen(when_text, then_text)
+
+
+def attach(label: str, content: object) -> None:
+    """Attach data to the current step.
+
+    *label* is plain text — an f-string is the way to vary it. If *content* is a
+    ``str`` it is stored verbatim; any other type is serialized as indented JSON.
+    """
+    if not isinstance(label, str):
+        raise PytestGivenError(
+            'attachment labels are plain text; f-strings are fine — '
+            'attach(f"{kind} log", …). In a parametrized scenario keep the '
+            'label the same in every case and let the content vary.'
+        )
+    collector = recording_collector('attach', label)
+    if collector is None:
+        return
+    if isinstance(content, str):
+        collector.attach(label, content, content_type='text')
+    else:
+        collector.attach(
+            label,
+            json.dumps(content, indent=2, default=str),
+            content_type='json',
+        )
+
+
 @runtime_checkable
 class StepDecorated(Protocol):
     """A function carrying a pytest-given step descriptor.
@@ -48,15 +108,6 @@ class StepDecorated(Protocol):
     """
 
     _step_descriptor: StepDescriptor
-
-
-_TEMPLATE_PARAM_KINDS = frozenset(
-    {
-        inspect.Parameter.POSITIONAL_OR_KEYWORD,
-        inspect.Parameter.KEYWORD_ONLY,
-        inspect.Parameter.POSITIONAL_ONLY,
-    }
-)
 
 
 class StepDescriptor:
@@ -95,14 +146,6 @@ class StepDescriptor:
         return isinstance(self._source, templatelib.Template)
 
     def __enter__(self) -> Self:
-        if self.is_deferred_template:
-            raise PytestGivenError(
-                f'{self.phase}(Template(...)) is not supported in a test body; '
-                f'use a t-string for dynamic values, or a plain string for '
-                f'static labels. Template is for @scenario(...) and helper-'
-                f'function decorators, where deferred substitution is the only '
-                f'sensible option.'
-            )
         return self._open()
 
     def _open(self, pinned_source: SourceLocation | None = None) -> Self:
@@ -111,8 +154,17 @@ class StepDescriptor:
         `when_then` drives both halves from its own frames, so the `then` half
         can no longer be anchored by walking out to user code — it is entered
         from `__exit__`, where the user's line has moved on. It passes the
-        pair's `with` line instead.
+        pair's `with` line instead. Every test-body entry lands here, so the
+        deferred-`Template` refusal sits here rather than in `__enter__`.
         """
+        if self.is_deferred_template:
+            raise PytestGivenError(
+                f'{self.phase}(Template(...)) is not supported in a test body; '
+                f'use a t-string for dynamic values, or a plain string for '
+                f'static labels. Template is for @scenario(...) and helper-'
+                f'function decorators, where deferred substitution is the only '
+                f'sensible option.'
+            )
         collector = recording_collector(self.phase, self.narration.text)
         if collector is None:
             return self
@@ -301,64 +353,6 @@ class StepDescriptor:
         return narration_of(parts)
 
 
-def normalize_activity(
-    activity: int | Sequence[int] | None,
-    kwarg: str = 'activity',
-) -> tuple[ActivityId, ...]:
-    """Normalize an ``activity=`` / ``activities=`` kwarg to ActivityId values.
-
-    `kwarg` names the argument the author actually wrote, so the step form and
-    the scenario form each report their own.
-    """
-    if activity is None:
-        return ()
-    # Each accepting branch excludes the type that would otherwise slip into
-    # it: a bool is an `int` and a str is a `Sequence[int]` to nobody but
-    # `isinstance`. Without the guards `activities='13'` would yield ids 1
-    # and 3 rather than the TypeError it deserves.
-    if isinstance(activity, int) and not isinstance(activity, bool):
-        return (ActivityId(activity),)
-    if isinstance(activity, Sequence) and not isinstance(activity, str):
-        result: list[ActivityId] = []
-        for item in activity:
-            if not isinstance(item, int) or isinstance(item, bool):
-                raise TypeError(
-                    f'{kwarg} sequence must contain int values, got {type(item)!r}'
-                )
-            result.append(ActivityId(item))
-        return tuple(result)
-    raise TypeError(
-        f'{kwarg} must be an int or a Sequence[int], got {type(activity)!r}'
-    )
-
-
-def given(
-    text: StepText,
-    *,
-    activity: int | Sequence[int] | None = None,
-) -> StepDescriptor:
-    """Create a Given step (context manager or decorator)."""
-    return StepDescriptor('given', text, activity_ids=normalize_activity(activity))
-
-
-def when(
-    text: StepText,
-    *,
-    activity: int | Sequence[int] | None = None,
-) -> StepDescriptor:
-    """Create a When step (context manager or decorator)."""
-    return StepDescriptor('when', text, activity_ids=normalize_activity(activity))
-
-
-def then(
-    text: StepText,
-    *,
-    activity: int | Sequence[int] | None = None,
-) -> StepDescriptor:
-    """Create a Then step (context manager or decorator)."""
-    return StepDescriptor('then', text, activity_ids=normalize_activity(activity))
-
-
 class WhenThen:
     """Narrate an action and its outcome as two sibling steps in one ``with``.
 
@@ -411,34 +405,41 @@ class WhenThen:
             self._then.__exit__(None, None, None)
 
 
-def when_then(
-    when_text: StepText,
-    then_text: StepText,
-) -> WhenThen:
-    """Pair a When action with its Then outcome as two sibling steps."""
-    return WhenThen(when_text, then_text)
+def normalize_activity(
+    activity: int | Sequence[int] | None,
+    kwarg: str = 'activity',
+) -> tuple[ActivityId, ...]:
+    """Normalize an ``activity=`` / ``activities=`` kwarg to ActivityId values.
 
-
-def attach(label: str, content: object) -> None:
-    """Attach data to the current step.
-
-    *label* is plain text — an f-string is the way to vary it. If *content* is a
-    ``str`` it is stored verbatim; any other type is serialized as indented JSON.
+    `kwarg` names the argument the author actually wrote, so the step form and
+    the scenario form each report their own.
     """
-    if not isinstance(label, str):
-        raise PytestGivenError(
-            'attachment labels are plain text; f-strings are fine — '
-            'attach(f"{kind} log", …). In a parametrized scenario keep the '
-            'label the same in every case and let the content vary.'
-        )
-    collector = recording_collector('attach', label)
-    if collector is None:
-        return
-    if isinstance(content, str):
-        collector.attach(label, content, content_type='text')
-    else:
-        collector.attach(
-            label,
-            json.dumps(content, indent=2, default=str),
-            content_type='json',
-        )
+    if activity is None:
+        return ()
+    # Each accepting branch excludes the type that would otherwise slip into
+    # it: a bool is an `int` and a str is a `Sequence[int]` to nobody but
+    # `isinstance`. Without the guards `activities='13'` would yield ids 1
+    # and 3 rather than the TypeError it deserves.
+    if isinstance(activity, int) and not isinstance(activity, bool):
+        return (ActivityId(activity),)
+    if isinstance(activity, Sequence) and not isinstance(activity, str):
+        result: list[ActivityId] = []
+        for item in activity:
+            if not isinstance(item, int) or isinstance(item, bool):
+                raise TypeError(
+                    f'{kwarg} sequence must contain int values, got {type(item)!r}'
+                )
+            result.append(ActivityId(item))
+        return tuple(result)
+    raise TypeError(
+        f'{kwarg} must be an int or a Sequence[int], got {type(activity)!r}'
+    )
+
+
+_TEMPLATE_PARAM_KINDS = frozenset(
+    {
+        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        inspect.Parameter.KEYWORD_ONLY,
+        inspect.Parameter.POSITIONAL_ONLY,
+    }
+)

@@ -36,6 +36,15 @@ def add_skills_parser(
     )
 
 
+def _run_skills_install(args: argparse.Namespace) -> int:
+    dest: Path = args.dest
+    try:
+        return _report_drift(dest) if args.check else _install_skills(dest)
+    except OSError as error:
+        print(f'Error: {error}', file=sys.stderr)
+        return 1
+
+
 def _install_skills(dest: Path) -> int:
     """Mirror the bundled skill directories into ``dest``.
 
@@ -53,15 +62,6 @@ def _install_skills(dest: Path) -> int:
         path.unlink()
         print(f'removed stale {path}')
     return 0
-
-
-def _run_skills_install(args: argparse.Namespace) -> int:
-    dest: Path = args.dest
-    try:
-        return _report_drift(dest) if args.check else _install_skills(dest)
-    except OSError as error:
-        print(f'Error: {error}', file=sys.stderr)
-        return 1
 
 
 def _report_drift(dest: Path) -> int:

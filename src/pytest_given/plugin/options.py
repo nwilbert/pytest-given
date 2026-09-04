@@ -14,7 +14,12 @@ import pytest
 
 from ..lint import parse_lint_config
 from ..model import PytestGivenError
-from ..report import SinkConfig, resolve_source_link_template
+from ..report import (
+    DEFAULT_HTML_PATH,
+    DEFAULT_JSON_PATH,
+    SinkConfig,
+    resolve_source_link_template,
+)
 from .state import GivenConfig, store_given_config
 
 
@@ -23,7 +28,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption(
         '--given-json',
         nargs='?',
-        const='given-report/report-data.json',
+        const=str(DEFAULT_JSON_PATH),
         default=None,
         help=(
             'Write JSON report data. Bare uses the default path; =PATH '
@@ -33,7 +38,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption(
         '--given-html',
         nargs='?',
-        const='given-report/report.html',
+        const=str(DEFAULT_HTML_PATH),
         default=None,
         help=(
             'Write the HTML report. Bare uses the default path; =PATH '
@@ -122,6 +127,42 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
+def pytest_configure(config: pytest.Config) -> None:
+    # Everything is parsed eagerly (fail fast), even when the lint itself is
+    # disabled for this run: a typo in a rule name or a source-link preset is a
+    # UsageError up front rather than a surprise after the last test. Only an
+    # HTML run resolves a source link — `github` would otherwise run its
+    # org/repo detection for a run that never asks.
+    try:
+        lint = parse_lint_config(
+            config.getini('given_lint_rules'), config.getini('given_lint_ignore')
+        )
+        source_link_template = (
+            resolve_source_link_template(
+                _cli_over_ini(config, 'given_source_link', str),
+                setting=_setting_spelling(config, 'given_source_link'),
+            )
+            if config.getoption('given_html') is not None
+            else None
+        )
+        sinks = _resolve_sinks(config, source_link_template)
+    except PytestGivenError as error:
+        raise pytest.UsageError(str(error)) from error
+    store_given_config(
+        config,
+        GivenConfig(
+            lint=lint,
+            # `BooleanOptionalAction` with `default=None` keeps the flag
+            # tri-state, so "not given" stays distinguishable from
+            # `--no-given-lint` and the ini is consulted only in the first case.
+            lint_enabled=_cli_over_ini(config, 'given_lint', bool),
+            sinks=sinks,
+            title=_resolve_title(config),
+            all_frames=bool(config.getoption('given_all_frames')),
+        ),
+    )
+
+
 def _cli_over_ini[T](config: pytest.Config, name: str, kind: type[T]) -> T:
     """The precedence rule for every option carrying both a flag and an ini,
     stated once: the flag when it was given at all, otherwise the ini.
@@ -139,6 +180,13 @@ def _cli_over_ini[T](config: pytest.Config, name: str, kind: type[T]) -> T:
     value = config.getini(name) if cli is None else cli
     assert isinstance(value, kind), f'{name}: expected {kind.__name__}'
     return value
+
+
+def _setting_spelling(config: pytest.Config, name: str) -> str:
+    """How the user spelled the option `_cli_over_ini` just resolved, so an
+    error about its value quotes the flag or the ini they actually wrote."""
+    flag = f'--{name.replace("_", "-")}'
+    return flag if config.getoption(name) is not None else name
 
 
 def _resolve_title(config: pytest.Config) -> str | None:
@@ -179,38 +227,3 @@ def _resolve_sinks(
             'next argument as its path, so write the path with an "=" '
             '(--given-html=PATH) or put the bare flag last.'
         ) from error
-
-
-def pytest_configure(config: pytest.Config) -> None:
-    # Everything is parsed eagerly (fail fast), even when the lint itself is
-    # disabled for this run: a typo in a rule name or a source-link preset is a
-    # UsageError up front rather than a surprise after the last test. Only an
-    # HTML run resolves a source link — `github` would otherwise run its
-    # org/repo detection for a run that never asks.
-    try:
-        lint = parse_lint_config(
-            config.getini('given_lint_rules'), config.getini('given_lint_ignore')
-        )
-        source_link_template = (
-            resolve_source_link_template(
-                _cli_over_ini(config, 'given_source_link', str)
-            )
-            if config.getoption('given_html') is not None
-            else None
-        )
-        sinks = _resolve_sinks(config, source_link_template)
-    except PytestGivenError as error:
-        raise pytest.UsageError(str(error)) from error
-    store_given_config(
-        config,
-        GivenConfig(
-            lint=lint,
-            # `BooleanOptionalAction` with `default=None` keeps the flag
-            # tri-state, so "not given" stays distinguishable from
-            # `--no-given-lint` and the ini is consulted only in the first case.
-            lint_enabled=_cli_over_ini(config, 'given_lint', bool),
-            sinks=sinks,
-            title=_resolve_title(config),
-            all_frames=bool(config.getoption('given_all_frames')),
-        ),
-    )

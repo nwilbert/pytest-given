@@ -1,21 +1,13 @@
-"""Text rules shared across packages that may not import each other.
+"""Text rules two packages that cannot import each other have to agree on.
 
-`capture/`, `lint/` and `report/` each depend on `model/` and never on one
-another, so a rule two of them have to agree on lives here in the leaf.
+`EMPHASIS` is matched by `capture/markdown_glossary.py`, which *strips* the
+markup, and by `report/inline_markdown.py`, which *renders* it — a term written
+``**Guest**`` has to canonicalize to the word its definition renders bold, so
+both must recognize exactly the same spans. Only the pattern is shared; what a
+match becomes differs by caller.
 
-`EMPHASIS` — `capture/markdown_glossary.py` *strips* this markup from a
-glossary term cell while `report/inline_markdown.py` *renders* it in a
-definition cell: a term written ``**Guest**`` has to canonicalize to the same
-word its definition renders bold, so the two must recognize exactly the same
-spans. Only the pattern is shared: what a match *becomes* differs by caller, so
-each keeps its own substitution function.
-
-`id_derive` — capture, lint and report all derive ids with it. It returns a
-bare `str`, not a `TermId`: a story id, a term id and a coverage instance id
-are derived the same way, so the callers that do want a typed id wrap it
-themselves and the ones that don't have no NewType to discard.
-
-`plural` — `report/` and `lint/` both count things into a sentence.
+`id_derive` returns a bare `str`, not a `TermId`: story ids, term ids and
+coverage instance ids all derive the same way.
 """
 
 import re
@@ -35,20 +27,24 @@ EMPHASIS = re.compile(r'`(.+?)`|\*\*(.+?)\*\*|__(.+?)__|\*(.+?)\*')
 _NON_ALNUM = re.compile(r'[^a-z0-9]+')
 
 
+def derived_id(name: str) -> str | None:
+    """`name` as a slug — lowercased, every non-ASCII-alphanumeric run folded to
+    a single `-` — or None if nothing survives the fold.
+
+    The fold runs after `str.lower`, so whether a name has a slug is not the
+    same question as whether its characters are ASCII: `'\u212a'` lowercases
+    into `'k'`. Callers that need the predicate ask this rather than
+    reimplementing it.
+    """
+    return _NON_ALNUM.sub('-', name.lower()).strip('-') or None
+
+
 def id_derive(name: str) -> str:
-    """`name` as a slug: lowercased, every non-ASCII-alphanumeric run folded to
-    a single `-`."""
-    slug = _NON_ALNUM.sub('-', name.lower()).strip('-')
-    if not slug:
+    """`derived_id`, raising instead of returning None."""
+    slug = derived_id(name)
+    if slug is None:
         raise PytestGivenError(
             f'derived id is empty for {name!r}; provide a name with at least '
             f'one ASCII alphanumeric character.'
         )
     return slug
-
-
-def plural(count: int, singular: str, plural_form: str | None = None) -> str:
-    """`'1 scenario'` / `'3 scenarios'` — the noun agreeing with its count."""
-    if count == 1:
-        return f'{count} {singular}'
-    return f'{count} {plural_form or singular + "s"}'

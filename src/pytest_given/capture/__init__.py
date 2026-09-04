@@ -12,7 +12,6 @@ note is where the two are told apart.
 from .collector import (
     Collector,
     FixtureRecording,
-    RecordingState,
     get_active_collector,
     set_active_collector,
 )
@@ -26,6 +25,7 @@ from .process_state import (
     restore_capture_state,
 )
 from .scenario import (
+    ScenarioDecorated,
     ScenarioDecorator,
     annotated_given_descriptors,
     scenario,
@@ -57,7 +57,7 @@ __all__ = [
     'FileGlossary',
     'FixtureRecording',
     'Glossary',
-    'RecordingState',
+    'ScenarioDecorated',
     'ScenarioDecorator',
     'StepDecorated',
     'StepDescriptor',

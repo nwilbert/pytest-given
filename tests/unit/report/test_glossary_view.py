@@ -35,9 +35,9 @@ def _verb_part(tid: str) -> ActivityTermRef:
 
 def _g() -> Glossary:
     g = Glossary()
-    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
-    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
-    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    g.register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
     return g
 
 
@@ -327,7 +327,7 @@ def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> N
         t'a {pg["Kindless"]} {pg["Term"]} referenced by a {pg["Story"]} activity'
     ):
         g = _g()
-        g._register(GlossaryTerm(id=TermId('widget'), kind=None, canonical='Widget'))
+        g.register(GlossaryTerm(id=TermId('widget'), kind=None, canonical='Widget'))
         kindless_part = ActivityTermRef(term_id=TermId('widget'), display='My Widget')
         a = Activity(
             id=ActivityId(1),

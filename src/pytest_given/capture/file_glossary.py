@@ -3,7 +3,9 @@
 from pathlib import Path
 
 from ..model import (
-    Glossary,
+    Glossary as BaseGlossary,
+)
+from ..model import (
     GlossaryTerm,
     PytestGivenError,
     TermId,
@@ -28,7 +30,7 @@ _KIND_ALIASES: dict[str, TermKind] = {
 }
 
 
-class FileGlossary(Glossary):
+class FileGlossary(BaseGlossary):
     """Glossary loaded from a Markdown file. Access terms by name: g['Guest'].
 
     A `Glossary` rather than a wrapper around one: everything that consumes a

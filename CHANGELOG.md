@@ -11,6 +11,19 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Fixed
+
+- `when_then(...)` rejects a `Template` narration in a test body, as `given`/`when`/`then` already do.
+- Story and glossary-term source locations are captured correctly on native Windows, which also restores the lint rules that depend on them.
+- `tag-shadows-term` no longer skips a tag whose slug collides with a term id when the tag contains a non-ASCII character that lowercases into ASCII.
+- A refused scenario on a run with no `--given-*` sink no longer reports itself under a "report not written" heading.
+- An unknown `--given-source-link` preset is reported under the flag the user typed rather than under the `given_source_link` ini name.
+- A report whose rendering fails unexpectedly still discards the previous run's report rather than leaving it on disk reading as current.
+
+### Changed
+
+- The `attachment-labels` and varying-`str` grouping refusals name the parametrize case they found, and the latter now points at `group_parametrized=False` as a way out.
+
 ## [0.2.0] - 2026-09-04
 
 ### Added

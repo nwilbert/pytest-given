@@ -1,15 +1,13 @@
 """Caller-frame source-location capture for non-pytest-item objects.
 
-`Story` and `GlossaryTerm` are constructed at user-code import time, not
-inside a pytest hook, so their source-location must be reconstructed from
-the call stack. The plugin sets rootdir during `pytest_load_initial_conftests`
-(before root conftest is imported); capture sites then call
-`capture_caller_source(skip=N)` from their user-facing wrappers. Returns
-None if rootdir is unset or the caller's file lies outside rootdir — the
-renderer treats that as "no link", same as a scenario whose `item.location`
-is absent.
+`Story` and `GlossaryTerm` are constructed at user-code import time, not inside
+a pytest hook, so their source location must be reconstructed from the call
+stack. The plugin sets rootdir during `pytest_load_initial_conftests`, before
+the root conftest is imported. A location outside rootdir, or no rootdir at
+all, is None — which the renderer shows as "no link".
 """
 
+import os
 import re
 import sys
 import types
@@ -40,9 +38,9 @@ _rootdir: Path | None = None
 _relpath_cache: dict[str, str | None] = {}
 
 
-# Frames whose file starts with this are ours, and never the answer
-# `capture_caller_source` is looking for.
-_PACKAGE_ROOT = f'{Path(__file__).parent.parent}/'
+# Frames whose file starts with this are ours. Built with the platform's own
+# separator: a literal '/' matches nothing on native Windows.
+PACKAGE_ROOT = f'{Path(__file__).parent.parent}{os.sep}'
 
 
 def set_rootdir(path: Path) -> None:
@@ -87,7 +85,7 @@ def capture_caller_source() -> SourceLocation | None:
     lands on cannot be made rootdir-relative.
     """
     frame: types.FrameType | None = sys._getframe(1)
-    while frame is not None and frame.f_code.co_filename.startswith(_PACKAGE_ROOT):
+    while frame is not None and frame.f_code.co_filename.startswith(PACKAGE_ROOT):
         frame = frame.f_back
     if frame is None:
         return None

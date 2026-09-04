@@ -1,9 +1,10 @@
+import os
 import sys
 from pathlib import Path
 
 import pytest
 
-from pytest_given.capture import source
+from pytest_given.capture import collector, source
 from pytest_given.capture.source import (
     _co_filename_to_path,
     capture_caller_source,
@@ -43,6 +44,14 @@ def test_captures_caller_when_inside_rootdir():
     assert loc.relpath.endswith('tests/unit/capture/test_source.py')
     assert '/' in loc.relpath  # POSIX-normalized even on Windows
     assert loc.line > 0
+
+
+def test_package_root_prefixes_a_real_internal_frame_filename():
+    """A hardcoded '/' here matches nothing on native Windows, and every story
+    and term then silently records `source=None`."""
+    assert source.PACKAGE_ROOT.endswith(os.sep)
+    assert source.__file__.startswith(source.PACKAGE_ROOT)
+    assert collector.__file__.startswith(source.PACKAGE_ROOT)
 
 
 def test_the_walk_passes_over_frames_inside_the_package():
@@ -213,5 +222,5 @@ def test_code_source_anchors_at_the_function_definition():
 def test_a_stack_that_never_leaves_the_package_has_no_anchor(monkeypatch):
     """The walk stops at the first frame outside `pytest_given/`; with no such
     frame there is no user code to point at, and no link is the honest answer."""
-    monkeypatch.setattr(source, '_PACKAGE_ROOT', '')
+    monkeypatch.setattr(source, 'PACKAGE_ROOT', '')
     assert capture_caller_source() is None

@@ -40,9 +40,9 @@ def _verb_part(tid: str) -> ActivityTermRef:
 
 def _g() -> Glossary:
     g = Glossary()
-    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
-    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
-    g._register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    g.register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
     return g
 
 

@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from pytest_given import PytestGivenError
+from pytest_given.report import sinks
 from pytest_given.report.sinks import SinkConfig, discard_stale_sinks
 
 
@@ -68,3 +69,19 @@ def test_every_sink_states_the_suffixes_it_accepts(field: str, expected: str) ->
 )
 def test_a_well_formed_sink_path_is_accepted(path: Path) -> None:
     assert SinkConfig(json_path=path).json_path == path
+
+
+def test_an_unexpected_render_failure_still_discards_the_stale_report(
+    tmp_path, monkeypatch
+):
+    """`emit_sinks` promises the previous run's report never survives a failed
+    one. A renderer bug raises something that is neither PytestGivenError nor
+    OSError, and that promise has to hold for it too."""
+    stale = tmp_path / 'report.json'
+    stale.write_text('{"stale": true}')
+    monkeypatch.setattr(
+        sinks, 'render_sinks', lambda *_: (_ for _ in ()).throw(RuntimeError('boom'))
+    )
+    with pytest.raises(RuntimeError, match='boom'):
+        sinks.emit_sinks({}, SinkConfig(json_path=stale))
+    assert not stale.exists()

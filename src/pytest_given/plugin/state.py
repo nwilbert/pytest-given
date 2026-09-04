@@ -19,7 +19,12 @@ from typing import NamedTuple
 
 import pytest
 
-from ..capture import Collector, FixtureRecording, ScenarioDecorator
+from ..capture import (
+    Collector,
+    FixtureRecording,
+    ScenarioDecorated,
+    ScenarioDecorator,
+)
 from ..lint import Finding, LintConfig
 from ..model import NodeId, ParamInfo
 from ..report import SinkConfig
@@ -114,9 +119,9 @@ def scenario_marker(item: pytest.Item) -> ScenarioDecorator | None:
     can't carry @scenario, so they're never load-bearing here.
     """
     func = getattr(item, 'function', None)
-    if func is None:
+    if not isinstance(func, ScenarioDecorated):
         return None
-    marker = getattr(func, '_scenario', None)
+    marker = func._scenario
     return marker if isinstance(marker, ScenarioDecorator) else None
 
 

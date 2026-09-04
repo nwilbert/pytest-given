@@ -4,7 +4,7 @@ body is inspected for structural lies."""
 
 import ast
 import keyword
-from collections.abc import Callable, Container, Iterable
+from collections.abc import Callable, Container, Iterable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -94,6 +94,7 @@ class _Scan:
     scenario: Scenario
     steps: list[_Resolved]
     by_path: dict[StepPath, _Resolved]
+    all_steps: dict[StepPath, Step]
 
 
 def _scan_scenario(
@@ -108,9 +109,9 @@ def _scan_scenario(
     at a time: a step's neighbours are the paths differing only in the last
     component.
     """
-    by_path = dict(walk_steps(scenario.steps))
+    all_steps = dict(walk_steps(scenario.steps))
     steps: list[_Resolved] = []
-    for path, step in by_path.items():
+    for path, step in all_steps.items():
         source = step.source
         if source is None:
             continue
@@ -120,8 +121,8 @@ def _scan_scenario(
         node = index.get(source.line) if index is not None else None
         if node is None:
             continue
-        before = by_path.get((*path[:-1], path[-1] - 1)) if path[-1] else None
-        after = by_path.get((*path[:-1], path[-1] + 1))
+        before = all_steps.get((*path[:-1], path[-1] - 1)) if path[-1] else None
+        after = all_steps.get((*path[:-1], path[-1] + 1))
         steps.append(
             _Resolved(
                 path=path,
@@ -135,6 +136,7 @@ def _scan_scenario(
         scenario=scenario,
         steps=steps,
         by_path={resolved.path: resolved for resolved in steps},
+        all_steps=all_steps,
     )
 
 
@@ -300,7 +302,7 @@ def _action_in_then(scan: _Scan) -> Iterable[RawFinding]:
     the shared `with`, so any call there *is* the act.
     """
     acts = False
-    for path, step in walk_steps(scan.scenario.steps):
+    for path, step in scan.all_steps.items():
         if step.phase != 'when':
             continue
         resolved = scan.by_path.get(path)
@@ -339,6 +341,8 @@ _STEP_RULES: dict[RuleId, _StepRule] = {
 _SCENARIO_RULES: dict[RuleId, _ScenarioRule] = {
     ACTION_IN_THEN: _action_in_then,
 }
+
+AST_RULE_IDS = frozenset(_STEP_RULES) | frozenset(_SCENARIO_RULES)
 
 
 def _step_finding(
@@ -399,18 +403,14 @@ def _names_used(node: ast.With, *, include_stores: bool) -> set[str]:
     """Names used anywhere under the `with` — items and body, nested steps
     included — skipping t-string subtrees: an interpolation in a narration
     (this step's own, or a nested step's) is text, not a code use."""
-    names: set[str] = set()
-    stack: list[ast.AST] = list(ast.iter_child_nodes(node))
-    while stack:
-        sub = stack.pop()
-        if isinstance(sub, ast.TemplateStr):
-            continue
-        if isinstance(sub, ast.Name) and (
-            include_stores or isinstance(sub.ctx, ast.Load)
-        ):
-            names.add(sub.id)
-        stack.extend(ast.iter_child_nodes(sub))
-    return names
+    return {
+        sub.id
+        for sub in _walk_pruned(
+            ast.iter_child_nodes(node), skip=lambda n: isinstance(n, ast.TemplateStr)
+        )
+        if isinstance(sub, ast.Name)
+        and (include_stores or isinstance(sub.ctx, ast.Load))
+    }
 
 
 def _body_performs_action(node: _BodyNode) -> bool:
@@ -436,15 +436,10 @@ def _assert_with_call(node: _BodyNode) -> bool:
 def _contains_assert_outside(stmts: list[ast.stmt], excluded: set[int]) -> bool:
     """Whether an `assert` exists under *stmts*, skipping excluded subtrees
     (child-step blocks, identified by node id)."""
-    stack: list[ast.AST] = list(stmts)
-    while stack:
-        node = stack.pop()
-        if id(node) in excluded:
-            continue
-        if isinstance(node, ast.Assert):
-            return True
-        stack.extend(ast.iter_child_nodes(node))
-    return False
+    return any(
+        isinstance(node, ast.Assert)
+        for node in _walk_pruned(stmts, skip=lambda n: id(n) in excluded)
+    )
 
 
 def _contains_check(node: _BodyNode) -> bool:
@@ -470,3 +465,21 @@ def _is_check_call(call: ast.Call) -> bool:
             and func.attr in ('raises', 'warns', 'fail')
         )
     return False
+
+
+def _walk_pruned(
+    roots: Iterable[ast.AST], *, skip: Callable[[ast.AST], bool]
+) -> Iterator[ast.AST]:
+    """Every node under `roots`, not descending into one `skip` accepts.
+
+    `ast.walk` cannot prune, and both callers have subtrees they must not
+    enter: a t-string's interpolations are narration text, and a nested step's
+    block belongs to that step.
+    """
+    stack: list[ast.AST] = list(roots)
+    while stack:
+        node = stack.pop()
+        if skip(node):
+            continue
+        yield node
+        stack.extend(ast.iter_child_nodes(node))

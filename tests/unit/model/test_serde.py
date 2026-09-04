@@ -564,6 +564,13 @@ def test_round_trip_via_to_dict() -> None:
             lambda d: d['glossary']['terms'][0].update(kind='thing'),
             'glossary term kind',
         ),
+        (lambda d: d['scenarios'][0]['steps'][0].update(phase='so'), 'step phase'),
+        (
+            lambda d: d['scenarios'][0]['steps'][0]['attachments'][0].update(
+                content_type='yaml'
+            ),
+            'attachment content type',
+        ),
     ],
 )
 def test_report_from_dict_rejects_an_out_of_range_literal(mutate, expected) -> None:
@@ -572,7 +579,18 @@ def test_report_from_dict_rejects_an_out_of_range_literal(mutate, expected) -> N
     report = ReportData(
         metadata=_meta(),
         scenarios=[
-            Scenario(id=NodeId('t.py::t'), narration=Narration(text='x'), module='m')
+            Scenario(
+                id=NodeId('t.py::t'),
+                narration=Narration(text='x'),
+                module='m',
+                steps=[
+                    Step(
+                        phase='given',
+                        narration=Narration(text='s'),
+                        attachments=[Attachment(label='l', content='c')],
+                    )
+                ],
+            )
         ],
         glossary=Glossary(
             terms=[GlossaryTerm(id=TermId('g'), kind='actor', canonical='G')]
@@ -601,8 +619,8 @@ def test_activity_part_variants_round_trip():
 
 def test_glossary_round_trips_and_rebuilds_index():
     g = Glossary()
-    g._register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
-    g._register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
+    g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
     report = ReportData(metadata=_meta(), glossary=g)
     rt = _round_trip(report)
     assert rt.glossary is not None

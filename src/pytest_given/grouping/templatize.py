@@ -21,6 +21,7 @@ from ..model import (
     RawParamValue,
     Step,
     StepPath,
+    param_id,
     placeholder_mismatch,
     rebuilt,
 )
@@ -34,7 +35,6 @@ from .columns import (
     Format,
     cell_text,
     param_cell,
-    param_id,
     trivial_format,
 )
 from .context import PartSite
@@ -206,8 +206,13 @@ def _name_part(part: NarrationPart, param_names: list[str]) -> NarrationPart:
     match part:
         case NarrationValue(expression=expression) if expression in param_names:
             return _param_slot(part)
-        case NarrationPlaceholder(name=name) if name not in param_names:
-            raise placeholder_mismatch(name, param_names)
+        case NarrationPlaceholder(name=name):
+            # Collection already validated a scenario name's placeholders
+            # against this same list, and reported them with a locator this
+            # far-downstream raise could not produce.
+            assert name in param_names, (
+                f'scenario-name placeholder {name!r} is not one of {param_names}'
+            )
     return part
 
 
