@@ -603,3 +603,11 @@ def test_push_step_source_defaults_to_none() -> None:
     collector.start_scenario('id', 'name', 'mod', [])
     step = collector.push_step('given', _n('a thing'))
     assert step.source is None
+
+
+def test_fail_ignores_a_node_id_the_collector_never_recorded() -> None:
+    """`records()` is the caller's cheap pre-check, not a precondition: an
+    unknown id is a no-op rather than a KeyError out of a teardown hook."""
+    collector = Collector()
+    collector.fail(NodeId('test.py::never_seen'), _error('boom'))
+    assert collector.scenarios == []

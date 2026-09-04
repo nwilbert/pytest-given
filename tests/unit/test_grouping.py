@@ -2828,3 +2828,16 @@ def test_cases_claiming_different_activities_say_so() -> None:
     }
     with pytest.raises(PytestGivenError, match='different step activities'):
         group_parametrized(scenarios, param_info)
+
+
+def test_detail_text_reads_a_part_that_carries_no_formatting() -> None:
+    """`detail` is the `(conversion, format_spec)` pair, absent for a literal
+    or a term ref — which the divergence message renders as prose rather than
+    unpacking a pair that is not there."""
+    assert (
+        checks._detail_text(checks.PartKey('literal', 'a machine')) == 'no formatting'
+    )
+    assert (
+        checks._detail_text(checks.PartKey('value', 'n', (None, ''))) == 'no formatting'
+    )
+    assert checks._detail_text(checks.PartKey('value', 'n', ('r', '>5'))) == '!r:>5'

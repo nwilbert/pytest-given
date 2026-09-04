@@ -360,7 +360,7 @@ The *checks* are not opt-in. Every run builds the report it would have written, 
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](#traceback-frames). |
 | `--given-lint` / `--no-given-lint` | `false` | Run the narration lint; an error-level finding fails the run. Also settable as the `given_lint` ini, which either form overrides. See [Narration lint](#narration-lint). |
 
-Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection.
+Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection. A path that could not be a report file (a `.py` test path, say) is refused before the suite runs rather than written over.
 
 The ini settings live in `[tool.pytest]`, pytest 9's native TOML table. The legacy `[tool.pytest.ini_options]` is still read, but the two are mutually exclusive — pytest raises `UsageError` if both are present.
 

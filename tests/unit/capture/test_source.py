@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from pytest_given.capture import source
 from pytest_given.capture.source import (
     _co_filename_to_path,
     capture_caller_source,
@@ -207,3 +208,10 @@ def test_code_source_anchors_at_the_function_definition():
     assert loc == SourceLocation(
         relpath='tests/unit/capture/test_source.py', line=base + 2
     )
+
+
+def test_a_stack_that_never_leaves_the_package_has_no_anchor(monkeypatch):
+    """The walk stops at the first frame outside `pytest_given/`; with no such
+    frame there is no user code to point at, and no link is the honest answer."""
+    monkeypatch.setattr(source, '_PACKAGE_ROOT', '')
+    assert capture_caller_source() is None

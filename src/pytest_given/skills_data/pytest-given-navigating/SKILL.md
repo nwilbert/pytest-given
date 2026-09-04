@@ -30,7 +30,7 @@ jq -r '.scenarios[] | select(.tags | index("validation"))
 ## Traps
 
 - **Scenario tags are report metadata, not pytest marks.** `pytest -m <tag>` selects nothing — that is expected, not a broken suite. Filter tags via the JSON report or read them in the Markdown output.
-- **Put a bare `--given-md` / `--given-json` last on the command line** (or use the `=PATH` form): a path-like token right after the bare flag is parsed as its output path, silently changing what runs.
+- **Put a bare `--given-md` / `--given-json` last on the command line** (or use the `=PATH` form): a path-like token right after the bare flag is parsed as its output path, changing what runs. A path whose suffix does not match the sink is refused up front, so the common mistake fails loudly instead of overwriting a test file.
 - **The Markdown report contains scenarios only.** Glossary and stories render in the HTML report (`--given-html`) and live in the JSON (`.glossary.terms[]`, `.stories[]`).
 - A ✗ scenario in the Markdown carries the failure's first message line and its innermost non-internal frame as a blockquote (a grouped one, per failing case under the table) — usually enough to place the failure. Drop to `.error` in the JSON, or rerun the node id with plain pytest, when you need the full frame list.
 - Re-render a saved run without rerunning tests: `pytest-given report <data.json> --format md`.

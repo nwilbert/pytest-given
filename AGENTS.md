@@ -34,22 +34,42 @@ The short version: bump `version` in `pyproject.toml` and add a matching `## [x.
 
 ## Architecture
 
-`src/pytest_given/` is five library subpackages plus two entry points, with a strict dependency direction (convention, not lint-enforced): `model/` is the leaf — dataclass schema, JSON serde, IDs, errors; `capture/` (records scenarios at runtime), `lint/` (checks them), and `report/` (renders HTML / Markdown / JSON) each depend on `model/` and never on each other. `grouping/` sits one layer up, on `model/` and `capture/`. The two entry points — `plugin/` (the pytest side, a package) and `cli.py` (the console script) — may import from all five and hold nothing the five could. Filenames carry the rest — what they don't:
+`src/pytest_given/` is five library subpackages plus two entry points, with a
+strict dependency direction (convention, not lint-enforced):
 
-- `grouping/` — the parametrize pass: groups a scenario's cases into one narrated tree plus a parameter table, promotes what varies into `param` / `derived` / `attachment` columns, and raises `PytestGivenError` on the six authoring forms that would make the grouped tree lie. Runs at session finish, *before* the sink is written, so its output is what every renderer reads. Inside: `group` runs the pass (partition on `(node_base(id), narration.text)`, baseline, assembly), `templatize` walks the baseline tree promoting what varies, `checks` holds the six rules, `columns` holds the table they build up, and `percase` is the other exit — the declined merge, each case leaving as its own scenario. Rule 4 holds a term ref to the same term and the same display in every case, whether or not a parametrize column binds it; a scenario that needs its pill to vary declines the grouping with `@scenario(..., group_parametrized=False)`.
-- `plugin/` — the pytest-side orchestrator, and only what needs pytest: hooks, option declarations, parametrize-value capture, scenario-source capture from `item.location`, fixture grafting, and thin adapters that resolve options into the pytest-free shapes the subpackages take (`_sink_config`). `__init__.py` is the hook surface pluggy registers — the `pytest11` entry point is the package, and pluggy scans a module's attributes for `pytest_*` names, so the re-exports there *are* the registration. Inside: `state` holds the four values a session keeps in `config.stash` and is the leaf every other module here reads; `options` declares the option table and is the one place an option carrying both a CLI flag and an ini settles which wins, so no read site re-derives that precedence (the CLI-only options — the three sinks and `--given-all-frames` — have none to settle, and are read where they are used); `collection` validates what `@scenario` declared; `fixtures` records a decorated fixture and grafts what it recorded; `runtest` is the per-item hooks; `session` is the two session edges. `pytest_sessionfinish` builds the report on **every** run, sinks configured or not — the grouping pass is where the six authoring rules are enforced, and a bare `pytest` failing on one is the point, not a side effect. It builds and renders every sink under one `PytestGivenError` handler before writing any of them, so a failure anywhere in the report path reports through the terminal summary and discards the sinks this run would have written, rather than escaping `console_main` as a bare traceback or leaving one sink replaced and another stale. A run that writes no report — or fails its lint — also registers an error with the terminal reporter's stats, because `session.exitstatus` is set too late for the summary line and would otherwise read green over a non-zero exit.
-- `cli.py` — the `pytest-given` console entry point and argparse root; owns `skills install` (mirrors `skills_data/` into a project's `.claude/skills/`, `--check` for drift) and delegates `report` to `report/cli.py`.
-- `capture/steps.py` and `capture/scenario.py` — the two halves of the authoring surface: `steps.py` holds what records inside a scenario (`given` / `when` / `then` / `when_then` / `attach` and the dual context-manager/decorator `StepDescriptor`), `scenario.py` what marks a test for the report (`@scenario` and the `Annotated[..., given(...)]` reader). `capture/traceback.py` names **both** modules in `_INTERNAL_SUFFIXES` so neither appears in a failure traceback: `steps.py` for its wrappers and `__enter__` / `__exit__`, `scenario.py` for `annotated_given_descriptors`, which runs from `pytest_runtest_setup` and rejects three authoring forms from there. The tuple names whole modules — its docstring says what that costs when one of them moves.
-- `capture/source.py` — `capture_caller_source(skip=...)` walks `inspect.stack` to record a construction site for `story()` and glossary registration; also the one platform seam (see [Conventions](#conventions)).
-- `capture/process_state.py` — the three process-globals capture keeps (rootdir, story registry, active-collector ContextVar) as one `CaptureState`, with `capture_snapshot` / `restore_capture_state` / `begin_capture_session`. Swapped together on purpose: a nested in-process run has to displace and restore every one, and missing one is a silent bug the *outer* session pays for.
-- `capture/discovery.py` — `resolve_glossary(stories, modules)` picks the suite's single glossary off the story tree, falling back to a conftest scan. Takes plain module objects rather than a session, so it stays pytest-free and unit-testable — as does the rest of `capture/`, which imports pytest nowhere: the warning a step recorded outside `@scenario` raises is `model.PytestGivenWarning`, not `pytest.PytestWarning`.
-- `report/sinks.py` — the JSON / HTML / Markdown sinks as one `SinkConfig`: `render_sinks` does everything that can fail and touches no file, `write_sinks` touches files and cannot fail on content, `discard_stale_sinks` removes a previous run's report that would otherwise read as current. The split is what keeps the sinks consistent with each other. Both entry points go through it — `plugin/session.py` and `report/cli.py` — so `pytest-given report` gets the same all-or-nothing guarantee and the renderers themselves only ever return text.
-- `report/slugs.py` — the URL-fragment slug a scenario is addressed by (`#scenario=<slug>`), with the collision escalation that keeps the common case short. Separate from `aggregations.py`, which holds the coverage, story and glossary rollups the Jinja templates read.
-- `report/templates/_macros.html.j2` — the macros the three views share (`render_step`, `render_error`, attachments, source and anchor links), imported `with context` so filters resolve as they did inline.
-- `Glossary` exists twice, on purpose. `model/schema.py` holds the storage — terms plus an id index — which is what the report model carries and what serde rebuilds; `capture/glossary.py` subclasses it with the user-facing registration API (`actor` / `work_object` / `verb`, `g(...)`, `g[...]`), because every one of those needs the caller's source location and `model` is the leaf that may not reach into `capture` to get it. `pytest_given.Glossary` is the subclass; everything internal annotates the base, which the subclass satisfies.
-- `lint/` — pure, imports only `model/`: rule catalog as data (`base.py`), `given_lint_*` config (`config.py`), rules over the recorded model (`runtime_rules.py`) and over step-body ASTs (`ast_rules.py`), and the findings' terminal presentation (`summary.py` — the title, aligned rows and error tally; the plugin owns only the writing).
+```
+model/                     the leaf — schema, serde, ids, errors, shared text rules
+capture/  lint/  report/   each on model/ only, never on each other
+grouping/                  on model/ + capture/
+plugin/   cli/             the entry points; may import all five, and hold
+                           nothing the five could
+```
 
-The public API is re-exported from `__init__.py` and documented in the skill's [references/api.md](src/pytest_given/skills_data/pytest-given-authoring/references/api.md).
+**Every module has a docstring saying what it is for and why it is shaped that
+way.** That is where the detail lives, and it stays true because it sits next
+to the code — read it before changing a module. What no filename tells you:
+
+- `grouping/` — the parametrize pass: a scenario's cases collapsed into one
+  narrated tree plus a parameter table, refusing the authoring forms that would
+  make that tree lie. Runs at session finish *before* the sinks are written, so
+  a bare `pytest` failing on one is the point, not a side effect.
+- `plugin/__init__.py` is the hook surface pluggy registers — the `pytest11`
+  entry point is the package, and pluggy scans a module's attributes for
+  `pytest_*` names, so the re-exports there *are* the registration.
+- `capture/` imports pytest nowhere, so all of it is unit-testable without a
+  session; a stray step warns with `model.PytestGivenWarning`, not pytest's.
+- `Glossary` exists twice on purpose: `model/schema.py` holds the storage the
+  report carries and serde rebuilds, and `capture/glossary.py` subclasses it
+  with the registration API, which needs a caller source location that the leaf
+  may not reach for. `pytest_given.Glossary` is the subclass; everything
+  internal annotates the base.
+- Each package exposes the *whole* job, not its parts: `report.emit_sinks`
+  (render → write → discard-on-failure, so a failure leaves no half-written
+  report) and `lint.run_lint`. Both entry points go through them, which is what
+  keeps `pytest-given report` behaving like the plugin.
+
+The public API is re-exported from `__init__.py` and documented in the skill's
+[references/api.md](src/pytest_given/skills_data/pytest-given-authoring/references/api.md).
 
 ### Step text & placeholders
 
