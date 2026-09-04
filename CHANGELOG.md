@@ -175,6 +175,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Plugin and run behavior
 
+- A `--given-json`/`--given-html`/`--given-md` path that could not be a report
+  file is now refused before the suite runs, instead of a bare flag swallowing a
+  following test path and overwriting — or, on a failed run, deleting — it.
 - A `git` on PATH that cannot be executed no longer fails the run.
 - A nested in-process pytest run that dies while parsing its arguments no longer
   strands the outer session's captured rootdir, which silently dropped every

@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, NamedTuple
 
-from ..model import ReportData
+from ..model import PytestGivenError, ReportData
 from .html_renderer import render_html_string
 from .md_renderer import render_md
 
@@ -35,6 +35,11 @@ class SinkConfig:
     md_to_stdout: bool = False
     source_link_template: str | None = None
 
+    def __post_init__(self) -> None:
+        _require_suffix('JSON', self.json_path, ('.json',))
+        _require_suffix('HTML', self.html_path, ('.html', '.htm'))
+        _require_suffix('Markdown', self.md_path, ('.md', '.markdown'))
+
     def file_paths(self) -> list[Path]:
         """The paths this run would write, in sink order. Only real files —
         Markdown bound for stdout has no path to overwrite or discard."""
@@ -48,6 +53,24 @@ class SinkConfig:
         """Whether any sink is configured — `file_paths()` plus stdout Markdown,
         which writes no file but still has to be rendered."""
         return bool(self.file_paths()) or self.md_to_stdout
+
+
+def _require_suffix(sink: str, path: Path | None, allowed: tuple[str, ...]) -> None:
+    """Refuse a sink path that could not be a report file.
+
+    These paths come from CLIs where a bare flag takes the next argument as
+    its value, so a mis-ordered `--given-html tests/test_x.py` would aim the
+    renderer at the author's own source — and `discard_stale_sinks` would then
+    unlink it on a run that failed to render. The suffix is the cheapest thing
+    that tells the two apart, and checking it turns silent data loss into a
+    message before the suite runs.
+    """
+    if path is None or path.suffix.lower() in allowed:
+        return
+    raise PytestGivenError(
+        f'The {sink} report path must end in {" or ".join(allowed)}, '
+        f'but got {str(path)!r}.'
+    )
 
 
 class RenderedFile(NamedTuple):

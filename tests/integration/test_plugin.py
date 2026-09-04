@@ -2316,6 +2316,27 @@ def test_given_json_alone_writes_json(pytester: pytest.Pytester) -> None:
     assert json_path.exists()
 
 
+@scenario(
+    t'A sink flag pointed at a source file is refused before the suite runs',
+    tags=['validation'],
+)
+def test_a_sink_path_that_is_not_a_report_file_is_refused(pytester) -> None:
+    """A bare `--given-html` takes the next argument as its path, so the
+    natural mis-ordering aims the renderer at the author's own test file."""
+    with given(t'a suite with one {pg["Scenario"].low}'):
+        source = pytester.makepyfile(_SUITE)
+        original = source.read_text(encoding='utf-8')
+    with when('a bare --given-html swallows the test path that follows it'):
+        result = pytester.runpytest('--given-html', str(source))
+    with then('the run is refused, naming the path and the flag-order fix'):
+        assert result.ret != 0
+        stderr = result.stderr.str()
+        assert 'must end in .html or .htm' in stderr
+        assert '--given-html=PATH' in stderr
+    with then(t'the source file is left exactly as it was, not overwritten'):
+        assert source.read_text(encoding='utf-8') == original
+
+
 _VIOLATING_SUITE = """
 import pytest
 from pytest_given import scenario, when

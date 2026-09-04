@@ -170,17 +170,28 @@ def _resolve_sinks(
     config: pytest.Config, source_link_template: str | None
 ) -> SinkConfig:
     """The three sink flags, resolved into the pytest-free shape `report/`
-    reads. CLI-only, so there is no ini precedence to settle here."""
+    reads. CLI-only, so there is no ini precedence to settle here.
+
+    `SinkConfig` rejects a path that could not be a report file; the flags are
+    where that mistake is made, so the hint about it belongs here.
+    """
     md_opt = config.getoption('given_md')
     json_opt = config.getoption('given_json')
     html_opt = config.getoption('given_html')
-    return SinkConfig(
-        json_path=Path(json_opt) if json_opt is not None else None,
-        html_path=Path(html_opt) if html_opt is not None else None,
-        md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
-        md_to_stdout=md_opt == '-',
-        source_link_template=source_link_template,
-    )
+    try:
+        return SinkConfig(
+            json_path=Path(json_opt) if json_opt is not None else None,
+            html_path=Path(html_opt) if html_opt is not None else None,
+            md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
+            md_to_stdout=md_opt == '-',
+            source_link_template=source_link_template,
+        )
+    except PytestGivenError as error:
+        raise PytestGivenError(
+            f'{error} A bare --given-json/--given-html/--given-md takes the '
+            'next argument as its path, so write the path with an "=" '
+            '(--given-html=PATH) or put the bare flag last.'
+        ) from error
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -198,12 +209,13 @@ def pytest_configure(config: pytest.Config) -> None:
             if config.getoption('given_html') is not None
             else None
         )
+        sinks = _resolve_sinks(config, source_link_template)
     except PytestGivenError as error:
         raise pytest.UsageError(str(error)) from error
     config.stash[given_config_key] = GivenConfig(
         lint=lint,
         lint_enabled=_resolve_lint_enabled(config),
-        sinks=_resolve_sinks(config, source_link_template),
+        sinks=sinks,
         title=_resolve_title(config),
         all_frames=bool(config.getoption('given_all_frames')),
     )
