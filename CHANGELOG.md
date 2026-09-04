@@ -9,7 +9,7 @@ The release workflow reads the section matching the version in `pyproject.toml`
 and uses it as the GitHub Release body, so each version needs a heading of the
 form `## [x.y.z] - YYYY-MM-DD`.
 
-## [Unreleased]
+## [0.2.0] - 2026-09-04
 
 ### Added
 
@@ -305,5 +305,6 @@ First public release.
 - Bundled authoring, navigating, and reviewing skills for AI agents, shipped in
   the wheel and version-matched to the plugin.
 
-[Unreleased]: https://github.com/nwilbert/pytest-given/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/nwilbert/pytest-given/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/nwilbert/pytest-given/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/nwilbert/pytest-given/releases/tag/v0.1.0

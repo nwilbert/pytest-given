@@ -1,6 +1,6 @@
 [project]
 name = "pytest-given"
-version = "0.1.0"
+version = "0.2.0"
 description = "A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests."
 readme = "README.md"
 # PEP 639: an SPDX expression plus the files it refers to. Deliberately no
