@@ -13,25 +13,6 @@ _BR = re.compile(r'&lt;br\s*/?\s*&gt;', re.IGNORECASE)
 _NEWLINE = re.compile(r'\r\n|[\r\n]')
 
 
-def _breaks(text: str) -> str:
-    """An author's `<br>` (escaped on the way in) and any newline as a real
-    break."""
-    return _NEWLINE.sub('<br>', _BR.sub('<br>', text))
-
-
-def _emphasis(match: re.Match[str]) -> str:
-    code, bold_star, bold_underscore, italic = match.groups()
-    if code is not None:
-        # Verbatim: a code span is the way to *show* `<br>` rather than break.
-        return f'<code>{code}</code>'
-    if bold_star is not None:
-        return f'<strong>{_breaks(bold_star)}</strong>'
-    if bold_underscore is not None:
-        return f'<strong>{_breaks(bold_underscore)}</strong>'
-    assert italic is not None
-    return f'<em>{_breaks(italic)}</em>'
-
-
 def render_inline_markdown(text: str) -> str:
     """HTML-escape `text`, then render **bold**/__bold__, *italic*, `code`, and
     hard breaks (<br> or a newline) as safe inline HTML.
@@ -50,3 +31,22 @@ def render_inline_markdown(text: str) -> str:
         end = match.end()
     out.append(_breaks(escaped[end:]))
     return ''.join(out)
+
+
+def _emphasis(match: re.Match[str]) -> str:
+    code, bold_star, bold_underscore, italic = match.groups()
+    if code is not None:
+        # Verbatim: a code span is the way to *show* `<br>` rather than break.
+        return f'<code>{code}</code>'
+    if bold_star is not None:
+        return f'<strong>{_breaks(bold_star)}</strong>'
+    if bold_underscore is not None:
+        return f'<strong>{_breaks(bold_underscore)}</strong>'
+    assert italic is not None
+    return f'<em>{_breaks(italic)}</em>'
+
+
+def _breaks(text: str) -> str:
+    """An author's `<br>` (escaped on the way in) and any newline as a real
+    break."""
+    return _NEWLINE.sub('<br>', _BR.sub('<br>', text))
