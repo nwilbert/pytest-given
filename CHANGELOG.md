@@ -9,6 +9,8 @@ The release workflow reads the section matching the version in `pyproject.toml`
 and uses it as the GitHub Release body, so each version needs a heading of the
 form `## [x.y.z] - YYYY-MM-DD`.
 
+## [Unreleased]
+
 ## [0.2.0] - 2026-09-04
 
 ### Added
