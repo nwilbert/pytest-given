@@ -48,7 +48,7 @@ def _promotion(param_names: list[str]) -> columns.ColumnBuilder:
     return columns.ColumnBuilder.for_params(group, {})
 
 
-def test_templatize_narration_rejects_unknown_placeholder() -> None:
+def test_templatize_scenario_name_rejects_unknown_placeholder() -> None:
     """Safety-net guard: a NarrationPlaceholder whose name isn't a parametrize
     column raises. Defense in depth on top of the collection-time hook, which
     catches Template placeholders in scenario names (and step text from
@@ -58,7 +58,7 @@ def test_templatize_narration_rejects_unknown_placeholder() -> None:
         text='', parts=(NarrationPlaceholder(name='cup_zize', column_id='cup_zize'),)
     )
     with pytest.raises(PytestGivenError, match='cup_zize'):
-        templatize.templatize_narration(narration, _promotion(['cup_size']))
+        templatize.templatize_scenario_name(narration, _promotion(['cup_size']))
 
 
 def test_group_parametrized_all_skipped_groups_as_skipped() -> None:
@@ -74,6 +74,30 @@ def test_group_parametrized_all_skipped_groups_as_skipped() -> None:
     grouped = group_parametrized(scenarios, param_info)
     assert len(grouped) == 1
     assert grouped[0].status == 'skipped'
+
+
+def test_group_parametrized_all_skipped_keeps_the_skip_reason() -> None:
+    """The grouped scenario reports `skipped`, and both renderers print the
+    reason beside it — so dropping it left the grouped view saying less than
+    the same test would with `group_parametrized=False`."""
+    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
+    scenarios = [
+        Scenario(
+            id=nid,
+            narration=Narration(text='x'),
+            module='m',
+            status='skipped',
+            skip_reason='needs a database',
+        )
+        for nid in (nid1, nid2)
+    ]
+    param_info = {
+        nid1: ParamSpec(names=['n'], values=[1]),
+        nid2: ParamSpec(names=['n'], values=[2]),
+    }
+    [grouped] = group_parametrized(scenarios, param_info)
+    assert grouped.status == 'skipped'
+    assert grouped.skip_reason == 'needs a database'
 
 
 def test_group_parametrized_mixed_pass_skip_groups_as_passed() -> None:
@@ -216,7 +240,7 @@ def test_templatize_keeps_a_scenario_name_term_ref_verbatim() -> None:
         ),
     )
     for param_names in (['guest'], ['euros']):
-        out = templatize.templatize_narration(narration, _promotion(param_names))
+        out = templatize.templatize_scenario_name(narration, _promotion(param_names))
         ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
         assert ref == narration.parts[0]
 
@@ -902,7 +926,7 @@ def test_a_skipped_case_gets_blank_derived_cells() -> None:
 
 def test_a_step_placeholder_naming_an_unknown_column_raises() -> None:
     """Defense in depth for the step-level walk, mirroring
-    test_templatize_narration_rejects_unknown_placeholder for the scenario-name
+    test_templatize_scenario_name_rejects_unknown_placeholder for the scenario-name
     walk: a Template placeholder in a step's own narration that doesn't match
     any parametrize column must still raise, not silently pass through."""
     step = Step(
@@ -983,7 +1007,7 @@ def test_a_grouped_steps_text_rebuild_covers_every_part_kind() -> None:
     assert step_out.narration.parts[7] == step('2.0').narration.parts[7]
 
 
-def test_templatize_narration_converts_a_matching_value_to_a_placeholder() -> None:
+def test_templatize_scenario_name_converts_a_matching_value_to_a_placeholder() -> None:
     """The scenario-name counterpart to the step-level NarrationValue
     promotion: a bare-name interpolation matching a parametrize column becomes
     a placeholder; one that doesn't match stays an inline value."""
@@ -996,7 +1020,7 @@ def test_templatize_narration_converts_a_matching_value_to_a_placeholder() -> No
             NarrationValue(rendered='12.5', expression='price'),
         ),
     )
-    out = templatize.templatize_narration(narration, _promotion(['cup_size']))
+    out = templatize.templatize_scenario_name(narration, _promotion(['cup_size']))
     placeholder = out.parts[1]
     assert isinstance(placeholder, NarrationPlaceholder)
     assert (placeholder.name, placeholder.column_id) == ('cup_size', 'cup_size')
@@ -2775,3 +2799,32 @@ def test_shape_separates_steps_claiming_different_activities() -> None:
 
 def test_shape_of_an_empty_tree_is_empty() -> None:
     assert _shape_of([]) == []
+
+
+def test_cases_claiming_different_activities_say_so() -> None:
+    """`activity=` is a per-call argument, so two cases can genuinely claim
+    different ids at one path. The grouped tree keeps one set — but that is not
+    'a different step structure', and the fix is smaller than declining the
+    grouping."""
+    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
+    scenarios = [
+        Scenario(
+            id=nid,
+            narration=Narration(text='x'),
+            module='m',
+            steps=[
+                Step(
+                    phase='given',
+                    narration=Narration(text='a machine'),
+                    activity_ids=(ActivityId(ids),),
+                )
+            ],
+        )
+        for nid, ids in ((nid1, 1), (nid2, 2))
+    ]
+    param_info = {
+        nid1: ParamSpec(names=['n'], values=[1]),
+        nid2: ParamSpec(names=['n'], values=[2]),
+    }
+    with pytest.raises(PytestGivenError, match='different step activities'):
+        group_parametrized(scenarios, param_info)

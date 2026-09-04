@@ -7,11 +7,11 @@ fire from the baseline walk, which is where the offending part is in hand.
 """
 
 from collections.abc import Iterable, Iterator
+from collections.abc import Set as AbstractSet
 from typing import NamedTuple
 
 from ..model import (
     ActivityId,
-    Attachment,
     AttachmentLabel,
     Narration,
     NarrationLiteral,
@@ -19,8 +19,6 @@ from ..model import (
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
-    NodeId,
-    PartIndex,
     Phase,
     PytestGivenError,
     RawParamValue,
@@ -32,20 +30,20 @@ from ..model import (
     node_base,
     render_interpolation,
 )
-from .context import Group
-
-# A step tree reduced to nested phase tuples — narration text and values
-# ignored. Two cases with equal signatures render truthfully in the grouped
-# parameter-table view.
-# One step's attachments grouped by label, in the order that case recorded
-# them. Built by the promotion walk (`attachments._by_label`), which is also
-# the only caller of the rule that reads it.
-type LabeledAttachments = dict[AttachmentLabel, list[Attachment]]
+from .columns import Format
+from .context import Group, PartSite
 
 
-def _shape(
-    indexed: Iterable[tuple[StepPath, Step]],
-) -> list[tuple[StepPath, Phase, tuple[ActivityId, ...]]]:
+class StepSignature(NamedTuple):
+    """What a grouped tree requires every case's step to share: where it sits,
+    its phase, and the activities it claims."""
+
+    path: StepPath
+    phase: Phase
+    activity_ids: tuple[ActivityId, ...]
+
+
+def _shape(indexed: Iterable[tuple[StepPath, Step]]) -> list[StepSignature]:
     """A case's tree reduced to what a grouped tree must share: where each step
     sits, its phase, and the activities it claims.
 
@@ -58,7 +56,9 @@ def _shape(
     `report.coverage` reads exactly that field to credit story coverage — the
     same lie rule 4 refuses a varying term ref to prevent.
     """
-    return [(path, step.phase, step.activity_ids) for path, step in indexed]
+    return [
+        StepSignature(path, step.phase, step.activity_ids) for path, step in indexed
+    ]
 
 
 def check_same_template(group: Group) -> None:
@@ -96,8 +96,14 @@ def check_same_template(group: Group) -> None:
         if case.id == baseline.id:
             continue
         case_steps = group.indexed[case.id]
-        if _shape(case_steps.items()) != signature:
+        case_signature = _shape(case_steps.items())
+        if _structure(case_signature) != _structure(signature):
             raise _divergence_error(case, 'a different step structure', group)
+        if case_signature != signature:
+            # Only the activities differ, which `a different step structure`
+            # would misdescribe — and the fix is to pick one activity, not to
+            # give up on grouping.
+            raise _varying_activity_error(case, group)
         for (path, step), keys in zip(baseline_steps, baseline_keys, strict=True):
             # A comparable case has the baseline's exact structure, so every
             # baseline path exists in it — index, never `.get`.
@@ -156,6 +162,8 @@ def _narration_difference(baseline_keys: list[PartKey], case: Narration) -> str 
 
 def _detail_text(key: PartKey) -> str:
     """A part's conversion and format spec as an author wrote them."""
+    if key.detail is None:
+        return 'no formatting'
     conversion, format_spec = key.detail
     return (
         f'{"!" + conversion if conversion else ""}'
@@ -170,7 +178,7 @@ class PartKey(NamedTuple):
 
     kind: str
     label: str
-    detail: tuple[str, ...] = ()
+    detail: Format | None = None
 
 
 def _part_key(part: NarrationPart) -> PartKey:
@@ -185,11 +193,29 @@ def _part_key(part: NarrationPart) -> PartKey:
         case NarrationLiteral(value=value):
             return PartKey('literal', value)
         case NarrationValue(expression=e, conversion=c, format_spec=f):
-            return PartKey('value', e, (c or '', f))
+            return PartKey('value', e, (c, f))
         case NarrationPlaceholder(name=n, conversion=c, format_spec=f):
-            return PartKey('placeholder', n, (c or '', f))
+            return PartKey('placeholder', n, (c, f))
         case NarrationTermRef(expression=expression):
             return PartKey('term', expression)
+
+
+def _structure(signature: list[StepSignature]) -> list[tuple[StepPath, Phase]]:
+    """The signature without its activities — where the steps sit and what
+    phase each is."""
+    return [(step.path, step.phase) for step in signature]
+
+
+def _varying_activity_error(case: Scenario, group: Group) -> PytestGivenError:
+    return _grouping_error(
+        group,
+        f'case {case_suffix(case.id)} of {_test_name(group.anchor)!r} claims '
+        f'different step activities than case {case_suffix(group.baseline.id)} '
+        f'— the grouped tree keeps one set, and story coverage is credited '
+        f'from exactly that field. Give the step one activity, or use '
+        f'@scenario(..., group_parametrized=False) to emit one scenario per '
+        f'case.',
+    )
 
 
 def _divergence_error(
@@ -288,8 +314,8 @@ def _reformat(value: RawParamValue, part: NarrationValue) -> str | None:
 
 
 def check_attachment_labels(
-    baseline: LabeledAttachments,
-    others: dict[NodeId, LabeledAttachments],
+    baseline: AbstractSet[AttachmentLabel],
+    others: Iterable[AbstractSet[AttachmentLabel]],
     group: Group,
 ) -> None:
     """Rule 5: a step whose set of attachment labels differs across cases.
@@ -300,12 +326,12 @@ def check_attachment_labels(
     comparison is over the *distinct* labels, so a label attached a different
     number of times does not raise.
 
-    Takes the label maps the promotion walk has already grouped rather than the
-    step, since deriving the label sets from the raw attachment lists a second
-    time is the whole of this rule's work.
+    Takes label *sets* rather than the maps the promotion walk grouped: those
+    keys are all this reads, and asking for the whole map is what made this
+    module know the shape of an attachment store it never opens.
     """
-    for case in group.comparable:
-        differing = sorted(baseline.keys() ^ others[case.id].keys())
+    for other in others:
+        differing = sorted(baseline ^ other)
         if not differing:
             continue
         raise _grouping_error(
@@ -318,11 +344,7 @@ def check_attachment_labels(
 
 
 def check_constant_term_ref(
-    part: NarrationTermRef,
-    index: PartIndex,
-    path: StepPath,
-    phase: Phase,
-    group: Group,
+    part: NarrationTermRef, site: PartSite, group: Group
 ) -> None:
     """Rule 4: a term ref must name the same term and read the same in every case.
 
@@ -333,7 +355,7 @@ def check_constant_term_ref(
     would file every case's value under the first case's.
     """
     identity = (part.term_id, part.display)
-    for case_part in _case_term_refs(index, path, group):
+    for case_part in _case_term_refs(site, group):
         if (case_part.term_id, case_part.display) == identity:
             continue
         raise _grouping_error(
@@ -342,21 +364,19 @@ def check_constant_term_ref(
             f'{_test_name(group.anchor)!r} varies across parametrize '
             f'cases — a term ref must name the same term and read the '
             f'same in every case. Split the term ref from the value: '
-            f'{phase}(t"{{pg[\'Term\']}} {{value}} …"), or use @scenario(..., '
+            f'{site.phase}(t"{{pg[\'Term\']}} {{value}} …"), or use @scenario(..., '
             f'group_parametrized=False) to emit one scenario per case.',
         )
 
 
-def _case_term_refs(
-    index: PartIndex, path: StepPath, group: Group
-) -> Iterator[NarrationTermRef]:
+def _case_term_refs(site: PartSite, group: Group) -> Iterator[NarrationTermRef]:
     """The term ref at the baseline's position in each comparable case.
 
     Rule 6 pins every comparable case to the baseline's template, so a term ref
     here is a term ref there; what may still differ is which term it names and
     how it reads.
     """
-    for _node_id, case_part in group.parts_at(path, index):
+    for _node_id, case_part in group.parts_at(site):
         assert isinstance(case_part, NarrationTermRef), (
             'rule 6 admits only cases shaped like the baseline'
         )

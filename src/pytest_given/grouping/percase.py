@@ -25,7 +25,7 @@ from ..model import (
 )
 
 
-def per_case_scenarios(group: list[Scenario], param_info: ParamInfo) -> list[Scenario]:
+def per_case_scenarios(cases: list[Scenario], param_info: ParamInfo) -> list[Scenario]:
     """Each case of an opted-out group as its own scenario, titled by its
     parametrize id.
 
@@ -36,7 +36,7 @@ def per_case_scenarios(group: list[Scenario], param_info: ParamInfo) -> list[Sce
     """
     return [
         replace(case, narration=_suffixed(case.narration, case_suffix(case.id)))
-        for case in (_substituted(s, param_info[s.id]) for s in group)
+        for case in (_substituted(s, param_info[s.id]) for s in cases)
     ]
 
 

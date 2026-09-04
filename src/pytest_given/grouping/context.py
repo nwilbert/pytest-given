@@ -14,12 +14,29 @@ from ..model import (
     NodeId,
     ParamInfo,
     PartIndex,
+    Phase,
     RawParamValue,
     Scenario,
     Step,
     StepPath,
     walk_steps,
 )
+
+
+@dataclass(frozen=True, kw_only=True)
+class PartSite:
+    """Where the walk is: one narration part's position in the baseline tree.
+
+    `path` and `index` index different things — a step among its siblings, and
+    a part within that step's narration — and were threaded as adjacent
+    parameters in two different orders, which is exactly the confusion
+    `PartIndex` exists to name. `phase` rides along because a refusal message
+    quotes it; nothing looks anything up by it.
+    """
+
+    path: StepPath
+    index: PartIndex
+    phase: Phase
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -48,28 +65,17 @@ class Group:
     # several trees.
     indexed: dict[NodeId, dict[StepPath, Step]]
 
-    def steps_at(self, path: StepPath) -> Iterator[tuple[NodeId, Step]]:
-        """Each comparable case's step at `path`.
-
-        Indexed, never `.get`: rule 6 has already refused a group whose
-        comparable cases differ in shape, so every baseline path exists in
-        every one of them. This is what `indexed` is for, and having it here
-        keeps `checks` and `templatize` from each spelling the lookup out.
-        """
-        for case in self.comparable:
-            yield case.id, self.indexed[case.id][path]
-
-    def parts_at(
-        self, path: StepPath, index: PartIndex
-    ) -> Iterator[tuple[NodeId, NarrationPart]]:
+    def parts_at(self, site: PartSite) -> Iterator[tuple[NodeId, NarrationPart]]:
         """Each comparable case's narration part at the baseline's position.
 
-        Same guarantee as `steps_at`, one level down: rule 6 pins every
-        comparable case to the baseline's template, so a part of the
-        baseline's kind sits at this index in each of them.
+        The one way across cases, so no caller spells the double lookup out.
+        Indexed, never `.get`: rule 6 has already refused a group whose
+        comparable cases differ in shape, so every baseline path exists in
+        every one of them and carries a part of the baseline's kind there.
         """
-        for node_id, step in self.steps_at(path):
-            yield node_id, step.narration.parts[index]
+        for case in self.comparable:
+            step = self.indexed[case.id][site.path]
+            yield case.id, step.narration.parts[site.index]
 
 
 def build_group(cases: list[Scenario], param_info: ParamInfo) -> Group:

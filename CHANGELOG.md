@@ -141,6 +141,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Authoring API
 
+- Parametrize cases that claim different step activities now say so, instead of
+  reporting the more drastic "a different step structure".
+
 - A `@given` fixture scoped wider than `function` no longer loses its step when
   the first test to use it has no `@scenario`.
 - `@given`/`@when`/`@then` are signature-preserving, so a decorated helper stays
@@ -223,6 +226,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
   either side discards all of them.
 
 #### Report content (all formats)
+
+- A parametrized scenario whose cases all skipped now keeps its skip reason
+  instead of reporting `skipped` with none.
 
 - A parametrized scenario now keeps its place in source order instead of moving
   below every unparametrized one.

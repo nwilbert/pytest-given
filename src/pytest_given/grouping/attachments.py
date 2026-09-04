@@ -13,12 +13,16 @@ from ..model import (
     StepAttachment,
     StepPath,
 )
-from .checks import LabeledAttachments, check_attachment_labels
+from .checks import check_attachment_labels
 from .columns import ColumnBuilder
+
+# One step's attachments grouped by label, in the order that case recorded
+# them — what `_by_label` builds and the promotion walk pairs by.
+type LabeledAttachments = dict[AttachmentLabel, list[Attachment]]
 
 
 def templatize_attachments(
-    step: Step, path: StepPath, ctx: ColumnBuilder
+    step: Step, path: StepPath, builder: ColumnBuilder
 ) -> list[StepAttachment]:
     """Baseline attachments, with any whose payload varies promoted to a column.
 
@@ -34,10 +38,12 @@ def templatize_attachments(
     """
     baseline = _by_label(step)
     others = {
-        case.id: _by_label(ctx.group.indexed[case.id][path])
-        for case in ctx.group.comparable
+        case.id: _by_label(builder.group.indexed[case.id][path])
+        for case in builder.group.comparable
     }
-    check_attachment_labels(baseline, others, ctx.group)
+    check_attachment_labels(
+        baseline.keys(), [other.keys() for other in others.values()], builder.group
+    )
 
     out: list[StepAttachment] = []
     seen: dict[AttachmentLabel, int] = {}
@@ -45,9 +51,9 @@ def templatize_attachments(
         assert isinstance(attachment, Attachment), 'a recorded tree holds no refs'
         occurrence = seen.get(attachment.label, 0)
         seen[attachment.label] = occurrence + 1
-        out.append(_promote_occurrence(attachment, occurrence, others, ctx))
+        out.append(_promote_occurrence(attachment, occurrence, others, builder))
         if occurrence == len(baseline[attachment.label]) - 1:
-            _promote_extra_occurrences(attachment.label, baseline, others, ctx)
+            _promote_extra_occurrences(attachment.label, baseline, others, builder)
     return out
 
 
@@ -66,7 +72,7 @@ def _promote_occurrence(
     attachment: Attachment,
     occurrence: int,
     others: dict[NodeId, LabeledAttachments],
-    ctx: ColumnBuilder,
+    builder: ColumnBuilder,
 ) -> StepAttachment:
     """The baseline's `occurrence`-th attachment of `attachment.label`: stays
     inline when every comparable case's occurrence matches it byte for byte,
@@ -83,9 +89,9 @@ def _promote_occurrence(
         for other in theirs.values()
     ):
         return attachment
-    column = ctx.new_column('attachment', attachment.label)
+    column = builder.new_column('attachment', attachment.label)
     for node_id, other in theirs.items():
-        ctx.set_cell(column.id, node_id, other)
+        builder.set_cell(column.id, node_id, other)
     # The badge is labeled with the *column* name, not the attachment's own
     # label: a label attached twice gives two columns, and a badge repeating
     # the bare label points the reader at the wrong one.
@@ -100,7 +106,7 @@ def _promote_extra_occurrences(
     label: AttachmentLabel,
     baseline: LabeledAttachments,
     others: dict[NodeId, LabeledAttachments],
-    ctx: ColumnBuilder,
+    builder: ColumnBuilder,
 ) -> None:
     """Occurrences of `label` past the baseline's own count: one column each,
     with the baseline's cell left `None` and nothing appended to the grouped
@@ -112,9 +118,11 @@ def _promote_extra_occurrences(
     for.
     """
     for occurrence in range(len(baseline[label]), _max_count(label, others)):
-        column = ctx.new_column('attachment', label)
+        column = builder.new_column('attachment', label)
         for node_id, by_label in others.items():
-            ctx.set_cell(column.id, node_id, _occurrence(by_label, label, occurrence))
+            builder.set_cell(
+                column.id, node_id, _occurrence(by_label, label, occurrence)
+            )
 
 
 def _max_count(label: AttachmentLabel, others: dict[NodeId, LabeledAttachments]) -> int:

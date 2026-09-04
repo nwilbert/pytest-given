@@ -20,12 +20,32 @@ from ..model import (
     NarrationPlaceholder,
     NarrationValue,
     NodeId,
+    ParameterCase,
     ParameterColumn,
+    ParameterTable,
     ParamValue,
     RawParamValue,
+    Scenario,
     render_interpolation,
 )
 from .context import Group
+
+# A slot's rendering details as the author wrote them: `(conversion,
+# format_spec)`. `None` for the pair as a whole means "no formatting at all",
+# which `param_cell` renders differently from an empty spec.
+type Format = tuple[str | None, str]
+
+
+def trivial_format(fmt: Format) -> bool:
+    """Whether a slot carries no formatting of its own.
+
+    One predicate for both readers: `param_cell_formats` deciding whether a
+    column can adopt a shared formatting, and `templatize._slot_format`
+    deciding whether to render a cell the plain way. They used to disagree on
+    a `('', '')` pair, which only one of them treated as trivial.
+    """
+    conversion, format_spec = fmt
+    return not conversion and not format_spec
 
 
 def param_id(name: str) -> ColumnId:
@@ -43,9 +63,9 @@ class ColumnBuilder:
     """The columns and cells a group's walk accumulates, and the group it reads.
 
     Both halves of the walk — `templatize` and `attachments` — take this one
-    object, which is what it is for. `checks` still takes a bare `Group`, so a
-    module that only inspects a group does not also carry the ability to add a
-    column to it.
+    object, which is what it is for, and both call it `builder`. `checks` still
+    takes a bare `Group`, so a module that only inspects a group does not also
+    carry the ability to add a column to it.
     """
 
     group: Group
@@ -53,6 +73,37 @@ class ColumnBuilder:
     cells: dict[ColumnId, dict[NodeId, CellValue]] = field(default_factory=dict)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
     _taken_names: set[str] = field(default_factory=set)
+
+    def table(self, cases: list[Scenario]) -> ParameterTable:
+        """The finished table: the columns, and one row per case.
+
+        The transposition from the cell store to positional rows belongs to
+        whatever owns the store, so nothing outside has to know that a row's
+        values are ordered by `columns`.
+        """
+        return ParameterTable(
+            columns=self.columns,
+            cases=[
+                ParameterCase(
+                    values=[self.cell(column.id, case.id) for column in self.columns],
+                    status=case.status,
+                    error=case.error,
+                )
+                for case in cases
+            ],
+        )
+
+    def derived(self, name: str, rendered: dict[NodeId, str]) -> ParameterColumn:
+        """A new `derived` column, filled with what each case rendered.
+
+        Creating and filling are one act: every promotion does both, and three
+        call sites doing them separately is three chances to point a slot at an
+        empty column.
+        """
+        column = self.new_column('derived', name)
+        for node_id, text in rendered.items():
+            self.set_cell(column.id, node_id, text)
+        return column
 
     @classmethod
     def for_params(cls, group: Group, formats: dict[str, Format]) -> ColumnBuilder:
@@ -155,9 +206,6 @@ def _param_value(value: RawParamValue) -> ParamValue:
     return str(value)
 
 
-type Format = tuple[str | None, str]
-
-
 def param_cell_formats(
     narrations: Iterable[Narration], param_names: list[str]
 ) -> dict[str, Format]:
@@ -189,7 +237,7 @@ def param_cell_formats(
     return {
         name: next(iter(formats))
         for name, formats in seen.items()
-        if len(formats) == 1 and formats != {(None, '')}
+        if len(formats) == 1 and not trivial_format(next(iter(formats)))
     }
 
 
