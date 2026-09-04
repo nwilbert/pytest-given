@@ -47,9 +47,22 @@ plugin/   cli/             the entry points; may import all five, and hold
                            nothing the five could
 ```
 
-**Every module has a docstring saying what it is for and why it is shaped that
-way.** That is where the detail lives, and it stays true because it sits next
-to the code — read it before changing a module. What no filename tells you:
+**Docstrings have to earn their keep.** Prose drifts out of sync with the code
+whether or not it sits beside it — every stale sentence in this codebase was
+written next to the thing it describes. So the defence is writing less, not
+writing more: a docstring that restates the signature, narrates the
+implementation, or justifies the module against an alternative that no longer
+exists is a liability, and deleting it is a fix. Prefer a precise name to a
+sentence explaining a vague one.
+
+What is worth writing down is what the code cannot say: a non-obvious
+invariant, a constraint that makes the shape necessary, a trap for the next
+reader. Keep it to a line or two. Cross-references (`X is the only caller of
+Y`, `this is the sole consumer of Z`) rot fastest and are the least useful —
+the reader can grep. When you change a module, delete the sentences that have
+stopped being true rather than repairing them.
+
+What no filename tells you:
 
 - `grouping/` — the parametrize pass: a scenario's cases collapsed into one
   narrated tree plus a parameter table, refusing the authoring forms that would
@@ -101,6 +114,14 @@ Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filt
 The narration rules live in the **`pytest-given-authoring` skill** — whose canonical source is [src/pytest_given/skills_data/](src/pytest_given/skills_data/pytest-given-authoring/SKILL.md) — every link in this document points there. Contributor agents auto-discover the mirrored copy under `.claude/skills/`, and downstream projects get it via `pytest-given skills install`. After editing the canonical copy, regenerate the committed copy with `uv run pytest-given skills install` and commit both (a sync test fails otherwise).
 
 **The skill is documentation with the same sync duty as the README.** A change to the public API surface or its rules updates the README *and* the skill's [references/api.md](src/pytest_given/skills_data/pytest-given-authoring/references/api.md) (which downstream agents rely on instead of the README — it ships in the wheel, version-matched); a change to narration/lint semantics updates [references/scenarios.md](src/pytest_given/skills_data/pytest-given-authoring/references/scenarios.md) and friends. No mechanical check catches content drift between README and skill — treat "does the skill need this too?" as part of every user-facing change.
+
+Narration is the one kind of prose this project does ask for at volume, and the
+reason is colocation: a step's text sits on the `with` that performs it, so a
+change to the body puts the sentence describing it under the same cursor, and
+the lint mechanically catches several ways the two can part company. That makes
+narration *easier* to keep honest than a docstring — not automatically honest.
+It still drifts, which is why [Report testing](#report-testing) gates on reading
+the regenerated `.md` rather than trusting the text.
 
 What is specific to this repo's self-report:
 

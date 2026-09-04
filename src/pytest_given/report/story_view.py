@@ -1,9 +1,5 @@
 """The Stories view's rollups: which activities each scenario covers, and the
 per-story tallies the template reads.
-
-Its own module rather than a shared `aggregations`, for the reason `slugs.py`
-gives for itself: this shares no input, no output and no vocabulary with the
-glossary rollups next door. It is also the only consumer of `coverage.py`.
 """
 
 from dataclasses import dataclass, field

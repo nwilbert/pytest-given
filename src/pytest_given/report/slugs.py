@@ -1,8 +1,4 @@
-"""The URL-fragment slug each scenario is addressed by (`#scenario=<slug>`).
-
-Its own module rather than another rollup in `aggregations`: naming a scenario
-for a URL shares no input, no output and no vocabulary with those.
-"""
+"""The URL-fragment slug each scenario is addressed by (`#scenario=<slug>`)."""
 
 import re
 from collections import Counter

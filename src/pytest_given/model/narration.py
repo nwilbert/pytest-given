@@ -67,11 +67,9 @@ def narration_text(parts: Sequence[NarrationPart]) -> str:
 def narration_of(parts: Iterable[NarrationPart]) -> Narration:
     """A narration carrying those parts, with `text` derived from them.
 
-    The one constructor for a parts-carrying `Narration`: `text` must equal
-    `narration_text(parts)` — grouping partitions cases on it and the report's
-    search box reads it — and nothing about the dataclass enforces that, so
-    every caller that builds parts comes through here rather than pairing the
-    two by hand.
+    `text` must equal `narration_text(parts)` — grouping partitions cases on
+    it and the report's search box reads it — and the dataclass does not
+    enforce that.
     """
     parts = tuple(parts)
     return Narration(text=narration_text(parts), parts=parts)

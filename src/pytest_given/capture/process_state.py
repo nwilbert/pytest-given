@@ -12,8 +12,7 @@ missing one is a silent bug the *outer* session pays for: a stranded rootdir
 makes every later step record `source=None`, which quietly takes the lint's
 whole AST surface down with it.
 
-This module is the only sanctioned caller of the accessors it imports; the
-state itself stays where it is used, because the rootdir carries a resolve
+The state itself stays where it is used, because the rootdir carries a resolve
 cache and the path-form folding that keeps it correct (see `source.py`).
 """
 

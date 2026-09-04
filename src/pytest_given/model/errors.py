@@ -1,3 +1,6 @@
+"""The exception and warning types every package raises, and the one error
+message two packages have to phrase identically."""
+
 from collections.abc import Sequence
 
 
