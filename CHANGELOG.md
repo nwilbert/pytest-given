@@ -229,6 +229,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - A parametrized scenario whose cases all skipped now keeps its skip reason
   instead of reporting `skipped` with none.
+- A parameter row whose cell count disagreed with the table's columns silently
+  truncated in the HTML report; it now fails the same way it already did in
+  Markdown.
 
 - A parametrized scenario now keeps its place in source order instead of moving
   below every unparametrized one.

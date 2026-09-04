@@ -1,6 +1,6 @@
 from .errors import PytestGivenError, PytestGivenWarning, placeholder_mismatch
 from .ids import case_suffix, id_derive, node_base
-from .markup import EMPHASIS
+from .markup import EMPHASIS, plural
 from .narration import (
     narration_of,
     narration_text,
@@ -15,6 +15,7 @@ from .runtime import (
     RawParamValue,
 )
 from .schema import (
+    STATUS_GLYPH,
     Activity,
     ActivityId,
     ActivityPart,
@@ -68,6 +69,7 @@ from .steps import (
 
 __all__ = [
     'EMPHASIS',
+    'STATUS_GLYPH',
     'Activity',
     'ActivityId',
     'ActivityPart',
@@ -126,6 +128,7 @@ __all__ = [
     'placeholder_mismatch',
     'placeholder_token',
     'placeholder_value',
+    'plural',
     'rebuilt',
     'render_interpolation',
     'report_from_dict',

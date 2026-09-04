@@ -208,7 +208,7 @@
 
 
 ## ○ All cases skipped · skipped
-`examples/coffeeshop/test_coffeeshop.py:261::test_parametrized_all_skipped`
+`examples/coffeeshop/test_coffeeshop.py:261::test_parametrized_all_skipped` — reason: awaiting fixture
 
 
 | n | |

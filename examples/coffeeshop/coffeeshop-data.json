@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-02T20:49:15.774461+00:00",
+    "timestamp": "2026-09-04T07:04:05.981813+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "3c72747abdd7eec871d23786d9b648706ce686cc",
+    "commit_sha": "6a5252d409d9d514f23586fabd1c947950b26bf0",
     "title": "Coffee Shop Example"
   },
   "scenarios": [
@@ -1418,7 +1418,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 59,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -1607,7 +1607,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
+      "skip_reason": "awaiting fixture",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 261

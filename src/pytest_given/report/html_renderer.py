@@ -14,6 +14,7 @@ import jinja2
 from markupsafe import Markup, escape
 
 from ..model import (
+    STATUS_GLYPH,
     ActivityPart,
     ActivityTermRef,
     ActivityWord,
@@ -26,12 +27,14 @@ from ..model import (
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
+    ParameterColumn,
     ReportData,
     Scenario,
     SourceLocation,
     TermId,
     TermKind,
     placeholder_token,
+    plural,
 )
 from .coverage import build_coverage_map
 from .glossary_view import build_glossary_view
@@ -40,6 +43,7 @@ from .palette import param_column_colors
 from .slugs import build_scenario_slug_index
 from .source_link import compile_source_link
 from .story_view import (
+    activity_key,
     build_activity_labels,
     build_scenario_activity_index,
     build_story_rollups,
@@ -114,7 +118,10 @@ def _build_env(
         loader=jinja2.FileSystemLoader(str(_TEMPLATES_DIR)),
         autoescape=True,
     )
-    env.globals['zip'] = zip
+    # The activity key's format lives in `story_view`; the template emits it
+    # for the jump button and `app.js` looks the label up by it, so both sides
+    # go through the one constructor.
+    env.globals['activity_key'] = activity_key
     # The step-tree macro branches on this: an AttachmentRef has no content to
     # expand, only a column to point at.
     env.tests['attachment_ref'] = lambda value: isinstance(value, AttachmentRef)
@@ -129,7 +136,29 @@ def _build_env(
     )
     env.filters['activity_part'] = _make_activity_part_filter(report.glossary)
     env.filters['inline_md'] = _inline_md
+    env.filters['plural'] = plural
+    env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
+    env.filters['param_color_class'] = _make_param_color_class(param_color_map)
     return env
+
+
+def _make_param_color_class(
+    param_color_map: ParamColorMap,
+) -> Callable[[ParameterColumn], str]:
+    """Jinja filter: a column's colour class, or empty for one that gets none.
+
+    Which columns are coloured was decided in three places — the map builder
+    skipping attachment columns, the template re-deriving that with its own
+    `kind != 'attachment'`, and a `.get(name, 0)` fallback that would have
+    painted a column the map missed in column 0's colour rather than failing.
+    """
+
+    def _class(column: ParameterColumn) -> str:
+        if column.kind == 'attachment':
+            return ''
+        return f'param-color-{param_color_map[column.name]}'
+
+    return _class
 
 
 def _render_context(

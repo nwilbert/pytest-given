@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-02T20:49:16.056731+00:00",
+    "timestamp": "2026-09-04T07:04:06.255442+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.1.0",
-    "commit_sha": "3c72747abdd7eec871d23786d9b648706ce686cc",
+    "commit_sha": "6a5252d409d9d514f23586fabd1c947950b26bf0",
     "title": "Hotel Booking Example"
   },
   "scenarios": [

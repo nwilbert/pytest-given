@@ -19,7 +19,7 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, render_error, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, render_error, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer, status_badge, status_dot with context -%}
 
   <header class="topbar">
     <div class="topbar-title">{{ metadata.title or metadata.project }}</div>
@@ -196,9 +196,7 @@
         {% if overflow_tags %}
         <button type="button" class="btn-reset scenario-tag scenario-tag-more" x-show="!expandedTags[{{ scenario_idx }}]" aria-label="Show {{ overflow_tags | length }} more tags" @click.stop="expandedTags[{{ scenario_idx }}] = true">+{{ overflow_tags | length }}</button>
         {% endif %}
-        <span class="scenario-status {{ scenario.status }}">
-          {% if scenario.status == 'passed' %}✓ passed{% elif scenario.status == 'failed' %}✗ failed{% else %}○ skipped{% endif %}
-        </span>
+        {{ status_badge(scenario.status) }}
         <span class="scenario-duration">{{ scenario.duration_ms }}ms</span>
       </span>
     </div>
@@ -231,7 +229,7 @@
         <thead>
           <tr>
             {% for col in scenario.parameters.columns %}
-            <th {% if col.kind != 'attachment' %}class="param-color-{{ param_color_map.get(col.name, 0) }}" {% endif %}data-param="{{ col.id }}">{{ col.name }}</th>
+            <th {% if col | param_color_class %}class="{{ col | param_color_class }}" {% endif %}data-param="{{ col.id }}">{{ col.name }}</th>
             {% endfor %}
             <th style="text-align:right">status</th>
           </tr>
@@ -240,7 +238,7 @@
           {% for case in scenario.parameters.cases %}
           {%- set case_idx = loop.index0 -%}
           <tr data-case-row class="{{ 'failed-row' if case.status == 'failed' else '' }}">
-            {% for col, val in zip(scenario.parameters.columns, case.values) %}
+            {% for col, val in scenario.parameters.cells(case) %}
             {% if col.kind == 'attachment' %}
             <td data-param="{{ col.id }}">
               {% if val %}
@@ -258,7 +256,7 @@
             {% endif %}
             {% endfor %}
             <td style="text-align:right">
-              {% if case.status == 'passed' %}<span class="dot-passed">✓</span>{% elif case.status == 'skipped' %}<span class="dot-skipped">○</span>{% else %}<span class="dot-failed">✗</span>{% endif %}
+              {{ status_dot(case.status) }}
             </td>
           </tr>
           {% if case.error %}
@@ -273,7 +271,7 @@
               cell that holds one both squeezes the columns beside it (the
               collapsed content still sizes the column) and clips what it
               cannot fit. -#}
-          {% for col, val in zip(scenario.parameters.columns, case.values) %}
+          {% for col, val in scenario.parameters.cells(case) %}
           {% if col.kind == 'attachment' and val %}
           {% set cell_id = 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0 %}
           <tr class="attachment-panel-row">
@@ -329,7 +327,7 @@
               :aria-pressed="selectedStory === $el.dataset.storyId"
               @click="selectStory($el.dataset.storyId)">
         <div class="story-sidebar-title">{{ story.title }}</div>
-        <div class="story-sidebar-meta">{{ story.activities | length }} activities · {{ scns | length }} scenario{{ 's' if scns | length != 1 else '' }}</div>
+        <div class="story-sidebar-meta">{{ story.activities | length }} activities · {{ scns | length | plural('scenario') }}</div>
       </button>
       {% endfor %}
     </div>
@@ -343,7 +341,7 @@
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
             <div class="header-title">{{ story.title }}{{ anchor_link('view=stories&story=' ~ story.id) }}</div>
-            <div class="header-context">{{ story.activities | length }} activities · {{ total_scns }} scenario{{ 's' if total_scns != 1 else '' }}</div>
+            <div class="header-context">{{ story.activities | length }} activities · {{ total_scns | plural('scenario') }}</div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
                     @click="clearActivityHighlights()">Deselect</button>
           </div>
@@ -372,7 +370,7 @@
               <span class="cov-chip cov-uncovered">no coverage</span>
               {% else %}
               {% set cov_class = 'cov-passed' if (cov.failed == 0 and cov.skipped == 0) else ('cov-failed' if cov.failed == cov.total else 'cov-mixed') %}
-              <span class="cov-chip {{ cov_class }}">{{ cov.total }} scenario{{ 's' if cov.total != 1 else '' }}{% if cov.failed %} · {{ cov.failed }} failing{% endif %}{% if cov.skipped %} · {{ cov.skipped }} skipped{% endif %}</span>
+              <span class="cov-chip {{ cov_class }}">{{ cov.total | plural('scenario') }}{% if cov.failed %} · {{ cov.failed }} failing{% endif %}{% if cov.skipped %} · {{ cov.skipped }} skipped{% endif %}</span>
               {% endif %}
               {#- Revealed by CSS once the row is selected (see .activity-jump),
                   so the row keeps one meaning per click: the row selects, this
@@ -380,7 +378,7 @@
                   to show — an uncovered activity would land on an empty list. -#}
               {% if cov.total %}
               <button type="button" class="use-chip activity-jump"
-                      data-activity-jump="{{ story.id }}:{{ activity.id }}">Open in Scenarios <span aria-hidden="true">→</span></button>
+                      data-activity-jump="{{ activity_key(story.id, activity.id) }}">Open in Scenarios <span aria-hidden="true">→</span></button>
               {% endif %}
             </div>
           </div>
@@ -400,9 +398,7 @@
                         data-goto-scenario="{{ scn.id }}">{{ scn.narration | narration }}</button>
               </div>
               <span class="scenario-meta">
-                <span class="scenario-status {{ scn.status }}">
-                  {{ '✓ passed' if scn.status == 'passed' else ('✗ failed' if scn.status == 'failed' else '○ skipped') }}
-                </span>
+                {{ status_badge(scn.status) }}
               </span>
             </div>
             {% if scn_covers.get(scn.id) %}
@@ -440,41 +436,19 @@
         </button>
       </label>
 
-      {% set actor_count = glossary_view.counts.actor %}
-      {% set object_count = glossary_view.counts.object %}
-      {% set verb_count = glossary_view.counts.verb %}
-      {% set kindless_count = glossary_view.counts.kindless %}
       {% set undefined_count = glossary_view.undefined_count %}
       {% set all_uncategorized = glossary_view.all_uncategorized %}
       {% if not all_uncategorized %}
       <div class="sidebar-section">
         <div class="sidebar-label">Show kinds</div>
+        {% for kind in glossary_view.kinds %}
         <label class="kind-filter-row">
-          <input type="checkbox" x-model="glossaryKindFilter.actor">
-          <span class="kind-swatch kind-swatch-actor"></span>
-          <span>Actors</span>
-          <span class="nav-group-count">{{ actor_count }}</span>
+          <input type="checkbox" x-model="glossaryKindFilter.{{ kind.key }}">
+          <span class="kind-swatch kind-swatch-{{ kind.key }}"></span>
+          <span>{{ kind.label }}</span>
+          <span class="nav-group-count">{{ kind.count }}</span>
         </label>
-        <label class="kind-filter-row">
-          <input type="checkbox" x-model="glossaryKindFilter.object">
-          <span class="kind-swatch kind-swatch-object"></span>
-          <span>Work Objects</span>
-          <span class="nav-group-count">{{ object_count }}</span>
-        </label>
-        <label class="kind-filter-row">
-          <input type="checkbox" x-model="glossaryKindFilter.verb">
-          <span class="kind-swatch kind-swatch-verb"></span>
-          <span>Verbs</span>
-          <span class="nav-group-count">{{ verb_count }}</span>
-        </label>
-        {% if kindless_count %}
-        <label class="kind-filter-row">
-          <input type="checkbox" x-model="glossaryKindFilter.kindless">
-          <span class="kind-swatch kind-swatch-kindless"></span>
-          <span>Uncategorized</span>
-          <span class="nav-group-count">{{ kindless_count }}</span>
-        </label>
-        {% endif %}
+        {% endfor %}
       </div>
       {% endif %}
 
@@ -498,11 +472,8 @@
         <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
           <div class="header-title">Glossary</div>
           <div class="header-context">
-            {{ glossary.terms | length }} term{{ 's' if glossary.terms | length != 1 else '' }}{% if not all_uncategorized %} ·
-            {{ actor_count }} actor{{ 's' if actor_count != 1 else '' }} ·
-            {{ object_count }} work object{{ 's' if object_count != 1 else '' }} ·
-            {{ verb_count }} verb{{ 's' if verb_count != 1 else '' }}{% if kindless_count %} ·
-            {{ kindless_count }} uncategorized{% endif %}{% endif %}
+            {{ glossary.terms | length | plural('term') }}{% if not all_uncategorized %}{% for kind in glossary_view.kinds %} ·
+            {{ kind.summary }}{% endfor %}{% endif %}
           </div>
           <button class="collapse-all-btn" @click="toggleAllTerms()">
             <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
@@ -525,6 +496,7 @@
         {% set agg = entry.aggregation %}
         {% set scn_ids = entry.scenario_ids %}
         {% set show_instances = entry.show_instances %}
+        {% set show_forms = entry.show_forms %}
         <div class="entry" id="term-{{ term.id }}"
              data-search="{{ term.canonical | lower }}"
              x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
@@ -546,7 +518,7 @@
           <div class="refs scenario-body" id="term-refs-{{ term.id }}" data-term-id="{{ term.id }}" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
-                {% if agg and agg.stories %}
+                {% if agg.stories %}
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   {% for sid in agg.stories %}
@@ -562,7 +534,7 @@
                   {% endfor %}
                 </div>
                 {% endif %}
-                {% if agg and kind_key == 'verb' and agg.forms %}
+                {% if show_forms %}
                 <div class="refs-line">
                   <span class="refs-label">Also used as:</span>
                   {% for form in agg.forms %}
@@ -574,7 +546,7 @@
                 <div class="refs-line">
                   <a class="use-chip" href="#" data-term-id="{{ term.id }}"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
-                    Show {{ scn_ids | length }} scenario{{ 's' if scn_ids | length != 1 else '' }} using this term
+                    Show {{ scn_ids | length | plural('scenario') }} using this term
                   </a>
                 </div>
                 {% endif %}

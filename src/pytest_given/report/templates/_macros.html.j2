@@ -9,6 +9,18 @@
   The two-space indent is deliberate: it keeps the rendered HTML identical to
   when these lines sat inline.
 #}
+  {#- A scenario's status as the badge the Scenarios and Stories views both
+      show, and as the bare dot a parameter row ends with. The glyph comes
+      from `STATUS_GLYPH` through the `status_glyph` filter, so the Markdown
+      sink and every place here paint one run the same way. -#}
+  {%- macro status_badge(status) -%}
+    <span class="scenario-status {{ status }}">{{ status | status_glyph }} {{ status }}</span>
+  {%- endmacro -%}
+
+  {%- macro status_dot(status) -%}
+    <span class="dot-{{ status }}">{{ status | status_glyph }}</span>
+  {%- endmacro -%}
+
   {#- The drag handle between a sidebar and its view. Every view renders one,
       and they all drive the same `sidebarWidth`, so the three sidebars stay
       the same width — a reader who widens one in Scenarios finds Glossary

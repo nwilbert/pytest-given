@@ -1,10 +1,10 @@
 """Rendering the Markdown report: the deterministic, diffable view of a run."""
 
 import re
-from collections.abc import Iterator
 from pathlib import Path
 
 from ..model import (
+    STATUS_GLYPH,
     Attachment,
     AttachmentRef,
     CellValue,
@@ -20,16 +20,11 @@ from ..model import (
     ParameterTable,
     ReportData,
     Scenario,
-    Status,
     Step,
     StepAttachment,
     node_base,
     placeholder_token,
 )
-
-# The same three glyphs the HTML view paints, so one run reads alike in
-# both sinks.
-_STATUS_GLYPH: dict[Status, str] = {'passed': '✓', 'failed': '✗', 'skipped': '○'}
 
 
 def render_md(report: ReportData) -> str:
@@ -41,7 +36,7 @@ def render_md(report: ReportData) -> str:
 
 
 def _scenario_md(scenario: Scenario) -> str:
-    glyph = _STATUS_GLYPH[scenario.status]
+    glyph = STATUS_GLYPH[scenario.status]
     suffix = ''
     if scenario.status == 'skipped':
         suffix = ' · skipped'
@@ -98,8 +93,8 @@ def _param_table_md(table: ParameterTable) -> str:
     rows: list[str] = []
     blocks: list[str] = []
     for case in table.cases:
-        cells = [_case_cell(column, value) for column, value in _cells(table, case)]
-        rows.append('| ' + ' | '.join([*cells, _STATUS_GLYPH[case.status]]) + ' |')
+        cells = [_case_cell(column, value) for column, value in table.cells(case)]
+        rows.append('| ' + ' | '.join([*cells, STATUS_GLYPH[case.status]]) + ' |')
         blocks.extend(_case_error_block(table, case))
         blocks.extend(_case_attachment_blocks(table, case))
     return '\n'.join([header, separator, *rows, *blocks])
@@ -153,7 +148,7 @@ def _case_attachment_blocks(table: ParameterTable, case: ParameterCase) -> list[
     """
     key = _case_key(table, case)
     lines: list[str] = []
-    for column, value in _cells(table, case):
+    for column, value in table.cells(case):
         if not isinstance(value, Attachment) or _fits_inline(value.content):
             continue
         lines.append('')
@@ -166,20 +161,8 @@ def _case_key(table: ParameterTable, case: ParameterCase) -> str:
     """A case's parametrize values, joined — how a note below the table names
     the row it belongs to."""
     return ', '.join(
-        _cell(value) for column, value in _cells(table, case) if column.kind == 'param'
+        _cell(value) for column, value in table.cells(case) if column.kind == 'param'
     )
-
-
-def _cells(
-    table: ParameterTable, case: ParameterCase
-) -> Iterator[tuple[ParameterColumn, CellValue]]:
-    """A case's cells paired with the columns they sit under.
-
-    `ParameterCase.values` is positionally aligned with `table.columns`, so the
-    pairing — and the `strict=True` that asserts the alignment — is stated once
-    here rather than at each site that walks a row.
-    """
-    return zip(table.columns, case.values, strict=True)
 
 
 _MAX_INLINE = 72

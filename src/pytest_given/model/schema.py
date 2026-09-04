@@ -194,6 +194,11 @@ type Phase = Literal['given', 'when', 'then']
 # `== 'passed'` reads false.
 type Status = Literal['passed', 'failed', 'skipped']
 
+# How a status is painted, wherever it is painted. One map rather than a
+# constant in the Markdown renderer and three separately-ordered conditionals
+# in the HTML template, which agreed only by inspection.
+STATUS_GLYPH: dict[Status, str] = {'passed': '✓', 'failed': '✗', 'skipped': '○'}
+
 # A @pytest.mark.parametrize value as captured for the report: JSON primitives
 # pass through; anything else (dates, objects) is coerced to its str() when the
 # cell is built, since parametrize values only feed display and the JSON sink
@@ -336,6 +341,16 @@ class ParameterCase:
 class ParameterTable:
     columns: list[ParameterColumn]
     cases: list[ParameterCase] = field(default_factory=list)
+
+    def cells(self, case: ParameterCase) -> list[tuple[ParameterColumn, CellValue]]:
+        """A case's cells paired with the columns they sit under.
+
+        `ParameterCase.values` is positionally aligned with `columns`, and
+        `strict=True` is what asserts it. Here rather than in either renderer:
+        both walk a row, and when only one of them paired strictly, a short
+        `values` raised in Markdown and silently truncated the HTML row.
+        """
+        return list(zip(self.columns, case.values, strict=True))
 
 
 @dataclass

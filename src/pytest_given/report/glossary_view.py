@@ -24,6 +24,7 @@ from ..model import (
     TermId,
     TermKind,
     iter_steps,
+    plural,
 )
 
 
@@ -64,6 +65,7 @@ class TermEntry:
     aggregation: GlossaryAggregation
     scenario_ids: list[NodeId]
     show_instances: bool
+    show_forms: bool
     summary: str
 
 
@@ -92,6 +94,7 @@ class GlossaryView:
     """
 
     groups: list[KindGroup]
+    kinds: list[KindTally]
     counts: dict[KindKey, int]
     term_scenarios: dict[TermId, list[NodeId]]
     undefined_count: int
@@ -105,14 +108,31 @@ class _KindRow(NamedTuple):
     label: str
     key: KindKey
     css_class: str
+    noun: str
+
+
+@dataclass(frozen=True)
+class KindTally:
+    """One kind as the Glossary sidebar and header present it.
+
+    Carries its own count and its own summary phrase, so the template loops
+    over the catalog instead of restating it — four hand-written filter rows
+    and four hand-pluralized counts that had to be edited in step with
+    `_KIND_GROUPS` to stay true.
+    """
+
+    label: str
+    key: KindKey
+    count: int
+    summary: str
 
 
 # Each kind's heading, filter key, and pill class, in display order.
 _KIND_GROUPS: tuple[_KindRow, ...] = (
-    _KindRow('Actors', 'actor', 'term-actor'),
-    _KindRow('Work Objects', 'object', 'term-obj'),
-    _KindRow('Verbs', 'verb', 'term-verb'),
-    _KindRow('Uncategorized', 'kindless', 'term-kindless'),
+    _KindRow('Actors', 'actor', 'term-actor', 'actor'),
+    _KindRow('Work Objects', 'object', 'term-obj', 'work object'),
+    _KindRow('Verbs', 'verb', 'term-verb', 'verb'),
+    _KindRow('Uncategorized', 'kindless', 'term-kindless', 'uncategorized'),
 )
 
 # Only an entity has instances worth listing; a verb's surface forms are its
@@ -142,6 +162,7 @@ def build_glossary_view(report: ReportData) -> GlossaryView:
     ]
     return GlossaryView(
         groups=groups,
+        kinds=_kind_tallies(counts),
         counts=counts,
         term_scenarios=crossrefs.term_scenarios,
         undefined_count=sum(1 for term in terms if term.definition is None),
@@ -150,6 +171,29 @@ def build_glossary_view(report: ReportData) -> GlossaryView:
             and not (counts['actor'] or counts['object'] or counts['verb'])
         ),
     )
+
+
+def _kind_tallies(counts: dict[KindKey, int]) -> list[KindTally]:
+    """The kinds the sidebar filters on and the header counts.
+
+    `kindless` appears only when something is in it — an empty bucket is not a
+    filter worth offering — while the three real kinds always do, so their
+    checkboxes do not appear and disappear as terms are categorized.
+    """
+    return [
+        KindTally(
+            label=row.label,
+            key=row.key,
+            count=counts[row.key],
+            summary=(
+                f'{counts[row.key]} {row.noun}'
+                if row.key == 'kindless'
+                else plural(counts[row.key], row.noun)
+            ),
+        )
+        for row in _KIND_GROUPS
+        if row.key != 'kindless' or counts[row.key]
+    ]
 
 
 def _term_entry(
@@ -163,26 +207,23 @@ def _term_entry(
         aggregation=aggregation,
         scenario_ids=scenario_ids,
         show_instances=show_instances,
+        show_forms=kind_key == 'verb' and bool(aggregation.forms),
         summary=' · '.join(
             part
             for part in (
-                _plural(len(aggregation.instances), 'instance')
-                if show_instances
-                else '',
-                _plural(len(aggregation.stories), 'story', 'stories'),
-                _plural(len(scenario_ids), 'scenario'),
+                _some(len(aggregation.instances), 'instance') if show_instances else '',
+                _some(len(aggregation.stories), 'story', 'stories'),
+                _some(len(scenario_ids), 'scenario'),
             )
             if part
         ),
     )
 
 
-def _plural(n: int, singular: str, plural: str | None = None) -> str:
+def _some(n: int, singular: str, plural_form: str | None = None) -> str:
     """`'3 scenarios'`, or empty for a count of zero — the summary lists only
     what a term actually has."""
-    if not n:
-        return ''
-    return f'{n} {singular}' if n == 1 else f'{n} {plural or singular + "s"}'
+    return plural(n, singular, plural_form) if n else ''
 
 
 @dataclass(frozen=True)
