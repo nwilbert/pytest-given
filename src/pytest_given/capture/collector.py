@@ -1,9 +1,11 @@
 """The recording seam: the `Collector` itself, the ContextVar naming the one
 that is active, and the error every step raises when there is none."""
 
+import contextlib
 import copy
 import time
 import warnings
+from collections.abc import Iterator
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -26,7 +28,6 @@ from ..model import (
     Step,
     Story,
     StoryId,
-    TracebackFrame,
 )
 from .template import Template, narration_from
 
@@ -62,15 +63,6 @@ class FixtureRecording:
     def __post_init__(self) -> None:
         if not self.stack:
             self.stack.append(self.root)
-
-
-@dataclass(frozen=True)
-class StateToken:
-    """Opaque token returned by enter_* methods; pass to exit_* to restore."""
-
-    previous_state: RecordingState
-    previous_recording: FixtureRecording | None
-    previous_fixture_descriptor: StepDescriptor | None
 
 
 _collector_var: ContextVar[Collector | None] = ContextVar('collector', default=None)
@@ -282,59 +274,59 @@ class Collector:
             return 0
         return int((time.monotonic() - self._started_at) * 1000)
 
-    def enter_fixture_setup(
-        self,
-        recording: FixtureRecording,
-        descriptor: StepDescriptor,
-    ) -> StateToken:
-        """Route recording into `recording` until the matching exit."""
-        return self._enter('fixture_setup', recording=recording, descriptor=descriptor)
+    @contextlib.contextmanager
+    def fixture_setup(
+        self, recording: FixtureRecording, descriptor: StepDescriptor
+    ) -> Iterator[None]:
+        """Route recording into `recording` for the duration of the block."""
+        with self._routing('fixture_setup', recording, descriptor):
+            yield
 
-    def enter_fixture_teardown(self) -> StateToken:
-        """Enter the state that refuses steps and attachments.
+    @contextlib.contextmanager
+    def fixture_teardown(self) -> Iterator[None]:
+        """Refuse steps and attachments for the duration of the block.
 
         Unlike setup, teardown pins no recording: nothing may be recorded from
         it, so there is nowhere for a step to go and no descriptor to match.
         """
-        return self._enter('fixture_teardown')
+        with self._routing('fixture_teardown', None, None):
+            yield
 
-    def exit_fixture(self, token: StateToken) -> None:
-        """Put back whatever the matching `enter_*` displaced.
-
-        One exit for both entries: the token carries the whole of what was
-        displaced, so leaving setup and leaving teardown are the same act.
-        """
-        self._state = token.previous_state
-        self._active_recording = token.previous_recording
-        self._active_fixture_descriptor = token.previous_fixture_descriptor
-
-    def _enter(
+    @contextlib.contextmanager
+    def _routing(
         self,
         state: RecordingState,
-        recording: FixtureRecording | None = None,
-        descriptor: StepDescriptor | None = None,
-    ) -> StateToken:
-        """Switch to `state`, returning the token that puts back what it
-        displaced. Nested by construction — a fixture setting up inside another
-        fixture's setup restores the outer one's routing on the way out."""
-        token = StateToken(
-            previous_state=self._state,
-            previous_recording=self._active_recording,
-            previous_fixture_descriptor=self._active_fixture_descriptor,
+        recording: FixtureRecording | None,
+        descriptor: StepDescriptor | None,
+    ) -> Iterator[None]:
+        """Switch to `state`, and put back whatever that displaced on the way
+        out. Nested by construction — a fixture setting up inside another
+        fixture's setup restores the outer one's routing when it leaves."""
+        previous = (
+            self._state,
+            self._active_recording,
+            self._active_fixture_descriptor,
         )
         self._state = state
         if recording is not None:
             self._active_recording = recording
             self._active_fixture_descriptor = descriptor
-        return token
+        try:
+            yield
+        finally:
+            (
+                self._state,
+                self._active_recording,
+                self._active_fixture_descriptor,
+            ) = previous
 
     def graft_recording(
         self,
-        recording: FixtureRecording,
+        root: Step,
         *,
         override_narration: Narration | None = None,
     ) -> None:
-        """Deep-copy the recording's root into the active scenario's steps.
+        """Deep-copy a fixture's recorded root into the active scenario's steps.
 
         When *override_narration* is given (an Annotated label on the fixture
         parameter), it replaces the grafted root's narration; the recorded
@@ -343,10 +335,10 @@ class Collector:
         # Grafting runs from the setup hook of an annotated item, which opened
         # the scenario before fixtures ran; nothing closes it until logreport.
         assert self._current_scenario is not None
-        root = copy.deepcopy(recording.root)
+        grafted = copy.deepcopy(root)
         if override_narration is not None:
-            root.narration = override_narration
-        self._current_scenario.steps.append(root)
+            grafted.narration = override_narration
+        self._current_scenario.steps.append(grafted)
 
     def graft_leaf_given(self, narration: Narration) -> None:
         """Append a childless `given` step to the active scenario.
@@ -477,43 +469,35 @@ class Collector:
             return self._active_recording.stack
         return self._step_stack
 
-    def fail_scenario(
-        self,
-        message: str,
-        frames: list[TracebackFrame] | None = None,
-        error_tail: str | None = None,
-    ) -> None:
-        if self._current_scenario is not None:
-            self._current_scenario.status = 'failed'
-            self._current_scenario.error = _error_info(message, frames, error_tail)
+    def records(self, node_id: NodeId) -> bool:
+        """Whether this collector holds a scenario for `node_id`.
 
-    def fail_recorded_scenario(
-        self,
-        node_id: NodeId,
-        message: str,
-        frames: list[TracebackFrame] | None = None,
-        error_tail: str | None = None,
-    ) -> None:
-        """Fail a scenario that has already finished — the teardown path.
-
-        A fixture raising past its `yield` errors after the call report ran
-        `finish_scenario`, so there is no active scenario left to mark and the
-        run would otherwise report green for something pytest counted as an
-        error.
-
-        An error already on the scenario is kept: a call-phase failure is what
-        the reader opened the scenario for.
+        True whether it is still open or already finished — the caller asking
+        is deciding whether an error is worth the expensive traceback work, and
+        that answer does not depend on which.
         """
-        scenario = self._scenarios_by_id[node_id]
+        return self.active_scenario_id == node_id or node_id in self._scenarios_by_id
+
+    def fail(self, node_id: NodeId, error: ErrorInfo) -> None:
+        """Mark `node_id`'s scenario failed, open or finished.
+
+        Both are one operation: a fixture raising past its `yield` errors after
+        the call report already ran `finish_scenario`, so there is no active
+        scenario left to mark and the run would otherwise report green for
+        something pytest counted as an error. Which of the two it is, is this
+        collector's business rather than its caller's.
+
+        The first error wins: a call-phase failure is what the reader opened
+        the scenario for, and a teardown error after it is the lesser story.
+        """
+        scenario = self._scenario_for(node_id)
+        if scenario is None:
+            return
         scenario.status = 'failed'
         if scenario.error is None:
-            scenario.error = _error_info(message, frames, error_tail)
+            scenario.error = error
 
-    def has_scenario(self, node_id: NodeId) -> bool:
-        return node_id in self._scenarios_by_id
-
-
-def _error_info(
-    message: str, frames: list[TracebackFrame] | None, error_tail: str | None
-) -> ErrorInfo:
-    return ErrorInfo(message=message, frames=frames or [], error_tail=error_tail)
+    def _scenario_for(self, node_id: NodeId) -> Scenario | None:
+        if self._current_scenario is not None and self._current_scenario.id == node_id:
+            return self._current_scenario
+        return self._scenarios_by_id.get(node_id)

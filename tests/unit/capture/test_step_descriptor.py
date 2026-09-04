@@ -675,14 +675,13 @@ def test_decorator_skips_push_when_active_fixture_descriptor_matches() -> None:
     collector.start_scenario('id', 'name', 'mod', [])
     root = Step(phase='given', narration=Narration(text='a coffee machine'))
     recording = FixtureRecording(root=root)
-    token = collector.enter_fixture_setup(recording, descriptor=desc)
     set_active_collector(collector)
     try:
-        assert fixture_body() == 'value'
-        assert recording.stack == [root]
-        assert root.children == []
+        with collector.fixture_setup(recording, desc):
+            assert fixture_body() == 'value'
+            assert recording.stack == [root]
+            assert root.children == []
     finally:
-        collector.exit_fixture(token)
         set_active_collector(None)
 
 
@@ -884,12 +883,11 @@ def test_decorator_records_when_called_from_inside_fixture_body() -> None:
     collector.start_scenario('id', 'name', 'mod', [])
     root = Step(phase='given', narration=Narration(text='a coffee machine'))
     recording = FixtureRecording(root=root)
-    token = collector.enter_fixture_setup(recording, descriptor=outer_desc)
     set_active_collector(collector)
     try:
-        insert()
+        with collector.fixture_setup(recording, outer_desc):
+            insert()
     finally:
-        collector.exit_fixture(token)
         set_active_collector(None)
     assert [c.narration.text for c in root.children] == ['inserting money']
 

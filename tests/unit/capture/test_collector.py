@@ -1,3 +1,4 @@
+from contextlib import ExitStack
 from types import SimpleNamespace
 
 import pytest
@@ -8,6 +9,7 @@ from pytest_given.capture import collector as collector_mod
 from pytest_given.capture.collector import Collector
 from pytest_given.capture.steps import StepDescriptor
 from pytest_given.model import (
+    ErrorInfo,
     Narration,
     NarrationLiteral,
     NarrationPart,
@@ -18,6 +20,10 @@ from pytest_given.model import (
     Step,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
+
+
+def _error(message: str) -> ErrorInfo:
+    return ErrorInfo(message=message, frames=[], error_tail=None)
 
 
 def _n(text: str) -> Narration:
@@ -187,9 +193,8 @@ def test_collector_state_transitions_idle_test_idle() -> None:
 def test_enter_fixture_setup_transitions_state() -> None:
     collector = Collector()
     recording = FixtureRecording(root=Step(phase='given', narration=_n('a shop')))
-    token = collector.enter_fixture_setup(recording, _descriptor())
-    assert collector.state == 'fixture_setup'
-    collector.exit_fixture(token)
+    with collector.fixture_setup(recording, _descriptor()):
+        assert collector.state == 'fixture_setup'
     assert collector.state == 'idle'
 
 
@@ -197,17 +202,15 @@ def test_enter_fixture_setup_nests_inside_test() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
     recording = FixtureRecording(root=Step(phase='given', narration=_n('a shop')))
-    token = collector.enter_fixture_setup(recording, _descriptor())
-    assert collector.state == 'fixture_setup'
-    collector.exit_fixture(token)
+    with collector.fixture_setup(recording, _descriptor()):
+        assert collector.state == 'fixture_setup'
     assert collector.state == 'test'  # restored
 
 
 def test_enter_fixture_teardown_transitions_state() -> None:
     collector = Collector()
-    token = collector.enter_fixture_teardown()
-    assert collector.state == 'fixture_teardown'
-    collector.exit_fixture(token)
+    with collector.fixture_teardown():
+        assert collector.state == 'fixture_teardown'
     assert collector.state == 'idle'
 
 
@@ -221,11 +224,12 @@ def test_push_step_during_fixture_setup_records_into_recording() -> None:
     with given(t'a {pg["Fixture recording"]} under setup'):
         root = Step(phase='given', narration=_n('a shop'))
         recording = FixtureRecording(root=root)
-        token = collector.enter_fixture_setup(recording, _descriptor())
+        setup = ExitStack()
+        setup.enter_context(collector.fixture_setup(recording, _descriptor()))
     with when(t'a {pg["Step"]} is pushed inside the fixture body', activity=7):
         collector.push_step('given', _n('with 3 items'))
         collector.pop_step()
-        collector.exit_fixture(token)
+        setup.close()
     with then('it is recorded as a child of the recording root'):
         assert len(root.children) == 1
         assert root.children[0].narration.text == 'with 3 items'
@@ -240,10 +244,11 @@ def test_attach_during_fixture_setup_records_into_recording() -> None:
     with given(t'a {pg["Fixture recording"]} under setup'):
         root = Step(phase='given', narration=_n('a shop'))
         recording = FixtureRecording(root=root)
-        token = collector.enter_fixture_setup(recording, _descriptor())
+        setup = ExitStack()
+        setup.enter_context(collector.fixture_setup(recording, _descriptor()))
     with when(t'an {pg["Attachment"]} is attached inside the fixture body', activity=6):
         collector.attach('snapshot', 'data')
-        collector.exit_fixture(token)
+        setup.close()
     with then(t'the {pg["Attachment"]} lands on the recording root'):
         assert len(root.attachments) == 1
         assert root.attachments[0].label == 'snapshot'
@@ -260,11 +265,12 @@ def test_push_step_routing_isolates_recording_from_scenario() -> None:
     with given(t'an {pg["Active scenario"]} with a {pg["Fixture recording"]}'):
         root = Step(phase='given', narration=_n('a shop'))
         recording = FixtureRecording(root=root)
-        token = collector.enter_fixture_setup(recording, _descriptor())
+        setup = ExitStack()
+        setup.enter_context(collector.fixture_setup(recording, _descriptor()))
     with when(t'a {pg["Step"]} is pushed inside the fixture body', activity=7):
         collector.push_step('given', _n('fixture-internal'))
         collector.pop_step()
-        collector.exit_fixture(token)
+        setup.close()
         recorded = collector.finish_scenario(status='passed')
     with then('the step lives only in the recording, not the scenario'):
         assert recorded.steps == []
@@ -279,22 +285,20 @@ def test_push_step_during_idle_raises() -> None:
 
 def test_push_step_during_teardown_raises() -> None:
     collector = Collector()
-    token = collector.enter_fixture_teardown()
-    try:
-        with pytest.raises(PytestGivenError, match='fixture teardown'):
-            collector.push_step('given', _n('teardown step'))
-    finally:
-        collector.exit_fixture(token)
+    with (
+        collector.fixture_teardown(),
+        pytest.raises(PytestGivenError, match='fixture teardown'),
+    ):
+        collector.push_step('given', _n('teardown step'))
 
 
 def test_attach_during_teardown_raises() -> None:
     collector = Collector()
-    token = collector.enter_fixture_teardown()
-    try:
-        with pytest.raises(PytestGivenError, match='fixture teardown'):
-            collector.attach('label', 'content')
-    finally:
-        collector.exit_fixture(token)
+    with (
+        collector.fixture_teardown(),
+        pytest.raises(PytestGivenError, match='fixture teardown'),
+    ):
+        collector.attach('label', 'content')
 
 
 def test_attach_during_idle_raises() -> None:
@@ -334,7 +338,7 @@ def test_graft_recording_deep_copies_into_scenario() -> None:
     with when(
         t'a {pg["Graft"]} copies it into the {pg["Active scenario"]}', activity=8
     ):
-        collector.graft_recording(recording)
+        collector.graft_recording(recording.root)
         recorded = collector.finish_scenario(status='passed')
     with then('the scenario gains a deep copy of the recorded steps'):
         assert recorded.steps[0].narration.text == 'a shop'
@@ -350,7 +354,7 @@ def test_graft_recording_without_scenario_is_refused() -> None:
     collector = Collector()
     recording = FixtureRecording(root=Step(phase='given', narration=_n('x')))
     with pytest.raises(AssertionError):
-        collector.graft_recording(recording)
+        collector.graft_recording(recording.root)
 
 
 def test_pop_step_protects_recording_root() -> None:
@@ -358,8 +362,7 @@ def test_pop_step_protects_recording_root() -> None:
     as the labeled parent for grafting."""
     collector = Collector()
     recording = FixtureRecording(root=Step(phase='given', narration=_n('label')))
-    token = collector.enter_fixture_setup(recording, _descriptor())
-    try:
+    with collector.fixture_setup(recording, _descriptor()):
         # Stack has just the root; pop should refuse to remove it.
         assert collector.pop_step() is None
         assert len(recording.stack) == 1
@@ -368,8 +371,6 @@ def test_pop_step_protects_recording_root() -> None:
         popped = collector.pop_step()
         assert popped is not None
         assert popped.narration.text == 'child'
-    finally:
-        collector.exit_fixture(token)
 
 
 def test_pop_step_with_empty_stack_returns_none() -> None:
@@ -468,15 +469,13 @@ def test_start_scenario_source_defaults_to_none() -> None:
     t'A {pg["Step fixture"].low} failing in teardown fails its finished '
     t'{pg["Scenario"].low}',
 )
-def test_fail_recorded_scenario_marks_a_finished_scenario_failed() -> None:
+def test_fail_marks_a_finished_scenario_failed() -> None:
     with given(t'a {pg["Scenario"]} that already finished as passed'):
         collector = Collector()
         collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
         recorded = collector.finish_scenario(status='passed')
     with when('a fixture raises past its yield, after the scenario finished'):
-        collector.fail_recorded_scenario(
-            NodeId('test.py::test_x'), message='teardown boom'
-        )
+        collector.fail(NodeId('test.py::test_x'), _error('teardown boom'))
     with then(t'the recorded {pg["Scenario"].low} carries the failure'):
         assert recorded.status == 'failed'
         assert recorded.error is not None
@@ -486,16 +485,14 @@ def test_fail_recorded_scenario_marks_a_finished_scenario_failed() -> None:
 @scenario(
     t'A teardown failure keeps the error the {pg["Scenario"].low} already carries',
 )
-def test_fail_recorded_scenario_keeps_an_existing_error() -> None:
+def test_fail_keeps_an_existing_error() -> None:
     with given(t'a {pg["Scenario"]} that already failed in its body'):
         collector = Collector()
         collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
-        collector.fail_scenario(message='body boom')
+        collector.fail(NodeId('test.py::test_x'), _error('body boom'))
         recorded = collector.finish_scenario(status='failed')
     with when('its fixture then also fails in teardown'):
-        collector.fail_recorded_scenario(
-            NodeId('test.py::test_x'), message='teardown boom'
-        )
+        collector.fail(NodeId('test.py::test_x'), _error('teardown boom'))
     with then('the body failure is what the report shows'):
         assert recorded.error is not None
         assert recorded.error.message == 'body boom'
@@ -504,7 +501,7 @@ def test_fail_recorded_scenario_keeps_an_existing_error() -> None:
 @scenario(
     t'A {pg["Collector"]} reports which {pg["Node ID"]("node ids")} it recorded',
 )
-def test_has_scenario_reports_only_recorded_node_ids() -> None:
+def test_records_reports_only_recorded_node_ids() -> None:
     """The teardown hook asks this before doing any traceback work, so an item
     the plugin recorded nothing for never pays for a report it would discard."""
     with given(t'a {pg["Collector"]} that recorded one {pg["Scenario"].low}'):
@@ -512,8 +509,8 @@ def test_has_scenario_reports_only_recorded_node_ids() -> None:
         collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
         collector.finish_scenario(status='passed')
     with when('the recorded and an unrecorded node id are both asked about'):
-        recorded = collector.has_scenario(NodeId('test.py::test_x'))
-        unrecorded = collector.has_scenario(NodeId('test.py::test_other'))
+        recorded = collector.records(NodeId('test.py::test_x'))
+        unrecorded = collector.records(NodeId('test.py::test_other'))
     with then('only the recorded node id is claimed'):
         assert recorded
         assert not unrecorded
@@ -552,7 +549,9 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
         root.children.append(Step(phase='given', narration=_n('a recorded child')))
         recording = FixtureRecording(root=root)
     with when(t'a {pg["Graft"]} supplies an override {pg["Narration"]}', activity=8):
-        collector.graft_recording(recording, override_narration=_n('a fancy machine'))
+        collector.graft_recording(
+            recording.root, override_narration=_n('a fancy machine')
+        )
         recorded = collector.finish_scenario(status='passed')
     with then('the grafted root shows the override text and keeps its children'):
         grafted = recorded.steps[0]
@@ -582,7 +581,7 @@ def test_graft_recording_without_override_is_unchanged() -> None:
     collector = Collector()
     collector.start_scenario('id', 'name', 'mod', [])
     recording = FixtureRecording(root=Step(phase='given', narration=_n('kept label')))
-    collector.graft_recording(recording)
+    collector.graft_recording(recording.root)
     scenario = collector.finish_scenario(status='passed')
     assert scenario.steps[0].narration.text == 'kept label'
 

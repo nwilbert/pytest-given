@@ -74,11 +74,10 @@ def pytest_fixture_setup(
             fixture_name=fixturedef.argname,
         )
     )
-    token = collector.enter_fixture_setup(recording, descriptor=desc)
     try:
-        yield
+        with collector.fixture_setup(recording, desc):
+            yield
     finally:
-        collector.exit_fixture(token)
         key = _setup_instance_key(fixturedef, request)
         session_state(request.config).fixture_recordings[key] = recording
 
@@ -110,12 +109,8 @@ def _ensure_teardown_wrapped(
         # Past the yield → teardown. Use the captured collector (not the
         # ContextVar): session-scoped fixtures tear down at session end, after
         # the per-test active collector is cleared.
-        token = collector.enter_fixture_teardown()
-        try:
-            with contextlib.suppress(StopIteration):
-                next(gen)
-        finally:
-            collector.exit_fixture(token)
+        with collector.fixture_teardown(), contextlib.suppress(StopIteration):
+            next(gen)
 
     # `functools.wraps` copies `__dict__`, so the wrapper already carries the
     # original's `_step_descriptor`; only the idempotence flag is new.
@@ -183,7 +178,7 @@ def _graft_recorded_fixtures(
         name = recording.root.fixture_name
         descriptor = descriptors.get(name) if name is not None else None
         collector.graft_recording(
-            recording,
+            recording.root,
             override_narration=None if descriptor is None else descriptor.narration,
         )
         grafted.add(name)

@@ -19,6 +19,7 @@ from ..capture import (
     snapshot_param_value,
 )
 from ..model import (
+    ErrorInfo,
     NodeId,
     ParamSpec,
     Status,
@@ -132,17 +133,11 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
         return
     collector = session_collector(item.config)
     node_id = NodeId(item.nodeid)
-    teardown = call.when == 'teardown'
     # Checked before any traceback work: `getrepr` below is the expensive
     # per-frame scan, and an item this plugin recorded nothing for — an
     # undecorated test in a suite that merely installs pytest-given — would
     # otherwise pay it on every teardown error only to discard the result.
-    tracked = (
-        collector.has_scenario(node_id)
-        if teardown
-        else collector.active_scenario_id == node_id
-    )
-    if not tracked:
+    if not collector.records(node_id):
         return
     # A skip's traceback is pure skip machinery — the scenario carries a
     # structured skip_reason instead. Short-circuited before getrepr, whose
@@ -155,12 +150,10 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) ->
     error_repr = call.excinfo.getrepr(style='short')
     message = str(call.excinfo.value)
     frames, error_tail = parse_short_repr(str(error_repr))
-    if teardown:
-        collector.fail_recorded_scenario(
-            node_id, message=message, frames=frames, error_tail=error_tail
-        )
-    else:
-        collector.fail_scenario(message=message, frames=frames, error_tail=error_tail)
+    collector.fail(
+        node_id,
+        ErrorInfo(message=message, frames=frames, error_tail=error_tail),
+    )
 
 
 @pytest.hookimpl(trylast=True)
