@@ -251,17 +251,17 @@ def test_pytest_runtest_teardown_clears_a_finished_scenario(
     assert get_active_collector() is None
 
 
-def test_pytest_runtest_teardown_clears_unannotated_flag(
+def test_pytest_runtest_teardown_returns_the_collector_to_idle(
     fake_config: Any,
     fresh_collector: Collector,
     fresh_state: state.SessionState,
 ) -> None:
-    fresh_collector.inside_unannotated_test = True
+    fresh_collector.enter_unannotated_test()
     fresh_state.published_for = NodeId('t::x')
     set_active_collector(fresh_collector)
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::x', config=fake_config))
     runtest.pytest_runtest_teardown(item)
-    assert fresh_collector.inside_unannotated_test is False
+    assert fresh_collector.state == 'idle'
     assert get_active_collector() is None
 
 

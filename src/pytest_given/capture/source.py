@@ -114,6 +114,11 @@ def _relativize(abs_path: Path) -> str | None:
     return rel
 
 
+# Frames whose file starts with this are ours, and never the answer
+# `capture_caller_source` is looking for.
+_PACKAGE_ROOT = f'{Path(__file__).parent.parent}/'
+
+
 def _optional_source(abs_path: Path, line: int) -> SourceLocation | None:
     """SourceLocation for an absolute path, or None when it can't be made
     rootdir-relative (rootdir unset or path outside it) — i.e. "no link". The
@@ -123,21 +128,26 @@ def _optional_source(abs_path: Path, line: int) -> SourceLocation | None:
     return None if rel is None else SourceLocation(relpath=rel, line=line)
 
 
-def capture_caller_source(skip: int = 1) -> SourceLocation | None:
-    """Return a SourceLocation for the frame `skip` levels up the call stack.
+def capture_caller_source() -> SourceLocation | None:
+    """A SourceLocation for the nearest frame outside this package.
 
-    `skip` counts the frames between the user's code and here, so every caller
-    passes its own depth: `skip=2` from a user-facing function that calls this
-    directly (`story()`, `given(...).__enter__`), `skip=3` from one that goes
-    through a shared helper (`g.actor("Guest")` -> `_declare` -> here).
+    Walks out rather than counting in. Every call site used to pass its own
+    depth — `skip=2` from a direct caller, `skip=3` from one behind a shared
+    helper — and getting it wrong did not raise: the frame landed inside
+    `pytest_given/`, `_relativize` returned None, and the term or story
+    silently recorded `source=None`, losing its report link and, with it, the
+    lint's whole AST surface. Inserting one wrapper anywhere in a call chain
+    was enough to do that. The walk cannot be wrong that way, and adding a
+    frame costs nothing.
 
-    Getting it wrong does not raise: the frame lands inside `pytest_given/`,
-    `_relativize` returns None, and the term or story records `source=None` —
-    losing its report link and, with it, the lint's AST surface. `skip=1`
-    (the immediate caller of this function) is the default only because it is
-    the floor; no production call site wants it.
+    Returns None if the stack never leaves the package, or if the frame it
+    lands on cannot be made rootdir-relative.
     """
-    frame = sys._getframe(skip)
+    frame: types.FrameType | None = sys._getframe(1)
+    while frame is not None and frame.f_code.co_filename.startswith(_PACKAGE_ROOT):
+        frame = frame.f_back
+    if frame is None:
+        return None
     abs_path = _co_filename_to_path(frame.f_code.co_filename)
     return _optional_source(abs_path, frame.f_lineno)
 

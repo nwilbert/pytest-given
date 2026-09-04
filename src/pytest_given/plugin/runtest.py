@@ -36,9 +36,9 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     collector = session_collector(item.config)
     marker = scenario_marker(item)
     if marker is None:
-        # Unannotated test: set the flag so `with given(...)` inside it warns
-        # instead of raising. Teardown clears the flag and active collector.
-        collector.inside_unannotated_test = True
+        # Unannotated test: `with given(...)` inside it warns instead of
+        # raising. Teardown returns the collector to idle and unpublishes it.
+        collector.enter_unannotated_test()
         session_state(item.config).published_for = NodeId(item.nodeid)
         set_active_collector(collector)
         yield
@@ -113,7 +113,7 @@ def pytest_runtest_teardown(item: pytest.Item) -> None:
     state = session_state(item.config)
     if state.published_for != NodeId(item.nodeid):
         return
-    session_collector(item.config).inside_unannotated_test = False
+    session_collector(item.config).exit_unannotated_test()
     state.published_for = None
     set_active_collector(None)
 

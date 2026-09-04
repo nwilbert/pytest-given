@@ -185,7 +185,7 @@ def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     """Construct a Story. Reassigns auto-numbered ids, validates uniqueness,
     and enforces v1's single-glossary invariant."""
     sid = StoryId(id_derive(title))
-    source = capture_caller_source(skip=2)
+    source = capture_caller_source()
     _register_story(sid, title, source)
     numbered = _assign_sequence_numbers(tuple(activities))
     _check_unique_ids(numbered)

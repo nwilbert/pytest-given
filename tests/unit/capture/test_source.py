@@ -44,22 +44,21 @@ def test_captures_caller_when_inside_rootdir():
     assert loc.line > 0
 
 
-def test_skip_argument_walks_up_call_stack():
+def test_the_walk_passes_over_frames_inside_the_package():
+    """The anchor is the nearest frame *outside* `pytest_given/`, so a helper
+    added anywhere in the chain cannot silently move it."""
     repo_root = Path(__file__).resolve().parents[3]
     set_rootdir(repo_root)
 
     def wrapper():
-        # skip=2: skip capture_caller_source itself + this wrapper, land on the
-        # test function below.
-        return capture_caller_source(skip=2)
+        return capture_caller_source()
 
     loc = wrapper()
     assert loc is not None
     assert loc.relpath.endswith('test_source.py')
-    # Line should point at the `loc = wrapper()` call site, not into wrapper.
-    # We don't assert the exact line (would couple to formatting) — only that
-    # it's reachable and inside the test function's body range.
-    assert loc.line > 0
+    # `wrapper` is the nearest frame outside the package, so it is the anchor —
+    # the walk stops at user code, wherever in user code that is.
+    assert loc.line == wrapper.__code__.co_firstlineno + 1
 
 
 def test_co_filename_to_path_rewrites_windows_path_on_wsl(monkeypatch):

@@ -156,7 +156,7 @@ def test_context_manager_in_idle_collector_raises() -> None:
 def test_context_manager_unannotated_test_warns_instead_of_raises() -> None:
     with given(t'a {pg["Collector"].low} recording inside an undecorated test'):
         collector = Collector()
-        collector.inside_unannotated_test = True
+        collector.enter_unannotated_test()
     with when(t'a given {pg["Step"].low} is opened against it'):
         # The swap is undone inside the step: this session's own collector is
         # what the surrounding narration records onto.
@@ -181,7 +181,7 @@ def test_when_then_warning_points_at_the_test_file() -> None:
     reach one level further than a bare step's — otherwise `filterwarnings`
     scoped by module never matches the test that caused it."""
     collector = Collector()
-    collector.inside_unannotated_test = True
+    collector.enter_unannotated_test()
     set_active_collector(collector)
     try:
         with pytest.warns(PytestGivenWarning) as caught, when_then('act', 'outcome'):
@@ -199,7 +199,7 @@ def test_attach_without_collector_raises() -> None:
 
 def test_attach_unannotated_test_warns_instead_of_raises() -> None:
     collector = Collector()
-    collector.inside_unannotated_test = True
+    collector.enter_unannotated_test()
     set_active_collector(collector)
     try:
         with pytest.warns(PytestGivenWarning, match='without @scenario'):

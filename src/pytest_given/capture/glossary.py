@@ -238,14 +238,8 @@ class Glossary(BaseGlossary):
     def _declare(
         self, kind: TermKind | None, name: str, definition: str | None
     ) -> TermHandle:
-        """Register `name` under `kind` and hand back its handle.
-
-        `skip=3` reaches past this method and the accessor that called it to
-        the user's own line.
-        """
-        term = _register_kind(
-            self, kind, name, definition, capture_caller_source(skip=3)
-        )
+        """Register `name` under `kind` and hand back its handle."""
+        term = _register_kind(self, kind, name, definition, capture_caller_source())
         return TermHandle(_term=term, _glossary=self)
 
     def actor(self, name: str, definition: str | None = None) -> TermHandle:

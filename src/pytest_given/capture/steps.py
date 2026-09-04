@@ -2,7 +2,7 @@
 
 The dual context-manager/decorator descriptor, the paired `when_then`, and the
 attachment call that binds to whatever step is open. They share
-`_recording_collector`, which decides whether a call records, no-ops with a
+`collector.recording_collector`, which decides whether a call records, no-ops with a
 warning, or refuses. The scenario marker is `scenario.py`'s.
 """
 
@@ -10,7 +10,6 @@ import functools
 import inspect
 import json
 import types
-import warnings
 from collections.abc import Callable, Mapping, Sequence
 from string import templatelib
 from typing import (
@@ -26,11 +25,10 @@ from ..model import (
     Narration,
     Phase,
     PytestGivenError,
-    PytestGivenWarning,
     SourceLocation,
     narration_of,
 )
-from .collector import Collector, get_active_collector, no_scenario_error
+from .collector import Collector, get_active_collector, recording_collector
 from .source import capture_caller_source, code_source
 from .template import (
     StepText,
@@ -53,28 +51,6 @@ class StepDecorated(Protocol):
     """
 
     _step_descriptor: StepDescriptor
-
-
-def _recording_collector(
-    action: str, warning: str, *, stacklevel: int = 3
-) -> Collector | None:
-    """The collector to record into, or None when the caller should do nothing.
-
-    None means an unannotated test, where `with given(...)` and `attach(...)`
-    are both legal and both no-ops: not a mistake, just a test with no report
-    to appear in. With nothing recording anywhere else there is no such
-    reading, and the call raises.
-
-    The default `stacklevel` reaches past this helper and its caller to the
-    user's own line; a composed descriptor adds one more frame.
-    """
-    collector = get_active_collector()
-    if collector is not None and collector.recording:
-        return collector
-    if collector is not None and collector.inside_unannotated_test:
-        warnings.warn(warning, PytestGivenWarning, stacklevel=stacklevel)
-        return None
-    raise no_scenario_error(action)
 
 
 _TEMPLATE_PARAM_KINDS = frozenset(
@@ -105,21 +81,11 @@ class StepDescriptor:
         text: StepText,
         *,
         activity_ids: tuple[ActivityId, ...] = (),
-        composed: bool = False,
     ) -> None:
         self.phase = phase
         self._source: StepText = text
         self.narration: Narration = narration_from(text)
         self.activity_ids: tuple[ActivityId, ...] = activity_ids
-        # `composed` marks a descriptor another construct drives — `when_then`,
-        # which enters both halves one frame above the user's `with`. That
-        # frame is what the caller-frame walk and the warning have to reach
-        # past, and why the shared lint anchor is pinned rather than walked for.
-        self._composed = composed
-        self._pinned_source: SourceLocation | None = None
-
-    def pin_source(self, source: SourceLocation | None) -> None:
-        self._pinned_source = source
 
     @property
     def is_deferred_template(self) -> bool:
@@ -140,19 +106,22 @@ class StepDescriptor:
                 f'function decorators, where deferred substitution is the only '
                 f'sensible option.'
             )
-        collector = _recording_collector(
-            f"enter '{self.phase}: {self.narration.text}'",
-            f"'{self.phase}: {self.narration.text}' recorded in a test without "
-            '@scenario — step will not appear in the report.',
-            stacklevel=4 if self._composed else 3,
-        )
+        return self._open()
+
+    def _open(self, pinned_source: SourceLocation | None = None) -> Self:
+        """Open this step, optionally against an anchor its caller already has.
+
+        `when_then` drives both halves from its own frames, so the `then` half
+        can no longer be anchored by walking out to user code — it is entered
+        from `__exit__`, where the user's line has moved on. It passes the
+        pair's `with` line instead.
+        """
+        collector = recording_collector(self.phase, self.narration.text)
         if collector is None:
             return self
-        source: SourceLocation | None = None
-        if collector.capture_step_source:
-            source = (
-                self._pinned_source if self._composed else capture_caller_source(skip=2)
-            )
+        source: SourceLocation | None = pinned_source
+        if source is None and collector.capture_step_source:
+            source = capture_caller_source()
         collector.push_step(
             self.phase, self.narration, activity_ids=self.activity_ids, source=source
         )
@@ -419,19 +388,18 @@ class WhenThen:
         when_text: StepText,
         then_text: StepText,
     ) -> None:
-        self._when = StepDescriptor('when', when_text, composed=True)
-        self._then = StepDescriptor('then', then_text, composed=True)
+        self._when = StepDescriptor('when', when_text)
+        self._then = StepDescriptor('then', then_text)
+        self._source: SourceLocation | None = None
 
     def __enter__(self) -> Self:
         collector = get_active_collector()
         if collector is not None and collector.capture_step_source:
             # Both steps share the pair's `with` statement as their anchor —
-            # captured here because the composed descriptors' own caller frame
-            # would be this method, not user code.
-            source = capture_caller_source(skip=2)
-            self._when.pin_source(source)
-            self._then.pin_source(source)
-        self._when.__enter__()
+            # captured here because the `then` half opens from `__exit__`,
+            # where the user's current line is the end of the body.
+            self._source = capture_caller_source()
+        self._when._open(self._source)
         return self
 
     def __exit__(
@@ -442,7 +410,7 @@ class WhenThen:
     ) -> None:
         self._when.__exit__(exc_type, exc_val, exc_tb)
         if exc_type is None:
-            self._then.__enter__()
+            self._then._open(self._source)
             self._then.__exit__(None, None, None)
 
 
@@ -466,11 +434,7 @@ def attach(label: str, content: object) -> None:
             'attach(f"{kind} log", …). In a parametrized scenario keep the '
             'label the same in every case and let the content vary.'
         )
-    collector = _recording_collector(
-        f"attach '{label}'",
-        f"attach('{label}') called in a test without @scenario — "
-        'attachment will not appear in the report.',
-    )
+    collector = recording_collector('attach', label)
     if collector is None:
         return
     if isinstance(content, str):

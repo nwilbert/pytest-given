@@ -54,7 +54,7 @@ def pytest_fixture_setup(
             'helper function.'
         )
     collector = session_collector(request.config)
-    if collector.state == 'idle' and fixturedef.scope == 'function':
+    if not collector.recording and fixturedef.scope == 'function':
         # Set up outside any tracked scenario — an unannotated test pulling in
         # a step fixture. A function-scoped one will be set up again for the
         # next test that wants it, so skipping costs nothing.

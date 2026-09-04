@@ -3,9 +3,11 @@ that is active, and the error every step raises when there is none."""
 
 import copy
 import time
+import warnings
 from contextvars import ContextVar
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Literal
+from pathlib import Path
+from typing import TYPE_CHECKING, Literal, NoReturn
 
 from ..model import (
     ActivityId,
@@ -17,6 +19,7 @@ from ..model import (
     NodeId,
     Phase,
     PytestGivenError,
+    PytestGivenWarning,
     Scenario,
     SourceLocation,
     Status,
@@ -33,8 +36,14 @@ if TYPE_CHECKING:
     from .steps import StepDescriptor
 
 
-# Lifecycle state of the collector — determines where push_step/attach route.
-type RecordingState = Literal['idle', 'test', 'fixture_setup', 'fixture_teardown']
+# Lifecycle state of the collector — determines where push_step/attach route,
+# and whether it routes anywhere at all. `unannotated` is a test running
+# without `@scenario`: steps inside it are legal and do nothing, which is a
+# different answer from both `idle` (nothing is running) and `fixture_teardown`
+# (something is running but may not record).
+type RecordingState = Literal[
+    'idle', 'unannotated', 'test', 'fixture_setup', 'fixture_teardown'
+]
 
 
 @dataclass
@@ -84,6 +93,58 @@ def no_scenario_error(action: str) -> PytestGivenError:
     return PytestGivenError(f'Cannot {action} — no active scenario or fixture.')
 
 
+# Every frame under here is ours, so `warnings.warn` reports the user's own
+# line without any call site counting frames to it.
+_PACKAGE_ROOT = f'{Path(__file__).parent.parent}/'
+
+
+def recording_collector(
+    kind: Phase | Literal['attach'], subject: str
+) -> Collector | None:
+    """The collector to record into, or None when the caller should do nothing.
+
+    The one place the "may I record right now?" question is answered, so the
+    step `__enter__`, `__exit__`, decorator and `attach` paths cannot drift
+    into disagreeing about it. Three outcomes, and only this function knows
+    which is which: record into the collector, no-op, or refuse.
+
+    None means an unannotated test, where `with given(...)` and `attach(...)`
+    are both legal and both no-ops: not a mistake, just a test with no report
+    to appear in. Anywhere else with nothing recording there is no such
+    reading, and the call raises.
+
+    Takes the attempt in pieces rather than pre-phrased: recording is the
+    common case and needs no sentence at all, so neither message is built on
+    the path that succeeds.
+    """
+    collector = get_active_collector()
+    if collector is not None and collector.recording:
+        return collector
+    if collector is not None and collector.state == 'unannotated':
+        warnings.warn(
+            _unannotated_warning(kind, subject),
+            PytestGivenWarning,
+            skip_file_prefixes=(_PACKAGE_ROOT,),
+        )
+        return None
+    action = f'attach {subject!r}' if kind == 'attach' else f"enter '{kind}: {subject}'"
+    if collector is not None:
+        collector.refuse_recording(action)
+    raise no_scenario_error(action)
+
+
+def _unannotated_warning(kind: Phase | Literal['attach'], subject: str) -> str:
+    if kind == 'attach':
+        return (
+            f"attach('{subject}') called in a test without @scenario — "
+            'attachment will not appear in the report.'
+        )
+    return (
+        f"'{kind}: {subject}' recorded in a test without @scenario — "
+        'step will not appear in the report.'
+    )
+
+
 class Collector:
     """Accumulates a session's scenarios, and the open step stack each one is
     recorded into."""
@@ -103,7 +164,6 @@ class Collector:
         self._state: RecordingState = 'idle'
         self._active_recording: FixtureRecording | None = None
         self._active_fixture_descriptor: StepDescriptor | None = None
-        self.inside_unannotated_test: bool = False
         self._discovered_stories: dict[StoryId, Story] = {}
 
     @property
@@ -114,8 +174,22 @@ class Collector:
     def recording(self) -> bool:
         """Whether a step pushed right now would be recorded — the one answer
         the step `__enter__`, `__exit__` and decorator paths all ask, so they
-        cannot drift into disagreeing about it."""
-        return self._state != 'idle'
+        cannot drift into disagreeing about it.
+
+        Teardown is *not* recording: a step pushed there raises. Answering True
+        for it — as "any state but idle" did — meant this could not be the one
+        answer it claims to be, and left the refusal to a second check further
+        in.
+        """
+        return self._state in ('test', 'fixture_setup')
+
+    def enter_unannotated_test(self) -> None:
+        """Enter a test running without `@scenario`, where a step is a no-op."""
+        self._state = 'unannotated'
+
+    def exit_unannotated_test(self) -> None:
+        if self._state == 'unannotated':
+            self._state = 'idle'
 
     @property
     def active_scenario_id(self) -> NodeId | None:
@@ -164,7 +238,6 @@ class Collector:
         self._step_stack = []
         self._started_at = None
         self._state = 'test'
-        self.inside_unannotated_test = False
         if story is not None:
             self._discovered_stories[story.id] = story
 
@@ -292,7 +365,8 @@ class Collector:
         activity_ids: tuple[ActivityId, ...] = (),
         source: SourceLocation | None = None,
     ) -> Step:
-        self._require_recordable(f"record '{phase}: {narration.text}'")
+        if not self.recording:
+            self.refuse_recording(f"record '{phase}: {narration.text}'")
         stack = self._target_stack()
         if stack and stack[-1].phase != phase:
             raise PytestGivenError(
@@ -307,7 +381,7 @@ class Collector:
         if stack:
             stack[-1].children.append(step)
         elif self._state == 'test':
-            # `_require_recordable` has ruled out idle and teardown, so a
+            # `refuse_recording` has ruled out idle and teardown, so a
             # recordable 'test' state always has a scenario. Asserted rather
             # than re-tested: the step is already on the stack, so a miss
             # would drop it from the report silently.
@@ -362,7 +436,8 @@ class Collector:
         *,
         content_type: ContentType = 'text',
     ) -> None:
-        self._require_recordable(f"attach '{label}'")
+        if not self.recording:
+            self.refuse_recording(f"attach '{label}'")
         stack = self._target_stack()
         if not stack:
             # An attachment binds to the step being recorded, so a test body
@@ -382,19 +457,20 @@ class Collector:
             )
         )
 
-    def _require_recordable(self, action: str) -> None:
+    def refuse_recording(self, action: str) -> NoReturn:
         """Refuse a recording the current state cannot take.
 
         `action` phrases the attempt ("record 'given: a machine'", "attach
-        'log'"), so both refusals name what the author actually wrote.
+        'log'"), so both refusals name what the author actually wrote. Only
+        ever called when `recording` is false, so every path out of here
+        raises.
         """
-        if self._state == 'idle':
-            raise no_scenario_error(action)
         if self._state == 'fixture_teardown':
             raise PytestGivenError(
                 f'Cannot {action} from fixture teardown — teardown is '
                 'technical, not narrative.'
             )
+        raise no_scenario_error(action)
 
     def _target_stack(self) -> list[Step]:
         if self._state == 'fixture_setup' and self._active_recording is not None:
