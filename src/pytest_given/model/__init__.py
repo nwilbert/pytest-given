@@ -1,5 +1,4 @@
 from .errors import PytestGivenError, PytestGivenWarning, placeholder_mismatch
-from .ids import case_suffix, id_derive, node_base
 from .markup import EMPHASIS, plural
 from .narration import (
     narration_of,
@@ -56,9 +55,12 @@ from .schema import (
     TermId,
     TermKind,
     TracebackFrame,
+    case_suffix,
     location_suffix,
+    node_base,
 )
 from .serde import report_from_dict, report_to_dict
+from .slug import id_derive
 from .steps import (
     PartIndex,
     StepPath,

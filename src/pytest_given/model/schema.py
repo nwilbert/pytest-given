@@ -50,6 +50,26 @@ class NarrationPlaceholder:
 # Pytest node ID, e.g. "tests/test_billing.py::test_buy_coffee[1-2-3]"
 NodeId = NewType('NodeId', str)
 
+
+def node_base(node_id: str) -> str:
+    """A node id (or a bare function segment) without its parametrize tail:
+    ``'f.py::t[1-2]' -> 'f.py::t'``, ``'t[1-2]' -> 't'``. Two cases of one
+    parametrized function share this; two different functions never do.
+
+    Lives beside `NodeId` because grouping and report both take node ids apart,
+    and neither may import the other. Typed `str` rather than `NodeId`: report
+    also applies it to a bare function segment, which is no node id.
+    """
+    return node_id.split('[', 1)[0]
+
+
+def case_suffix(node_id: str) -> str:
+    """The parametrize tail of a node id, brackets included, or ``''`` when it
+    has none: ``'f.py::t[1-2]' -> '[1-2]'``, ``'f.py::t' -> ''``."""
+    _, bracket, rest = node_id.partition('[')
+    return f'{bracket}{rest}'
+
+
 TermId = NewType('TermId', str)
 ActivityId = NewType('ActivityId', int)
 StoryId = NewType('StoryId', str)
