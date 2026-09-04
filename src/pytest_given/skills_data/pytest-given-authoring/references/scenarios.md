@@ -70,9 +70,9 @@ The narration lint (`pytest --given-lint`, or `given_lint = true` in `[tool.pyte
 | `missing-phase` | warn | A passed scenario that doesn't cover all three phases. Fixture `@given`s and `Annotated[..., given(...)]` parameters count. |
 | `check-outside-then` | warn | An `assert` inside a `given` or `when` (the `when` half of a `when_then` pair is exempt). |
 | `action-in-then` | warn | No `when` performs an action and a `then` folds the action into its assertion. |
-| `unused-interpolation` | warn | A t-string narration interpolating `{name}` that the step body never uses. |
+| `unused-interpolation` | warn | A `with`-anchored step whose narration interpolates `{name}` that the step body never uses — a t-string interpolation, or a parametrize placeholder in a grouped scenario. |
 | `tag-shadows-term` | warn | A scenario tag whose slug duplicates a glossary term. |
-| `dead-term` | off | A glossary term referenced by no step narration and no story activity. Off by default because an unreferenced term is normal; opt in where the glossary is meant to be fully exercised. |
+| `dead-term` | off | A glossary term referenced by no scenario narration, no step narration and no story activity. Off by default because an unreferenced term is normal; opt in where the glossary is meant to be fully exercised. |
 
 Severities are overridable per rule via the `given_lint_rules` ini; that and the rest of the setup are in the project README.
 
