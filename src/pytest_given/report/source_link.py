@@ -4,6 +4,10 @@ Resolves a config value into a substitution template, and substitutes the
 template variables against a SourceLocation + metadata. Errors raised here
 are PytestGivenError, so they surface uniformly through both the plugin
 session-finish path and the standalone CLI.
+
+`detect_commit_sha` is here rather than in a module of its own because it is
+the same `git` seam the `github` preset reads, and its only consumer is the
+report metadata that the SHA-pinned links are substituted from.
 """
 
 import os

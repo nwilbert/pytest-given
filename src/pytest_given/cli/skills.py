@@ -1,71 +1,18 @@
-"""Command-line entry point for the ``pytest-given`` console script.
-
-Top-level orchestrator like the ``plugin`` package: allowed to import from any
-subpackage. Owns the argparse root; every subcommand registers its own parser
-and binds its handler with ``set_defaults``, so dispatch stays one call.
-"""
+"""The ``pytest-given skills`` subcommand: mirror the bundled skills into a
+project's ``.claude/skills/``, or report drift against them."""
 
 import argparse
 import sys
-from collections.abc import Callable
 from importlib.resources import files
 from importlib.resources.abc import Traversable
 from pathlib import Path, PurePosixPath
-
-from .report import add_report_parser
 
 type SkillTree = dict[PurePosixPath, bytes]
 
 DEFAULT_SKILLS_DEST = Path('.claude') / 'skills'
 
 
-def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        prog='pytest-given',
-        description='pytest-given command-line tools.',
-    )
-    subparsers = parser.add_subparsers(required=True)
-    add_report_parser(subparsers)
-    _add_skills_parser(subparsers)
-    args = parser.parse_args(argv)
-    handler: Callable[[argparse.Namespace], int] = args.handler
-    return handler(args)
-
-
-def _install_skills(dest: Path) -> int:
-    """Mirror the bundled skill directories into ``dest``.
-
-    Touches only the bundled ``pytest-given-*`` directories: sibling skills in
-    ``dest`` are never read or written.
-    """
-    bundled = _bundled_skill_tree()
-    stale = _stale_files(dest, bundled)
-    for rel, data in bundled.items():
-        target = dest.joinpath(*rel.parts)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(data)
-        print(f'wrote {target}')
-    for path in stale:
-        path.unlink()
-        print(f'removed stale {path}')
-    return 0
-
-
-def _check_skills(dest: Path) -> int:
-    bundled = _bundled_skill_tree()
-    return _report_drift(dest, bundled, _stale_files(dest, bundled))
-
-
-def _run_skills_install(args: argparse.Namespace) -> int:
-    dest: Path = args.dest
-    try:
-        return _check_skills(dest) if args.check else _install_skills(dest)
-    except OSError as error:
-        print(f'Error: {error}', file=sys.stderr)
-        return 1
-
-
-def _add_skills_parser(
+def add_skills_parser(
     subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
 ) -> None:
     skills_parser = subparsers.add_parser(
@@ -89,7 +36,41 @@ def _add_skills_parser(
     )
 
 
-def _report_drift(dest: Path, bundled: SkillTree, stale: list[Path]) -> int:
+def _install_skills(dest: Path) -> int:
+    """Mirror the bundled skill directories into ``dest``.
+
+    Touches only the bundled ``pytest-given-*`` directories: sibling skills in
+    ``dest`` are never read or written.
+    """
+    bundled = _bundled_skill_tree()
+    stale = _stale_files(dest, bundled)
+    for rel, data in bundled.items():
+        target = dest.joinpath(*rel.parts)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+        print(f'wrote {target}')
+    for path in stale:
+        path.unlink()
+        print(f'removed stale {path}')
+    return 0
+
+
+def _run_skills_install(args: argparse.Namespace) -> int:
+    dest: Path = args.dest
+    try:
+        return _report_drift(dest) if args.check else _install_skills(dest)
+    except OSError as error:
+        print(f'Error: {error}', file=sys.stderr)
+        return 1
+
+
+def _report_drift(dest: Path) -> int:
+    """Report how ``dest`` differs from the bundled skills, without writing.
+
+    Derives the bundle and the stale set itself: both are functions of `dest`,
+    so passing them in only let a caller hand over a mismatched pair.
+    """
+    bundled = _bundled_skill_tree()
     findings: list[str] = []
     for rel, data in bundled.items():
         target = dest.joinpath(*rel.parts)
@@ -97,7 +78,7 @@ def _report_drift(dest: Path, bundled: SkillTree, stale: list[Path]) -> int:
             findings.append(f'missing: {target}')
         elif target.read_bytes() != data:
             findings.append(f'differs: {target}')
-    findings.extend(f'stale: {path}' for path in stale)
+    findings.extend(f'stale: {path}' for path in _stale_files(dest, bundled))
     for finding in findings:
         print(finding)
     if findings:
@@ -130,7 +111,3 @@ def _stale_files(dest: Path, bundled: SkillTree) -> list[Path]:
         for path in sorted((dest / name).rglob('*'))
         if path.is_file() and path not in known
     ]
-
-
-if __name__ == '__main__':  # pragma: no cover
-    sys.exit(main())

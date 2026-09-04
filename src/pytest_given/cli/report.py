@@ -7,8 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from ..model import PytestGivenError, report_from_dict
-from .sinks import SinkConfig, emit_sinks
-from .source_link import resolve_source_link_template
+from ..report import SinkConfig, emit_sinks, resolve_source_link_template
 
 DEFAULT_HTML_OUTPUT = Path('given-report/report.html')
 
