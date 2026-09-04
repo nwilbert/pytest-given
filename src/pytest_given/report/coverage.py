@@ -12,9 +12,11 @@ from ..model import (
     Glossary,
     NarrationTermRef,
     NodeId,
+    ReportData,
     Scenario,
     Step,
     Story,
+    StoryId,
     TermId,
     id_derive,
     iter_steps,
@@ -191,3 +193,30 @@ def compute_coverage(
             if aid in scope and index.refs_by_activity[aid].issubset(s_cache)
         }
     return covered
+
+
+def build_coverage_map(report: ReportData) -> CoverageMap:
+    """Which activities each scenario covers, keyed by node id — empty for one
+    bound to no story, or a report with no glossary to match term refs against.
+
+    Each story is indexed once and reused across the scenarios bound to it.
+
+    Here rather than beside the Story view it feeds: this is matching, not
+    presentation, and it is the only reason `StoryIndex` would have to be part
+    of another module's vocabulary.
+    """
+    glossary = report.glossary
+    if glossary is None:
+        return {scenario.id: set() for scenario in report.scenarios}
+    stories = {story.id: story for story in report.stories}
+    indexes: dict[StoryId, StoryIndex] = {}
+    result: CoverageMap = {}
+    for scenario in report.scenarios:
+        story = stories.get(scenario.story_id) if scenario.story_id else None
+        if story is None:
+            result[scenario.id] = set()
+            continue
+        if story.id not in indexes:
+            indexes[story.id] = build_story_index(glossary, story)
+        result[scenario.id] = compute_coverage(glossary, scenario, indexes[story.id])
+    return result

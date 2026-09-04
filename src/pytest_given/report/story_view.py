@@ -17,13 +17,7 @@ from ..model import (
     Scenario,
     StoryId,
 )
-from .coverage import (
-    CoverageMap,
-    StoryIndex,
-    build_story_index,
-    compute_coverage,
-    is_coverage_eligible,
-)
+from .coverage import CoverageMap, is_coverage_eligible
 
 type ActivityKey = str
 """`'<story id>:<activity id>'` — an activity's handle outside its own story.
@@ -74,29 +68,6 @@ class StoryRollup:
 
     scenarios: list[Scenario] = field(default_factory=list)
     per_activity: dict[ActivityId, ActivityCoverage] = field(default_factory=dict)
-
-
-def build_coverage_maps(report: ReportData) -> CoverageMap:
-    """Which activities each scenario covers, keyed by node id — empty for one
-    bound to no story, or a report with no glossary to match term refs against.
-
-    Each story is indexed once and reused across the scenarios bound to it.
-    """
-    glossary = report.glossary
-    if glossary is None:
-        return {scenario.id: set() for scenario in report.scenarios}
-    stories = {story.id: story for story in report.stories}
-    indexes: dict[StoryId, StoryIndex] = {}
-    result: CoverageMap = {}
-    for scenario in report.scenarios:
-        story = stories.get(scenario.story_id) if scenario.story_id else None
-        if story is None:
-            result[scenario.id] = set()
-            continue
-        if story.id not in indexes:
-            indexes[story.id] = build_story_index(glossary, story)
-        result[scenario.id] = compute_coverage(glossary, scenario, indexes[story.id])
-    return result
 
 
 def build_story_rollups(

@@ -21,10 +21,10 @@ from pytest_given.model import (
     StoryId,
     TermId,
 )
+from pytest_given.report.coverage import build_coverage_map
 from pytest_given.report.html_renderer import TabVisibility, tab_visibility
 from pytest_given.report.story_view import (
     build_activity_labels,
-    build_coverage_maps,
     build_story_rollups,
 )
 from tests.ubiquitous_language import pg
@@ -120,7 +120,7 @@ def test_build_coverage_maps_produces_per_scenario_dicts() -> None:
         story_id=StoryId('book'),
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
-    maps = build_coverage_maps(rd)
+    maps = build_coverage_map(rd)
     assert ActivityId(1) in maps[NodeId('test::x')]
 
 
@@ -133,7 +133,7 @@ def test_build_coverage_maps_empty_for_scenario_without_story() -> None:
         steps=[],
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
-    maps = build_coverage_maps(rd)
+    maps = build_coverage_map(rd)
     assert maps[NodeId('t')] == set()
 
 
@@ -145,7 +145,7 @@ def test_build_coverage_maps_empty_when_no_glossary() -> None:
         steps=[],
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn])
-    maps = build_coverage_maps(rd)
+    maps = build_coverage_map(rd)
     assert maps == {NodeId('t'): set()}
 
 
@@ -160,7 +160,7 @@ def test_build_coverage_maps_empty_for_scenario_with_unknown_story_id() -> None:
         story_id=StoryId('nonexistent'),
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
-    maps = build_coverage_maps(rd)
+    maps = build_coverage_map(rd)
     assert maps[NodeId('t')] == set()
 
 
@@ -201,7 +201,7 @@ def test_build_story_rollups_flags_under_anchored_activity_ineligible() -> None:
         )
         rd = ReportData(metadata=_meta(), scenarios=[], stories=[story], glossary=g)
     with when('the story rollups are built'):
-        rollups = build_story_rollups(rd, build_coverage_maps(rd))
+        rollups = build_story_rollups(rd, build_coverage_map(rd))
     with then(t'only the anchored {pg["Activity"]} is {pg["Coverage"]}-eligible'):
         per_activity = rollups[StoryId('book')].per_activity
         assert per_activity[ActivityId(1)].eligible is True
@@ -248,7 +248,7 @@ def test_build_story_rollups_pinned_under_anchored_activity_is_tracked() -> None
             metadata=_meta(), scenarios=[pinned], stories=[story], glossary=g
         )
     with when('the story rollups are built'):
-        rollups = build_story_rollups(rd, build_coverage_maps(rd))
+        rollups = build_story_rollups(rd, build_coverage_map(rd))
     with then(t'it stays narration-ineligible but is no longer untracked'):
         cov = rollups[StoryId('book')].per_activity[ActivityId(1)]
         assert cov.eligible is False
@@ -302,7 +302,7 @@ def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
         _covering_scn('test::d', 'skipped'),
     ]
     rd = ReportData(metadata=_meta(), scenarios=scns, stories=[story], glossary=g)
-    rollups = build_story_rollups(rd, build_coverage_maps(rd))
+    rollups = build_story_rollups(rd, build_coverage_map(rd))
     cov = rollups[StoryId('book')].per_activity[ActivityId(1)]
     assert cov.total == 4
     assert cov.passed == 2

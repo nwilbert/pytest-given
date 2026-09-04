@@ -8,7 +8,7 @@ story rollups next door.
 
 from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import NamedTuple, NewType
+from typing import Literal, NamedTuple, NewType
 
 from ..model import (
     ActivityTermRef,
@@ -22,6 +22,7 @@ from ..model import (
     Story,
     StoryId,
     TermId,
+    TermKind,
     iter_steps,
 )
 
@@ -66,12 +67,17 @@ class TermEntry:
     summary: str
 
 
+# A term's kind as the Glossary view keys on it: the model's three, plus the
+# bucket a term whose kind was never settled falls into.
+type KindKey = TermKind | Literal['kindless']
+
+
 @dataclass(frozen=True)
 class KindGroup:
     """The Glossary view's terms under one kind heading."""
 
     label: str
-    key: str
+    key: KindKey
     css_class: str
     entries: list[TermEntry]
 
@@ -86,7 +92,8 @@ class GlossaryView:
     """
 
     groups: list[KindGroup]
-    counts: dict[str, int]
+    counts: dict[KindKey, int]
+    term_scenarios: dict[TermId, list[NodeId]]
     undefined_count: int
     all_uncategorized: bool
 
@@ -96,7 +103,7 @@ class _KindRow(NamedTuple):
     carries, minus the entries the view fills in."""
 
     label: str
-    key: str
+    key: KindKey
     css_class: str
 
 
@@ -110,12 +117,14 @@ _KIND_GROUPS: tuple[_KindRow, ...] = (
 
 # Only an entity has instances worth listing; a verb's surface forms are its
 # own section.
-_INSTANCE_KINDS = frozenset({'actor', 'object'})
+_INSTANCE_KINDS: frozenset[KindKey] = frozenset({'actor', 'object'})
 
 
-def build_glossary_view(report: ReportData, views: GlossaryViews) -> GlossaryView:
+def build_glossary_view(report: ReportData) -> GlossaryView:
+    """The Glossary view, and the cross-reference index it was built from."""
+    crossrefs = build_term_crossrefs(report)
     terms = report.glossary.terms if report.glossary is not None else []
-    by_kind: dict[str, list[GlossaryTerm]] = {row.key: [] for row in _KIND_GROUPS}
+    by_kind: dict[KindKey, list[GlossaryTerm]] = {row.key: [] for row in _KIND_GROUPS}
     for term in terms:
         by_kind[term.kind or 'kindless'].append(term)
     counts = {key: len(group) for key, group in by_kind.items()}
@@ -124,7 +133,9 @@ def build_glossary_view(report: ReportData, views: GlossaryViews) -> GlossaryVie
             label=row.label,
             key=row.key,
             css_class=row.css_class,
-            entries=[_term_entry(term, row.key, views) for term in by_kind[row.key]],
+            entries=[
+                _term_entry(term, row.key, crossrefs) for term in by_kind[row.key]
+            ],
         )
         for row in _KIND_GROUPS
         if by_kind[row.key]
@@ -132,6 +143,7 @@ def build_glossary_view(report: ReportData, views: GlossaryViews) -> GlossaryVie
     return GlossaryView(
         groups=groups,
         counts=counts,
+        term_scenarios=crossrefs.term_scenarios,
         undefined_count=sum(1 for term in terms if term.definition is None),
         all_uncategorized=bool(
             counts['kindless']
@@ -140,9 +152,11 @@ def build_glossary_view(report: ReportData, views: GlossaryViews) -> GlossaryVie
     )
 
 
-def _term_entry(term: GlossaryTerm, kind_key: str, views: GlossaryViews) -> TermEntry:
-    aggregation = views.aggregations.get(term.id, GlossaryAggregation())
-    scenario_ids = views.term_scenarios.get(term.id, [])
+def _term_entry(
+    term: GlossaryTerm, kind_key: KindKey, crossrefs: TermCrossRefs
+) -> TermEntry:
+    aggregation = crossrefs.aggregations.get(term.id, GlossaryAggregation())
+    scenario_ids = crossrefs.term_scenarios.get(term.id, [])
     show_instances = kind_key in _INSTANCE_KINDS and bool(aggregation.instances)
     return TermEntry(
         term=term,
@@ -172,9 +186,9 @@ def _plural(n: int, singular: str, plural: str | None = None) -> str:
 
 
 @dataclass(frozen=True)
-class GlossaryViews:
-    """What the Glossary view reads: per-term aggregations, and which scenarios
-    reference each term.
+class TermCrossRefs:
+    """The cross-reference index the Glossary view is built from: per-term
+    aggregations, and which scenarios reference each term.
 
     Built from one walk, so the two cannot disagree about what counts as a
     reference — they did when one walked only the steps and the other the
@@ -186,7 +200,7 @@ class GlossaryViews:
     term_scenarios: dict[TermId, list[NodeId]]
 
 
-def build_glossary_views(report: ReportData) -> GlossaryViews:
+def build_term_crossrefs(report: ReportData) -> TermCrossRefs:
     """Per-term aggregations and the term-to-scenarios index.
 
     Scenario narrations contribute entity instances; story activity prose
@@ -195,7 +209,7 @@ def build_glossary_views(report: ReportData) -> GlossaryViews:
     """
     glossary = report.glossary
     if glossary is None:
-        return GlossaryViews(aggregations={}, term_scenarios={})
+        return TermCrossRefs(aggregations={}, term_scenarios={})
     index = _GlossaryIndex(glossary)
     term_scenarios: dict[TermId, list[NodeId]] = {}
     for scenario in report.scenarios:
@@ -224,7 +238,7 @@ def build_glossary_views(report: ReportData) -> GlossaryViews:
             index.record_story_ref(ref.term_id, story.id)
             index.record_instance(ref.term_id, ref.display)
             index.record_form(ref.term_id, ref.display)
-    return GlossaryViews(aggregations=index.result(), term_scenarios=term_scenarios)
+    return TermCrossRefs(aggregations=index.result(), term_scenarios=term_scenarios)
 
 
 def _scenario_narrations(scenario: Scenario) -> Iterator[tuple[Narration, str | None]]:

@@ -30,16 +30,17 @@ from ..model import (
     Scenario,
     SourceLocation,
     TermId,
+    TermKind,
     placeholder_token,
 )
-from .glossary_view import build_glossary_view, build_glossary_views
+from .coverage import build_coverage_map
+from .glossary_view import build_glossary_view
 from .inline_markdown import render_inline_markdown
 from .palette import param_column_colors
 from .slugs import build_scenario_slug_index
 from .source_link import compile_source_link
 from .story_view import (
     build_activity_labels,
-    build_coverage_maps,
     build_scenario_activity_index,
     build_story_rollups,
 )
@@ -137,10 +138,10 @@ def _render_context(
     """Everything `report.html.j2` reads, in three groups: the report model
     itself, the precomputed aggregations, and the JSON blobs the page's Alpine
     state is seeded from."""
-    coverage_maps = build_coverage_maps(report)
-    scn_covers = build_scenario_activity_index(coverage_maps)
+    glossary_view = build_glossary_view(report)
+    coverage = build_coverage_map(report)
+    scn_covers = build_scenario_activity_index(coverage)
     activity_labels = build_activity_labels(report)
-    glossary_views = build_glossary_views(report)
     scenario_slugs = build_scenario_slug_index(report)
     term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
     return {
@@ -148,9 +149,9 @@ def _render_context(
         'scenarios': report.scenarios,
         'stories': report.stories,
         'glossary': report.glossary,
-        'glossary_view': build_glossary_view(report, glossary_views),
+        'glossary_view': glossary_view,
         'tab_visibility': tab_visibility(report),
-        'story_rollups': build_story_rollups(report, coverage_maps),
+        'story_rollups': build_story_rollups(report, coverage),
         'scn_covers': scn_covers,
         'scenario_slugs': scenario_slugs,
         'param_color_map': param_color_map,
@@ -164,7 +165,7 @@ def _render_context(
             | {
                 'story_ids': [story.id for story in report.stories],
                 'term_ids': term_ids,
-                'term_scenarios': glossary_views.term_scenarios,
+                'term_scenarios': glossary_view.term_scenarios,
                 'scenario_activities': scn_covers,
                 'activity_labels': activity_labels,
                 'scenario_slugs': {
@@ -364,36 +365,38 @@ def _render_narration_part(
             return _render_term_ref(part, glossary)
 
 
-_TERM_KIND_CLASSES: dict[str | None, str] = {
+_TERM_KIND_CLASSES: dict[TermKind, str] = {
     'actor': 'term-ref-actor',
     'object': 'term-ref-object',
     'verb': 'term-ref-verb',
 }
 
 
-def _term_kind_class(kind: str | None) -> str:
-    """The CSS class for a term's kind. A kind still deferred to inference —
-    or one this renderer does not know — falls back, and `dict.get` already
-    reads `None` as a miss."""
-    return _TERM_KIND_CLASSES.get(kind, 'term-ref-unknown')
+def _term_kind_class(kind: TermKind | None) -> str:
+    """The CSS class for a term's kind, or the fallback for one still deferred
+    to inference. `TermKind` is closed, so the lookup is total."""
+    return 'term-ref-unknown' if kind is None else _TERM_KIND_CLASSES[kind]
 
 
-def _term_ref_span(term: GlossaryTerm | None, term_id: TermId, display: str) -> str:
-    """One term reference, as an activity part.
+def _unknown_term_span(display: str) -> str:
+    """A term the glossary does not hold, as an activity part.
 
-    A term the glossary does not hold gets a plain span: no `data-term-id`, so
-    the deep-link handler cannot navigate to a `#term=` that does not exist,
-    and no tooltip marker. That arm is reached only from the activity filter —
-    `_render_term_ref` handles the same case for a *narration* by returning
-    bare text, because narration prose wraps nothing, while every part of an
-    activity timeline is a span and a bare text node would break its layout.
+    No `data-term-id`, so the deep-link handler cannot navigate to a `#term=`
+    that does not exist, and no tooltip marker. Activity parts only:
+    `_render_term_ref` answers the same case for a *narration* with bare text,
+    because narration prose wraps nothing, while every part of an activity
+    timeline is a span and a bare text node would break its layout.
+    """
+    return f'<span class="term-ref-unknown">{escape(display)}</span>'
+
+
+def _term_ref_span(term: GlossaryTerm, term_id: TermId, display: str) -> str:
+    """One term reference the glossary holds.
 
     The tooltip's name and definition are *not* written here — `app.js` looks
     them up by id in the glossary `_app_data` already ships, which is what
     keeps a term used 900 times from carrying 900 copies of its definition.
     """
-    if term is None:
-        return f'<span class="term-ref-unknown">{escape(display)}</span>'
     classes = f'{_term_kind_class(term.kind)} term-ref--link has-term-tip'
     return (
         f'<span class="{classes}" data-term-id="{escape(term_id)}">'
@@ -420,6 +423,8 @@ def _make_activity_part_filter(
         match part:
             case ActivityTermRef(term_id=tid, display=display):
                 term = glossary.get(tid) if glossary else None
+                if term is None:
+                    return Markup(_unknown_term_span(display))
                 return Markup(_term_ref_span(term, tid, display))
             case ActivityWord(text=text):
                 return Markup(f'<span class="activity-word">{escape(text)}</span>')
