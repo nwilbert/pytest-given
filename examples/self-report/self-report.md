@@ -55,8 +55,15 @@
 - **then** it holds one row per «case», with that row's values
 - **then** the grouped steps carry a placeholder per matching name
 
+## ✓ A refusal on a run with no sink does not claim a «report» was skipped
+`tests/integration/test_plugin.py:382::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation
+
+- **given** a suite whose narration varies across parametrize cases
+- **when** the suite runs with no --given-* sink
+- **then** the refusal is reported without claiming a report was skipped
+
 ## ✓ A refused run discards the previous run's «report»
-`tests/integration/test_plugin.py:382::test_a_grouping_error_discards_the_previous_report` · validation
+`tests/integration/test_plugin.py:410::test_a_grouping_error_discards_the_previous_report` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -76,7 +83,7 @@
 - **then** the stale files are gone rather than left reading as current
 
 ## ✓ An unknown «source link» preset stops the run before it collects
-`tests/integration/test_plugin.py:450::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:478::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
   - 📎 suite:
@@ -89,11 +96,18 @@
             assert True
     ```
 - **when** the suite runs with a misspelled «source link» preset
-- **then** the run ends as a usage error, naming the preset
+- **then** the run ends as a usage error, naming the flag the user typed
 - **then** no test ran: the run stopped at configure, before collection
 
+## ✓ An unknown «source link» preset in an ini reports the ini name
+`tests/integration/test_plugin.py:510::test_an_unknown_source_link_preset_in_an_ini_names_the_ini` · validation
+
+- **given** a suite configured through the ini rather than the flag
+- **when** the suite runs with an HTML sink
+- **then** the error names the ini setting, not a flag the user never typed
+
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2265::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2319::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -116,14 +130,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2278::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2332::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2299::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2353::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -131,7 +145,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A sink flag pointed at a source file is refused before the suite runs
-`tests/integration/test_plugin.py:2319::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
+`tests/integration/test_plugin.py:2373::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
 
 - **given** a suite with one «scenario»
 - **when** a bare --given-html swallows the test path that follows it
@@ -139,7 +153,7 @@
 - **then** the source file is left exactly as it was, not overwritten
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2352::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2406::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -159,7 +173,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:2384::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:2438::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -168,7 +182,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:2570::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:2624::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -293,6 +307,14 @@
     ```
 - **when** the run collects no test but still trips a stale ignore
 - **then** the run keeps NO_TESTS_COLLECTED rather than reporting a test failure
+
+## ✓ A failure inside the lint keeps the «report» it was handed
+`tests/integration/test_plugin_lint.py:452::test_a_lint_failure_is_reported_and_keeps_the_written_report` · validation
+
+- **given** a clean suite and a lint pass that raises
+- **when** the suite runs with an HTML sink
+- **then** the failure is summarized rather than raised as a traceback
+- **then** the report that was already written is still there
 
 ## ✓ A «scenario» records under its «node ID»
 `tests/unit/capture/test_collector.py:38::test_start_and_finish_scenario`
@@ -1151,7 +1173,7 @@
 | not-a-string | ✓ |
 
 ## ✓ A string `activities=` argument is refused by `@scenario`
-`tests/unit/capture/test_step_descriptor.py:920::test_scenario_rejects_a_string_activities_argument` · validation
+`tests/unit/capture/test_step_descriptor.py:940::test_scenario_rejects_a_string_activities_argument` · validation
 
 - **given** a string where a sequence of «activity» ids goes
 - **when** the «scenario» is declared
@@ -1485,7 +1507,7 @@
 - **then** the step carries a single «Term ref»
 
 ## ✓ «Narration lint» flags a «step» whose body does nothing
-`tests/unit/lint/test_ast_rules.py:100::test_empty_step_fires_on_pass_only_body`
+`tests/unit/lint/test_ast_rules.py:101::test_empty_step_fires_on_pass_only_body`
 
 - **given** a given «step» whose body is only `pass`
   - 📎 step body:
@@ -1499,7 +1521,7 @@
 - **then** its «severity» is error
 
 ## ✓ «Narration lint» flags a then «step» that checks nothing
-`tests/unit/lint/test_ast_rules.py:261::test_then_without_check_fires`
+`tests/unit/lint/test_ast_rules.py:262::test_then_without_check_fires`
 
 - **given** a then «step» whose body only calls
   - 📎 step body:
@@ -1513,7 +1535,7 @@
 - **then** a then-without-check «finding» reports the unchecked then
 
 ## ✓ «Narration lint» flags an assert outside a then «step» · 2 cases
-`tests/unit/lint/test_ast_rules.py:425::test_check_outside_then_fires_on_assert_in_given_or_when`
+`tests/unit/lint/test_ast_rules.py:426::test_check_outside_then_fires_on_assert_in_given_or_when`
 
 - **given** a {phase} «step» whose body asserts
   - 📎 step body — *see parameter table*
@@ -1542,7 +1564,7 @@
   ```
 
 ## ✓ «Narration lint» flags a then «step» that folds in the action
-`tests/unit/lint/test_ast_rules.py:561::test_action_in_then_fires_when_no_when_exists`
+`tests/unit/lint/test_ast_rules.py:562::test_action_in_then_fires_when_no_when_exists`
 
 - **given** a «scenario» with no when, acting inside its then
   - 📎 step body:
@@ -1557,7 +1579,7 @@
 - **then** a warn «finding» points at the then and says no when acts
 
 ## ✓ «Narration lint» flags a «narration» interpolating a name the body never uses
-`tests/unit/lint/test_ast_rules.py:737::test_unused_interpolation_fires_on_unused_bare_identifier`
+`tests/unit/lint/test_ast_rules.py:738::test_unused_interpolation_fires_on_unused_bare_identifier`
 
 - **given** a given «step» whose body never loads the name
   - 📎 step body:
@@ -1570,7 +1592,7 @@
 - **then** a warn «finding» names the interpolation the body ignores
 
 ## ✓ «Narration lint» flags a passed «scenario» that skips a «phase»
-`tests/unit/lint/test_runtime_rules.py:62::test_missing_phase_fires_on_passed_two_phase_scenario`
+`tests/unit/lint/test_runtime_rules.py:63::test_missing_phase_fires_on_passed_two_phase_scenario`
 
 - **given** a passed «scenario» narrating only given and then
 - **when** the runtime «rules» run
@@ -1578,7 +1600,7 @@
 - **then** its «severity» is the catalog default, warn
 
 ## ✓ «Narration lint» flags a «tag» that duplicates a «term»
-`tests/unit/lint/test_runtime_rules.py:131::test_tag_shadows_term_fires_once_per_unique_tag`
+`tests/unit/lint/test_runtime_rules.py:132::test_tag_shadows_term_fires_once_per_unique_tag`
 
 - **given** a «glossary» defining one «term»
 - **given** two scenarios carrying that word as a «tag»
@@ -1586,7 +1608,7 @@
 - **then** a single warn «finding» names the «tag», the «term» it shadows, and both scenarios
 
 ## ✓ «Narration lint» flags a «term» that no «step» or «story» references
-`tests/unit/lint/test_runtime_rules.py:219::test_dead_term_flags_unreferenced_term`
+`tests/unit/lint/test_runtime_rules.py:220::test_dead_term_flags_unreferenced_term`
 
 - **given** a «glossary» holding one unreferenced «term»
 - **when** the runtime «rules» run over no scenarios and no stories
@@ -1926,7 +1948,7 @@
     ```
 
 ## ✓ A «parametrized scenario» renders its «parameter table»
-`tests/unit/report/test_md_renderer.py:225::test_parametrized_scenario_renders_table` · parametrization
+`tests/unit/report/test_md_renderer.py:241::test_parametrized_scenario_renders_table` · parametrization
 
 - **given** a «Parametrized scenario» with a two-«Case» «Parameter table»
 - **when** the Markdown «Report» is rendered
@@ -1947,7 +1969,7 @@
     ```
 
 ## ✓ A failing «step» is marked with a minimal error digest
-`tests/unit/report/test_md_renderer.py:262::test_failing_scenario_renders_a_minimal_error`
+`tests/unit/report/test_md_renderer.py:278::test_failing_scenario_renders_a_minimal_error`
 
 - **given** a failed «Scenario» carrying a two-line error and an internal frame
   - 📎 Error record:
@@ -1990,7 +2012,7 @@
 - **then** only the first message line and the non-internal frame are quoted
 
 ## ✓ A multi-line «attachment» renders as a fenced block
-`tests/unit/report/test_md_renderer.py:333::test_multiline_attachment_renders_fenced_block`
+`tests/unit/report/test_md_renderer.py:349::test_multiline_attachment_renders_fenced_block`
 
 - **given** a «Step» carrying a multi-line «Attachment»
 - **when** the Markdown «Report» is rendered
@@ -2011,7 +2033,7 @@
     ````
 
 ## ✓ A skipped scenario shows its skip reason
-`tests/unit/report/test_md_renderer.py:496::test_skipped_scenario_shows_reason`
+`tests/unit/report/test_md_renderer.py:512::test_skipped_scenario_shows_reason`
 
 - **given** a skipped «Scenario» with a reason
 - **when** the Markdown «Report» is rendered
@@ -2108,28 +2130,28 @@
 - **then** the label reads as prose under a story-scoped key, with the «path» texts joined
 
 ## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
-`tests/unit/test_grouping.py:117::test_group_parametrized_any_failed_groups_as_failed` · parametrization
+`tests/unit/test_grouping.py:116::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
 - **given** three «Case» records of one «Parametrized scenario»
 - **when** the «grouping» pass collapses them
 - **then** one scenario remains and any failed «Case» fails it
 
 ## ✓ A «parametrized scenario» keeps its place among the «scenarios» around it
-`tests/unit/test_grouping.py:149::test_group_parametrized_keeps_source_order` · parametrization
+`tests/unit/test_grouping.py:148::test_group_parametrized_keeps_source_order` · parametrization
 
 - **given** a plain «scenario» between two parametrized ones
 - **when** the «grouping» pass runs
 - **then** the «report» lists them in the order the file declares
 
 ## ✓ The grouped tree comes from the first passed «case»
-`tests/unit/test_grouping.py:248::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
+`tests/unit/test_grouping.py:247::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
 
 - **given** a skipped first «Case» and a second one that ran
 - **when** the «cases» are «grouped»
 - **then** the tree is the one the passed «Case» recorded
 
 ## ✓ A plain-str «narration» that varies across «cases» is refused
-`tests/unit/test_grouping.py:475::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
+`tests/unit/test_grouping.py:474::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
 
 - **given** two «cases» whose text differs but records no parts
 - **when** the «cases» are «grouped»
@@ -2137,7 +2159,7 @@
 - **then** the error names the test, the missing parts and the t-string fix
 
 ## ✓ A narrated value that varies becomes a derived «parameter table» column
-`tests/unit/test_grouping.py:592::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
+`tests/unit/test_grouping.py:591::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
 
 - **given** two «cases» narrating a value that differs
 - **when** «templatizing» walks the «cases»
@@ -2145,7 +2167,7 @@
 - **then** the «Step» keeps a placeholder pointing at that column
 
 ## ✓ A varying interpolation that is not a bare name is refused
-`tests/unit/test_grouping.py:704::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
+`tests/unit/test_grouping.py:703::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
 
 - **given** two «cases» narrating a computed expression
 - **when** the «cases» are «grouped»
@@ -2153,14 +2175,14 @@
 - **then** the error quotes the expression and shows the bind-a-local fix
 
 ## ✓ A «parameter table» cell reads the way the scenario name formats it
-`tests/unit/test_grouping.py:1070::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
+`tests/unit/test_grouping.py:1069::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
 
 - **given** a Template scenario name formatting its parameter
 - **when** the «cases» are «grouped»
 - **then** the cells carry the formatting the name declared
 
 ## ✓ A scenario name formatting a parameter a «step» reads plainly gets its own column
-`tests/unit/test_grouping.py:1085::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1084::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
 
 - **given** a name formatting the parameter and a step reading it plainly
 - **when** the «cases» are «grouped»
@@ -2168,7 +2190,7 @@
 - **then** the name renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» formatting a parameter the scenario name reads plainly gets its own column
-`tests/unit/test_grouping.py:1128::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1127::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
 
 - **given** a step formatting the parameter and a name reading it plainly
 - **when** the «cases» are «grouped»
@@ -2176,7 +2198,7 @@
 - **then** the step renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» narrating a parameter its column no longer holds is refused
-`tests/unit/test_grouping.py:1210::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
+`tests/unit/test_grouping.py:1209::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
 
 - **given** two «cases» narrating a value their column lacks
 - **when** the «cases» are «grouped»
@@ -2184,7 +2206,7 @@
 - **then** the error names the column and what the case actually narrated
 
 ## ✓ A «term ref» whose display differs between «cases» is refused
-`tests/unit/test_grouping.py:1561::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1560::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» reads differently
 - **when** the «cases» are «grouped»
@@ -2192,7 +2214,7 @@
 - **then** the error names the «Term ref» and the split-it-out fix
 
 ## ✓ A «term ref» that *is* the parametrize value is refused too
-`tests/unit/test_grouping.py:1618::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1617::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» is the parameter itself
 - **when** the «cases» are «grouped»
@@ -2200,7 +2222,7 @@
 - **then** the error points at the per-case «scenario» opt-out
 
 ## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py:1782::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+`tests/unit/test_grouping.py:1781::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
 
 - **given** two «cases» attaching a label with differing payloads
 - **when** «templatizing» walks the «cases»
@@ -2208,15 +2230,15 @@
 - **then** the «Step» keeps a content-less badge pointing at it
 
 ## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py:1838::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+`tests/unit/test_grouping.py:1837::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
 
 - **given** an «Attachment» label only one «Case» attaches
 - **when** the «cases» are «grouped»
 - **then** the grouping is refused
-- **then** the error names the label and asks for a constant one
+- **then** the error names the label, the case, and asks for a constant one
 
 ## ✓ A «parameter table» cell reads the way the «step» that points at it read
-`tests/unit/test_grouping.py:2386::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+`tests/unit/test_grouping.py:2383::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec
 - **when** «grouping» builds the «parameter table»
@@ -2224,7 +2246,7 @@
 - **then** the step keeps its placeholder, which that cell substitutes into
 
 ## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py:2543::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+`tests/unit/test_grouping.py:2540::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
 
 - **given** two «cases» whose «step» trees differ
 - **when** the «cases» are «grouped»
@@ -2232,7 +2254,7 @@
 - **then** the error names the divergence and the opt-out that answers it
 
 ## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
-`tests/unit/test_grouping.py:2694::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
+`tests/unit/test_grouping.py:2691::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
 
 - **given** a step narrating a parameter bound to a glossary term instance
 - **when** the «cases» are «grouped»

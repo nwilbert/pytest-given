@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-04T12:49:55.666383+00:00",
+    "timestamp": "2026-09-04T20:39:11.712384+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "a21d79a04634eac9171687bd9575f58f453d8d01",
+    "commit_sha": "336af3c309af0e77c67f921086a71125495268d5",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -26,7 +26,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -134,7 +134,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -272,7 +272,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -421,6 +421,75 @@
       "activity_ids": []
     },
     {
+      "id": "tests/integration/test_plugin.py::test_a_grouping_error_without_sinks_does_not_say_report_not_written",
+      "narration": {
+        "text": "A refusal on a run with no sink does not claim a report was skipped",
+        "parts": [
+          {
+            "value": "A refusal on a run with no sink does not claim a "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].low"
+          },
+          {
+            "value": " was skipped"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 13,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite whose narration varies across parametrize cases",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with no --given-* sink",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the refusal is reported without claiming a report was skipped",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 382
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "tests/integration/test_plugin.py::test_a_grouping_error_discards_the_previous_report",
       "narration": {
         "text": "A refused run discards the previous run's report",
@@ -440,7 +509,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -521,7 +590,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 382
+        "line": 410
       },
       "story_id": null,
       "activity_ids": []
@@ -594,7 +663,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the run ends as a usage error, naming the preset",
+            "text": "the run ends as a usage error, naming the flag the user typed",
             "parts": []
           },
           "children": [],
@@ -619,7 +688,76 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 450
+        "line": 478
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin.py::test_an_unknown_source_link_preset_in_an_ini_names_the_ini",
+      "narration": {
+        "text": "An unknown source link preset in an ini reports the ini name",
+        "parts": [
+          {
+            "value": "An unknown "
+          },
+          {
+            "term_id": "source-link",
+            "display": "source link",
+            "expression": "pg[\"Source link\"].low"
+          },
+          {
+            "value": " preset in an ini reports the ini name"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 6,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite configured through the ini rather than the flag",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with an HTML sink",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the error names the ini setting, not a flag the user never typed",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 510
       },
       "story_id": null,
       "activity_ids": []
@@ -645,7 +783,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -712,7 +850,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2265
+        "line": 2319
       },
       "story_id": null,
       "activity_ids": []
@@ -738,7 +876,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 19,
       "steps": [
         {
           "phase": "given",
@@ -788,7 +926,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2278
+        "line": 2332
       },
       "story_id": null,
       "activity_ids": []
@@ -814,7 +952,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -875,7 +1013,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2299
+        "line": 2353
       },
       "story_id": null,
       "activity_ids": []
@@ -895,7 +1033,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -960,7 +1098,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2319
+        "line": 2373
       },
       "story_id": null,
       "activity_ids": []
@@ -985,7 +1123,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -1043,7 +1181,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2352
+        "line": 2406
       },
       "story_id": null,
       "activity_ids": []
@@ -1069,7 +1207,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -1141,7 +1279,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2384
+        "line": 2438
       },
       "story_id": null,
       "activity_ids": []
@@ -1169,7 +1307,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -1216,7 +1354,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2570
+        "line": 2624
       },
       "story_id": null,
       "activity_ids": []
@@ -1239,7 +1377,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -1340,7 +1478,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -1439,7 +1577,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -1561,7 +1699,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1665,7 +1803,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -1717,6 +1855,86 @@
         "line": 433
       },
       "story_id": "adopt-pytest-given",
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin_lint.py::test_a_lint_failure_is_reported_and_keeps_the_written_report",
+      "narration": {
+        "text": "A failure inside the lint keeps the report it was handed",
+        "parts": [
+          {
+            "value": "A failure inside the lint keeps the "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].low"
+          },
+          {
+            "value": " it was handed"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin_lint",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 56,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a clean suite and a lint pass that raises",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with an HTML sink",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the failure is summarized rather than raised as a traceback",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the report that was already written is still there",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin_lint.py",
+        "line": 452
+      },
+      "story_id": null,
       "activity_ids": []
     },
     {
@@ -9531,7 +9749,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 920
+        "line": 940
       },
       "story_id": null,
       "activity_ids": []
@@ -12037,7 +12255,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -13919,7 +14137,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 100
+        "line": 101
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14035,7 +14253,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 261
+        "line": 262
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14205,7 +14423,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 425
+        "line": 426
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14321,7 +14539,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 561
+        "line": 562
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14437,7 +14655,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 737
+        "line": 738
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14583,7 +14801,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
-        "line": 62
+        "line": 63
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14739,7 +14957,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
-        "line": 131
+        "line": 132
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -14898,7 +15116,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
-        "line": 219
+        "line": 220
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -17671,7 +17889,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 53,
+      "duration_ms": 66,
       "steps": [
         {
           "phase": "given",
@@ -18267,7 +18485,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 225
+        "line": 241
       },
       "story_id": null,
       "activity_ids": []
@@ -18381,7 +18599,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 262
+        "line": 278
       },
       "story_id": null,
       "activity_ids": []
@@ -18495,7 +18713,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 333
+        "line": 349
       },
       "story_id": null,
       "activity_ids": []
@@ -18580,7 +18798,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 496
+        "line": 512
       },
       "story_id": null,
       "activity_ids": []
@@ -19576,7 +19794,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 117
+        "line": 116
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -19691,7 +19909,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 149
+        "line": 148
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -19798,7 +20016,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 248
+        "line": 247
       },
       "story_id": null,
       "activity_ids": []
@@ -19916,7 +20134,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 475
+        "line": 474
       },
       "story_id": null,
       "activity_ids": []
@@ -20034,7 +20252,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 592
+        "line": 591
       },
       "story_id": null,
       "activity_ids": []
@@ -20137,7 +20355,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 704
+        "line": 703
       },
       "story_id": null,
       "activity_ids": []
@@ -20223,7 +20441,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1070
+        "line": 1069
       },
       "story_id": null,
       "activity_ids": []
@@ -20320,7 +20538,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1085
+        "line": 1084
       },
       "story_id": null,
       "activity_ids": []
@@ -20417,7 +20635,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1128
+        "line": 1127
       },
       "story_id": null,
       "activity_ids": []
@@ -20527,7 +20745,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1210
+        "line": 1209
       },
       "story_id": null,
       "activity_ids": []
@@ -20665,7 +20883,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1561
+        "line": 1560
       },
       "story_id": null,
       "activity_ids": []
@@ -20795,7 +21013,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1618
+        "line": 1617
       },
       "story_id": null,
       "activity_ids": []
@@ -20933,7 +21151,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1782
+        "line": 1781
       },
       "story_id": null,
       "activity_ids": []
@@ -21053,7 +21271,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the error names the label and asks for a constant one",
+            "text": "the error names the label, the case, and asks for a constant one",
             "parts": []
           },
           "children": [],
@@ -21067,7 +21285,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1838
+        "line": 1837
       },
       "story_id": null,
       "activity_ids": []
@@ -21181,7 +21399,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2386
+        "line": 2383
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -21309,7 +21527,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2543
+        "line": 2540
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -21426,7 +21644,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2694
+        "line": 2691
       },
       "story_id": null,
       "activity_ids": []
