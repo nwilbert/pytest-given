@@ -201,13 +201,14 @@ def register_or_conflict(
 def handle_or_raise(
     glossary: BaseGlossary,
     name: str,
-    handle_cache: dict[TermId, TermHandle] | None = None,
+    handle_cache: dict[TermId, TermHandle],
 ) -> TermHandle:
     """Name-based, case-insensitive get-only lookup. Raises PytestGivenError
     with a did-you-mean hint on an unknown name. Shared by the code glossary's
-    g[...] / g(...) lookups and FileGlossary."""
+    g[...] / g(...) lookups and FileGlossary — both of which pass their own
+    cache, so a repeated lookup returns the same handle either way."""
     term_id = TermId(id_derive(name))
-    if handle_cache is not None and term_id in handle_cache:
+    if term_id in handle_cache:
         return handle_cache[term_id]
     term = glossary.get(term_id)
     if term is None:
@@ -217,8 +218,7 @@ def handle_or_raise(
         hint = f' Did you mean: {", ".join(close)}?' if close else ''
         raise PytestGivenError(f'no glossary term named {name!r}.{hint}')
     handle = TermHandle(_term=term, _glossary=glossary)
-    if handle_cache is not None:
-        handle_cache[term_id] = handle
+    handle_cache[term_id] = handle
     return handle
 
 
@@ -230,6 +230,10 @@ class Glossary(BaseGlossary):
     definition supplied only the first time included. Re-reading a term declared
     elsewhere is `g[name]`, which never registers.
     """
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        self._handles: dict[TermId, TermHandle] = {}
 
     def _declare(
         self, kind: TermKind | None, name: str, definition: str | None
@@ -262,4 +266,4 @@ class Glossary(BaseGlossary):
 
     def __getitem__(self, name: str) -> TermHandle:
         """Get-only lookup; an unknown name raises with a did-you-mean hint."""
-        return handle_or_raise(self, name)
+        return handle_or_raise(self, name, self._handles)

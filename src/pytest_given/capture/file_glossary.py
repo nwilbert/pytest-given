@@ -28,8 +28,14 @@ _KIND_ALIASES: dict[str, TermKind] = {
 }
 
 
-class FileGlossary:
-    """Glossary loaded from a Markdown file. Access terms by name: g['Guest']."""
+class FileGlossary(Glossary):
+    """Glossary loaded from a Markdown file. Access terms by name: g['Guest'].
+
+    A `Glossary` rather than a wrapper around one: everything that consumes a
+    glossary — `resolve_glossary`, the report model, `handle_or_raise` — wants
+    the storage, and an `isinstance` that answered False for half the user-
+    facing glossaries made every one of those sites carry a second arm.
+    """
 
     def __init__(
         self,
@@ -39,6 +45,8 @@ class FileGlossary:
         description_column: ColumnSpec = 1,
         kind_column: ColumnSpec | None = None,
     ) -> None:
+        super().__init__()
+        self._handles: dict[TermId, TermHandle] = {}
         self._path = Path(path)
         try:
             text = self._path.read_text(encoding='utf-8')
@@ -50,14 +58,8 @@ class FileGlossary:
             description_column=description_column,
             kind_column=kind_column,
         )
-        self._glossary = Glossary()
-        self._handles: dict[TermId, TermHandle] = {}
         for row in rows:
             self._add_row(row)
-
-    @property
-    def glossary(self) -> Glossary:
-        return self._glossary
 
     def _add_row(self, row: GlossaryRow) -> None:
         try:
@@ -73,7 +75,7 @@ class FileGlossary:
             source=file_source(self._path, row.line),
         )
         register_or_conflict(
-            self._glossary,
+            self,
             term,
             lambda _existing: (
                 f'{self._path}:{row.line}: term {row.term!r} (id {term_id!r}) '
@@ -93,7 +95,7 @@ class FileGlossary:
         return mapped
 
     def __getitem__(self, name: str) -> TermHandle:
-        return handle_or_raise(self._glossary, name, self._handles)
+        return handle_or_raise(self, name, self._handles)
 
     def __call__(self, name: str) -> TermHandle:
         # A FileGlossary is a closed vocabulary: the call form looks up only,

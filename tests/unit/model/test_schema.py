@@ -328,6 +328,18 @@ def test_story_glossary_pin_excluded_from_repr_and_equality() -> None:
     assert '_glossaries' not in repr(s1)
 
 
+def test_a_glossary_is_identified_by_object_not_by_value() -> None:
+    """Nothing compares two glossaries by value, and several places collect the
+    distinct ones a story tree reaches — which needs them hashable."""
+    one = Glossary(terms=[GlossaryTerm(id=TermId('a'), kind='actor', canonical='A')])
+    same_terms = Glossary(
+        terms=[GlossaryTerm(id=TermId('a'), kind='actor', canonical='A')]
+    )
+    assert one != same_terms
+    assert one == one
+    assert frozenset({one, same_terms, one}) == frozenset({one, same_terms})
+
+
 # --- Task 1.4: Glossary container with atomic write-through ---
 
 
@@ -347,13 +359,11 @@ def test_glossary_register_rejects_id_collision() -> None:
         g._register(GlossaryTerm(id=TermId('x'), kind='verb', canonical='X'))
 
 
-def test_glossary_index_excluded_from_repr_and_equality() -> None:
-    g1 = Glossary()
-    g1._register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
-    g2 = Glossary()
-    g2._register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
-    assert g1 == g2
-    assert '_by_id' not in repr(g1)
+def test_glossary_index_excluded_from_repr() -> None:
+    """The index is derived from `terms`; showing it would double every term."""
+    g = Glossary()
+    g._register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
+    assert '_by_id' not in repr(g)
 
 
 def test_glossary_post_init_indexes_terms_passed_at_construction() -> None:
@@ -471,22 +481,3 @@ def test_attachment_ref_has_no_content_field() -> None:
     )
     assert not hasattr(ref, 'content')
     assert ref.column_id == 'attachment:0'
-
-
-def test_glossary_reindex_picks_up_a_direct_mutation() -> None:
-    """`terms` has to stay a public list — the reflective serializer reads it
-    by name — so a caller that mutates it directly reindexes to make `get` see
-    the change. Both shapes count: an append, and a replacement in place, which
-    the length-comparing self-heal this replaced could not detect."""
-    glossary = Glossary(
-        terms=[GlossaryTerm(id=TermId('a'), kind='actor', canonical='A')]
-    )
-    glossary.terms.append(GlossaryTerm(id=TermId('b'), kind='actor', canonical='B'))
-    glossary.terms[0] = GlossaryTerm(id=TermId('a'), kind='actor', canonical='A2')
-    glossary.reindex()
-    appended = glossary.get(TermId('b'))
-    replaced = glossary.get(TermId('a'))
-    assert appended is not None
-    assert appended.canonical == 'B'
-    assert replaced is not None
-    assert replaced.canonical == 'A2'

@@ -66,6 +66,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
   belongs to.
 - **Breaking.** `activity(..., id=N)` is now `activity(..., activity_id=N)`; the
   `Activity.id` field itself is unchanged.
+- **Breaking.** `FileGlossary` is now a `Glossary` subclass rather than a wrapper
+  around one, so its `.glossary` attribute is gone — use the `FileGlossary`
+  itself wherever that attribute was passed.
 - A glossary term placed in an activity slot its declared kind forbids now raises
   `PytestGivenError` when `activity(...)` is built rather than at session finish.
 - A glossary file whose table has a header and separator but no data rows now

@@ -87,6 +87,19 @@ class Narration:
 type TermKind = Literal['actor', 'object', 'verb']
 
 
+@dataclass(frozen=True)
+class SourceLocation:
+    """A file/line pointer to a scenario's test function.
+
+    `relpath` is POSIX-normalized and relative to pytest's rootdir; `line` is
+    1-indexed. Stored on Scenario; rootdir is never serialized to avoid
+    leaking local paths.
+    """
+
+    relpath: str
+    line: int
+
+
 @dataclass(frozen=True, kw_only=True)
 class GlossaryTerm:
     id: TermId
@@ -118,42 +131,25 @@ type ActivityPart = ActivityTermRef | ActivityWord
 
 
 @dataclass(frozen=True, kw_only=True)
-class GlossaryPinned:
-    """A story-tree node that pins the live `Glossary` objects its subtree
-    references, keyed by `id()`.
-
-    `story()` pins them at construction so `capture.discovery.resolve_glossary`
-    can pick the report's glossary off the story tree it was handed, rather than
-    off a session-global that a nested run could clear. A declared field (not a
-    name stashed at runtime) so it is typed and mypy sees every read;
-    underscored, so serde drops it and it never reaches the JSON.
-    """
-
-    _glossaries: dict[int, Glossary] = field(
-        repr=False, compare=False, default_factory=dict
-    )
-
-
-@dataclass(frozen=True, kw_only=True)
-class ActivityPath(GlossaryPinned):
+class ActivityPath:
     parts: tuple[ActivityPart, ...]
 
 
 @dataclass(frozen=True, kw_only=True)
-class Activity(GlossaryPinned):
+class Activity:
     id: ActivityId
     paths: tuple[ActivityPath, ...]
 
 
 @dataclass(frozen=True, kw_only=True)
-class Story(GlossaryPinned):
+class Story:
     id: StoryId
     title: str
     activities: tuple[Activity, ...]
     source: SourceLocation | None = None
 
 
-@dataclass
+@dataclass(eq=False)
 class Glossary:
     """Mutable container of glossary terms with an id-keyed index.
 
@@ -161,33 +157,26 @@ class Glossary:
     model carries and what the deserializer rebuilds. The user-facing
     registration API is a subclass in `pytest_given.capture.glossary`, which
     needs the caller's source location — capture's business, not the leaf's.
+
+    `eq=False` keeps identity equality and, with it, hashability. Nothing
+    compares two glossaries by value, while several places do need to collect
+    the distinct ones a story tree reaches — which is a `frozenset` only if
+    this is hashable.
     """
 
     # Public and mutable because the reflective serializer reads it by name.
-    # A caller that mutates it directly owes `reindex()`; the constructor and
-    # `_register` keep the index current on their own, and nothing in the
-    # package takes the direct route.
+    # `_register` and the constructor are the only writers, and both keep the
+    # index current; rebuild by constructing rather than by mutating in place.
     terms: list[GlossaryTerm] = field(default_factory=list)
     _by_id: dict[TermId, GlossaryTerm] = field(
         init=False, repr=False, compare=False, default_factory=dict
     )
 
     def __post_init__(self) -> None:
-        self.reindex()
+        self._by_id = {term.id: term for term in self.terms}
 
     def get(self, key: TermId) -> GlossaryTerm | None:
         return self._by_id.get(key)
-
-    def reindex(self) -> None:
-        """Rebuild the id index from `terms`.
-
-        Explicit rather than a self-heal inside `get`: the length comparison
-        that used to trigger one saw an append but not a replacement in place,
-        which keeps the length equal and leaves `get` returning the term that
-        was swapped out — so it advertised a guarantee it could not keep, on
-        the hottest read in the report path.
-        """
-        self._by_id = {term.id: term for term in self.terms}
 
     def _register(self, term: GlossaryTerm) -> None:
         assert self.get(term.id) is None, f'term id {term.id!r} already registered'
@@ -251,19 +240,6 @@ class AttachmentRef:
 
 # What may sit on a grouped step: a real payload, or a pointer to a column.
 type StepAttachment = Attachment | AttachmentRef
-
-
-@dataclass(frozen=True)
-class SourceLocation:
-    """A file/line pointer to a scenario's test function.
-
-    `relpath` is POSIX-normalized and relative to pytest's rootdir; `line` is
-    1-indexed. Stored on Scenario; rootdir is never serialized to avoid
-    leaking local paths.
-    """
-
-    relpath: str
-    line: int
 
 
 def location_suffix(location: SourceLocation | None) -> str:

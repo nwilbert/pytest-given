@@ -11,8 +11,7 @@ from pathlib import Path
 from types import ModuleType
 
 from ..model import Glossary, PytestGivenError, Story
-from .file_glossary import FileGlossary
-from .story import merge_glossaries
+from .story import pinned_glossaries
 
 
 def resolve_glossary(
@@ -30,14 +29,16 @@ def resolve_glossary(
     the suite that declares a glossary and only ever uses term refs in
     narrations.
     """
-    reaching = merge_glossaries(story._glossaries for story in stories)
+    reaching = frozenset[Glossary]().union(
+        *(pinned_glossaries(story) for story in stories)
+    )
     if len(reaching) > 1:
         raise PytestGivenError(
             f'stories reach {len(reaching)} distinct Glossary instances; '
             f'v1 supports at most one.'
         )
     if reaching:
-        return next(iter(reaching.values()))
+        return next(iter(reaching))
     return _glossary_from_modules(modules)
 
 
@@ -45,28 +46,26 @@ def _glossary_from_modules(modules: Iterable[ModuleType]) -> Glossary | None:
     """The single `Glossary` declared across the given conftest modules.
 
     Deduped by object identity, so one glossary imported into several conftests
-    is still one glossary. A `FileGlossary` contributes the `Glossary` it wraps.
+    is still one glossary.
     """
-    distinct: dict[int, tuple[str, Glossary]] = {}
+    distinct: dict[Glossary, str] = {}
     for module in modules:
         module_file = getattr(module, '__file__', None)
         if module_file is None or Path(module_file).name != 'conftest.py':
             continue
         for attr_name in dir(module):
             attr = getattr(module, attr_name, None)
-            if isinstance(attr, FileGlossary):
-                distinct.setdefault(id(attr.glossary), (module_file, attr.glossary))
-            elif isinstance(attr, Glossary):
-                distinct.setdefault(id(attr), (module_file, attr))
+            if isinstance(attr, Glossary):
+                distinct.setdefault(attr, module_file)
     if len(distinct) > 1:
         details = ', '.join(
             f'{path} ({len(glossary.terms)} term(s))'
-            for path, glossary in distinct.values()
+            for glossary, path in distinct.items()
         )
         raise PytestGivenError(
             f'multiple Glossary instances found in conftests ({len(distinct)}): '
             f'{details}. v1 supports at most one glossary per suite.'
         )
     if distinct:
-        return next(iter(distinct.values()))[1]
+        return next(iter(distinct))
     return None

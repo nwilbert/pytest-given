@@ -1,6 +1,7 @@
-"""Story / Activity / Path constructors."""
+"""Story / Activity / Path constructors, and the glossary pin they carry."""
 
 from collections.abc import Iterable, Sequence
+from dataclasses import dataclass, replace
 
 from ..model import (
     Activity,
@@ -25,6 +26,49 @@ from .source import capture_caller_source
 type _PathArg = TermRef | str
 
 
+@dataclass(frozen=True, kw_only=True)
+class _Pinned:
+    """The live `Glossary` objects a story-tree node's subtree references.
+
+    `story()` pins them at construction so `discovery.resolve_glossary` can
+    pick the suite's glossary off the story tree it was handed, rather than off
+    a session-global that a nested run could clear.
+
+    A capture-side subclass rather than a field on the schema: the report model
+    neither carries this nor serializes it, and `model/` is the leaf — it may
+    not reach into `capture` for the `Glossary` these actually are. Underscored
+    all the same, so the reflective serializer drops it if one of these ever
+    does reach serde.
+    """
+
+    _glossaries: frozenset[Glossary] = frozenset()
+
+
+@dataclass(frozen=True, kw_only=True)
+class _PinnedPath(ActivityPath, _Pinned):
+    pass
+
+
+@dataclass(frozen=True, kw_only=True)
+class _PinnedActivity(Activity, _Pinned):
+    pass
+
+
+@dataclass(frozen=True, kw_only=True)
+class _PinnedStory(Story, _Pinned):
+    pass
+
+
+def pinned_glossaries(node: object) -> frozenset[Glossary]:
+    """The glossaries pinned on a story-tree node.
+
+    Empty for a node that did not come from `path()` / `activity()` /
+    `story()` — a deserialized report's, most of all, which carries its
+    glossary as a serialized field instead.
+    """
+    return node._glossaries if isinstance(node, _Pinned) else frozenset()
+
+
 def path(*parts: _PathArg) -> ActivityPath:
     """Build an ActivityPath as a node/edge alternation, so it maps directly
     onto a Domain Storytelling graph. Even positions (0, 2, ...) are entity
@@ -45,16 +89,13 @@ def path(*parts: _PathArg) -> ActivityPath:
             continue  # a bare word carries no role; valid at any position
         _check_position(part, position, slot_for(position), parts)
     schema_parts = tuple(_to_part(part) for part in parts)
-    # Stash the live Glossary objects the path references; the enclosing
-    # activity and story merge them upwards, which is what enforces the v1 "one
-    # glossary per story" invariant at construction time. Keyed by id(), which
-    # dedups by identity (Glossary is unhashable) while keeping the object.
-    glossaries: dict[int, Glossary] = {
-        id(owner): owner
-        for owner in (_glossary_of(part) for part in parts)
-        if owner is not None
-    }
-    return ActivityPath(parts=schema_parts, _glossaries=glossaries)
+    # Pin the live Glossary objects the path references; the enclosing activity
+    # and story union them upwards, which is what enforces the v1 "one glossary
+    # per story" invariant at construction time.
+    glossaries = frozenset(
+        owner for part in parts if (owner := _glossary_of(part)) is not None
+    )
+    return _PinnedPath(parts=schema_parts, _glossaries=glossaries)
 
 
 def _glossary_of(value: object) -> Glossary | None:
@@ -83,29 +124,22 @@ def activity(
         paths = tuple(p for p in parts_or_paths if isinstance(p, ActivityPath))
     else:
         paths = (path(*parts_or_paths),)  # type: ignore[arg-type]
-    glossaries = merge_glossaries(p._glossaries for p in paths)
+    glossaries = _union(pinned_glossaries(p) for p in paths)
     if activity_id == 0:
         raise PytestGivenError(
             'activity(activity_id=0) is reserved as the unset sentinel; '
             'use activity_id=1.. or omit to take the auto-assigned sequence '
             'number.'
         )
-    return Activity(
+    return _PinnedActivity(
         id=ActivityId(activity_id if activity_id is not None else 0),
         paths=paths,
         _glossaries=glossaries,
     )
 
 
-def merge_glossaries(
-    stashes: Iterable[dict[int, Glossary]],
-) -> dict[int, Glossary]:
-    """Union the id→Glossary stashes of several paths/activities, deduping by
-    object identity."""
-    merged: dict[int, Glossary] = {}
-    for stash in stashes:
-        merged.update(stash)
-    return merged
+def _union(pins: Iterable[frozenset[Glossary]]) -> frozenset[Glossary]:
+    return frozenset[Glossary]().union(*pins)
 
 
 # Which story ids this process has seen declared, and where. Process-global,
@@ -155,9 +189,9 @@ def story(title: str, activities: Sequence[Activity] = ()) -> Story:
     _register_story(sid, title, source)
     numbered = _assign_sequence_numbers(tuple(activities))
     _check_unique_ids(numbered)
-    glossaries = merge_glossaries(a._glossaries for a in numbered)
+    glossaries = _union(pinned_glossaries(a) for a in numbered)
     _check_single_glossary(title, glossaries)
-    return Story(
+    return _PinnedStory(
         id=sid,
         title=title,
         activities=numbered,
@@ -181,9 +215,7 @@ def _assign_sequence_numbers(
             continue
         while ActivityId(next_seq) in taken:
             next_seq += 1
-        out.append(
-            Activity(id=ActivityId(next_seq), paths=a.paths, _glossaries=a._glossaries)
-        )
+        out.append(replace(a, id=ActivityId(next_seq)))
         next_seq += 1
     return tuple(out)
 
@@ -198,7 +230,7 @@ def _check_unique_ids(activities: tuple[Activity, ...]) -> None:
         seen.add(a.id)
 
 
-def _check_single_glossary(title: str, glossaries: dict[int, Glossary]) -> None:
+def _check_single_glossary(title: str, glossaries: frozenset[Glossary]) -> None:
     if len(glossaries) > 1:
         raise PytestGivenError(
             f'story {title!r} spans multiple glossaries ({len(glossaries)}); '

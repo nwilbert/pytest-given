@@ -74,7 +74,7 @@ def test_a_file_glossary_on_a_conftest_is_discovered(tmp_path: Path) -> None:
     )
     file_glossary = FileGlossary(md_path)
     modules = [_FakeConftest('/x/conftest.py', g=file_glossary)]
-    assert resolve_glossary([], modules) is file_glossary.glossary
+    assert resolve_glossary([], modules) is file_glossary
 
 
 def test_a_plain_glossary_on_a_conftest_is_discovered() -> None:

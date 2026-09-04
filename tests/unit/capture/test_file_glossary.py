@@ -4,7 +4,7 @@ from pytest_given import attach, given, scenario, then, when, when_then
 from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.glossary import TermHandle
 from pytest_given.capture.story import activity
-from pytest_given.model import ActivityTermRef, PytestGivenError, TermId
+from pytest_given.model import ActivityTermRef, Glossary, PytestGivenError, TermId
 from tests.ubiquitous_language import pg
 
 GLOSSARY_MD = """# Glossary
@@ -210,12 +210,12 @@ def test_missing_file_raises(tmp_path):
         FileGlossary(missing)
 
 
-def test_glossary_property_returns_inner_glossary(glossary_file):
-    """FileGlossary.glossary property returns the inner Glossary with parsed terms."""
+def test_a_file_glossary_is_a_glossary(glossary_file):
+    """A FileGlossary *is* the storage rather than wrapping it, so every
+    consumer of a glossary takes one without a second isinstance arm."""
     fg = FileGlossary(glossary_file)
-    inner = fg.glossary
-    assert inner is not None
-    assert inner.get(TermId('guest')) is not None
+    assert isinstance(fg, Glossary)
+    assert fg.get(TermId('guest')) is not None
 
 
 @scenario(
@@ -274,7 +274,7 @@ def test_blank_description_cell_normalizes_to_none(tmp_path):
     with when(t'the {pg["File glossary"]} parses it'):
         fg = FileGlossary(path)
     with then(t'the {pg["Term"]} definition is None, i.e. {pg["Undefined"]}'):
-        assert fg.glossary.get(TermId('guest')).definition is None
+        assert fg.get(TermId('guest')).definition is None
 
 
 @scenario(
@@ -293,8 +293,8 @@ def test_idempotent_duplicate_rows_ok(tmp_path):
     with when(t'the {pg["File glossary"]} parses them'):
         fg = FileGlossary(path)
     with then(t'they collapse to a single {pg["Term"]}'):
-        assert len(fg.glossary.terms) == 1
-        assert fg.glossary.get(TermId('guest')) is not None
+        assert len(fg.terms) == 1
+        assert fg.get(TermId('guest')) is not None
 
 
 # --- Task 3: FileGlossary.__call__ (lookup-only, closed vocabulary) ---
@@ -331,4 +331,4 @@ def test_file_glossary_call_unknown_name_raises(glossary_file):
     ):
         glossary('Unknown Term')
     with then(t'no new {pg["Term"]} was created'):
-        assert len(glossary.glossary.terms) == 3
+        assert len(glossary.terms) == 3
