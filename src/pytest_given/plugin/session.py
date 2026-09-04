@@ -22,16 +22,7 @@ from ..capture import (
     restore_capture_state,
 )
 from ..grouping import group_parametrized
-from ..lint import (
-    Finding,
-    apply_config,
-    enabled_rules,
-    error_count,
-    run_ast_rules,
-    run_runtime_rules,
-    summary_rows,
-    summary_title,
-)
+from ..lint import Finding, error_count, run_lint, summary_rows, summary_title
 from ..model import (
     Glossary,
     Metadata,
@@ -218,10 +209,11 @@ def _run_lint(session: pytest.Session, built: _SessionReport) -> None:
     given = given_config(config)
     if not given.lint_enabled:
         return
-    enabled = enabled_rules(given.lint)
-    findings = apply_config(
-        run_runtime_rules(built.scenarios, built.glossary, built.stories, enabled)
-        + run_ast_rules(built.scenarios, Path(config.rootpath), enabled),
+    findings = run_lint(
+        built.scenarios,
+        built.glossary,
+        built.stories,
+        Path(config.rootpath),
         given.lint,
     )
     if not findings:

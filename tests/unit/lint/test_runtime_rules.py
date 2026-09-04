@@ -3,7 +3,8 @@
 import dataclasses
 
 from pytest_given import given, scenario, then, when
-from pytest_given.lint import DEFAULTS, RuleId, run_runtime_rules
+from pytest_given.lint import DEFAULTS, RuleId
+from pytest_given.lint.runtime_rules import run_runtime_rules
 from pytest_given.model import (
     Activity,
     ActivityId,

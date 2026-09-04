@@ -34,10 +34,29 @@ class IgnoreEntry:
 
 @dataclass(frozen=True, kw_only=True)
 class LintConfig:
-    """The two ini options, parsed."""
+    """The two ini options, parsed, and the rule severities they resolve to."""
 
     levels: dict[RuleId, Level]
     ignores: list[IgnoreEntry]
+
+    @property
+    def effective(self) -> dict[RuleId, Level]:
+        """Every known rule's level, configured overrides over the defaults."""
+        return DEFAULTS | self.levels
+
+    @property
+    def enabled(self) -> frozenset[RuleId]:
+        """The rules whose effective level is not ``off``.
+
+        Handed to the rule runners so a disabled rule does not run at all,
+        which is what the spec means by ``off``. Resolving severities
+        afterwards still drops an ``off`` finding — `apply_config` stays the
+        authority for a caller that assembled findings itself — but nothing
+        computes one in a normal run.
+        """
+        return frozenset(
+            rule for rule, level in self.effective.items() if level != 'off'
+        )
 
 
 def parse_lint_config(rule_lines: list[str], ignore_lines: list[str]) -> LintConfig:
@@ -77,34 +96,26 @@ def parse_ignore_entries(lines: list[str]) -> list[IgnoreEntry]:
 
     A prefix is only recognized when the text before the first ':' is shaped
     like a rule id — so node-id globs (``*::test_x``, ``tests/t.py::test_a``)
-    parse as bare patterns.
+    parse as bare patterns. A rule-shaped prefix that names no known rule is a
+    typo worth reporting, *unless* what follows is itself a node id: that is
+    how a Windows drive letter arrives (``c:/repo/tests/t.py::test_x``), where
+    the prefix is part of a path rather than a rule scope.
     """
     entries: list[IgnoreEntry] = []
     for line in lines:
         prefix, sep, rest = line.partition(':')
-        if sep and _RULE_PREFIX_RE.fullmatch(prefix.strip()):
-            rule = RuleId(prefix.strip())
-            if rule not in DEFAULTS:
+        rule = RuleId(prefix.strip())
+        if sep and _RULE_PREFIX_RE.fullmatch(rule):
+            if rule in DEFAULTS:
+                entries.append(IgnoreEntry(raw=line, rule=rule, pattern=rest.strip()))
+                continue
+            if '::' not in rest:
                 raise PytestGivenError(
                     f'unknown rule prefix {rule!r} in given_lint_ignore entry '
                     f'{line!r} (known: {", ".join(sorted(DEFAULTS))}).'
                 )
-            entries.append(IgnoreEntry(raw=line, rule=rule, pattern=rest.strip()))
-        else:
-            entries.append(IgnoreEntry(raw=line, rule=None, pattern=line.strip()))
+        entries.append(IgnoreEntry(raw=line, rule=None, pattern=line.strip()))
     return entries
-
-
-def enabled_rules(config: LintConfig) -> frozenset[RuleId]:
-    """The rules whose effective level is not ``off``.
-
-    Handed to the rule runners so a disabled rule does not run at all, which
-    is what the spec means by ``off``. Resolving severities afterwards still
-    drops an ``off`` finding — `apply_config` stays the authority for a caller
-    that assembled findings itself — but nothing computes one in a normal run.
-    """
-    effective = DEFAULTS | config.levels
-    return frozenset(rule for rule, level in effective.items() if level != 'off')
 
 
 def apply_config(findings: list[RawFinding], config: LintConfig) -> list[Finding]:
@@ -120,7 +131,7 @@ def apply_config(findings: list[RawFinding], config: LintConfig) -> list[Finding
     consumer re-sorting the whole list would pull them to the front.
     `summary_rows` renders the order it is given.
     """
-    effective = DEFAULTS | config.levels
+    effective = config.effective
     used: set[int] = set()
     kept: list[Finding] = []
     for raw in findings:

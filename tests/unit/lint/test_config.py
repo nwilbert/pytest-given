@@ -204,3 +204,22 @@ def test_the_documented_rule_tables_match_the_catalog() -> None:
         assert rows == {str(rule): level for rule, level in DEFAULTS.items()}, (
             f'{doc.name} rule table is out of sync with lint.DEFAULTS'
         )
+
+
+def test_a_windows_drive_letter_is_a_path_not_a_rule_prefix() -> None:
+    """`c:/repo/tests/t.py::test_x` is rule-shaped before its first ':', but
+    what follows is a node id — the prefix is a drive, not a rule scope."""
+    [entry] = parse_ignore_entries(['c:/repo/tests/t.py::test_x'])
+    assert entry.rule is None
+    assert entry.pattern == 'c:/repo/tests/t.py::test_x'
+
+
+def test_a_rule_scoped_node_id_glob_still_parses_as_rule_scoped() -> None:
+    [entry] = parse_ignore_entries(['empty-step:tests/t.py::test_x'])
+    assert entry.rule == RuleId('empty-step')
+    assert entry.pattern == 'tests/t.py::test_x'
+
+
+def test_an_unknown_rule_prefix_without_a_node_id_is_still_reported() -> None:
+    with pytest.raises(PytestGivenError, match='unknown rule prefix'):
+        parse_ignore_entries(['emty-step:some-subject'])

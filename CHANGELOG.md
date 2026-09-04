@@ -157,6 +157,9 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 #### Narration lint
 
+- A `given_lint_ignore` entry beginning with a Windows drive letter
+  (`c:/repo/tests/t.py::test_x`) is no longer rejected as an unknown rule prefix.
+
 - A rule configured `off` no longer runs; levels were applied only after every
   rule had already produced its findings.
 - A scenario tag with no ASCII alphanumerics (`tags=['日本語']`) no longer takes
