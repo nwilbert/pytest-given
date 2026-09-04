@@ -13,8 +13,8 @@ from ..model import (
     ParamInfo,
     Scenario,
     Status,
+    iter_steps,
     node_base,
-    step_narrations,
 )
 from .checks import check_rebound_params, check_same_template
 from .columns import ColumnBuilder, param_cell_formats
@@ -68,7 +68,8 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
     # The scenario name is scanned alongside the steps — a `Template` name's
     # spec is a slot's spec, and often the only one in play.
     formats = param_cell_formats(
-        [anchor.narration, *step_narrations(baseline.steps)], group.param_names
+        [anchor.narration, *(s.narration for s in iter_steps(baseline.steps))],
+        group.param_names,
     )
     ctx = ColumnBuilder.for_params(group, formats)
     template_steps = templatize_steps(baseline.steps, (), ctx)

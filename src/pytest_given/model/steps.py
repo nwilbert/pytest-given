@@ -37,11 +37,7 @@ def iter_steps(steps: list[Step]) -> Iterator[Step]:
     return (step for _path, step in walk_steps(steps))
 
 
-def step_narrations(steps: list[Step]) -> Iterator[Narration]:
-    return (step.narration for _path, step in walk_steps(steps))
-
-
 def iter_narrations(scenario: Scenario) -> Iterator[Narration]:
     """A scenario's own narration followed by every step's, depth-first."""
     yield scenario.narration
-    yield from step_narrations(scenario.steps)
+    yield from (step.narration for step in iter_steps(scenario.steps))

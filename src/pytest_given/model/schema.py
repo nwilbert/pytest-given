@@ -272,7 +272,7 @@ class TracebackFrame:
     is_internal: bool
 
 
-@dataclass
+@dataclass(frozen=True)
 class ErrorInfo:
     message: str
     frames: list[TracebackFrame] = field(default_factory=list)
@@ -322,7 +322,7 @@ class ParameterColumn:
 type CellValue = ParamValue | Attachment
 
 
-@dataclass
+@dataclass(frozen=True)
 class ParameterCase:
     """One parametrize case: its cells, positionally aligned with the table's
     columns."""
@@ -332,7 +332,7 @@ class ParameterCase:
     error: ErrorInfo | None = None
 
 
-@dataclass
+@dataclass(frozen=True)
 class ParameterTable:
     columns: list[ParameterColumn]
     cases: list[ParameterCase] = field(default_factory=list)
@@ -355,7 +355,7 @@ class Scenario:
     activity_ids: tuple[ActivityId, ...] = ()
 
 
-@dataclass
+@dataclass(frozen=True)
 class Metadata:
     project: str
     timestamp: str
@@ -368,7 +368,7 @@ class Metadata:
     title: str | None = None
 
 
-@dataclass
+@dataclass(frozen=True)
 class ReportData:
     metadata: Metadata
     scenarios: list[Scenario] = field(default_factory=list)

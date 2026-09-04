@@ -63,7 +63,6 @@ from .steps import (
     StepPath,
     iter_narrations,
     iter_steps,
-    step_narrations,
     walk_steps,
 )
 
@@ -131,6 +130,5 @@ __all__ = [
     'render_interpolation',
     'report_from_dict',
     'report_to_dict',
-    'step_narrations',
     'walk_steps',
 ]

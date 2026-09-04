@@ -63,8 +63,10 @@ def narration_from(value: StepText | Narration) -> Narration:
     if isinstance(value, Narration):
         return value
     if isinstance(value, templatelib.Template):
-        text, parts = parse_tstring(value)
-        return Narration(text=text, parts=parts)
+        # Through `narration_of` like the `Template` branch below, rather than
+        # pairing text and parts by hand: one constructor, one place the
+        # text-renders-its-parts invariant is established.
+        return narration_of(parse_tstring(value)[1])
     if isinstance(value, Template):
         # Text derived from the parts, never the raw template string: a
         # placeholder renders as its bare `{name}` token, so `'{amount:.2f}'`
