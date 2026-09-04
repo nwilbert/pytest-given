@@ -20,7 +20,6 @@ from .discovery import resolve_glossary
 from .file_glossary import FileGlossary
 from .glossary import Glossary
 from .kind_inference import infer_glossary_kinds
-from .params import snapshot_param_value
 from .process_state import (
     begin_capture_session,
     capture_snapshot,
@@ -80,7 +79,6 @@ __all__ = [
     'restore_capture_state',
     'scenario',
     'set_active_collector',
-    'snapshot_param_value',
     'story',
     'then',
     'try_term_ref',

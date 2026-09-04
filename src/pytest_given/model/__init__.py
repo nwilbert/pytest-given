@@ -1,5 +1,4 @@
 from .errors import PytestGivenError, PytestGivenWarning, placeholder_mismatch
-from .markup import EMPHASIS, plural
 from .narration import (
     narration_of,
     narration_text,
@@ -60,7 +59,6 @@ from .schema import (
     node_base,
 )
 from .serde import report_from_dict, report_to_dict
-from .slug import id_derive
 from .steps import (
     PartIndex,
     StepPath,
@@ -68,6 +66,7 @@ from .steps import (
     iter_steps,
     walk_steps,
 )
+from .text import EMPHASIS, id_derive, plural
 
 __all__ = [
     'EMPHASIS',

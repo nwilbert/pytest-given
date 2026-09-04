@@ -40,7 +40,7 @@ The short version: bump `version` in `pyproject.toml` and add a matching `## [x.
 strict dependency direction (convention, not lint-enforced):
 
 ```
-model/                     the leaf — schema, serde, slugs, errors, shared text rules
+model/                     the leaf — schema, serde, errors, shared text rules
 capture/  lint/  report/   each on model/ only, never on each other
 grouping/                  on model/ + capture/
 plugin/   cli/             the entry points; may import all five, and hold
