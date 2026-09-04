@@ -268,7 +268,7 @@ def test_compute_coverage_covers_canonical_activity_via_instance_step(g):
             ),
         )
         story = Story(id=StoryId('s'), title='S', activities=(a,))
-    with when(t'a {pg["Scenario"]} step names a specific {pg["Instance"]}'):
+    with given(t'a {pg["Scenario"]} step naming a specific {pg["Instance"]}'):
         scenario = _scenario_with_steps(
             _step(
                 'when',
@@ -277,6 +277,7 @@ def test_compute_coverage_covers_canonical_activity_via_instance_step(g):
                 _term_ref('room', 'Room'),
             ),
         )
+    with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
         coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} reports the {pg["Activity"]} as covered'):
         assert ActivityId(1) in coverage
@@ -299,7 +300,7 @@ def test_compute_coverage_does_not_cover_instance_activity_with_canonical_step(g
             ),
         )
         story = Story(id=StoryId('s'), title='S', activities=(a,))
-    with when(t'a {pg["Scenario"]} step only names the canonical {pg["Actor"]}'):
+    with given(t'a {pg["Scenario"]} step naming only the canonical {pg["Actor"]}'):
         scenario = _scenario_with_steps(
             _step(
                 'when',
@@ -308,6 +309,7 @@ def test_compute_coverage_does_not_cover_instance_activity_with_canonical_step(g
                 _term_ref('room', 'Room'),
             ),
         )
+    with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
         coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} leaves the more specific instance activity uncovered'):
         assert ActivityId(1) not in coverage
@@ -394,8 +396,8 @@ def test_compute_coverage_scenario_constrained_to_activity_ids(g):
             ),
         )
         story = Story(id=StoryId('s'), title='S', activities=(a1, a2))
-    with when(
-        t'the {pg["Scenario"]} {pg["Scenario↔activity binding"]("binds")} '
+    with given(
+        t'a {pg["Scenario"]} {pg["Scenario↔activity binding"]("bound")} '
         t'only to activity 1'
     ):
         scenario = _scenario_with_steps(
@@ -407,6 +409,7 @@ def test_compute_coverage_scenario_constrained_to_activity_ids(g):
             ),
             activity_ids=[1],
         )
+    with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
         coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} considers only the bound {pg["Activity"]}'):
         assert ActivityId(1) in coverage
@@ -479,11 +482,12 @@ def test_compute_coverage_excludes_under_anchored_activity(g):
             paths=(_path(ActivityWord(text='just'), ActivityWord(text='words')),),
         )
         story = Story(id=StoryId('s'), title='S', activities=(a,))
-    with when('coverage is computed against a scenario'):
+    with given(t'a {pg["Scenario"]} narrating one {pg["Term ref"]}'):
         scenario = _scenario_with_steps(
             _step('given', _term_ref('guest', 'Guest')),
             _step('when'),
         )
+    with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
         coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} excludes the under-anchored {pg["Activity"]}'):
         assert ActivityId(1) not in coverage
@@ -506,7 +510,9 @@ def test_compute_coverage_nested_steps_are_walked(g):
             ),
         )
         story = Story(id=StoryId('s'), title='S', activities=(a,))
-    with when(t'the covering {pg["Term ref"]}s live in a nested child {pg["Step"]}'):
+    with given(
+        t'the covering {pg["Term ref"]("term refs")} in a nested child {pg["Step"]}'
+    ):
         parent = _step('given')
         child = _step(
             'when',
@@ -516,6 +522,7 @@ def test_compute_coverage_nested_steps_are_walked(g):
         )
         parent.children.append(child)
         scenario = _scenario_with_steps(parent)
+    with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
         coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(
         t'the nested {pg["Step"]} still counts and the {pg["Activity"]} is covered'
@@ -541,11 +548,12 @@ def test_compute_coverage_explicit_step_binding_covers_eligible_activity(g):
             ),
         )
         story = Story(id=StoryId('s'), title='S', activities=(activity,))
-    with when(
-        t'a {pg["Step"]} {pg["Scenario↔activity binding"]("binds")} '
+    with given(
+        t'a {pg["Step"]} {pg["Scenario↔activity binding"]("bound")} '
         t'to it explicitly by id'
     ):
         scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
+    with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
         coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} counts it directly, without identity matching'):
         assert ActivityId(1) in coverage
@@ -569,11 +577,12 @@ def test_compute_coverage_explicit_binding_covers_under_anchored_activity(g):
             ),
         )
         story = Story(id=StoryId('s'), title='S', activities=(activity,))
-    with when(
-        t'a {pg["Step"]} {pg["Scenario↔activity binding"]("binds")} '
+    with given(
+        t'a {pg["Step"]} {pg["Scenario↔activity binding"]("bound")} '
         t'to it explicitly by id'
     ):
         scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
+    with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
         coverage = compute_coverage(g, scenario, build_story_index(g, story))
     with then(t'{pg["Coverage"]} counts it, despite the missing anchors'):
         assert ActivityId(1) in coverage

@@ -106,8 +106,17 @@
 - **when** the suite runs with an HTML sink
 - **then** the error names the ini setting, not a flag the user never typed
 
+## ✓ A «report» that fails to render discards the previous one too
+`tests/integration/test_plugin.py:536::test_a_render_failure_leaves_no_half_replaced_report` · validation
+
+- **given** a suite with one «scenario»
+- **given** a «report» pair on disk from a previous run
+- **when** the run trips a «renderer» failure
+- **then** the run fails, saying no report was written
+- **then** neither the stale pair nor a half-written new one survives
+
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2319::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2327::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -130,14 +139,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2332::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2340::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2353::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2361::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -145,7 +154,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A sink flag pointed at a source file is refused before the suite runs
-`tests/integration/test_plugin.py:2373::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
+`tests/integration/test_plugin.py:2381::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
 
 - **given** a suite with one «scenario»
 - **when** a bare --given-html swallows the test path that follows it
@@ -153,7 +162,7 @@
 - **then** the source file is left exactly as it was, not overwritten
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2406::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2414::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -173,7 +182,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:2438::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:2446::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -182,7 +191,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:2624::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:2632::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -290,7 +299,7 @@
 ## ✓ An error «finding» leaves a more specific exit code alone
 `tests/integration/test_plugin_lint.py:433::test_lint_error_does_not_mask_a_more_specific_exit_code`
 
-- **given** a suite whose lint would fail, deselected so nothing is collected
+- **given** a suite whose lint would fail, under a stale ignore entry
   - 📎 suite:
     ```
     
@@ -305,7 +314,7 @@
         with then("it is two"):
             assert x == 2
     ```
-- **when** the run collects no test but still trips a stale ignore
+- **when** the suite runs deselected, so nothing is collected
 - **then** the run keeps NO_TESTS_COLLECTED rather than reporting a test failure
 
 ## ✓ A failure inside the lint keeps the «report» it was handed
@@ -778,82 +787,83 @@
 ## ✓ An «actor» «slot» anywhere wins over a noun «slot» elsewhere
 `tests/unit/capture/test_kind_inference.py:64::test_actor_anywhere_beats_object`
 
-- **given** a «Term» that sits in a noun slot in one «Story»
-- **when** the same «Term» also appears in an «Actor» slot
+- **given** a «glossary» of «Kindless» «Term» entries
+- **given** one «Story» putting a «Term» in a noun slot and another putting it in an «Actor» slot
+- **when** «Kind inference» runs over both «stories»
 - **then** its inferred kind is «Actor»
 
 ## ✓ A «term» used in no «story» stays «kindless»
-`tests/unit/capture/test_kind_inference.py:84::test_never_used_stays_kindless`
+`tests/unit/capture/test_kind_inference.py:87::test_never_used_stays_kindless`
 
 - **given** a «Term» referenced by no «Story»
 - **when** «Kind inference» runs with no stories
 - **then** the «Term» remains «Kindless»
 
 ## ✓ A «term» in both a «verb» and a noun «slot» is a conflict
-`tests/unit/capture/test_kind_inference.py:96::test_verb_and_noun_conflict_raises` · diagnostics, validation
+`tests/unit/capture/test_kind_inference.py:99::test_verb_and_noun_conflict_raises` · diagnostics, validation
 
 - **given** a «Kindless» «Term» used in a verb slot and a noun slot
 - **when** kind resolution runs over both stories
 - **then** a PytestGivenError names the conflicting term
 
 ## ✓ A declared kind consistent with its «slot» is kept
-`tests/unit/capture/test_kind_inference.py:118::test_declared_kind_verified_and_kept`
+`tests/unit/capture/test_kind_inference.py:121::test_declared_kind_verified_and_kept`
 
 - **given** a glossary with explicitly declared «Term» kinds
 - **when** «Kind inference» runs over a matching «Story»
 - **then** the declared kinds are verified and preserved
 
 ## ✓ A declared «verb» in an «actor» «slot» is rejected
-`tests/unit/capture/test_kind_inference.py:140::test_declared_verb_in_actor_slot_raises` · diagnostics, validation
+`tests/unit/capture/test_kind_inference.py:143::test_declared_verb_in_actor_slot_raises` · diagnostics, validation
 
 - **given** a «Term» declared as a «Verb»
 - **when** kind resolution places it in the «Actor» slot
 - **then** a PytestGivenError names the misplaced term
 
 ## ✓ A «term» used as both «verb» and «actor» is a conflict
-`tests/unit/capture/test_kind_inference.py:157::test_verb_and_actor_conflict_raises` · diagnostics, validation
+`tests/unit/capture/test_kind_inference.py:160::test_verb_and_actor_conflict_raises` · diagnostics, validation
 
 - **given** a «Kindless» «Term» used in a verb slot and an actor slot
 - **when** kind resolution runs over both stories
 - **then** a PytestGivenError names the conflicting term
 
 ## ✓ A declared «work object» in an «actor» «slot» is rejected
-`tests/unit/capture/test_kind_inference.py:183::test_declared_object_in_actor_slot_raises` · diagnostics, validation
+`tests/unit/capture/test_kind_inference.py:186::test_declared_object_in_actor_slot_raises` · diagnostics, validation
 
 - **given** a «Term» declared as a «Work Object»
 - **when** kind resolution places it in the «Actor» slot
 - **then** a PytestGivenError names the misplaced term
 
 ## ✓ A declared «actor» in a «verb» «slot» is rejected
-`tests/unit/capture/test_kind_inference.py:201::test_declared_actor_in_verb_slot_raises` · validation
+`tests/unit/capture/test_kind_inference.py:204::test_declared_actor_in_verb_slot_raises` · validation
 
 - **given** a «Term» declared as an «Actor»
 - **when** kind resolution places it at position 1 (the verb slot)
 - **then** a PytestGivenError says an actor cannot fill the verb slot
 
 ## ✓ A conflict error names only the offending «stories»
-`tests/unit/capture/test_kind_inference.py:220::test_conflict_where_names_only_offending_stories` · diagnostics, validation
+`tests/unit/capture/test_kind_inference.py:223::test_conflict_where_names_only_offending_stories` · diagnostics, validation
 
 - **given** an «Actor» «Term» that also appears in a verb slot
 - **when** kind resolution raises
 - **then** only the offending story is named in the message
 
 ## ✓ A conflict message excludes «stories» with an unrelated «slot»
-`tests/unit/capture/test_kind_inference.py:240::test_inferred_conflict_where_excludes_unrelated_slot_stories` · diagnostics, validation
+`tests/unit/capture/test_kind_inference.py:243::test_inferred_conflict_where_excludes_unrelated_slot_stories` · diagnostics, validation
 
 - **given** a «Kindless» «Term» used in verb, actor and noun slots
 - **when** the verb-vs-actor conflict is raised
 - **then** only the verb and actor stories are named, not the noun one
 
 ## ✓ A declared «verb» in a noun «slot» is rejected
-`tests/unit/capture/test_kind_inference.py:263::test_declared_verb_in_noun_slot_raises` · validation
+`tests/unit/capture/test_kind_inference.py:266::test_declared_verb_in_noun_slot_raises` · validation
 
 - **given** a «Term» declared as a «Verb»
 - **when** kind resolution places it at position ≥2 (a noun slot)
 - **then** a PytestGivenError says a verb cannot fill the noun slot
 
 ## ✓ «Slot» positions alternate verb/noun after the «actor»
-`tests/unit/capture/test_kind_inference.py:282::test_slot_for_maps_odd_positions_to_verb`
+`tests/unit/capture/test_kind_inference.py:285::test_slot_for_maps_odd_positions_to_verb`
 
 - **given** the five positions of a short activity path
 - **when** the «Slot» rule is applied to each position
@@ -1172,8 +1182,21 @@
 | t-string | ✓ |
 | not-a-string | ✓ |
 
+## ✓ A `Template` «narration» is refused in a test body · 3 cases
+`tests/unit/capture/test_step_descriptor.py:563::test_phase_with_pytest_given_template_as_context_manager_raises` · validation
+
+- **given** an «Active scenario» in a local «Collector»
+- **when** a {phase_name} «step» opens on a `Template`
+- **then** a PytestGivenError says a template is not supported in a test body
+
+| phase_name | |
+|---|---|
+| given | ✓ |
+| when | ✓ |
+| then | ✓ |
+
 ## ✓ A string `activities=` argument is refused by `@scenario`
-`tests/unit/capture/test_step_descriptor.py:940::test_scenario_rejects_a_string_activities_argument` · validation
+`tests/unit/capture/test_step_descriptor.py:955::test_scenario_rejects_a_string_activities_argument` · validation
 
 - **given** a string where a sequence of «activity» ids goes
 - **when** the «scenario» is declared
@@ -1213,10 +1236,10 @@
 - **given** a Guest actor
 - **given** a search verb
 - **when** a «Path» of only two parts is built
-- **then** a PytestGivenError rejects it as too short
+- **then** a PytestGivenError rejects it as too short, counting the parts
 
 ## ✓ Position 0 of a «path» must be an «actor»
-`tests/unit/capture/test_story.py:154::test_path_rejects_work_object_in_position_0` · validation
+`tests/unit/capture/test_story.py:156::test_path_rejects_work_object_in_position_0` · validation
 
 - **given** a search verb
 - **given** a Room work object
@@ -1224,7 +1247,7 @@
 - **then** a PytestGivenError says position 0 is the «Actor» slot
 
 ## ✓ A «verb» cannot open a «path»
-`tests/unit/capture/test_story.py:169::test_path_rejects_verb_in_position_0` · validation
+`tests/unit/capture/test_story.py:171::test_path_rejects_verb_in_position_0` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -1233,7 +1256,7 @@
 - **then** a PytestGivenError says position 0 is the «Actor» slot
 
 ## ✓ A bare string may stand in for the «actor» «slot»
-`tests/unit/capture/test_story.py:184::test_path_allows_bare_string_in_position_0`
+`tests/unit/capture/test_story.py:186::test_path_allows_bare_string_in_position_0`
 
 - **given** a search verb
 - **given** a Room work object
@@ -1241,7 +1264,7 @@
 - **then** it is accepted as an «Activity Part» word
 
 ## ✓ Position 1 of a «path» must be a «verb»
-`tests/unit/capture/test_story.py:194::test_path_rejects_actor_in_position_1` · validation
+`tests/unit/capture/test_story.py:196::test_path_rejects_actor_in_position_1` · validation
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1249,7 +1272,7 @@
 - **then** a PytestGivenError says position 1 is the «Verb» slot
 
 ## ✓ A «work object» cannot fill the «verb» «slot»
-`tests/unit/capture/test_story.py:209::test_path_rejects_work_object_in_position_1` · validation
+`tests/unit/capture/test_story.py:211::test_path_rejects_work_object_in_position_1` · validation
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1257,7 +1280,7 @@
 - **then** a PytestGivenError says position 1 is the «Verb» slot
 
 ## ✓ Position 2 of a «path» must be a noun
-`tests/unit/capture/test_story.py:224::test_path_rejects_verb_in_position_2` · validation
+`tests/unit/capture/test_story.py:226::test_path_rejects_verb_in_position_2` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -1265,7 +1288,7 @@
 - **then** a PytestGivenError says position 2 is the noun slot
 
 ## ✓ A bare «verb» may sit between two real entity nodes
-`tests/unit/capture/test_story.py:239::test_path_allows_bare_verb_between_term_nodes`
+`tests/unit/capture/test_story.py:241::test_path_allows_bare_verb_between_term_nodes`
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1273,28 +1296,28 @@
 - **then** the entities are term refs and the verb stays a bare word
 
 ## ✓ A «path» may be fully bare words
-`tests/unit/capture/test_story.py:254::test_path_allows_fully_bare_path`
+`tests/unit/capture/test_story.py:256::test_path_allows_fully_bare_path`
 
 - **given** three plain words with no glossary handles
 - **when** a «Path» is built from them
 - **then** every part is an «Activity Part» word
 
 ## ✓ Node/edge alternation allows a trailing connective node
-`tests/unit/capture/test_story.py:273::test_path_allows_node_edge_alternation_with_connective`
+`tests/unit/capture/test_story.py:275::test_path_allows_node_edge_alternation_with_connective`
 
 - **given** an «Actor», a «Verb», a «Work Object» and a second actor
 - **when** they form a five-part «Path» joined by a connective
 - **then** even positions are term-ref nodes and the connective stays a word
 
 ## ✓ A «path» may not end on a dangling edge
-`tests/unit/capture/test_story.py:298::test_path_rejects_dangling_edge` · validation
+`tests/unit/capture/test_story.py:300::test_path_rejects_dangling_edge` · validation
 
 - **given** an «Actor», «Verb» and «Work Object» plus a connective
 - **when** a path ending on a connective edge is built
-- **then** a PytestGivenError rejects the dangling edge
+- **then** a PytestGivenError names the trailing arrow with no target
 
 ## ✓ A single-path «activity» synthesizes one «path»
-`tests/unit/capture/test_story.py:323::test_activity_single_path_synthesizes_one_path`
+`tests/unit/capture/test_story.py:328::test_activity_single_path_synthesizes_one_path`
 
 - **given** a Guest actor
 - **given** a search verb
@@ -1303,7 +1326,7 @@
 - **then** it wraps a single «Path»
 
 ## ✓ An «activity» may branch into multiple «paths»
-`tests/unit/capture/test_story.py:336::test_activity_multi_path_accepts_multiple_paths`
+`tests/unit/capture/test_story.py:341::test_activity_multi_path_accepts_multiple_paths`
 
 - **given** a Guest actor
 - **given** a search verb
@@ -1313,7 +1336,7 @@
 - **then** the activity carries both paths
 
 ## ✓ Mixing loose parts and prebuilt «paths» is rejected
-`tests/unit/capture/test_story.py:350::test_activity_mixing_parts_and_paths_raises` · validation
+`tests/unit/capture/test_story.py:355::test_activity_mixing_parts_and_paths_raises` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -1323,7 +1346,7 @@
 - **then** a PytestGivenError rejects the mix
 
 ## ✓ «Activity» id 0 is reserved
-`tests/unit/capture/test_story.py:367::test_activity_explicit_id_zero_raises` · validation
+`tests/unit/capture/test_story.py:372::test_activity_explicit_id_zero_raises` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -1332,7 +1355,7 @@
 - **then** a PytestGivenError says activity_id=0 is reserved
 
 ## ✓ A «story» auto-numbers its «activities» from one
-`tests/unit/capture/test_story.py:385::test_story_auto_numbers_activities_from_one`
+`tests/unit/capture/test_story.py:390::test_story_auto_numbers_activities_from_one`
 
 - **given** a Guest actor
 - **given** a search verb
@@ -1341,7 +1364,7 @@
 - **then** the activities are numbered 1 and 2
 
 ## ✓ Auto-numbering skips ids already taken explicitly
-`tests/unit/capture/test_story.py:400::test_story_auto_numbering_skips_taken_explicit_ids`
+`tests/unit/capture/test_story.py:405::test_story_auto_numbering_skips_taken_explicit_ids`
 
 - **given** a Guest actor
 - **given** a search verb
@@ -1351,7 +1374,7 @@
 - **then** auto picks skip the ids already used explicitly
 
 ## ✓ Duplicate «activity» ids in a «story» are rejected
-`tests/unit/capture/test_story.py:417::test_story_rejects_duplicate_activity_ids` · validation
+`tests/unit/capture/test_story.py:422::test_story_rejects_duplicate_activity_ids` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -1361,14 +1384,14 @@
 - **then** a PytestGivenError reports the duplicate activity id
 
 ## ✓ A «story» derives its id from its title
-`tests/unit/capture/test_story.py:437::test_story_derives_id_from_title`
+`tests/unit/capture/test_story.py:442::test_story_derives_id_from_title`
 
 - **given** a human-readable story title
 - **when** a «Story» is built from it
 - **then** its id is the slugified title
 
 ## ✓ A «story» may span only one «glossary»
-`tests/unit/capture/test_story.py:449::test_story_rejects_two_glossaries` · validation
+`tests/unit/capture/test_story.py:454::test_story_rejects_two_glossaries` · validation
 
 - **given** a Guest actor
 - **given** a search verb
@@ -1378,28 +1401,28 @@
 - **then** a PytestGivenError says a story spans multiple glossaries
 
 ## ✓ Two «stories» with the same id collide
-`tests/unit/capture/test_story.py:495::test_story_id_collision_raises_with_both_sites` · validation
+`tests/unit/capture/test_story.py:500::test_story_id_collision_raises_with_both_sites` · validation
 
 - **given** a «Story» already declared under an id
 - **when** a second story is declared with the same slug
 - **then** a PytestGivenError reports the id was already declared
 
 ## ✓ A «path» may chain a second verb-object pair
-`tests/unit/capture/test_story.py:578::test_path_allows_second_verb_edge`
+`tests/unit/capture/test_story.py:583::test_path_allows_second_verb_edge`
 
 - **given** an «Actor», two «Verb» and two «Work Object» handles
 - **when** they form a five-node «Path» (actor verb object verb object)
 - **then** every slot is a «Term ref», with no bare words
 
 ## ✓ A declared «work object» in a «verb» «slot» is rejected at construction
-`tests/unit/capture/test_story.py:670::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
+`tests/unit/capture/test_story.py:675::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
 
 - **given** a «File glossary» declaring Room a work object
 - **when** Room is placed in the «verb» «slot»
 - **then** a PytestGivenError names the term and its declared kind
 
 ## ✓ A «slot» error names the «term», not its repr
-`tests/unit/capture/test_story.py:696::test_slot_error_message_stays_compact` · diagnostics
+`tests/unit/capture/test_story.py:701::test_slot_error_message_stays_compact` · diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1409,14 +1432,14 @@
 - **then** the message is short and free of dataclass reprs
 
 ## ✓ A kindless «term» stays valid in any «slot»
-`tests/unit/capture/test_story.py:717::test_kindless_term_is_accepted_in_either_slot` · validation
+`tests/unit/capture/test_story.py:722::test_kindless_term_is_accepted_in_either_slot` · validation
 
 - **given** a «Kindless» «Term» declared with g(...)
 - **when** it is placed in a node «slot» and a verb slot
 - **then** both paths construct, leaving the kind to inference
 
 ## ✓ A non-handle «activity part» names its type
-`tests/unit/capture/test_story.py:732::test_non_handle_part_names_its_type` · validation, diagnostics
+`tests/unit/capture/test_story.py:737::test_non_handle_part_names_its_type` · validation, diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1654,18 +1677,20 @@
 `tests/unit/report/test_coverage.py:255::test_compute_coverage_covers_canonical_activity_via_instance_step`
 
 - **given** a «Story» with a canonical «Activity»
-- **when** a «Scenario» step names a specific «Instance»
+- **given** a «Scenario» step naming a specific «Instance»
+- **when** «Coverage» is computed against the «Story»
 - **then** «Coverage» reports the «Activity» as covered
 
 ## ✓ A canonical «step» does not cover an «instance» «activity»
-`tests/unit/report/test_coverage.py:285::test_compute_coverage_does_not_cover_instance_activity_with_canonical_step`
+`tests/unit/report/test_coverage.py:286::test_compute_coverage_does_not_cover_instance_activity_with_canonical_step`
 
 - **given** an «Activity» anchored to a named «Instance»
-- **when** a «Scenario» step only names the canonical «Actor»
+- **given** a «Scenario» step naming only the canonical «Actor»
+- **when** «Coverage» is computed against the «Story»
 - **then** «Coverage» leaves the more specific instance activity uncovered
 
 ## ✓ Promoting a bare word to a «verb» ref drops «coverage» from a «step» that matched
-`tests/unit/report/test_coverage.py:316::test_compute_coverage_lost_when_activity_gains_a_term`
+`tests/unit/report/test_coverage.py:318::test_compute_coverage_lost_when_activity_gains_a_term`
 
 - **given** a «Step» naming two «term refs»
 - **given** the same «Activity» with that middle slot a bare word, then a «Verb» ref
@@ -1674,52 +1699,57 @@
 - **then** the widened «Activity» is no longer covered
 
 ## ✓ A «scenario» «activity» binding constrains «coverage»
-`tests/unit/report/test_coverage.py:370::test_compute_coverage_scenario_constrained_to_activity_ids`
+`tests/unit/report/test_coverage.py:372::test_compute_coverage_scenario_constrained_to_activity_ids`
 
 - **given** a «Story» with two matching activities
-- **when** the «Scenario» «binds» only to activity 1
+- **given** a «Scenario» «bound» only to activity 1
+- **when** «Coverage» is computed against the «Story»
 - **then** «Coverage» considers only the bound «Activity»
 
 ## ✓ An «activity» with two distinct «terms» is «coverage»-eligible
-`tests/unit/report/test_coverage.py:416::test_is_coverage_eligible_true_for_two_distinct_terms`
+`tests/unit/report/test_coverage.py:419::test_is_coverage_eligible_true_for_two_distinct_terms`
 
 - **given** an «Activity» anchored by two distinct «Term» refs
 - **when** its «Coverage» eligibility is checked
 - **then** it is eligible for «Coverage» tracking
 
 ## ✓ An under-anchored «activity» is not «coverage»-eligible
-`tests/unit/report/test_coverage.py:438::test_is_coverage_eligible_false_for_one_distinct_term`
+`tests/unit/report/test_coverage.py:441::test_is_coverage_eligible_false_for_one_distinct_term`
 
 - **given** an «Activity» that mentions only one distinct «Term»
 - **when** its «Coverage» eligibility is checked
 - **then** it is ineligible — «Coverage» needs at least two anchors
 
 ## ✓ An under-anchored «activity» is never covered by narration matching
-`tests/unit/report/test_coverage.py:468::test_compute_coverage_excludes_under_anchored_activity`
+`tests/unit/report/test_coverage.py:471::test_compute_coverage_excludes_under_anchored_activity`
 
 - **given** a «Story» whose «Activity» is all bare words
-- **when** coverage is computed against a scenario
+- **given** a «Scenario» narrating one «Term ref»
+- **when** «Coverage» is computed against the «Story»
 - **then** «Coverage» excludes the under-anchored «Activity»
 
 ## ✓ Nested «steps» are walked for «coverage»
-`tests/unit/report/test_coverage.py:492::test_compute_coverage_nested_steps_are_walked`
+`tests/unit/report/test_coverage.py:496::test_compute_coverage_nested_steps_are_walked`
 
 - **given** a «Story» with one canonical «Activity»
-- **when** the covering «Term ref»s live in a nested child «Step»
+- **given** the covering «term refs» in a nested child «Step»
+- **when** «Coverage» is computed against the «Story»
 - **then** the nested «Step» still counts and the «Activity» is covered
 
 ## ✓ An explicit «step» binding covers an eligible «activity»
-`tests/unit/report/test_coverage.py:526::test_compute_coverage_explicit_step_binding_covers_eligible_activity`
+`tests/unit/report/test_coverage.py:533::test_compute_coverage_explicit_step_binding_covers_eligible_activity`
 
 - **given** a «Story» with a coverage-eligible «Activity»
-- **when** a «Step» «binds» to it explicitly by id
+- **given** a «Step» «bound» to it explicitly by id
+- **when** «Coverage» is computed against the «Story»
 - **then** «Coverage» counts it directly, without identity matching
 
 ## ✓ An explicit binding covers an under-anchored «activity»
-`tests/unit/report/test_coverage.py:554::test_compute_coverage_explicit_binding_covers_under_anchored_activity`
+`tests/unit/report/test_coverage.py:562::test_compute_coverage_explicit_binding_covers_under_anchored_activity`
 
 - **given** a «Story» whose «Activity» is under-anchored
-- **when** a «Step» «binds» to it explicitly by id
+- **given** a «Step» «bound» to it explicitly by id
+- **when** «Coverage» is computed against the «Story»
 - **then** «Coverage» counts it, despite the missing anchors
 
 ## ✓ The «glossary» view aggregates «instances» and «verb» forms
@@ -2157,17 +2187,19 @@
 - **when** the «cases» are «grouped»
 - **then** the grouping is refused
 - **then** the error names the test, the missing parts and the t-string fix
+- **then** it names the «Case» whose values were baked in, and the per-case opt-out
 
 ## ✓ A narrated value that varies becomes a derived «parameter table» column
-`tests/unit/test_grouping.py:591::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
+`tests/unit/test_grouping.py:597::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
 
 - **given** two «cases» narrating a value that differs
 - **when** «templatizing» walks the «cases»
 - **then** the value becomes a derived column beside the parametrize one
 - **then** the «Step» keeps a placeholder pointing at that column
+- **then** the placeholder keeps the format spec and conversion it narrated
 
 ## ✓ A varying interpolation that is not a bare name is refused
-`tests/unit/test_grouping.py:703::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
+`tests/unit/test_grouping.py:710::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
 
 - **given** two «cases» narrating a computed expression
 - **when** the «cases» are «grouped»
@@ -2175,14 +2207,14 @@
 - **then** the error quotes the expression and shows the bind-a-local fix
 
 ## ✓ A «parameter table» cell reads the way the scenario name formats it
-`tests/unit/test_grouping.py:1069::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
+`tests/unit/test_grouping.py:1076::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
 
 - **given** a Template scenario name formatting its parameter
 - **when** the «cases» are «grouped»
 - **then** the cells carry the formatting the name declared
 
 ## ✓ A scenario name formatting a parameter a «step» reads plainly gets its own column
-`tests/unit/test_grouping.py:1084::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1091::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
 
 - **given** a name formatting the parameter and a step reading it plainly
 - **when** the «cases» are «grouped»
@@ -2190,7 +2222,7 @@
 - **then** the name renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» formatting a parameter the scenario name reads plainly gets its own column
-`tests/unit/test_grouping.py:1127::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1134::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
 
 - **given** a step formatting the parameter and a name reading it plainly
 - **when** the «cases» are «grouped»
@@ -2198,7 +2230,7 @@
 - **then** the step renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» narrating a parameter its column no longer holds is refused
-`tests/unit/test_grouping.py:1209::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
+`tests/unit/test_grouping.py:1216::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
 
 - **given** two «cases» narrating a value their column lacks
 - **when** the «cases» are «grouped»
@@ -2206,7 +2238,7 @@
 - **then** the error names the column and what the case actually narrated
 
 ## ✓ A «term ref» whose display differs between «cases» is refused
-`tests/unit/test_grouping.py:1560::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1567::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» reads differently
 - **when** the «cases» are «grouped»
@@ -2214,7 +2246,7 @@
 - **then** the error names the «Term ref» and the split-it-out fix
 
 ## ✓ A «term ref» that *is* the parametrize value is refused too
-`tests/unit/test_grouping.py:1617::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1624::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» is the parameter itself
 - **when** the «cases» are «grouped»
@@ -2222,7 +2254,7 @@
 - **then** the error points at the per-case «scenario» opt-out
 
 ## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py:1781::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+`tests/unit/test_grouping.py:1788::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
 
 - **given** two «cases» attaching a label with differing payloads
 - **when** «templatizing» walks the «cases»
@@ -2230,7 +2262,7 @@
 - **then** the «Step» keeps a content-less badge pointing at it
 
 ## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py:1837::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+`tests/unit/test_grouping.py:1844::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
 
 - **given** an «Attachment» label only one «Case» attaches
 - **when** the «cases» are «grouped»
@@ -2238,7 +2270,7 @@
 - **then** the error names the label, the case, and asks for a constant one
 
 ## ✓ A «parameter table» cell reads the way the «step» that points at it read
-`tests/unit/test_grouping.py:2383::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+`tests/unit/test_grouping.py:2390::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec
 - **when** «grouping» builds the «parameter table»
@@ -2246,7 +2278,7 @@
 - **then** the step keeps its placeholder, which that cell substitutes into
 
 ## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py:2540::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+`tests/unit/test_grouping.py:2547::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
 
 - **given** two «cases» whose «step» trees differ
 - **when** the «cases» are «grouped»
@@ -2254,7 +2286,7 @@
 - **then** the error names the divergence and the opt-out that answers it
 
 ## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
-`tests/unit/test_grouping.py:2691::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
+`tests/unit/test_grouping.py:2698::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
 
 - **given** a step narrating a parameter bound to a glossary term instance
 - **when** the «cases» are «grouped»

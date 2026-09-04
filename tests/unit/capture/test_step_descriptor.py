@@ -560,23 +560,38 @@ def test_step_descriptor_with_tstring_records_rendered_text_and_parts() -> None:
     )
 
 
-@pytest.mark.parametrize('phase_factory', [given, when, then])
+@scenario(
+    t'A `Template` {pg["Narration"].low} is refused in a test body',
+    tags=['validation'],
+)
+@pytest.mark.parametrize('phase_name', ['given', 'when', 'then'])
 def test_phase_with_pytest_given_template_as_context_manager_raises(
-    phase_factory,
+    phase_name: str,
 ) -> None:
     """`with given/when/then(Template(...))` is rejected — t-strings handle
     the body case."""
-    collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [])
-    set_active_collector(collector)
-    try:
-        with (
-            pytest.raises(PytestGivenError, match='not supported in a test body'),
-            phase_factory(Template('a {cup_size} ml cup')),
-        ):
-            pass
-    finally:
-        set_active_collector(None)
+    session_collector = get_active_collector()
+    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+        phase_factory = {'given': given, 'when': when, 'then': then}[phase_name]
+        collector = Collector()
+        collector.start_scenario('id', 'name', 'mod', [])
+
+    def open_template_step() -> None:
+        set_active_collector(collector)
+        try:
+            with phase_factory(Template('a {cup_size} ml cup')):
+                pass
+        finally:
+            set_active_collector(session_collector)
+
+    with (
+        when_then(
+            t'a {phase_name} {pg["Step"].low} opens on a `Template`',
+            'a PytestGivenError says a template is not supported in a test body',
+        ),
+        pytest.raises(PytestGivenError, match='not supported in a test body'),
+    ):
+        open_template_step()
 
 
 @pytest.mark.parametrize('slot', ['when', 'then'])

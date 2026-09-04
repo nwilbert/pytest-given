@@ -498,6 +498,12 @@ def test_a_varying_str_narration_raises_rule_one() -> None:
         assert 'records no parts' in message
         assert 'Use a t-string' in message
         assert message.endswith('(t.py:12)')
+    with then(
+        t'it names the {pg["Case"]} whose values were baked in, and the '
+        t'per-case opt-out'
+    ):
+        assert 'case [200]' in message
+        assert 'group_parametrized=False' in message
 
 
 def test_a_varying_str_narration_names_the_violating_steps_own_phase() -> None:
@@ -614,9 +620,10 @@ def test_a_varying_bare_name_interpolation_becomes_a_derived_column() -> None:
         part = grouped.steps[0].narration.parts[1]
         assert isinstance(part, NarrationPlaceholder)
         assert (part.name, part.column_id) == ('price', 'derived:0')
-    # format_spec/conversion pass through the derived-placeholder site
-    # unchanged — rule 3 (a later task) re-applies them to the raw value.
-    assert (part.format_spec, part.conversion) == ('.2f', 'r')
+    with then('the placeholder keeps the format spec and conversion it narrated'):
+        # They pass through the derived-placeholder site unchanged — rule 3
+        # re-applies them to the raw value.
+        assert (part.format_spec, part.conversion) == ('.2f', 'r')
 
 
 def test_a_grouped_steps_text_is_rebuilt_from_its_parts() -> None:

@@ -445,6 +445,6 @@ def test_subscript_unknown_name_raises_with_hint():
             'a near-miss name is subscripted',
             'a PytestGivenError is raised with a spelling hint',
         ),
-        pytest.raises(PytestGivenError, match='redeems'),
+        pytest.raises(PytestGivenError, match='Did you mean: redeems'),
     ):
         g['redeem']

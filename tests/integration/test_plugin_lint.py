@@ -435,13 +435,13 @@ def test_removed_phase_check_ini_key_is_unknown(pytester):
     story=adopt_pytest_given,
 )
 def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
-    with given('a suite whose lint would fail, deselected so nothing is collected'):
+    with given('a suite whose lint would fail, under a stale ignore entry'):
         attach('suite', EMPTY_GIVEN)
-    with when('the run collects no test but still trips a stale ignore', activity=11):
         pytester.makeini(
             '[pytest]\ngiven_lint = true\ngiven_lint_ignore = ["never-matches-*"]\n'
         )
         pytester.makepyfile(test_sample=EMPTY_GIVEN)
+    with when('the suite runs deselected, so nothing is collected', activity=11):
         result = pytester.runpytest_inprocess('-k', 'no-such-test')
     with then('the run keeps NO_TESTS_COLLECTED rather than reporting a test failure'):
         # pytest binds exitstatus before sessionfinish, so overwriting it

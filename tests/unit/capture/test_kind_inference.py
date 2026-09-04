@@ -66,16 +66,19 @@ def test_infers_actor_verb_object_by_position():
     t'{pg["Slot"].low} elsewhere',
 )
 def test_actor_anywhere_beats_object():
-    with given(t'a {pg["Term"]} that sits in a noun slot in one {pg["Story"]}'):
-        # 'guest' appears at noun slot in story 1, actor slot in story 2
+    with given(t'a {pg["Glossary"].low} of {pg["Kindless"]} {pg["Term"]} entries'):
         glossary = Glossary(
             terms=[_term('host'), _term('greet'), _term('guest'), _term('wave')]
         )
-    with when(t'the same {pg["Term"]} also appears in an {pg["Actor"]} slot'):
+    with given(
+        t'one {pg["Story"]} putting a {pg["Term"]} in a noun slot and another '
+        t'putting it in an {pg["Actor"]} slot'
+    ):
         stories = [
             _story('S1', ('host', 'greet', 'guest')),
             _story('S2', ('guest', 'wave', 'host')),
         ]
+    with when(t'{pg["Kind inference"]} runs over both {pg["Story"]("stories")}'):
         inferred = infer_glossary_kinds(glossary, stories)
     with then(t'its inferred kind is {pg["Actor"]}'):
         assert _kind(inferred, 'guest') == 'actor'

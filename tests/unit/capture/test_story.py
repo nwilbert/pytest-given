@@ -144,9 +144,11 @@ def test_path_rejects_path_with_fewer_than_three_parts(guest, search):
     with (
         when_then(
             t'a {pg["Path"]} of only two parts is built',
-            'a PytestGivenError rejects it as too short',
+            'a PytestGivenError rejects it as too short, counting the parts',
         ),
-        pytest.raises(PytestGivenError, match=r'odd|length.*3|alternate'),
+        # The part count is the only thing separating this message from the
+        # dangling-edge one below, so it is what the pin has to carry.
+        pytest.raises(PytestGivenError, match=r'odd length >= 3.*got 2 part\(s\)'),
     ):
         path(guest, search)
 
@@ -310,9 +312,12 @@ def test_path_rejects_dangling_edge():
     with (
         when_then(
             'a path ending on a connective edge is built',
-            'a PytestGivenError rejects the dangling edge',
+            'a PytestGivenError names the trailing arrow with no target',
         ),
-        pytest.raises(PytestGivenError, match=r'odd|dangling|ends'),
+        pytest.raises(
+            PytestGivenError,
+            match=r'got 4 part\(s\).*trailing arrow with no target',
+        ),
     ):
         path(actor, verb, booking, 'to')
 
@@ -739,7 +744,10 @@ def test_non_handle_part_names_its_type(guest, room):
             t'an int is passed where a {pg["Verb"].low} handle belongs',
             'a PytestGivenError names the offending type and the path',
         ),
-        pytest.raises(PytestGivenError, match=r'must be a verb: got int'),
+        pytest.raises(
+            PytestGivenError,
+            match=r'must be a verb: got int.*Path: Guest → int → Room',
+        ),
     ):
         path(guest, 42, room)
 

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-04T20:39:11.712384+00:00",
+    "timestamp": "2026-09-04T21:04:06.925062+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "336af3c309af0e77c67f921086a71125495268d5",
+    "commit_sha": "7f6ffaa1fd9428df00add43113e0cd6de9b14a46",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -134,7 +134,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -272,7 +272,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -443,7 +443,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -509,7 +509,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -618,7 +618,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -716,7 +716,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -758,6 +758,130 @@
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 510
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/integration/test_plugin.py::test_a_render_failure_leaves_no_half_replaced_report",
+      "narration": {
+        "text": "A report that fails to render discards the previous one too",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].low"
+          },
+          {
+            "value": " that fails to render discards the previous one too"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 21,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite with one scenario",
+            "parts": [
+              {
+                "value": "a suite with one "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report pair on disk from a previous run",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].low"
+              },
+              {
+                "value": " pair on disk from a previous run"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the run trips a renderer failure",
+            "parts": [
+              {
+                "value": "the run trips a "
+              },
+              {
+                "term_id": "renderer",
+                "display": "renderer",
+                "expression": "pg[\"Renderer\"].low"
+              },
+              {
+                "value": " failure"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the run fails, saying no report was written",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "neither the stale pair nor a half-written new one survives",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 536
       },
       "story_id": null,
       "activity_ids": []
@@ -850,7 +974,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2319
+        "line": 2327
       },
       "story_id": null,
       "activity_ids": []
@@ -876,7 +1000,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 19,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -926,7 +1050,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2332
+        "line": 2340
       },
       "story_id": null,
       "activity_ids": []
@@ -952,7 +1076,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -1013,7 +1137,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2353
+        "line": 2361
       },
       "story_id": null,
       "activity_ids": []
@@ -1033,7 +1157,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -1098,7 +1222,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2373
+        "line": 2381
       },
       "story_id": null,
       "activity_ids": []
@@ -1123,7 +1247,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -1181,7 +1305,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2406
+        "line": 2414
       },
       "story_id": null,
       "activity_ids": []
@@ -1207,7 +1331,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -1279,7 +1403,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2438
+        "line": 2446
       },
       "story_id": null,
       "activity_ids": []
@@ -1354,7 +1478,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2624
+        "line": 2632
       },
       "story_id": null,
       "activity_ids": []
@@ -1377,7 +1501,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 36,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -1478,7 +1602,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -1577,7 +1701,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -1699,7 +1823,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -1803,12 +1927,12 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
           "narration": {
-            "text": "a suite whose lint would fail, deselected so nothing is collected",
+            "text": "a suite whose lint would fail, under a stale ignore entry",
             "parts": []
           },
           "children": [],
@@ -1825,7 +1949,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the run collects no test but still trips a stale ignore",
+            "text": "the suite runs deselected, so nothing is collected",
             "parts": []
           },
           "children": [],
@@ -1880,7 +2004,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -6354,10 +6478,26 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Term that sits in a noun slot in one Story",
+            "text": "a glossary of Kindless Term entries",
             "parts": [
               {
                 "value": "a "
+              },
+              {
+                "term_id": "glossary",
+                "display": "glossary",
+                "expression": "pg[\"Glossary\"].low"
+              },
+              {
+                "value": " of "
+              },
+              {
+                "term_id": "kindless",
+                "display": "Kindless",
+                "expression": "pg[\"Kindless\"]"
+              },
+              {
+                "value": " "
               },
               {
                 "term_id": "term",
@@ -6365,12 +6505,46 @@
                 "expression": "pg[\"Term\"]"
               },
               {
-                "value": " that sits in a noun slot in one "
+                "value": " entries"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "one Story putting a Term in a noun slot and another putting it in an Actor slot",
+            "parts": [
+              {
+                "value": "one "
               },
               {
                 "term_id": "story",
                 "display": "Story",
                 "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " putting a "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]"
+              },
+              {
+                "value": " in a noun slot and another putting it in an "
+              },
+              {
+                "term_id": "actor",
+                "display": "Actor",
+                "expression": "pg[\"Actor\"]"
+              },
+              {
+                "value": " slot"
               }
             ]
           },
@@ -6382,26 +6556,20 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the same Term also appears in an Actor slot",
+            "text": "Kind inference runs over both stories",
             "parts": [
               {
-                "value": "the same "
+                "term_id": "kind-inference",
+                "display": "Kind inference",
+                "expression": "pg[\"Kind inference\"]"
               },
               {
-                "term_id": "term",
-                "display": "Term",
-                "expression": "pg[\"Term\"]"
+                "value": " runs over both "
               },
               {
-                "value": " also appears in an "
-              },
-              {
-                "term_id": "actor",
-                "display": "Actor",
-                "expression": "pg[\"Actor\"]"
-              },
-              {
-                "value": " slot"
+                "term_id": "story",
+                "display": "stories",
+                "expression": "pg[\"Story\"](\"stories\")"
               }
             ]
           },
@@ -6559,7 +6727,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 84
+        "line": 87
       },
       "story_id": null,
       "activity_ids": []
@@ -6665,7 +6833,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 96
+        "line": 99
       },
       "story_id": null,
       "activity_ids": []
@@ -6758,7 +6926,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 118
+        "line": 121
       },
       "story_id": null,
       "activity_ids": []
@@ -6873,7 +7041,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 140
+        "line": 143
       },
       "story_id": null,
       "activity_ids": []
@@ -6979,7 +7147,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 157
+        "line": 160
       },
       "story_id": null,
       "activity_ids": []
@@ -7094,7 +7262,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 183
+        "line": 186
       },
       "story_id": null,
       "activity_ids": []
@@ -7196,7 +7364,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 201
+        "line": 204
       },
       "story_id": null,
       "activity_ids": []
@@ -7283,7 +7451,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 220
+        "line": 223
       },
       "story_id": null,
       "activity_ids": []
@@ -7378,7 +7546,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 240
+        "line": 243
       },
       "story_id": null,
       "activity_ids": []
@@ -7472,7 +7640,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 263
+        "line": 266
       },
       "story_id": null,
       "activity_ids": []
@@ -7565,7 +7733,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 282
+        "line": 285
       },
       "story_id": null,
       "activity_ids": []
@@ -9670,6 +9838,144 @@
       "activity_ids": []
     },
     {
+      "id": "tests/unit/capture/test_step_descriptor.py::test_phase_with_pytest_given_template_as_context_manager_raises[given]",
+      "narration": {
+        "text": "A `Template` narration is refused in a test body",
+        "parts": [
+          {
+            "value": "A `Template` "
+          },
+          {
+            "term_id": "narration",
+            "display": "narration",
+            "expression": "pg[\"Narration\"].low"
+          },
+          {
+            "value": " is refused in a test body"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_step_descriptor",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an Active scenario in a local Collector",
+            "parts": [
+              {
+                "value": "an "
+              },
+              {
+                "term_id": "active-scenario",
+                "display": "Active scenario",
+                "expression": "pg[\"Active scenario\"]"
+              },
+              {
+                "value": " in a local "
+              },
+              {
+                "term_id": "collector",
+                "display": "Collector",
+                "expression": "pg[\"Collector\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a {phase_name} step opens on a `Template`",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "name": "phase_name",
+                "column_id": "phase_name",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": " opens on a `Template`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a PytestGivenError says a template is not supported in a test body",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "phase_name",
+            "name": "phase_name",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "values": [
+              "given"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "when"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "then"
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_step_descriptor.py",
+        "line": 563
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
       "id": "tests/unit/capture/test_step_descriptor.py::test_scenario_rejects_a_string_activities_argument",
       "narration": {
         "text": "A string `activities=` argument is refused by `@scenario`",
@@ -9749,7 +10055,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 940
+        "line": 955
       },
       "story_id": null,
       "activity_ids": []
@@ -10248,7 +10554,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a PytestGivenError rejects it as too short",
+            "text": "a PytestGivenError rejects it as too short, counting the parts",
             "parts": []
           },
           "children": [],
@@ -10379,7 +10685,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 154
+        "line": 156
       },
       "story_id": null,
       "activity_ids": []
@@ -10504,7 +10810,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 169
+        "line": 171
       },
       "story_id": null,
       "activity_ids": []
@@ -10608,7 +10914,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 184
+        "line": 186
       },
       "story_id": null,
       "activity_ids": []
@@ -10722,7 +11028,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 194
+        "line": 196
       },
       "story_id": null,
       "activity_ids": []
@@ -10844,7 +11150,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 209
+        "line": 211
       },
       "story_id": null,
       "activity_ids": []
@@ -10941,7 +11247,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 224
+        "line": 226
       },
       "story_id": null,
       "activity_ids": []
@@ -11036,7 +11342,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 239
+        "line": 241
       },
       "story_id": null,
       "activity_ids": []
@@ -11127,7 +11433,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 254
+        "line": 256
       },
       "story_id": null,
       "activity_ids": []
@@ -11222,7 +11528,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 273
+        "line": 275
       },
       "story_id": null,
       "activity_ids": []
@@ -11305,7 +11611,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a PytestGivenError rejects the dangling edge",
+            "text": "a PytestGivenError names the trailing arrow with no target",
             "parts": []
           },
           "children": [],
@@ -11319,7 +11625,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 298
+        "line": 300
       },
       "story_id": null,
       "activity_ids": []
@@ -11436,7 +11742,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 323
+        "line": 328
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -11564,7 +11870,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 336
+        "line": 341
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -11684,7 +11990,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 350
+        "line": 355
       },
       "story_id": null,
       "activity_ids": []
@@ -11784,7 +12090,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 367
+        "line": 372
       },
       "story_id": null,
       "activity_ids": []
@@ -11903,7 +12209,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 385
+        "line": 390
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -12012,7 +12318,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 400
+        "line": 405
       },
       "story_id": null,
       "activity_ids": []
@@ -12143,7 +12449,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 417
+        "line": 422
       },
       "story_id": null,
       "activity_ids": []
@@ -12222,7 +12528,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 437
+        "line": 442
       },
       "story_id": null,
       "activity_ids": []
@@ -12255,7 +12561,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -12341,7 +12647,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 449
+        "line": 454
       },
       "story_id": null,
       "activity_ids": []
@@ -12422,7 +12728,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 495
+        "line": 500
       },
       "story_id": null,
       "activity_ids": []
@@ -12541,7 +12847,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 578
+        "line": 583
       },
       "story_id": null,
       "activity_ids": []
@@ -12655,7 +12961,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 670
+        "line": 675
       },
       "story_id": null,
       "activity_ids": []
@@ -12785,7 +13091,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 696
+        "line": 701
       },
       "story_id": null,
       "activity_ids": []
@@ -12891,7 +13197,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 717
+        "line": 722
       },
       "story_id": null,
       "activity_ids": []
@@ -12984,7 +13290,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 732
+        "line": 737
       },
       "story_id": null,
       "activity_ids": []
@@ -15738,9 +16044,9 @@
           "fixture_name": null
         },
         {
-          "phase": "when",
+          "phase": "given",
           "narration": {
-            "text": "a Scenario step names a specific Instance",
+            "text": "a Scenario step naming a specific Instance",
             "parts": [
               {
                 "value": "a "
@@ -15751,12 +16057,37 @@
                 "expression": "pg[\"Scenario\"]"
               },
               {
-                "value": " step names a specific "
+                "value": " step naming a specific "
               },
               {
                 "term_id": "instance",
                 "display": "Instance",
                 "expression": "pg[\"Instance\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage is computed against the Story",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]"
+              },
+              {
+                "value": " is computed against the "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
               }
             ]
           },
@@ -15869,9 +16200,9 @@
           "fixture_name": null
         },
         {
-          "phase": "when",
+          "phase": "given",
           "narration": {
-            "text": "a Scenario step only names the canonical Actor",
+            "text": "a Scenario step naming only the canonical Actor",
             "parts": [
               {
                 "value": "a "
@@ -15882,12 +16213,37 @@
                 "expression": "pg[\"Scenario\"]"
               },
               {
-                "value": " step only names the canonical "
+                "value": " step naming only the canonical "
               },
               {
                 "term_id": "actor",
                 "display": "Actor",
                 "expression": "pg[\"Actor\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage is computed against the Story",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]"
+              },
+              {
+                "value": " is computed against the "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
               }
             ]
           },
@@ -15922,7 +16278,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 285
+        "line": 286
       },
       "story_id": null,
       "activity_ids": []
@@ -16102,7 +16458,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 316
+        "line": 318
       },
       "story_id": null,
       "activity_ids": []
@@ -16167,12 +16523,12 @@
           "fixture_name": null
         },
         {
-          "phase": "when",
+          "phase": "given",
           "narration": {
-            "text": "the Scenario binds only to activity 1",
+            "text": "a Scenario bound only to activity 1",
             "parts": [
               {
-                "value": "the "
+                "value": "a "
               },
               {
                 "term_id": "scenario",
@@ -16184,11 +16540,36 @@
               },
               {
                 "term_id": "scenario-activity-binding",
-                "display": "binds",
-                "expression": "pg[\"Scenario\u2194activity binding\"](\"binds\")"
+                "display": "bound",
+                "expression": "pg[\"Scenario\u2194activity binding\"](\"bound\")"
               },
               {
                 "value": " only to activity 1"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage is computed against the Story",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]"
+              },
+              {
+                "value": " is computed against the "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
               }
             ]
           },
@@ -16228,7 +16609,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 370
+        "line": 372
       },
       "story_id": null,
       "activity_ids": []
@@ -16355,7 +16736,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 416
+        "line": 419
       },
       "story_id": null,
       "activity_ids": []
@@ -16471,7 +16852,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 438
+        "line": 441
       },
       "story_id": null,
       "activity_ids": []
@@ -16531,10 +16912,52 @@
           "fixture_name": null
         },
         {
+          "phase": "given",
+          "narration": {
+            "text": "a Scenario narrating one Term ref",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "Scenario",
+                "expression": "pg[\"Scenario\"]"
+              },
+              {
+                "value": " narrating one "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "Term ref",
+                "expression": "pg[\"Term ref\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "when",
           "narration": {
-            "text": "coverage is computed against a scenario",
-            "parts": []
+            "text": "Coverage is computed against the Story",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]"
+              },
+              {
+                "value": " is computed against the "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              }
+            ]
           },
           "children": [],
           "attachments": [],
@@ -16572,7 +16995,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 468
+        "line": 471
       },
       "story_id": null,
       "activity_ids": []
@@ -16634,25 +17057,50 @@
           "fixture_name": null
         },
         {
-          "phase": "when",
+          "phase": "given",
           "narration": {
-            "text": "the covering Term refs live in a nested child Step",
+            "text": "the covering term refs in a nested child Step",
             "parts": [
               {
                 "value": "the covering "
               },
               {
                 "term_id": "term-ref",
-                "display": "Term ref",
-                "expression": "pg[\"Term ref\"]"
+                "display": "term refs",
+                "expression": "pg[\"Term ref\"](\"term refs\")"
               },
               {
-                "value": "s live in a nested child "
+                "value": " in a nested child "
               },
               {
                 "term_id": "step",
                 "display": "Step",
                 "expression": "pg[\"Step\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage is computed against the Story",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]"
+              },
+              {
+                "value": " is computed against the "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
               }
             ]
           },
@@ -16698,7 +17146,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 492
+        "line": 496
       },
       "story_id": null,
       "activity_ids": []
@@ -16760,9 +17208,9 @@
           "fixture_name": null
         },
         {
-          "phase": "when",
+          "phase": "given",
           "narration": {
-            "text": "a Step binds to it explicitly by id",
+            "text": "a Step bound to it explicitly by id",
             "parts": [
               {
                 "value": "a "
@@ -16777,11 +17225,36 @@
               },
               {
                 "term_id": "scenario-activity-binding",
-                "display": "binds",
-                "expression": "pg[\"Scenario\u2194activity binding\"](\"binds\")"
+                "display": "bound",
+                "expression": "pg[\"Scenario\u2194activity binding\"](\"bound\")"
               },
               {
                 "value": " to it explicitly by id"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage is computed against the Story",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]"
+              },
+              {
+                "value": " is computed against the "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
               }
             ]
           },
@@ -16816,7 +17289,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 526
+        "line": 533
       },
       "story_id": null,
       "activity_ids": []
@@ -16873,9 +17346,9 @@
           "fixture_name": null
         },
         {
-          "phase": "when",
+          "phase": "given",
           "narration": {
-            "text": "a Step binds to it explicitly by id",
+            "text": "a Step bound to it explicitly by id",
             "parts": [
               {
                 "value": "a "
@@ -16890,11 +17363,36 @@
               },
               {
                 "term_id": "scenario-activity-binding",
-                "display": "binds",
-                "expression": "pg[\"Scenario\u2194activity binding\"](\"binds\")"
+                "display": "bound",
+                "expression": "pg[\"Scenario\u2194activity binding\"](\"bound\")"
               },
               {
                 "value": " to it explicitly by id"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage is computed against the Story",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]"
+              },
+              {
+                "value": " is computed against the "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
               }
             ]
           },
@@ -16929,7 +17427,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 554
+        "line": 562
       },
       "story_id": null,
       "activity_ids": []
@@ -17889,7 +18387,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 66,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -20127,6 +20625,29 @@
           "attachments": [],
           "activity_ids": [],
           "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it names the Case whose values were baked in, and the per-case opt-out",
+            "parts": [
+              {
+                "value": "it names the "
+              },
+              {
+                "term_id": "case",
+                "display": "Case",
+                "expression": "pg[\"Case\"]"
+              },
+              {
+                "value": " whose values were baked in, and the per-case opt-out"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
@@ -20245,6 +20766,17 @@
           "attachments": [],
           "activity_ids": [],
           "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the placeholder keeps the format spec and conversion it narrated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
         }
       ],
       "parameters": null,
@@ -20252,7 +20784,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 591
+        "line": 597
       },
       "story_id": null,
       "activity_ids": []
@@ -20355,7 +20887,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 703
+        "line": 710
       },
       "story_id": null,
       "activity_ids": []
@@ -20441,7 +20973,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1069
+        "line": 1076
       },
       "story_id": null,
       "activity_ids": []
@@ -20538,7 +21070,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1084
+        "line": 1091
       },
       "story_id": null,
       "activity_ids": []
@@ -20635,7 +21167,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1127
+        "line": 1134
       },
       "story_id": null,
       "activity_ids": []
@@ -20745,7 +21277,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1209
+        "line": 1216
       },
       "story_id": null,
       "activity_ids": []
@@ -20883,7 +21415,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1560
+        "line": 1567
       },
       "story_id": null,
       "activity_ids": []
@@ -21013,7 +21545,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1617
+        "line": 1624
       },
       "story_id": null,
       "activity_ids": []
@@ -21151,7 +21683,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1781
+        "line": 1788
       },
       "story_id": null,
       "activity_ids": []
@@ -21285,7 +21817,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1837
+        "line": 1844
       },
       "story_id": null,
       "activity_ids": []
@@ -21399,7 +21931,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2383
+        "line": 2390
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -21527,7 +22059,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2540
+        "line": 2547
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -21644,7 +22176,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2691
+        "line": 2698
       },
       "story_id": null,
       "activity_ids": []

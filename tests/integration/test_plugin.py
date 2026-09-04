@@ -533,38 +533,46 @@ def test_an_unknown_source_link_preset_in_an_ini_names_the_ini(pytester):
         result.stderr.fnmatch_lines(['*Unknown given_source_link preset*'])
 
 
+@scenario(
+    t'A {pg["Report"].low} that fails to render discards the previous one too',
+    tags=['validation'],
+)
 def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):
     """Every sink is rendered before any is written.
 
     Otherwise the JSON lands, the HTML render raises, and the pair on disk
     describes two different runs with nothing saying so.
     """
-    pytester.makepyfile(
-        """
-        from pytest_given import scenario, then
+    with given(t'a suite with one {pg["Scenario"].low}'):
+        pytester.makepyfile(
+            """
+            from pytest_given import scenario, then
 
-        @scenario("Brew")
-        def test_brew():
-            with then("it brews"):
-                assert True
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    html_path = tmp_path / 'report.html'
-    json_path.write_text('{"stale": true}')
-    html_path.write_text('<html>stale</html>')
-    # A raw template passes preset resolution at configure time and fails when
-    # the renderer compiles it — the last point a sink can still raise.
-    result = pytester.runpytest(
-        f'--given-json={json_path}',
-        f'--given-html={html_path}',
-        '--given-source-link={bogus}',
-    )
-    assert result.ret == pytest.ExitCode.TESTS_FAILED
-    result.stdout.fnmatch_lines(['*report not written*'])
-    # Neither the stale pair nor a half-written new one survives.
-    assert not json_path.exists()
-    assert not html_path.exists()
+            @scenario("Brew")
+            def test_brew():
+                with then("it brews"):
+                    assert True
+            """
+        )
+    with given(t'a {pg["Report"].low} pair on disk from a previous run'):
+        json_path = tmp_path / 'report.json'
+        html_path = tmp_path / 'report.html'
+        json_path.write_text('{"stale": true}')
+        html_path.write_text('<html>stale</html>')
+    with when(t'the run trips a {pg["Renderer"].low} failure'):
+        # A raw template passes preset resolution at configure time and fails
+        # when the renderer compiles it — the last point a sink can still raise.
+        result = pytester.runpytest(
+            f'--given-json={json_path}',
+            f'--given-html={html_path}',
+            '--given-source-link={bogus}',
+        )
+    with then('the run fails, saying no report was written'):
+        assert result.ret == pytest.ExitCode.TESTS_FAILED
+        result.stdout.fnmatch_lines(['*report not written*'])
+    with then('neither the stale pair nor a half-written new one survives'):
+        assert not json_path.exists()
+        assert not html_path.exists()
 
 
 def test_a_write_failure_leaves_no_half_written_report(pytester, tmp_path):
@@ -2337,9 +2345,9 @@ def test_given_md_prints_fenced_block(pytester: pytest.Pytester) -> None:
         result = pytester.runpytest('--given-md')
     with then('the narration is printed between the fence markers'):
         out = result.stdout.str()
-        assert '<!-- pytest-given:md:start -->' in out
-        assert '<!-- pytest-given:md:end -->' in out
-        assert '## ✓ Buy coffee' in out
+        start = out.index('<!-- pytest-given:md:start -->')
+        end = out.index('<!-- pytest-given:md:end -->')
+        assert start < out.index('## ✓ Buy coffee') < end
 
 
 def test_given_md_path_writes_file_no_stdout(pytester: pytest.Pytester) -> None:
