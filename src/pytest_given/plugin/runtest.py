@@ -204,7 +204,7 @@ def _filter_internal_frames(excinfo: pytest.ExceptionInfo[BaseException]) -> Non
 
 
 def _is_internal_entry(entry: TracebackEntry) -> bool:
-    return is_internal_path(str(entry.path).replace('\\', '/'))
+    return is_internal_path(str(entry.path))
 
 
 def _extract_skip_reason(longrepr: object) -> str | None:

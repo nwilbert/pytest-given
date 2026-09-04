@@ -13,7 +13,6 @@ import types
 from collections.abc import Callable, Mapping, Sequence
 from string import templatelib
 from typing import (
-    Any,
     Protocol,
     Self,
     cast,
@@ -43,11 +42,9 @@ from .template import (
 class StepDecorated(Protocol):
     """A function carrying a pytest-given step descriptor.
 
-    Not a return type: the decorator is signature-preserving, and the two read
-    sites (`plugin.fixtures`) probe `_step_descriptor` with `getattr` because
-    they are asking whether the attribute is there at all. What is left is the
-    `runtime_checkable` shape itself, which is the marker contract written down
-    once.
+    Not a return type — the decorator is signature-preserving — but the shape
+    the two read sites in `plugin.fixtures` narrow with, so the marker contract
+    is written down once and checked where it is read.
     """
 
     _step_descriptor: StepDescriptor
@@ -196,7 +193,7 @@ class StepDescriptor:
         if inspect.iscoroutinefunction(func):
 
             @functools.wraps(func)
-            async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
+            async def async_wrapper(*args: object, **kwargs: object) -> object:
                 collector = self._push_call_step(func, sig, args, kwargs)
                 if collector is None:
                     return await func(*args, **kwargs)
@@ -208,7 +205,7 @@ class StepDescriptor:
             return self._marked(cast('F', async_wrapper))
 
         @functools.wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
+        def wrapper(*args: object, **kwargs: object) -> object:
             collector = self._push_call_step(func, sig, args, kwargs)
             if collector is None:
                 return func(*args, **kwargs)
@@ -228,8 +225,8 @@ class StepDescriptor:
         self,
         func: Callable[..., object],
         sig: inspect.Signature | None,
-        args: tuple[Any, ...],
-        kwargs: Mapping[str, Any],
+        args: tuple[object, ...],
+        kwargs: Mapping[str, object],
     ) -> Collector | None:
         """Open this step for one helper call, returning the collector to pop
         it with — or None when the call passes straight through.
@@ -294,8 +291,8 @@ class StepDescriptor:
     def _narration_for_call(
         self,
         sig: inspect.Signature,
-        args: tuple[Any, ...],
-        kwargs: Mapping[str, Any],
+        args: tuple[object, ...],
+        kwargs: Mapping[str, object],
     ) -> Narration:
         assert isinstance(self._source, Template)
         bound = sig.bind(*args, **kwargs)

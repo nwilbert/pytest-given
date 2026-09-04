@@ -45,9 +45,14 @@ def slot_for(position: int) -> Slot:
     return 'noun'
 
 
+# Which slots a term was seen in, and the stories that saw it there — the
+# evidence one term's kind is inferred from.
+type SlotSightings = dict[Slot, set[str]]
+
+
 def infer_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary:
     """Return a new Glossary with each term's kind inferred/verified."""
-    stories_by_slot: dict[TermId, dict[Slot, set[str]]] = defaultdict(
+    sightings_by_term: dict[TermId, SlotSightings] = defaultdict(
         lambda: defaultdict(set)
     )
     for story in stories:
@@ -56,9 +61,9 @@ def infer_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary:
                 for position, part in enumerate(activity_path.parts):
                     if isinstance(part, ActivityTermRef):
                         slot = slot_for(position)
-                        stories_by_slot[part.term_id][slot].add(story.title)
+                        sightings_by_term[part.term_id][slot].add(story.title)
     inferred_terms = [
-        replace(term, kind=_infer_one(term, stories_by_slot.get(term.id, {})))
+        replace(term, kind=_infer_one(term, sightings_by_term.get(term.id, {})))
         for term in glossary.terms
     ]
     return Glossary(terms=inferred_terms)
@@ -66,15 +71,15 @@ def infer_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary:
 
 def _infer_one(
     term: GlossaryTerm,
-    stories_by_slot: dict[Slot, set[str]],
+    sightings: SlotSightings,
 ) -> TermKind | None:
-    slots = set(stories_by_slot)
+    slots = set(sightings)
     if term.kind is not None:
-        _verify_declared(term, stories_by_slot)
+        _verify_declared(term, sightings)
         return term.kind
     if 'verb' in slots and ('actor' in slots or 'noun' in slots):
         other: Slot = 'actor' if 'actor' in slots else 'noun'
-        where = _where(stories_by_slot, 'verb', other)
+        where = _where(sightings, 'verb', other)
         raise PytestGivenError(
             f'term {term.canonical!r} is used in incompatible positions{where}: '
             f'a verb slot and an actor/noun slot. Add a kind column to disambiguate.'
@@ -88,10 +93,10 @@ def _infer_one(
     return None
 
 
-def _verify_declared(term: GlossaryTerm, stories_by_slot: dict[Slot, set[str]]) -> None:
+def _verify_declared(term: GlossaryTerm, sightings: SlotSightings) -> None:
     for slot in _SLOT_ORDER:
-        if slot in stories_by_slot and term.kind not in ROLE_ACCEPTS[slot]:
-            _raise_declared(term, f'{slot} slot', _where(stories_by_slot, slot))
+        if slot in sightings and term.kind not in ROLE_ACCEPTS[slot]:
+            _raise_declared(term, f'{slot} slot', _where(sightings, slot))
 
 
 def _raise_declared(term: GlossaryTerm, slot: str, where: str) -> None:
@@ -101,8 +106,8 @@ def _raise_declared(term: GlossaryTerm, slot: str, where: str) -> None:
     )
 
 
-def _where(stories_by_slot: dict[Slot, set[str]], *slots: Slot) -> str:
+def _where(sightings: SlotSightings, *slots: Slot) -> str:
     """Story titles for just the named slots, so a conflict names only the
     stories that actually contributed the offending positions."""
-    titles = sorted({title for slot in slots for title in stories_by_slot[slot]})
+    titles = sorted({title for slot in slots for title in sightings[slot]})
     return f' (in {", ".join(titles)})' if titles else ''

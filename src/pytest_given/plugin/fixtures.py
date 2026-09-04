@@ -19,6 +19,7 @@ import pytest
 from ..capture import (
     Collector,
     FixtureRecording,
+    StepDecorated,
     StepDescriptor,
     annotated_given_descriptors,
 )
@@ -37,7 +38,8 @@ def pytest_fixture_setup(
     fixturedef: pytest.FixtureDef[object],
     request: pytest.FixtureRequest,
 ) -> Generator[None]:
-    desc = getattr(fixturedef.func, '_step_descriptor', None)
+    func = fixturedef.func
+    desc = func._step_descriptor if isinstance(func, StepDecorated) else None
     if not isinstance(desc, StepDescriptor):
         yield
         return
@@ -227,6 +229,6 @@ def _step_fixturedef(item: pytest.Item, name: str) -> pytest.FixtureDef[object] 
     if not defs:
         return None
     fixturedef = defs[-1]
-    if getattr(fixturedef.func, '_step_descriptor', None) is None:
+    if not isinstance(fixturedef.func, StepDecorated):
         return None
     return fixturedef

@@ -33,9 +33,12 @@ _INTERNAL_SUBSTRINGS = (
     '/site-packages/_pytest/',
     '/site-packages/pluggy/',
 )
-_INTERNAL_SUFFIXES = (
-    '/pytest_given/capture/steps.py',
-    '/pytest_given/capture/scenario.py',
+# Derived from the modules themselves, so moving or renaming one is a name
+# error here rather than a suffix that silently stops matching and puts our
+# own frames back into every user traceback.
+_INTERNAL_SUFFIXES = tuple(
+    f'/{module.replace(".", "/")}.py'
+    for module in ('pytest_given.capture.steps', 'pytest_given.capture.scenario')
 )
 
 _SITE_PACKAGES_MARKER = '/site-packages/'
@@ -128,7 +131,14 @@ def _portable_path(normalized_path: str) -> str:
     return to_relpath(normalized_path)
 
 
-def is_internal_path(normalized_path: str) -> bool:
-    if any(s in normalized_path for s in _INTERNAL_SUBSTRINGS):
+def is_internal_path(path: str) -> bool:
+    """Whether a traceback frame's file is ours or the machinery's.
+
+    Normalizes here rather than trusting the caller to have done it: the
+    precondition was named in the parameter and enforced by nothing, and both
+    call sites spelled the same fixup out beforehand.
+    """
+    normalized = path.replace('\\', '/')
+    if any(s in normalized for s in _INTERNAL_SUBSTRINGS):
         return True
-    return any(normalized_path.endswith(s) for s in _INTERNAL_SUFFIXES)
+    return any(normalized.endswith(s) for s in _INTERNAL_SUFFIXES)

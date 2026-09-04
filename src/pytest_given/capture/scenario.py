@@ -8,7 +8,7 @@ that is `steps.py`, which this module imports for the descriptor an
 import inspect
 from collections.abc import Callable, Sequence
 from string import templatelib
-from typing import Any, cast, get_type_hints
+from typing import cast, get_type_hints
 
 from ..model import (
     ActivityId,
@@ -127,7 +127,7 @@ def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
     ``when(...)`` / ``then(...)``, a t-string label, or more than one
     descriptor on a single parameter.
     """
-    target = inspect.unwrap(cast(Any, func))
+    target = inspect.unwrap(cast('Callable[..., object]', func))
     try:
         hints = get_type_hints(target, include_extras=True)
     except Exception:  # noqa: BLE001 — annotations are arbitrary user code; see the docstring

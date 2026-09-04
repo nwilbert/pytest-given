@@ -1,3 +1,14 @@
+"""Recording a run: the authoring surface, and the machinery behind it.
+
+Two audiences share this namespace. The authoring surface — `given` / `when` /
+`then` / `when_then` / `attach`, `@scenario`, `story` / `activity` / `path`,
+`Glossary` / `FileGlossary` / `Template` — is re-exported from the package
+root and is what a test author writes. Everything else is the seam `plugin/`
+drives it through, public only because a sibling subpackage may import solely
+from a subpackage root. `__all__` stays sorted rather than grouped, so this
+note is where the two are told apart.
+"""
+
 from .collector import (
     Collector,
     FixtureRecording,
@@ -22,6 +33,7 @@ from .scenario import (
 )
 from .source import item_source
 from .steps import (
+    StepDecorated,
     StepDescriptor,
     attach,
     given,
@@ -48,6 +60,7 @@ __all__ = [
     'Glossary',
     'RecordingState',
     'ScenarioDecorator',
+    'StepDecorated',
     'StepDescriptor',
     'Template',
     'activity',

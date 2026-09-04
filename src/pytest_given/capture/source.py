@@ -119,12 +119,12 @@ def _relativize(abs_path: Path) -> str | None:
 _PACKAGE_ROOT = f'{Path(__file__).parent.parent}/'
 
 
-def _optional_source(abs_path: Path, line: int) -> SourceLocation | None:
+def file_source(path: Path, line: int) -> SourceLocation | None:
     """SourceLocation for an absolute path, or None when it can't be made
     rootdir-relative (rootdir unset or path outside it) — i.e. "no link". The
     counterpart to `to_relpath`, which instead degrades to the path as given.
     """
-    rel = _relativize(abs_path)
+    rel = _relativize(path)
     return None if rel is None else SourceLocation(relpath=rel, line=line)
 
 
@@ -149,7 +149,7 @@ def capture_caller_source() -> SourceLocation | None:
     if frame is None:
         return None
     abs_path = _co_filename_to_path(frame.f_code.co_filename)
-    return _optional_source(abs_path, frame.f_lineno)
+    return file_source(abs_path, frame.f_lineno)
 
 
 def to_relpath(raw: str) -> str:
@@ -191,10 +191,4 @@ def code_source(code: types.CodeType) -> SourceLocation | None:
     is unset or the file lies outside it.
     """
     abs_path = _co_filename_to_path(code.co_filename)
-    return _optional_source(abs_path, code.co_firstlineno)
-
-
-def file_source(path: Path, line: int) -> SourceLocation | None:
-    """`capture_caller_source` for a path already in hand rather than a stack
-    frame — a glossary table row, say."""
-    return _optional_source(path, line)
+    return file_source(abs_path, code.co_firstlineno)
