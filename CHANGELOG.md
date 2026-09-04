@@ -23,6 +23,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Changed
 
 - The `attachment-labels` and varying-`str` grouping refusals name the parametrize case they found, and the latter now points at `group_parametrized=False` as a way out.
+- The reviewing skill ships `references/pairs.md` — a script pairing each
+  scenario's narration with its test's source — and audits the rules the
+  release notes announce. Both skills now flag alternation `match=` pins and a
+  `when` that narrates arrangement while its body acts.
 
 ## [0.2.0] - 2026-09-04
 

@@ -54,6 +54,12 @@ def test_reviewing_skill_story_coverage_reference_is_bundled() -> None:
     assert (root / 'references' / 'story-coverage.md').is_file()
 
 
+def test_reviewing_skill_pairs_reference_is_bundled() -> None:
+    """The reviewing skill links references/pairs.md for the narration/body dump."""
+    root = files('pytest_given') / 'skills_data' / 'pytest-given-reviewing'
+    assert (root / 'references' / 'pairs.md').is_file()
+
+
 def test_skill_frontmatter_names_match_directories() -> None:
     for skill_dir in _skill_dirs():
         fields = _frontmatter(skill_dir / 'SKILL.md')

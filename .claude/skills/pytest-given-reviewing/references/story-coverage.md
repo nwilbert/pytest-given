@@ -43,3 +43,5 @@ for story in d['stories']:
 ```
 
 It matches on term ids alone, and it lets a pinned step match by narration as well as by its pin — two ways it can call an activity covered when the report won't. Treat its output as a **floor** on what is uncovered. Tighten it by comparing `display` values when the story under review uses instances.
+
+Before reporting an `UNCOVERED` line, read the activity's declaration site: a story maps the whole flow, so some activities (elicitation, human review) are deliberate gaps, usually marked there. Report a marked one only if the marking has gone stale.
