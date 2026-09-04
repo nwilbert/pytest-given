@@ -16,14 +16,16 @@ uv sync --group dev
 
 ## Quality gates
 
-Run all checks: `uv run nox`. List individual sessions with `uv run nox -l`.
+`uv run nox` runs the default gate — `format`, `lint`, `mypy`, `test`, `coverage` (a 100% target), `audit` (a `pip-audit` of the locked dependencies). The sessions below are on-demand; list them all with `uv run nox -l`.
 
 - `uv run nox -s examples` regenerates the JSON, HTML, and Markdown files under `examples/coffeeshop/`, `examples/hotel-booking/`, and `examples/file-glossary-booking/`. Run after changes to the renderer, templates, plugin output schema, or any example test file, and commit the updated outputs.
 - `uv run nox -s self_report` regenerates `examples/self-report/` — pytest-given applied to its own backend tests (see [Writing self-report scenarios](#writing-self-report-scenarios)). Run after decorating more tests or changing decorated ones, and commit the updated outputs.
-- **Only commit a regenerated report when its *content* actually changed.** Every regeneration rewrites `commit_sha` (to current HEAD, including the SHA-pinned source-link URLs), `timestamp`, and `duration_ms` in the JSON and HTML, so a report whose real content is untouched by your change will still show a diff — `git checkout` those files rather than committing the noise. The Markdown report carries none of these fields: it is deterministic, so **read the `.md` diff first** — it is the behavioral delta of your change in prose. (An unchanged `.md` doesn't by itself prove the JSON/HTML are noise-only: glossary and story data never surface in the Markdown. A shifted source line does — it sits in the `relpath:line::test_name` anchor under every heading.) Regenerate only the reports a change can affect: the `examples` reports narrate the `examples/**` test files, and the `self_report` narrates the backend tests under `tests/**` (so a shifted line number in a decorated backend test — e.g. from adding or removing code above it — is a real self-report change worth committing, even when no example changed).
+- **Only commit a regenerated report when its *content* actually changed.**
+  - Every regeneration rewrites `commit_sha` (to current HEAD, including the SHA-pinned source-link URLs), `timestamp`, and `duration_ms` in the JSON and HTML, so a report your change didn't really touch still shows a diff — `git checkout` those files rather than committing the noise.
+  - **Read the `.md` diff first**: the Markdown carries none of those fields, so it is the behavioral delta of your change in prose. An unchanged `.md` doesn't by itself prove the JSON/HTML are noise-only (glossary and story data never surface in the Markdown); a shifted source line does show up, in the `relpath:line::test_name` anchor under every heading.
+  - Regenerate only the reports a change can affect — `examples` narrates `examples/**`, `self_report` narrates `tests/**`. A shifted line number in a decorated backend test is therefore a real self-report change worth committing, even when no example changed.
 - Both regeneration sessions run the narration lint (`--given-lint`; see [Narration lint](README.md#narration-lint) and the [design spec](docs/specs/2026-07-05-narration-lint-design.md)): in `self_report` the backend suite has no intentional failures, so an error finding **fails report regeneration** — a real gate. The `examples` session's intentional failures already return a tolerated exit 1 (`success_codes=[0, 1]`) that masks the lint exit code; there the printed "narration lint" summary is the signal. Keep the backend suite lint-clean; a step the lint mis-flags belongs on the `given_lint_ignore` list, whose entries must each suppress a finding (stale entries fail the run). The rule catalog and the ignore mechanics live in the [authoring skill](src/pytest_given/skills_data/pytest-given-authoring/references/scenarios.md) under "Mechanical counterparts"; the honest-two-phase test an ignored `missing-phase` has to pass is under "Phase structure" in the same file.
-- `uv run nox -s coverage` enforces a 100% coverage target.
-- `uv run nox -s benchmark` generates the large-scenarios suite and renders its JSON + HTML into `benchmarks/` (gitignored). Not part of the default gate — run it when a change could move report-generation cost; `benchmarks/bench.py` does size sweeps and cProfile runs directly.
+- `uv run nox -s benchmark` generates the large-scenarios suite and renders its JSON + HTML into `benchmarks/` (gitignored). Run it when a change could move report-generation cost; `benchmarks/bench.py` does size sweeps and cProfile runs directly.
 - `uv run nox -s build` builds the wheel + sdist and verifies them the way a consumer would: it checks the wheel carries `py.typed`, the report templates and the bundled skills, then installs it into a throwaway environment and runs a real scenario through it. The in-repo suite imports from `src/`, so it cannot see a packaging regression — this session is the only thing that can. CI runs it on every push; the release workflow runs the same session.
 
 ## Releasing
@@ -68,6 +70,8 @@ to the code — read it before changing a module. What no filename tells you:
   report) and `lint.run_lint`. Both entry points go through them, which is what
   keeps `pytest-given report` behaving like the plugin.
 
+`tests/` splits `unit/` (no pytest session needed) from `integration/`, which drives the plugin end to end through `pytester` inner runs (enabled by the root `conftest.py`). Narration written inside an inner run belongs to *that* run's collector — only the outer, decorated test reaches the self-report.
+
 The public API is re-exported from `__init__.py` and documented in the skill's
 [references/api.md](src/pytest_given/skills_data/pytest-given-authoring/references/api.md).
 
@@ -89,24 +93,18 @@ Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filt
 - The report targets desktop only — assume a minimum viewport width of ~900px. No mobile/responsive layout needed.
 - Traceback display and header metadata formatting are known limitations, not current priorities.
 - Never save Playwright screenshots into the project directory. Use `/tmp/` or omit the `filename` parameter.
-- **Chrome caches `file://` pages across a `browser_navigate` to the same path**, including a changed query or hash — so a report regenerated mid-session keeps serving the previous build and the change under test looks like it did nothing. Navigate to `about:blank` and back to force a fresh read, and confirm the fix is live (grep the page's inlined script for a string only the new build has) before concluding a behavior is broken.
-- If the Playwright MCP browser install hangs after the download reaches 100% (microsoft/playwright#40998 in alpha builds), switch `.mcp.json` from `--browser chromium` to `--browser chrome` to use system Chrome.
 
-**Setup:** copy `.mcp.json.example` to `.mcp.json` (gitignored) to enable the server. It is deliberately not committed: opening a report needs `--allow-unrestricted-file-access`, because Playwright MCP blocks `file://` navigation entirely by default and offers no narrower scope. That flag also lets the browser read any file the user can, so it stays opt-in per developer rather than arriving with a clone. Keep the version pinned — `@latest` would resolve fresh from npm on every launch.
-
-- `.mcp.json` is read at **session start**: creating it mid-session leaves the `browser_*` tools missing until a restart, so check for them before planning a task that ends in Playwright verification.
-- The pinned version wants its own browser build; an already-installed chromium fails at the first `browser_navigate` with `Browser "chrome-for-testing" is not installed`. Fix: `npx @playwright/mcp@<pinned-version> install-browser chrome-for-testing`.
+**Setup and known traps** (`.mcp.json`, the `file://` page cache, browser installs) live in [docs/playwright-setup.md](docs/playwright-setup.md). `.mcp.json` is read at **session start**, so check that the `browser_*` tools exist before planning a task that ends in Playwright verification.
 
 ## Writing self-report scenarios
 
-The narration rules live in the **`pytest-given-authoring` skill** — whose canonical source is [src/pytest_given/skills_data/](src/pytest_given/skills_data/pytest-given-authoring/SKILL.md) — every link in this document points there. Contributor agents auto-discover the mirrored copy under `.claude/skills/`, and downstream projects get it via `pytest-given skills install`. After editing the canonical copy, regenerate the committed copy with `uv run pytest-given skills install` and commit both (a sync test fails otherwise). The subsection below covers only what is specific to this repo's self-report.
+The narration rules live in the **`pytest-given-authoring` skill** — whose canonical source is [src/pytest_given/skills_data/](src/pytest_given/skills_data/pytest-given-authoring/SKILL.md) — every link in this document points there. Contributor agents auto-discover the mirrored copy under `.claude/skills/`, and downstream projects get it via `pytest-given skills install`. After editing the canonical copy, regenerate the committed copy with `uv run pytest-given skills install` and commit both (a sync test fails otherwise).
 
 **The skill is documentation with the same sync duty as the README.** A change to the public API surface or its rules updates the README *and* the skill's [references/api.md](src/pytest_given/skills_data/pytest-given-authoring/references/api.md) (which downstream agents rely on instead of the README — it ships in the wheel, version-matched); a change to narration/lint semantics updates [references/scenarios.md](src/pytest_given/skills_data/pytest-given-authoring/references/scenarios.md) and friends. No mechanical check catches content drift between README and skill — treat "does the skill need this too?" as part of every user-facing change.
 
-### Self-report mechanics (this repo)
+What is specific to this repo's self-report:
 
-- The glossary handle is `pg` — `GLOSSARY.md` loaded as a `FileGlossary` in `tests/conftest.py` via `tests/ubiquitous_language.py`. Term-rename mechanics live under [Conventions](#conventions).
-- Regeneration (`uv run nox -s self_report`), narration-lint gating, and the commit-noise / `.md`-diff-review rules live under [Quality gates](#quality-gates).
+- The glossary handle is `pg` — `GLOSSARY.md` loaded as a `FileGlossary` in `tests/conftest.py` via `tests/ubiquitous_language.py`. Term-rename mechanics live under [Conventions](#conventions); regeneration and lint gating under [Quality gates](#quality-gates).
 - **New or changed user-facing behavior needs a scenario, not just a test** — otherwise the behavior is invisible in the report. Decorate the test that best *states* the rule, one per rule, not per branch; the edge cases around it stay plain. Two gaps to check for: a rule the [CHANGELOG](CHANGELOG.md) announces that no scenario names, and a [GLOSSARY.md](GLOSSARY.md) row *asserting* behavior (`Templatize`, `Parameter table`) that no scenario demonstrates.
 
 ## Conventions
