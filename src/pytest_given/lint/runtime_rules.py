@@ -64,8 +64,11 @@ def _missing_phase_findings(grouped: list[Scenario]) -> list[RawFinding]:
         missing = [phase for phase in _PHASE_ORDER if phase not in present]
         if missing:
             findings.append(
-                _scenario_finding(
-                    MISSING_PHASE, scenario, f'missing: {", ".join(missing)}'
+                RawFinding(
+                    rule=MISSING_PHASE,
+                    subject=scenario.id,
+                    location=scenario.source,
+                    message=f'missing: {", ".join(missing)}',
                 )
             )
     return findings
@@ -157,15 +160,6 @@ def _dead_term_findings(
         for term in glossary.terms
         if term.id not in referenced
     ]
-
-
-def _scenario_finding(rule: RuleId, scenario: Scenario, text: str) -> RawFinding:
-    return RawFinding(
-        rule=rule,
-        subject=scenario.id,
-        location=scenario.source,
-        message=text,
-    )
 
 
 def _slugifiable(name: str) -> bool:

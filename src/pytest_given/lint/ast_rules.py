@@ -11,7 +11,7 @@ from pathlib import Path
 from ..model import (
     NarrationPlaceholder,
     NarrationValue,
-    NodeId,
+    Phase,
     Scenario,
     SourceLocation,
     Step,
@@ -51,8 +51,8 @@ def run_ast_rules(
     that the rule does not run, and reading and parsing every test file to
     build findings that would then be discarded is the expensive half.
     """
-    step_rules = [(rule, fn) for rule, fn in _STEP_RULES if rule in enabled]
-    scenario_rules = [(rule, fn) for rule, fn in _SCENARIO_RULES if rule in enabled]
+    step_rules = [fn for rule, fn in _STEP_RULES.items() if rule in enabled]
+    scenario_rules = [fn for rule, fn in _SCENARIO_RULES.items() if rule in enabled]
     if not step_rules and not scenario_rules:
         return []
     indexes: dict[str, dict[int, _BodyNode] | None] = {}
@@ -60,9 +60,9 @@ def run_ast_rules(
     for scenario in scenarios:
         scan = _scan_scenario(scenario, rootdir, indexes)
         for resolved in scan.steps:
-            for _rule, step_rule in step_rules:
+            for step_rule in step_rules:
                 findings.extend(step_rule(resolved, scan))
-        for _rule, scenario_rule in scenario_rules:
+        for scenario_rule in scenario_rules:
             findings.extend(scenario_rule(scan))
     return findings
 
@@ -74,15 +74,15 @@ class _Resolved:
 
     A `when_then` pair is recognized as sibling `when`+`then` steps sharing
     one anchor — unambiguous, because cross-phase nesting is rejected at
-    record time, so no other construct produces that shape.
+    record time, so no other construct produces that shape. `pair_role` is
+    which half of such a pair this step is, or None when it is not in one; a
+    step has one phase, so the two halves were never independent.
     """
 
-    node_id: NodeId
     path: StepPath
     step: Step
     source: SourceLocation
-    pair_when: bool
-    pair_then: bool
+    pair_role: Phase | None
     node: _BodyNode
 
 
@@ -124,22 +124,10 @@ def _scan_scenario(
         after = by_path.get((*path[:-1], path[-1] + 1))
         steps.append(
             _Resolved(
-                node_id=scenario.id,
                 path=path,
                 step=step,
                 source=source,
-                pair_when=(
-                    step.phase == 'when'
-                    and after is not None
-                    and after.phase == 'then'
-                    and after.source == source
-                ),
-                pair_then=(
-                    step.phase == 'then'
-                    and before is not None
-                    and before.phase == 'when'
-                    and before.source == source
-                ),
+                pair_role=_pair_role(step, before, after, source),
                 node=node,
             )
         )
@@ -148,6 +136,31 @@ def _scan_scenario(
         steps=steps,
         by_path={resolved.path: resolved for resolved in steps},
     )
+
+
+def _pair_role(
+    step: Step, before: Step | None, after: Step | None, source: SourceLocation
+) -> Phase | None:
+    """Which half of a `when_then` pair `step` is, or None when it is in none.
+
+    The two halves were never independent — a step has one phase — so this is
+    one answer rather than a flag per half.
+    """
+    if (
+        step.phase == 'when'
+        and after is not None
+        and after.phase == 'then'
+        and after.source == source
+    ):
+        return 'when'
+    if (
+        step.phase == 'then'
+        and before is not None
+        and before.phase == 'when'
+        and before.source == source
+    ):
+        return 'then'
+    return None
 
 
 def _index_body_nodes(path: Path) -> dict[int, _BodyNode] | None:
@@ -178,7 +191,7 @@ def _index_body_nodes(path: Path) -> dict[int, _BodyNode] | None:
     return index
 
 
-def _empty_step(resolved: _Resolved, _scan: _Scan) -> Iterable[RawFinding]:
+def _empty_step(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
     """Rule `empty-step`: the step's body contains no executable code.
 
     Nested steps count as content for their parent (only leaves fire), and a
@@ -186,18 +199,18 @@ def _empty_step(resolved: _Resolved, _scan: _Scan) -> Iterable[RawFinding]:
     `pytest.raises` with-item is not body content, so the acting expression
     must still be there.
     """
-    if resolved.pair_then:
+    if resolved.pair_role == 'then':
         return
     body = [stmt for stmt in resolved.node.body if not _is_constant_stmt(stmt)]
     if not body:
-        yield _step_finding(EMPTY_STEP, resolved, 'has no code')
+        yield _step_finding(EMPTY_STEP, scan, resolved, 'has no code')
     elif resolved.step.phase != 'given' and all(_is_attach_stmt(s) for s in body):
         # Attaching is not acting or checking; a `given` that only attaches
         # its arranged artifact is legitimate.
-        yield _step_finding(EMPTY_STEP, resolved, 'contains only attach() calls')
+        yield _step_finding(EMPTY_STEP, scan, resolved, 'contains only attach() calls')
 
 
-def _then_without_check(resolved: _Resolved, _scan: _Scan) -> Iterable[RawFinding]:
+def _then_without_check(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
     """Rule `then-without-check`: a `then` body contains no assertion.
 
     A parent whose nested `then` child checks passes (the walk sees the whole
@@ -205,7 +218,7 @@ def _then_without_check(resolved: _Resolved, _scan: _Scan) -> Iterable[RawFindin
     `pytest.raises` with-item sits on its anchored `with`.
     """
     if resolved.step.phase == 'then' and not _contains_check(resolved.node):
-        yield _step_finding(THEN_WITHOUT_CHECK, resolved, 'contains no assertion')
+        yield _step_finding(THEN_WITHOUT_CHECK, scan, resolved, 'contains no assertion')
 
 
 def _check_outside_then(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
@@ -216,7 +229,7 @@ def _check_outside_then(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding
     business (it is scanned as its own anchored step), so the parent's scan
     excludes resolved child subtrees.
     """
-    if resolved.step.phase == 'then' or resolved.pair_when:
+    if resolved.step.phase == 'then' or (resolved.pair_role == 'when'):
         return
     child_nodes = {
         id(child.node)
@@ -226,12 +239,13 @@ def _check_outside_then(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding
     if _contains_assert_outside(resolved.node.body, child_nodes):
         yield _anchored_finding(
             CHECK_OUTSIDE_THEN,
+            scan,
             resolved,
             f'assert inside {resolved.step.phase} {resolved.step.narration.text!r}',
         )
 
 
-def _unused_interpolation(resolved: _Resolved, _scan: _Scan) -> Iterable[RawFinding]:
+def _unused_interpolation(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
     """Rule `unused-interpolation`: a t-string step interpolates a bare
     identifier its body never uses.
 
@@ -267,6 +281,7 @@ def _unused_interpolation(resolved: _Resolved, _scan: _Scan) -> Iterable[RawFind
         if name not in used:
             yield _step_finding(
                 UNUSED_INTERPOLATION,
+                scan,
                 resolved,
                 f'interpolates {{{name}}} but never uses it',
             )
@@ -291,16 +306,17 @@ def _action_in_then(scan: _Scan) -> Iterable[RawFinding]:
         resolved = scan.by_path.get(path)
         if resolved is None:
             return
-        if resolved.pair_when or _body_performs_action(resolved.node):
+        if (resolved.pair_role == 'when') or _body_performs_action(resolved.node):
             acts = True
     if acts:
         return
     for resolved in scan.steps:
-        if resolved.step.phase != 'then' or resolved.pair_then:
+        if resolved.step.phase != 'then' or (resolved.pair_role == 'then'):
             continue
         if _assert_with_call(resolved.node):
             yield _anchored_finding(
                 ACTION_IN_THEN,
+                scan,
                 resolved,
                 f'then {resolved.step.narration.text!r} folds the action into '
                 f'its assertion; no when acts',
@@ -311,32 +327,37 @@ def _action_in_then(scan: _Scan) -> Iterable[RawFinding]:
 type _StepRule = Callable[[_Resolved, _Scan], Iterable[RawFinding]]
 type _ScenarioRule = Callable[[_Scan], Iterable[RawFinding]]
 
-# Each rule paired with its id, so `run_ast_rules` can drop the ones that are
-# off before it parses anything.
-_STEP_RULES: tuple[tuple[RuleId, _StepRule], ...] = (
-    (EMPTY_STEP, _empty_step),
-    (THEN_WITHOUT_CHECK, _then_without_check),
-    (CHECK_OUTSIDE_THEN, _check_outside_then),
-    (UNUSED_INTERPOLATION, _unused_interpolation),
-)
+# Keyed by rule id, so `run_ast_rules` can drop the ones that are off before
+# it parses anything.
+_STEP_RULES: dict[RuleId, _StepRule] = {
+    EMPTY_STEP: _empty_step,
+    THEN_WITHOUT_CHECK: _then_without_check,
+    CHECK_OUTSIDE_THEN: _check_outside_then,
+    UNUSED_INTERPOLATION: _unused_interpolation,
+}
 
-_SCENARIO_RULES: tuple[tuple[RuleId, _ScenarioRule], ...] = (
-    (ACTION_IN_THEN, _action_in_then),
-)
+_SCENARIO_RULES: dict[RuleId, _ScenarioRule] = {
+    ACTION_IN_THEN: _action_in_then,
+}
 
 
-def _step_finding(rule: RuleId, resolved: _Resolved, problem: str) -> RawFinding:
+def _step_finding(
+    rule: RuleId, scan: _Scan, resolved: _Resolved, problem: str
+) -> RawFinding:
     return _anchored_finding(
         rule,
+        scan,
         resolved,
         f'{resolved.step.phase} {resolved.step.narration.text!r} {problem}',
     )
 
 
-def _anchored_finding(rule: RuleId, resolved: _Resolved, text: str) -> RawFinding:
+def _anchored_finding(
+    rule: RuleId, scan: _Scan, resolved: _Resolved, text: str
+) -> RawFinding:
     return RawFinding(
         rule=rule,
-        subject=resolved.node_id,
+        subject=scan.scenario.id,
         location=resolved.source,
         message=text,
     )
