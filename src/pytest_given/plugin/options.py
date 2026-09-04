@@ -1,20 +1,21 @@
 """The plugin's options: declaration, and the one place they are resolved.
 
 `pytest_configure` parses every option into a single `GivenConfig` before the
-suite runs, so a typo in a rule name or a source-link preset is a `UsageError`
-up front rather than a surprise after the last test.
+suite runs, so a typo in a rule name — and, on an HTML run, in a source-link
+preset — is a `UsageError` up front rather than a surprise after the last test.
+The preset is resolved only for an HTML run because the `github` one shells out
+to `git remote`, which a run that writes no HTML should not pay for.
 """
 
 import argparse
 from pathlib import Path
-from typing import cast
 
 import pytest
 
 from ..lint import parse_lint_config
 from ..model import PytestGivenError
 from ..report import SinkConfig, resolve_source_link_template
-from .state import GivenConfig, given_config_key
+from .state import GivenConfig, store_given_config
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -120,7 +121,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
-def _cli_over_ini(config: pytest.Config, name: str) -> str | bool:
+def _cli_over_ini[T](config: pytest.Config, name: str, kind: type[T]) -> T:
     """The precedence rule for every option carrying both a flag and an ini,
     stated once: the flag when it was given at all, otherwise the ini.
 
@@ -128,16 +129,14 @@ def _cli_over_ini(config: pytest.Config, name: str) -> str | bool:
     so an explicitly empty one still wins over the ini — `--given-source-link=`
     disables links rather than falling through. Each option's argparse `dest`
     is its ini name, so one lookup name serves both.
+
+    `kind` is what the option's ini declares, so the narrowing is an assert
+    over a value this function actually looked at rather than a cast laundering
+    `Any` past the type checker.
     """
     cli = config.getoption(name)
-    return cast('str | bool', config.getini(name) if cli is None else cli)
-
-
-def _cli_over_ini_str(config: pytest.Config, name: str) -> str:
-    """`_cli_over_ini` for an option whose ini is declared `type='string'`, so
-    both sources are already `str`."""
-    value = _cli_over_ini(config, name)
-    assert isinstance(value, str), f'{name} is declared a string ini'
+    value = config.getini(name) if cli is None else cli
+    assert isinstance(value, kind), f'{name}: expected {kind.__name__}'
     return value
 
 
@@ -150,20 +149,7 @@ def _resolve_title(config: pytest.Config) -> str | None:
     other. Coalescing here rather than in `_cli_over_ini` keeps it this
     option's own rule: `--given-source-link=` means the opposite.
     """
-    return _cli_over_ini_str(config, 'given_title') or None
-
-
-def _resolve_lint_enabled(config: pytest.Config) -> bool:
-    """The lint switch.
-
-    `BooleanOptionalAction` with `default=None` keeps the flag tri-state, so
-    "not given" stays distinguishable from `--no-given-lint` and the ini is
-    consulted only in the first case. It is also what makes this the one
-    option whose flag and ini agree on a type — every other paired option is
-    string on both sides.
-    """
-    value = _cli_over_ini(config, 'given_lint')
-    return bool(value)
+    return _cli_over_ini(config, 'given_title', str) or None
 
 
 def _resolve_sinks(
@@ -205,17 +191,25 @@ def pytest_configure(config: pytest.Config) -> None:
             config.getini('given_lint_rules'), config.getini('given_lint_ignore')
         )
         source_link_template = (
-            resolve_source_link_template(_cli_over_ini_str(config, 'given_source_link'))
+            resolve_source_link_template(
+                _cli_over_ini(config, 'given_source_link', str)
+            )
             if config.getoption('given_html') is not None
             else None
         )
         sinks = _resolve_sinks(config, source_link_template)
     except PytestGivenError as error:
         raise pytest.UsageError(str(error)) from error
-    config.stash[given_config_key] = GivenConfig(
-        lint=lint,
-        lint_enabled=_resolve_lint_enabled(config),
-        sinks=sinks,
-        title=_resolve_title(config),
-        all_frames=bool(config.getoption('given_all_frames')),
+    store_given_config(
+        config,
+        GivenConfig(
+            lint=lint,
+            # `BooleanOptionalAction` with `default=None` keeps the flag
+            # tri-state, so "not given" stays distinguishable from
+            # `--no-given-lint` and the ini is consulted only in the first case.
+            lint_enabled=_cli_over_ini(config, 'given_lint', bool),
+            sinks=sinks,
+            title=_resolve_title(config),
+            all_frames=bool(config.getoption('given_all_frames')),
+        ),
     )

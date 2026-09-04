@@ -14,7 +14,6 @@ from typing import Any
 import pytest
 
 from ..capture import (
-    Collector,
     begin_capture_session,
     capture_snapshot,
     infer_glossary_kinds,
@@ -34,15 +33,11 @@ from ..model import (
 )
 from ..report import detect_commit_sha, discard_stale_sinks, emit_sinks
 from .state import (
-    SessionOutcome,
-    SessionState,
-    collector_key,
     given_config,
+    init_session_stash,
     session_collector,
     session_outcome,
-    session_outcome_key,
     session_state,
-    session_state_key,
 )
 
 
@@ -84,12 +79,7 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     be built in `pytest_configure`, because there is one such hook per plugin
     and the collector above reads `lint_enabled` out of it.
     """
-    config = session.config
-    config.stash[collector_key] = Collector(
-        capture_step_source=given_config(config).lint_enabled
-    )
-    config.stash[session_state_key] = SessionState()
-    config.stash[session_outcome_key] = SessionOutcome()
+    init_session_stash(session.config)
 
 
 @dataclass(frozen=True, kw_only=True)

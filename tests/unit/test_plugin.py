@@ -45,21 +45,32 @@ def fake_config() -> Any:
     """A config double carrying a real Stash with a session collector and its
     hook bookkeeping, as `pytest_sessionstart` leaves it."""
     config = SimpleNamespace(stash=pytest.Stash())
-    config.stash[state.collector_key] = Collector()
-    config.stash[state.session_state_key] = state.SessionState()
+    state.store_given_config(config, _given_config())
+    state.init_session_stash(config)
     return config
+
+
+def _given_config() -> state.GivenConfig:
+    """The resolved options a default run leaves in the stash."""
+    return state.GivenConfig(
+        lint=LintConfig(levels={}, ignores=[]),
+        lint_enabled=False,
+        sinks=SinkConfig(),
+        title=None,
+        all_frames=False,
+    )
 
 
 @pytest.fixture
 def fresh_collector(fake_config: Any) -> Collector:
     """The collector owned by `fake_config`'s session."""
-    return fake_config.stash[state.collector_key]
+    return state.session_collector(fake_config)
 
 
 @pytest.fixture
 def fresh_state(fake_config: Any) -> state.SessionState:
     """The hook bookkeeping owned by `fake_config`'s session."""
-    return fake_config.stash[state.session_state_key]
+    return state.session_state(fake_config)
 
 
 def _drive_fixture_setup(fixturedef: Any, request: Any) -> None:
@@ -301,13 +312,7 @@ def _fake_session() -> Any:
     `pytest_sessionstart` reads the result rather than re-deriving it.
     """
     config = SimpleNamespace(stash=pytest.Stash())
-    config.stash[state.given_config_key] = state.GivenConfig(
-        lint=LintConfig(levels={}, ignores=[]),
-        lint_enabled=False,
-        sinks=SinkConfig(),
-        title=None,
-        all_frames=False,
-    )
+    state.store_given_config(config, _given_config())
     return SimpleNamespace(config=config)
 
 

@@ -10,13 +10,13 @@ instead, where the traceback points at the decorator.
 import pytest
 
 from ..capture import (
-    ScenarioDecorator,
     Template,
 )
 from ..model import (
     PytestGivenError,
     placeholder_mismatch,
 )
+from .state import scenario_marker
 
 
 @pytest.hookimpl(trylast=True)
@@ -77,16 +77,3 @@ def _validate_scenario_marker(item: pytest.Item) -> None:
                 param_names,
                 where=f'in @scenario(...) on {item.nodeid!r}',
             )
-
-
-def scenario_marker(item: pytest.Item) -> ScenarioDecorator | None:
-    """Get the _scenario attribute from a test function, if present.
-
-    Returns None for items without a `.function` (e.g. DoctestItem) — those
-    can't carry @scenario, so they're never load-bearing here.
-    """
-    func = getattr(item, 'function', None)
-    if func is None:
-        return None
-    marker = getattr(func, '_scenario', None)
-    return marker if isinstance(marker, ScenarioDecorator) else None

@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from ..capture import (
+    Collector,
     get_active_collector,
     is_internal_path,
     item_source,
@@ -24,9 +25,8 @@ from ..model import (
     ParamSpec,
     Status,
 )
-from .collection import scenario_marker
 from .fixtures import graft_fixture_recordings
-from .state import given_config, session_collector, session_state
+from .state import given_config, scenario_marker, session_collector, session_state
 
 if TYPE_CHECKING:
     from _pytest._code.code import TracebackEntry
@@ -64,8 +64,23 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     session_state(item.config).published_for = node_id
     set_active_collector(collector)
     # Pre-fixture-setup work done; let pytest run fixture setup here.
-    yield
-    _capture_param_spec(item, node_id, group=marker.group_parametrized)
+    #
+    # `finally`, because all three of these matter most when setup *failed*: a
+    # fixture exception is recorded onto the scenario by `makereport`, and the
+    # scenario still needs the `given` steps its fixtures recorded before the
+    # failure. Old-style `hookwrapper` runs post-yield code after a raising
+    # inner hook anyway; `wrapper=True` throws in at the yield instead, so
+    # without this the migration pytest recommends would silently drop them.
+    try:
+        yield
+    finally:
+        _finish_setup(item, node_id, collector, group=marker.group_parametrized)
+
+
+def _finish_setup(
+    item: pytest.Item, node_id: NodeId, collector: Collector, *, group: bool
+) -> None:
+    _capture_param_spec(item, node_id, group=group)
     graft_fixture_recordings(item, collector)
     # The clock starts past fixture setup, so a scenario's duration is its own.
     collector.begin_timing()

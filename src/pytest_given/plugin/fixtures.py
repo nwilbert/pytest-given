@@ -149,7 +149,7 @@ def _fixture_instance_key(
     """Built here rather than at either end of the graft, so the two cannot
     drift into keys that no longer meet — a miss is silent, and costs the
     fixture's whole recorded subtree."""
-    return (id(fixturedef), cache_key)
+    return FixtureInstanceKey(fixturedef_id=id(fixturedef), cache_key=cache_key)
 
 
 def graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
