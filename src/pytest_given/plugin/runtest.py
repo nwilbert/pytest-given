@@ -5,8 +5,6 @@ and the two report hooks put a failure behind the right phase and close the
 scenario out.
 """
 
-import contextlib
-import copy
 from collections.abc import Generator
 from typing import TYPE_CHECKING
 
@@ -24,8 +22,8 @@ from ..model import (
     ErrorInfo,
     NodeId,
     ParamSpec,
-    RawParamValue,
     Status,
+    snapshot_param_value,
 )
 from .fixtures import graft_fixture_recordings
 from .state import given_config, scenario_marker, session_collector, session_state
@@ -111,33 +109,11 @@ def _capture_param_spec(item: pytest.Item, node_id: NodeId, *, group: bool) -> N
     session_state(item.config).param_info[node_id] = ParamSpec(
         names=names,
         values=[
-            _snapshot_param_value(funcargs.get(name, callspec.params[name]))
+            snapshot_param_value(funcargs.get(name, callspec.params[name]))
             for name in names
         ],
         group=group,
     )
-
-
-def _snapshot_param_value(value: RawParamValue) -> RawParamValue:
-    """A shallow copy of a parametrize value, or the value itself when its type
-    refuses to be copied or the copy would not render the way it does.
-
-    Best effort by nature: a value that cannot be copied is one whose mutation
-    cannot be guarded against either.
-
-    A copy that renders differently is worse than no copy at all. An object
-    inheriting the default `__repr__` — or a `MagicMock` — renders its own
-    address, so the copy would put a value in the cell that no case narrated.
-    Mutation cannot change such a rendering anyway.
-    """
-    with contextlib.suppress(Exception):
-        snapshot = copy.copy(value)
-        # Both renderings, since an interpolation may ask for either: `!r`
-        # takes `repr` and a bare `{x}` takes `str`, and a type can define one
-        # by value and inherit the other from `object`.
-        if (str(snapshot), repr(snapshot)) == (str(value), repr(value)):
-            return snapshot
-    return value
 
 
 @pytest.hookimpl(trylast=True)

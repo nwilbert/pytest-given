@@ -34,9 +34,9 @@ from pytest_given.model import (
     NodeId,
     PytestGivenError,
     Step,
+    snapshot_param_value,
 )
 from pytest_given.plugin import collection, fixtures, runtest, session, state
-from pytest_given.plugin.runtest import _snapshot_param_value
 from pytest_given.report import SinkConfig
 
 
@@ -564,13 +564,13 @@ def test_an_uncopyable_parametrize_value_is_kept_as_it_is() -> None:
     mutation could not have been guarded against anyway, and refusing to copy
     it must not take the run down with it."""
     value = _Uncopyable()
-    assert _snapshot_param_value(value) is value
+    assert snapshot_param_value(value) is value
 
 
 def test_a_copyable_parametrize_value_is_snapshotted() -> None:
     """The copy is what keeps a later in-place mutation out of the table."""
     value = ['latte']
-    snapshot = _snapshot_param_value(value)
+    snapshot = snapshot_param_value(value)
     value.append('cup')
     assert snapshot == ['latte']
 
@@ -586,7 +586,7 @@ def test_a_value_rendering_by_identity_is_kept_as_it_is() -> None:
     the rebound-parameter rule as a rebinding that never happened. Mutation
     cannot change such a rendering, so the copy protects nothing."""
     value = _IdentityRepr()
-    assert _snapshot_param_value(value) is value
+    assert snapshot_param_value(value) is value
 
 
 class _StrByValueReprByIdentity:
@@ -600,4 +600,4 @@ class _StrByValueReprByIdentity:
 def test_a_value_rendering_by_identity_under_repr_only_is_kept_as_it_is() -> None:
     """Both renderings are checked: an interpolation may ask for either."""
     value = _StrByValueReprByIdentity()
-    assert _snapshot_param_value(value) is value
+    assert snapshot_param_value(value) is value

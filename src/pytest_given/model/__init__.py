@@ -19,6 +19,7 @@ from .runtime import (
     ParamInfo,
     ParamSpec,
     RawParamValue,
+    snapshot_param_value,
 )
 from .schema import (
     CONTENT_TYPES,
@@ -146,5 +147,6 @@ __all__ = [
     'render_interpolation',
     'report_from_dict',
     'report_to_dict',
+    'snapshot_param_value',
     'walk_steps',
 ]
