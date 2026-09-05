@@ -105,19 +105,23 @@ def recording_collector(
     the path that succeeds.
     """
     collector = get_active_collector()
-    if collector is not None and collector.recording:
+    if collector is None:
+        raise _no_scenario_error(_attempt(kind, subject))
+    if collector.recording:
         return collector
-    if collector is not None and collector.state == 'unannotated':
-        warnings.warn(
-            _unannotated_warning(kind, subject),
-            PytestGivenWarning,
-            skip_file_prefixes=(PACKAGE_ROOT,),
-        )
-        return None
-    action = f'attach {subject!r}' if kind == 'attach' else f"enter '{kind}: {subject}'"
-    if collector is not None:
-        collector.refuse_recording(action)
-    raise _no_scenario_error(action)
+    if collector.state != 'unannotated':
+        collector.refuse_recording(_attempt(kind, subject))
+    warnings.warn(
+        _unannotated_warning(kind, subject),
+        PytestGivenWarning,
+        skip_file_prefixes=(PACKAGE_ROOT,),
+    )
+    return None
+
+
+def _attempt(kind: Phase | Literal['attach'], subject: str) -> str:
+    """The attempt as a refusal names it."""
+    return f'attach {subject!r}' if kind == 'attach' else f"enter '{kind}: {subject}'"
 
 
 def _unannotated_warning(kind: Phase | Literal['attach'], subject: str) -> str:

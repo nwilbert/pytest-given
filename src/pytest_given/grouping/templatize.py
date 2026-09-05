@@ -140,15 +140,11 @@ def _templatize_value(
 ) -> NarrationPart:
     """An interpolation no parametrize column binds: kept as it is when every
     case renders it the same, promoted to a `derived` column when they do not."""
-    if all(
-        rendering == part.rendered for rendering in _renderings(site, builder).values()
-    ):
-        # Checked before the cells are collected: nothing varies in the
-        # overwhelming majority of parts, and only a promotion needs every
-        # case's rendering kept.
+    rendered = _renderings(site, builder)
+    if all(rendering == part.rendered for rendering in rendered.values()):
         return part
     check_promotable_expression(part, site.phase, builder.group)
-    return _slot(part, builder.derived(part.expression, _renderings(site, builder)))
+    return _slot(part, builder.derived(part.expression, rendered))
 
 
 def _renderings(site: PartSite, builder: ColumnBuilder) -> dict[NodeId, str]:
