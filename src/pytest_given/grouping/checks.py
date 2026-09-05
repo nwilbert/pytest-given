@@ -1,16 +1,27 @@
-"""The six authoring forms that would make a grouped tree lie about its cases.
+"""The six authoring forms that would make a grouped tree lie about its cases,
+and how two cases' trees are compared to find them.
 
 Each raises `PytestGivenError` rather than reporting a finding the way lint
 does: a grouped tree built on any of these is false, so the run fails and no
 sink is written. Some are checked up front against the whole group; the rest
 fire from the baseline walk, which is where the offending part is in hand.
+
+The comparison the rules run on lives at the bottom: a step tree reduced to
+what a grouped tree must share, a narration part reduced to its template, and
+the phrasing that names the first difference between two of them.
 """
 
 from collections.abc import Iterable, Iterator
 from collections.abc import Set as AbstractSet
+from typing import NamedTuple
 
 from ..model import (
+    ActivityId,
     AttachmentLabel,
+    Narration,
+    NarrationLiteral,
+    NarrationPart,
+    NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
     NodeId,
@@ -19,18 +30,14 @@ from ..model import (
     RawParamValue,
     Scenario,
     Step,
+    StepPath,
     case_suffix,
     location_suffix,
     node_base,
     render_interpolation,
 )
+from .columns import Format
 from .context import Group, PartSite
-from .step_shape import (
-    _narration_difference,
-    _part_key,
-    _shape,
-    _structure,
-)
 
 
 def check_same_template(group: Group) -> None:
@@ -59,17 +66,17 @@ def check_same_template(group: Group) -> None:
     # `walk_steps` mapping is keyed by DFS pre-order path, which makes the
     # path/shape list below equivalent to a recursive structure signature.
     baseline_steps = list(group.indexed[baseline.id].items())
-    signature = _shape(baseline_steps)
+    signature = step_shape(baseline_steps)
     baseline_keys = [
-        [_part_key(part) for part in step.narration.parts]
+        [part_key(part) for part in step.narration.parts]
         for _path, step in baseline_steps
     ]
     for case in group.comparable:
         if case.id == baseline.id:
             continue
         case_steps = group.indexed[case.id]
-        case_signature = _shape(case_steps.items())
-        if _structure(case_signature) != _structure(signature):
+        case_signature = step_shape(case_steps.items())
+        if step_structure(case_signature) != step_structure(signature):
             raise _divergence_error(case, 'a different step structure', group)
         if case_signature != signature:
             # Only the activities differ, which `a different step structure`
@@ -86,7 +93,7 @@ def check_same_template(group: Group) -> None:
                 if other.text != step.narration.text:
                     raise _varying_str_error(step, group)
                 continue
-            difference = _narration_difference(keys, other)
+            difference = narration_difference(keys, other)
             if difference is not None:
                 raise _divergence_error(
                     case, f'{difference} in its {step.phase} step', group
@@ -302,3 +309,99 @@ def _grouping_error(group: Group, body: str) -> PytestGivenError:
 
 def _test_name(scenario: Scenario) -> str:
     return node_base(scenario.id).rpartition('::')[2]
+
+
+class StepSignature(NamedTuple):
+    """What a grouped tree requires every case's step to share: where it sits,
+    its phase, and the activities it claims."""
+
+    path: StepPath
+    phase: Phase
+    activity_ids: tuple[ActivityId, ...]
+
+
+class PartKey(NamedTuple):
+    """What a part contributes to its narration's template: its kind, the text
+    a divergence message names it by, and the rendering details that must match
+    without being worth naming."""
+
+    kind: str
+    label: str
+    detail: Format | None = None
+
+
+def step_shape(indexed: Iterable[tuple[StepPath, Step]]) -> list[StepSignature]:
+    """A case's tree reduced to what a grouped tree must share: where each step
+    sits, its phase, and the activities it claims.
+
+    Paths carry the nesting, so this needs no recursion — a `walk_steps`
+    mapping is already DFS pre-order.
+
+    `activity_ids` is in here because `activity=` is a per-call argument, so
+    `given(t'…', activity=a if flag else b)` gives two cases genuinely
+    different ids at one path. The grouped tree keeps a single set, and
+    `report.coverage` reads exactly that field to credit story coverage — the
+    same lie rule 4 refuses a varying term ref to prevent.
+    """
+    return [
+        StepSignature(path, step.phase, step.activity_ids) for path, step in indexed
+    ]
+
+
+def step_structure(signature: list[StepSignature]) -> list[tuple[StepPath, Phase]]:
+    """The signature without its activities — where the steps sit and what
+    phase each is."""
+    return [(step.path, step.phase) for step in signature]
+
+
+def part_key(part: NarrationPart) -> PartKey:
+    """A part reduced to its template.
+
+    Never `rendered`, which is exactly what grouping promotes into a column,
+    and never a term ref's `display` — rule 4 governs that, and names it as the
+    authoring error it is where a template divergence would only report that
+    two cases disagree.
+    """
+    match part:
+        case NarrationLiteral(value=value):
+            return PartKey('literal', value)
+        case NarrationValue(expression=e, conversion=c, format_spec=f):
+            return PartKey('value', e, (c, f))
+        case NarrationPlaceholder(name=n, conversion=c, format_spec=f):
+            return PartKey('placeholder', n, (c, f))
+        case NarrationTermRef(expression=expression):
+            return PartKey('term', expression)
+
+
+def narration_difference(baseline_keys: list[PartKey], case: Narration) -> str | None:
+    """How the case's narration differs from the baseline's keys as a template,
+    or None when they agree."""
+    case_keys = [part_key(part) for part in case.parts]
+    if [key.kind for key in baseline_keys] != [key.kind for key in case_keys]:
+        return 'a differently shaped narration'
+    for baseline_key, case_key in zip(baseline_keys, case_keys, strict=True):
+        if baseline_key == case_key:
+            continue
+        if baseline_key.label == case_key.label:
+            # Same kind, same label: what differs is the `detail` — the
+            # conversion and format spec — so naming the labels would quote
+            # the same string twice.
+            return (
+                f'a different formatting of {baseline_key.label!r} '
+                f'({detail_text(baseline_key)} vs {detail_text(case_key)})'
+            )
+        if baseline_key.kind == 'literal':
+            return f'different wording ({baseline_key.label!r} vs {case_key.label!r})'
+        return f'a different expression ({baseline_key.label!r} vs {case_key.label!r})'
+    return None
+
+
+def detail_text(key: PartKey) -> str:
+    """A part's conversion and format spec as an author wrote them."""
+    if key.detail is None:
+        return 'no formatting'
+    conversion, format_spec = key.detail
+    return (
+        f'{"!" + conversion if conversion else ""}'
+        f'{":" + format_spec if format_spec else ""}'
+    ) or 'no formatting'

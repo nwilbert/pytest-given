@@ -10,7 +10,6 @@ from pytest_given.grouping import (
     checks,
     columns,
     group_parametrized,
-    step_shape,
     templatize,
 )
 from pytest_given.grouping.context import build_group
@@ -2767,9 +2766,9 @@ def _sig_step(phase: str, text: str, children: list[Step] | None = None) -> Step
 
 
 def _shape_of(steps: list[Step]) -> list[tuple[StepPath, str, tuple[ActivityId, ...]]]:
-    """`checks._shape` over a freshly walked tree, the way `build_group` feeds
+    """`checks.step_shape` over a freshly walked tree, the way `build_group` feeds
     it."""
-    return checks._shape(walk_steps(steps))
+    return checks.step_shape(walk_steps(steps))
 
 
 def _sig_tree() -> list[Step]:
@@ -2838,8 +2837,8 @@ def test_detail_text_reads_a_part_that_carries_no_formatting() -> None:
     """`detail` is the `(conversion, format_spec)` pair, absent for a literal
     or a term ref — which the divergence message renders as prose rather than
     unpacking a pair that is not there."""
-    detail_text = step_shape._detail_text
-    key = step_shape.PartKey
+    detail_text = checks.detail_text
+    key = checks.PartKey
     assert detail_text(key('literal', 'a machine')) == 'no formatting'
     assert detail_text(key('value', 'n', (None, ''))) == 'no formatting'
     assert detail_text(key('value', 'n', ('r', '>5'))) == '!r:>5'
