@@ -8,7 +8,7 @@ that is `steps.py`, which this module imports for the descriptor an
 import inspect
 from collections.abc import Callable, Sequence
 from string import templatelib
-from typing import Protocol, cast, get_type_hints, runtime_checkable
+from typing import cast, get_type_hints
 
 from ..model import (
     ActivityId,
@@ -53,16 +53,14 @@ class ScenarioDecorator:
         return func
 
 
-@runtime_checkable
-class ScenarioDecorated(Protocol):
-    """A function carrying a pytest-given scenario marker.
+def scenario_marker(func: object) -> ScenarioDecorator | None:
+    """The marker `@scenario` hung on `func`, or None for anything else.
 
-    Not a return type — the decorator is signature-preserving — but the shape
-    `plugin.state.scenario_marker` narrows with, so the marker attribute is
-    named in one place instead of spelled as a string on both sides.
+    Reading the attribute is this module's job, so its name stays spelled in
+    the one file that writes it.
     """
-
-    _scenario: ScenarioDecorator
+    marker = getattr(func, '_scenario', None)
+    return marker if isinstance(marker, ScenarioDecorator) else None
 
 
 def scenario(

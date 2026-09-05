@@ -19,9 +19,9 @@ import pytest
 from ..capture import (
     Collector,
     FixtureRecording,
-    StepDecorated,
     StepDescriptor,
     annotated_given_descriptors,
+    step_descriptor,
 )
 from ..model import (
     PytestGivenError,
@@ -38,9 +38,8 @@ def pytest_fixture_setup(
     fixturedef: pytest.FixtureDef[object],
     request: pytest.FixtureRequest,
 ) -> Generator[None]:
-    func = fixturedef.func
-    desc = func._step_descriptor if isinstance(func, StepDecorated) else None
-    if not isinstance(desc, StepDescriptor):
+    desc = step_descriptor(fixturedef.func)
+    if desc is None:
         yield
         return
     if desc.phase != 'given':
@@ -229,6 +228,6 @@ def _step_fixturedef(item: pytest.Item, name: str) -> pytest.FixtureDef[object] 
     if not defs:
         return None
     fixturedef = defs[-1]
-    if not isinstance(fixturedef.func, StepDecorated):
+    if step_descriptor(fixturedef.func) is None:
         return None
     return fixturedef

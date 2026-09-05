@@ -22,8 +22,10 @@ import pytest
 from ..capture import (
     Collector,
     FixtureRecording,
-    ScenarioDecorated,
     ScenarioDecorator,
+)
+from ..capture import (
+    scenario_marker as capture_scenario_marker,
 )
 from ..lint import Finding, LintConfig
 from ..model import NodeId, ParamInfo
@@ -118,11 +120,7 @@ def scenario_marker(item: pytest.Item) -> ScenarioDecorator | None:
     Returns None for items without a `.function` (e.g. DoctestItem) — those
     can't carry @scenario, so they're never load-bearing here.
     """
-    func = getattr(item, 'function', None)
-    if not isinstance(func, ScenarioDecorated):
-        return None
-    marker = func._scenario
-    return marker if isinstance(marker, ScenarioDecorator) else None
+    return capture_scenario_marker(getattr(item, 'function', None))
 
 
 def session_collector(config: pytest.Config) -> Collector:

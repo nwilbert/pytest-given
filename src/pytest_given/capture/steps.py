@@ -13,10 +13,8 @@ import types
 from collections.abc import Callable, Mapping, Sequence
 from string import templatelib
 from typing import (
-    Protocol,
     Self,
     cast,
-    runtime_checkable,
 )
 
 from ..model import (
@@ -98,16 +96,15 @@ def attach(label: str, content: object) -> None:
         )
 
 
-@runtime_checkable
-class StepDecorated(Protocol):
-    """A function carrying a pytest-given step descriptor.
+def step_descriptor(func: object) -> StepDescriptor | None:
+    """The descriptor a step decorator hung on `func`, or None for anything
+    else.
 
-    Not a return type — the decorator is signature-preserving — but the shape
-    the two read sites in `plugin.fixtures` narrow with, so the marker contract
-    is written down once and checked where it is read.
+    Reading the attribute is this module's job, so its name stays spelled in
+    the one file that writes it.
     """
-
-    _step_descriptor: StepDescriptor
+    descriptor = getattr(func, '_step_descriptor', None)
+    return descriptor if isinstance(descriptor, StepDescriptor) else None
 
 
 class StepDescriptor:

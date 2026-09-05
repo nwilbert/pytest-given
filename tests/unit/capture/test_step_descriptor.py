@@ -18,11 +18,11 @@ from pytest_given.capture.collector import (
 from pytest_given.capture.scenario import scenario
 from pytest_given.capture.source import restore_rootdir, set_rootdir
 from pytest_given.capture.steps import (
-    StepDecorated,
     StepDescriptor,
     attach,
     given,
     normalize_activity,
+    step_descriptor,
     then,
     when,
     when_then,
@@ -82,22 +82,27 @@ def test_decorator_basic() -> None:
     assert insert_money._step_descriptor.narration.text == 'inserting money'
 
 
-def test_decorated_function_satisfies_step_decorated_protocol() -> None:
-    """A function returned by StepDescriptor.__call__ structurally satisfies the
-    StepDecorated protocol — the typed contract callers cast through to read
-    `_step_descriptor` without a type: ignore."""
+def test_step_descriptor_reads_back_only_from_a_decorated_function() -> None:
+    """`step_descriptor` is how the plugin asks whether a function carries a
+    step, so it must answer for the decorated case and decline every other —
+    including an object carrying a `_step_descriptor` of the wrong type."""
 
     @when('inserting money')
     def insert_money() -> str:
         return 'done'
 
-    assert isinstance(insert_money, StepDecorated)
+    assert step_descriptor(insert_money) is insert_money._step_descriptor
 
-    # A plain undecorated function does not satisfy the protocol.
     def plain() -> None:
         pass
 
-    assert not isinstance(plain, StepDecorated)
+    assert step_descriptor(plain) is None
+    assert step_descriptor(object()) is None
+
+    class Impostor:
+        _step_descriptor = 'not a descriptor'
+
+    assert step_descriptor(Impostor()) is None
 
 
 def test_decorator_preserves_function_metadata() -> None:
@@ -1280,7 +1285,7 @@ def test_decorator_leaves_an_async_generator_fixture_body_to_the_hook() -> None:
     finally:
         set_active_collector(None)
     assert scenario.steps == []
-    assert cast(StepDecorated, session)._step_descriptor is desc
+    assert step_descriptor(session) is desc
 
 
 def test_decorator_template_slot_records_a_term_instance_as_a_term_ref() -> None:

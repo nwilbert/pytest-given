@@ -25,17 +25,17 @@ from .process_state import (
     restore_capture_state,
 )
 from .scenario import (
-    ScenarioDecorated,
     ScenarioDecorator,
     annotated_given_descriptors,
     scenario,
+    scenario_marker,
 )
 from .source import item_source
 from .steps import (
-    StepDecorated,
     StepDescriptor,
     attach,
     given,
+    step_descriptor,
     then,
     when,
     when_then,
@@ -57,9 +57,7 @@ __all__ = [
     'FileGlossary',
     'FixtureRecording',
     'Glossary',
-    'ScenarioDecorated',
     'ScenarioDecorator',
-    'StepDecorated',
     'StepDescriptor',
     'Template',
     'activity',
@@ -78,7 +76,9 @@ __all__ = [
     'resolved_placeholder_part',
     'restore_capture_state',
     'scenario',
+    'scenario_marker',
     'set_active_collector',
+    'step_descriptor',
     'story',
     'then',
     'try_term_ref',
