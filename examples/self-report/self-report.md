@@ -116,7 +116,7 @@
 - **then** neither the stale pair nor a half-written new one survives
 
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2327::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2360::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -139,14 +139,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2340::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2373::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2361::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2394::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -154,7 +154,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A sink flag pointed at a source file is refused before the suite runs
-`tests/integration/test_plugin.py:2381::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
+`tests/integration/test_plugin.py:2414::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
 
 - **given** a suite with one «scenario»
 - **when** a bare --given-html swallows the test path that follows it
@@ -162,7 +162,7 @@
 - **then** the source file is left exactly as it was, not overwritten
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2414::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2447::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -182,7 +182,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:2446::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:2479::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -191,7 +191,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:2632::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:2665::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -1113,7 +1113,7 @@
 - **then** it carries the given «Phase» and its «Narration»
 
 ## ✓ A «step» opened outside a «scenario» warns rather than raising
-`tests/unit/capture/test_step_descriptor.py:152::test_context_manager_unannotated_test_warns_instead_of_raises`
+`tests/unit/capture/test_step_descriptor.py:157::test_context_manager_unannotated_test_warns_instead_of_raises`
 
 - **given** a «collector» recording inside an undecorated test
 - **when** a given «step» is opened against it
@@ -1121,28 +1121,28 @@
 - **then** it names the missing `@scenario`, so a suite can filter it
 
 ## ✓ «when_then» records the action and its outcome as siblings
-`tests/unit/capture/test_step_descriptor.py:280::test_when_then_records_two_sibling_steps_on_clean_exit`
+`tests/unit/capture/test_step_descriptor.py:285::test_when_then_records_two_sibling_steps_on_clean_exit`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a «when_then» block exits cleanly
 - **then** a when and a sibling then «Step» are recorded
 
 ## ✓ «when_then» pairs with an inner pytest.raises
-`tests/unit/capture/test_step_descriptor.py:305::test_when_then_pairs_with_inner_pytest_raises`
+`tests/unit/capture/test_step_descriptor.py:310::test_when_then_pairs_with_inner_pytest_raises`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises and an inner pytest.raises swallows it
 - **then** both sibling steps are still recorded
 
 ## ✓ «when_then» omits the then when the body raises uncaught
-`tests/unit/capture/test_step_descriptor.py:333::test_when_then_omits_then_when_body_raises_uncaught` · validation
+`tests/unit/capture/test_step_descriptor.py:338::test_when_then_omits_then_when_body_raises_uncaught` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises with nothing catching inside
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ A cross-phase «step» cannot open inside a «when_then» body · 2 cases
-`tests/unit/capture/test_step_descriptor.py:375::test_when_then_rejects_cross_phase_nested_step` · validation
+`tests/unit/capture/test_step_descriptor.py:380::test_when_then_rejects_cross_phase_nested_step` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a given or then opens inside the «when_then» body
@@ -1155,14 +1155,14 @@
 | then | ✓ |
 
 ## ✓ A nested when becomes a child of the «when_then» action
-`tests/unit/capture/test_step_descriptor.py:407::test_when_then_allows_nested_when_as_child_sub_step`
+`tests/unit/capture/test_step_descriptor.py:412::test_when_then_allows_nested_when_as_child_sub_step`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a when opens inside the «when_then» body
 - **then** the sub-action is a child of the action and the then still follows
 
 ## ✓ `@scenario` marks the test function without wrapping it
-`tests/unit/capture/test_step_descriptor.py:451::test_scenario_marks_the_function_without_wrapping_it`
+`tests/unit/capture/test_step_descriptor.py:456::test_scenario_marks_the_function_without_wrapping_it`
 
 - **given** a test function taking one fixture
 - **when** the function is decorated
@@ -1170,7 +1170,7 @@
 - **then** it carries the «scenario» marker, and a plain one does not
 
 ## ✓ An «attachment» label must be plain text · 3 cases
-`tests/unit/capture/test_step_descriptor.py:521::test_attach_rejects_a_non_str_label` · validation
+`tests/unit/capture/test_step_descriptor.py:526::test_attach_rejects_a_non_str_label` · validation
 
 - **given** a non-str «Attachment» label of kind {label_kind}
 - **when** it is attached
@@ -1183,7 +1183,7 @@
 | not-a-string | ✓ |
 
 ## ✓ A `Template` «narration» is refused in a test body · 3 cases
-`tests/unit/capture/test_step_descriptor.py:563::test_phase_with_pytest_given_template_as_context_manager_raises` · validation
+`tests/unit/capture/test_step_descriptor.py:568::test_phase_with_pytest_given_template_as_context_manager_raises` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a {phase_name} «step» opens on a `Template`
@@ -1196,7 +1196,7 @@
 | then | ✓ |
 
 ## ✓ A string `activities=` argument is refused by `@scenario`
-`tests/unit/capture/test_step_descriptor.py:955::test_scenario_rejects_a_string_activities_argument` · validation
+`tests/unit/capture/test_step_descriptor.py:960::test_scenario_rejects_a_string_activities_argument` · validation
 
 - **given** a string where a sequence of «activity» ids goes
 - **when** the «scenario» is declared
@@ -1474,56 +1474,56 @@
 | {x + 1} | ✓ |
 
 ## ✓ A t-string interpolation becomes a value part
-`tests/unit/capture/test_template.py:151::test_parse_tstring_single_interpolation`
+`tests/unit/capture/test_template.py:152::test_parse_tstring_single_interpolation`
 
 - **given** a t-string step with one interpolated value
 - **when** the t-string is parsed at runtime
 - **then** the interpolation becomes a «Narration» value part
 
 ## ✓ A t-string can interpolate an arbitrary expression
-`tests/unit/capture/test_template.py:214::test_parse_tstring_expression`
+`tests/unit/capture/test_template.py:219::test_parse_tstring_expression`
 
 - **given** a t-string step interpolating a computed expression
 - **when** the t-string is parsed
 - **then** the «Value highlight» part records the full expression
 
 ## ✓ A «glossary» handle in a t-string emits a «term ref»
-`tests/unit/capture/test_template.py:253::test_tstring_with_actor_emits_term_ref`
+`tests/unit/capture/test_template.py:259::test_tstring_with_actor_emits_term_ref`
 
 - **given** an «Actor» handle from the glossary
 - **when** the handle is interpolated into a t-string step
 - **then** the step carries a «Term ref» for that «Actor»
 
 ## ✓ A «work object» handle in a t-string emits a «term ref»
-`tests/unit/capture/test_template.py:281::test_tstring_with_work_object_emits_term_ref`
+`tests/unit/capture/test_template.py:287::test_tstring_with_work_object_emits_term_ref`
 
 - **given** a «Work Object» handle from the glossary
 - **when** it is interpolated into a t-string step
 - **then** the step carries a «Term ref» for that «Work Object»
 
 ## ✓ A bare «verb» handle keeps its canonical display
-`tests/unit/capture/test_template.py:302::test_tstring_with_verb_emits_term_ref_with_canonical_display`
+`tests/unit/capture/test_template.py:308::test_tstring_with_verb_emits_term_ref_with_canonical_display`
 
 - **given** a «Verb» handle used without an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the canonical verb
 
 ## ✓ An inflected «verb» in a t-string shows the «inflection»
-`tests/unit/capture/test_template.py:317::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display`
+`tests/unit/capture/test_template.py:323::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display`
 
 - **given** a «Verb» handle called with an «Inflection»
 - **when** it is interpolated into a t-string step
 - **then** the «Term ref» shows the inflection but keeps the verb id
 
 ## ✓ A «term ref» may not carry a format spec
-`tests/unit/capture/test_template.py:357::test_tstring_term_ref_with_format_spec_raises` · validation
+`tests/unit/capture/test_template.py:363::test_tstring_term_ref_with_format_spec_raises` · validation
 
 - **given** an «Actor» handle interpolated with a format spec
 - **when** the t-string is parsed
 - **then** a PytestGivenError says a «Term ref» takes no format spec
 
 ## ✓ A «FileGlossary» handle works in a t-string «step»
-`tests/unit/capture/test_template.py:400::test_tstring_with_file_term_handle_emits_term_ref`
+`tests/unit/capture/test_template.py:406::test_tstring_with_file_term_handle_emits_term_ref`
 
 - **given** a «Deferred term» from a «File glossary»
 - **when** it is interpolated into a t-string step
@@ -2138,14 +2138,14 @@
 - **then** the error points at the env var and the raw-template escape hatch
 
 ## ✓ An under-anchored «activity» is flagged ineligible in rollups
-`tests/unit/report/test_story_view.py:167::test_build_story_rollups_flags_under_anchored_activity_ineligible`
+`tests/unit/report/test_story_view.py:165::test_build_story_rollups_flags_under_anchored_activity_ineligible`
 
 - **given** a «Story» with an anchored and an under-anchored «Activity»
 - **when** the story rollups are built
 - **then** only the anchored «Activity» is «Coverage»-eligible
 
 ## ✓ A pinned under-anchored «activity» stops reading as untracked
-`tests/unit/report/test_story_view.py:211::test_build_story_rollups_pinned_under_anchored_activity_is_tracked`
+`tests/unit/report/test_story_view.py:209::test_build_story_rollups_pinned_under_anchored_activity_is_tracked`
 
 - **given** a «Story» whose only «Activity» is under-anchored
 - **given** a «Scenario» whose «step» pins it by id
@@ -2153,35 +2153,35 @@
 - **then** it stays narration-ineligible but is no longer untracked
 
 ## ✓ An «Activity» is labeled by the prose of its «paths»
-`tests/unit/report/test_story_view.py:313::test_build_activity_labels_joins_parts_into_prose`
+`tests/unit/report/test_story_view.py:311::test_build_activity_labels_joins_parts_into_prose`
 
 - **given** a «Story» with a two-«path» «activity»
 - **when** the «activity» labels are built
 - **then** the label reads as prose under a story-scoped key, with the «path» texts joined
 
 ## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
-`tests/unit/test_grouping.py:116::test_group_parametrized_any_failed_groups_as_failed` · parametrization
+`tests/unit/test_grouping.py:115::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
 - **given** three «Case» records of one «Parametrized scenario»
 - **when** the «grouping» pass collapses them
 - **then** one scenario remains and any failed «Case» fails it
 
 ## ✓ A «parametrized scenario» keeps its place among the «scenarios» around it
-`tests/unit/test_grouping.py:148::test_group_parametrized_keeps_source_order` · parametrization
+`tests/unit/test_grouping.py:147::test_group_parametrized_keeps_source_order` · parametrization
 
 - **given** a plain «scenario» between two parametrized ones
 - **when** the «grouping» pass runs
 - **then** the «report» lists them in the order the file declares
 
 ## ✓ The grouped tree comes from the first passed «case»
-`tests/unit/test_grouping.py:247::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
+`tests/unit/test_grouping.py:246::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
 
 - **given** a skipped first «Case» and a second one that ran
 - **when** the «cases» are «grouped»
 - **then** the tree is the one the passed «Case» recorded
 
 ## ✓ A plain-str «narration» that varies across «cases» is refused
-`tests/unit/test_grouping.py:474::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
+`tests/unit/test_grouping.py:473::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
 
 - **given** two «cases» whose text differs but records no parts
 - **when** the «cases» are «grouped»
@@ -2190,7 +2190,7 @@
 - **then** it names the «Case» whose values were baked in, and the per-case opt-out
 
 ## ✓ A narrated value that varies becomes a derived «parameter table» column
-`tests/unit/test_grouping.py:597::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
+`tests/unit/test_grouping.py:596::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
 
 - **given** two «cases» narrating a value that differs
 - **when** «templatizing» walks the «cases»
@@ -2199,7 +2199,7 @@
 - **then** the placeholder keeps the format spec and conversion it narrated
 
 ## ✓ A varying interpolation that is not a bare name is refused
-`tests/unit/test_grouping.py:710::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
+`tests/unit/test_grouping.py:709::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
 
 - **given** two «cases» narrating a computed expression
 - **when** the «cases» are «grouped»
@@ -2207,14 +2207,14 @@
 - **then** the error quotes the expression and shows the bind-a-local fix
 
 ## ✓ A «parameter table» cell reads the way the scenario name formats it
-`tests/unit/test_grouping.py:1076::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
+`tests/unit/test_grouping.py:1075::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
 
 - **given** a Template scenario name formatting its parameter
 - **when** the «cases» are «grouped»
 - **then** the cells carry the formatting the name declared
 
 ## ✓ A scenario name formatting a parameter a «step» reads plainly gets its own column
-`tests/unit/test_grouping.py:1091::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1090::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
 
 - **given** a name formatting the parameter and a step reading it plainly
 - **when** the «cases» are «grouped»
@@ -2222,7 +2222,7 @@
 - **then** the name renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» formatting a parameter the scenario name reads plainly gets its own column
-`tests/unit/test_grouping.py:1134::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1133::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
 
 - **given** a step formatting the parameter and a name reading it plainly
 - **when** the «cases» are «grouped»
@@ -2230,7 +2230,7 @@
 - **then** the step renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» narrating a parameter its column no longer holds is refused
-`tests/unit/test_grouping.py:1216::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
+`tests/unit/test_grouping.py:1215::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
 
 - **given** two «cases» narrating a value their column lacks
 - **when** the «cases» are «grouped»
@@ -2238,7 +2238,7 @@
 - **then** the error names the column and what the case actually narrated
 
 ## ✓ A «term ref» whose display differs between «cases» is refused
-`tests/unit/test_grouping.py:1567::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1566::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» reads differently
 - **when** the «cases» are «grouped»
@@ -2246,7 +2246,7 @@
 - **then** the error names the «Term ref» and the split-it-out fix
 
 ## ✓ A «term ref» that *is* the parametrize value is refused too
-`tests/unit/test_grouping.py:1624::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1623::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «Term ref» is the parameter itself
 - **when** the «cases» are «grouped»
@@ -2254,7 +2254,7 @@
 - **then** the error points at the per-case «scenario» opt-out
 
 ## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py:1788::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+`tests/unit/test_grouping.py:1787::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
 
 - **given** two «cases» attaching a label with differing payloads
 - **when** «templatizing» walks the «cases»
@@ -2262,7 +2262,7 @@
 - **then** the «Step» keeps a content-less badge pointing at it
 
 ## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py:1844::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+`tests/unit/test_grouping.py:1843::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
 
 - **given** an «Attachment» label only one «Case» attaches
 - **when** the «cases» are «grouped»
@@ -2270,7 +2270,7 @@
 - **then** the error names the label, the case, and asks for a constant one
 
 ## ✓ A «parameter table» cell reads the way the «step» that points at it read
-`tests/unit/test_grouping.py:2390::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+`tests/unit/test_grouping.py:2389::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec
 - **when** «grouping» builds the «parameter table»
@@ -2278,7 +2278,7 @@
 - **then** the step keeps its placeholder, which that cell substitutes into
 
 ## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py:2547::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+`tests/unit/test_grouping.py:2546::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
 
 - **given** two «cases» whose «step» trees differ
 - **when** the «cases» are «grouped»
@@ -2286,7 +2286,7 @@
 - **then** the error names the divergence and the opt-out that answers it
 
 ## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
-`tests/unit/test_grouping.py:2698::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
+`tests/unit/test_grouping.py:2697::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
 
 - **given** a step narrating a parameter bound to a glossary term instance
 - **when** the «cases» are «grouped»
