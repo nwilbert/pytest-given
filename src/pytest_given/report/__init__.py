@@ -12,8 +12,8 @@ from .sinks import (
     RenderedFile,
     RenderedSinks,
     SinkConfig,
-    discard_stale_sinks,
     emit_sinks,
+    sink_failure,
 )
 from .source_link import detect_commit_sha, resolve_source_link_template
 
@@ -24,7 +24,7 @@ __all__ = [
     'RenderedSinks',
     'SinkConfig',
     'detect_commit_sha',
-    'discard_stale_sinks',
     'emit_sinks',
     'resolve_source_link_template',
+    'sink_failure',
 ]

@@ -31,7 +31,7 @@ from ..model import (
     Story,
     report_to_dict,
 )
-from ..report import detect_commit_sha, discard_stale_sinks, emit_sinks
+from ..report import detect_commit_sha, emit_sinks, sink_failure
 from .state import (
     given_config,
     init_session_stash,
@@ -126,8 +126,8 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
             if rendered.md_stdout is not None:
                 session_outcome(config).md_stdout = rendered.md_stdout
     except (PytestGivenError, OSError) as error:
-        session_outcome(config).report_error = '\n'.join(
-            [str(error), *discard_stale_sinks(given_config(config).sinks)]
+        session_outcome(config).report_error = sink_failure(
+            error, given_config(config).sinks
         )
         _fail_run(session)
         return

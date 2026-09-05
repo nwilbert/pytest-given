@@ -114,9 +114,7 @@ def emit_sinks(
         rendered = render_sinks(report_dict, config, source)
         write_sinks(rendered)
     except (PytestGivenError, OSError) as error:
-        raise PytestGivenError(
-            '\n'.join([str(error), *discard_stale_sinks(config)])
-        ) from error
+        raise PytestGivenError(sink_failure(error, config)) from error
     except Exception:
         # A renderer bug (an undefined template name, a missing color key) is
         # not a user error and keeps its own traceback — but it fails the same
@@ -163,6 +161,17 @@ def write_sinks(rendered: RenderedSinks) -> None:
     for path, text in rendered.files:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding='utf-8')
+
+
+def sink_failure(error: Exception, config: SinkConfig) -> str:
+    """What to report when a run produces no report: the failure, and what
+    discarding the stale sinks did.
+
+    `emit_sinks` covers a failure inside itself, but a report that fails to
+    *build* never reaches it and leaves the same stale files behind — so the
+    plugin needs this composition too, and this is the one place it is spelled.
+    """
+    return '\n'.join([str(error), *discard_stale_sinks(config)])
 
 
 def discard_stale_sinks(config: SinkConfig) -> list[str]:
