@@ -44,9 +44,28 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
         if not moved:
             # Every directory is already in the slug and the pair still reads
             # the same. Nothing shorter than the node id can separate them.
-            slugs.update({node_id: node_id for node_id in colliding})
+            slugs.update(_fallback_slugs(colliding))
             break
     return slugs
+
+
+def _fallback_slugs(colliding: list[NodeId]) -> dict[NodeId, str]:
+    """Fragment-safe, unique slugs for scenarios no path depth separates.
+
+    A node id is unique by construction but may carry the characters
+    `_fragment_safe` folds — and folding can make two of them collide all over
+    again, which is the one case the escalation above cannot reach. Such a
+    group is separated by an ordinal over the *sorted* ids, so the slug a
+    scenario gets still does not depend on the order the report lists them in.
+    """
+    by_safe: dict[str, list[NodeId]] = {}
+    for node_id in sorted(colliding):
+        by_safe.setdefault(_fragment_safe(node_id), []).append(node_id)
+    return {
+        node_id: safe if len(group) == 1 else f'{safe}-{ordinal}'
+        for safe, group in by_safe.items()
+        for ordinal, node_id in enumerate(group, start=1)
+    }
 
 
 def _colliding_ids(slugs: dict[NodeId, str]) -> list[NodeId]:

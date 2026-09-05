@@ -20,6 +20,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - An unknown `--given-source-link` preset is reported under the flag the user typed rather than under the `given_source_link` ini name.
 - A report whose rendering fails unexpectedly still discards the previous run's report rather than leaving it on disk reading as current.
 - A step `activity=` recorded from a `@given` fixture scoped wider than `function`, pulled in by a test without `@scenario`, now raises a `PytestGivenError` naming the cause instead of a bare `AssertionError`.
+- The `#scenario=` deep link works for two scenarios whose node ids differ only in a character the slug folds; the fallback slug no longer hands back characters that break the URL fragment.
 
 ### Changed
 

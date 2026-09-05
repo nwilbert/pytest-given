@@ -98,6 +98,34 @@ def test_scenario_slug_escalates_only_as_far_as_it_must() -> None:
     assert index[NodeId('other/test_z.py::test_w')] == 'z/w'
 
 
+def test_scenario_slug_fallback_stays_fragment_safe() -> None:
+    """The fallback is still addressed as `#scenario=<slug>`, so it may not
+    hand back characters `_fragment_safe` exists to remove — a `+` there
+    decodes to a space and the deep link silently misses."""
+    rd = ReportData(
+        metadata=_meta(),
+        scenarios=[_scn('test_x.py::test_y[a+b]'), _scn('test_x.py::test_y[a-b]')],
+    )
+    index = build_scenario_slug_index(rd)
+    for slug in index.values():
+        assert not set(slug) & set('+&=# ')
+
+
+def test_scenario_slug_fallback_separates_ids_that_fold_together() -> None:
+    """Two node ids differing only in a character the fold removes are still
+    told apart, and which one gets which slug does not depend on the order the
+    report lists them in."""
+    ids = ['test_x.py::test_y[a+b]', 'test_x.py::test_y[a-b]']
+    forward = build_scenario_slug_index(
+        ReportData(metadata=_meta(), scenarios=[_scn(i) for i in ids])
+    )
+    reverse = build_scenario_slug_index(
+        ReportData(metadata=_meta(), scenarios=[_scn(i) for i in reversed(ids)])
+    )
+    assert len(set(forward.values())) == 2
+    assert forward == reverse
+
+
 def test_scenario_slug_falls_back_to_the_node_id_when_paths_cannot_separate() -> None:
     """`test_x.py` beside `x.py` in one directory reads the same at every
     depth; the node id is the only thing left that is unique."""
