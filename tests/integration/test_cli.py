@@ -209,6 +209,21 @@ def test_cli_reports_malformed_json_without_a_traceback(tmp_path: Path, capsys) 
     assert 'Traceback' not in err
 
 
+def test_cli_reports_a_non_utf8_file_without_a_traceback(
+    tmp_path: Path, capsys
+) -> None:
+    """Bytes that are not UTF-8 at all are the same kind of file problem as
+    malformed JSON — `UnicodeDecodeError` is a `ValueError`, so it escapes the
+    `JSONDecodeError` clause unless this path catches it too."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_bytes(b'\xff\xfe\x00not utf-8')
+    rc = main(['report', str(json_path)])
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert 'Error' in err
+    assert 'Traceback' not in err
+
+
 def test_cli_reports_a_stale_report_without_a_traceback(tmp_path: Path, capsys) -> None:
     """`serde` raises PytestGivenError for a report written by an older
     pytest-given precisely so this path can say so — the message exists to

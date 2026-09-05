@@ -62,7 +62,10 @@ def run_report(args: argparse.Namespace) -> int:
     try:
         config = _sink_config(args.output, args.source_link, args.format)
         rendered = emit_sinks(_load_report(json_file), config, str(json_file))
-    except json.JSONDecodeError as error:
+    except (json.JSONDecodeError, UnicodeDecodeError) as error:
+        # A file that is not UTF-8 at all never reaches the JSON parser, and
+        # `UnicodeDecodeError` is a `ValueError` — neither clause below sees
+        # it, so it belongs here with the other unreadable-input cases.
         print(f'Error: {json_file} is not valid JSON — {error}', file=sys.stderr)
         return 1
     except (PytestGivenError, OSError) as error:
