@@ -384,7 +384,16 @@ class Collector:
         phase: Phase,
         activity_ids: tuple[ActivityId, ...],
     ) -> None:
-        assert self._current_scenario is not None
+        if self._current_scenario is None:
+            # A `@given` fixture scoped wider than `function` records even
+            # when no scenario is active, so this is reachable from an
+            # unannotated test pulling that fixture in.
+            raise PytestGivenError(
+                f'step activity= requires a scenario to scope against, but '
+                f'this step was recorded outside one — an unannotated test '
+                f'pulled in a fixture that records it '
+                f'(phase={phase!r}, ids={list(activity_ids)}).'
+            )
         story_id = self._current_scenario.story_id
         story = self._discovered_stories[story_id] if story_id is not None else None
         if story is None:

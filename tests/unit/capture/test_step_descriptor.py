@@ -1101,6 +1101,24 @@ def test_push_step_requires_story_when_activity_ids_given() -> None:
         )
 
 
+def test_push_step_activity_without_scenario_is_a_user_error() -> None:
+    """A `@given` fixture scoped wider than `function` records even when no
+    scenario is active — an unannotated test pulled it in. `activity=` there
+    has no scenario to scope against, which is the same authoring mistake as a
+    scenario without a story, and earns the same error rather than an assert.
+    """
+    collector = Collector()
+    descriptor = given('a wide arrangement')
+    recording = FixtureRecording(
+        root=Step(phase='given', narration=Narration(text='a wide arrangement'))
+    )
+    with collector.fixture_setup(recording, descriptor):
+        with pytest.raises(PytestGivenError, match='requires a scenario'):
+            collector.push_step(
+                'given', Narration(text='a thing'), activity_ids=(ActivityId(1),)
+            )
+
+
 # --- Gated step-source capture (narration-lint anchors) ---
 
 

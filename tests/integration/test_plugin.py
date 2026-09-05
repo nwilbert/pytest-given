@@ -1916,6 +1916,39 @@ def test_step_activity_without_scenario_story_raises(pytester):
     result.stdout.fnmatch_lines(['*step activity= requires a story on the scenario*'])
 
 
+def test_step_activity_in_wide_fixture_without_scenario_reports_the_cause(pytester):
+    """A wider-than-function `@given` fixture records even for an unannotated
+    test, so `activity=` in its body has no scenario to scope against. That is
+    an authoring mistake and must name itself, not surface as an assert."""
+    pytester.makepyfile("""
+        import pytest
+        from pytest_given import Glossary, activity, given, scenario, story
+
+        g = Glossary()
+        s = story('Wide', [activity(g.actor('Guest'), g.verb('search'),
+                                    g.work_object('Room'), activity_id=1)])
+
+        @pytest.fixture(scope='module')
+        @given('a module-scoped arrangement')
+        def wide():
+            with given('an inner step', activity=1):
+                pass
+            yield 1
+
+        def test_unannotated(wide):
+            assert wide == 1
+
+        @scenario('later', story=s)
+        def test_annotated(wide):
+            with given('something'):
+                pass
+    """)
+    result = pytester.runpytest()
+    assert result.ret != 0
+    result.stdout.fnmatch_lines(['*step activity= requires a scenario*'])
+    assert 'AssertionError' not in result.stdout.str()
+
+
 # --- Session-finish discovery, and what serde leaves out ---
 
 
