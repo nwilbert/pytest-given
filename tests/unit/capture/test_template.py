@@ -143,7 +143,8 @@ def test_template_non_identifier_raises_pytest_given_error(
 
 def test_parse_tstring_literal_only() -> None:
     cup_size = 200  # noqa: F841
-    rendered, parts = parse_tstring(t'just a label')
+    parts = parse_tstring(t'just a label')
+    rendered = narration_text(parts)
     assert rendered == 'just a label'
     assert parts == (NarrationLiteral(value='just a label'),)
 
@@ -155,7 +156,8 @@ def test_parse_tstring_single_interpolation() -> None:
     with given('a t-string step with one interpolated value'):
         cup_size = 200
     with when('the t-string is parsed at runtime'):
-        rendered, parts = parse_tstring(t'a {cup_size} ml cup')
+        parts = parse_tstring(t'a {cup_size} ml cup')
+        rendered = narration_text(parts)
     with then(t'the interpolation becomes a {pg["Narration"]} value part'):
         assert rendered == 'a 200 ml cup'
         assert parts == (
@@ -172,7 +174,8 @@ def test_parse_tstring_single_interpolation() -> None:
 
 def test_parse_tstring_format_spec() -> None:
     n = 7
-    rendered, parts = parse_tstring(t'n={n:03d}')
+    parts = parse_tstring(t'n={n:03d}')
+    rendered = narration_text(parts)
     assert rendered == 'n=007'
     assert parts == (
         NarrationLiteral(value='n='),
@@ -187,7 +190,8 @@ def test_parse_tstring_format_spec() -> None:
 
 def test_parse_tstring_conversion() -> None:
     obj = 'hi'
-    rendered, parts = parse_tstring(t'r={obj!r}')
+    parts = parse_tstring(t'r={obj!r}')
+    rendered = narration_text(parts)
     assert rendered == "r='hi'"
     assert parts == (
         NarrationLiteral(value='r='),
@@ -203,7 +207,8 @@ def test_parse_tstring_conversion() -> None:
 def test_parse_tstring_consecutive_interpolations() -> None:
     a = 1
     b = 2
-    rendered, parts = parse_tstring(t'{a}{b}')
+    parts = parse_tstring(t'{a}{b}')
+    rendered = narration_text(parts)
     assert rendered == '12'
     assert parts == (
         NarrationValue(rendered='1', expression='a', format_spec='', conversion=None),
@@ -218,7 +223,8 @@ def test_parse_tstring_expression() -> None:
     with given('a t-string step interpolating a computed expression'):
         price = 10
     with when('the t-string is parsed'):
-        rendered, parts = parse_tstring(t'cost: {price * 1.2}')
+        parts = parse_tstring(t'cost: {price * 1.2}')
+        rendered = narration_text(parts)
     with then(t'the {pg["Value highlight"]} part records the full expression'):
         assert rendered == 'cost: 12.0'
         assert parts[1] == NarrationValue(
@@ -234,7 +240,7 @@ def test_parse_tstring_accepts_templatelib_template() -> None:
     cup_size = 200
     tpl = t'{cup_size}'
     assert isinstance(tpl, templatelib.Template)
-    rendered, _ = parse_tstring(tpl)
+    rendered = narration_text(parse_tstring(tpl))
     assert rendered == '200'
 
 
@@ -257,7 +263,7 @@ def test_tstring_with_actor_emits_term_ref(glossary: Glossary) -> None:
     with given(t'an {pg["Actor"]} handle from the glossary'):
         guest = glossary.actor('Guest')  # idempotent re-fetch
     with when('the handle is interpolated into a t-string step'):
-        _, parts = parse_tstring(t'a {guest} arrives')
+        parts = parse_tstring(t'a {guest} arrives')
     with then(t'the step carries a {pg["Term ref"]} for that {pg["Actor"]}'):
         assert any(
             isinstance(p, NarrationTermRef)
@@ -271,7 +277,7 @@ def test_tstring_with_actor_instance_emits_term_ref_with_instance_display(
     glossary: Glossary,
 ) -> None:
     guest = glossary.actor('Guest')
-    _, parts = parse_tstring(t'{guest("Alice")} arrives')
+    parts = parse_tstring(t'{guest("Alice")} arrives')
     term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
     assert len(term_refs) == 1
     assert term_refs[0].term_id == 'guest'
@@ -285,7 +291,7 @@ def test_tstring_with_work_object_emits_term_ref(glossary: Glossary) -> None:
     with given(t'a {pg["Work Object"]} handle from the glossary'):
         room = glossary.work_object('Room')
     with when('it is interpolated into a t-string step'):
-        _, parts = parse_tstring(t'the {room} is clean')
+        parts = parse_tstring(t'the {room} is clean')
     with then(t'the step carries a {pg["Term ref"]} for that {pg["Work Object"]}'):
         term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
         assert term_refs[0].term_id == 'room'
@@ -294,7 +300,7 @@ def test_tstring_with_work_object_emits_term_ref(glossary: Glossary) -> None:
 
 def test_tstring_with_work_object_instance_emits_term_ref(glossary: Glossary) -> None:
     room = glossary.work_object('Room')
-    _, parts = parse_tstring(t'the {room("Deluxe Suite")} is clean')
+    parts = parse_tstring(t'the {room("Deluxe Suite")} is clean')
     term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
     assert term_refs[0].display == 'Deluxe Suite'
 
@@ -308,7 +314,7 @@ def test_tstring_with_verb_emits_term_ref_with_canonical_display(
     with given(t'a {pg["Verb"]} handle used without an {pg["Inflection"]}'):
         search = glossary.verb('search')
     with when('it is interpolated into a t-string step'):
-        _, parts = parse_tstring(t'they {search}')
+        parts = parse_tstring(t'they {search}')
     with then(t'the {pg["Term ref"]} shows the canonical verb'):
         term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
         assert term_refs[0].display == 'search'
@@ -323,7 +329,7 @@ def test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display(
     with given(t'a {pg["Verb"]} handle called with an {pg["Inflection"]}'):
         search = glossary.verb('search')
     with when('it is interpolated into a t-string step'):
-        _, parts = parse_tstring(t'they {search("searches for")} a room')
+        parts = parse_tstring(t'they {search("searches for")} a room')
     with then(t'the {pg["Term ref"]} shows the inflection but keeps the verb id'):
         term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
         assert term_refs[0].display == 'searches for'
@@ -334,13 +340,13 @@ def test_tstring_with_plain_value_still_emits_narration_value(
     glossary: Glossary,
 ) -> None:
     name = 'Alice'
-    _, parts = parse_tstring(t'hi {name}')
+    parts = parse_tstring(t'hi {name}')
     assert any(isinstance(p, NarrationValue) for p in parts)
 
 
 def test_tstring_rendered_text_uses_display_for_term_refs(glossary: Glossary) -> None:
     guest = glossary.actor('Guest')
-    text, _ = parse_tstring(t'the {guest("Alice")} arrives')
+    text = narration_text(parse_tstring(t'the {guest("Alice")} arrives'))
     assert text == 'the Alice arrives'
 
 
@@ -349,7 +355,7 @@ def test_tstring_rendered_text_uses_display_for_term_refs(glossary: Glossary) ->
 
 def test_tstring_with_term_ref_populates_expression(glossary: Glossary) -> None:
     guest = glossary.actor('Guest')
-    _, parts = parse_tstring(t'a {guest} arrives')
+    parts = parse_tstring(t'a {guest} arrives')
     ref = next(p for p in parts if isinstance(p, NarrationTermRef))
     assert ref.expression == 'guest'
 
@@ -408,7 +414,7 @@ def test_tstring_with_file_term_handle_emits_term_ref(
     with given(t'a {pg["Deferred term"]} from a {pg["File glossary"]}'):
         guest = file_glossary['Guest']
     with when('it is interpolated into a t-string step', activity=4):
-        _, parts = parse_tstring(t'a {guest} arrives')
+        parts = parse_tstring(t'a {guest} arrives')
     with then(t'the step carries a single {pg["Term ref"]}'):
         term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
         assert len(term_refs) == 1
@@ -420,7 +426,7 @@ def test_tstring_with_file_term_instance_emits_term_ref_with_override_display(
     file_glossary: FileGlossary,
 ) -> None:
     guest = file_glossary['Guest']
-    _, parts = parse_tstring(t'{guest("Alice")} books a room')
+    parts = parse_tstring(t'{guest("Alice")} books a room')
     term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
     assert len(term_refs) == 1
     assert term_refs[0].term_id == 'guest'

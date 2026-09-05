@@ -14,7 +14,6 @@ from ..model import (
     NarrationValue,
     PytestGivenError,
     narration_of,
-    narration_text,
     param_id,
     placeholder_value,
     render_interpolation,
@@ -66,7 +65,7 @@ def narration_from(value: StepText | Narration) -> Narration:
         # Through `narration_of` like the `Template` branch below, rather than
         # pairing text and parts by hand: one constructor, one place the
         # text-renders-its-parts invariant is established.
-        return narration_of(parse_tstring(value)[1])
+        return narration_of(parse_tstring(value))
     if isinstance(value, Template):
         # Text derived from the parts, never the raw template string: a
         # placeholder renders as its bare `{name}` token, so `'{amount:.2f}'`
@@ -114,8 +113,8 @@ class Template:
 
 def parse_tstring(
     tstring: templatelib.Template,
-) -> tuple[str, tuple[NarrationPart, ...]]:
-    """Convert a t-string Template into (rendered text, structured parts).
+) -> tuple[NarrationPart, ...]:
+    """Convert a t-string Template into its structured parts.
 
     An interpolation of a glossary handle (or one of its instances) records a
     `NarrationTermRef`; every other value records a `NarrationValue`.
@@ -147,7 +146,7 @@ def parse_tstring(
                         conversion=conversion,
                     )
                 )
-    return narration_text(parts), tuple(parts)
+    return tuple(parts)
 
 
 def try_term_ref(
