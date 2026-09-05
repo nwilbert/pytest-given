@@ -77,11 +77,14 @@ What no filename tells you:
   report carries and serde rebuilds, and `capture/glossary.py` subclasses it
   with the registration API, which needs a caller source location that the leaf
   may not reach for. `pytest_given.Glossary` is the subclass; everything
-  internal annotates the base.
+  internal annotates the base. `LookupGlossary` sits between them and owns the
+  `g['Guest']` read-back both user-facing glossaries share.
 - Each package exposes the *whole* job, not its parts: `report.emit_sinks`
   (render → write → discard-on-failure, so a failure leaves no half-written
-  report) and `lint.run_lint`. Both entry points go through them, which is what
-  keeps `pytest-given report` behaving like the plugin.
+  report) and `lint.run_lint`. Both entry points reach the sinks through
+  `emit_sinks`, which is what keeps `pytest-given report` behaving like the
+  plugin; the lint is the plugin's alone, since the CLI re-renders a report
+  rather than running a suite.
 
 `tests/` splits `unit/` (no pytest session needed) from `integration/`, which drives the plugin end to end through `pytester` inner runs (enabled by the root `conftest.py`). Narration written inside an inner run belongs to *that* run's collector — only the outer, decorated test reaches the self-report.
 

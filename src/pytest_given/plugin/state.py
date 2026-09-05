@@ -10,8 +10,8 @@ clobbering — the outer session's. The keys are private and the two seeders are
 the only writers, so "one writer each" is enforced rather than asked for.
 
 `scenario_marker` is here for the same reason the accessors are: it reads what
-a test function declared, three of this package's modules ask it, and none of
-them owns the answer.
+a test function declared, and none of the hooks that ask owns the answer. It
+adds only the `.function` hop — reading the marker itself is `capture`'s.
 """
 
 from dataclasses import dataclass, field

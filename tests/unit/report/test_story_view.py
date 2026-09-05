@@ -52,9 +52,7 @@ def _meta() -> Metadata:
 
 def test_tab_visibility_only_scenarios_visible_with_empty_report() -> None:
     rd = ReportData(metadata=_meta())
-    assert tab_visibility(rd) == TabVisibility(
-        scenarios=True, stories=False, glossary=False
-    )
+    assert tab_visibility(rd) == TabVisibility(stories=False, glossary=False)
     assert tab_visibility(rd).visible_count == 1
 
 

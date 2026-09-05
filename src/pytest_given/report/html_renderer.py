@@ -59,18 +59,17 @@ type ParamColorMap = dict[str, int]
 class TabVisibility:
     """Which browse tabs a report has anything to show in."""
 
-    scenarios: bool
     stories: bool
     glossary: bool
 
     @property
     def visible_count(self) -> int:
-        return sum((self.scenarios, self.stories, self.glossary))
+        """Scenarios is always one of them, so the other two are the count."""
+        return 1 + self.stories + self.glossary
 
 
 def tab_visibility(report: ReportData) -> TabVisibility:
     return TabVisibility(
-        scenarios=True,
         stories=bool(report.stories),
         glossary=bool(report.glossary is not None and report.glossary.terms),
     )

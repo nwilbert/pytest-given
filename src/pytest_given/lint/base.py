@@ -56,11 +56,10 @@ class RawFinding:
 class Finding(RawFinding):
     """A raw finding resolved against the configuration, ready to print.
 
-    Extends `RawFinding` rather than restating its four fields — the same
-    reason `ast_rules._Resolved` extends its own base: the `**vars()` splat
-    that builds one then supplies exactly the base's fields by construction,
-    so a field added to `RawFinding` cannot be silently dropped on the way
-    through `_resolved`.
+    Extends `RawFinding` rather than restating its four fields: the `**vars()`
+    splat that builds one then supplies exactly the base's fields by
+    construction, so a field added to `RawFinding` cannot be silently dropped
+    on the way through `_resolved`.
     """
 
     severity: Severity
