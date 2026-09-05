@@ -3,9 +3,6 @@
 from pathlib import Path
 
 from ..model import (
-    Glossary as BaseGlossary,
-)
-from ..model import (
     GlossaryTerm,
     PytestGivenError,
     TermId,
@@ -13,8 +10,8 @@ from ..model import (
     id_derive,
 )
 from .glossary import (
+    LookupGlossary,
     TermHandle,
-    handle_or_raise,
     normalize_definition,
     register_or_conflict,
 )
@@ -30,11 +27,11 @@ _KIND_ALIASES: dict[str, TermKind] = {
 }
 
 
-class FileGlossary(BaseGlossary):
+class FileGlossary(LookupGlossary):
     """Glossary loaded from a Markdown file. Access terms by name: g['Guest'].
 
     A `Glossary` rather than a wrapper around one: everything that consumes a
-    glossary — `resolve_glossary`, the report model, `handle_or_raise` — wants
+    glossary — `resolve_glossary`, the report model, the name lookup — wants
     the storage, and an `isinstance` that answered False for half the user-
     facing glossaries made every one of those sites carry a second arm.
     """
@@ -48,7 +45,6 @@ class FileGlossary(BaseGlossary):
         kind_column: ColumnSpec | None = None,
     ) -> None:
         super().__init__()
-        self._handles: dict[TermId, TermHandle] = {}
         self._path = Path(path)
         try:
             text = self._path.read_text(encoding='utf-8')
@@ -95,9 +91,6 @@ class FileGlossary(BaseGlossary):
                 f"'actor', 'object'/'work object', 'verb'."
             )
         return mapped
-
-    def __getitem__(self, name: str) -> TermHandle:
-        return handle_or_raise(self, name, self._handles)
 
     def __call__(self, name: str) -> TermHandle:
         # A FileGlossary is a closed vocabulary: the call form looks up only,

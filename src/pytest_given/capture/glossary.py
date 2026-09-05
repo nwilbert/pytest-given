@@ -19,7 +19,38 @@ from ..model import (
 from .source import capture_caller_source
 
 
-class Glossary(BaseGlossary):
+class LookupGlossary(BaseGlossary):
+    """A glossary that reads a term back by name, as `g['Guest']`.
+
+    Both user-facing glossaries do this, and both have to hand back the *same*
+    handle for a repeated lookup — so the cache that guarantees it lives here
+    rather than once per subclass, where it was also the reason the lookup had
+    to take it as an argument.
+    """
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        self._handles: dict[TermId, TermHandle] = {}
+
+    def __getitem__(self, name: str) -> TermHandle:
+        """Name-based, case-insensitive get-only lookup. Raises
+        `PytestGivenError` with a did-you-mean hint on an unknown name."""
+        term_id = TermId(id_derive(name))
+        if term_id in self._handles:
+            return self._handles[term_id]
+        term = self.get(term_id)
+        if term is None:
+            close = difflib.get_close_matches(
+                name, [candidate.canonical for candidate in self.terms], n=3
+            )
+            hint = f' Did you mean: {", ".join(close)}?' if close else ''
+            raise PytestGivenError(f'no glossary term named {name!r}.{hint}')
+        handle = TermHandle(_term=term, _glossary=self)
+        self._handles[term_id] = handle
+        return handle
+
+
+class Glossary(LookupGlossary):
     """The user-facing glossary: the model's storage plus the registration API.
 
     Every registration below is idempotent for an *exactly* repeated one — kind,
@@ -27,10 +58,6 @@ class Glossary(BaseGlossary):
     definition supplied only the first time included. Re-reading a term declared
     elsewhere is `g[name]`, which never registers.
     """
-
-    def __post_init__(self) -> None:
-        super().__post_init__()
-        self._handles: dict[TermId, TermHandle] = {}
 
     def _declare(
         self, kind: TermKind | None, name: str, definition: str | None
@@ -54,10 +81,6 @@ class Glossary(BaseGlossary):
     def __call__(self, name: str, definition: str | None = None) -> TermHandle:
         """Declare-or-get a term whose kind inference will settle later."""
         return self._declare(None, name, definition)
-
-    def __getitem__(self, name: str) -> TermHandle:
-        """Get-only lookup; an unknown name raises with a did-you-mean hint."""
-        return handle_or_raise(self, name, self._handles)
 
 
 def normalize_definition(definition: str | None) -> str | None:
@@ -235,27 +258,3 @@ def register_or_conflict(
         raise PytestGivenError(conflict_message(existing))
     glossary.register(term)
     return term
-
-
-def handle_or_raise(
-    glossary: BaseGlossary,
-    name: str,
-    handle_cache: dict[TermId, TermHandle],
-) -> TermHandle:
-    """Name-based, case-insensitive get-only lookup. Raises PytestGivenError
-    with a did-you-mean hint on an unknown name. Shared by the code glossary's
-    g[...] / g(...) lookups and FileGlossary — both of which pass their own
-    cache, so a repeated lookup returns the same handle either way."""
-    term_id = TermId(id_derive(name))
-    if term_id in handle_cache:
-        return handle_cache[term_id]
-    term = glossary.get(term_id)
-    if term is None:
-        close = difflib.get_close_matches(
-            name, [candidate.canonical for candidate in glossary.terms], n=3
-        )
-        hint = f' Did you mean: {", ".join(close)}?' if close else ''
-        raise PytestGivenError(f'no glossary term named {name!r}.{hint}')
-    handle = TermHandle(_term=term, _glossary=glossary)
-    handle_cache[term_id] = handle
-    return handle
