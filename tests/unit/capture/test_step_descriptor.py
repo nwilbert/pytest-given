@@ -16,7 +16,11 @@ from pytest_given.capture.collector import (
     set_active_collector,
 )
 from pytest_given.capture.scenario import scenario
-from pytest_given.capture.source import restore_rootdir, set_rootdir
+from pytest_given.capture.source import (
+    _co_filename_to_path,
+    restore_rootdir,
+    set_rootdir,
+)
 from pytest_given.capture.steps import (
     StepDescriptor,
     attach,
@@ -193,7 +197,12 @@ def test_when_then_warning_points_at_the_test_file() -> None:
             pass
     finally:
         set_active_collector(None)
-    assert [w.filename for w in caught] == [__file__, __file__]
+    # `w.filename` is the frame's `co_filename`, whose convention is fixed when
+    # the `.pyc` is compiled, while `__file__` follows the running interpreter —
+    # a shared WSL+Windows checkout hands us one of each. Fold both so this
+    # asserts which file the warning points at, not which convention named it.
+    here = _co_filename_to_path(__file__)
+    assert [_co_filename_to_path(w.filename) for w in caught] == [here, here]
 
 
 def test_attach_without_collector_raises() -> None:
