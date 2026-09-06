@@ -162,6 +162,13 @@ given_lint_ignore = [
     # `collector.attach(...)` is the call under test here, not a narration
     # attachment; `empty-step` matches the method name whatever the receiver.
     "empty-step: tests/unit/capture/test_collector.py::test_attach_outside_any_step_raises",
+    # Same shape one level up: `attach(...)` is the action being rejected, so
+    # the step is an action, not a bare attachment.
+    "empty-step: tests/unit/capture/test_step_descriptor.py::test_attach_rejects_a_non_str_label*",
+    # `phase_name` picks the phase factory in the given block, and the body
+    # reaches it through `open_template_step`'s closure — used, but not by a
+    # name the rule can see in the step body.
+    "unused-interpolation: tests/unit/capture/test_step_descriptor.py::test_phase_with_pytest_given_template_as_context_manager_raises*",
 ]
 
 [tool.mypy]
