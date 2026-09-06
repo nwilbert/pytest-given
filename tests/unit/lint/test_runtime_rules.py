@@ -218,8 +218,8 @@ def _dead_term_findings(glossary, grouped=(), stories=()):
 
 
 @scenario(
-    t'{pg["Narration lint"]} flags a {pg["Term"].low} that no {pg["Step"].low} or '
-    t'{pg["Story"].low} references',
+    t'{pg["Narration lint"]} flags a {pg["Term"].low} referenced by no '
+    t'{pg["Scenario"].low} name, {pg["Step"].low} or {pg["Story"].low}',
     story=adopt_pytest_given,
 )
 def test_dead_term_flags_unreferenced_term() -> None:
@@ -233,8 +233,9 @@ def test_dead_term_flags_unreferenced_term() -> None:
     with then(t'the {pg["Finding"].low} names the unreferenced {pg["Term"].low}'):
         [finding] = findings
         assert finding.subject == 'ghost-term'
-        assert (
-            finding.message == "term 'Ghost term' is referenced by no step and no story"
+        assert finding.message == (
+            "term 'Ghost term' is referenced by no scenario name, "
+            'no step and no story activity'
         )
     with then(t'its {pg["Severity"].low} is off — the rule is opt-in'):
         # Catalog default; `apply_config` drops it unless the suite opts in.

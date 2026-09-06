@@ -414,7 +414,10 @@ def test_dead_term_opt_in_flags_unreferenced_term(pytester):
         'given_lint_rules=dead-term=warn',
     )
     result.stdout.fnmatch_lines(
-        ["*WARN*dead-term*guest*term 'Guest' is referenced by no step and no story*"]
+        [
+            "*WARN*dead-term*guest*term 'Guest' is referenced by no scenario name, "
+            'no step and no story activity*'
+        ]
     )
 
 

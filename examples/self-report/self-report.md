@@ -297,7 +297,7 @@
 - **then** the lint runs and its error finding fails the run
 
 ## ✓ An error «finding» leaves a more specific exit code alone
-`tests/integration/test_plugin_lint.py:433::test_lint_error_does_not_mask_a_more_specific_exit_code`
+`tests/integration/test_plugin_lint.py:436::test_lint_error_does_not_mask_a_more_specific_exit_code`
 
 - **given** a suite whose lint would fail, under a stale ignore entry
   - 📎 suite:
@@ -318,7 +318,7 @@
 - **then** the run keeps NO_TESTS_COLLECTED rather than reporting a test failure
 
 ## ✓ A failure inside the lint keeps the «report» it was handed
-`tests/integration/test_plugin_lint.py:452::test_a_lint_failure_is_reported_and_keeps_the_written_report` · validation
+`tests/integration/test_plugin_lint.py:455::test_a_lint_failure_is_reported_and_keeps_the_written_report` · validation
 
 - **given** a clean suite and a lint pass that raises
 - **when** the suite runs with an HTML sink
@@ -1630,7 +1630,7 @@
 - **when** the runtime «rules» run
 - **then** a single warn «finding» names the «tag», the «term» it shadows, and both scenarios
 
-## ✓ «Narration lint» flags a «term» that no «step» or «story» references
+## ✓ «Narration lint» flags a «term» referenced by no «scenario» name, «step» or «story»
 `tests/unit/lint/test_runtime_rules.py:220::test_dead_term_flags_unreferenced_term`
 
 - **given** a «glossary» holding one unreferenced «term»
