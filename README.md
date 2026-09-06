@@ -72,7 +72,7 @@ Increasingly those tests aren't hand-written at all: a human describes a scenari
 
 ### `@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)`
 
-Required for a test to appear in the report. `story=` / `activities=` bind it to a domain story (see [Domain Storytelling](#domain-storytelling)) — `activities=` takes an `int` or a sequence of them, never a string; `group_parametrized=False` declines parametrize merging. The decorated function is returned unwrapped.
+Required for a test to appear in the report. `story=` / `activities=` bind it to a domain story (see [Domain Storytelling](#domain-storytelling)) — `activities=` requires `story=` and takes an `int` or a sequence of them, never a string; `group_parametrized=False` declines parametrize merging. The decorated function is returned unwrapped.
 
 ### `given(text)`, `when(text)`, `then(text)`
 
@@ -122,7 +122,7 @@ def test_rejects_underpayment(
         buy_coffee(machine, cents)
 ```
 
-A `Template` placeholder renders as `{col}` in the grouped view and as the concrete value per row. A t-string is rejected here, and so are `when`/`then` — the parameter value isn't in scope at definition time, and the action and outcome live in the test body.
+A `Template` placeholder renders as `{col}` in the grouped view and as the concrete value per row. `when`/`then` are rejected here — the action and its outcome belong in the test body.
 
 As a helper-function decorator (any phase). The helper records its own step on each call; for dynamic narration, use `pytest_given.Template` and reference the helper's parameters:
 
@@ -226,7 +226,7 @@ What a column cannot carry is a case that narrates a *different sentence*. When 
 | 3 | An interpolation naming a parametrize column that no longer holds the case's value | Rename the local that rebound the name — or, if the body mutated the value in place before narrating it, bind the result to its own name and narrate that |
 | 4 | A term ref that names a different term or reads differently between cases — including one bound to a parametrize column | Split the term ref from the value: `given(t"{pg['Customer']} {name} places an order")` |
 | 5 | A step whose set of `attach` labels differs between cases | Keep the label constant and let the content vary — that's what the attachment column is for |
-| 6 | Passed cases that narrate different templates — a different step structure, a differently shaped narration, different wording, or a different interpolated expression | Decline the merge with `@scenario(..., group_parametrized=False)` and let each case be its own scenario |
+| 6 | Passed cases that narrate different templates — a different step structure, a differently shaped narration, different wording, a different interpolated expression, or a step pinned to different activities | Decline the merge with `@scenario(..., group_parametrized=False)` and let each case be its own scenario (for a varying `activity=` pin, give the step one activity instead) |
 
 ### Domain Storytelling
 
@@ -277,7 +277,7 @@ with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
     ...
 ```
 
-**Kinds** — a term's kind is either declared (`g.actor(...)` / `g.work_object(...)` / `g.verb(...)`, or a `kind_column`) or **inferred from story activity-slot positions** at session finish: position 0 → actor, odd positions → verb, even positions ≥ 2 → work object. A declared kind is never silently overridden — it is checked against its slot when `activity(...)` is constructed, so misplacing it raises `PytestGivenError` naming the term and its kind. Inference then handles only the undeclared terms, and raises at session finish if one turns up in both a verb slot and a noun slot; add a `kind_column` to disambiguate.
+**Kinds** — a term's kind is either declared (`g.actor(...)` / `g.work_object(...)` / `g.verb(...)`, or a `kind_column`) or **inferred from story activity-slot positions** at session finish: position 0 → actor, odd positions → verb, even positions ≥ 2 → work object. A declared kind is never silently overridden — it is checked against its slot when `activity(...)` is constructed, so misplacing it raises `PytestGivenError` naming the term and its kind. Inference then handles only the undeclared terms, and raises at session finish if one turns up in a verb slot and an actor or noun slot; add a `kind_column` to disambiguate.
 
 **Kindless and undefined terms** — a term no story activity references stays kindless; on a code-defined glossary `g('foo')` declares one the team hasn't classified yet (`g['foo']` only looks up, and raises if unknown), showing an *Undefined* badge until `definition=` is supplied. Every declared term reaches the report, referenced or not; kindless ones render under a neutral wash and collect under **Uncategorized** in the Glossary tab.
 
@@ -323,7 +323,7 @@ def test_select_suite(carol):
         ...
 ```
 
-Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it; selecting an activity offers *Open in Scenarios*, which filters the Scenarios view down to those scenarios. A step can also bind explicitly with `given(text, activity=...)`, naming an activity by its 1-based position in the story; pass `activity(..., activity_id=N)` to fix a row's number so inserting a row later doesn't renumber the pins after it. `@scenario(..., activities=[2, 3])` narrows a scenario to those 1-based activity numbers, so it can cover no others.
+Each step's term references are matched against the story's activities to compute coverage. The Stories tab shows the timeline with a coverage chip per activity and the scenarios that touch it; selecting an activity offers *Open in Scenarios*, which filters the Scenarios view down to those scenarios. A step can also bind explicitly with `given(text, activity=...)`, naming an activity by its 1-based position in the story; pass `activity(..., activity_id=N)` to fix a row's number so inserting a row later doesn't renumber the pins after it. `@scenario(..., activities=[2, 3])` requires `story=` and narrows the scenario to those activity ids, so it can cover no others.
 
 The [domain-storytelling](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-07-domain-storytelling-design.md) and [file-backed glossary](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-18-file-backed-glossary-design.md) design specs carry the full surface; the [examples](#examples) show it end to end.
 
@@ -377,9 +377,9 @@ Each rule has a fixed default severity; there is no master level. A `warn` findi
 | `missing-phase` | `warn` | A passed scenario that doesn't cover all three Given/When/Then phases. Fixture `@given`s and `Annotated[..., given(...)]` parameters count; each logical scenario is evaluated once regardless of parametrization. |
 | `check-outside-then` | `warn` | An `assert` inside a `given` or `when` (the `when` half of a `when_then` pair is exempt). |
 | `action-in-then` | `warn` | A scenario where no `when` performs an action and a `then` folds the action into its assertion. |
-| `unused-interpolation` | `warn` | A t-string narration that interpolates `{name}` but never uses `name` in the step body. |
+| `unused-interpolation` | `warn` | A `with`-anchored step whose narration interpolates `{name}` — a t-string value or a parameter-table placeholder — that the step body never uses. |
 | `tag-shadows-term` | `warn` | A scenario tag whose slug duplicates a glossary term — one concept named through two mechanisms. |
-| `dead-term` | `off` | A glossary term referenced by no step narration and no story activity. Opt in on suites whose glossary is meant to be fully exercised. |
+| `dead-term` | `off` | A glossary term referenced by no scenario or step narration and no story activity. Opt in on suites whose glossary is meant to be fully exercised. |
 
 Override severities per rule with `given_lint_rules`, and exempt individual subjects with `given_lint_ignore` — bare node-id globs, or scoped to one rule with a `rule-id:` prefix:
 
