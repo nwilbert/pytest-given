@@ -42,11 +42,6 @@
 .pg-hero-gwt b {
   font-weight: 700;
 }
-.pg-hero-note {
-  margin: 1rem 0 0;
-  font-size: 0.8rem;
-  opacity: 0.8;
-}
 .pg-hero a:not(.md-button) {
   color: #fff;
   text-decoration: underline;
