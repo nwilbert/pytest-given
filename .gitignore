@@ -21,3 +21,9 @@ docs/superpowers/plans/
 .claude/settings.local.json
 .playwright-mcp/
 .mcp.json
+
+# Documentation site: build output and the copies docs_build stages into docs_dir
+/site/
+/docs/site/examples/
+/docs/site/changelog.md
+/docs/site/assets/

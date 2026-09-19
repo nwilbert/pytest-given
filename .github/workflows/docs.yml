@@ -1,0 +1,61 @@
+name: Docs
+
+# Pull requests get a strict build. Pushes to main publish `/dev/`. Manual
+# dispatch republishes any version — for repairs, not the normal path (the
+# Release workflow publishes `/<major.minor>/` and `latest`).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: mike version to publish (dev, or major.minor)
+        required: true
+        default: dev
+      alias:
+        description: alias to move to that version (empty for none)
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+      - run: uv tool install --python 3.14 nox
+      - run: nox -s docs_build
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # Deploys commit to gh-pages; serialise them rather than race on the push.
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    steps:
+      # Credentials stay: mike pushes gh-pages with them.
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+      - run: uv tool install --python 3.14 nox
+      # mike only builds on the published branch if origin/gh-pages is present
+      # locally; a single-branch checkout would make it start over and the push
+      # would be rejected. The branch does not exist before the first deploy.
+      - run: git fetch --depth=1 origin gh-pages || echo "no gh-pages branch yet"
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - env:
+          VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || 'dev' }}
+          ALIAS: ${{ github.event_name == 'workflow_dispatch' && inputs.alias || '' }}
+        run: nox -s docs_deploy -- "$VERSION" $ALIAS

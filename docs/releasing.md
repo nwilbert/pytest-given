@@ -77,6 +77,21 @@ thing. Nothing is tagged.
 
 - [ ] Add a fresh empty `## [Unreleased]` section to `CHANGELOG.md`.
 
+## Documentation site
+
+The site at <https://nwilbert.github.io/pytest-given/> is built with Zensical and
+published by [mike](https://github.com/squidfunk/mike) into the `gh-pages` branch:
+`/dev/` on every push to `main` (the [Docs workflow](../.github/workflows/docs.yml)),
+`/<major.minor>/` plus the `latest` alias by the `docs` job of the Release workflow
+after a `pypi` release. The site root follows `latest` once a release has been
+published, `dev` before that.
+
+One-time setup, already done: **Settings → Pages → Build and deployment → Source:
+Deploy from a branch → `gh-pages` / `(root)`**. If the site ever needs to be
+republished by hand — a botched `gh-pages` commit, a moved alias — dispatch the
+Docs workflow with the version and alias to publish; it runs the same
+`nox -s docs_deploy` the automated paths use.
+
 ## What the workflow does
 
 | job | runs | notes |

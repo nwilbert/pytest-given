@@ -1,0 +1,11 @@
+# Examples
+
+Four example suites live under [`examples/`](https://github.com/nwilbert/pytest-given/tree/main/examples/), each with its JSON, Markdown, and HTML output committed. Each report below is the committed HTML, served from this site.
+
+- [`coffeeshop/test_coffeeshop.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/coffeeshop/test_coffeeshop.py) · [report](examples/coffeeshop.html) — the core surface: nested step blocks, `@given` fixtures with teardown, text and JSON attachments, t-string interpolation, `Annotated[..., given(...)]` labels, step-recording helpers, parametrize tables, and failure / skip rendering.
+- [`hotel-booking/test_hotel_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/test_hotel_booking.py) · [report](examples/hotel-booking.html) — Domain Storytelling over a code-defined `Glossary`: single- and multi-path `activity(...)` rows, scenarios bound to them with per-activity coverage, and kindless + undefined terms awaiting classification.
+- [`file-glossary-booking/test_file_glossary_booking.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/file-glossary-booking/test_file_glossary_booking.py) · [report](examples/file-glossary-booking.html) — the same over a Markdown `FileGlossary`: name-based term access, kinds inferred from activity slots, one deliberately kindless term.
+- [`self-report/`](https://github.com/nwilbert/pytest-given/tree/main/examples/self-report/) · [report](examples/self-report.html) — pytest-given applied to its own backend suite, narrated in the vocabulary of [`GLOSSARY.md`](https://github.com/nwilbert/pytest-given/blob/main/GLOSSARY.md) (loaded as a `FileGlossary`) and generated from the whole suite rather than a hand-written test file.
+
+Run `nox -s examples` to regenerate the first three, and `nox -s self_report` for the self-report.
+

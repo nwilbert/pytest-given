@@ -1,0 +1,62 @@
+[project]
+site_name = "pytest-given"
+site_description = "A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests."
+site_url = "https://nwilbert.github.io/pytest-given/"
+repo_url = "https://github.com/nwilbert/pytest-given"
+edit_uri = "edit/main/docs/site/"
+docs_dir = "docs/site"
+site_dir = "site"
+
+nav = [
+  { "Home" = "index.md" },
+  { "Getting started" = "getting-started.md" },
+  { "Guide" = [
+    { "Scenarios & steps" = "guide/scenarios.md" },
+    { "Step text & placeholders" = "guide/step-text.md" },
+    { "Parametrized scenarios" = "guide/parametrized.md" },
+    { "Domain Storytelling" = "guide/domain-storytelling.md" },
+    { "Attachments" = "guide/attachments.md" },
+  ] },
+  { "Configuration" = [
+    { "pytest options" = "configuration/pytest-options.md" },
+    { "Narration lint" = "configuration/narration-lint.md" },
+    { "Source links & tracebacks" = "configuration/source-links.md" },
+  ] },
+  { "Standalone CLI" = "cli.md" },
+  { "Examples" = "examples.md" },
+  { "Working with AI agents" = "ai-agents.md" },
+  { "Changelog" = "changelog.md" },
+]
+
+[project.theme]
+features = [
+  "navigation.sections",
+  "navigation.top",
+  "search.suggest",
+  "search.highlight",
+  "content.code.copy",
+  "content.action.edit",
+]
+
+[[project.theme.palette]]
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+scheme = "slate"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
+
+[project.extra.version]
+provider = "mike"
+
+[project.markdown_extensions]
+admonition = {}
+attr_list = {}
+md_in_html = {}
+tables = {}
+toc = { permalink = true }
+pymdownx.superfences = {}
+pymdownx.highlight = { anchor_linenums = true }
+pymdownx.inlinehilite = {}

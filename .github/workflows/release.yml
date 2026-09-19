@@ -211,3 +211,28 @@ jobs:
             --notes-file release-notes.md \
             --target "${COMMIT}" \
             dist/*
+
+  # Publishes this release's docs as /<major.minor>/ and moves `latest` there.
+  # Runs from the same commit the release was tagged at.
+  docs:
+    if: inputs.target == 'pypi'
+    needs: [build, github-release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    steps:
+      # Credentials stay: mike pushes gh-pages with them.
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+      - run: uv tool install --python 3.14 nox
+      - run: git fetch --depth=1 origin gh-pages || echo "no gh-pages branch yet"
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - env:
+          VERSION: ${{ needs.build.outputs.version }}
+        # 0.3.1 publishes as 0.3: a patch release replaces its minor's docs.
+        run: nox -s docs_deploy -- "${VERSION%.*}" latest

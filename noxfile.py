@@ -1,4 +1,5 @@
 import json
+import re
 import shutil
 import tempfile
 import webbrowser
@@ -393,6 +394,72 @@ def examples(session: nox.Session) -> None:
         'toggle; hotel-booking uses the default filter. '
         'file-glossary-booking has no intentional failures.'
     )
+
+
+_DOCS_SITE = Path('docs/site')
+
+# Files the site embeds but that are single-sourced elsewhere in the repo. Each
+# copy lands under docs_dir (Zensical builds everything there and has no
+# exclude list), and every target is gitignored.
+_DOCS_STAGED_FILES = [
+    (Path('CHANGELOG.md'), _DOCS_SITE / 'changelog.md'),
+    (
+        Path('docs/pytest-given-diagram.png'),
+        _DOCS_SITE / 'assets' / 'pytest-given-diagram.png',
+    ),
+    *(
+        (
+            Path('examples') / name / f'{name}.html',
+            _DOCS_SITE / 'examples' / f'{name}.html',
+        )
+        for name in (
+            'coffeeshop',
+            'hotel-booking',
+            'file-glossary-booking',
+            'self-report',
+        )
+    ),
+]
+
+
+def _stage_docs(session: nox.Session) -> None:
+    for source, target in _DOCS_STAGED_FILES:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+        session.log(f'staged {source} -> {target}')
+
+
+@nox.session
+def docs_build(session: nox.Session) -> None:
+    """Stage the embedded reports, changelog and diagram, then build the site."""
+    _sync(session, 'docs')
+    _stage_docs(session)
+    session.run('zensical', 'build', '--strict')
+
+
+@nox.session
+def docs_deploy(session: nox.Session) -> None:
+    """Build the site strictly, then publish it to gh-pages with mike.
+
+    `-- <version> [alias]`: `dev` for main, `<major.minor>` for a release,
+    `latest` as the alias that the site root should follow.
+    """
+    if not 1 <= len(session.posargs) <= 2:
+        session.error('usage: nox -s docs_deploy -- <version> [alias]')
+    version, *aliases = session.posargs
+    _sync(session, 'docs')
+    _stage_docs(session)
+    # mike runs its own (non-strict) build; this one is the gate.
+    session.run('zensical', 'build', '--strict')
+    session.run('mike', 'deploy', '--push', '--update-aliases', version, *aliases)
+    # The site root follows `latest` once a release exists; before that, `dev`.
+    if 'latest' in aliases:
+        session.run('mike', 'set-default', '--push', 'latest')
+    elif version == 'dev':
+        listing = session.run('mike', 'list', silent=True)
+        assert isinstance(listing, str)
+        if not re.search(r'\blatest\b', listing):
+            session.run('mike', 'set-default', '--push', 'dev')
 
 
 @nox.session
