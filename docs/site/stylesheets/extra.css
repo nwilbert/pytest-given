@@ -1,0 +1,82 @@
+/* Aubergine brand colour: links, active nav, tab underline, hero. */
+:root > * {
+  --md-primary-fg-color: #5b2c6f;
+  --md-primary-fg-color--light: #ead9f2;
+  --md-primary-fg-color--dark: #3f1d4e;
+  --md-accent-fg-color: #7a3d94;
+  --md-accent-fg-color--transparent: rgba(91, 44, 111, 0.1);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #c9a6dc;
+  --md-primary-fg-color--light: #e4d3ec;
+  --md-primary-fg-color--dark: #a985c0;
+  --md-accent-fg-color: #d9bce8;
+  --md-accent-fg-color--transparent: rgba(201, 166, 220, 0.14);
+}
+
+/* Home hero */
+.pg-hero {
+  margin: 0 0 2rem;
+  padding: 1.5rem 1.75rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #4a2159 0%, #2e1238 100%);
+  color: #fff;
+}
+.pg-hero-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+.pg-hero-logo {
+  width: 3rem;
+  height: 3rem;
+  flex: none;
+}
+.pg-hero h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+.pg-hero p {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  max-width: 44rem;
+  opacity: 0.95;
+}
+.pg-hero-gwt span {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.pg-hero-gwt b {
+  font-weight: 700;
+}
+.pg-hero-punch {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+}
+.pg-hero a:not(.md-button) {
+  color: #fff;
+  text-decoration: underline;
+}
+.pg-hero code {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+.pg-hero .md-button {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.75);
+}
+.pg-hero .md-button:hover {
+  background: rgba(255, 255, 255, 0.26);
+  border-color: #fff;
+}
+.pg-hero .md-button--primary {
+  background: #fff;
+  color: #3f1d4e;
+  border-color: #fff;
+}

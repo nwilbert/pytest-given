@@ -1,14 +1,22 @@
 # pytest-given
 
-A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests. Inspired by [JGiven](https://jgiven.org/) (Java). The code is the single source of truth — no separate Gherkin DSL.
+A pytest plugin that turns Given/When/Then annotated tests into interactive HTML reports.
+
+**Given** your pytest tests,<br>
+**when** you narrate them with `given` / `when` / `then` (no Gherkin, no separate DSL),<br>
+**then** documentation and behavior fuse into one report.
+
+**What people and agents read is what the code does.**
+
+Inspired by [JGiven](https://jgiven.org/) (Java).
 
 **Documentation: <https://nwilbert.github.io/pytest-given/dev/>**
 
 Live examples:
-- **[Coffeeshop report →](https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html)** — tour of the core features, including `Annotated` `given` labels.
-- **[Hotel-booking report →](https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html)** — Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
-- **[File-glossary report →](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html)** — Domain Storytelling with a Markdown `FileGlossary` and kinds inferred from story activities.
-- **[Self-report →](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html)** — pytest-given run against its own test suite (dogfooding).
+- **[Coffeeshop report](https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html)**: tour of the core features, including `Annotated` `given` labels.
+- **[Hotel-booking report](https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html)**: Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
+- **[File-glossary report](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html)**: Domain Storytelling with a Markdown `FileGlossary` and kinds inferred from story activities.
+- **[Self-report](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html)**: pytest-given run against its own test suite (dogfooding).
 
 ## Quick start
 
@@ -60,7 +68,7 @@ This produces `given-report/report.html` — one file you can open directly in a
 
 Classical BDD tools (Cucumber, behave, pytest-bdd) center on a natural-language DSL like Gherkin, designed so stakeholders can author tests themselves and engineers maintain the glue that binds each step to a Python function.
 
-pytest-given is for the opposite case: **engineers write normal tests, and the plugin turns them into readable documentation**. Stakeholders, domain experts, and engineers on adjacent teams can open the HTML report and follow it without touching the test suite; for the engineers writing the tests, the same narrative gives a domain-focused view of behavior that's easier to scan than raw test code — browsable by tag, glossary term, or module, with text search and status filters.
+pytest-given is for the opposite case: **engineers or their agents write normal tests, and the plugin turns them into readable documentation**. Stakeholders, domain experts, and engineers on adjacent teams can open the HTML report and follow it without touching the test suite; for the engineers writing the tests, the same narrative gives a domain-focused view of behavior that's easier to scan than raw test code — browsable by tag, glossary term, or module, with text search and status filters.
 
 - Plain Python — no Gherkin, no `.feature` files, no parser.
 - Tests stay first-class pytest tests; the report is a by-product.

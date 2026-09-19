@@ -2,11 +2,15 @@
 
 Everything a narrated test uses: the decorator that puts it in the report, and the step context managers that describe it.
 
-## `@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)`
+## `@scenario`
+
+`@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)`
 
 Required for a test to appear in the report. `story=` / `activities=` bind it to a domain story (see [Domain Storytelling](domain-storytelling.md)) — `activities=` requires `story=` and takes an `int` or a sequence of them, never a string; `group_parametrized=False` declines parametrize merging. The decorated function is returned unwrapped.
 
-## `given(text)`, `when(text)`, `then(text)`
+## `given` / `when` / `then`
+
+`given(text)`, `when(text)`, `then(text)`
 
 Dual-purpose: use as a **context manager** inside a test body, or as a **decorator** on a fixture or helper function.
 
@@ -82,7 +86,9 @@ with when('I place a large order'):
 
 Crossing phases is rejected: a `then` opened inside a `when` raises `PytestGivenError`. That covers decorated helpers too — a `@when` helper called from inside a `given` block raises — so a helper used from more than one phase should stay undecorated and be narrated at its call site.
 
-## `when_then(when_text, then_text)`
+## `when_then`
+
+`when_then(when_text, then_text)`
 
 When a single call is both the action under test and the thing you assert about — most often an expected raise — pair it with `pytest.raises` and let `when_then` narrate both an action and its outcome from one `with`:
 

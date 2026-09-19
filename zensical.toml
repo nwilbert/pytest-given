@@ -6,6 +6,7 @@ repo_url = "https://github.com/nwilbert/pytest-given"
 edit_uri = "edit/main/docs/site/"
 docs_dir = "docs/site"
 site_dir = "site"
+extra_css = ["stylesheets/extra.css"]
 
 nav = [
   { "Home" = "index.md" },
@@ -14,23 +15,30 @@ nav = [
     { "Scenarios & steps" = "guide/scenarios.md" },
     { "Step text & placeholders" = "guide/step-text.md" },
     { "Parametrized scenarios" = "guide/parametrized.md" },
-    { "Domain Storytelling" = "guide/domain-storytelling.md" },
     { "Attachments" = "guide/attachments.md" },
-  ] },
-  { "Configuration" = [
-    { "pytest options" = "configuration/pytest-options.md" },
+    { "Domain Storytelling" = "guide/domain-storytelling.md" },
     { "Narration lint" = "configuration/narration-lint.md" },
-    { "Source links & tracebacks" = "configuration/source-links.md" },
+    { "Working with AI agents" = "ai-agents.md" },
   ] },
-  { "Standalone CLI" = "cli.md" },
+  { "Reports" = [
+    { "pytest options" = "configuration/pytest-options.md" },
+    { "Source links & tracebacks" = "configuration/source-links.md" },
+    { "Standalone CLI" = "cli.md" },
+  ] },
   { "Examples" = "examples.md" },
-  { "Working with AI agents" = "ai-agents.md" },
   { "Changelog" = "changelog.md" },
 ]
 
 [project.theme]
+font.text = "Inter"
+font.code = "JetBrains Mono"
+logo = "assets/logo.svg"
+favicon = "assets/favicon.svg"
 features = [
+  "navigation.tabs",
+  "navigation.tabs.sticky",
   "navigation.sections",
+  "toc.integrate",
   "navigation.top",
   "search.suggest",
   "search.highlight",
@@ -38,15 +46,27 @@ features = [
   "content.action.edit",
 ]
 
+# System preference by default; the header button cycles system -> light -> dark.
 [[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
 scheme = "default"
+primary = "custom"
+accent = "custom"
 toggle.icon = "lucide/sun"
 toggle.name = "Switch to dark mode"
 
 [[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
 scheme = "slate"
+primary = "custom"
+accent = "custom"
 toggle.icon = "lucide/moon"
-toggle.name = "Switch to light mode"
+toggle.name = "Switch to system preference"
 
 [project.extra.version]
 provider = "mike"
@@ -56,7 +76,7 @@ admonition = {}
 attr_list = {}
 md_in_html = {}
 tables = {}
-toc = { permalink = true }
+toc = { permalink = true, toc_depth = 2 }
 pymdownx.superfences = {}
 pymdownx.highlight = { anchor_linenums = true }
 pymdownx.inlinehilite = {}

@@ -1,6 +1,6 @@
 # Attachments
 
-## `attach(label, content)`
+`attach(label, content)`
 
 Attach data to the current step. Strings are stored verbatim; other types are JSON-serialized.
 
