@@ -58,7 +58,7 @@ Term ids and story ids are slugs: lowercased, non-alphanumeric runs → `-` (`La
 
 ## Coverage
 
-`{story_id, activity_id, tracked, scenario_ids: [...]}` — the same per-activity coverage the Stories tab renders, one record per activity of every story, in story then activity order. `scenario_ids` are the node ids of the scenarios covering the activity; `tracked: false` marks an activity the report can say nothing about (fewer than two glossary terms and no `activity=` pin reaching it — the Stories tab's "not coverage-tracked"), which is a gap in vocabulary, not in tests. **Read coverage from here rather than recomputing it from `steps[]`**: the matching rule works on term *identities* (display-derived instances with a canonical fallback, pins replacing narration), and reimplementing it from `term_id`s gets the answer wrong.
+`{story_id, activity_id, tracked, scenario_ids: [...]}` — the same per-activity coverage the Stories tab renders, one record per activity of every story, in story then activity order. `scenario_ids` are the node ids of the scenarios covering the activity; `tracked: false` marks an activity the report can say nothing about (fewer than two glossary terms and no `activity=` pin reaching it — the Stories tab's "not coverage-tracked"), which is a gap in vocabulary, not in tests. **Read coverage from here rather than recomputing it from `steps[]`**: the rule is per step, gated by the two-term eligibility, with pins replacing narration — reimplementing it gets the answer wrong.
 
 ## Recipes
 

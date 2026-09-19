@@ -1638,59 +1638,39 @@
 - **then** the «finding» names the unreferenced «term»
 - **then** its «severity» is off — the rule is opt-in
 
-## ✓ A «verb» «activity» ref has one identity regardless of «inflection»
-`tests/unit/report/test_coverage.py:67::test_identity_of_activity_term_ref_verb_ignores_display`
+## ✓ An «activity» is referenced by its «terms», whatever their surface form
+`tests/unit/report/test_coverage.py:40::test_a_refs_collects_term_ids_whatever_the_display`
 
-- **given** a «Verb» written canonically and as an «Inflection»
-- **when** «Coverage» derives each «Term ref» identity
-- **then** both collapse to the one canonical verb identity
+- **given** an «Activity» written with an «Instance» and an «Inflection»
+- **when** «Coverage» collects the «Activity» references
+- **then** they are the «Term» ids alone; words contribute nothing
 
 ## ✓ A branching «activity» unions references across its «paths»
-`tests/unit/report/test_coverage.py:150::test_a_refs_unions_across_multi_path_activity`
+`tests/unit/report/test_coverage.py:66::test_a_refs_unions_across_multi_path_activity`
 
 - **given** an «Activity» that branches into two «Path» alternatives
 - **when** «Coverage» collects the «Activity» references
-- **then** both «Instance» identities across the branches are present
+- **then** the «terms» of both branches are present
 
-## ✓ An «instance» «step» ref adds a canonical fallback
-`tests/unit/report/test_coverage.py:204::test_s_for_step_instance_entity_ref_adds_canonical_fallback`
+## ✓ A «step» is referenced by its «terms», whatever their surface form
+`tests/unit/report/test_coverage.py:112::test_s_for_step_collects_term_ids_whatever_the_display`
 
-- **given** a «Step» referring to a named «Instance»
-- **when** «Coverage» computes the identity set for the «Step»
-- **then** it includes the canonical «Term ref» fallback
+- **given** a «Step» naming an «Instance» and an «Inflection»
+- **when** «Coverage» collects the «Step» references
+- **then** they are the «Term» ids alone
 
-## ✓ A «verb» ref always resolves to its canonical identity
-`tests/unit/report/test_coverage.py:219::test_s_for_step_verb_ref_always_canonical`
+## ✓ An «instance» and its bare «term» cover each other
+`tests/unit/report/test_coverage.py:138::test_compute_coverage_matches_instance_and_bare_term_both_ways`
 
-- **given** a «Step» using an «Inflection» of a «Verb»
-- **when** «Coverage» computes its identity set
-- **then** the identity ignores the surface form and stays canonical
-
-## ✓ An unknown «term ref» is skipped
-`tests/unit/report/test_coverage.py:231::test_s_for_step_unknown_term_ref_skipped` · validation
-
-- **given** a «Step» referencing a «Term» not in the glossary
-- **when** «Coverage» computes its identity set
-- **then** the unknown ref contributes nothing to the identity set
-
-## ✓ An «instance» «step» covers a canonical «activity»
-`tests/unit/report/test_coverage.py:255::test_compute_coverage_covers_canonical_activity_via_instance_step`
-
-- **given** a «Story» with a canonical «Activity»
-- **given** a «Scenario» step naming a specific «Instance»
-- **when** «Coverage» is computed against the «Story»
-- **then** «Coverage» reports the «Activity» as covered
-
-## ✓ A canonical «step» does not cover an «instance» «activity»
-`tests/unit/report/test_coverage.py:286::test_compute_coverage_does_not_cover_instance_activity_with_canonical_step`
-
-- **given** an «Activity» anchored to a named «Instance»
-- **given** a «Scenario» step naming only the canonical «Actor»
-- **when** «Coverage» is computed against the «Story»
-- **then** «Coverage» leaves the more specific instance activity uncovered
+- **given** an «Activity» naming a bare «Actor»
+- **given** the same «Activity» naming an «Instance» of that actor
+- **given** a «Step» naming the «Instance», and one naming the bare actor
+- **when** «Coverage» is computed for each pairing
+- **then** the «Instance» «Step» covers the bare «Activity»
+- **then** the bare «Step» covers the «Instance» «Activity»
 
 ## ✓ Promoting a bare word to a «verb» ref drops «coverage» from a «step» that matched
-`tests/unit/report/test_coverage.py:318::test_compute_coverage_lost_when_activity_gains_a_term`
+`tests/unit/report/test_coverage.py:198::test_compute_coverage_lost_when_activity_gains_a_term`
 
 - **given** a «Step» naming two «term refs»
 - **given** the same «Activity» with that middle slot a bare word, then a «Verb» ref
@@ -1699,7 +1679,7 @@
 - **then** the widened «Activity» is no longer covered
 
 ## ✓ A «scenario» «activity» binding constrains «coverage»
-`tests/unit/report/test_coverage.py:372::test_compute_coverage_scenario_constrained_to_activity_ids`
+`tests/unit/report/test_coverage.py:250::test_compute_coverage_scenario_constrained_to_activity_ids`
 
 - **given** a «Story» with two matching activities
 - **given** a «Scenario» «bound» only to activity 1
@@ -1707,21 +1687,21 @@
 - **then** «Coverage» considers only the bound «Activity»
 
 ## ✓ An «activity» with two distinct «terms» is «coverage»-eligible
-`tests/unit/report/test_coverage.py:419::test_is_coverage_eligible_true_for_two_distinct_terms`
+`tests/unit/report/test_coverage.py:297::test_is_coverage_eligible_true_for_two_distinct_terms`
 
 - **given** an «Activity» anchored by two distinct «Term» refs
 - **when** its «Coverage» eligibility is checked
 - **then** it is eligible for «Coverage» tracking
 
 ## ✓ An under-anchored «activity» is not «coverage»-eligible
-`tests/unit/report/test_coverage.py:441::test_is_coverage_eligible_false_for_one_distinct_term`
+`tests/unit/report/test_coverage.py:319::test_is_coverage_eligible_false_for_one_distinct_term`
 
 - **given** an «Activity» that mentions only one distinct «Term»
 - **when** its «Coverage» eligibility is checked
 - **then** it is ineligible — «Coverage» needs at least two anchors
 
 ## ✓ An under-anchored «activity» is never covered by narration matching
-`tests/unit/report/test_coverage.py:471::test_compute_coverage_excludes_under_anchored_activity`
+`tests/unit/report/test_coverage.py:349::test_compute_coverage_excludes_under_anchored_activity`
 
 - **given** a «Story» whose «Activity» is all bare words
 - **given** a «Scenario» narrating one «Term ref»
@@ -1729,7 +1709,7 @@
 - **then** «Coverage» excludes the under-anchored «Activity»
 
 ## ✓ Nested «steps» are walked for «coverage»
-`tests/unit/report/test_coverage.py:496::test_compute_coverage_nested_steps_are_walked`
+`tests/unit/report/test_coverage.py:374::test_compute_coverage_nested_steps_are_walked`
 
 - **given** a «Story» with one canonical «Activity»
 - **given** the covering «term refs» in a nested child «Step»
@@ -1737,15 +1717,15 @@
 - **then** the nested «Step» still counts and the «Activity» is covered
 
 ## ✓ An explicit «step» binding covers an eligible «activity»
-`tests/unit/report/test_coverage.py:533::test_compute_coverage_explicit_step_binding_covers_eligible_activity`
+`tests/unit/report/test_coverage.py:411::test_compute_coverage_explicit_step_binding_covers_eligible_activity`
 
 - **given** a «Story» with a coverage-eligible «Activity»
 - **given** a «Step» «bound» to it explicitly by id
 - **when** «Coverage» is computed against the «Story»
-- **then** «Coverage» counts it directly, without identity matching
+- **then** «Coverage» counts it directly, without narration matching
 
 ## ✓ An explicit binding covers an under-anchored «activity»
-`tests/unit/report/test_coverage.py:562::test_compute_coverage_explicit_binding_covers_under_anchored_activity`
+`tests/unit/report/test_coverage.py:440::test_compute_coverage_explicit_binding_covers_under_anchored_activity`
 
 - **given** a «Story» whose «Activity» is under-anchored
 - **given** a «Step» «bound» to it explicitly by id

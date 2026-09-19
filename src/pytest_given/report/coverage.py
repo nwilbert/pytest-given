@@ -1,15 +1,11 @@
 """Scenario ↔ story-activity coverage matching."""
 
 from dataclasses import dataclass
-from typing import NamedTuple
 
 from ..model import (
     Activity,
     ActivityId,
-    ActivityPart,
     ActivityTermRef,
-    ActivityWord,
-    Glossary,
     NarrationTermRef,
     NodeId,
     ReportData,
@@ -18,15 +14,8 @@ from ..model import (
     Story,
     StoryId,
     TermId,
-    id_derive,
     iter_steps,
 )
-
-
-class Identity(NamedTuple):
-    term_id: TermId
-    instance_id: str | None
-
 
 # Which activities a scenario covers.
 type CoverageMap = dict[NodeId, set[ActivityId]]
@@ -36,10 +25,9 @@ type CoverageMap = dict[NodeId, set[ActivityId]]
 class StoryIndex:
     """A story's activities reduced to what matching needs, built once.
 
-    Depends only on the story and the glossary, so it is shared across every
-    scenario bound to that story instead of rebuilt per scenario — which
-    computes `a_refs` once per activity rather than once per activity per
-    scenario.
+    Depends only on the story, so it is shared across every scenario bound to
+    that story instead of rebuilt per scenario — which computes `a_refs` once
+    per activity rather than once per activity per scenario.
 
     Eligibility is *not* recorded, even though `refs_by_activity` is keyed by
     exactly the eligible activities: the index is built lazily, only for a
@@ -48,14 +36,14 @@ class StoryIndex:
     asks `is_coverage_eligible` again for that reason.
     """
 
-    refs_by_activity: dict[ActivityId, set[Identity]]
-    activities_by_identity: dict[Identity, set[ActivityId]]
+    refs_by_activity: dict[ActivityId, set[TermId]]
+    activities_by_term: dict[TermId, set[ActivityId]]
     ids: set[ActivityId]
 
 
 def build_coverage_map(report: ReportData) -> CoverageMap:
     """Which activities each scenario covers, keyed by node id — empty for one
-    bound to no story, or a report with no glossary to match term refs against.
+    bound to no story.
 
     Each story is indexed once and reused across the scenarios bound to it.
 
@@ -63,9 +51,6 @@ def build_coverage_map(report: ReportData) -> CoverageMap:
     presentation, and it is the only reason `StoryIndex` would have to be part
     of another module's vocabulary.
     """
-    glossary = report.glossary
-    if glossary is None:
-        return {scenario.id: set() for scenario in report.scenarios}
     stories = {story.id: story for story in report.stories}
     indexes: dict[StoryId, StoryIndex] = {}
     result: CoverageMap = {}
@@ -75,12 +60,12 @@ def build_coverage_map(report: ReportData) -> CoverageMap:
             result[scenario.id] = set()
             continue
         if story.id not in indexes:
-            indexes[story.id] = build_story_index(glossary, story)
-        result[scenario.id] = compute_coverage(glossary, scenario, indexes[story.id])
+            indexes[story.id] = build_story_index(story)
+        result[scenario.id] = compute_coverage(scenario, indexes[story.id])
     return result
 
 
-def build_story_index(glossary: Glossary, story: Story) -> StoryIndex:
+def build_story_index(story: Story) -> StoryIndex:
     """Index *story* for matching.
 
     Under-anchored activities (fewer than 2 distinct term refs) are excluded
@@ -89,52 +74,31 @@ def build_story_index(glossary: Glossary, story: Story) -> StoryIndex:
     what the narration cannot, so it reaches them too.
     """
     refs_by_activity = {
-        activity.id: a_refs(glossary, activity)
+        activity.id: a_refs(activity)
         for activity in story.activities
         if is_coverage_eligible(activity)
     }
-    activities_by_identity: dict[Identity, set[ActivityId]] = {}
+    activities_by_term: dict[TermId, set[ActivityId]] = {}
     for aid, refs in refs_by_activity.items():
-        for ident in refs:
-            activities_by_identity.setdefault(ident, set()).add(aid)
+        for term_id in refs:
+            activities_by_term.setdefault(term_id, set()).add(aid)
     return StoryIndex(
         refs_by_activity=refs_by_activity,
-        activities_by_identity=activities_by_identity,
+        activities_by_term=activities_by_term,
         ids={a.id for a in story.activities},
     )
 
 
-def a_refs(glossary: Glossary, activity: Activity) -> set[Identity]:
-    """Identity set used for strict A_refs ⊆ S coverage matching. Every
-    activity participates; words contribute nothing."""
-    out: set[Identity] = set()
-    for activity_path in activity.paths:
-        for part in activity_path.parts:
-            ident = identity_of_part(glossary, part)
-            if ident is not None:
-                out.add(ident)
-    return out
-
-
-def identity_of_part(
-    glossary: Glossary,
-    part: ActivityPart,
-) -> Identity | None:
-    """Identity contributed by a single ActivityPart. Words → None.
-
-    Verbs contribute the canonical (term_id, None); actors/work objects (and
-    kindless terms) contribute an instance identity derived from display."""
-    match part:
-        case ActivityTermRef(term_id=tid, display=display):
-            term = glossary.get(tid)
-            if term is not None and term.kind == 'verb':
-                return Identity(term_id=tid, instance_id=None)
-            return Identity(
-                term_id=tid,
-                instance_id=instance_id_of(glossary, tid, display),
-            )
-        case ActivityWord():
-            return None
+def a_refs(activity: Activity) -> set[TermId]:
+    """The term ids the A_refs ⊆ S rule matches an activity on, across all
+    its paths. Words contribute nothing; an instance or inflection counts as
+    its term, so `guest('Alice')` and `guest` are the same ref."""
+    return {
+        part.term_id
+        for activity_path in activity.paths
+        for part in activity_path.parts
+        if isinstance(part, ActivityTermRef)
+    }
 
 
 def is_coverage_eligible(activity: Activity) -> bool:
@@ -151,9 +115,7 @@ def is_coverage_eligible(activity: Activity) -> bool:
     return len(term_ids) >= 2
 
 
-def compute_coverage(
-    glossary: Glossary, scenario: Scenario, index: StoryIndex
-) -> set[ActivityId]:
+def compute_coverage(scenario: Scenario, index: StoryIndex) -> set[ActivityId]:
     """The activities this scenario covers.
 
     A non-empty `scenario.activity_ids` bounds which can appear at all.
@@ -171,10 +133,10 @@ def compute_coverage(
         if step.activity_ids:
             covered |= {aid for aid in step.activity_ids if aid in scope}
             continue
-        s_cache = s_for_step(glossary, step)
+        s_cache = s_for_step(step)
         candidates: set[ActivityId] = set()
-        for ident in s_cache:
-            candidates |= index.activities_by_identity.get(ident, set())
+        for term_id in s_cache:
+            candidates |= index.activities_by_term.get(term_id, set())
         covered |= {
             aid
             for aid in candidates
@@ -183,40 +145,16 @@ def compute_coverage(
     return covered
 
 
-def s_for_step(glossary: Glossary, step: Step) -> set[Identity]:
-    """Identity set contributed by a step's narration term refs.
-
-    Applies the canonical-fallback rule: entity instance refs contribute
-    both their specific identity and the canonical (term_id, None).
+def s_for_step(step: Step) -> set[TermId]:
+    """The term ids a step's narration term refs contribute, whatever their
+    surface form.
 
     One pass serves a grouped scenario as well as a plain one: rule 4 requires
-    a term ref to read identically in every case, so the grouped tree's displays
-    are every case's.
+    a term ref to read identically in every case, so the grouped tree's term
+    refs are every case's.
     """
-    out: set[Identity] = set()
-    for part in step.narration.parts:
-        if not isinstance(part, NarrationTermRef):
-            continue
-        term = glossary.get(part.term_id)
-        if term is None:
-            continue
-        out.add(Identity(term_id=part.term_id, instance_id=None))
-        if term.kind == 'verb':
-            continue
-        instance_id = instance_id_of(glossary, part.term_id, part.display)
-        if instance_id is not None:
-            out.add(Identity(term_id=part.term_id, instance_id=instance_id))
-    return out
-
-
-def instance_id_of(
-    glossary: Glossary,
-    term_id: TermId,
-    display: str,
-) -> str | None:
-    """None for the canonical display (or an unknown term), otherwise the
-    slug of the display."""
-    term = glossary.get(term_id)
-    if term is None or display == term.canonical:
-        return None
-    return id_derive(display)
+    return {
+        part.term_id
+        for part in step.narration.parts
+        if isinstance(part, NarrationTermRef)
+    }

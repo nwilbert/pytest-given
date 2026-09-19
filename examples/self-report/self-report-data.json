@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-19T07:02:53.294290+00:00",
+    "timestamp": "2026-09-19T07:30:08.411083+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "3bd8f0aadc2e06e37739ea3fce62651367d8e590",
+    "commit_sha": "62b3fac9f09a1108d28d847db103be5d603a3f38",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -26,7 +26,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",
@@ -134,7 +134,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -272,7 +272,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -443,7 +443,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -509,7 +509,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -716,7 +716,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -785,7 +785,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -907,7 +907,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -1000,7 +1000,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -1076,7 +1076,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 75,
+      "duration_ms": 65,
       "steps": [
         {
           "phase": "given",
@@ -1157,7 +1157,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -1247,7 +1247,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -1331,7 +1331,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 77,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -1431,7 +1431,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -1501,7 +1501,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1602,7 +1602,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -1701,7 +1701,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -1823,7 +1823,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -1927,7 +1927,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -2004,7 +2004,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 71,
+      "duration_ms": 67,
       "steps": [
         {
           "phase": "given",
@@ -3676,7 +3676,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -3965,7 +3965,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -4898,7 +4898,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -12891,7 +12891,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -15433,20 +15433,12 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_coverage.py::test_identity_of_activity_term_ref_verb_ignores_display",
+      "id": "tests/unit/report/test_coverage.py::test_a_refs_collects_term_ids_whatever_the_display",
       "narration": {
-        "text": "A verb activity ref has one identity regardless of inflection",
+        "text": "An activity is referenced by its terms, whatever their surface form",
         "parts": [
           {
-            "value": "A "
-          },
-          {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
-          },
-          {
-            "value": " "
+            "value": "An "
           },
           {
             "term_id": "activity",
@@ -15454,12 +15446,15 @@
             "expression": "pg[\"Activity\"].low"
           },
           {
-            "value": " ref has one identity regardless of "
+            "value": " is referenced by its "
           },
           {
-            "term_id": "inflection",
-            "display": "inflection",
-            "expression": "pg[\"Inflection\"].low"
+            "term_id": "term",
+            "display": "terms",
+            "expression": "pg[\"Term\"](\"terms\")"
+          },
+          {
+            "value": ", whatever their surface form"
           }
         ]
       },
@@ -15471,18 +15466,26 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Verb written canonically and as an Inflection",
+            "text": "an Activity written with an Instance and an Inflection",
             "parts": [
               {
-                "value": "a "
+                "value": "an "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
-                "value": " written canonically and as an "
+                "value": " written with an "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]"
+              },
+              {
+                "value": " and an "
               },
               {
                 "term_id": "inflection",
@@ -15499,7 +15502,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "Coverage derives each Term ref identity",
+            "text": "Coverage collects the Activity references",
             "parts": [
               {
                 "term_id": "coverage",
@@ -15507,15 +15510,15 @@
                 "expression": "pg[\"Coverage\"]"
               },
               {
-                "value": " derives each "
+                "value": " collects the "
               },
               {
-                "term_id": "term-ref",
-                "display": "Term ref",
-                "expression": "pg[\"Term ref\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
-                "value": " identity"
+                "value": " references"
               }
             ]
           },
@@ -15527,8 +15530,20 @@
         {
           "phase": "then",
           "narration": {
-            "text": "both collapse to the one canonical verb identity",
-            "parts": []
+            "text": "they are the Term ids alone; words contribute nothing",
+            "parts": [
+              {
+                "value": "they are the "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]"
+              },
+              {
+                "value": " ids alone; words contribute nothing"
+              }
+            ]
           },
           "children": [],
           "attachments": [],
@@ -15541,7 +15556,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 67
+        "line": 40
       },
       "story_id": null,
       "activity_ids": []
@@ -15636,18 +15651,18 @@
         {
           "phase": "then",
           "narration": {
-            "text": "both Instance identities across the branches are present",
+            "text": "the terms of both branches are present",
             "parts": [
               {
-                "value": "both "
+                "value": "the "
               },
               {
-                "term_id": "instance",
-                "display": "Instance",
-                "expression": "pg[\"Instance\"]"
+                "term_id": "term",
+                "display": "terms",
+                "expression": "pg[\"Term\"](\"terms\")"
               },
               {
-                "value": " identities across the branches are present"
+                "value": " of both branches are present"
               }
             ]
           },
@@ -15662,26 +15677,18 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 150
+        "line": 66
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_coverage.py::test_s_for_step_instance_entity_ref_adds_canonical_fallback",
+      "id": "tests/unit/report/test_coverage.py::test_s_for_step_collects_term_ids_whatever_the_display",
       "narration": {
-        "text": "An instance step ref adds a canonical fallback",
+        "text": "A step is referenced by its terms, whatever their surface form",
         "parts": [
           {
-            "value": "An "
-          },
-          {
-            "term_id": "instance",
-            "display": "instance",
-            "expression": "pg[\"Instance\"].low"
-          },
-          {
-            "value": " "
+            "value": "A "
           },
           {
             "term_id": "step",
@@ -15689,7 +15696,15 @@
             "expression": "pg[\"Step\"].low"
           },
           {
-            "value": " ref adds a canonical fallback"
+            "value": " is referenced by its "
+          },
+          {
+            "term_id": "term",
+            "display": "terms",
+            "expression": "pg[\"Term\"](\"terms\")"
+          },
+          {
+            "value": ", whatever their surface form"
           }
         ]
       },
@@ -15701,7 +15716,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Step referring to a named Instance",
+            "text": "a Step naming an Instance and an Inflection",
             "parts": [
               {
                 "value": "a "
@@ -15712,130 +15727,20 @@
                 "expression": "pg[\"Step\"]"
               },
               {
-                "value": " referring to a named "
+                "value": " naming an "
               },
               {
                 "term_id": "instance",
                 "display": "Instance",
                 "expression": "pg[\"Instance\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "Coverage computes the identity set for the Step",
-            "parts": [
-              {
-                "term_id": "coverage",
-                "display": "Coverage",
-                "expression": "pg[\"Coverage\"]"
               },
               {
-                "value": " computes the identity set for the "
-              },
-              {
-                "term_id": "step",
-                "display": "Step",
-                "expression": "pg[\"Step\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "it includes the canonical Term ref fallback",
-            "parts": [
-              {
-                "value": "it includes the canonical "
-              },
-              {
-                "term_id": "term-ref",
-                "display": "Term ref",
-                "expression": "pg[\"Term ref\"]"
-              },
-              {
-                "value": " fallback"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_coverage.py",
-        "line": 204
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_coverage.py::test_s_for_step_verb_ref_always_canonical",
-      "narration": {
-        "text": "A verb ref always resolves to its canonical identity",
-        "parts": [
-          {
-            "value": "A "
-          },
-          {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
-          },
-          {
-            "value": " ref always resolves to its canonical identity"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_coverage",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Step using an Inflection of a Verb",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "step",
-                "display": "Step",
-                "expression": "pg[\"Step\"]"
-              },
-              {
-                "value": " using an "
+                "value": " and an "
               },
               {
                 "term_id": "inflection",
                 "display": "Inflection",
                 "expression": "pg[\"Inflection\"]"
-              },
-              {
-                "value": " of a "
-              },
-              {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
               }
             ]
           },
@@ -15847,7 +15752,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "Coverage computes its identity set",
+            "text": "Coverage collects the Step references",
             "parts": [
               {
                 "term_id": "coverage",
@@ -15855,7 +15760,15 @@
                 "expression": "pg[\"Coverage\"]"
               },
               {
-                "value": " computes its identity set"
+                "value": " collects the "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]"
+              },
+              {
+                "value": " references"
               }
             ]
           },
@@ -15867,65 +15780,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the identity ignores the surface form and stays canonical",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_coverage.py",
-        "line": 219
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_coverage.py::test_s_for_step_unknown_term_ref_skipped",
-      "narration": {
-        "text": "An unknown term ref is skipped",
-        "parts": [
-          {
-            "value": "An unknown "
-          },
-          {
-            "term_id": "term-ref",
-            "display": "term ref",
-            "expression": "pg[\"Term ref\"].low"
-          },
-          {
-            "value": " is skipped"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_coverage",
-      "tags": [
-        "validation"
-      ],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Step referencing a Term not in the glossary",
+            "text": "they are the Term ids alone",
             "parts": [
               {
-                "value": "a "
-              },
-              {
-                "term_id": "step",
-                "display": "Step",
-                "expression": "pg[\"Step\"]"
-              },
-              {
-                "value": " referencing a "
+                "value": "they are the "
               },
               {
                 "term_id": "term",
@@ -15933,40 +15791,9 @@
                 "expression": "pg[\"Term\"]"
               },
               {
-                "value": " not in the glossary"
+                "value": " ids alone"
               }
             ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "Coverage computes its identity set",
-            "parts": [
-              {
-                "term_id": "coverage",
-                "display": "Coverage",
-                "expression": "pg[\"Coverage\"]"
-              },
-              {
-                "value": " computes its identity set"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the unknown ref contributes nothing to the identity set",
-            "parts": []
           },
           "children": [],
           "attachments": [],
@@ -15979,15 +15806,15 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 231
+        "line": 112
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_covers_canonical_activity_via_instance_step",
+      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_matches_instance_and_bare_term_both_ways",
       "narration": {
-        "text": "An instance step covers a canonical activity",
+        "text": "An instance and its bare term cover each other",
         "parts": [
           {
             "value": "An "
@@ -15998,20 +15825,15 @@
             "expression": "pg[\"Instance\"].low"
           },
           {
-            "value": " "
+            "value": " and its bare "
           },
           {
-            "term_id": "step",
-            "display": "step",
-            "expression": "pg[\"Step\"].low"
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low"
           },
           {
-            "value": " covers a canonical "
-          },
-          {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "value": " cover each other"
           }
         ]
       },
@@ -16023,163 +15845,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story with a canonical Activity",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              },
-              {
-                "value": " with a canonical "
-              },
-              {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Scenario step naming a specific Instance",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "scenario",
-                "display": "Scenario",
-                "expression": "pg[\"Scenario\"]"
-              },
-              {
-                "value": " step naming a specific "
-              },
-              {
-                "term_id": "instance",
-                "display": "Instance",
-                "expression": "pg[\"Instance\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "Coverage is computed against the Story",
-            "parts": [
-              {
-                "term_id": "coverage",
-                "display": "Coverage",
-                "expression": "pg[\"Coverage\"]"
-              },
-              {
-                "value": " is computed against the "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "Coverage reports the Activity as covered",
-            "parts": [
-              {
-                "term_id": "coverage",
-                "display": "Coverage",
-                "expression": "pg[\"Coverage\"]"
-              },
-              {
-                "value": " reports the "
-              },
-              {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
-              },
-              {
-                "value": " as covered"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_coverage.py",
-        "line": 255
-      },
-      "story_id": null,
-      "activity_ids": []
-    },
-    {
-      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_does_not_cover_instance_activity_with_canonical_step",
-      "narration": {
-        "text": "A canonical step does not cover an instance activity",
-        "parts": [
-          {
-            "value": "A canonical "
-          },
-          {
-            "term_id": "step",
-            "display": "step",
-            "expression": "pg[\"Step\"].low"
-          },
-          {
-            "value": " does not cover an "
-          },
-          {
-            "term_id": "instance",
-            "display": "instance",
-            "expression": "pg[\"Instance\"].low"
-          },
-          {
-            "value": " "
-          },
-          {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_coverage",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "an Activity anchored to a named Instance",
+            "text": "an Activity naming a bare Actor",
             "parts": [
               {
                 "value": "an "
@@ -16190,35 +15856,7 @@
                 "expression": "pg[\"Activity\"]"
               },
               {
-                "value": " anchored to a named "
-              },
-              {
-                "term_id": "instance",
-                "display": "Instance",
-                "expression": "pg[\"Instance\"]"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "activity_ids": [],
-          "fixture_name": null
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Scenario step naming only the canonical Actor",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "scenario",
-                "display": "Scenario",
-                "expression": "pg[\"Scenario\"]"
-              },
-              {
-                "value": " step naming only the canonical "
+                "value": " naming a bare "
               },
               {
                 "term_id": "actor",
@@ -16233,9 +15871,71 @@
           "fixture_name": null
         },
         {
+          "phase": "given",
+          "narration": {
+            "text": "the same Activity naming an Instance of that actor",
+            "parts": [
+              {
+                "value": "the same "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
+              },
+              {
+                "value": " naming an "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]"
+              },
+              {
+                "value": " of that actor"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Step naming the Instance, and one naming the bare actor",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]"
+              },
+              {
+                "value": " naming the "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]"
+              },
+              {
+                "value": ", and one naming the bare actor"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
           "phase": "when",
           "narration": {
-            "text": "Coverage is computed against the Story",
+            "text": "Coverage is computed for each pairing",
             "parts": [
               {
                 "term_id": "coverage",
@@ -16243,12 +15943,7 @@
                 "expression": "pg[\"Coverage\"]"
               },
               {
-                "value": " is computed against the "
-              },
-              {
-                "term_id": "story",
-                "display": "Story",
-                "expression": "pg[\"Story\"]"
+                "value": " is computed for each pairing"
               }
             ]
           },
@@ -16260,15 +15955,67 @@
         {
           "phase": "then",
           "narration": {
-            "text": "Coverage leaves the more specific instance activity uncovered",
+            "text": "the Instance Step covers the bare Activity",
             "parts": [
               {
-                "term_id": "coverage",
-                "display": "Coverage",
-                "expression": "pg[\"Coverage\"]"
+                "value": "the "
               },
               {
-                "value": " leaves the more specific instance activity uncovered"
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]"
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]"
+              },
+              {
+                "value": " covers the bare "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the bare Step covers the Instance Activity",
+            "parts": [
+              {
+                "value": "the bare "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]"
+              },
+              {
+                "value": " covers the "
+              },
+              {
+                "term_id": "instance",
+                "display": "Instance",
+                "expression": "pg[\"Instance\"]"
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               }
             ]
           },
@@ -16283,7 +16030,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 286
+        "line": 138
       },
       "story_id": null,
       "activity_ids": []
@@ -16463,7 +16210,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 318
+        "line": 198
       },
       "story_id": null,
       "activity_ids": []
@@ -16614,7 +16361,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 372
+        "line": 250
       },
       "story_id": null,
       "activity_ids": []
@@ -16741,7 +16488,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 419
+        "line": 297
       },
       "story_id": null,
       "activity_ids": []
@@ -16857,7 +16604,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 441
+        "line": 319
       },
       "story_id": null,
       "activity_ids": []
@@ -17000,7 +16747,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 471
+        "line": 349
       },
       "story_id": null,
       "activity_ids": []
@@ -17151,7 +16898,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 496
+        "line": 374
       },
       "story_id": null,
       "activity_ids": []
@@ -17271,7 +17018,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "Coverage counts it directly, without identity matching",
+            "text": "Coverage counts it directly, without narration matching",
             "parts": [
               {
                 "term_id": "coverage",
@@ -17279,7 +17026,7 @@
                 "expression": "pg[\"Coverage\"]"
               },
               {
-                "value": " counts it directly, without identity matching"
+                "value": " counts it directly, without narration matching"
               }
             ]
           },
@@ -17294,7 +17041,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 533
+        "line": 411
       },
       "story_id": null,
       "activity_ids": []
@@ -17432,7 +17179,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 562
+        "line": 440
       },
       "story_id": null,
       "activity_ids": []
@@ -18392,7 +18139,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 86,
+      "duration_ms": 79,
       "steps": [
         {
           "phase": "given",
@@ -22985,7 +22732,7 @@
         "id": "coverage",
         "kind": null,
         "canonical": "Coverage",
-        "definition": "The \"did this scenario touch that activity\" relation. Computed by the *A_refs \u2286 S* rule: an activity is covered when its set of term references (as identities, with a canonical fallback) is a subset of a single step's term-reference identities \u2014 matching is per step, not against the union across steps. A step can also cover an activity explicitly via the `activity=` pin, regardless of its narration or its term count.",
+        "definition": "The \"did this scenario touch that activity\" relation. Computed by the *A_refs \u2286 S* rule: an activity is covered when the set of terms it references is a subset of the terms a single step references \u2014 matching is per step, not against the union across steps, and on terms, not surface forms: an *instance* or *inflection* counts as its term. A step can also cover an activity explicitly via the `activity=` pin, regardless of its narration or its term count.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 91

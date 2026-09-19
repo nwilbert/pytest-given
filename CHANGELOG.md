@@ -15,6 +15,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - The JSON report carries a top-level `coverage` key — one record per story activity with `tracked` and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.
 
+### Changed
+
+- Story coverage matches on glossary terms alone: an instance in an activity (`guest('Alice')`) is now covered by a step naming the bare term, and vice versa — activities that differed only by instance are no longer told apart by narration, only by an `activity=` pin.
+
 ### Fixed
 
 - `when_then(...)` rejects a `Template` narration in a test body, as `given`/`when`/`then` already do.

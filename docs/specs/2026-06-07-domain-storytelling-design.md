@@ -437,6 +437,8 @@ Each `Step` carries:
 - `activity_ids: tuple[ActivityId, ...]` — set iff `given(…, activity=…)` (or `when` / `then`) was provided; otherwise `()`.
 - `narration.parts` — possibly containing `NarrationTermRef` instances, each with a `term_id`.
 
+> **Instance identity superseded (2026-09-19):** matching is on term ids alone. `A_refs` and `S` are plain sets of `term_id`; an entity instance, a `.low` and a verb inflection each count as their term, so the canonical-fallback rule and the directional instance rows in the cheat-sheet below no longer apply — activities 5 and 6 in the walk-through now conflate, and an `activity=` pin is what separates them. The asymmetry proved harder to explain than the distinction was worth once story activities are written at role level.
+
 Each `Activity` of the bound `Story` has:
 
 - a set of referenced **identities**, `A_refs`. An identity is computed per-part using *strict* matching (no canonical-fallback — that asymmetry lives only on the step side, see *Step → activity binding*):
