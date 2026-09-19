@@ -23,8 +23,19 @@
   background: linear-gradient(135deg, #4a2159 0%, #2e1238 100%);
   color: #fff;
 }
+.pg-hero-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+.pg-hero-logo {
+  width: 3rem;
+  height: 3rem;
+  flex: none;
+}
 .pg-hero h1 {
-  margin: 0 0 0.5rem;
+  margin: 0;
   color: #fff;
   font-size: 2.2rem;
   font-weight: 700;
