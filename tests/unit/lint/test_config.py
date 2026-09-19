@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from pytest_given.cli.skills import BUNDLED_SKILLS_ROOT
 from pytest_given.lint import DEFAULTS, LintConfig
 from pytest_given.lint.base import RawFinding, RuleId
 from pytest_given.lint.config import (
@@ -186,13 +187,11 @@ def test_the_documented_rule_tables_match_the_catalog() -> None:
     changed, and a downstream agent reads the skill's copy instead of the
     README — so both are checked against `DEFAULTS` here.
     """
-    root = Path(__file__).resolve().parents[3]
+    readme = Path(__file__).resolve().parents[3] / 'README.md'
     skill = (
-        root
-        / 'src/pytest_given/.agents/skills/pytest-given-authoring'
-        / 'references/scenarios.md'
+        BUNDLED_SKILLS_ROOT / 'pytest-given-authoring' / 'references' / 'scenarios.md'
     )
-    for doc in (root / 'README.md', skill):
+    for doc in (readme, skill):
         rows = dict(
             re.findall(
                 r'^\| `([a-z][a-z0-9-]*)` \| `?(off|warn|error)`? \|',

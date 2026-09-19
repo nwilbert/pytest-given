@@ -3,6 +3,8 @@ import shutil
 import tempfile
 import webbrowser
 import zipfile
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 import nox
@@ -148,10 +150,11 @@ def test_smoke():
 # and only fails on a user's first install. A trailing slash means "this
 # directory must contain something"; anything else must match a member exactly,
 # so a stray `py.typed.bak` cannot satisfy the `py.typed` requirement.
+_WHEEL_SKILLS_DIR = 'pytest_given/.agents/skills/'
 _REQUIRED_WHEEL_PATHS = (
     'pytest_given/py.typed',
     'pytest_given/report/templates/',
-    'pytest_given/.agents/skills/',
+    _WHEEL_SKILLS_DIR,
 )
 
 
@@ -168,6 +171,7 @@ def build(session: nox.Session) -> None:
     Run before dispatching the release workflow; the workflow runs this same
     session, so a green run here means the artifacts are release-shaped.
     """
+    _sync(session, 'build')
     dist = Path('dist')
     if dist.exists():
         shutil.rmtree(dist)
@@ -187,7 +191,7 @@ def build(session: nox.Session) -> None:
         session.error(f'{wheel.name} is missing {", ".join(missing)}')
 
     _smoke_test_install(session, '--with', str(wheel), described_as=wheel.name)
-    _check_library_skills_discovery(session, wheel)
+    _check_library_skills_discovery(session, wheel, names)
     session.log(f'{wheel.name} passed packaging checks and a live smoke run')
 
 
@@ -201,30 +205,37 @@ def _smoke_test_install(
     the rootdir conftest — together they guarantee the import under test is the
     installed distribution rather than `src/`.
     """
+    with _throwaway_workdir(session) as workdir:
+        (workdir / 'test_smoke.py').write_text(_SMOKE_TEST, encoding='utf-8')
+        session.run(
+            'uv',
+            'run',
+            '--isolated',
+            '--no-project',
+            *install_args,
+            'pytest',
+            'test_smoke.py',
+            '--given-md=smoke.md',
+            '--given-html=smoke.html',
+            '-q',
+            external=True,
+        )
+        narration = (workdir / 'smoke.md').read_text(encoding='utf-8')
+        if 'narration is captured' not in narration:
+            session.error(f'{described_as} produced a report without narration')
+        if (workdir / 'smoke.html').stat().st_size < 10_000:
+            session.error(f'{described_as} produced a suspiciously small report')
+
+
+@contextmanager
+def _throwaway_workdir(session: nox.Session) -> Iterator[Path]:
+    """Run the block from a fresh temporary directory, then restore the cwd."""
     project_root = Path.cwd()
     with tempfile.TemporaryDirectory() as tmp:
         workdir = Path(tmp)
-        (workdir / 'test_smoke.py').write_text(_SMOKE_TEST, encoding='utf-8')
         session.chdir(workdir)
         try:
-            session.run(
-                'uv',
-                'run',
-                '--isolated',
-                '--no-project',
-                *install_args,
-                'pytest',
-                'test_smoke.py',
-                '--given-md=smoke.md',
-                '--given-html=smoke.html',
-                '-q',
-                external=True,
-            )
-            narration = (workdir / 'smoke.md').read_text(encoding='utf-8')
-            if 'narration is captured' not in narration:
-                session.error(f'{described_as} produced a report without narration')
-            if (workdir / 'smoke.html').stat().st_size < 10_000:
-                session.error(f'{described_as} produced a suspiciously small report')
+            yield workdir
         finally:
             # Windows cannot remove a directory that is still the cwd.
             session.chdir(project_root)
@@ -239,52 +250,45 @@ dependencies = ["pytest-given"]
 """
 
 
-def _check_library_skills_discovery(session: nox.Session, wheel: Path) -> None:
-    """Verify that `library-skills` discovers every bundled skill from the wheel.
+def _check_library_skills_discovery(
+    session: nox.Session, wheel: Path, names: list[str]
+) -> None:
+    """Verify that `library-skills` discovers every skill the wheel carries.
 
-    Sets up what a downstream project looks like — a `pyproject.toml` naming
-    pytest-given as a dependency and a `.venv` with the wheel installed — and
-    scans it the way a consumer would. `_REQUIRED_WHEEL_PATHS` only proves the
-    skills directory is in the wheel; this proves the scanner's convention
-    (`.agents/skills/<name>/SKILL.md`, name matching the directory) holds for
-    each skill, which is what makes `uvx library-skills install` work for
-    consumers.
+    `_REQUIRED_WHEEL_PATHS` only proves the skills directory is in the wheel;
+    this proves the scanner's convention (`.agents/skills/<name>/SKILL.md`,
+    name matching the directory) holds for each skill, which is what makes
+    `uvx library-skills install` work for consumers.
     """
     expected = sorted(
-        skill.name
-        for skill in (Path('src') / 'pytest_given' / '.agents' / 'skills').iterdir()
-        if skill.is_dir()
+        name.removeprefix(_WHEEL_SKILLS_DIR).removesuffix('/SKILL.md')
+        for name in names
+        if name.startswith(_WHEEL_SKILLS_DIR) and name.endswith('/SKILL.md')
     )
-    _sync(session, 'build')
-    project_root = Path.cwd()
-    with tempfile.TemporaryDirectory() as tmp:
-        workdir = Path(tmp)
+    assert expected, f'{wheel.name} carries no SKILL.md under {_WHEEL_SKILLS_DIR}'
+    with _throwaway_workdir(session) as workdir:
         (workdir / 'pyproject.toml').write_text(_CONSUMER_PYPROJECT, encoding='utf-8')
-        session.chdir(workdir)
-        try:
-            session.run('uv', 'venv', '--quiet', '.venv', external=True)
-            session.run(
-                'uv',
-                'pip',
-                'install',
-                '--quiet',
-                '--python',
-                '.venv',
-                str(wheel),
-                external=True,
-            )
-            # nox exports UV_PROJECT_ENVIRONMENT=<session venv>, which
-            # library-skills honors before the nearest `.venv` — so point it
-            # at the consumer's environment explicitly.
-            scan = session.run(
-                'library-skills',
-                'scan',
-                '--json',
-                env={'UV_PROJECT_ENVIRONMENT': '.venv'},
-                silent=True,
-            )
-        finally:
-            session.chdir(project_root)
+        session.run('uv', 'venv', '--quiet', '.venv', external=True)
+        session.run(
+            'uv',
+            'pip',
+            'install',
+            '--quiet',
+            '--python',
+            '.venv',
+            str(wheel),
+            external=True,
+        )
+        # nox exports UV_PROJECT_ENVIRONMENT=<session venv>, which
+        # library-skills honors before the nearest `.venv` — so point it
+        # at the consumer's environment explicitly.
+        scan = session.run(
+            'library-skills',
+            'scan',
+            '--json',
+            env={'UV_PROJECT_ENVIRONMENT': '.venv'},
+            silent=True,
+        )
     assert isinstance(scan, str)
     discovered = sorted(skill['name'] for skill in json.loads(scan)['skills'])
     if discovered != expected:

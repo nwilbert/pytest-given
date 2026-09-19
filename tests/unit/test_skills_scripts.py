@@ -11,9 +11,9 @@ import json
 import re
 import subprocess
 import sys
-from importlib.resources import files
 from pathlib import Path
 
+from pytest_given.cli.skills import BUNDLED_SKILLS_ROOT
 from pytest_given.model import (
     Metadata,
     Narration,
@@ -52,12 +52,7 @@ def _write_report(directory: Path, report: ReportData) -> Path:
 def _run(reference: str, cwd: Path, *args: str) -> str:
     """Run the one python block of a bundled reference, from `cwd`."""
     text = (
-        files('pytest_given')
-        / '.agents'
-        / 'skills'
-        / 'pytest-given-reviewing'
-        / 'references'
-        / reference
+        BUNDLED_SKILLS_ROOT / 'pytest-given-reviewing' / 'references' / reference
     ).read_text(encoding='utf-8')
     blocks = re.findall(r'```python\n(.*?)```', text, re.DOTALL)
     assert len(blocks) == 1, f'{reference} must hold exactly one python block'

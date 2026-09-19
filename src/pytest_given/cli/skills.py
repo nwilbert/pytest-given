@@ -10,6 +10,8 @@ from pathlib import Path, PurePosixPath
 type SkillTree = dict[PurePosixPath, bytes]
 
 DEFAULT_SKILLS_DEST = Path('.claude') / 'skills'
+# The layout `library-skills` scans for: `.agents/skills/<name>/SKILL.md`.
+BUNDLED_SKILLS_ROOT = files('pytest_given') / '.agents' / 'skills'
 
 
 def add_skills_parser(
@@ -89,7 +91,7 @@ def _report_drift(dest: Path) -> int:
 
 def _bundled_skill_tree() -> SkillTree:
     tree: SkillTree = {}
-    _collect(files('pytest_given') / '.agents' / 'skills', PurePosixPath(), tree)
+    _collect(BUNDLED_SKILLS_ROOT, PurePosixPath(), tree)
     return tree
 
 

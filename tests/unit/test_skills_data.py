@@ -1,12 +1,12 @@
-from importlib.resources import files
 from importlib.resources.abc import Traversable
 
 import pytest
 
+from pytest_given.cli.skills import BUNDLED_SKILLS_ROOT
+
 
 def _skill_dirs() -> list[Traversable]:
-    root = files('pytest_given') / '.agents' / 'skills'
-    return [child for child in root.iterdir() if child.is_dir()]
+    return [child for child in BUNDLED_SKILLS_ROOT.iterdir() if child.is_dir()]
 
 
 def _frontmatter(skill_md: Traversable) -> dict[str, str]:
@@ -34,31 +34,29 @@ def test_bundles_the_expected_skills() -> None:
 
 @pytest.mark.parametrize('skill', BUNDLED_SKILLS)
 def test_every_skill_has_a_skill_md(skill: str) -> None:
-    assert (files('pytest_given') / '.agents' / 'skills' / skill / 'SKILL.md').is_file()
+    assert (BUNDLED_SKILLS_ROOT / skill / 'SKILL.md').is_file()
 
 
 @pytest.mark.parametrize('skill', BUNDLED_SKILLS)
 def test_reference_guides_are_bundled(skill: str) -> None:
-    assert (
-        files('pytest_given') / '.agents' / 'skills' / skill / 'references'
-    ).is_dir()
+    assert (BUNDLED_SKILLS_ROOT / skill / 'references').is_dir()
 
 
 def test_reviewing_skill_cross_reference_target_exists() -> None:
     """The reviewing skill links ../pytest-given-authoring/references/scenarios.md."""
-    root = files('pytest_given') / '.agents' / 'skills'
-    assert (root / 'pytest-given-authoring' / 'references' / 'scenarios.md').is_file()
+    root = BUNDLED_SKILLS_ROOT / 'pytest-given-authoring'
+    assert (root / 'references' / 'scenarios.md').is_file()
 
 
 def test_reviewing_skill_story_coverage_reference_is_bundled() -> None:
     """The reviewing skill links references/story-coverage.md for the JSON query."""
-    root = files('pytest_given') / '.agents' / 'skills' / 'pytest-given-reviewing'
+    root = BUNDLED_SKILLS_ROOT / 'pytest-given-reviewing'
     assert (root / 'references' / 'story-coverage.md').is_file()
 
 
 def test_reviewing_skill_pairs_reference_is_bundled() -> None:
     """The reviewing skill links references/pairs.md for the narration/body dump."""
-    root = files('pytest_given') / '.agents' / 'skills' / 'pytest-given-reviewing'
+    root = BUNDLED_SKILLS_ROOT / 'pytest-given-reviewing'
     assert (root / 'references' / 'pairs.md').is_file()
 
 
