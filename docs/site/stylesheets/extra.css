@@ -149,3 +149,41 @@
   color: #3f1d4e;
   border-color: #fff;
 }
+
+/* Home diagram: an inline SVG (assets/pytest-given-diagram.svg, which carries
+   its own artwork rules) whose colours are these tokens, so it follows the brand
+   and the colour scheme. One hue in two weights: actors (people and agents)
+   tinted, artifacts solid. The README copy resolves the same tokens to literals
+   in noxfile.py's `diagram` session -- keep the two lists in step. */
+:root > * {
+  --pg-diagram-bg: var(--md-default-bg-color);
+  --pg-diagram-line: var(--md-default-fg-color--light);
+  --pg-diagram-panel: var(--md-code-bg-color);
+  --pg-diagram-panel-edge: var(--md-default-fg-color--lighter);
+  --pg-diagram-people-fill: var(--md-primary-fg-color--light);
+  --pg-diagram-people-ink: var(--md-primary-fg-color--dark);
+  --pg-diagram-artifact-fill: var(--md-primary-fg-color);
+  --pg-diagram-artifact-ink: #fff;
+}
+[data-md-color-scheme="slate"] {
+  --pg-diagram-people-fill: #352e3c; /* lilac at 22% over the slate page; opaque so the icon cut-out covers what it sits on */
+  --pg-diagram-people-ink: var(--md-primary-fg-color--light);
+  --pg-diagram-artifact-ink: var(--md-default-bg-color);
+}
+.md-typeset .pg-diagram {
+  width: 100%; /* the theme's figure is fit-content, which collapses an SVG with no intrinsic width */
+  max-width: 36rem;
+  margin: 1.5rem auto 2rem;
+}
+.pg-diagram-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.md-typeset .pg-diagram figcaption {
+  max-width: none;
+  margin: 0.4rem 0 0;
+  font-size: 0.7rem;
+  font-style: normal;
+  text-align: right;
+}

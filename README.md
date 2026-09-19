@@ -77,7 +77,7 @@ pytest-given is for the opposite case: **engineers or their agents write normal 
 Increasingly those tests aren't hand-written at all: a human describes a scenario in prose and an AI agent generates the test alongside the code it exercises, so the narrated report — not the raw test code — becomes the artifact humans review. The diagram below sketches that loop between people, agents, and artifacts; [Working with AI agents](https://nwilbert.github.io/pytest-given/dev/ai-agents/) covers how to drive it.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/nwilbert/pytest-given/main/docs/pytest-given-diagram.png" alt="A loop between people, agents, and artifacts: developers and domain experts instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report that domain experts validate and developers review, feeding back to the agents." width="640">
+  <img src="https://raw.githubusercontent.com/nwilbert/pytest-given/main/docs/pytest-given-diagram.svg" alt="A loop between people, agents, and artifacts: developers and domain experts instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report that domain experts validate and developers review, feeding back to the agents." width="640">
 </p>
 
 ## Features
