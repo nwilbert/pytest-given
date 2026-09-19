@@ -35,6 +35,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
   scenario's narration with its test's source — and audits the rules the
   release notes announce. Both skills now flag alternation `match=` pins and a
   `when` that narrates arrangement while its body acts.
+- The authoring skill's `stories.md` spells out the directional instance rule of coverage matching (and its consequence: write activities with bare handles), that two activities with nested term sets always cover together, and how to verify coverage from the JSON report; the reviewing skill's coverage recipe reads the report's `coverage` key instead of reimplementing the rule.
 
 ## [0.2.0] - 2026-09-04
 

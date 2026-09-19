@@ -11,7 +11,7 @@ Domain experts narrate a **concrete case** ("Carol books rooms for her team", no
 - **Actors** — people, roles, or systems that *do* something (an organizer, a booking system). An actor appears once; the story flows through it.
 - **Work objects** — the things actors work *with* and pass around: documents, items, information (a booking, a payment, a confirmation).
 - **Activities** — the verbs connecting an actor to work objects; numbered, forming the story's sequence.
-- **Granularity** — stories exist at levels: coarse-grained (a whole process, for overview) down to fine-grained (one step's detail). Pick one level per story; don't mix.
+- **Granularity** — stories exist at levels: coarse-grained (a whole process, for overview) down to fine-grained (one step's detail). Pick one level per story; don't mix. Note that `@scenario(story=...)` binds to **one** story, so keeping a coarse and a fine story of the same flow makes every scenario choose which level it covers — the usual answer is one level per suite.
 - **As-is vs to-be** — a story records either how work happens today or how it should happen after the change. Label which.
 
 ## Mapping onto pytest-given

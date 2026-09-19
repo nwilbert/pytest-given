@@ -2079,7 +2079,7 @@
     ```
 
 ## ✓ The JSON report carries each «activity»'s «coverage»
-`tests/unit/report/test_sinks.py:188::test_json_sink_carries_per_activity_coverage`
+`tests/unit/report/test_sinks.py:183::test_json_sink_carries_per_activity_coverage`
 
 - **given** a «Story» with a covered, an uncovered, an untracked «Activity»
 - **when** the JSON sink is rendered
@@ -2087,7 +2087,7 @@
 - **then** the rest of the report is the input dict, unchanged
 
 ## ✓ A re-rendered report recomputes «coverage» rather than carrying it
-`tests/unit/report/test_sinks.py:222::test_json_sink_replaces_incoming_coverage`
+`tests/unit/report/test_sinks.py:217::test_json_sink_replaces_incoming_coverage`
 
 - **given** a saved report dict whose `coverage` no longer matches its steps
 - **when** `pytest-given report` re-renders it to JSON

@@ -36,16 +36,29 @@ activity(
 ```python
 @scenario('Carol selects a suite', story=book_a_group_trip)
 def test_select_suite(carol):
-    with when(t'{organizer("Carol")} {select("selects")} a {room}'):
+    with when(t'{organizer("Carol")} {select("selects")} the {room("Deluxe Suite")}'):
         ...
 ```
 
-Coverage is matched **per step**: an activity is covered when a *single step's* term references include all of the activity's terms (an instance also counts for its canonical term) — references spread across several steps don't add up. The Stories tab shows a coverage chip per activity with the scenarios that touch it.
+Coverage is matched **per step**: an activity is covered when a *single step's* term references include all of the activity's terms — references spread across several steps don't add up. The Stories tab shows a coverage chip per activity with the scenarios that touch it; the JSON report carries the same result under `coverage[]` (below).
 
-Two corollaries of "per step":
+What the rule means when you write:
 
 - **Only step narration counts.** Term refs in the `@scenario` name never contribute. A scenario titled with both actors stays uncovered until those refs also appear in a `given`/`when`/`then`.
-- **Growing an activity's terms raises its coverage bar.** Adding a term — or narrowing one to an instance (`room` → `room('Deluxe Suite')`) — makes every covering step carry the new identity too, so editing a story can silently uncover a scenario that used to cover it (a pinned step is immune). Re-render the Stories tab after touching an activity.
+- **An instance in an activity demands the instance in the step; a bare term in an activity is satisfied by either.** Matching is on identities: a verb matches on its canonical whatever the inflection (`select('selects')` and `select('selected')` are one identity), but an actor or work object written as an instance — `room('Deluxe Suite')`, `organizer('Carol')` — is its own identity. A step's instance ref counts for both the instance and the bare term; a step's bare ref counts only for the bare term. So `{room("Deluxe Suite")}` in a step covers a `room` activity and a `room('Deluxe Suite')` one, while `{room}` covers only the first — which is why the step above says `Deluxe Suite`. **Write activities with bare handles — `room`, not `room('Deluxe Suite')` — unless the instance is what the activity is about**; every instance you put in an activity is one more exact display every covering step has to carry.
+- **Two activities cover together when one's terms are a subset of the other's.** The test is `activity terms ⊆ step terms`, so a step covering `organizer · adds · guest · booking` also covers an `organizer · adds · guest` activity, whatever that row meant — the two are never distinguishable by narration. An instance counts as its bare term here too: a step covering `guest('Alice') · books · room` also covers `guest · books · room`. When two rows come out nested, give the narrower one a term the wider lacks (a distinct verb usually does it), merge them, or accept the shared chip; a pin on the covering step reaches only the activities it names, so it separates them too.
+- **Growing an activity's terms raises its coverage bar.** Adding a term — or narrowing one to an instance (`room` → `room('Deluxe Suite')`) — makes every covering step carry the new identity too, so editing a story can silently uncover a scenario that used to cover it (a pinned step is immune).
+
+**Verify coverage after touching an activity or a covering step** — from the JSON report, not by re-deriving the rule:
+
+```bash
+pytest <selection> --given-json=report.json
+# tracked activities no scenario covers, as story#activity
+jq -r '.coverage[] | select(.tracked and .scenario_ids == [])
+       | .story_id + "#" + (.activity_id|tostring)' report.json
+```
+
+`coverage[]` holds `{story_id, activity_id, tracked, scenario_ids}` per activity, computed by the same code as the Stories tab; `tracked: false` is the "not coverage-tracked" chip. The full shape is in the navigating skill's `references/report-json.md`.
 
 A step can also **pin** an activity explicitly — `given(text, activity=3)`, taking the 1-based activity number in the story (or a sequence of numbers). A pin *replaces* narration matching for that step rather than adding to it: the step covers exactly the activities it names and no others, however well its text fits them. A pin is also the only thing that reaches an under-anchored activity: the two-term rule gates narration matching, not pins. Use a pin when the activity is phrased above the vocabulary the step narrates (e.g. a process-level activity implemented by a technical test), and keep it on the one step that genuinely demonstrates the activity.
 
