@@ -170,62 +170,20 @@
   --pg-diagram-people-ink: var(--md-primary-fg-color--light);
   --pg-diagram-artifact-ink: var(--md-default-bg-color);
 }
-.pg-diagram {
-  margin: 1.5rem auto 2rem;
+.md-typeset .pg-diagram {
+  width: 100%; /* the theme's figure is fit-content, which collapses an SVG with no intrinsic width */
   max-width: 36rem;
-}
-.pg-diagram-open {
-  display: block;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  border-radius: 0.5rem;
-  background: none;
-  color: inherit;
-  cursor: zoom-in;
-}
-.pg-diagram-open:focus-visible {
-  outline: 0.15rem solid var(--md-accent-fg-color);
-  outline-offset: 0.25rem;
+  margin: 1.5rem auto 2rem;
 }
 .pg-diagram-svg {
   display: block;
   width: 100%;
   height: auto;
 }
-.pg-diagram-dialog {
-  width: min(92vw, 92vh);
+.md-typeset .pg-diagram figcaption {
   max-width: none;
-  padding: 2.5rem 1rem 1rem;
-  border: 1px solid var(--md-default-fg-color--lighter); /* the page and the dialog share a background in slate */
-  border-radius: 0.5rem;
-  background: var(--md-default-bg-color);
-  color: var(--md-default-fg-color);
-}
-.pg-diagram-dialog::backdrop {
-  background: rgba(0, 0, 0, 0.55);
-}
-.pg-diagram-dialog svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.pg-diagram-close {
-  position: absolute;
-  top: 0.6rem;
-  right: 0.8rem;
-  padding: 0.2rem 0.6rem;
-  border: 0;
-  border-radius: 0.2rem;
-  background: none;
-  color: var(--md-default-fg-color--light);
-  font: inherit;
+  margin: 0.4rem 0 0;
   font-size: 0.7rem;
-  cursor: pointer;
-}
-.pg-diagram-close:hover,
-.pg-diagram-close:focus-visible {
-  color: var(--md-accent-fg-color);
-  background: var(--md-accent-fg-color--transparent);
-  outline: none;
+  font-style: normal;
+  text-align: right;
 }
