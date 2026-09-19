@@ -2,5 +2,22 @@
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true
+  },
+  "attribution": {
+    "commit": ""
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); if printf \"%s\" \"$input\" | grep -qi \"git commit\" && printf \"%s\" \"$input\" | grep -qiE \"co-authored-by:[^<]*<[^>]*@\"; then echo \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PreToolUse\\\",\\\"permissionDecision\\\":\\\"deny\\\",\\\"permissionDecisionReason\\\":\\\"This repo forbids Co-Authored-By trailers (AGENTS.md: single-line commit messages). Re-run the commit without the trailer.\\\"}}\"; fi",
+            "statusMessage": "Checking commit for co-author trailer"
+          }
+        ]
+      }
+    ]
   }
 }
