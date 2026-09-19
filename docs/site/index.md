@@ -53,4 +53,4 @@ See [AGENTS.md](https://github.com/nwilbert/pytest-given/blob/main/AGENTS.md) fo
 
 ## License
 
-MIT
+[MIT](https://github.com/nwilbert/pytest-given/blob/main/LICENSE.md). The bundled Alpine.js runtime is also MIT; its notice is in [THIRD-PARTY-LICENSES](https://github.com/nwilbert/pytest-given/blob/main/THIRD-PARTY-LICENSES).
