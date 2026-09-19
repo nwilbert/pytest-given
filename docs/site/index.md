@@ -5,7 +5,7 @@ title: Home
 <div class="pg-hero" markdown>
 
 <div class="pg-hero-title" markdown>
-<svg class="pg-hero-logo" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h3"/><path d="M11 6h5"/><path d="M4 12h3"/><path d="M11 12h9"/><path d="M3.5 18.5l2 2 4-4.5"/><path d="M13 18h7"/></svg>
+<p class="pg-hero-logo-wrap"><svg class="pg-hero-logo" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h3"/><path d="M11 6h5"/><path d="M4 12h3"/><path d="M11 12h9"/><path d="M3.5 18.5l2 2 4-4.5"/><path d="M13 18h7"/></svg></p>
 
 # pytest-given
 
@@ -19,8 +19,10 @@ title: Home
 
 <p class="pg-hero-punch">What people and agents read is what the code does.</p>
 
+<p class="pg-hero-actions" markdown>
 [Getting started](getting-started.md){ .md-button .md-button--primary }
 [See a report](examples/coffeeshop.html){ .md-button target=_blank }
+</p>
 
 </div>
 
