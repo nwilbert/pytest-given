@@ -13,6 +13,16 @@ mistake shipped to PyPI is permanent.
 
 ### 1. Prepare the bump
 
+- [ ] **First release with the documentation site (0.3.0) only:** the release
+      publishes `/latest/` for the first time, so repoint every `/dev/` docs link
+      to `/latest/` in the same bump commit — `README.md`,
+      `src/pytest_given/cli/report.py`, `src/pytest_given/plugin/options.py`, and
+      `SKILL.md`, `references/api.md`, `references/scenarios.md` under
+      `src/pytest_given/.agents/skills/pytest-given-authoring/`
+      (`grep -rn "pytest-given/dev/"` finds them all, `AGENTS.md` included).
+      Expect the TestPyPI rehearsal's link check (step 2) to 404 on those
+      links — `/latest/` only exists once the `pypi` run has published it.
+      Then delete this item.
 - [ ] Bump `version` in `pyproject.toml`.
 - [ ] Add a `## [x.y.z] - YYYY-MM-DD` section to `CHANGELOG.md`. The workflow
       extracts this exact section as the GitHub Release body, and fails the build
@@ -72,6 +82,10 @@ thing. Nothing is tagged.
 - [ ] `uv run nox -s check_release` — the same check as step 2, against real
       PyPI. Give the index a moment; a just-uploaded version can take a little
       while to appear.
+- [ ] Confirm <https://nwilbert.github.io/pytest-given/latest/> resolves. If
+      the `docs` job was cancelled by a concurrent push to `main` (the two
+      share the `gh-pages` concurrency group), dispatch the Docs workflow with
+      version `<major.minor>` and alias `latest`.
 
 ### 4. After
 
@@ -100,6 +114,7 @@ Docs workflow with the version and alias to publish; it runs the same
 | `build` | guards, then `nox -s build` | Uploads `dist/` as a workflow artifact. |
 | `publish` | `pypa/gh-action-pypi-publish` | Environment-scoped, `id-token: write`. |
 | `github-release` | `gh release create` | Creates the `v<version>` tag and the GitHub Release. Skipped for rehearsals. |
+| `docs` | `nox -s docs_deploy -- <major.minor> latest` | Publishes the release's docs as `/<major.minor>/` and moves the `latest` alias there. Skipped for rehearsals. |
 
 The `build` job refuses to proceed if the tag already exists, if the version is
 already on the target index, if `CHANGELOG.md` has no section for it, or — for

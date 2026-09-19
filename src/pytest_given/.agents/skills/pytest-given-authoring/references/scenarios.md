@@ -74,7 +74,7 @@ The narration lint (`pytest --given-lint`, or `given_lint = true` in `[tool.pyte
 | `tag-shadows-term` | warn | A scenario tag whose slug duplicates a glossary term. |
 | `dead-term` | off | A glossary term referenced by no scenario narration, no step narration and no story activity. Off by default because an unreferenced term is normal; opt in where the glossary is meant to be fully exercised. |
 
-Severities are overridable per rule via the `given_lint_rules` ini; that and the rest of the setup are in the project README.
+Severities are overridable per rule via the `given_lint_rules` ini; that and the rest of the setup are in the project documentation at <https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/>.
 
 **A `then-without-check` finding on a step that does check is usually a naming problem.** The rule recognizes an assertion helper by its name alone, so `assert_totals(order)` passes where an identical `check_totals(order)` fires — rename the helper before reaching for the ignore list. What the rule genuinely cannot see is a third-party matcher under some other name (pytest's `result.stdout.fnmatch_lines(...)` is neither an `assert` statement nor an `assert*` call): there, either let the step carry a real `assert` as well, or ignore-list it.
 

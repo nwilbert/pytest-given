@@ -2,7 +2,7 @@
 
 All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-*` flag enables its own sink independently, and they combine freely (e.g. pass both `--given-json` and `--given-html` to get both files from one run).
 
-The *checks* are not opt-in. Every run builds the report it would have written, so an authoring form that cannot be narrated honestly — the parametrize rules above among them — fails the run whether or not a sink was configured, rather than surfacing on the first run that happens to ask for HTML.
+The *checks* are not opt-in. Every run builds the report it would have written, so an authoring form that cannot be narrated honestly — the [parametrize rules](../guide/parametrized.md) among them — fails the run whether or not a sink was configured, rather than surfacing on the first run that happens to ask for HTML.
 
 | Flag | Default | Description |
 |------|---------|-------------|

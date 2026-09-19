@@ -35,7 +35,8 @@ def add_report_parser(
         default='none',
         help=(
             'Source-link template or preset (vscode, cursor, zed, pycharm, '
-            'github, none). See README for variables.'
+            'github, none). Variables: '
+            'https://nwilbert.github.io/pytest-given/dev/configuration/source-links/'
         ),
     )
     report_parser.add_argument(

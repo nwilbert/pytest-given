@@ -85,9 +85,11 @@ packages = ["src/pytest_given"]
 # untracked local directories, so this is an allowlist rather than a list of
 # exclusions. `pyproject.toml`, the readme, and the license files are always
 # included. GLOSSARY.md is load-bearing: tests/conftest.py loads it as a
-# FileGlossary. `examples/` is deliberately out — 2.6 MB of pre-rendered
-# reports that no test reads (the eight `examples/` mentions under tests/ are
-# all string literals), browsable on GitHub instead.
+# FileGlossary. The narration-lint docs page is listed for the same reason:
+# tests/unit/lint/test_config.py checks its rule table against the lint
+# catalog. `examples/` is deliberately out — 2.6 MB of pre-rendered reports
+# that no test reads (the eight `examples/` mentions under tests/ are all
+# string literals), browsable on GitHub instead.
 [tool.hatch.build.targets.sdist]
 # Patterns are gitignore-style: a leading slash anchors to the project root.
 # Without it, "GLOSSARY.md" also matches examples/file-glossary-booking/GLOSSARY.md.
@@ -100,6 +102,7 @@ include = [
     "/README.md",
     "/CHANGELOG.md",
     "/GLOSSARY.md",
+    "/docs/site/configuration/narration-lint.md",
     "/AGENTS.md",
 ]
 

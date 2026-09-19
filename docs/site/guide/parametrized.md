@@ -23,7 +23,7 @@ def test_brew(cup_size):
     ...
 ```
 
-The `Template` name and the glossary-handle t-string name from the table above don't combine: a title needing both a term ref and a per-case value isn't expressible today.
+The `Template` name and the glossary-handle t-string name from the [step-text table](step-text.md) don't combine: a title needing both a term ref and a per-case value isn't expressible today.
 
 What a column cannot carry is a case that narrates a *different sentence*. When the narration genuinely branches per case, add `group_parametrized=False` to the `@scenario` above to decline the merge. Each case then becomes its own scenario with no parameter table, titled by its parametrize id — `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first (a plain-string name is suffixed the same way). Every case carries the id, including one whose name already renders its values. On a test that isn't parametrized the argument raises at collection.
 

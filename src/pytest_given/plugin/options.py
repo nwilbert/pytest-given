@@ -71,7 +71,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         default=None,
         help=(
             'Source-link template or preset (vscode, cursor, zed, pycharm, '
-            'github, none). See README for available variables.'
+            'github, none). Variables: '
+            'https://nwilbert.github.io/pytest-given/dev/configuration/source-links/'
         ),
     )
     group.addoption(

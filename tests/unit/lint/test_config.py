@@ -181,17 +181,24 @@ def test_apply_config_stale_entries_come_last() -> None:
 
 
 def test_the_documented_rule_tables_match_the_catalog() -> None:
-    """README and the bundled authoring skill each hand-maintain a rule table.
+    """The narration-lint docs page and the bundled authoring skill each
+    hand-maintain a rule table.
 
     Nothing else notices when a rule is added, renamed, or has its default
     changed, and a downstream agent reads the skill's copy instead of the
-    README — so both are checked against `DEFAULTS` here.
+    site — so both are checked against `DEFAULTS` here.
     """
-    readme = Path(__file__).resolve().parents[3] / 'README.md'
+    docs_page = (
+        Path(__file__).resolve().parents[3]
+        / 'docs'
+        / 'site'
+        / 'configuration'
+        / 'narration-lint.md'
+    )
     skill = (
         BUNDLED_SKILLS_ROOT / 'pytest-given-authoring' / 'references' / 'scenarios.md'
     )
-    for doc in (readme, skill):
+    for doc in (docs_page, skill):
         rows = dict(
             re.findall(
                 r'^\| `([a-z][a-z0-9-]*)` \| `?(off|warn|error)`? \|',
