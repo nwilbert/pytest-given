@@ -331,7 +331,9 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="pytest-given" class="md-nav__button md-logo" aria-label="pytest-given" data-md-component="logo">
       
@@ -529,10 +531,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#scenarioname-tagsnone-storynone-activitiesnone-group_parametrizedtrue" class="md-nav__link">
+  <a href="#scenario" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        <code>@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)</code>
+        <code>@scenario</code>
       </span>
     </span>
   </a>
@@ -540,10 +542,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#giventext-whentext-thentext" class="md-nav__link">
+  <a href="#given-when-then" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        <code>given(text)</code>, <code>when(text)</code>, <code>then(text)</code>
+        <code>given</code> / <code>when</code> / <code>then</code>
       </span>
     </span>
   </a>
@@ -551,10 +553,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#when_thenwhen_text-then_text" class="md-nav__link">
+  <a href="#when_then" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        <code>when_then(when_text, then_text)</code>
+        <code>when_then</code>
       </span>
     </span>
   </a>
@@ -995,79 +997,6 @@
               </div>
             
             
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  
-                    
-                    
-                    
-                      
-                    
-                    
-                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-                      <div class="md-sidebar-button__wrapper">
-                        <label class="md-sidebar-button" for="__toc"></label>
-                      </div>
-                    
-                  
-                  <div class="md-sidebar__inner">
-                    
-
-
-<nav class="md-nav md-nav--secondary" aria-label="On this page">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#scenarioname-tagsnone-storynone-activitiesnone-group_parametrizedtrue" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#giventext-whentext-thentext" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>given(text)</code>, <code>when(text)</code>, <code>then(text)</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when_thenwhen_text-then_text" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>when_then(when_text, then_text)</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           
             <div class="md-content" data-md-component="content">
@@ -1086,9 +1015,11 @@
 
 <h1 id="scenarios-steps">Scenarios &amp; steps<a class="headerlink" href="#scenarios-steps" title="Permanent link">&para;</a></h1>
 <p>Everything a narrated test uses: the decorator that puts it in the report, and the step context managers that describe it.</p>
-<h2 id="scenarioname-tagsnone-storynone-activitiesnone-group_parametrizedtrue"><code>@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)</code><a class="headerlink" href="#scenarioname-tagsnone-storynone-activitiesnone-group_parametrizedtrue" title="Permanent link">&para;</a></h2>
+<h2 id="scenario"><code>@scenario</code><a class="headerlink" href="#scenario" title="Permanent link">&para;</a></h2>
+<p><code>@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)</code></p>
 <p>Required for a test to appear in the report. <code>story=</code> / <code>activities=</code> bind it to a domain story (see <a href="../domain-storytelling/">Domain Storytelling</a>) — <code>activities=</code> requires <code>story=</code> and takes an <code>int</code> or a sequence of them, never a string; <code>group_parametrized=False</code> declines parametrize merging. The decorated function is returned unwrapped.</p>
-<h2 id="giventext-whentext-thentext"><code>given(text)</code>, <code>when(text)</code>, <code>then(text)</code><a class="headerlink" href="#giventext-whentext-thentext" title="Permanent link">&para;</a></h2>
+<h2 id="given-when-then"><code>given</code> / <code>when</code> / <code>then</code><a class="headerlink" href="#given-when-then" title="Permanent link">&para;</a></h2>
+<p><code>given(text)</code>, <code>when(text)</code>, <code>then(text)</code></p>
 <p>Dual-purpose: use as a <strong>context manager</strong> inside a test body, or as a <strong>decorator</strong> on a fixture or helper function.</p>
 <p>As context managers:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">with</span> <span class="n">given</span><span class="p">(</span><span class="s1">&#39;an empty cart&#39;</span><span class="p">):</span>
@@ -1141,7 +1072,8 @@
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        <span class="o">...</span>
 </code></pre></div>
 <p>Crossing phases is rejected: a <code>then</code> opened inside a <code>when</code> raises <code>PytestGivenError</code>. That covers decorated helpers too — a <code>@when</code> helper called from inside a <code>given</code> block raises — so a helper used from more than one phase should stay undecorated and be narrated at its call site.</p>
-<h2 id="when_thenwhen_text-then_text"><code>when_then(when_text, then_text)</code><a class="headerlink" href="#when_thenwhen_text-then_text" title="Permanent link">&para;</a></h2>
+<h2 id="when_then"><code>when_then</code><a class="headerlink" href="#when_then" title="Permanent link">&para;</a></h2>
+<p><code>when_then(when_text, then_text)</code></p>
 <p>When a single call is both the action under test and the thing you assert about — most often an expected raise — pair it with <code>pytest.raises</code> and let <code>when_then</code> narrate both an action and its outcome from one <code>with</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pytest_given</span><span class="w"> </span><span class="kn">import</span> <span class="n">when_then</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
@@ -1218,7 +1150,7 @@
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["navigation.tabs","navigation.sections","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["navigation.tabs","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.df5d1f2b.min.js"></script>
