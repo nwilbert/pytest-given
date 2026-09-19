@@ -234,12 +234,12 @@ def test_build_glossary_aggregations_verb_in_step_not_collected_as_instance() ->
 
 
 @scenario(
-    t'A canonical entity reference is not an {pg["Instance"].low}',
+    t'A canonical entity reference is not an {pg["Instance"].low}, whatever its case',
 )
 def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -> None:
     with given(
-        t'a {pg["Story"]} activity and a {pg["Step"]} referencing entities '
-        t'by canonical name only'
+        t'a {pg["Story"]} activity referencing entities by canonical name, '
+        t'and a {pg["Step"]} referencing one in lowercase'
     ):
         g = _g()
         a = Activity(
@@ -261,7 +261,7 @@ def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -
             phase='when',
             narration=Narration(
                 text='x',
-                parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
+                parts=(NarrationTermRef(term_id=TermId('guest'), display='guest'),),
             ),
         )
         scn = Scenario(

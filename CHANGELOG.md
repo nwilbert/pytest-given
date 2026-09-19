@@ -21,6 +21,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Fixed
 
+- The Glossary view no longer lists a term's own name in another case (`guest.low`) under Instances.
 - `when_then(...)` rejects a `Template` narration in a test body, as `given`/`when`/`then` already do.
 - Story and glossary-term source locations are captured correctly on native Windows, which also restores the lint rules that depend on them.
 - `tag-shadows-term` no longer skips a tag whose slug collides with a term id when the tag contains a non-ASCII character that lowercases into ASCII.

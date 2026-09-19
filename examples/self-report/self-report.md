@@ -1870,29 +1870,29 @@
 - **when** the «Glossary» aggregations are built
 - **then** the «Story» and the «Inflection» appear once each
 
-## ✓ A canonical entity reference is not an «instance»
+## ✓ A canonical entity reference is not an «instance», whatever its case
 `tests/unit/report/test_glossary_view.py:236::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
 
-- **given** a «Story» activity and a «Step» referencing entities by canonical name only
+- **given** a «Story» activity referencing entities by canonical name, and a «Step» referencing one in lowercase
 - **when** the «Glossary» aggregations are built
 - **then** neither entity term records an «Instance»
 
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_glossary_view.py:322::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
+`tests/unit/report/test_glossary_view.py:323::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
 
 - **given** a «Kindless» «Term» referenced by a «Story» activity
 - **when** the «Glossary» aggregations are built
 - **then** the «Term» lists the «Story» but no «Instance» and no «Inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_glossary_view.py:355::test_glossary_aggregations_annotates_fixture_provenance`
+`tests/unit/report/test_glossary_view.py:356::test_glossary_aggregations_annotates_fixture_provenance`
 
 - **given** a «Scenario» whose fixture-sourced «Step» names an «Instance»
 - **when** the «Glossary» aggregations are built
 - **then** the «Instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_glossary_view.py:444::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
+`tests/unit/report/test_glossary_view.py:445::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
 
 - **given** a «Scenario» referencing one «Term» in two steps and another in its name
 - **when** the term-scenario index is built

@@ -317,10 +317,10 @@ class _GlossaryIndex:
     ) -> None:
         """Note one occurrence of an entity term reading as `display`.
 
-        A reference whose display matches the term's canonical name is the
-        concept itself, not an instance, so only specific displays (``Alice``
-        for ``Guest``) reach the Instances list. Verbs and kindless terms have
-        no instances and are ignored here.
+        A reference whose display is the term's canonical name — in any case,
+        so ``guest.low`` too — is the concept itself, not an instance; only
+        specific displays (``Alice`` for ``Guest``) reach the Instances list.
+        Verbs and kindless terms have no instances and are ignored here.
         """
         term = self._glossary.get(term_id)
         if term is None or term.kind not in ('actor', 'object'):
@@ -328,7 +328,7 @@ class _GlossaryIndex:
         if (term_id, display) in self._instances:
             return
         self._instances.add((term_id, display))
-        if display != term.canonical:
+        if display.lower() != term.canonical.lower():
             self._agg(term_id).instances.append(
                 TermOccurrence(display=display, fixture_name=fixture_name)
             )
