@@ -32,8 +32,20 @@
 .pg-hero p {
   margin: 0 0 1rem;
   font-size: 1rem;
-  max-width: 40rem;
+  max-width: 44rem;
   opacity: 0.95;
+}
+.pg-hero-gwt span {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.pg-hero-gwt b {
+  font-weight: 700;
+}
+.pg-hero-note {
+  margin: 1rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.8;
 }
 .pg-hero a:not(.md-button) {
   color: #fff;
