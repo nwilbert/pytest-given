@@ -7,18 +7,27 @@ two work objects joined by a preposition, two actors in the same path,
 multi-path activities for parallel branches, and an activity whose vocabulary
 is undefined but classified by kind inference.
 
+The glossary holds only vocabulary with a meaning specific to the domain. The
+verbs that are plain sentence prose — *searches for*, *selects*, *adds*,
+*submits*, *sends* — stay bare strings in the activities; only the verbs a
+hotel would define (confirm, decline, cancel, refund) are terms.
+
 Three scenarios implement the Story at varying detail, each in full
 Given/When/Then form:
 
-* `test_pick_suite` — happy path, covers activities 1-2.
+* `test_pick_suite` — happy path, covers activities 1-2. Both activities
+  narrate the same two terms (Organizer, Room) — their verbs are bare — so
+  narration alone cannot tell them apart; the steps pin their activity number
+  with `activity=`.
 * `test_complete_booking` — happy path through the rest, covers 2-6.
   Activity 2 is intentionally shared with `test_pick_suite` so the Stories tab
-  shows two badges on that row.
-* `test_payment_declined` — parametrized error branch using a `reject` verb
+  shows two badges on that row (its `given` pins activity 2 for the same
+  reason as above).
+* `test_payment_declined` — parametrized error branch using a `decline` verb
   that lives in the glossary but isn't part of any story activity. Cases pair
   a payment method with its decline reason (credit card / insufficient funds,
   debit card / expired card, bank transfer / fraud check), all funneling
-  through the same reject path. Covers 3 and 4, overlapping with
+  through the same decline path. Covers 3 and 4, overlapping with
   `test_complete_booking` to show how a scenario can probe a different aspect
   (the failure path) of the same activities.
 
@@ -33,8 +42,8 @@ vocabulary still needs to be exercised by a test.
 A second, shorter Story — `Cancel a Booking` — shares the same glossary to
 exercise the multi-story parts of the report (Stories tab, story filter) and to
 show vocabulary reused across stories (Guest, Booking, Payment, Confirmation,
-Booking System, send). Its single scenario `test_cancel_booking` covers all
-three of its activities.
+Booking System). Its single scenario `test_cancel_booking` covers all three of
+its activities.
 """
 
 import pytest
@@ -62,18 +71,15 @@ booking = g.work_object('Booking', 'A reservation for one or more rooms.')
 payment = g.work_object('Payment', 'Money transferred for a booking.')
 confirmation = g.work_object('Confirmation', 'Notification of a successful booking.')
 
-search = g.verb('search', 'Look up available options.')
-select = g.verb('select', 'Choose one option from a set.')
-add = g.verb('add', 'Attach a member to a collection.')
-submit = g.verb('submit', 'Send to the system for processing.')
-confirm = g.verb('confirm', 'Finalize and acknowledge.')
-send = g.verb('send', 'Deliver to a recipient.')
-# `reject` is in the ubiquitous language but no Story activity uses it yet —
+confirm = g.verb(
+    'confirm', 'Guarantee a paid booking so its rooms are held for arrival.'
+)
+# `decline` is in the ubiquitous language but no Story activity uses it yet —
 # it surfaces in the Glossary tab and powers the error-path scenario.
-reject = g.verb('reject', 'Refuse to process or accept.')
-# Vocabulary for the second Story — reused alongside `send` from the first.
+decline = g.verb('decline', 'Refuse a payment, leaving its booking pending.')
+# Vocabulary for the second Story.
 cancel = g.verb('cancel', 'Withdraw a booking before arrival.')
-refund = g.verb('refund', 'Return money for a cancelled booking.')
+refund = g.verb('refund', 'Return the payment for a cancelled booking.')
 
 
 book_a_group_trip = story(
@@ -81,23 +87,23 @@ book_a_group_trip = story(
     [
         # 1. Actor instance + canonical work object (the room category, before
         #    any specific room is chosen).
-        activity(organizer('Carol'), search('searches for'), room),
+        activity(organizer('Carol'), 'searches for', room),
         # 2. Actor instance + work-object instance.
-        activity(organizer('Carol'), select('selects'), room('Deluxe Suite')),
+        activity(organizer('Carol'), 'selects', room('Deluxe Suite')),
         # 3. Multi-path: two parallel branches, each a two-actor sentence
         #    joined by a preposition.
         activity(
-            path(organizer('Carol'), add('adds'), guest('Alice'), 'to', booking),
-            path(organizer('Carol'), add('adds'), guest('Bob'), 'to', booking),
+            path(organizer('Carol'), 'adds', guest('Alice'), 'to', booking),
+            path(organizer('Carol'), 'adds', guest('Bob'), 'to', booking),
         ),
         # 4. Two work objects connected by a preposition.
-        activity(organizer('Carol'), submit('submits'), payment, 'for', booking),
+        activity(organizer('Carol'), 'submits', payment, 'for', booking),
         # 5. System confirms the booking.
         activity(booking_system, confirm('confirms'), booking),
         # 6. Multi-path send — one confirmation per guest, in parallel.
         activity(
-            path(booking_system, send('sends'), confirmation, 'to', guest('Alice')),
-            path(booking_system, send('sends'), confirmation, 'to', guest('Bob')),
+            path(booking_system, 'sends', confirmation, 'to', guest('Alice')),
+            path(booking_system, 'sends', confirmation, 'to', guest('Bob')),
         ),
         # 7. Vocabulary the team hasn't classified yet — kindless until kind
         #    inference runs, and undefined until someone writes a definition.
@@ -112,7 +118,7 @@ book_a_group_trip = story(
 
 # A short second Story sharing the same glossary — exercises the multi-story
 # parts of the report (Stories tab, story filter) and shows vocabulary reused
-# across stories (Guest, Booking, Payment, Confirmation, Booking System, send).
+# across stories (Guest, Booking, Payment, Confirmation, Booking System).
 cancel_a_booking = story(
     'Cancel a Booking',
     [
@@ -121,8 +127,8 @@ cancel_a_booking = story(
         # Two work objects joined by a preposition — the refund settles the
         # payment for that booking.
         activity(booking_system, refund('refunds'), payment, 'for', booking),
-        # Reuses the send/confirmation vocabulary from the first story.
-        activity(booking_system, send('sends'), confirmation, 'to', guest('Alice')),
+        # Reuses the confirmation vocabulary from the first story.
+        activity(booking_system, 'sends', confirmation, 'to', guest('Alice')),
     ],
 )
 
@@ -152,18 +158,18 @@ def test_pick_suite(carol):
             'Deluxe Suite': {'available': True},
             'Standard': {'available': False},
         }
-    with when(t'{organizer("Carol")} {search("searches for")} a {room}'):
+    with when(t'{organizer("Carol")} searches for a {room}', activity=1):
         offered = [name for name, r in catalog.items() if r['available']]
-    with when(t'{organizer("Carol")} {select("selects")} the {room("Deluxe Suite")}'):
+    with when(t'{organizer("Carol")} selects the {room("Deluxe Suite")}', activity=2):
         carol['selection'] = offered[0]
-    with then(t'the {room("Deluxe Suite")} is held for {organizer("Carol")}'):
+    with then(t'the {room("Deluxe Suite")} is held for the group'):
         assert carol['selection'] == 'Deluxe Suite'
 
 
 @scenario('Carol completes the booking for both guests', story=book_a_group_trip)
 def test_complete_booking(carol, alice, bob):
     with given(
-        t'{organizer("Carol")} has {select("selected")} the {room("Deluxe Suite")}'
+        t'{organizer("Carol")} has selected the {room("Deluxe Suite")}', activity=2
     ):
         booking_state = {
             'room': 'Deluxe Suite',
@@ -173,19 +179,17 @@ def test_complete_booking(carol, alice, bob):
             'notified': [],
         }
     with when(
-        t'{organizer("Carol")} {add("adds")} {guest("Alice")} '
-        t'and {guest("Bob")} to the {booking}'
+        t'{organizer("Carol")} adds {guest("Alice")} and {guest("Bob")} '
+        t'to the {booking}'
     ):
         booking_state['guests'] = [alice['name'], bob['name']]
-    with when(
-        t'{organizer("Carol")} {submit("submits")} the {payment} for the {booking}'
-    ):
+    with when(t'{organizer("Carol")} submits the {payment} for the {booking}'):
         booking_state['paid'] = True
     with then(t'the {booking_system} {confirm("confirms")} the {booking}'):
         booking_state['confirmed'] = booking_state['paid']
         assert booking_state['confirmed']
     with then(
-        t'the {booking_system} {send("sends")} the {confirmation} '
+        t'the {booking_system} sends the {confirmation} '
         t'to {guest("Alice")} and {guest("Bob")}'
     ):
         booking_state['notified'] = list(booking_state['guests'])
@@ -209,8 +213,8 @@ SUPPORTED_PAYMENT_METHODS = {'credit card', 'debit card', 'bank transfer'}
 )
 def test_payment_declined(carol, alice, bob, payment_method, decline_reason):
     with given(
-        t'{organizer("Carol")} has {add("added")} {guest("Alice")} '
-        t'and {guest("Bob")} to the {booking}'
+        t'{organizer("Carol")} has added {guest("Alice")} and {guest("Bob")} '
+        t'to the {booking}'
     ):
         booking_state = {
             'guests': [alice['name'], bob['name']],
@@ -218,13 +222,13 @@ def test_payment_declined(carol, alice, bob, payment_method, decline_reason):
             'confirmed': False,
         }
     with when(
-        t'{organizer("Carol")} {submit("submits")} the {payment} '
+        t'{organizer("Carol")} submits the {payment} '
         t'by {payment_method} for the {booking}'
     ):
         # Payment processor reports the parametrized decline reason.
         processor_response = decline_reason
     with then(
-        t'the {booking_system} {reject("rejects")} the {payment} '
+        t'the {booking_system} {decline("declines")} the {payment} '
         t'because of {decline_reason}'
     ):
         assert payment_method in SUPPORTED_PAYMENT_METHODS
@@ -254,8 +258,6 @@ def test_cancel_booking(alice):
     ):
         booking_state['refunded'] = booking_state['cancelled'] and booking_state['paid']
         assert booking_state['refunded']
-    with then(
-        t'the {booking_system} {send("sends")} a {confirmation} to {guest("Alice")}'
-    ):
+    with then(t'the {booking_system} sends a {confirmation} to {guest("Alice")}'):
         booking_state['notified'] = [alice['name']]
         assert booking_state['notified'] == ['Alice']

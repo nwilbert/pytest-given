@@ -240,16 +240,16 @@ from pytest_given import Glossary
 g = Glossary()
 guest = g.actor('Guest', definition='Person booking accommodation.')
 room = g.work_object('Room', definition='A bookable hotel room.')
-search = g.verb('search', definition='Look up available options.')
+book = g.verb('book', definition='Reserve a room for a stay.')
 ```
 
-Use the captured handles directly in t-strings — `t'a {guest} {search("searches for")} a {room}'`. Each interpolation becomes a washed, kind-colored word in the rendered step, with the term's definition as a tooltip. Glossary terms feed the Glossary tab.
+Use the captured handles directly in t-strings — `t'a {guest} {book("books")} a {room}'`. Each interpolation becomes a washed, kind-colored word in the rendered step, with the term's definition as a tooltip. Glossary terms feed the Glossary tab.
 
 Reference a term with the lightest surface form that fits the sentence — the same three forms on every handle (captured or looked up):
 
 - **Bare** — `{guest}` renders the term's canonical text. Use it whenever the word appears as-is; restating it as `guest('Guest')` is redundant.
 - **`.low`** — `{guest.low}` renders the canonical lowercased, the common mid-sentence form, instead of the equivalent `guest('guest')`.
-- **Callable override** — `guest('Alice')` supplies any other surface: a verb inflection (`search('searches for')`), a plural (`room('rooms')`), or a concrete instance.
+- **Callable override** — `guest('Alice')` supplies any other surface: a verb inflection (`book('books')`), a plural (`room('rooms')`), or a concrete instance.
 
 **Loading a Markdown glossary file instead** — if your project already keeps a `GLOSSARY.md`, point `FileGlossary` at it rather than declaring terms in code:
 
@@ -296,19 +296,19 @@ from tests.ubiquitous_language import g  # noqa: F401 — plugin discovery
 from pytest_given import activity, story
 
 book_a_group_trip = story('Book a Group Trip', [
-    activity(organizer('Carol'), search('searches for'), room),
-    activity(organizer('Carol'), select('selects'), room('Deluxe Suite')),
+    activity(organizer('Carol'), 'searches for', room),
+    activity(organizer('Carol'), 'selects', room('Deluxe Suite')),
 ])
 ```
 
-An activity reads left-to-right: actor → verb → work object (with optional connective words). Any part may be a bare string instead of a glossary handle — but an activity needs at least two distinct glossary terms to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them explicitly.
+An activity reads left-to-right: actor → verb → work object (with optional connective words). Any part may be a bare string instead of a glossary handle — generic verbs like *searches for* belong there; only vocabulary with a domain-specific meaning earns a glossary row — but an activity needs at least two distinct glossary terms to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them explicitly.
 
 `path(...)` gives one activity **parallel branches** — alternate sentences that happen together, one per branch:
 
 ```python
 activity(
-    path(organizer('Carol'), add('adds'), guest('Alice'), 'to', trip),
-    path(organizer('Carol'), add('adds'), guest('Bob'), 'to', trip),
+    path(organizer('Carol'), 'adds', guest('Alice'), 'to', trip),
+    path(organizer('Carol'), 'adds', guest('Bob'), 'to', trip),
 )
 ```
 
@@ -319,7 +319,7 @@ A path alternates node / edge / node …, so it has an odd length ≥ 3 and ends
 ```python
 @scenario('Carol selects a suite', story=book_a_group_trip)
 def test_select_suite(carol):
-    with when(t'{organizer("Carol")} {select("selects")} the {room("Deluxe Suite")}'):
+    with when(t'{organizer("Carol")} selects the {room("Deluxe Suite")}'):
         ...
 ```
 

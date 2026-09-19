@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-19T06:08:56.544461+00:00",
+    "timestamp": "2026-09-19T10:07:10.521283+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "8475ddf56c8cfde22a9ce2606c0a51da444ff62f",
+    "commit_sha": "44a42449f975d359cfc6de10ed4f143a5fb186b2",
     "title": "Hotel Booking Example"
   },
   "scenarios": [
@@ -73,15 +73,7 @@
                 "expression": "organizer(\"Carol\")"
               },
               {
-                "value": " "
-              },
-              {
-                "term_id": "search",
-                "display": "searches for",
-                "expression": "search(\"searches for\")"
-              },
-              {
-                "value": " a "
+                "value": " searches for a "
               },
               {
                 "term_id": "room",
@@ -92,7 +84,9 @@
           },
           "children": [],
           "attachments": [],
-          "activity_ids": [],
+          "activity_ids": [
+            1
+          ],
           "fixture_name": null
         },
         {
@@ -106,15 +100,7 @@
                 "expression": "organizer(\"Carol\")"
               },
               {
-                "value": " "
-              },
-              {
-                "term_id": "select",
-                "display": "selects",
-                "expression": "select(\"selects\")"
-              },
-              {
-                "value": " the "
+                "value": " selects the "
               },
               {
                 "term_id": "room",
@@ -125,13 +111,15 @@
           },
           "children": [],
           "attachments": [],
-          "activity_ids": [],
+          "activity_ids": [
+            2
+          ],
           "fixture_name": null
         },
         {
           "phase": "then",
           "narration": {
-            "text": "the Deluxe Suite is held for Carol",
+            "text": "the Deluxe Suite is held for the group",
             "parts": [
               {
                 "value": "the "
@@ -142,12 +130,7 @@
                 "expression": "room(\"Deluxe Suite\")"
               },
               {
-                "value": " is held for "
-              },
-              {
-                "term_id": "organizer",
-                "display": "Carol",
-                "expression": "organizer(\"Carol\")"
+                "value": " is held for the group"
               }
             ]
           },
@@ -162,7 +145,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 148
+        "line": 154
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
@@ -249,15 +232,7 @@
                 "expression": "organizer(\"Carol\")"
               },
               {
-                "value": " has "
-              },
-              {
-                "term_id": "select",
-                "display": "selected",
-                "expression": "select(\"selected\")"
-              },
-              {
-                "value": " the "
+                "value": " has selected the "
               },
               {
                 "term_id": "room",
@@ -268,7 +243,9 @@
           },
           "children": [],
           "attachments": [],
-          "activity_ids": [],
+          "activity_ids": [
+            2
+          ],
           "fixture_name": null
         },
         {
@@ -282,15 +259,7 @@
                 "expression": "organizer(\"Carol\")"
               },
               {
-                "value": " "
-              },
-              {
-                "term_id": "add",
-                "display": "adds",
-                "expression": "add(\"adds\")"
-              },
-              {
-                "value": " "
+                "value": " adds "
               },
               {
                 "term_id": "guest",
@@ -331,15 +300,7 @@
                 "expression": "organizer(\"Carol\")"
               },
               {
-                "value": " "
-              },
-              {
-                "term_id": "submit",
-                "display": "submits",
-                "expression": "submit(\"submits\")"
-              },
-              {
-                "value": " the "
+                "value": " submits the "
               },
               {
                 "term_id": "payment",
@@ -411,15 +372,7 @@
                 "expression": "booking_system"
               },
               {
-                "value": " "
-              },
-              {
-                "term_id": "send",
-                "display": "sends",
-                "expression": "send(\"sends\")"
-              },
-              {
-                "value": " the "
+                "value": " sends the "
               },
               {
                 "term_id": "confirmation",
@@ -455,7 +408,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 163
+        "line": 169
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
@@ -469,7 +422,7 @@
       "module": "test_hotel_booking",
       "tags": [],
       "status": "failed",
-      "duration_ms": 30,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -542,15 +495,7 @@
                 "expression": "organizer(\"Carol\")"
               },
               {
-                "value": " has "
-              },
-              {
-                "term_id": "add",
-                "display": "added",
-                "expression": "add(\"added\")"
-              },
-              {
-                "value": " "
+                "value": " has added "
               },
               {
                 "term_id": "guest",
@@ -591,15 +536,7 @@
                 "expression": "organizer(\"Carol\")"
               },
               {
-                "value": " "
-              },
-              {
-                "term_id": "submit",
-                "display": "submits",
-                "expression": "submit(\"submits\")"
-              },
-              {
-                "value": " the "
+                "value": " submits the "
               },
               {
                 "term_id": "payment",
@@ -633,7 +570,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the Booking System rejects the Payment because of {decline_reason}",
+            "text": "the Booking System declines the Payment because of {decline_reason}",
             "parts": [
               {
                 "value": "the "
@@ -647,9 +584,9 @@
                 "value": " "
               },
               {
-                "term_id": "reject",
-                "display": "rejects",
-                "expression": "reject(\"rejects\")"
+                "term_id": "decline",
+                "display": "declines",
+                "expression": "decline(\"declines\")"
               },
               {
                 "value": " the "
@@ -769,7 +706,7 @@
               "frames": [
                 {
                   "path": "examples/hotel-booking/test_hotel_booking.py",
-                  "lineno": 230,
+                  "lineno": 234,
                   "func": "test_payment_declined",
                   "code": "    assert payment_method in SUPPORTED_PAYMENT_METHODS",
                   "is_internal": false
@@ -784,7 +721,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 198
+        "line": 202
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
@@ -939,15 +876,7 @@
                 "expression": "booking_system"
               },
               {
-                "value": " "
-              },
-              {
-                "term_id": "send",
-                "display": "sends",
-                "expression": "send(\"sends\")"
-              },
-              {
-                "value": " a "
+                "value": " sends a "
               },
               {
                 "term_id": "confirmation",
@@ -975,7 +904,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 240
+        "line": 244
       },
       "story_id": "cancel-a-booking",
       "activity_ids": []
@@ -990,7 +919,7 @@
         "definition": "Person booking accommodation on behalf of a group.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 56
+          "line": 65
         }
       },
       {
@@ -1000,7 +929,7 @@
         "definition": "Individual traveler in the group.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 57
+          "line": 66
         }
       },
       {
@@ -1010,7 +939,7 @@
         "definition": "Automated reservation back-end.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 58
+          "line": 67
         }
       },
       {
@@ -1020,7 +949,7 @@
         "definition": "A bookable hotel room.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 60
+          "line": 69
         }
       },
       {
@@ -1030,7 +959,7 @@
         "definition": "A reservation for one or more rooms.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 61
+          "line": 70
         }
       },
       {
@@ -1040,7 +969,7 @@
         "definition": "Money transferred for a booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 62
+          "line": 71
         }
       },
       {
@@ -1050,77 +979,27 @@
         "definition": "Notification of a successful booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 63
-        }
-      },
-      {
-        "id": "search",
-        "kind": "verb",
-        "canonical": "search",
-        "definition": "Look up available options.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 65
-        }
-      },
-      {
-        "id": "select",
-        "kind": "verb",
-        "canonical": "select",
-        "definition": "Choose one option from a set.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 66
-        }
-      },
-      {
-        "id": "add",
-        "kind": "verb",
-        "canonical": "add",
-        "definition": "Attach a member to a collection.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 67
-        }
-      },
-      {
-        "id": "submit",
-        "kind": "verb",
-        "canonical": "submit",
-        "definition": "Send to the system for processing.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 68
+          "line": 72
         }
       },
       {
         "id": "confirm",
         "kind": "verb",
         "canonical": "confirm",
-        "definition": "Finalize and acknowledge.",
+        "definition": "Guarantee a paid booking so its rooms are held for arrival.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 69
+          "line": 74
         }
       },
       {
-        "id": "send",
+        "id": "decline",
         "kind": "verb",
-        "canonical": "send",
-        "definition": "Deliver to a recipient.",
+        "canonical": "decline",
+        "definition": "Refuse a payment, leaving its booking pending.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 70
-        }
-      },
-      {
-        "id": "reject",
-        "kind": "verb",
-        "canonical": "reject",
-        "definition": "Refuse to process or accept.",
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 73
+          "line": 79
         }
       },
       {
@@ -1130,17 +1009,17 @@
         "definition": "Withdraw a booking before arrival.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 75
+          "line": 81
         }
       },
       {
         "id": "refund",
         "kind": "verb",
         "canonical": "refund",
-        "definition": "Return money for a cancelled booking.",
+        "definition": "Return the payment for a cancelled booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 76
+          "line": 82
         }
       },
       {
@@ -1150,7 +1029,7 @@
         "definition": null,
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 106
+          "line": 112
         }
       },
       {
@@ -1160,7 +1039,7 @@
         "definition": null,
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 107
+          "line": 113
         }
       }
     ]
@@ -1180,8 +1059,7 @@
                   "display": "Carol"
                 },
                 {
-                  "term_id": "search",
-                  "display": "searches for"
+                  "text": "searches for"
                 },
                 {
                   "term_id": "room",
@@ -1201,8 +1079,7 @@
                   "display": "Carol"
                 },
                 {
-                  "term_id": "select",
-                  "display": "selects"
+                  "text": "selects"
                 },
                 {
                   "term_id": "room",
@@ -1222,8 +1099,7 @@
                   "display": "Carol"
                 },
                 {
-                  "term_id": "add",
-                  "display": "adds"
+                  "text": "adds"
                 },
                 {
                   "term_id": "guest",
@@ -1245,8 +1121,7 @@
                   "display": "Carol"
                 },
                 {
-                  "term_id": "add",
-                  "display": "adds"
+                  "text": "adds"
                 },
                 {
                   "term_id": "guest",
@@ -1273,8 +1148,7 @@
                   "display": "Carol"
                 },
                 {
-                  "term_id": "submit",
-                  "display": "submits"
+                  "text": "submits"
                 },
                 {
                   "term_id": "payment",
@@ -1322,8 +1196,7 @@
                   "display": "Booking System"
                 },
                 {
-                  "term_id": "send",
-                  "display": "sends"
+                  "text": "sends"
                 },
                 {
                   "term_id": "confirmation",
@@ -1345,8 +1218,7 @@
                   "display": "Booking System"
                 },
                 {
-                  "term_id": "send",
-                  "display": "sends"
+                  "text": "sends"
                 },
                 {
                   "term_id": "confirmation",
@@ -1387,7 +1259,7 @@
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 79
+        "line": 85
       }
     },
     {
@@ -1453,8 +1325,7 @@
                   "display": "Booking System"
                 },
                 {
-                  "term_id": "send",
-                  "display": "sends"
+                  "text": "sends"
                 },
                 {
                   "term_id": "confirmation",
@@ -1474,7 +1345,7 @@
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 116
+        "line": 122
       }
     }
   ],

@@ -8,22 +8,22 @@ A domain story models a flow as a sequence of activities — who does what with 
 from pytest_given import activity, path, story
 
 book_a_group_trip = story('Book a Group Trip', [
-    activity(organizer('Carol'), search('searches for'), room),
-    activity(organizer('Carol'), select('selects'), room('Deluxe Suite')),
-    activity(organizer('Carol'), submit('submits'), payment, 'for', booking),
+    activity(organizer('Carol'), 'searches for', room),
+    activity(organizer('Carol'), 'submits', payment, 'for', booking),
+    activity(booking_system, confirm('confirms'), booking),
 ])
 ```
 
 - An activity reads left-to-right: **actor → verb → work object**, with optional connective words (`'for'`, `'to'`) between parts. Structurally it is a strict node/edge alternation of odd length ≥ 3: even positions are entity nodes (position 0 is the acting actor), odd positions are edges (a verb or a connective).
 - **A bare word consumes a position.** Write a connective as one string in an edge slot (`'to the'`, `'with a'`); never insert a standalone article before a noun — it shifts the noun into a verb slot and construction fails.
-- Handles come from the glossary; calling one supplies an instance or inflection — `organizer('Carol')`, `search('searches for')`.
-- Any part may be a **bare string** instead of a glossary handle — but an activity needs at least two distinct glossary terms to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them (below).
+- Handles come from the glossary; calling one supplies an instance or inflection — `organizer('Carol')`, `confirm('confirms')`.
+- Any part may be a **bare string** instead of a glossary handle — the right place for a verb that is just sentence prose (*searches for*, *submits*; see [Authoring workflow](#authoring-workflow)). But an activity needs at least two distinct glossary terms to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them (below).
 - `path(...)` branches an activity where alternate sequences run in parallel or share a prefix:
 
 ```python
 activity(
-    path(organizer('Carol'), add('adds'), guest('Alice'), 'to', booking),
-    path(organizer('Carol'), add('adds'), guest('Bob'), 'to', booking),
+    path(organizer('Carol'), 'adds', guest('Alice'), 'to', booking),
+    path(organizer('Carol'), 'adds', guest('Bob'), 'to', booking),
 ),
 ```
 
@@ -36,7 +36,7 @@ activity(
 ```python
 @scenario('Carol selects a suite', story=book_a_group_trip)
 def test_select_suite(carol):
-    with when(t'{organizer("Carol")} {select("selects")} the {room("Deluxe Suite")}'):
+    with when(t'{organizer("Carol")} selects the {room("Deluxe Suite")}'):
         ...
 ```
 

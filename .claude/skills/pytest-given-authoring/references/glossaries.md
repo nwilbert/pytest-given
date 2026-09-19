@@ -27,7 +27,7 @@ from pytest_given import Glossary
 g = Glossary()
 guest = g.actor('Guest', definition='Person booking accommodation.')
 room = g.work_object('Room', definition='A bookable hotel room.')
-search = g.verb('search', definition='Look up available options.')
+book = g.verb('book', definition='Reserve a room for a stay.')
 ```
 
 Either way, **give the language a public home**: define the glossary — and the stories, once there are some — in one dedicated, publicly named module, e.g. `tests/ubiquitous_language.py`. The module *is* the suite's ubiquitous language, not a private helper — don't underscore-prefix it; test modules import their handles from it. Glossary-only mode is fine — you get the Glossary tab without writing any stories.

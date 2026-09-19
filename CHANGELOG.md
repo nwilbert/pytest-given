@@ -18,6 +18,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Changed
 
 - Story coverage matches on glossary terms alone: an instance in an activity (`guest('Alice')`) is now covered by a step naming the bare term, and vice versa — activities that differed only by instance are no longer told apart by narration, only by an `activity=` pin.
+- The authoring skill's and README's glossary snippets keep generic verbs (*searches for*, *adds*) as bare activity strings instead of glossary terms, and the hotel-booking example's glossary is trimmed to domain vocabulary accordingly.
 
 ### Fixed
 
