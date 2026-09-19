@@ -16,7 +16,7 @@ uv sync --group dev
 
 ## Quality gates
 
-`uv run nox` runs the default gate — `format`, `lint`, `mypy`, `test`, `coverage` (a 100% target), `audit` (a `pip-audit` of the locked dependencies). The sessions below are on-demand; list them all with `uv run nox -l`.
+`uv run nox` runs the default gate — `format`, `lint`, `mypy`, `test`, `coverage` (a 100% target), `audit` (a `pip-audit` of the locked dependencies). **Run it (or at minimum `uv run nox -s format lint mypy test`) before every commit.** The sessions below are on-demand; list them all with `uv run nox -l`.
 
 - `uv run nox -s examples` regenerates the JSON, HTML, and Markdown files under `examples/coffeeshop/`, `examples/hotel-booking/`, and `examples/file-glossary-booking/`. Run after changes to the renderer, templates, plugin output schema, or any example test file, and commit the updated outputs.
 - `uv run nox -s self_report` regenerates `examples/self-report/` — pytest-given applied to its own backend tests (see [Writing self-report scenarios](#writing-self-report-scenarios)). Run after decorating more tests or changing decorated ones, and commit the updated outputs.
@@ -24,15 +24,13 @@ uv sync --group dev
   - Every regeneration rewrites `commit_sha` (to current HEAD, including the SHA-pinned source-link URLs), `timestamp`, and `duration_ms` in the JSON and HTML, so a report your change didn't really touch still shows a diff — `git checkout` those files rather than committing the noise.
   - **Read the `.md` diff first**: the Markdown carries none of those fields, so it is the behavioral delta of your change in prose. An unchanged `.md` doesn't by itself prove the JSON/HTML are noise-only (glossary and story data never surface in the Markdown); a shifted source line does show up, in the `relpath:line::test_name` anchor under every heading.
   - Regenerate only the reports a change can affect — `examples` narrates `examples/**`, `self_report` narrates `tests/**`. A shifted line number in a decorated backend test is therefore a real self-report change worth committing, even when no example changed.
-- Both regeneration sessions run the narration lint (`--given-lint`; see [Narration lint](README.md#narration-lint) and the [design spec](docs/specs/2026-07-05-narration-lint-design.md)): in `self_report` the backend suite has no intentional failures, so an error finding **fails report regeneration** — a real gate. The `examples` session's intentional failures already return a tolerated exit 1 (`success_codes=[0, 1]`) that masks the lint exit code; there the printed "narration lint" summary is the signal. Keep the backend suite lint-clean; a step the lint mis-flags belongs on the `given_lint_ignore` list, whose entries must each suppress a finding (stale entries fail the run). The rule catalog and the ignore mechanics live in the [authoring skill](src/pytest_given/.agents/skills/pytest-given-authoring/references/scenarios.md) under "Mechanical counterparts"; the honest-two-phase test an ignored `missing-phase` has to pass is under "Phase structure" in the same file.
+- Both regeneration sessions run the narration lint (`--given-lint`; see [Narration lint](README.md#narration-lint) and the [design spec](docs/specs/2026-07-05-narration-lint-design.md)). `self_report` fails on any lint error — a real gate, keep the backend suite lint-clean. `examples` tolerates exit 1 for its intentional failures, which masks the lint exit code, so read the printed "narration lint" summary there. A step the lint mis-flags goes on the `given_lint_ignore` list (stale entries fail the run); the rule catalog and ignore mechanics are in the [authoring skill](src/pytest_given/.agents/skills/pytest-given-authoring/references/scenarios.md) under "Mechanical counterparts", and the honest-two-phase test an ignored `missing-phase` has to pass under "Phase structure".
 - `uv run nox -s benchmark` generates the large-scenarios suite and renders its JSON + HTML into `benchmarks/` (gitignored). Run it when a change could move report-generation cost; `benchmarks/bench.py` does size sweeps and cProfile runs directly.
-- `uv run nox -s build` builds the wheel + sdist and verifies them the way a consumer would: it checks the wheel carries `py.typed`, the report templates and the bundled skills, installs it into a throwaway environment and runs a real scenario through it, then scans a throwaway consumer project with [library-skills](https://library-skills.io) to prove every bundled skill is discoverable from the wheel (the skills live under `pytest_given/.agents/skills/`, the layout that scanner expects). The in-repo suite imports from `src/`, so it cannot see a packaging regression — this session is the only thing that can. CI runs it on every push; the release workflow runs the same session.
+- `uv run nox -s build` builds the wheel + sdist and verifies them as a consumer would — `py.typed`, templates and bundled skills present, a real scenario run from a throwaway install, and [library-skills](https://library-skills.io) discovery of every bundled skill. The in-repo suite imports from `src/`, so this session is the only thing that catches a packaging regression. CI and the release workflow both run it.
 
 ## Releasing
 
-Releases go to PyPI via a manually dispatched [Release workflow](.github/workflows/release.yml), authenticated with Trusted Publishing (no tokens anywhere) and always rehearsed on TestPyPI first. The step-by-step checklist lives in [docs/releasing.md](docs/releasing.md).
-
-The short version: bump `version` in `pyproject.toml` and add a matching `## [x.y.z]` section to `CHANGELOG.md`, land it on `main` (a PR is optional — CI gates direct pushes too), dispatch with `testpypi`, run `uv run nox -s check_release -- testpypi`, then dispatch with `pypi` and re-check with `uv run nox -s check_release`.
+Releases go to PyPI via a manually dispatched [Release workflow](.github/workflows/release.yml), authenticated with Trusted Publishing (no tokens anywhere) and always rehearsed on TestPyPI first. The step-by-step checklist, including the version bump and CHANGELOG section it needs, lives in [docs/releasing.md](docs/releasing.md).
 
 ## Architecture
 
@@ -46,21 +44,6 @@ grouping/                  on model/ + capture/
 plugin/   cli/             the entry points; may import all five, and hold
                            nothing the five could
 ```
-
-**Docstrings have to earn their keep.** Prose drifts out of sync with the code
-whether or not it sits beside it — every stale sentence in this codebase was
-written next to the thing it describes. So the defence is writing less, not
-writing more: a docstring that restates the signature, narrates the
-implementation, or justifies the module against an alternative that no longer
-exists is a liability, and deleting it is a fix. Prefer a precise name to a
-sentence explaining a vague one.
-
-What is worth writing down is what the code cannot say: a non-obvious
-invariant, a constraint that makes the shape necessary, a trap for the next
-reader. Keep it to a line or two. Cross-references (`X is the only caller of
-Y`, `this is the sole consumer of Z`) rot fastest and are the least useful —
-the reader can grep. When you change a module, delete the sentences that have
-stopped being true rather than repairing them.
 
 What no filename tells you:
 
@@ -88,12 +71,7 @@ What no filename tells you:
 
 `tests/` splits `unit/` (no pytest session needed) from `integration/`, which drives the plugin end to end through `pytester` inner runs (enabled by the root `conftest.py`). Narration written inside an inner run belongs to *that* run's collector — only the outer, decorated test reaches the self-report.
 
-The public API is re-exported from `__init__.py` and documented in the skill's
-[references/api.md](src/pytest_given/.agents/skills/pytest-given-authoring/references/api.md).
-
-### Step text & placeholders
-
-The authoring forms (t-string vs `Template` vs plain string, and where each is rejected) are documented in the skill's [references/api.md](src/pytest_given/.agents/skills/pytest-given-authoring/references/api.md); design rationale in the [design spec](docs/specs/2026-05-23-structured-step-text-design.md).
+The public API, including the step-text authoring forms (t-string vs `Template` vs plain string), is re-exported from `__init__.py` and documented in the skill's [references/api.md](src/pytest_given/.agents/skills/pytest-given-authoring/references/api.md).
 
 ## Handling report output
 
@@ -101,30 +79,25 @@ Outputs are opt-in; a bare `uv run pytest` writes nothing. The workflow for read
 
 ## Report testing
 
-Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filter in `html_renderer.py` **must** be Playwright-verified before commit — Python-side regex tests on rendered HTML do not catch broken Alpine expressions, malformed `:class` bindings, or other runtime browser issues (the substring matches even when the attribute is unparseable). Open e.g. `examples/coffeeshop/coffeeshop.html` (regenerate via `uv run nox -s examples`) with the Playwright MCP server, check `browser_console_messages` for errors after init, then drive the changed surface (hover, click, URL hash). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
+Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filter in `html_renderer.py` **must** be Playwright-verified before commit. The project has no JS-side UI tests, and Python tests on rendered HTML cannot stand in: a substring match passes on a broken Alpine expression or a malformed `:class` binding. So:
 
-- **Don't write Python tests that pin frontend markup** (specific class names, wrapper structure, inline-handler shape, SVG strings). They check implementation details, not behavior, and rot the moment the renderer is refactored. The project has no JS-side UI tests; Playwright is the only verification for frontend concerns. Python tests stay on the renderer's data-shaped contract (what `data-param` value, which scenario IDs, which counts) — not on how the markup is assembled.
-- **Don't TDD frontend changes** for the same reason: a failing markup assertion isn't proving the bug exists in the browser, and a passing one isn't proving the fix works. Apply the change, regenerate `examples/`, drive it in Playwright, capture the result.
-
-- The report targets desktop only — assume a minimum viewport width of ~900px. No mobile/responsive layout needed.
+- **No Python tests that pin frontend markup** (class names, wrapper structure, inline-handler shape, SVG strings) — they check implementation, not behavior, and rot on every renderer refactor. Python tests stay on the renderer's data-shaped contract (which `data-param` value, which scenario IDs, which counts).
+- **No TDD for frontend changes**: apply the change, regenerate `examples/`, drive it in Playwright, capture the result.
+- Open e.g. `examples/coffeeshop/coffeeshop.html` (regenerate via `uv run nox -s examples`) with the Playwright MCP server, check `browser_console_messages` for errors after init, then drive the changed surface (hover, click, URL hash). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
+- Desktop only — assume a minimum viewport width of ~900px.
 - Traceback display and header metadata formatting are known limitations, not current priorities.
-- Never save Playwright screenshots into the project directory. Use `/tmp/` or omit the `filename` parameter.
+- Never save Playwright screenshots into the project directory — use the session scratchpad or omit the `filename` parameter.
 
 **Setup and known traps** (`.mcp.json`, the `file://` page cache, browser installs) live in [docs/playwright-setup.md](docs/playwright-setup.md). `.mcp.json` is read at **session start**, so check that the `browser_*` tools exist before planning a task that ends in Playwright verification.
 
 ## Writing self-report scenarios
 
-The narration rules live in the **`pytest-given-authoring` skill** — whose canonical source is [src/pytest_given/.agents/skills/](src/pytest_given/.agents/skills/pytest-given-authoring/SKILL.md) — every link in this document points there. Contributor agents auto-discover the mirrored copy under `.claude/skills/`, and downstream projects get it via `pytest-given skills install` or `uvx library-skills install` (the `.agents/skills/` layout is what library-skills scans for). After editing the canonical copy, regenerate the committed copy with `uv run pytest-given skills install` and commit both (a sync test fails otherwise).
+The narration rules live in the **`pytest-given-authoring` skill**, whose canonical source is [src/pytest_given/.agents/skills/](src/pytest_given/.agents/skills/pytest-given-authoring/SKILL.md) — every link in this document points there. The copy under `.claude/skills/` is a mirror: after editing the canonical copy, regenerate it with `uv run pytest-given skills install` and commit both (a sync test fails otherwise).
 
-**The skill is documentation with the same sync duty as the README.** A change to the public API surface or its rules updates the README *and* the skill's [references/api.md](src/pytest_given/.agents/skills/pytest-given-authoring/references/api.md) (which downstream agents rely on instead of the README — it ships in the wheel, version-matched); a change to narration/lint semantics updates [references/scenarios.md](src/pytest_given/.agents/skills/pytest-given-authoring/references/scenarios.md) and friends. No mechanical check catches content drift between README and skill — treat "does the skill need this too?" as part of every user-facing change. The exception is the scripts a reference ships in a `python` block: `tests/unit/test_skills_scripts.py` runs each one against a report built from the model, so those cannot drift from the schema silently.
+**The skill is documentation with the same sync duty as the README** — downstream agents read it instead of the README, version-matched from the wheel. A change to the public API surface or its rules updates the README *and* [references/api.md](src/pytest_given/.agents/skills/pytest-given-authoring/references/api.md); a change to narration/lint semantics updates [references/scenarios.md](src/pytest_given/.agents/skills/pytest-given-authoring/references/scenarios.md) and friends. No check catches prose drift between README and skill, so ask "does the skill need this too?" on every user-facing change; only the `python` blocks are covered — `tests/unit/test_skills_scripts.py` runs each against a report built from the model.
 
-Narration is the one kind of prose this project does ask for at volume, and the
-reason is colocation: a step's text sits on the `with` that performs it, so a
-change to the body puts the sentence describing it under the same cursor, and
-the lint mechanically catches several ways the two can part company. That makes
-narration *easier* to keep honest than a docstring — not automatically honest.
-It still drifts, which is why [Report testing](#report-testing) gates on reading
-the regenerated `.md` rather than trusting the text.
+Narration drifts like any other prose — the lint catches several ways step text and body can part company, not all of them — which is why [Quality gates](#quality-gates) has you read the regenerated `.md` rather than trust the text.
+Before merging changes to narrated tests, run the `pytest-given-reviewing` skill: it layers the lint, a semantic audit of step text against step bodies, and a hygiene pass over glossary, tags and stories.
 
 What is specific to this repo's self-report:
 
@@ -134,6 +107,7 @@ What is specific to this repo's self-report:
 ## Conventions
 
 - Use the canonical vocabulary from [GLOSSARY.md](GLOSSARY.md) in prose as well as code — docs, skill references, and specs say the official term (`term ref`, not a paraphrase like "narrated term"). Naming and rename mechanics live in the skill's [references/glossaries.md](src/pytest_given/.agents/skills/pytest-given-authoring/references/glossaries.md); here, a rename lands in one commit (glossary row, `pg\[` references, implementation naming) plus a regenerated `uv run nox -s self_report`. Adding a term is safe, but still regenerate.
+- **Docstrings only for what the code cannot say** — a non-obvious invariant, a constraint that makes the shape necessary, a trap for the next reader — and a line or two at most. No signature restatement, no implementation narration, no `X is the only caller of Y` cross-references (they rot fastest; the reader can grep). Prefer a precise name to a sentence explaining a vague one. When you change a module, delete the sentences that have stopped being true rather than repairing them.
 - Avoid `Any` — use precise types, generics, `TYPE_CHECKING` imports, or `ContextVar[T]` over untyped `threading.local`.
 - Use `NewType` for domain-specific IDs (e.g., `NodeId`) and PEP 695 `type` statements for aliases. Avoid raw complex types like `dict[str, tuple[list[str], list[Any]]]` — introduce named types instead.
 - Only module-level imports — no inline/function-level imports.
@@ -142,11 +116,10 @@ What is specific to this repo's self-report:
 - Relative imports inside the package throughout — `from .schema import Scenario` for siblings, `from ..model import Scenario` across subpackages (always through the subpackage root, never into its submodules). Tests use absolute imports and may reach into any internal path. The dependency direction those imports must respect is under [Architecture](#architecture).
 - Prefer `assert` over `# pragma: no cover` for invariant guards. Asserts document the invariant and fail loudly if violated; pragmas hide the line and silently bail. Reserve `# pragma: no cover` for code that genuinely cannot be exercised by a test (e.g. `if __name__ == '__main__':` script entry).
 - Step-down rule: callers before callees, public before private. Read each file top-down from high-level API to implementation details.
-- TDD: write tests first
+- TDD: write tests first (except frontend changes — see [Report testing](#report-testing)).
 - Commit messages: single line, no co-author trailers, no leading file/area labels like `TODO:` or `README:` — just describe the change ("note example cleanup as todo", not "TODO: note example cleanup"). Conventional-commit-style scope prefixes like `docs:` / `examples:` / `renderer:` are fine when they add information.
 - Keep commits coherent: each commit should represent one logical change. Don't split "do X", "tests for X", and "review-fixup for X" into separate commits — squash them before pushing. Don't bundle unrelated changes either.
-- **A user-facing change adds its `CHANGELOG.md` entry in the same commit**, under `## [Unreleased]`, in the fitting Keep a Changelog category (each category appears at most once per version — extend the existing heading rather than adding a second one). User-facing = public API, CLI flags, report output, lint rules, bundled skills; internal work (refactors, tests, CI, contributor docs) gets no entry. Release-time version bumps live under [Releasing](#releasing).
-- **One sentence per entry**, written for someone upgrading the package: name the symbol, flag, or surface, and say what changed. Only a breaking change earns more — the migration it needs. Cut the rest: rationale, measurements, before/after detail, and anything the reader would discover the moment they look at the thing. Visual and interaction polish is worth mentioning but not itemizing: give it one short collective bullet per release ("the sidebar and its chips are visually tidied"), never a bullet per restyled element. Accessibility fixes are the exception — they stay on their own line, since they change who can use the thing. If a change isn't worth an upgrader's attention at all, it gets none. When in doubt, the shorter entry is the right one.
+- **A user-facing change adds its `CHANGELOG.md` entry in the same commit**, under `## [Unreleased]`, in the fitting Keep a Changelog category (each category appears at most once per version — extend the existing heading rather than adding a second one). User-facing = public API, CLI flags, report output, lint rules, bundled skills; internal work (refactors, tests, CI, contributor docs) gets no entry.
+- **One sentence per entry**, written for someone upgrading: name the symbol, flag, or surface and say what changed — no rationale, measurements, or before/after detail. Only a breaking change earns more: the migration it needs. Visual and interaction polish gets one collective bullet per release ("the sidebar and its chips are visually tidied"), never a bullet per restyled element; accessibility fixes stay on their own line. When in doubt, the shorter entry is the right one.
 - Plan files under `docs/superpowers/plans/` are scratch artifacts — never commit them. Spec files under `docs/specs/` are committed.
 - New specs land under `docs/specs/proposed/`. When a spec's implementation lands, `git mv` it up one level into `docs/specs/` in the same commit, and fix its relative links in the same edit — a `../`-prefixed link to a sibling spec resolves into `docs/` once the file moves. `ls docs/specs/proposed` is the canonical list of outstanding design work.
-- Always run `uv run nox` (or at minimum `uv run nox -s format lint mypy test`) before committing
