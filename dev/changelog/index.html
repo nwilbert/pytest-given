@@ -1,0 +1,1853 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests.">
+      
+      
+      
+        <link rel="canonical" href="https://nwilbert.github.io/pytest-given/dev/changelog/">
+      
+      
+        <link rel="prev" href="../ai-agents/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.61">
+    
+    
+      
+        <title>Changelog - pytest-given</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.ce62732f.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.812a03bb.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./.." title="pytest-given" class="md-header__button md-logo" aria-label="pytest-given" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pytest-given
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="none" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="none" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/nwilbert/pytest-given" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="./.." title="pytest-given" class="md-nav__button md-logo" aria-label="pytest-given" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    pytest-given
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nwilbert/pytest-given" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Home
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Getting started
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Guide
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Guide
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/scenarios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Scenarios & steps
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/step-text/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Step text & placeholders
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/parametrized/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Parametrized scenarios
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/domain-storytelling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Domain Storytelling
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/attachments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Attachments
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Configuration
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Configuration
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/pytest-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  pytest options
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/narration-lint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Narration lint
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/source-links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Source links & tracebacks
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Standalone CLI
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Examples
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai-agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Working with AI agents
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Changelog
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Changelog
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Unreleased
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Added
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Changed
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Fixed
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Changed
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#020-2026-09-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        0.2.0 - 2026-09-04
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.2.0 - 2026-09-04">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Added
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Changed
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Changed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        CLI
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authoring-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Authoring API
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plugin-and-run-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Plugin and run behavior
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report-content-all-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Report content (all formats)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#html-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        HTML report
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bundled-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Bundled skills
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Removed
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Fixed
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fixed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authoring-api_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Authoring API
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#narration-lint" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Narration lint
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Report
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plugin-and-run-behavior_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Plugin and run behavior
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report-content-all-formats_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Report content (all formats)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#html-report_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        HTML report
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bundled-skills_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Bundled skills
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010-2026-08-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        0.1.0 - 2026-08-08
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.0 - 2026-08-08">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Added
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                      
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
+                  
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Unreleased
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Added
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Changed
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Fixed
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Changed
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#020-2026-09-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        0.2.0 - 2026-09-04
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.2.0 - 2026-09-04">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Added
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Changed
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Changed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        CLI
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authoring-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Authoring API
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plugin-and-run-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Plugin and run behavior
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report-content-all-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Report content (all formats)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#html-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        HTML report
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bundled-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Bundled skills
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Removed
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Fixed
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fixed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authoring-api_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Authoring API
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#narration-lint" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Narration lint
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Report
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plugin-and-run-behavior_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Plugin and run behavior
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report-content-all-formats_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Report content (all formats)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#html-report_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        HTML report
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bundled-skills_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Bundled skills
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010-2026-08-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        0.1.0 - 2026-08-08
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.0 - 2026-08-08">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Added
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+  
+    <a href="https://github.com/nwilbert/pytest-given/edit/main/docs/site/changelog.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-file-pen" viewBox="0 0 24 24"><path d="M12.659 22H18a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v9.34"/><path d="M14 2v5a1 1 0 0 0 1 1h5M10.378 12.622a1 1 0 0 1 3 3.003L8.36 20.637a2 2 0 0 1-.854.506l-2.867.837a.5.5 0 0 1-.62-.62l.836-2.869a2 2 0 0 1 .506-.853z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<p>All notable changes to this project are documented here.</p>
+<p>The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>,
+and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<p>The release workflow reads the section matching the version in <code>pyproject.toml</code>
+and uses it as the GitHub Release body, so each version needs a heading of the
+form <code>## [x.y.z] - YYYY-MM-DD</code>.</p>
+<h2 id="unreleased"><a href="https://github.com/nwilbert/pytest-given/compare/v0.2.0...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The bundled skills ship under <code>pytest_given/.agents/skills/</code> in the wheel, so downstream projects can also install them with <a href="https://library-skills.io">library-skills</a> (<code>uvx library-skills install --claude</code>) alongside the skills of their other dependencies. <code>pytest-given skills install</code> keeps working as before.</li>
+<li>The JSON report carries a top-level <code>coverage</code> key — one record per story activity with <code>tracked</code> and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.</li>
+</ul>
+<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Story coverage matches on glossary terms alone: an instance in an activity (<code>guest('Alice')</code>) is now covered by a step naming the bare term, and vice versa — activities that differed only by instance are no longer told apart by narration, only by an <code>activity=</code> pin.</li>
+<li>The authoring skill's and README's glossary snippets keep generic verbs (<em>searches for</em>, <em>adds</em>) as bare activity strings instead of glossary terms, and the hotel-booking example's glossary is trimmed to domain vocabulary accordingly.</li>
+</ul>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The Glossary view no longer lists a term's own name in another case (<code>guest.low</code>) under Instances.</li>
+<li><code>when_then(...)</code> rejects a <code>Template</code> narration in a test body, as <code>given</code>/<code>when</code>/<code>then</code> already do.</li>
+<li>Story and glossary-term source locations are captured correctly on native Windows, which also restores the lint rules that depend on them.</li>
+<li><code>tag-shadows-term</code> no longer skips a tag whose slug collides with a term id when the tag contains a non-ASCII character that lowercases into ASCII.</li>
+<li>A refused scenario on a run with no <code>--given-*</code> sink no longer reports itself under a "report not written" heading.</li>
+<li>An unknown <code>--given-source-link</code> preset is reported under the flag the user typed rather than under the <code>given_source_link</code> ini name.</li>
+<li>A report whose rendering fails unexpectedly still discards the previous run's report rather than leaving it on disk reading as current.</li>
+<li>A step <code>activity=</code> recorded from a <code>@given</code> fixture scoped wider than <code>function</code>, pulled in by a test without <code>@scenario</code>, now raises a <code>PytestGivenError</code> naming the cause instead of a bare <code>AssertionError</code>.</li>
+<li>The <code>#scenario=</code> deep link works for two scenarios whose node ids differ only in a character the slug folds; the fallback slug no longer hands back characters that break the URL fragment.</li>
+<li><code>pytest-given report</code> reports a non-UTF-8 input file as an error rather than crashing with a traceback.</li>
+<li>A <code>dead-term</code> finding states the criterion the rule actually applies: a term ref in a <code>@scenario</code> name keeps a term alive, which the old message did not mention.</li>
+</ul>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The <code>attachment-labels</code> and varying-<code>str</code> grouping refusals name the parametrize case they found, and the latter now points at <code>group_parametrized=False</code> as a way out.</li>
+<li>The reviewing skill ships <code>references/pairs.md</code> — a script pairing each
+  scenario's narration with its test's source — and audits the rules the
+  release notes announce. Both skills now flag alternation <code>match=</code> pins and a
+  <code>when</code> that narrates arrangement while its body acts.</li>
+<li>The authoring skill's <code>stories.md</code> spells out the directional instance rule of coverage matching (and its consequence: write activities with bare handles), that two activities with nested term sets always cover together, and how to verify coverage from the JSON report; the reviewing skill's coverage recipe reads the report's <code>coverage</code> key instead of reimplementing the rule.</li>
+</ul>
+<h2 id="020-2026-09-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.1.0...v0.2.0">0.2.0</a> - 2026-09-04<a class="headerlink" href="#020-2026-09-04" title="Permanent link">&para;</a></h2>
+<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>pytest_given.PytestGivenWarning</code> is a top-level export, and a step or
+  <code>attach()</code> recorded in a test without <code>@scenario</code> now warns with it instead of
+  <code>pytest.PytestWarning</code>.</li>
+<li><code>--given-title=TEXT</code> (or the <code>given_title</code> ini) names the report, replacing the
+  rootdir name.</li>
+<li>A parametrized scenario's parameter table now carries a typed column per varying
+  value — <code>param</code>, <code>derived</code>, or <code>attachment</code> for a varying attachment payload —
+  rather than one column per parametrize name.</li>
+<li><code>@scenario(group_parametrized=False)</code> declines the grouping and emits each case
+  as its own scenario, titled by its parametrize id.</li>
+<li>The HTML report's sidebar gains <strong>Terms</strong> as a third browse axis, and all three
+  axes — Tags, Terms, Modules — now filter the Scenarios view the same way, with
+  each active filter carried in the URL.</li>
+<li>The sidebar can be ordered by group size as well as by name, and resized by
+  dragging its seam or with the arrow keys.</li>
+<li>A selected activity in the Stories view offers <strong>Open in Scenarios</strong>, filtering
+  the Scenarios view down to the scenarios covering it.</li>
+</ul>
+<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
+<h4 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Breaking.</strong> <code>--given-lint</code> is a plain boolean flag: write <code>--given-lint</code> and
+  <code>--no-given-lint</code> instead of <code>--given-lint=true</code> / <code>--given-lint=false</code>. Either
+  form still overrides the <code>given_lint</code> ini for one run.</li>
+</ul>
+<h4 id="authoring-api">Authoring API<a class="headerlink" href="#authoring-api" title="Permanent link">&para;</a></h4>
+<ul>
+<li>
+<p><strong>Breaking.</strong> Step narration must now be uniform across parametrize cases;
+  these fail the run with <code>PytestGivenError</code>, writing no report, instead of
+  quietly reporting case 1:</p>
+</li>
+<li>
+<p>a plain <code>str</code> (usually an f-string) that renders differently per case;</p>
+</li>
+<li>a varying interpolation that is not a bare name (<code>t"{cup_size * 0.01}"</code>,
+    <code>t"{m.balance}"</code>);</li>
+<li>a t-string narrating a parametrize name that no longer holds the case's
+    value — either a local rebound it, or the body mutated it in place;</li>
+<li>a step whose set of <code>attach</code> labels differs between cases;</li>
+<li>a glossary term ref that names a different term or reads differently between
+    cases, including one bound to a parametrize column;</li>
+<li>passed cases that narrate different templates altogether.</li>
+</ul>
+<p>Every one but the last is fixed by binding the varying part to a local and
+  narrating it with a t-string, keeping labels and term refs constant; varying
+  content belongs in the new <code>attachment</code> column. The last needs
+  <code>@scenario(..., group_parametrized=False)</code>, giving each case its own scenario.
+- <strong>Breaking.</strong> <code>attach()</code> now takes a plain <code>str</code> label; a t-string label raises
+  <code>PytestGivenError</code> — use an f-string.
+- <strong>Breaking.</strong> <code>attach()</code> called with no step open now raises <code>PytestGivenError</code>
+  instead of silently discarding the payload; move the call inside the step it
+  belongs to.
+- <strong>Breaking.</strong> <code>activity(..., id=N)</code> is now <code>activity(..., activity_id=N)</code>; the
+  <code>Activity.id</code> field itself is unchanged.
+- <strong>Breaking.</strong> <code>FileGlossary</code> is now a <code>Glossary</code> subclass rather than a wrapper
+  around one, so its <code>.glossary</code> attribute is gone — use the <code>FileGlossary</code>
+  itself wherever that attribute was passed.
+- A glossary term placed in an activity slot its declared kind forbids now raises
+  <code>PytestGivenError</code> when <code>activity(...)</code> is built rather than at session finish.
+- A glossary file whose table has a header and separator but no data rows now
+  says so, instead of reporting that no table was found.
+- A <code>FileGlossary</code> whose columns are all named now skips a Markdown table that
+  carries none of those names, so a glossary file may hold prose tables beside
+  the glossary; a table carrying some of them still raises, as does any table
+  under an index-based column spec.
+- <code>@scenario(activities=...)</code> now rejects a <code>str</code> and non-<code>int</code> members with a
+  <code>TypeError</code>.
+- <code>@scenario</code> now returns the test function itself rather than a wrapper, so the
+  test keeps its own signature.</p>
+<h4 id="plugin-and-run-behavior">Plugin and run behavior<a class="headerlink" href="#plugin-and-run-behavior" title="Permanent link">&para;</a></h4>
+<ul>
+<li>An unknown <code>given_source_link</code> preset is now a <code>UsageError</code> raised before the
+  suite runs.</li>
+<li>The collection-time <code>@scenario</code> checks now report as a <code>UsageError</code> instead of
+  an <code>INTERNALERROR</code> traceback.</li>
+<li>The narration lint summary prints each finding's location in its own column
+  rather than appended to the message.</li>
+<li><code>pytest-given</code> with no subcommand, and <code>pytest-given skills</code> with no
+  subcommand, now print that parser's usage and exit 2 instead of the root help
+  and exit 1.</li>
+</ul>
+<h4 id="report-content-all-formats">Report content (all formats)<a class="headerlink" href="#report-content-all-formats" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Breaking (JSON report).</strong> <code>parameters.names</code> becomes <code>parameters.columns</code>
+  (<code>{id, name, kind}</code>), cells may hold an attachment object, placeholder parts
+  gain <code>column_id</code>, term-ref parts lose <code>param_column</code>, and a grouped step's
+  <code>narration.text</code> is the template rather than case 1's rendering.</li>
+<li><strong>Breaking (JSON report).</strong> A step no longer carries <code>status</code> or <code>error</code>;
+  failure lives on the scenario and on the parameter table's cases. A consumer
+  reading <code>step.status</code> should read <code>scenario.status</code> instead.</li>
+<li>The Markdown report now shows a scenario's failure reason — the message and the
+  failing frame — under the scenario, and under the parameter table for each
+  failed case.</li>
+</ul>
+<h4 id="html-report">HTML report<a class="headerlink" href="#html-report" title="Permanent link">&para;</a></h4>
+<ul>
+<li>The browse sidebar leads with <strong>Modules</strong> and renders them as a collapsible
+  package tree whose nodes filter by path prefix; it no longer lists individual
+  scenarios under each group.</li>
+<li>The report's colors are retuned into one system — a term ref in a step or a
+  scenario title reads as a word under a light wash rather than a bordered pill
+  (the Glossary view keeps its pills), and column colors are generated per
+  column — and the sidebar, its filter chips and the attachment badges are
+  tidied along with it.</li>
+<li>The report opens and filters substantially faster on large suites, and its file
+  is smaller — a term reference now points at its glossary entry instead of
+  repeating the entry's definition, which takes about 18% off a term-heavy
+  report.</li>
+<li>A glossary term referenced only in a <code>@scenario</code> title now contributes an
+  instance to the Glossary view, where it previously counted toward the term's
+  scenario tally while showing no instance.</li>
+</ul>
+<h4 id="bundled-skills">Bundled skills<a class="headerlink" href="#bundled-skills" title="Permanent link">&para;</a></h4>
+<ul>
+<li>The authoring and reviewing skills gain the report mechanics their rules depend
+  on, a symptom index, a completeness audit, the full lint rule catalog, and
+  guidance for sparser tagging.</li>
+</ul>
+<h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Breaking.</strong> The <code>divergent-case-structure</code> lint rule; delete any
+  <code>given_lint_rules</code> or <code>given_lint_ignore</code> entry naming it, which would
+  otherwise fail config parsing.</li>
+</ul>
+<h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
+<h4 id="authoring-api_1">Authoring API<a class="headerlink" href="#authoring-api_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>
+<p>Parametrize cases that claim different step activities now say so, instead of
+  reporting the more drastic "a different step structure".</p>
+</li>
+<li>
+<p>A <code>@given</code> fixture scoped wider than <code>function</code> no longer loses its step when
+  the first test to use it has no <code>@scenario</code>.</p>
+</li>
+<li><code>@given</code>/<code>@when</code>/<code>@then</code> are signature-preserving, so a decorated helper stays
+  callable to a type checker (was: <code>"StepDecorated" not callable</code>).</li>
+<li><code>@given(...)</code> above <code>@pytest.fixture</code> now raises and names the fix, instead of
+  surfacing as <code>fixture '&lt;name&gt;' not found</code>.</li>
+<li><code>@scenario(activities=...)</code> is now typed <code>int | Sequence[int] | None</code>, so a
+  bare <code>activities=2</code> type-checks.</li>
+<li><code>@scenario(activities=...)</code> with an unknown id, or without <code>story=</code>, is
+  rejected at the decorator rather than at collection.</li>
+<li>A <code>-k</code>- or <code>--deselect</code>-narrowed run no longer fails on an authoring error in
+  a scenario it did not select.</li>
+<li>Glossary term handles are now hashable, and equal for the same term whichever
+  accessor produced them.</li>
+<li>A <code>when_then</code> step in a test without <code>@scenario</code> now points its warning at the
+  test rather than at pytest-given's own module.</li>
+</ul>
+<h4 id="narration-lint">Narration lint<a class="headerlink" href="#narration-lint" title="Permanent link">&para;</a></h4>
+<ul>
+<li>
+<p>A <code>given_lint_ignore</code> entry beginning with a Windows drive letter
+  (<code>c:/repo/tests/t.py::test_x</code>) is no longer rejected as an unknown rule prefix.</p>
+</li>
+<li>
+<p>A rule configured <code>off</code> no longer runs; levels were applied only after every
+  rule had already produced its findings.</p>
+</li>
+<li>A scenario tag with no ASCII alphanumerics (<code>tags=['日本語']</code>) no longer takes
+  the run down with a traceback from <code>tag-shadows-term</code>.</li>
+</ul>
+<h4 id="report">Report<a class="headerlink" href="#report" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>pytest-given report</code> reports an unreadable input as an error instead of a
+  traceback (a directory raised <code>IsADirectoryError</code> through the console script).</li>
+<li>A JSON report with an out-of-range scenario <code>status</code> or term <code>kind</code> is
+  rejected by name, instead of crashing a renderer with a bare <code>KeyError</code>.</li>
+<li>A <code>&lt;br&gt;</code> inside an inline code span in a glossary definition renders as text
+  rather than as a line break.</li>
+<li>The Terms browse axis no longer lists a term the selected glossary does not
+  hold.</li>
+</ul>
+<h4 id="plugin-and-run-behavior_1">Plugin and run behavior<a class="headerlink" href="#plugin-and-run-behavior_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>A <code>--given-json</code>/<code>--given-html</code>/<code>--given-md</code> path that could not be a report
+  file is now refused before the suite runs, instead of a bare flag swallowing a
+  following test path and overwriting — or, on a failed run, deleting — it.</li>
+<li><code>pytest-given report</code> now discards a stale report when the <em>render</em> fails, not
+  only when the write does.</li>
+<li><code>pytest-given report --source-link</code> is now validated on a <code>--format md</code> run
+  instead of being accepted and ignored, and an unknown preset is reported under
+  the name the user typed.</li>
+<li>A <code>git</code> on PATH that cannot be executed no longer fails the run.</li>
+<li>A nested in-process pytest run that dies while parsing its arguments no longer
+  strands the outer session's captured rootdir, which silently dropped every
+  later step's source anchor.</li>
+<li><code>@given</code>/<code>@when</code>/<code>@then</code> on an <code>async def</code> helper now records around the
+  awaited body, and async generator fixtures are handled too.</li>
+<li>The narration lint now inspects <code>async def</code> step helpers, whose bodies were
+  invisible to every AST rule.</li>
+<li>An explicit <code>--given-source-link=</code> now disables source links instead of falling
+  through to the <code>given_source_link</code> ini.</li>
+<li>A finished scenario no longer leaves its collector — and every scenario and
+  step it recorded — reachable from a process-global for the rest of the process.</li>
+<li>An error-level lint finding no longer overwrites a more specific exit code, so
+  an interrupted or nothing-collected run keeps reporting as one.</li>
+<li>A report that cannot be written into an unwritable directory now reports
+  through the terminal summary instead of escaping as a bare traceback.</li>
+<li><code>pytest-given report</code> and <code>pytest-given skills install</code> now report a failed
+  write as a CLI error, and a failed <code>report</code> write discards the previous run's
+  report rather than leaving it to read as current.</li>
+<li><code>pytest-given report</code> now reports a bad input file — missing, unparsable, or
+  JSON that is not a pytest-given report — as a CLI error instead of a traceback,
+  as does an unknown <code>--source-link</code> preset.</li>
+<li>A fixture that raises after its <code>yield</code> now fails the scenario it tore down,
+  instead of leaving it green in a report pytest counted as an error.</li>
+<li>An error-level narration-lint finding now counts as an error in the run's
+  summary line.</li>
+<li>Every failure building or writing a report — a suite reaching two glossaries, a
+  term used in incompatible slots, an unusable source-link template, an
+  unwritable output path — now surfaces as a terminal summary and a failing exit
+  code, where only grouping errors did.</li>
+<li>The sinks are now rendered in full before any is written, and a failure on
+  either side discards all of them.</li>
+</ul>
+<h4 id="report-content-all-formats_1">Report content (all formats)<a class="headerlink" href="#report-content-all-formats_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>A parametrized scenario whose cases all skipped now keeps its skip reason
+  instead of reporting <code>skipped</code> with none.</li>
+<li>
+<p>A parameter row whose cell count disagreed with the table's columns silently
+  truncated in the HTML report; it now fails the same way it already did in
+  Markdown.</p>
+</li>
+<li>
+<p>A parametrized scenario now keeps its place in source order instead of moving
+  below every unparametrized one.</p>
+</li>
+<li>A glossary term written as a code span keeps the markup inside it, so
+  <code>`a*b*c`</code> canonicalizes to <code>a*b*c</code>.</li>
+<li>A parameter-table cell now reads the way the step pointing at it read, carrying
+  the interpolation's own format spec and, under <code>indirect=True</code>, the bound test
+  argument.</li>
+<li>A <code>Template</code> narration's <code>text</code> is now what its parts render, so the report's
+  search box and <code>jq</code> queries match what the page displays.</li>
+<li>The grouped step tree now comes from the first case that <em>passed</em>, where a
+  skipped case 1 used to render an empty tree.</li>
+<li>A parametrize value that is a glossary term instance now narrates as its
+  display rather than the whole <code>Glossary</code> dataclass repr — in a step's
+  <code>Template</code> slot, in a scenario name, and in an
+  <code>Annotated[..., given(Template(...))]</code> parameter label.</li>
+</ul>
+<h4 id="html-report_1">HTML report<a class="headerlink" href="#html-report_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Two test files sharing a basename across directories no longer abort the HTML
+  report; the scenarios' <code>#scenario=</code> slugs gain directory components instead.</li>
+<li>A <code>#view=stories</code>, <code>#view=glossary</code> or <code>#term=</code> link opened against a report
+  that has no such tab now falls back to the Scenarios view.</li>
+<li>The Glossary view's kind headings and their term counts now follow the search
+  and definition filters, and a filter matching nothing says so.</li>
+<li>Content reaching past a scenario card's right edge is no longer clipped: a wide
+  parameter table and an attachment payload scroll, a source path and a
+  traceback's frame location wrap, and the source link no longer overlaps the
+  card's last element.</li>
+<li>Jumping to a scenario from a story activity, or to a term's scenarios from the
+  Glossary tab, now clears filters that would hide the target; the filters in a
+  <code>#scenario=</code> deep link still win.</li>
+<li>Accent-colored text and the parametrize column colors now meet WCAG AA, and
+  term kinds stay distinguishable for red-green color blindness.</li>
+<li>The report is operable from the keyboard: status pills, browse-axis and
+  browse-tree rows, tag pills, story sidebar entries, activity and attachment
+  badges, and every expand/collapse chevron are now real buttons, and the view
+  tabs report which one is selected.</li>
+<li>A step pinned with <code>given(..., activity=N)</code> now covers an activity regardless
+  of its term count; an under-anchored activity previously still rendered as
+  "not coverage-tracked".</li>
+</ul>
+<h4 id="bundled-skills_1">Bundled skills<a class="headerlink" href="#bundled-skills_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>The bundled skills are corrected against the shipped behavior.</li>
+</ul>
+<h2 id="010-2026-08-08"><a href="https://github.com/nwilbert/pytest-given/releases/tag/v0.1.0">0.1.0</a> - 2026-08-08<a class="headerlink" href="#010-2026-08-08" title="Permanent link">&para;</a></h2>
+<p>First public release.</p>
+<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>@scenario</code> decorator plus <code>given</code> / <code>when</code> / <code>then</code> step blocks, usable as
+  both context managers and decorators, including on fixtures.</li>
+<li>Self-contained interactive HTML report (<code>--given-html</code>), Markdown report
+  (<code>--given-md</code>), and JSON report (<code>--given-json</code>). The HTML bundles Alpine.js
+  and needs no server or external assets.</li>
+<li>Structured step text: plain strings, <code>Template</code> objects, and t-strings
+  (<a href="https://peps.python.org/pep-0750/">PEP 750</a>), with parameter interpolation
+  rendered as highlighted values.</li>
+<li><code>attach()</code> for text and JSON attachments on a step.</li>
+<li>Domain Storytelling support: ubiquitous-language glossaries (inline or
+  Markdown-backed via <code>FileGlossary</code>), Domain Stories, and story coverage.</li>
+<li>Narration lint (<code>--given-lint</code>) with a configurable rule catalog via
+  <code>given_lint_rules</code> and <code>given_lint_ignore</code>.</li>
+<li><code>--given-source-link</code> with <code>vscode</code>, <code>cursor</code>, <code>zed</code>, <code>pycharm</code>, and <code>github</code>
+  presets for jumping from a report step to its source.</li>
+<li><code>pytest-given</code> console script: <code>report</code> to re-render a saved JSON report, and
+  <code>skills install</code> to mirror the bundled agent skills into a project's
+  <code>.claude/skills/</code>.</li>
+<li>Bundled authoring, navigating, and reviewing skills for AI agents, shipped in
+  the wheel and version-matched to the plugin.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-circle-arrow-up" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4M12 16V8"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.sections","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      
+    
+  </body>
+</html>
