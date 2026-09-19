@@ -42,6 +42,11 @@
 .pg-hero-gwt b {
   font-weight: 700;
 }
+.pg-hero-punch {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+}
 .pg-hero a:not(.md-button) {
   color: #fff;
   text-decoration: underline;
