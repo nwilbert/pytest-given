@@ -22,6 +22,9 @@
         <loc>https://nwilbert.github.io/pytest-given/dev/guide/attachments/</loc>
       </url>
       <url>
+        <loc>https://nwilbert.github.io/pytest-given/dev/ai-agents/</loc>
+      </url>
+      <url>
         <loc>https://nwilbert.github.io/pytest-given/dev/configuration/pytest-options/</loc>
       </url>
       <url>
@@ -35,9 +38,6 @@
       </url>
       <url>
         <loc>https://nwilbert.github.io/pytest-given/dev/examples/</loc>
-      </url>
-      <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/ai-agents/</loc>
       </url>
       <url>
         <loc>https://nwilbert.github.io/pytest-given/dev/changelog/</loc>

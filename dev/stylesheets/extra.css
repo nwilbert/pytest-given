@@ -1,0 +1,56 @@
+/* The report's accent (styles.css --color-accent) so site and reports read as one product. */
+:root > * {
+  --md-primary-fg-color: #2563eb;
+  --md-primary-fg-color--light: #dbeafe;
+  --md-primary-fg-color--dark: #1d4ed8;
+  --md-accent-fg-color: #1d4ed8;
+  --md-accent-fg-color--transparent: rgba(37, 99, 235, 0.1);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-accent-fg-color: #60a5fa;
+  --md-accent-fg-color--transparent: rgba(96, 165, 250, 0.12);
+}
+
+/* Home hero */
+.pg-hero {
+  margin: 0 0 2rem;
+  padding: 1.5rem 1.75rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, var(--md-primary-fg-color) 0%, var(--md-primary-fg-color--dark) 100%);
+  color: #fff;
+}
+.pg-hero h1 {
+  margin: 0 0 0.5rem;
+  color: #fff;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+.pg-hero p {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  max-width: 40rem;
+  opacity: 0.95;
+}
+.pg-hero a:not(.md-button) {
+  color: #fff;
+  text-decoration: underline;
+}
+.pg-hero code {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+.pg-hero .md-button {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.75);
+}
+.pg-hero .md-button:hover {
+  background: rgba(255, 255, 255, 0.26);
+  border-color: #fff;
+}
+.pg-hero .md-button--primary {
+  background: #fff;
+  color: var(--md-primary-fg-color--dark);
+  border-color: #fff;
+}
