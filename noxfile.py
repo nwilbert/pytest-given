@@ -400,9 +400,9 @@ _DOCS_SITE = Path('docs/site')
 
 # Files the site embeds but that are single-sourced elsewhere in the repo. Each
 # copy lands under docs_dir (Zensical builds everything there and has no
-# exclude list), and every target is gitignored.
+# exclude list), and every target is gitignored. CHANGELOG.md needs no copy:
+# docs/site/changelog.md embeds it with a pymdownx.snippets include.
 _DOCS_STAGED_FILES = [
-    (Path('CHANGELOG.md'), _DOCS_SITE / 'changelog.md'),
     (
         Path('docs/pytest-given-diagram.png'),
         _DOCS_SITE / 'assets' / 'pytest-given-diagram.png',
@@ -431,7 +431,7 @@ def _stage_docs(session: nox.Session) -> None:
 
 @nox.session
 def docs_build(session: nox.Session) -> None:
-    """Stage the embedded reports, changelog and diagram, then build the site."""
+    """Stage the embedded reports and diagram, then build the site."""
     _sync(session, 'docs')
     _stage_docs(session)
     session.run('zensical', 'build', '--strict')

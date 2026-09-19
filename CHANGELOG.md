@@ -9,6 +9,8 @@ The release workflow reads the section matching the version in `pyproject.toml`
 and uses it as the GitHub Release body, so each version needs a heading of the
 form `## [x.y.z] - YYYY-MM-DD`.
 
+<!-- --8<-- [start:site] -->
+
 ## [Unreleased]
 
 ### Added
@@ -344,3 +346,5 @@ First public release.
 [Unreleased]: https://github.com/nwilbert/pytest-given/compare/v0.2.0...HEAD
 [0.2.0]: https://github.com/nwilbert/pytest-given/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/nwilbert/pytest-given/releases/tag/v0.1.0
+
+<!-- --8<-- [end:site] -->

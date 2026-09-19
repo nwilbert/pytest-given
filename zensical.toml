@@ -80,3 +80,5 @@ toc = { permalink = true, toc_depth = 2 }
 pymdownx.superfences = {}
 pymdownx.highlight = { anchor_linenums = true }
 pymdownx.inlinehilite = {}
+# The changelog page embeds the repo-root CHANGELOG.md between its `site` markers.
+pymdownx.snippets = { base_path = ["."], check_paths = true }

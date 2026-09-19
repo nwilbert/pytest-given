@@ -20,16 +20,16 @@ title: Home
 <p class="pg-hero-punch">What people and agents read is what the code does.</p>
 
 [Getting started](getting-started.md){ .md-button .md-button--primary }
-[See a report](examples/coffeeshop.html){ .md-button }
+[See a report](examples/coffeeshop.html){ .md-button target=_blank }
 
 </div>
 
 Live examples:
 
-- **[Coffeeshop report](examples/coffeeshop.html)**: tour of the core features, including `Annotated` `given` labels.
-- **[Hotel-booking report](examples/hotel-booking.html)**: Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
-- **[File-glossary report](examples/file-glossary-booking.html)**: Domain Storytelling with a Markdown `FileGlossary` and kinds inferred from story activities.
-- **[Self-report](examples/self-report.html)**: pytest-given run against its own test suite (dogfooding).
+- **[Coffeeshop report](examples/coffeeshop.html){ target=_blank }**: tour of the core features, including `Annotated` `given` labels.
+- **[Hotel-booking report](examples/hotel-booking.html){ target=_blank }**: Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
+- **[File-glossary report](examples/file-glossary-booking.html){ target=_blank }**: Domain Storytelling with a Markdown `FileGlossary` and kinds inferred from story activities.
+- **[Self-report](examples/self-report.html){ target=_blank }**: pytest-given run against its own test suite (dogfooding).
 
 ## Why pytest-given?
 

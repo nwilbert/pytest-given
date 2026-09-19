@@ -66,7 +66,7 @@ docs/site/
   ai-agents.md                 working with AI agents, incl. the skills install section
   assets/pytest-given-diagram.png   staged copy, gitignored (see Build)
   examples/*.html              staged copies, gitignored
-  changelog.md                 staged copy, gitignored
+  changelog.md                 embeds CHANGELOG.md via a pymdownx.snippets include
 site/                          build output, gitignored
 ```
 
@@ -109,9 +109,11 @@ becomes a link to `AGENTS.md` on the Home page; it is not a site page.
 Two nox sessions are the only entry points, locally and in CI:
 
 - **`docs_build`** — stages the build inputs, then runs `zensical build --strict`. Staging copies
-  `examples/<name>/<name>.html` to `docs/site/examples/<name>.html`, `CHANGELOG.md` to
-  `docs/site/changelog.md`, and `docs/pytest-given-diagram.png` to `docs/site/assets/`. All
-  three targets are gitignored so each file stays single-sourced. `--strict` fails the build
+  `examples/<name>/<name>.html` to `docs/site/examples/<name>.html` and
+  `docs/pytest-given-diagram.png` to `docs/site/assets/`. Both targets are gitignored so each
+  file stays single-sourced. `CHANGELOG.md` is not copied: `docs/site/changelog.md` is a tracked
+  page that embeds it with a `pymdownx.snippets` include between `site` markers, so its
+  edit-this-page link resolves and the release-process preamble stays off the site. `--strict` fails the build
   on an unresolved link, which is the test that the cross-page links survived the move.
 - **`docs_deploy -- <version> [alias]`** — runs the `docs_build` steps first, so a site that
   fails `--strict` is never deployed, then
