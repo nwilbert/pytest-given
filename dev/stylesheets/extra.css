@@ -17,6 +17,7 @@
 
 /* Home hero */
 .pg-hero {
+  clear: both; /* sit below the floated "Edit this page" button, not under it */
   margin: 0 0 2rem;
   padding: 1.5rem 1.75rem;
   border-radius: 0.5rem;
@@ -39,6 +40,12 @@
   color: #fff;
   font-size: 2.2rem;
   font-weight: 700;
+  white-space: nowrap;
+}
+@media (max-width: 30em) {
+  .pg-hero h1 {
+    font-size: 1.6rem;
+  }
 }
 .pg-hero p {
   margin: 0 0 1rem;
