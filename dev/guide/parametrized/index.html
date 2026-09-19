@@ -801,7 +801,7 @@
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_brew</span><span class="p">(</span><span class="n">cup_size</span><span class="p">):</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="o">...</span>
 </code></pre></div>
-<p>The <code>Template</code> name and the glossary-handle t-string name from the table above don't combine: a title needing both a term ref and a per-case value isn't expressible today.</p>
+<p>The <code>Template</code> name and the glossary-handle t-string name from the <a href="../step-text/">step-text table</a> don't combine: a title needing both a term ref and a per-case value isn't expressible today.</p>
 <p>What a column cannot carry is a case that narrates a <em>different sentence</em>. When the narration genuinely branches per case, add <code>group_parametrized=False</code> to the <code>@scenario</code> above to decline the merge. Each case then becomes its own scenario with no parameter table, titled by its parametrize id — <code>Brew 200 ml [200]</code> for the <code>Template</code> above, whose placeholders are substituted per case first (a plain-string name is suffixed the same way). Every case carries the id, including one whose name already renders its values. On a test that isn't parametrized the argument raises at collection.</p>
 <p><strong>Six authoring forms are rejected outright</strong> in a parametrized scenario, because each would make the grouped tree lie. Every one fails the run and writes no report — the message names the fix:</p>
 <table>

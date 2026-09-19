@@ -1451,6 +1451,7 @@ form <code>## [x.y.z] - YYYY-MM-DD</code>.</p>
 <ul>
 <li>The bundled skills ship under <code>pytest_given/.agents/skills/</code> in the wheel, so downstream projects can also install them with <a href="https://library-skills.io">library-skills</a> (<code>uvx library-skills install --claude</code>) alongside the skills of their other dependencies. <code>pytest-given skills install</code> keeps working as before.</li>
 <li>The JSON report carries a top-level <code>coverage</code> key — one record per story activity with <code>tracked</code> and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.</li>
+<li>The documentation lives at <a href="https://nwilbert.github.io/pytest-given/">https://nwilbert.github.io/pytest-given/</a>; the README keeps the overview and quick start, and the bundled skills and the <code>--given-source-link</code> / <code>--source-link</code> help text point at the site.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>

@@ -785,7 +785,7 @@
 
 <h1 id="pytest-options">pytest options<a class="headerlink" href="#pytest-options" title="Permanent link">&para;</a></h1>
 <p>All report outputs are opt-in — a bare <code>pytest</code> writes nothing. Each <code>--given-*</code> flag enables its own sink independently, and they combine freely (e.g. pass both <code>--given-json</code> and <code>--given-html</code> to get both files from one run).</p>
-<p>The <em>checks</em> are not opt-in. Every run builds the report it would have written, so an authoring form that cannot be narrated honestly — the parametrize rules above among them — fails the run whether or not a sink was configured, rather than surfacing on the first run that happens to ask for HTML.</p>
+<p>The <em>checks</em> are not opt-in. Every run builds the report it would have written, so an authoring form that cannot be narrated honestly — the <a href="../../guide/parametrized/">parametrize rules</a> among them — fails the run whether or not a sink was configured, rather than surfacing on the first run that happens to ask for HTML.</p>
 <table>
 <thead>
 <tr>
