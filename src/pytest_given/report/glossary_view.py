@@ -293,6 +293,13 @@ def _story_term_refs(story: Story) -> Iterator[ActivityTermRef]:
     )
 
 
+def _is_own_name(display: str, term: GlossaryTerm) -> bool:
+    """Whether a reference reads as the term's canonical name in any case —
+    `guest.low` and `Guest` alike — and so names the concept itself rather
+    than an instance or an inflection of it."""
+    return display.lower() == term.canonical.lower()
+
+
 class _GlossaryIndex:
     """Accumulates the Glossary view's cross-references, deduping as it goes.
 
@@ -328,7 +335,7 @@ class _GlossaryIndex:
         if (term_id, display) in self._instances:
             return
         self._instances.add((term_id, display))
-        if display.lower() != term.canonical.lower():
+        if not _is_own_name(display, term):
             self._agg(term_id).instances.append(
                 TermOccurrence(display=display, fixture_name=fixture_name)
             )
@@ -336,8 +343,8 @@ class _GlossaryIndex:
     def record_form(self, term_id: TermId, display: str) -> None:
         """Note one surface form of a verb term.
 
-        The canonical form is the term's own name and is not a *form* of it, so
-        only inflections are listed. Non-verbs are ignored.
+        The canonical form is the term's own name — in any case — and is not a
+        *form* of it, so only inflections are listed. Non-verbs are ignored.
         """
         term = self._glossary.get(term_id)
         if term is None or term.kind != 'verb':
@@ -345,7 +352,7 @@ class _GlossaryIndex:
         if (term_id, display) in self._forms:
             return
         self._forms.add((term_id, display))
-        if display != term.canonical:
+        if not _is_own_name(display, term):
             self._agg(term_id).forms.append(TermForm(display))
 
     def record_story_ref(self, term_id: TermId, story_id: StoryId) -> None:

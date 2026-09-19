@@ -9,6 +9,7 @@ from typing import Any
 from ..model import PytestGivenError
 from ..report import (
     DEFAULT_HTML_PATH,
+    SOURCE_LINK_HELP,
     SinkConfig,
     emit_sinks,
     resolve_source_link_template,
@@ -33,11 +34,7 @@ def add_report_parser(
     report_parser.add_argument(
         '--source-link',
         default='none',
-        help=(
-            'Source-link template or preset (vscode, cursor, zed, pycharm, '
-            'github, none). Variables: '
-            'https://nwilbert.github.io/pytest-given/dev/configuration/source-links/'
-        ),
+        help=SOURCE_LINK_HELP,
     )
     report_parser.add_argument(
         '--format',

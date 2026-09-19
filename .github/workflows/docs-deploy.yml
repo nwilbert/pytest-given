@@ -1,0 +1,43 @@
+name: Deploy docs
+
+# The one gh-pages publish job, called by the Docs workflow (`dev` on a push
+# to main, any version on dispatch) and by the Release workflow
+# (`<major.minor>` plus `latest`). Callers grant it `contents: write`.
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: mike version to publish (dev, or major.minor)
+        required: true
+        type: string
+      alias:
+        description: alias to move to that version (empty for none)
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # Deploys commit to gh-pages; serialise them rather than race on the push.
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    steps:
+      # Credentials stay: mike pushes gh-pages with them.
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+      - run: uv tool install --python 3.14 nox
+      # mike only builds on the published branch if origin/gh-pages is present
+      # locally; a single-branch checkout would make it start over and the push
+      # would be rejected. The branch does not exist before the first deploy.
+      - run: git fetch --depth=1 origin gh-pages || echo "no gh-pages branch yet"
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - env:
+          VERSION: ${{ inputs.version }}
+          ALIAS: ${{ inputs.alias }}
+        run: nox -s docs_deploy -- "$VERSION" $ALIAS

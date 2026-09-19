@@ -398,43 +398,38 @@ def examples(session: nox.Session) -> None:
 
 _DOCS_SITE = Path('docs/site')
 
-# Files the site embeds but that are single-sourced elsewhere in the repo. Each
-# copy lands under docs_dir (Zensical builds everything there and has no
-# exclude list), and every target is gitignored. CHANGELOG.md needs no copy:
-# docs/site/changelog.md embeds it with a pymdownx.snippets include.
-_DOCS_STAGED_FILES = [
-    (
-        Path('docs/pytest-given-diagram.png'),
-        _DOCS_SITE / 'assets' / 'pytest-given-diagram.png',
-    ),
-    *(
+
+def _build_docs(session: nox.Session) -> None:
+    """Stage the files the site embeds, then build it strictly.
+
+    The staged files are single-sourced elsewhere in the repo: the diagram, and
+    every example's rendered report (one `<name>/<name>.html` per example
+    directory). Each copy lands under docs_dir (Zensical builds everything there
+    and has no exclude list), and every target is gitignored. CHANGELOG.md needs
+    no copy: docs/site/changelog.md embeds it with a pymdownx.snippets include.
+    """
+    _sync(session, 'docs')
+    staged = [
         (
-            Path('examples') / name / f'{name}.html',
-            _DOCS_SITE / 'examples' / f'{name}.html',
-        )
-        for name in (
-            'coffeeshop',
-            'hotel-booking',
-            'file-glossary-booking',
-            'self-report',
-        )
-    ),
-]
-
-
-def _stage_docs(session: nox.Session) -> None:
-    for source, target in _DOCS_STAGED_FILES:
+            Path('docs/pytest-given-diagram.png'),
+            _DOCS_SITE / 'assets' / 'pytest-given-diagram.png',
+        ),
+        *(
+            (report, _DOCS_SITE / 'examples' / report.name)
+            for report in sorted(Path('examples').glob('*/*.html'))
+        ),
+    ]
+    for source, target in staged:
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
         session.log(f'staged {source} -> {target}')
+    session.run('zensical', 'build', '--strict')
 
 
 @nox.session
 def docs_build(session: nox.Session) -> None:
     """Stage the embedded reports and diagram, then build the site."""
-    _sync(session, 'docs')
-    _stage_docs(session)
-    session.run('zensical', 'build', '--strict')
+    _build_docs(session)
 
 
 @nox.session
@@ -447,10 +442,8 @@ def docs_deploy(session: nox.Session) -> None:
     if not 1 <= len(session.posargs) <= 2:
         session.error('usage: nox -s docs_deploy -- <version> [alias]')
     version, *aliases = session.posargs
-    _sync(session, 'docs')
-    _stage_docs(session)
     # mike runs its own (non-strict) build; this one is the gate.
-    session.run('zensical', 'build', '--strict')
+    _build_docs(session)
     session.run('mike', 'deploy', '--push', '--update-aliases', version, *aliases)
     # The site root follows `latest` once a release exists; before that, `dev`.
     if 'latest' in aliases:

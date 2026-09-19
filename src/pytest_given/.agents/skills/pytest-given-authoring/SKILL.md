@@ -23,7 +23,7 @@ Read the guide for the artifact you are about to touch — not all of them:
 | Modeling questions (actors vs work objects, granularity), or the project's first story | `references/domain-storytelling.md` |
 | Exact signatures, imports, step-text forms (t-string vs `Template`), parametrize behavior | `references/api.md` |
 
-`references/api.md` matches the installed package version — prefer it over external docs for syntax questions. Setup tasks (installing pytest-given, enabling report output or the narration lint in CI) are out of scope for these guides; see the project documentation at <https://nwilbert.github.io/pytest-given/dev/>.
+`references/api.md` matches the installed package version — prefer it over external docs for syntax questions. Setup tasks (installing pytest-given, enabling report output or the narration lint in CI) are out of scope for these guides; see the project documentation at <https://nwilbert.github.io/pytest-given/>.
 
 ## When the report doesn't show what you expect
 

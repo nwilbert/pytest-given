@@ -16,8 +16,8 @@ mistake shipped to PyPI is permanent.
 - [ ] **First release with the documentation site (0.3.0) only:** the release
       publishes `/latest/` for the first time, so repoint every `/dev/` docs link
       to `/latest/` in the same bump commit — `README.md`,
-      `src/pytest_given/cli/report.py`, `src/pytest_given/plugin/options.py`, and
-      `SKILL.md`, `references/api.md`, `references/scenarios.md` under
+      `SOURCE_LINK_HELP` in `src/pytest_given/report/source_link.py`, and
+      `references/scenarios.md` under
       `src/pytest_given/.agents/skills/pytest-given-authoring/`
       (`grep -rn "pytest-given/dev/"` finds them all, `AGENTS.md` included).
       Expect the TestPyPI rehearsal's link check (step 2) to 404 on those

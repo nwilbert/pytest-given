@@ -17,6 +17,7 @@ from ..model import PytestGivenError
 from ..report import (
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
+    SOURCE_LINK_HELP,
     SinkConfig,
     resolve_source_link_template,
 )
@@ -69,11 +70,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption(
         '--given-source-link',
         default=None,
-        help=(
-            'Source-link template or preset (vscode, cursor, zed, pycharm, '
-            'github, none). Variables: '
-            'https://nwilbert.github.io/pytest-given/dev/configuration/source-links/'
-        ),
+        help=SOURCE_LINK_HELP,
     )
     group.addoption(
         '--given-title',

@@ -32,6 +32,14 @@ _ALL_PRESET_NAMES = frozenset(_STATIC_PRESETS) | {'github'}
 
 _VALID_VARS = frozenset({'path', 'relpath', 'line', 'project', 'sha'})
 
+# The one help text for `--given-source-link` and the CLI's `--source-link`,
+# so the two entry points advertise the same presets and the same docs page.
+SOURCE_LINK_HELP = (
+    'Source-link template or preset (vscode, cursor, zed, pycharm, github, '
+    'none). Variables: '
+    'https://nwilbert.github.io/pytest-given/dev/configuration/source-links/'
+)
+
 
 def _valid_vars() -> str:
     """The substitutable variables, for the messages that list them."""

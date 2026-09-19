@@ -13,8 +13,6 @@ from pytest_given.model import (
     ActivityPath,
     ActivityTermRef,
     ActivityWord,
-    Glossary,
-    GlossaryTerm,
     Metadata,
     Narration,
     NarrationTermRef,
@@ -119,12 +117,6 @@ def _story_report() -> ReportData:
     nothing narrates (`guest confirm booking`), and an under-anchored one
     (`guest browses listings`); a single bound scenario whose one step narrates
     the first."""
-    glossary = Glossary()
-    for term_id in ('guest', 'search', 'room', 'confirm', 'booking'):
-        glossary.register(
-            GlossaryTerm(id=TermId(term_id), kind=None, canonical=term_id)
-        )
-
     story = Story(
         id=StoryId('book'),
         title='Book',
@@ -176,7 +168,6 @@ def _story_report() -> ReportData:
             )
         ],
         stories=[story],
-        glossary=glossary,
     )
 
 

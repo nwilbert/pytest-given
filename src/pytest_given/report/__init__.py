@@ -15,11 +15,16 @@ from .sinks import (
     emit_sinks,
     sink_failure,
 )
-from .source_link import detect_commit_sha, resolve_source_link_template
+from .source_link import (
+    SOURCE_LINK_HELP,
+    detect_commit_sha,
+    resolve_source_link_template,
+)
 
 __all__ = [
     'DEFAULT_HTML_PATH',
     'DEFAULT_JSON_PATH',
+    'SOURCE_LINK_HELP',
     'RenderedFile',
     'RenderedSinks',
     'SinkConfig',

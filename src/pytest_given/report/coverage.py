@@ -106,13 +106,7 @@ def is_coverage_eligible(activity: Activity) -> bool:
     least two distinct glossary term refs. Under-anchored activities (0 or 1
     distinct term) are excluded from it, and render 'not coverage-tracked'
     unless an `activity=` pin covers them anyway."""
-    term_ids = {
-        part.term_id
-        for activity_path in activity.paths
-        for part in activity_path.parts
-        if isinstance(part, ActivityTermRef)
-    }
-    return len(term_ids) >= 2
+    return len(a_refs(activity)) >= 2
 
 
 def compute_coverage(scenario: Scenario, index: StoryIndex) -> set[ActivityId]:
