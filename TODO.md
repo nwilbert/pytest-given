@@ -8,7 +8,6 @@
 
 - [ ] Markdown rendering for review: opt-in `--given-md-source` inlining each scenario's body, plus a Stories section from the production coverage rollups — retires the two scripts the reviewing skill ships (see `docs/specs/proposed/2026-09-04-markdown-review-rendering-design.md`)
 - [ ] Add sort option in Glossary, to sort by number of scenarios, instances, or stories
-- [ ] check support for https://library-skills.io/
 - [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios
 - [ ] Glossary: Optionally hide kind? Group / filter by story?

@@ -189,7 +189,7 @@ def test_the_documented_rule_tables_match_the_catalog() -> None:
     root = Path(__file__).resolve().parents[3]
     skill = (
         root
-        / 'src/pytest_given/skills_data/pytest-given-authoring'
+        / 'src/pytest_given/.agents/skills/pytest-given-authoring'
         / 'references/scenarios.md'
     )
     for doc in (root / 'README.md', skill):

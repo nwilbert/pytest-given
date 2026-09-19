@@ -13,6 +13,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
+- The bundled skills ship under `pytest_given/.agents/skills/` in the wheel, so downstream projects can also install them with [library-skills](https://library-skills.io) (`uvx library-skills install --claude`) alongside the skills of their other dependencies. `pytest-given skills install` keeps working as before.
 - The JSON report carries a top-level `coverage` key — one record per story activity with `tracked` and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.
 
 ### Changed

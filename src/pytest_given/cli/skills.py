@@ -89,7 +89,7 @@ def _report_drift(dest: Path) -> int:
 
 def _bundled_skill_tree() -> SkillTree:
     tree: SkillTree = {}
-    _collect(files('pytest_given') / 'skills_data', PurePosixPath(), tree)
+    _collect(files('pytest_given') / '.agents' / 'skills', PurePosixPath(), tree)
     return tree
 
 

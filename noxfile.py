@@ -1,3 +1,4 @@
+import json
 import shutil
 import tempfile
 import webbrowser
@@ -150,7 +151,7 @@ def test_smoke():
 _REQUIRED_WHEEL_PATHS = (
     'pytest_given/py.typed',
     'pytest_given/report/templates/',
-    'pytest_given/skills_data/',
+    'pytest_given/.agents/skills/',
 )
 
 
@@ -186,6 +187,7 @@ def build(session: nox.Session) -> None:
         session.error(f'{wheel.name} is missing {", ".join(missing)}')
 
     _smoke_test_install(session, '--with', str(wheel), described_as=wheel.name)
+    _check_library_skills_discovery(session, wheel)
     session.log(f'{wheel.name} passed packaging checks and a live smoke run')
 
 
@@ -226,6 +228,71 @@ def _smoke_test_install(
         finally:
             # Windows cannot remove a directory that is still the cwd.
             session.chdir(project_root)
+
+
+# `library-skills scan` lists skills of the project's direct dependencies only,
+# so the throwaway consumer has to name pytest-given as one.
+_CONSUMER_PYPROJECT = """[project]
+name = "consumer"
+version = "0.0.0"
+dependencies = ["pytest-given"]
+"""
+
+
+def _check_library_skills_discovery(session: nox.Session, wheel: Path) -> None:
+    """Verify that `library-skills` discovers every bundled skill from the wheel.
+
+    Sets up what a downstream project looks like — a `pyproject.toml` naming
+    pytest-given as a dependency and a `.venv` with the wheel installed — and
+    scans it the way a consumer would. `_REQUIRED_WHEEL_PATHS` only proves the
+    skills directory is in the wheel; this proves the scanner's convention
+    (`.agents/skills/<name>/SKILL.md`, name matching the directory) holds for
+    each skill, which is what makes `uvx library-skills install` work for
+    consumers.
+    """
+    expected = sorted(
+        skill.name
+        for skill in (Path('src') / 'pytest_given' / '.agents' / 'skills').iterdir()
+        if skill.is_dir()
+    )
+    _sync(session, 'build')
+    project_root = Path.cwd()
+    with tempfile.TemporaryDirectory() as tmp:
+        workdir = Path(tmp)
+        (workdir / 'pyproject.toml').write_text(_CONSUMER_PYPROJECT, encoding='utf-8')
+        session.chdir(workdir)
+        try:
+            session.run('uv', 'venv', '--quiet', '.venv', external=True)
+            session.run(
+                'uv',
+                'pip',
+                'install',
+                '--quiet',
+                '--python',
+                '.venv',
+                str(wheel),
+                external=True,
+            )
+            # nox exports UV_PROJECT_ENVIRONMENT=<session venv>, which
+            # library-skills honors before the nearest `.venv` — so point it
+            # at the consumer's environment explicitly.
+            scan = session.run(
+                'library-skills',
+                'scan',
+                '--json',
+                env={'UV_PROJECT_ENVIRONMENT': '.venv'},
+                silent=True,
+            )
+        finally:
+            session.chdir(project_root)
+    assert isinstance(scan, str)
+    discovered = sorted(skill['name'] for skill in json.loads(scan)['skills'])
+    if discovered != expected:
+        session.error(
+            f'library-skills discovered {discovered} in {wheel.name}, '
+            f'expected {expected}'
+        )
+    session.log(f'library-skills discovers {", ".join(discovered)}')
 
 
 @nox.session

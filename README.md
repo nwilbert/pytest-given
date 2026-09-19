@@ -16,10 +16,12 @@ pip install pytest-given
 
 Requires **Python ≥ 3.14** (t-strings — [PEP 750](https://peps.python.org/pep-0750/) — are part of the step-text API) and **pytest ≥ 9.0**.
 
-If AI agents work in your repo, also install the bundled [agent skills](#agent-skills):
+If AI agents work in your repo, also install the bundled [agent skills](#agent-skills) — with pytest-given's own command, or with [library-skills](https://library-skills.io) alongside the skills of your other dependencies:
 
 ```bash
 pytest-given skills install
+# or
+uvx library-skills install --claude
 ```
 
 Then narrate a test:
@@ -493,17 +495,20 @@ What the agent itself gets out of it:
 - **A controlled vocabulary.** A `Glossary` — or a `FileGlossary` over the `GLOSSARY.md` you already keep — gives the agent a stable set of domain terms to narrate with, keeping naming consistent across sessions.
 - **Early, typed errors.** Misusing a step-text form (a t-string on a decorator, a `Template` in a test body) raises `PytestGivenError` immediately with a clear message — cheap for an agent to learn from.
 
-Adopt selectively: decorate the tests that assert behavior, and leave plumbing (trivial getters, constructors, round-trips) as plain tests — they add report noise, not signal. pytest-given's own suite decorates about a fifth of its tests. Codify your narration conventions where agents will read them; the bundled [authoring skill](https://github.com/nwilbert/pytest-given/blob/main/src/pytest_given/skills_data/pytest-given-authoring/SKILL.md) ships a battle-tested set of rules for keeping narration truthful.
+Adopt selectively: decorate the tests that assert behavior, and leave plumbing (trivial getters, constructors, round-trips) as plain tests — they add report noise, not signal. pytest-given's own suite decorates about a fifth of its tests. Codify your narration conventions where agents will read them; the bundled [authoring skill](https://github.com/nwilbert/pytest-given/blob/main/src/pytest_given/.agents/skills/pytest-given-authoring/SKILL.md) ships a battle-tested set of rules for keeping narration truthful.
 
 ### Agent skills
 
-`pytest-given skills install` copies the bundled [Agent Skills](https://agentskills.io) into your repo's `.claude/skills/`, where Claude Code (and other harnesses following the same format) auto-discover them. Three ship:
+Three [Agent Skills](https://agentskills.io) ship in the wheel, under `pytest_given/.agents/skills/`:
 
 - **`pytest-given-authoring`** — a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories.
 - **`pytest-given-navigating`** — exploring a codebase through its rendered reports instead of grepping test bodies.
 - **`pytest-given-reviewing`** — a layered review of narrated tests: the narration lint as the structural gate, a semantic audit of step text against step bodies, a completeness audit of what the report leaves out, then a hygiene pass over the glossary, tags and stories.
 
-The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` exits 1 on drift, for a CI guard. Use `--dest` for a non-default skills directory.
+Two ways to get them into your repo, where Claude Code (and other harnesses following the same format) auto-discover them:
+
+- **`pytest-given skills install`** copies them into `.claude/skills/`. The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` exits 1 on drift, for a CI guard. Use `--dest` for a non-default skills directory.
+- **`uvx library-skills install --claude`** — [library-skills](https://library-skills.io) scans your project's dependencies for bundled skills and links them into `.agents/skills/` (and, with `--claude`, `.claude/skills/`), so one command covers pytest-given and every other library that ships skills. Symlinks track upgrades automatically; on Windows without developer mode add `--copy`.
 
 ## Development
 

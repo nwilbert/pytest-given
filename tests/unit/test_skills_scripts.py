@@ -53,7 +53,8 @@ def _run(reference: str, cwd: Path, *args: str) -> str:
     """Run the one python block of a bundled reference, from `cwd`."""
     text = (
         files('pytest_given')
-        / 'skills_data'
+        / '.agents'
+        / 'skills'
         / 'pytest-given-reviewing'
         / 'references'
         / reference
