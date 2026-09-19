@@ -1,12 +1,13 @@
 # Report JSON shape
 
-`pytest <selection> --given-json=report.json` writes one file with four top-level keys:
+`pytest <selection> --given-json=report.json` writes one file with five top-level keys:
 
 ```
 metadata      project, title, timestamp, pytest_version, plugin_version, commit_sha
 scenarios[]   one entry per @scenario (parametrized cases grouped into one)
 glossary      {terms: [...]} — every declared term, referenced or not; null on a suite with no glossary
 stories[]     one entry per story(...)
+coverage[]    one entry per story activity — which scenarios cover it
 ```
 
 ## Scenario
@@ -55,6 +56,10 @@ Term ids and story ids are slugs: lowercased, non-alphanumeric runs → `-` (`La
 
 `{id, title, activities: [{id, paths: [{parts: [...]}]}], source}` — activity ids are what `activity_ids` on scenarios and steps point at. An activity part is either `{term_id, display}` (a glossary term) or `{text}` (a bare connective word, which carries no id and never counts for coverage), so filter parts on `term_id` rather than assuming every one has it.
 
+## Coverage
+
+`{story_id, activity_id, tracked, scenario_ids: [...]}` — the same per-activity coverage the Stories tab renders, one record per activity of every story, in story then activity order. `scenario_ids` are the node ids of the scenarios covering the activity; `tracked: false` marks an activity the report can say nothing about (fewer than two glossary terms and no `activity=` pin reaching it — the Stories tab's "not coverage-tracked"), which is a gap in vocabulary, not in tests. **Read coverage from here rather than recomputing it from `steps[]`**: the matching rule works on term *identities* (display-derived instances with a canonical fallback, pins replacing narration), and reimplementing it from `term_id`s gets the answer wrong.
+
 ## Recipes
 
 ```bash
@@ -75,6 +80,14 @@ jq -r '.scenarios[] | select(.tags | index("validation")) | .narration.text' rep
 
 # Scenarios implementing a story
 jq -r '.scenarios[] | select(.story_id == "lend-and-return-a-book") | .narration.text' report.json
+
+# Uncovered activities (tracked ones no scenario covers), as story#activity
+jq -r '.coverage[] | select(.tracked and .scenario_ids == [])
+       | .story_id + "#" + (.activity_id|tostring)' report.json
+
+# Which scenarios cover one activity
+jq -r '.coverage[] | select(.story_id == "lend-and-return-a-book" and .activity_id == 3)
+       | .scenario_ids[]' report.json
 
 # Every term with its definition
 jq -r '.glossary.terms[] | .canonical + ": " + .definition' report.json

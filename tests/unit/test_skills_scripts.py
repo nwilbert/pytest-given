@@ -1,4 +1,4 @@
-"""Runs the scripts the reviewing skill ships in its references.
+"""Runs the script the reviewing skill ships in its references.
 
 To the packaging tests a reference is prose; to its reader it is code that
 walks the report schema, and nothing else holds the two together. Each test
@@ -15,23 +15,12 @@ from importlib.resources import files
 from pathlib import Path
 
 from pytest_given.model import (
-    Activity,
-    ActivityId,
-    ActivityPath,
-    ActivityTermRef,
-    Glossary,
-    GlossaryTerm,
     Metadata,
     Narration,
-    NarrationTermRef,
     NodeId,
     ReportData,
     Scenario,
     SourceLocation,
-    Step,
-    Story,
-    StoryId,
-    TermId,
     report_to_dict,
 )
 
@@ -113,62 +102,3 @@ def test_pairs_script_dumps_each_narration_beside_its_test(tmp_path: Path) -> No
     # The whole test, decorator included, under real line numbers.
     assert f'{_DEMO_LINE - 1}\t@scenario' in dump
     assert "with then('it is one'):" in dump
-
-
-def _term_path(*term_ids: str) -> ActivityPath:
-    return ActivityPath(
-        parts=tuple(
-            ActivityTermRef(term_id=TermId(tid), display=tid) for tid in term_ids
-        )
-    )
-
-
-def test_story_coverage_script_names_only_the_uncovered_activity(
-    tmp_path: Path,
-) -> None:
-    glossary = Glossary()
-    for term_id in ('guest', 'search', 'room', 'confirm', 'booking'):
-        glossary.register(
-            GlossaryTerm(id=TermId(term_id), kind=None, canonical=term_id)
-        )
-    story = Story(
-        id=StoryId('book'),
-        title='Book',
-        activities=(
-            Activity(id=ActivityId(1), paths=(_term_path('guest', 'search', 'room'),)),
-            Activity(
-                id=ActivityId(2), paths=(_term_path('guest', 'confirm', 'booking'),)
-            ),
-        ),
-    )
-    step = Step(
-        phase='when',
-        narration=Narration(
-            text='a guest searches a room',
-            parts=tuple(
-                NarrationTermRef(term_id=TermId(tid), display=tid)
-                for tid in ('guest', 'search', 'room')
-            ),
-        ),
-    )
-    _write_report(
-        tmp_path,
-        ReportData(
-            metadata=_meta(),
-            scenarios=[
-                Scenario(
-                    id=NodeId('tests/test_demo.py::test_demo'),
-                    narration=Narration(text='A demo scenario'),
-                    module='tests.test_demo',
-                    steps=[step],
-                    story_id=StoryId('book'),
-                )
-            ],
-            stories=[story],
-            glossary=glossary,
-        ),
-    )
-
-    output = _run('story-coverage.md', tmp_path, 'report.json')
-
-    assert output.split() == ['UNCOVERED', 'book#2']

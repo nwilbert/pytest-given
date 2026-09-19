@@ -11,6 +11,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Added
+
+- The JSON report carries a top-level `coverage` key — one record per story activity with `tracked` and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.
+
 ### Fixed
 
 - `when_then(...)` rejects a `Template` narration in a test body, as `given`/`when`/`then` already do.

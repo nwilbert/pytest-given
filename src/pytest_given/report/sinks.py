@@ -21,9 +21,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, NamedTuple
 
-from ..model import PytestGivenError, report_from_dict
+from ..model import PytestGivenError, ReportData, report_from_dict
 from .html_renderer import render_html_string
 from .md_renderer import render_md
+from .story_view import build_coverage_records
 
 # Where a bare --given-json / --given-html / `pytest-given report` writes.
 # Report-layout facts, so both entry points read them from here rather than
@@ -130,14 +131,14 @@ def render_sinks(
     """Render the configured sinks to text. Nothing here touches the filesystem.
 
     Takes only the serialized report and deserializes it here, so the JSON sink
-    can write the dict verbatim while the other two render from a copy that has
-    been through serde — every sink then shows exactly what the JSON can
-    express, and no caller has to keep two views of one run in agreement.
+    writes the dict itself while the other two render from a copy that has been
+    through serde — every sink then shows exactly what the JSON can express,
+    and no caller has to keep two views of one run in agreement.
     """
     report = report_from_dict(report_dict, source)
     files: list[RenderedFile] = []
     if config.json_path is not None:
-        files.append(RenderedFile(config.json_path, json.dumps(report_dict, indent=2)))
+        files.append(RenderedFile(config.json_path, render_json(report_dict, report)))
     if config.html_path is not None:
         files.append(
             RenderedFile(
@@ -155,6 +156,14 @@ def render_sinks(
         if config.md_path is not None:
             files.append(RenderedFile(config.md_path, md))
     return RenderedSinks(files=files, md_stdout=md_stdout)
+
+
+def render_json(report_dict: dict[str, Any], report: ReportData) -> str:
+    """The dict plus its derived sections. `report_from_dict` reads none of
+    them, so a saved report re-rendered through `pytest-given report` recomputes
+    them rather than carrying a stale copy."""
+    json_dict = {**report_dict, 'coverage': build_coverage_records(report)}
+    return json.dumps(json_dict, indent=2)
 
 
 def write_sinks(rendered: RenderedSinks) -> None:

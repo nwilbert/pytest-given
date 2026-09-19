@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-06T10:47:14.881760+00:00",
+    "timestamp": "2026-09-19T06:54:25.363610+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "86997a32917fcfc2d139e149061869c62b5cb20e",
+    "commit_sha": "8475ddf56c8cfde22a9ce2606c0a51da444ff62f",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -26,7 +26,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -134,7 +134,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -272,7 +272,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -443,7 +443,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -509,7 +509,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -785,7 +785,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -907,7 +907,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1000,7 +1000,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -1076,7 +1076,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 70,
+      "duration_ms": 66,
       "steps": [
         {
           "phase": "given",
@@ -1331,7 +1331,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -1431,7 +1431,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1501,7 +1501,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1602,7 +1602,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -1701,7 +1701,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 702,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -1823,7 +1823,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1362,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -1927,7 +1927,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -2004,7 +2004,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 79,
+      "duration_ms": 75,
       "steps": [
         {
           "phase": "given",
@@ -3489,7 +3489,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -3574,7 +3574,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -3676,7 +3676,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -3874,7 +3874,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -3965,7 +3965,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -4593,7 +4593,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -5006,7 +5006,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -12891,7 +12891,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -18392,7 +18392,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 82,
+      "duration_ms": 86,
       "steps": [
         {
           "phase": "given",
@@ -19302,6 +19302,205 @@
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 512
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_sinks.py::test_json_sink_carries_per_activity_coverage",
+      "narration": {
+        "text": "The JSON report carries each activity's coverage",
+        "parts": [
+          {
+            "value": "The JSON report carries each "
+          },
+          {
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg['Activity'].low"
+          },
+          {
+            "value": "'s "
+          },
+          {
+            "term_id": "coverage",
+            "display": "coverage",
+            "expression": "pg['Coverage'].low"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_sinks",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Story with a covered, an uncovered, an untracked Activity",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              },
+              {
+                "value": " with a covered, an uncovered, an untracked "
+              },
+              {
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the JSON sink is rendered",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a top-level `coverage` lists every activity once",
+            "parts": [
+              {
+                "value": "a top-level `coverage` lists every "
+              },
+              {
+                "term_id": "activity",
+                "display": "activity",
+                "expression": "pg[\"Activity\"].low"
+              },
+              {
+                "value": " once"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the rest of the report is the input dict, unchanged",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_sinks.py",
+        "line": 188
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_sinks.py::test_json_sink_replaces_incoming_coverage",
+      "narration": {
+        "text": "A re-rendered report recomputes coverage rather than carrying it",
+        "parts": [
+          {
+            "value": "A re-rendered report recomputes "
+          },
+          {
+            "term_id": "coverage",
+            "display": "coverage",
+            "expression": "pg[\"Coverage\"].low"
+          },
+          {
+            "value": " rather than carrying it"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_sinks",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a saved report dict whose `coverage` no longer matches its steps",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "`pytest-given report` re-renders it to JSON",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the coverage is the one the steps actually earn",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "coverage",
+                "display": "coverage",
+                "expression": "pg[\"Coverage\"].low"
+              },
+              {
+                "value": " is the one the "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].low"
+              },
+              {
+                "value": "s actually earn"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_sinks.py",
+        "line": 222
       },
       "story_id": null,
       "activity_ids": []
@@ -23187,6 +23386,124 @@
         "relpath": "tests/ubiquitous_language.py",
         "line": 53
       }
+    }
+  ],
+  "coverage": [
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 1,
+      "tracked": true,
+      "scenario_ids": []
+    },
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 2,
+      "tracked": true,
+      "scenario_ids": [
+        "tests/unit/capture/test_story.py::test_activity_single_path_synthesizes_one_path",
+        "tests/unit/capture/test_story.py::test_activity_multi_path_accepts_multiple_paths",
+        "tests/unit/capture/test_story.py::test_story_auto_numbers_activities_from_one"
+      ]
+    },
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 3,
+      "tracked": true,
+      "scenario_ids": [
+        "tests/unit/capture/test_glossary.py::test_glossary_actor_registers_and_returns_handle",
+        "tests/unit/capture/test_glossary.py::test_glossary_re_registration_with_matching_fields_is_idempotent",
+        "tests/unit/capture/test_glossary.py::test_call_declares_kindless_term"
+      ]
+    },
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 4,
+      "tracked": true,
+      "scenario_ids": [
+        "tests/unit/capture/test_template.py::test_tstring_with_file_term_handle_emits_term_ref"
+      ]
+    },
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 5,
+      "tracked": true,
+      "scenario_ids": [
+        "tests/unit/capture/test_step_descriptor.py::test_context_manager_basic",
+        "tests/unit/capture/test_step_descriptor.py::test_when_then_records_two_sibling_steps_on_clean_exit",
+        "tests/unit/capture/test_step_descriptor.py::test_when_then_allows_nested_when_as_child_sub_step"
+      ]
+    },
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 6,
+      "tracked": true,
+      "scenario_ids": [
+        "tests/unit/capture/test_collector.py::test_attach_during_fixture_setup_records_into_recording"
+      ]
+    },
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 7,
+      "tracked": true,
+      "scenario_ids": [
+        "tests/unit/capture/test_collector.py::test_collect_steps",
+        "tests/unit/capture/test_collector.py::test_push_step_during_fixture_setup_records_into_recording",
+        "tests/unit/capture/test_collector.py::test_push_step_routing_isolates_recording_from_scenario"
+      ]
+    },
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 8,
+      "tracked": true,
+      "scenario_ids": [
+        "tests/integration/test_plugin.py::test_step_fixture_appears_as_given_step",
+        "tests/unit/capture/test_collector.py::test_graft_recording_deep_copies_into_scenario",
+        "tests/unit/capture/test_collector.py::test_graft_leaf_given_appends_childless_given_step",
+        "tests/unit/capture/test_collector.py::test_graft_recording_override_replaces_root_narration_keeps_children"
+      ]
+    },
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 9,
+      "tracked": true,
+      "scenario_ids": [
+        "tests/integration/test_plugin.py::test_parametrized_test_as_table",
+        "tests/unit/test_grouping.py::test_group_parametrized_any_failed_groups_as_failed",
+        "tests/unit/test_grouping.py::test_group_parametrized_keeps_source_order",
+        "tests/unit/test_percase.py::test_opted_out_group_emits_one_scenario_per_case"
+      ]
+    },
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 10,
+      "tracked": true,
+      "scenario_ids": [
+        "tests/unit/report/test_html_renderer.py::test_render_parametrized_step_with_structured_narration"
+      ]
+    },
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 11,
+      "tracked": true,
+      "scenario_ids": [
+        "tests/integration/test_plugin_lint.py::test_enabled_error_finding_fails_the_run",
+        "tests/integration/test_plugin_lint.py::test_warn_override_prints_but_does_not_fail",
+        "tests/integration/test_plugin_lint.py::test_lint_error_does_not_mask_a_more_specific_exit_code",
+        "tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body",
+        "tests/unit/lint/test_ast_rules.py::test_then_without_check_fires",
+        "tests/unit/lint/test_ast_rules.py::test_check_outside_then_fires_on_assert_in_given_or_when[given]",
+        "tests/unit/lint/test_ast_rules.py::test_action_in_then_fires_when_no_when_exists",
+        "tests/unit/lint/test_ast_rules.py::test_unused_interpolation_fires_on_unused_bare_identifier",
+        "tests/unit/lint/test_runtime_rules.py::test_missing_phase_fires_on_passed_two_phase_scenario",
+        "tests/unit/lint/test_runtime_rules.py::test_tag_shadows_term_fires_once_per_unique_tag",
+        "tests/unit/lint/test_runtime_rules.py::test_dead_term_flags_unreferenced_term"
+      ]
+    },
+    {
+      "story_id": "adopt-pytest-given",
+      "activity_id": 12,
+      "tracked": true,
+      "scenario_ids": []
     }
   ]
 }

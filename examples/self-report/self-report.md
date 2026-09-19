@@ -2078,6 +2078,21 @@
     - **when** act
     ```
 
+## ✓ The JSON report carries each «activity»'s «coverage»
+`tests/unit/report/test_sinks.py:188::test_json_sink_carries_per_activity_coverage`
+
+- **given** a «Story» with a covered, an uncovered, an untracked «Activity»
+- **when** the JSON sink is rendered
+- **then** a top-level `coverage` lists every «activity» once
+- **then** the rest of the report is the input dict, unchanged
+
+## ✓ A re-rendered report recomputes «coverage» rather than carrying it
+`tests/unit/report/test_sinks.py:222::test_json_sink_replaces_incoming_coverage`
+
+- **given** a saved report dict whose `coverage` no longer matches its steps
+- **when** `pytest-given report` re-renders it to JSON
+- **then** the «coverage» is the one the «step»s actually earn
+
 ## ✓ The literal `none` disables the «source link»
 `tests/unit/report/test_source_link.py:29::test_resolve_template_none_returns_none`
 

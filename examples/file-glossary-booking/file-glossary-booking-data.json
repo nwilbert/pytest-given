@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-04T12:49:49.279831+00:00",
+    "timestamp": "2026-09-19T06:08:56.932335+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "a21d79a04634eac9171687bd9575f58f453d8d01",
+    "commit_sha": "8475ddf56c8cfde22a9ce2606c0a51da444ff62f",
     "title": "File Glossary Example"
   },
   "scenarios": [
@@ -401,6 +401,31 @@
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
         "line": 42
       }
+    }
+  ],
+  "coverage": [
+    {
+      "story_id": "book-a-room",
+      "activity_id": 1,
+      "tracked": false,
+      "scenario_ids": []
+    },
+    {
+      "story_id": "book-a-room",
+      "activity_id": 2,
+      "tracked": true,
+      "scenario_ids": [
+        "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room",
+        "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room"
+      ]
+    },
+    {
+      "story_id": "book-a-room",
+      "activity_id": 3,
+      "tracked": true,
+      "scenario_ids": [
+        "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room"
+      ]
     }
   ]
 }

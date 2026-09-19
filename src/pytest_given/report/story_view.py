@@ -1,8 +1,9 @@
 """The Stories view's rollups: which activities each scenario covers, and the
-per-story tallies the template reads.
+per-story tallies the Stories tab and the JSON `coverage` section read.
 """
 
 from dataclasses import dataclass, field
+from typing import TypedDict
 
 from ..model import (
     ActivityId,
@@ -13,7 +14,7 @@ from ..model import (
     Scenario,
     StoryId,
 )
-from .coverage import CoverageMap, is_coverage_eligible
+from .coverage import CoverageMap, build_coverage_map, is_coverage_eligible
 
 type ActivityKey = str
 """`'<story id>:<activity id>'` — an activity's handle outside its own story.
@@ -100,6 +101,32 @@ def build_story_rollups(
             )
         rollups[story.id] = StoryRollup(scenarios=scenarios, per_activity=per_activity)
     return rollups
+
+
+class CoverageRecord(TypedDict):
+    """One activity's coverage as the JSON report carries it, under the
+    top-level `coverage` key — in story then activity order."""
+
+    story_id: StoryId
+    activity_id: ActivityId
+    tracked: bool
+    scenario_ids: list[NodeId]
+
+
+def build_coverage_records(report: ReportData) -> list[CoverageRecord]:
+    """Built from the rollups the Stories tab renders, so the JSON and the
+    HTML cannot disagree on what is covered."""
+    rollups = build_story_rollups(report, build_coverage_map(report))
+    return [
+        CoverageRecord(
+            story_id=story_id,
+            activity_id=activity_id,
+            tracked=not coverage.untracked,
+            scenario_ids=coverage.scenario_ids,
+        )
+        for story_id, rollup in rollups.items()
+        for activity_id, coverage in rollup.per_activity.items()
+    ]
 
 
 def build_scenario_activity_index(
