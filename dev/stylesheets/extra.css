@@ -149,3 +149,83 @@
   color: #3f1d4e;
   border-color: #fff;
 }
+
+/* Home diagram: an inline SVG (assets/pytest-given-diagram.svg, which carries
+   its own artwork rules) whose colours are these tokens, so it follows the brand
+   and the colour scheme. One hue in two weights: actors (people and agents)
+   tinted, artifacts solid. The README copy resolves the same tokens to literals
+   in noxfile.py's `diagram` session -- keep the two lists in step. */
+:root > * {
+  --pg-diagram-bg: var(--md-default-bg-color);
+  --pg-diagram-line: var(--md-default-fg-color--light);
+  --pg-diagram-panel: var(--md-code-bg-color);
+  --pg-diagram-panel-edge: var(--md-default-fg-color--lighter);
+  --pg-diagram-people-fill: var(--md-primary-fg-color--light);
+  --pg-diagram-people-ink: var(--md-primary-fg-color--dark);
+  --pg-diagram-artifact-fill: var(--md-primary-fg-color);
+  --pg-diagram-artifact-ink: #fff;
+}
+[data-md-color-scheme="slate"] {
+  --pg-diagram-people-fill: #352e3c; /* lilac at 22% over the slate page; opaque so the icon cut-out covers what it sits on */
+  --pg-diagram-people-ink: var(--md-primary-fg-color--light);
+  --pg-diagram-artifact-ink: var(--md-default-bg-color);
+}
+.pg-diagram {
+  margin: 1.5rem auto 2rem;
+  max-width: 36rem;
+}
+.pg-diagram-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0.5rem;
+  background: none;
+  color: inherit;
+  cursor: zoom-in;
+}
+.pg-diagram-open:focus-visible {
+  outline: 0.15rem solid var(--md-accent-fg-color);
+  outline-offset: 0.25rem;
+}
+.pg-diagram-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.pg-diagram-dialog {
+  width: min(92vw, 92vh);
+  max-width: none;
+  padding: 2.5rem 1rem 1rem;
+  border: 1px solid var(--md-default-fg-color--lighter); /* the page and the dialog share a background in slate */
+  border-radius: 0.5rem;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+}
+.pg-diagram-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+.pg-diagram-dialog svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.pg-diagram-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border: 0;
+  border-radius: 0.2rem;
+  background: none;
+  color: var(--md-default-fg-color--light);
+  font: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+.pg-diagram-close:hover,
+.pg-diagram-close:focus-visible {
+  color: var(--md-accent-fg-color);
+  background: var(--md-accent-fg-color--transparent);
+  outline: none;
+}
