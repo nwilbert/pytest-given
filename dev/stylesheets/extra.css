@@ -1,15 +1,18 @@
-/* The report's accent (styles.css --color-accent) so site and reports read as one product. */
+/* Aubergine brand colour: links, active nav, tab underline, hero. */
 :root > * {
-  --md-primary-fg-color: #2563eb;
-  --md-primary-fg-color--light: #dbeafe;
-  --md-primary-fg-color--dark: #1d4ed8;
-  --md-accent-fg-color: #1d4ed8;
-  --md-accent-fg-color--transparent: rgba(37, 99, 235, 0.1);
+  --md-primary-fg-color: #5b2c6f;
+  --md-primary-fg-color--light: #ead9f2;
+  --md-primary-fg-color--dark: #3f1d4e;
+  --md-accent-fg-color: #7a3d94;
+  --md-accent-fg-color--transparent: rgba(91, 44, 111, 0.1);
 }
 
 [data-md-color-scheme="slate"] {
-  --md-accent-fg-color: #60a5fa;
-  --md-accent-fg-color--transparent: rgba(96, 165, 250, 0.12);
+  --md-primary-fg-color: #c9a6dc;
+  --md-primary-fg-color--light: #e4d3ec;
+  --md-primary-fg-color--dark: #a985c0;
+  --md-accent-fg-color: #d9bce8;
+  --md-accent-fg-color--transparent: rgba(201, 166, 220, 0.14);
 }
 
 /* Home hero */
@@ -17,7 +20,7 @@
   margin: 0 0 2rem;
   padding: 1.5rem 1.75rem;
   border-radius: 0.5rem;
-  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #4a2159 0%, #2e1238 100%);
   color: #fff;
 }
 .pg-hero h1 {
@@ -51,6 +54,6 @@
 }
 .pg-hero .md-button--primary {
   background: #fff;
-  color: #1e3a8a;
+  color: #3f1d4e;
   border-color: #fff;
 }
