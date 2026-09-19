@@ -30,8 +30,7 @@ nav = [
 ]
 
 [project.theme]
-font.text = "Inter"
-font.code = "JetBrains Mono"
+font = false # fonts are self-hosted, see stylesheets/extra.css
 logo = "assets/logo.svg"
 favicon = "assets/favicon.svg"
 features = [
